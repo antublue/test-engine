@@ -1,0 +1,389 @@
+# AntuBLUE Test Engine
+
+The AntuBLUE Test Engine is a JUnit 5 based test engine that allows for parameterized testing at the test class level.
+
+## Why ?
+
+Currently, JUnit 5 does not support parameterized tests at the test class level
+- https://github.com/junit-team/junit5/issues/878
+
+## Latest Releases
+
+- General Availability (GA): [AntuBLUE Test Engine v2.0.5](https://github.com/antublue/test-engine/releases/tag/v2.0.5)
+
+## Common Annotations
+
+| Annotation                      | Scope  |  Required | Static | Example                                          |
+|---------------------------------|--------|-----------|--------|--------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | method | yes       | yes    | `public static Stream<Parameter> parameters();`  |
+| `@TestEngine.ParameterSetter`   | method | yes       | no     | `public void setParameter(Parameter parameter);` |
+| `@TestEngine.BeforeClass`       | method | no        | yes    | `public static void beforeClass();`              |
+| `@TestEngine.BeforeAll`         | method | no        | no     | `public void beforeAll();`                       |
+| `@TestEngine.BeforeEach`        | method | no        | no     | `public void beforeEach();`                      |
+| `@TestEngine.Test`              | method | yes       | no     | `public void test();`                            |
+| `@TestEngine.AfterEach`         | method | no        | no     | `public void afterEach();`                       |
+| `@TestEngine.AfterAll`          | method | no        | no     | `public void afterAll();`                        |
+| `@TestEngine.AfterClass`        | method | no        | yes    | `public static void afterClass();`               |
+
+**NOTES**
+
+- `public` and `protected` methods are supported for `@TestEngine.X` annotations
+
+
+- By default, methods are executed in alphabetical order based on a method name, regardless of where they are declared (class or superclasses)
+
+
+- `@TestEngine.Order` can be used to control method order
+  - Methods are sorted by the annotation value first, then alphabetically by the test method name
+  - Method order is relative to other methods with the same annotation
+
+## Additional Annotations
+
+| Annotation                  | Scope  | Required | Usage                                                                               |
+|-----------------------------|--------|----------|-------------------------------------------------------------------------------------|
+| `@TestEngine.BaseClass`     | class  | no       | Marks a test class as being a base class (skips direct execution)                   |
+| `@TestEngine.Order(<int>)`  | method | no       | Provides a way to order methods  relative to other methods with the same annotation |
+| `@TestEngine.Tag(<string>)` | class  | no       | Provides a way to tag a test class                                                  | 
+
+
+**Notes**
+
+- Only one `@TestEngine.Tag(<string>)` is supported for a test class.
+
+
+- It's recommended to use a tag string format of `/tag1/tag2/tag3/`
+
+## What is a `Parameter` ?
+
+`Parameter` is an interface all parameter objects must implement to allow for parameter name and value resolution
+
+The `Parameter` interface also has static methods to wrap an Object
+
+### Usage of `Parameter`
+
+- `@TestEngine.ParameterSupplier` must return a `Stream<Parameter>`
+
+
+- `@TestEngine.ParameterSetter` requires single `Parameter` object
+
+
+- The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name 
+  - `boolean`
+  - `byte`
+  - `char`
+  - `short`
+  - `int`
+  - `long`
+  - `float`
+  - `double`
+  - `String`
+
+Example
+
+```java
+    @TestEngine.ParameterSupplier
+    public static Stream<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            collection.add(
+                    Parameter.of(
+                            "Array [" + i + "]",
+                            new String[] { String.valueOf(i), String.valueOf(i * 2) }));
+        }
+        return collection.stream();
+    }
+```
+
+In this scenario, the value of the `Parameter` is a String[] array
+
+```java
+String[] values = paramater.value();
+```
+
+## Configuration values
+
+The AntuBLUE Test Engine has seven configuration parameters
+
+| Configuration                   | Type         | Java System Property                          | Environment Variable                          |
+|---------------------------------|--------------|-----------------------------------------------|-----------------------------------------------|
+| thread count                    | integer      | antublue.test.engine.thread.count           | ANTUBLUE_TEST_ENGINE_THREAD_COUNT           |
+| test class name include filter  | regex string | antublue.test.engine.test.class.include     | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE     |
+| test class name exclude filter  | regex string | antublue.test.engine.test.class.exclude     | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE     |
+| test method name include filter | regex string | antublue.test.engine.test.method.include    | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE    |
+| test method name exclude filter | regex string | antublue.test.engine.test.method.exclude    | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE    |
+| test class tag include filter   | regex string | antublue.test.engine.test.class.tag.include | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE |
+| test class tag exclude filter   | regex string | antublue.test.engine.test.class.tag.exclude | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE |
+
+Using a combination of the properties allows for running individual test classes / test methods
+
+**Notes**
+
+- Environment variables take precedence over Java system properties
+
+- If all test methods are excluded, then the test class will be excluded
+
+- If no test classes are found, an error exit code of -2 is returned
+
+## Example Test Class
+
+```java
+package org.antublue.test.engine.test.example;
+
+import api.org.antublue.test.engine.Parameter;
+import api.org.antublue.test.engine.TestEngine;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Stream;
+
+/**
+ * Example test
+ */
+public class ParameterTest {
+
+  private Parameter parameter;
+
+  @TestEngine.ParameterSupplier
+  public static Stream<Parameter> parameters() {
+    Collection<Parameter> collection = new ArrayList<>();
+
+    for (int i = 0; i < 10; i++) {
+      int value = i * 3;
+      collection.add(Parameter.of("argument(" + i + ") = " + value, String.valueOf(value)));
+    }
+
+    return collection.stream();
+  }
+
+  @TestEngine.ParameterSetter
+  public void setParameter(Parameter parameter) {
+    this.parameter = parameter;
+  }
+
+  @TestEngine.BeforeAll
+  public void beforeAll() {
+    System.out.println("beforeAll()");
+  }
+
+  @TestEngine.Test
+  public void test1() {
+    System.out.println("test1(" + parameter.value() + ")");
+  }
+
+  @TestEngine.Test
+  public void test2() {
+    System.out.println("test2(" + parameter.value() + ")");
+  }
+
+  @TestEngine.AfterAll
+  public void afterAll() {
+    System.out.println("afterAll()");
+  }
+}
+```
+
+Additional test examples...
+
+https://github.com/antublue/test-engine/tree/main/examples/src/main/java/example
+
+## Maven
+
+Add the AntuBLUE Test Engine Maven repository to your `pom.xml` file...
+
+```xml
+<repositories>
+    <repository>
+        <id>antublue-test-engine</id>
+        <url>https://repository.antublue.org/test-engine</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+</repositories>
+```
+
+Add the AntuBLUE Test Engine jars (and dependencies)...
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>org.antublue</groupId>
+    <artifactId>test-engine</artifactId>
+    <version>2.0.6</version>
+  </dependency>
+  <dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter-api</artifactId>
+    <version>5.9.2</version>
+  </dependency>
+  <dependency>
+    <groupId>org.junit.platform</groupId>
+    <artifactId>junit-platform-launcher</artifactId>
+    <version>1.9.2</version>
+  </dependency>
+  <dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter-engine</artifactId>
+    <version>5.9.2</version>
+  </dependency>
+</dependencies>
+```
+
+Disable the Maven Surefire plugin...
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>3.0.0</version>
+    <configuration>
+        <skipTests>true</skipTests>
+    </configuration>
+</plugin>
+```
+
+Add the `test-engine-maven-plugin` repository...
+
+```xml
+<pluginRepositories>
+    <pluginRepository>
+        <id>test-engine-maven-plugin</id>
+        <url>https://repository.antublue.org/test-engine-maven-plugin</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </pluginRepository>
+</pluginRepositories>
+```
+
+Add the `test-engine-maven-plugin`...
+
+```xml
+<plugin>
+    <groupId>org.antublue</groupId>
+    <artifactId>test-engine-maven-plugin</artifactId>
+    <version>0.0.3</version>
+    <configuration>
+        <java>
+            <classPath>core/target/*:core/target/dependencies/*:examples/target/*</classPath>
+        </java>
+    </configuration>
+    <executions>
+        <execution>
+            <phase>integration-test</phase>
+            <goals>
+                <goal>test</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
+Build and test your project...
+
+```bash
+mvn clean package integration-test
+```
+
+**Notes**
+
+- The AntuBLUE Test Engine requires core JUnit 5 jars as dependencies
+
+## Command Line (standalone) Usage
+
+The AntuBLUE Test Engine jar has the ability to run as a standalone executable, provided all dependencies are on the classpath
+
+Example:
+
+```bash
+java \
+  -cp "<directory of all your dependencies>/*" \
+  org.antublue.test.engine.TestEngine
+```
+
+## Design
+
+State Machine flow...
+
+```
+ Scan all classpath jars for test classes that contains a method annotated with "@TestEngine.Test"
+ 
+ for (each test class in the Collection<Class>) {
+ 
+    for each test class, create a thread
+    
+    thread {
+    
+        call "@TestEngine.ParameterSupplier" method to get a Stream<Parameter>
+    
+        execute "@TestEngine.BeforeClass" methods 
+     
+        create a single instance of the test class
+        
+        for (each Parameter in the Stream<Parameter>) {
+        
+            execute the "@TestEngine.ParameterSetter" method with the Parameter value
+            
+            execute "@TestEngine.BeforeAll" methods
+            
+            for (each "@TestEngine.Test" method in the test class) {
+            
+                execute "@TestEngine.BeforeEach" methods
+            
+                execute "@TestEngine.Test" method
+                
+                execute "@TestEngine.AfterEach" methods
+            }
+            
+            execute "@TestEngine.AfterAll" method
+        }
+        
+        execute "@TestEngine.AfterClass" methods
+    }
+ }
+```
+
+**Notes**
+
+- Each parameterized test class will be executed sequentially, but different test classes are executed in parallel threads
+  - By default, thread count is equal to number of available processors as reported by Java
+  - The thread count can be changed by the Java system property or environment variable
+
+# Building
+
+You need Java 8 or greater to build
+
+```shell
+git clone https://github.com/antublue/test-engine
+cd test-engine
+mvn clean package
+```
+
+To install to your local repository
+
+```shell
+mvn clean package install
+```
+
+## Getting Help
+
+GitHub's Discussions is the current mechanism for help / support
+
+## Contributing
+
+Contributions to the AntuBLUE Test Engine are both welcomed and appreciated.
+
+The project uses a simplified GitFlow branching strategy
+- `main` is the latest release
+- `development-<NEXT RELEASE>` is the next release
+
+For changes, you should...
+- Create a branch based on `development-<NEXT RELEASE>`
+- Make your changes
+- Open a PR against `development-<NEXT RELEASE>`
