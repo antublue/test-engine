@@ -1,3 +1,5 @@
+[![Build](https://github.com/antublue/test-engine/actions/workflows/build.yml/badge.svg)](https://github.com/antublue/test-engine/actions/workflows/build.yml)
+
 # AntuBLUE Test Engine
 
 The AntuBLUE Test Engine is a JUnit 5 based test engine that allows for parameterized testing at the test class level.
