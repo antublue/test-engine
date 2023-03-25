@@ -47,11 +47,12 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Additional Annotations
 
-| Annotation                  | Scope  | Required | Usage                                                                               |
-|-----------------------------|--------|----------|-------------------------------------------------------------------------------------|
-| `@TestEngine.BaseClass`     | class  | no       | Marks a test class as being a base class (skips direct execution)                   |
-| `@TestEngine.Order(<int>)`  | method | no       | Provides a way to order methods  relative to other methods with the same annotation |
-| `@TestEngine.Tag(<string>)` | class  | no       | Provides a way to tag a test class                                                  | 
+| Annotation                  | Scope           | Required | Usage                                                                               |
+|-----------------------------|-----------------|----------|-------------------------------------------------------------------------------------|
+| `@TestEngine.Disabledd`     | class or method | no       | Marks a test class or method disabled                                               |
+| `@TestEngine.BaseClass`     | class           | no       | Marks a test class as being a base class (skips direct execution)                   |
+| `@TestEngine.Order(<int>)`  | method          | no       | Provides a way to order methods  relative to other methods with the same annotation |
+| `@TestEngine.Tag(<string>)` | class           | no       | Provides a way to tag a test class                                                  | 
 
 
 **Notes**
