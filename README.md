@@ -1,8 +1,14 @@
 [![Build](https://github.com/antublue/test-engine/actions/workflows/build.yml/badge.svg)](https://github.com/antublue/test-engine/actions/workflows/build.yml)
+[![Code Quality](https://api.codiga.io/project/36230/score/svg)](https://app.codiga.io/hub/project/36230/test-engine)
+[![Code Grade](https://api.codiga.io/project/36230/status/svg)](https://app.codiga.io/hub/project/36230/test-engine)
 
-# AntuBLUE Test Engine
+<br/>
 
-The AntuBLUE Test Engine is a JUnit 5 based test engine that allows for parameterized testing at the test class level.
+![AntuBLUE logo](resources/logo.png)
+
+# Test Engine
+
+The Test Engine is a JUnit 5 based test engine that allows for parameterized testing at the test class level.
 
 ## Why ?
 
@@ -11,7 +17,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Latest Releases
 
-- General Availability (GA): [AntuBLUE Test Engine v2.0.5](https://github.com/antublue/test-engine/releases/tag/v2.0.5)
+- General Availability (GA): [Test Engine v2.0.5](https://github.com/antublue/test-engine/releases/tag/v2.0.5)
 
 ## Common Annotations
 
@@ -104,7 +110,7 @@ String[] values = paramater.value();
 
 ## Configuration values
 
-The AntuBLUE Test Engine has seven configuration parameters
+The Test Engine has seven configuration parameters
 
 | Configuration                   | Type         | Java System Property                          | Environment Variable                          |
 |---------------------------------|--------------|-----------------------------------------------|-----------------------------------------------|
@@ -190,7 +196,7 @@ https://github.com/antublue/test-engine/tree/main/examples/src/main/java/example
 
 ## Maven
 
-Add the AntuBLUE Test Engine Maven repository to your `pom.xml` file...
+Add the Test Engine Maven repository to your `pom.xml` file...
 
 ```xml
 <repositories>
@@ -207,7 +213,7 @@ Add the AntuBLUE Test Engine Maven repository to your `pom.xml` file...
 </repositories>
 ```
 
-Add the AntuBLUE Test Engine jars (and dependencies)...
+Add the Test Engine jars (and dependencies)...
 
 ```xml
 <dependencies>
@@ -295,11 +301,11 @@ mvn clean package integration-test
 
 **Notes**
 
-- The AntuBLUE Test Engine requires core JUnit 5 jars as dependencies
+- The Test Engine requires core JUnit 5 jars as dependencies
 
 ## Command Line (standalone) Usage
 
-The AntuBLUE Test Engine jar has the ability to run as a standalone executable, provided all dependencies are on the classpath
+The Test Engine jar has the ability to run as a standalone executable, provided all dependencies are on the classpath
 
 Example:
 
@@ -379,7 +385,7 @@ GitHub's Discussions is the current mechanism for help / support
 
 ## Contributing
 
-Contributions to the AntuBLUE Test Engine are both welcomed and appreciated.
+Contributions to the Test Engine are both welcomed and appreciated.
 
 The project uses a simplified GitFlow branching strategy
 - `main` is the latest release
