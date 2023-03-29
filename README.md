@@ -17,7 +17,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v2.0.5](https://github.com/antublue/test-engine/releases/tag/v2.0.5)
+- General Availability (GA): [Test Engine v2.0.6](https://github.com/antublue/test-engine/releases/tag/v2.0.6)
 
 ## Common Annotations
 
@@ -204,7 +204,7 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>2.0.5</version>
+    <version>2.0.6</version>
   </dependency>
   <dependency>
     <groupId>org.junit.jupiter</groupId>
