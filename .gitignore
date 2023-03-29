@@ -25,6 +25,7 @@ hs_err_pid*
 **/*.iml
 **/target/*
 **/.idea/*
-**/repository/*
 
 dependency-reduced-pom.xml
+release.properties
+pom.xml.releaseBackup
