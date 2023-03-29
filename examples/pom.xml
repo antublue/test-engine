@@ -9,7 +9,7 @@
     <artifactId>test-engine-examples</artifactId>
     <version>2.0.5</version>
     <packaging>jar</packaging>
-    <name>Test Engine Examples</name>
+    <name>AntuBLUE Test Engine Examples</name>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -17,19 +17,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>test-engine-maven-plugin</id>
-            <url>https://repository.antublue.org/test-engine-maven-plugin</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <build>
         <plugins>
