@@ -195,24 +195,7 @@ Additional test examples...
 
 https://github.com/antublue/test-engine/tree/main/examples/src/main/java/example
 
-## Maven
-
-Add the Test Engine Maven repository to your `pom.xml` file...
-
-```xml
-<repositories>
-    <repository>
-        <id>antublue-test-engine</id>
-        <url>https://repository.antublue.org/test-engine</url>
-        <releases>
-            <enabled>true</enabled>
-        </releases>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
-</repositories>
-```
+## Maven Usage
 
 Add the Test Engine jars (and dependencies)...
 
@@ -221,7 +204,7 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>2.0.6</version>
+    <version>2.0.5</version>
   </dependency>
   <dependency>
     <groupId>org.junit.jupiter</groupId>
@@ -254,35 +237,13 @@ Disable the Maven Surefire plugin...
 </plugin>
 ```
 
-Add the `test-engine-maven-plugin` repository...
-
-```xml
-<pluginRepositories>
-    <pluginRepository>
-        <id>test-engine-maven-plugin</id>
-        <url>https://repository.antublue.org/test-engine-maven-plugin</url>
-        <releases>
-            <enabled>true</enabled>
-        </releases>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </pluginRepository>
-</pluginRepositories>
-```
-
-Add the `test-engine-maven-plugin`...
+Add the Test Engine Maven Plugin...
 
 ```xml
 <plugin>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-maven-plugin</artifactId>
     <version>0.0.3</version>
-    <configuration>
-        <java>
-            <classPath>core/target/*:core/target/dependencies/*:examples/target/*</classPath>
-        </java>
-    </configuration>
     <executions>
         <execution>
             <phase>integration-test</phase>
@@ -306,7 +267,7 @@ mvn clean package integration-test
 
 ## Command Line (standalone) Usage
 
-The Test Engine jar has the ability to run as a standalone executable, provided all dependencies are on the classpath
+The Test Engine has the ability to run as a standalone executable, provided all dependencies are on the classpath
 
 Example:
 
