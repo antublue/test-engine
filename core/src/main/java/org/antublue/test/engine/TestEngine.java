@@ -93,7 +93,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 new TestEngineEngineDiscoveryRequest(engineDiscoveryRequest, configurationParameters);
 
         // Create a EngineDescriptor as the target
-        EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
+        EngineDescriptor engineDescriptor = new EngineDescriptor(UniqueId.forEngine(getId()), getId());
 
         // Create a AntuBLUETestEngineDiscoverySelectorResolver and
         // resolve selectors, adding them to the engine descriptor

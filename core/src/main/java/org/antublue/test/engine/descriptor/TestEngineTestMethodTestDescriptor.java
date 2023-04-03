@@ -14,25 +14,45 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.support.descriptor;
+package org.antublue.test.engine.descriptor;
 
+import org.antublue.test.engine.api.Parameter;
 import org.junit.platform.engine.UniqueId;
 
-public class TestEngineClassTestDescriptor extends TestEngineAbstractTestDescriptor {
+import java.lang.reflect.Method;
+
+public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDescriptor {
 
     private final Class<?> testClass;
+    private final Parameter testParameter;
+    private final Method testMethod;
 
-    public TestEngineClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
+    public TestEngineTestMethodTestDescriptor(
+            UniqueId uniqueId,
+            String displayName,
+            Class<?> testClass,
+            Parameter testParameter,
+            Method testMethod) {
         super(uniqueId, displayName);
         this.testClass = testClass;
+        this.testParameter = testParameter;
+        this.testMethod = testMethod;
     }
 
     @Override
     public Type getType() {
-        return Type.CONTAINER;
+        return Type.TEST;
     }
 
     public Class<?> getTestClass() {
         return testClass;
+    }
+
+    public Parameter getTestParameter() {
+        return testParameter;
+    }
+
+    public Method getTestMethod() {
+        return testMethod;
     }
 }

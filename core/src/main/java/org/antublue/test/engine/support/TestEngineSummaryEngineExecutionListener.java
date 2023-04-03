@@ -18,9 +18,9 @@ package org.antublue.test.engine.support;
 
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.support.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
-import org.antublue.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineParameterTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineTestMethodTestDescriptor;
 import org.antublue.test.engine.support.logger.Logger;
 import org.antublue.test.engine.support.logger.LoggerFactory;
 import org.antublue.test.engine.support.util.Switch;
@@ -36,6 +36,7 @@ import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.Set;
 
 public class TestEngineSummaryEngineExecutionListener implements EngineExecutionListener {
 
@@ -52,11 +53,33 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
 
     public TestEngineSummaryEngineExecutionListener(TestPlan testPlan) {
         this.testPlan = testPlan;
+
+        /*
+        Set<TestIdentifier> rootTestIdentifiers = testPlan.getRoots();
+        System.out.println("rootTestIdentifiers " + rootTestIdentifiers.size());
+        for (TestIdentifier testIdentifier : rootTestIdentifiers) {
+            print(testPlan, testIdentifier, 0);
+        }
+        */
+
         this.summaryGeneratingListener = new SummaryGeneratingListener();
         this.summaryGeneratingListener.testPlanExecutionStarted(testPlan);
 
         Optional<String> optionalDetailOutput =testPlan.getConfigurationParameters().get("antublue.test.engine.output");
         optionalDetailOutput.ifPresent(s -> detailedOutput = "detailed".equalsIgnoreCase(s));
+    }
+
+    private static void print(TestPlan testPlan, TestIdentifier testIdentifier, int offset) {
+        for (int i = 0; i < offset; i++) {
+            System.out.print(" ");
+        }
+        System.out.println("testIdentifier " + testIdentifier.getUniqueId());
+        System.out.flush();
+
+        Set<TestIdentifier> children = testPlan.getChildren(testIdentifier);
+        for (TestIdentifier child : children) {
+            print(testPlan, child, offset + 2);
+        }
     }
 
     @Override

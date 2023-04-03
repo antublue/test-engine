@@ -17,9 +17,9 @@
 package org.antublue.test.engine.support;
 
 import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.support.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
-import org.antublue.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineParameterTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineTestMethodTestDescriptor;
 import org.antublue.test.engine.support.logger.Logger;
 import org.antublue.test.engine.support.logger.LoggerFactory;
 import org.antublue.test.engine.support.predicate.TestClassPredicate;
@@ -44,6 +44,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -321,7 +322,6 @@ public class TestEngineDiscoverySelectorResolver {
             EngineDescriptor engineDescriptor,
             Map<Class<?>, Collection<Method>> testClassToMethodMap) {
         LOGGER.trace("processSelectors()");
-        UniqueId uniqueId = engineDescriptor.getUniqueId();
 
         try {
             for (Class<?> testClass : testClassToMethodMap.keySet()) {
@@ -418,7 +418,7 @@ public class TestEngineDiscoverySelectorResolver {
 
                 TestEngineClassTestDescriptor testClassTestDescriptor =
                         new TestEngineClassTestDescriptor(
-                                uniqueId.append("/", testClass.getName()),
+                                createUniqueId(engineDescriptor, testClass),
                                 testClass.getName(),
                                 testClass);
 
@@ -430,7 +430,7 @@ public class TestEngineDiscoverySelectorResolver {
 
                     TestEngineParameterTestDescriptor testEngineParameterTestDescriptor =
                             new TestEngineParameterTestDescriptor(
-                                    uniqueId.append("/", testClass.getName() + "/" + testParameterUniqueName),
+                                    createUniqueId(engineDescriptor, testClass, testParameter),
                                     testParameterName,
                                     testClass,
                                     testParameter);
@@ -450,7 +450,7 @@ public class TestEngineDiscoverySelectorResolver {
 
                         TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor =
                                 new TestEngineTestMethodTestDescriptor(
-                                        uniqueId.append("/", testClass.getName() + "/" + testParameterUniqueName + "/" + testMethodUniqueName),
+                                        createUniqueId(engineDescriptor, testClass, testParameter, testMethod),
                                         testMethod.getName(),
                                         testClass,
                                         testParameter,
@@ -471,5 +471,30 @@ public class TestEngineDiscoverySelectorResolver {
         } catch (Throwable t) {
             throw new TestEngineException("Exception in TestEngine", t);
         }
+    }
+
+    private static UniqueId createUniqueId(EngineDescriptor engineDescriptor, Class<?> clazz) {
+        return createUniqueId(engineDescriptor, clazz, null, null);
+    }
+
+    private static UniqueId createUniqueId(EngineDescriptor engineDescriptor, Class<?> clazz, Object parameter) {
+        return createUniqueId(engineDescriptor, clazz, parameter, null);
+    }
+
+    private static UniqueId createUniqueId(EngineDescriptor engineDescriptor, Class<?> clazz, Object parameter, Method method) {
+        UniqueId uniqueId = engineDescriptor.getUniqueId();
+        if (clazz != null) {
+            uniqueId = uniqueId.append("class", clazz.getName());
+        }
+
+        if (parameter != null) {
+            uniqueId = uniqueId.append("parameter", String.valueOf(parameter.hashCode()));
+        }
+
+        if (method != null) {
+            uniqueId = uniqueId.append("method", method.getName());
+        }
+
+        return uniqueId;
     }
 }

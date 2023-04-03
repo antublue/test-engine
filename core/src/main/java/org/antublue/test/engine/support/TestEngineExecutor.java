@@ -16,9 +16,9 @@
 
 package org.antublue.test.engine.support;
 
-import org.antublue.test.engine.support.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.support.descriptor.TestEngineParameterTestDescriptor;
-import org.antublue.test.engine.support.descriptor.TestEngineTestMethodTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineParameterTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineTestMethodTestDescriptor;
 import org.antublue.test.engine.support.logger.Logger;
 import org.antublue.test.engine.support.logger.LoggerFactory;
 import org.antublue.test.engine.support.util.Switch;

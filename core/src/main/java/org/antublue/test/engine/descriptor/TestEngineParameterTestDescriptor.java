@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.support.descriptor;
+package org.antublue.test.engine.descriptor;
 
 import org.antublue.test.engine.api.Parameter;
 import org.junit.platform.engine.UniqueId;

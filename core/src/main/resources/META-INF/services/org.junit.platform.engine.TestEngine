@@ -1,1 +1,2 @@
 org.antublue.test.engine.TestEngine
+org.junit.jupiter.engine.JupiterTestEngine

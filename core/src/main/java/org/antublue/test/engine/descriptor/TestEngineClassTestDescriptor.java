@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.support.descriptor;
+package org.antublue.test.engine.descriptor;
 
-import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
-import java.util.ArrayList;
-import java.util.List;
+public class TestEngineClassTestDescriptor extends TestEngineAbstractTestDescriptor {
 
-public abstract class TestEngineAbstractTestDescriptor extends AbstractTestDescriptor {
+    private final Class<?> testClass;
 
-    private final List<TestExecutionResult> testExecutionResultList;
-
-    protected TestEngineAbstractTestDescriptor(UniqueId uniqueId, String displayName) {
+    public TestEngineClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
         super(uniqueId, displayName);
-        this.testExecutionResultList = new ArrayList<>();
+        this.testClass = testClass;
     }
 
-    public List<TestExecutionResult> getTestExecutionResultList() {
-        return testExecutionResultList;
+    @Override
+    public Type getType() {
+        return Type.CONTAINER;
+    }
+
+    public Class<?> getTestClass() {
+        return testClass;
     }
 }
