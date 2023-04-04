@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 public @interface TestEngine {
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Parameter {
 

@@ -10,8 +10,9 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class ParameterTest {
+public class ParameterFieldTest {
 
+    @TestEngine.Parameter
     private Parameter parameter;
 
     @TestEngine.ParameterSupplier
@@ -22,11 +23,6 @@ public class ParameterTest {
             collection.add(Parameter.of(String.valueOf(value)));
         }
         return collection.stream();
-    }
-
-    @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        this.parameter = parameter;
     }
 
     @TestEngine.BeforeAll

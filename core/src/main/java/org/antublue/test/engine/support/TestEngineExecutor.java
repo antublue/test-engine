@@ -30,9 +30,11 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -224,9 +226,19 @@ public class TestEngineExecutor {
         Object testParameter = testEngineParameterTestDescriptor.getTestParameter();
 
         try {
+            LOGGER.trace("injecting @TestEngine.Parameter field...");
+            Collection<Field> testParameterFields = TestEngineReflectionUtils.getParameterFields(testClass);
+            for (Field testParameterField : testParameterFields) {
+                LOGGER.trace("  field [%s]", testParameterField.getName());
+                testParameterField.set(testInstance, testParameter);
+            }
+
             LOGGER.trace("executing @TestEngine.Parameter method...");
-            Method testParameterMethod = TestEngineReflectionUtils.getParameterMethods(testClass).stream().findFirst().get();
-            testParameterMethod.invoke(testInstance, testParameter);
+            Collection<Method> testParameterMethods = TestEngineReflectionUtils.getParameterMethods(testClass);
+            for (Method testParameterMethod : testParameterMethods) {
+                LOGGER.trace("  method [%s]", testParameterMethod.getName());
+                testParameterMethod.invoke(testInstance, testParameter);
+            }
 
             LOGGER.trace("executing @TestEngine.BeforeAll methods...");
             for (Method beforeAllMethod : TestEngineReflectionUtils.getBeforeAllMethods(testClass)) {

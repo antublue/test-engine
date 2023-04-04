@@ -25,6 +25,7 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.launcher.TestPlan;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -32,8 +33,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -47,6 +51,7 @@ public final class TestEngineReflectionUtils {
     private enum Scope { STATIC, NON_STATIC }
 
     private static final Map<Class<?>, Collection<Method>> parameterSupplierMethodCache;
+    private static final Map<Class<?>, Collection<Field>> parameterFieldCache;
     private static final Map<Class<?>, Collection<Method>> parameterMethodCache;
     private static final Map<Class<?>, Collection<Method>> beforeClassMethodCache;
     private static final Map<Class<?>, Collection<Method>> beforeAllMethodCache;
@@ -60,6 +65,7 @@ public final class TestEngineReflectionUtils {
 
     static {
         parameterSupplierMethodCache = new HashMap<>();
+        parameterFieldCache = new HashMap<>();
         parameterMethodCache = new HashMap<>();
         beforeClassMethodCache = new HashMap<>();
         beforeAllMethodCache = new HashMap<>();
@@ -96,7 +102,7 @@ public final class TestEngineReflectionUtils {
         stringBuilder
                 .append(
                     String.format(
-                            "getAllMethods(%s, %s, %s, %s",
+                            "getMethods(%s, %s, %s, %s",
                             clazz.getName(),
                             annotation.getName(),
                             scope,
@@ -207,6 +213,58 @@ public final class TestEngineReflectionUtils {
         Class<?> declaringClass = clazz.getSuperclass();
         if ((declaringClass != null) && !declaringClass.equals(Object.class)) {
             resolveMethods(declaringClass, annotation, scope, returnType, parameterTypes, methodMap);
+        }
+    }
+
+    private static Collection<Field> getFields(
+            Class<?> clazz,
+            Class<? extends Annotation> annotation,
+            Class<?> fieldType) {
+        LOGGER.trace("getFields(%s, %s, %s)", clazz.getName(), annotation.getName(), fieldType.getName());
+
+        Set<Field> fieldSet = new LinkedHashSet<>();
+        resolveFields(clazz, annotation, fieldType, fieldSet);
+        return fieldSet;
+    }
+
+    private static void resolveFields(
+            Class<?> clazz,
+            Class<? extends Annotation> annotation,
+            Class<?> fieldType,
+            Set<Field> fieldSet) {
+        LOGGER.trace("resolveMethods(%s, %s, %s)", clazz.getName(), annotation.getName(), fieldType);
+
+        // TODO convert to Stream syntax
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            int modifiers = field.getModifiers();
+            if (!Modifier.isFinal(modifiers)
+                    && !Modifier.isStatic(modifiers)
+                    && field.isAnnotationPresent(TestEngine.Parameter.class)
+                    && (field.getType() == fieldType)) {
+                field.setAccessible(true);
+                fieldSet.add(field);
+            }
+        }
+
+        Class<?> declaringClass = clazz.getSuperclass();
+        if ((declaringClass != null) && !declaringClass.equals(Object.class)) {
+            resolveFields(declaringClass, annotation, fieldType, fieldSet);
+        }
+    }
+
+    public static Collection<Field> getParameterFields(Class<?> clazz) {
+        synchronized (parameterFieldCache) {
+            LOGGER.trace(String.format("getParameterFields(%s)", clazz.getName()));
+
+            if (parameterFieldCache.containsKey(clazz)) {
+                return parameterFieldCache.get(clazz);
+            }
+
+            Collection<Field> parameterFields = getFields(clazz, TestEngine.Parameter.class, Parameter.class);
+            parameterFieldCache.put(clazz, parameterFields);
+
+            return parameterFields;
         }
     }
 

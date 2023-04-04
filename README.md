@@ -21,17 +21,17 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Common Annotations
 
-| Annotation                      | Scope  |  Required | Static | Example                                         |
-|---------------------------------|--------|-----------|--------|-------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | method | yes       | yes    | `public static Stream<Parameter> parameters();` |
-| `@TestEngine.Parameter`         | method | yes       | no     | `public void parameter(Parameterr parameter);`  |
-| `@TestEngine.BeforeClass`       | method | no        | yes    | `public static void beforeClass();`             |
-| `@TestEngine.BeforeAll`         | method | no        | no     | `public void beforeAll();`                      |
-| `@TestEngine.BeforeEach`        | method | no        | no     | `public void beforeEach();`                     |
-| `@TestEngine.Test`              | method | yes       | no     | `public void test();`                           |
-| `@TestEngine.AfterEach`         | method | no        | no     | `public void afterEach();`                      |
-| `@TestEngine.AfterAll`          | method | no        | no     | `public void afterAll();`                       |
-| `@TestEngine.AfterClass`        | method | no        | yes    | `public static void afterClass();`              |
+| Annotation                      | Scope           |  Required | Static | Example                                                                    |
+|---------------------------------|-----------------|-----------|--------|----------------------------------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | method          | yes       | yes    | `public static Stream<Parameter> parameters();`                            |
+| `@TestEngine.Parameter`         | field or method | yes       | no     | `public Parameter parameter` `public void parameter(Parameter parameter);` |
+| `@TestEngine.BeforeClass`       | method          | no        | yes    | `public static void beforeClass();`                                        |
+| `@TestEngine.BeforeAll`         | method          | no        | no     | `public void beforeAll();`                                                 |
+| `@TestEngine.BeforeEach`        | method          | no        | no     | `public void beforeEach();`                                                |
+| `@TestEngine.Test`              | method          | yes       | no     | `public void test();`                                                      |
+| `@TestEngine.AfterEach`         | method          | no        | no     | `public void afterEach();`                                                 |
+| `@TestEngine.AfterAll`          | method          | no        | no     | `public void afterAll();`                                                  |
+| `@TestEngine.AfterClass`        | method          | no        | yes    | `public static void afterClass();`                                         |
 
 **NOTES**
 
