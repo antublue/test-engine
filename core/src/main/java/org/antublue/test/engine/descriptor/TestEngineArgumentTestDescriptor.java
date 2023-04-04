@@ -16,18 +16,18 @@
 
 package org.antublue.test.engine.descriptor;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.junit.platform.engine.UniqueId;
 
-public class TestEngineParameterTestDescriptor extends TestEngineAbstractTestDescriptor {
+public class TestEngineArgumentTestDescriptor extends TestEngineAbstractTestDescriptor {
 
     private final Class<?> testClass;
-    private final Parameter testParameter;
+    private final Argument testArgument;
 
-    public TestEngineParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Parameter testParameter) {
-        super(uniqueId, testParameter.name());
+    public TestEngineArgumentTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Argument testArgument) {
+        super(uniqueId, testArgument.name());
         this.testClass = testClass;
-        this.testParameter = testParameter;
+        this.testArgument = testArgument;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class TestEngineParameterTestDescriptor extends TestEngineAbstractTestDes
         return testClass;
     }
 
-    public Parameter getTestParameter() {
-        return testParameter;
+    public Argument getTestArgument() {
+        return testArgument;
     }
 }

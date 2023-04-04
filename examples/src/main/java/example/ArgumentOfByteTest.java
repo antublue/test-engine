@@ -7,21 +7,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Example test
  */
-@TestEngine.Tag("/tag2/")
-public class TaggedClassTest2 {
+public class ArgumentOfByteTest {
 
     private Argument argument;
 
     @TestEngine.Arguments
     public static Stream<Argument> arguments() {
         Collection<Argument> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            int value = i * 3;
-            collection.add(org.antublue.test.engine.api.Argument.of(String.valueOf(value)));
-        }
+        collection.add(org.antublue.test.engine.api.Argument.of((byte) 1));
+        collection.add(org.antublue.test.engine.api.Argument.of((byte) 2));
         return collection.stream();
     }
 
@@ -38,11 +37,7 @@ public class TaggedClassTest2 {
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + argument.value() + ")");
-    }
-
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + argument.value() + ")");
+        assertThat(argument.value(Byte.class).getClass()).isEqualTo(Byte.class);
     }
 
     @TestEngine.AfterAll

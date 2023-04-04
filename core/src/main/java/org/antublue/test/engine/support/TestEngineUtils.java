@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.support;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.support.logger.Logger;
 import org.antublue.test.engine.support.logger.LoggerFactory;
@@ -46,8 +46,8 @@ public final class TestEngineUtils {
 
     private enum Scope { STATIC, NON_STATIC }
 
-    private static final Map<Class<?>, Collection<Method>> parameterSupplierMethodsCache;
-    private static final Map<Class<?>, Collection<Method>> parameterSetterMethodCache;
+    private static final Map<Class<?>, Collection<Method>> argumentsMethodCache;
+    private static final Map<Class<?>, Collection<Method>> argumentMethodCache;
     private static final Map<Class<?>, Collection<Method>> beforeClassMethodCache;
     private static final Map<Class<?>, Collection<Method>> beforeAllMethodCache;
     private static final Map<Class<?>, Collection<Method>> beforeEachMethodCache;
@@ -59,8 +59,8 @@ public final class TestEngineUtils {
     private static final Map<Method, String> methodDisplayNameCache;
 
     static {
-        parameterSupplierMethodsCache = new HashMap<>();
-        parameterSetterMethodCache = new HashMap<>();
+        argumentsMethodCache = new HashMap<>();
+        argumentMethodCache = new HashMap<>();
         beforeClassMethodCache = new HashMap<>();
         beforeAllMethodCache = new HashMap<>();
         beforeEachMethodCache = new HashMap<>();
@@ -243,23 +243,23 @@ public final class TestEngineUtils {
     }
 
     /**
-     * Method to get a Collection of @TestEngine.ParameterSupplier Methods sorted alphabetically
+     * Method to get a Collection of @TestEngine.Arguments Methods sorted alphabetically
      *
      * @param clazz
      * @return
      */
-    public static Collection<Method> getParameterSupplierMethods(Class<?> clazz) {
-        synchronized (parameterSupplierMethodsCache) {
-            LOGGER.trace(String.format("getParameterSupplierMethods(%s)", clazz.getName()));
+    public static Collection<Method> getArgumentsMethods(Class<?> clazz) {
+        synchronized (argumentsMethodCache) {
+            LOGGER.trace(String.format("getArgumentsMethods(%s)", clazz.getName()));
 
-            if (parameterSupplierMethodsCache.containsKey(clazz)) {
-                return parameterSupplierMethodsCache.get(clazz);
+            if (argumentsMethodCache.containsKey(clazz)) {
+                return argumentsMethodCache.get(clazz);
             }
 
             List<Method> methodList =
                     getMethods(
                             clazz,
-                            TestEngine.ParameterSupplier.class,
+                            TestEngine.Arguments.class,
                             Scope.STATIC,
                             Stream.class,
                             (Class<?>[]) null);
@@ -268,30 +268,32 @@ public final class TestEngineUtils {
 
             Collection<Method> methods = Collections.unmodifiableCollection(methodList);
 
-            parameterSupplierMethodsCache.put(clazz, methods);
+            argumentsMethodCache.put(clazz, methods);
 
             return methods;
         }
     }
 
-    public static Collection<Method> getParameterSetterMethods(Class<?> clazz) {
-        synchronized (parameterSetterMethodCache) {
-            if (parameterSetterMethodCache.containsKey(clazz)) {
-                return parameterSetterMethodCache.get(clazz);
+    public static Collection<Method> getArgumentMethods(Class<?> clazz) {
+        synchronized (argumentMethodCache) {
+            LOGGER.trace(String.format("getArgumentMethods(%s)", clazz.getName()));
+
+            if (argumentMethodCache.containsKey(clazz)) {
+                return argumentMethodCache.get(clazz);
             }
             List<Method> methodList =
                     getMethods(
                             clazz,
-                            TestEngine.ParameterSetter.class,
+                            TestEngine.Argument.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            Parameter.class);
+                            Argument.class);
 
             sortByOrderAnnotation(methodList);
 
             Collection<Method> methods = Collections.unmodifiableCollection(methodList);
 
-            parameterSetterMethodCache.put(clazz, methods);
+            argumentMethodCache.put(clazz, methods);
 
             return methods;
         }

@@ -1,7 +1,7 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.api.ParameterMap;
+import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.ArgumentMap;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.source.CsvSource;
 
@@ -19,18 +19,18 @@ public class CsvSourceTest2 {
 
     private static final String RESOURCE_NAME = "/sample.missing-headers.csv";
 
-    private ParameterMap parameterMap;
+    private ArgumentMap argumentMap;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() throws IOException {
+    @TestEngine.Arguments
+    public static Stream<Argument> arguments() throws IOException {
         try (InputStream inputStream = CsvSourceTest2.class.getResourceAsStream(RESOURCE_NAME)) {
             return CsvSource.of(inputStream, StandardCharsets.UTF_8);
         }
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
-        this.parameterMap = parameter.value();
+    @TestEngine.Argument
+    public void argument(Argument argument) {
+        this.argumentMap = argument.value();
     }
 
     @TestEngine.BeforeAll
@@ -40,9 +40,9 @@ public class CsvSourceTest2 {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameterMap.get("First Name") + " " + parameterMap.get("Last Name") + ")");
+        System.out.println("test1(" + argumentMap.get("First Name") + " " + argumentMap.get("Last Name") + ")");
 
-        Set<Map.Entry<String, Object>> entrySet = parameterMap.entrySet();
+        Set<Map.Entry<String, Object>> entrySet = argumentMap.entrySet();
         for (Map.Entry<String, Object> entry : entrySet) {
             System.out.println("entry [" + entry.getKey() + "] = [" + entry.getValue() + "]");
         }
@@ -50,7 +50,7 @@ public class CsvSourceTest2 {
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameterMap.get("Email") + ")");
+        System.out.println("test2(" + argumentMap.get("Email") + ")");
     }
 
     @TestEngine.AfterAll

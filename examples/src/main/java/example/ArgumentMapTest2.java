@@ -1,6 +1,7 @@
 package example;
 
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.ArgumentMap;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -10,24 +11,26 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@TestEngine.Tag("/tag2/")
-public class TaggedClassTest2 {
+public class ArgumentMapTest2 {
 
-    private Argument argument;
+    private ArgumentMap argumentMap;
 
     @TestEngine.Arguments
     public static Stream<Argument> arguments() {
         Collection<Argument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            int value = i * 3;
-            collection.add(org.antublue.test.engine.api.Argument.of(String.valueOf(value)));
+            collection.add(
+                    org.antublue.test.engine.api.Argument.of(
+                            "ArgumentMap[" + i + "]",
+                            new ArgumentMap().put("key1", "value1")));
         }
+        collection.add(org.antublue.test.engine.api.Argument.of("null value", new ArgumentMap().put("null key", null)));
         return collection.stream();
     }
 
     @TestEngine.Argument
     public void argument(Argument argument) {
-        this.argument = argument;
+        argumentMap = argument.value();
     }
 
     @TestEngine.BeforeAll
@@ -37,12 +40,14 @@ public class TaggedClassTest2 {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument.value() + ")");
+        String value = argumentMap.get("key1", String.class);
+        System.out.println("test1(" + value + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + argument.value() + ")");
+        String value = argumentMap.get("key1", String.class);
+        System.out.println("test2(" + value + ")");
     }
 
     @TestEngine.AfterAll

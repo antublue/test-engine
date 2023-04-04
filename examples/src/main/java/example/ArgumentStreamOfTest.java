@@ -2,21 +2,22 @@ package example;
 
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.source.EnumSource;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
 /**
  * Example test
  */
-public class EnumSourceTest {
+public class ArgumentStreamOfTest {
 
     private Argument argument;
 
     @TestEngine.Arguments
-    public static Stream<Argument> arguments() throws IOException {
-        return EnumSource.of(DaysOfTheWeek.class);
+    public static Stream<Argument> arguments() {
+        return Stream.of(
+                org.antublue.test.engine.api.Argument.of(String.valueOf(1)),
+                org.antublue.test.engine.api.Argument.of("String"),
+                org.antublue.test.engine.api.Argument.of(String.valueOf(3.0f)));
     }
 
     @TestEngine.Argument
@@ -42,26 +43,5 @@ public class EnumSourceTest {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
-    }
-
-    private enum DaysOfTheWeek {
-
-        SUNDAY("sunday"),
-        MONDAY("monday"),
-        TUESDAY("tuesday"),
-        WEDNESDAY("wednesday"),
-        THURSDAY("thursday"),
-        FRIDAY("friday"),
-        SATURDAY("saturday");
-
-        private String value;
-
-        DaysOfTheWeek(String value) {
-            this.value = value;
-        }
-
-        public String toString() {
-            return value;
-        }
     }
 }

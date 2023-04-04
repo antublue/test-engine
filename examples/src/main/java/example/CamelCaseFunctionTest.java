@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -22,28 +22,28 @@ public class CamelCaseFunctionTest {
 
     private Tuple tuple;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
+    @TestEngine.Arguments
+    public static Stream<Argument> arguments() {
+        Collection<Argument> collection = new ArrayList<>();
 
         Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Parameter.of(tuple.input, tuple));
+        collection.add(org.antublue.test.engine.api.Argument.of(tuple.input, tuple));
 
         tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Parameter.of(tuple.input, tuple));
+        collection.add(org.antublue.test.engine.api.Argument.of(tuple.input, tuple));
 
         tuple = new Tuple("THIS", "this");
-        collection.add(Parameter.of(tuple.input, tuple));
+        collection.add(org.antublue.test.engine.api.Argument.of(tuple.input, tuple));
 
         tuple = new Tuple("tHis", "this");
-        collection.add(Parameter.of(tuple.input, tuple));
+        collection.add(org.antublue.test.engine.api.Argument.of(tuple.input, tuple));
 
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
-        tuple = parameter.value();
+    @TestEngine.Argument
+    public void argument(Argument argument) {
+        tuple = argument.value();
     }
 
     @TestEngine.BeforeAll

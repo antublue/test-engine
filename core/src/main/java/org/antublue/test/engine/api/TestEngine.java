@@ -11,13 +11,13 @@ public @interface TestEngine {
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
-    @interface ParameterSetter {
+    @interface Argument {
 
     }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
-    @interface ParameterSupplier {
+    @interface Arguments {
 
     }
 

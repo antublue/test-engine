@@ -21,17 +21,17 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Common Annotations
 
-| Annotation                      | Scope  |  Required | Static | Example                                          |
-|---------------------------------|--------|-----------|--------|--------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | method | yes       | yes    | `public static Stream<Parameter> parameters();`  |
-| `@TestEngine.ParameterSetter`   | method | yes       | no     | `public void setParameter(Parameter parameter);` |
-| `@TestEngine.BeforeClass`       | method | no        | yes    | `public static void beforeClass();`              |
-| `@TestEngine.BeforeAll`         | method | no        | no     | `public void beforeAll();`                       |
-| `@TestEngine.BeforeEach`        | method | no        | no     | `public void beforeEach();`                      |
-| `@TestEngine.Test`              | method | yes       | no     | `public void test();`                            |
-| `@TestEngine.AfterEach`         | method | no        | no     | `public void afterEach();`                       |
-| `@TestEngine.AfterAll`          | method | no        | no     | `public void afterAll();`                        |
-| `@TestEngine.AfterClass`        | method | no        | yes    | `public static void afterClass();`               |
+| Annotation                | Scope  |  Required | Static | Example                                       |
+|---------------------------|--------|-----------|--------|-----------------------------------------------|
+| `@TestEngine.Arguments`   | method | yes       | yes    | `public static Stream<Argument> arguments();` |
+| `@TestEngine.Argument`    | method | yes       | no     | `public void argument(Argumentr argument);`   |
+| `@TestEngine.BeforeClass` | method | no        | yes    | `public static void beforeClass();`           |
+| `@TestEngine.BeforeAll`   | method | no        | no     | `public void beforeAll();`                    |
+| `@TestEngine.BeforeEach`  | method | no        | no     | `public void beforeEach();`                   |
+| `@TestEngine.Test`        | method | yes       | no     | `public void test();`                         |
+| `@TestEngine.AfterEach`   | method | no        | no     | `public void afterEach();`                    |
+| `@TestEngine.AfterAll`    | method | no        | no     | `public void afterAll();`                     |
+| `@TestEngine.AfterClass`  | method | no        | yes    | `public static void afterClass();`            |
 
 **NOTES**
 
@@ -62,21 +62,21 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 - It's recommended to use a tag string format of `/tag1/tag2/tag3/`
 
-## What is a `Parameter` ?
+## What is a `Argument` ?
 
-`Parameter` is an interface all parameter objects must implement to allow for parameter name and value resolution
+`Argument` is an interface all argument objects must implement to allow for argument name and value resolution
 
-The `Parameter` interface also has static methods to wrap an Object
+The `Argument` interface also has static methods to wrap an Object
 
-### Usage of `Parameter`
+### Usage of `Argument`
 
-- `@TestEngine.ParameterSupplier` must return a `Stream<Parameter>`
-
-
-- `@TestEngine.ParameterSetter` requires single `Parameter` object
+- `@TestEngine.Arguments` must return a `Stream<Argument>`
 
 
-- The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name 
+- `@TestEngine.Argument` requires single `Argument` object as parameter
+
+
+- The `Argument` interface defines various static methods to wrap basic Java types, using the value as the name 
   - `boolean`
   - `byte`
   - `char`
@@ -90,28 +90,28 @@ The `Parameter` interface also has static methods to wrap an Object
 Example
 
 ```java
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
+    @TestEngine.Arguments
+    public static Stream<Argument> stream() {
+        Collection<Argument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             collection.add(
-                    Parameter.of(
-                            "Array [" + i + "]",
-                            new String[] { String.valueOf(i), String.valueOf(i * 2) }));
+                Argument.of(
+                    "Array [" + i + "]",
+                    new String[] { String.valueOf(i), String.valueOf(i * 2) }));
         }
         return collection.stream();
     }
 ```
 
-In this scenario, the value of the `Parameter` is a String[] array
+In this scenario, the value of the `Argument` is a String[] array
 
 ```java
-String[] values = paramater.value();
+String[] values = argument.value();
 ```
 
 ## Configuration values
 
-The Test Engine has seven configuration parameters
+The Test Engine has seven configuration arguments
 
 | Configuration                   | Type         | Java System Property                          | Environment Variable                          |
 |---------------------------------|--------------|-----------------------------------------------|-----------------------------------------------|
@@ -138,7 +138,7 @@ Using a combination of the properties allows for running individual test classes
 ```java
 package org.antublue.test.engine.test.example;
 
-import api.org.antublue.test.engine.Parameter;
+import api.org.antublue.test.engine.Argument;
 import api.org.antublue.test.engine.TestEngine;
 
 import java.util.ArrayList;
@@ -148,25 +148,25 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class ParameterTest {
+public class ArgumentTest {
 
-  private Parameter parameter;
+  private Argument argument;
 
-  @TestEngine.ParameterSupplier
-  public static Stream<Parameter> parameters() {
-    Collection<Parameter> collection = new ArrayList<>();
+  @TestEngine.Arguments
+  public static Stream<Argument> stream() {
+    Collection<Argument> collection = new ArrayList<>();
 
     for (int i = 0; i < 10; i++) {
       int value = i * 3;
-      collection.add(Parameter.of("argument(" + i + ") = " + value, String.valueOf(value)));
+      collection.add(Argument.of("argument(" + i + ") = " + value, String.valueOf(value)));
     }
 
     return collection.stream();
   }
 
-  @TestEngine.ParameterSetter
-  public void setParameter(Parameter parameter) {
-    this.parameter = parameter;
+  @TestEngine.Argument
+  public void argument(Argument argument) {
+    this.argument = argument;
   }
 
   @TestEngine.BeforeAll
@@ -176,12 +176,12 @@ public class ParameterTest {
 
   @TestEngine.Test
   public void test1() {
-    System.out.println("test1(" + parameter.value() + ")");
+    System.out.println("test1(" + argument.value() + ")");
   }
 
   @TestEngine.Test
   public void test2() {
-    System.out.println("test2(" + parameter.value() + ")");
+    System.out.println("test2(" + argument.value() + ")");
   }
 
   @TestEngine.AfterAll
@@ -290,15 +290,15 @@ State Machine flow...
     
     thread {
     
-        call "@TestEngine.ParameterSupplier" method to get a Stream<Parameter>
+        call "@TestEngine.Arguments" method to get a Stream<Argument>
     
         execute "@TestEngine.BeforeClass" methods 
      
         create a single instance of the test class
         
-        for (each Parameter in the Stream<Parameter>) {
+        for (each Argument in the Stream<Argument>) {
         
-            execute the "@TestEngine.ParameterSetter" method with the Parameter value
+            execute the "@TestEngine.Argument" method with the Argument object
             
             execute "@TestEngine.BeforeAll" methods
             

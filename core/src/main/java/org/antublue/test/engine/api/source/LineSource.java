@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.api.source;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Class to create a Stream of Parameters where each Parameter
+ * Class to create a Stream of Arguments where each Argument
  * value is a line, skipping lines that start with a "#"
  */
 public final class LineSource {
@@ -45,28 +45,28 @@ public final class LineSource {
     }
 
     /**
-     * Method to get a Stream of Parameters from a File
+     * Method to get a Stream of Arguments from a File
      *
      * @param file
      * @param charset
      * @return
      * @throws IOException
      */
-    public static Stream<Parameter> of(File file, Charset charset) throws IOException {
+    public static Stream<Argument> of(File file, Charset charset) throws IOException {
         try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
             return of(inputStream, charset);
         }
     }
 
     /**
-     * Method to get a Stream of Parameters from a Reader
+     * Method to get a Stream of Arguments from a Reader
      *
      * @param reader
      * @return
      * @throws IOException
      */
-    public static Stream<Parameter> of(Reader reader) throws IOException {
-        List<Parameter> list = new ArrayList<>();
+    public static Stream<Argument> of(Reader reader) throws IOException {
+        List<Argument> list = new ArrayList<>();
 
         try (BufferedReader bufferedReader = new BufferedReader(reader)) {
             long index = 1;
@@ -77,7 +77,7 @@ public final class LineSource {
                 }
 
                 if (!line.startsWith("#")) {
-                    list.add(Parameter.of("line [" + index + "]", line));
+                    list.add(Argument.of("line [" + index + "]", line));
                     index++;
                 }
             }
@@ -87,14 +87,14 @@ public final class LineSource {
     }
 
     /**
-     * Method to get a Stream of Parameters from an InputStream
+     * Method to get a Stream of Arguments from an InputStream
      *
      * @param inputStream
      * @param charset
      * @return
      * @throws IOException
      */
-    public static Stream<Parameter> of(InputStream inputStream, Charset charset) throws IOException {
+    public static Stream<Argument> of(InputStream inputStream, Charset charset) throws IOException {
         try (Reader reader = new InputStreamReader(inputStream, charset)) {
             return of(reader);
         }

@@ -23,15 +23,15 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
- * Class to implement a ParameterMap
+ * Class to implement an ArgumentMap
  */
 @SuppressWarnings("unchecked")
-public class ParameterMap extends LinkedHashMap<String, Object> {
+public class ArgumentMap extends LinkedHashMap<String, Object> {
 
     /**
      * Constructor
      */
-    public ParameterMap() {
+    public ArgumentMap() {
         super();
     }
 
@@ -53,7 +53,7 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
      * @param object
      * @return
      */
-    public ParameterMap put(String key, Object object) {
+    public ArgumentMap put(String key, Object object) {
         validateKey(key);
         super.put(key, object);
         return this;

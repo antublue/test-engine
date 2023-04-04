@@ -16,23 +16,24 @@
 
 package org.antublue.test.engine.api;
 
-import org.antublue.test.engine.support.api.ParameterImpl;
+import org.antublue.test.engine.support.api.ArgumentImpl;
 
 import java.util.Objects;
 
 /**
- * Interface to implement a Parameter
+ * Interface to implement an Argument
  */
-public interface Parameter {
+public interface Argument {
 
     /**
-     * Method to get the parameter name
+     * Method to get the argument name
+     *
      * @return
      */
     String name();
 
     /**
-     * Method to get the parameter value cast as the return type
+     * Method to get the argument value cast as the return type
      *
      * @return
      * @param <T>
@@ -40,7 +41,7 @@ public interface Parameter {
     <T> T value();
 
     /**
-     * Method to get the parameter value cast to a specific type
+     * Method to get the argument value cast to a specific type
      *
      * @param clazz
      * @return
@@ -49,126 +50,126 @@ public interface Parameter {
     <T> T value(Class<T> clazz);
 
     /**
-     * Method to create a Parameter object (useful for a static import)
+     * Method to create an Argument object (useful for a static import)
      *
      * @param name
      * @param value
      * @return
      */
-    static Parameter parameter(String name, Object value) {
+    static Argument argument(String name, Object value) {
         return of(name, value);
     }
 
     /**
-     * Method to create a Parameter object
+     * Method to create an Argument object
      *
      * @param name
      * @param value
      * @return
      */
-    static Parameter of(String name, Object value) {
+    static Argument of(String name, Object value) {
         Objects.requireNonNull(name);
 
         if (name.trim().isEmpty()) {
             throw new IllegalArgumentException("name is empty");
         }
 
-        return new ParameterImpl(name.trim(), value);
+        return new ArgumentImpl(name.trim(), value);
     }
 
     /**
-     * Method to create a Parameter containing a boolean
+     * Method to create an Argument containing a boolean
      *
      * @param b
      * @return
      */
-    static Parameter of(boolean b) {
+    static Argument of(boolean b) {
         return of(String.valueOf(b), b);
     }
 
     /**
-     * Method to create a Parameter containing as byte
+     * Method to create a Argument containing as byte
      *
      * @param b
      * @return
      */
-    static Parameter of(byte b) {
+    static Argument of(byte b) {
         return of(String.valueOf(b), b);
     }
 
     /**
-     * Method to create a Parameter containing as char
+     * Method to create a Argument containing as char
      *
      * @param c
      * @return
      */
-    static Parameter of(char c) {
+    static Argument of(char c) {
         return of(String.valueOf(c), c);
     }
 
     /**
-     * Method to create a Parameter containing a short
+     * Method to create a Argument containing a short
      *
      * @param s
      * @return
      */
-    static Parameter of(short s) {
+    static Argument of(short s) {
         return of(String.valueOf(s), s);
     }
 
     /**
-     * Method to create a Parameter containing an int
+     * Method to create a Argument containing an int
      *
      * @param i
      * @return
      */
-    static Parameter of(int i) {
+    static Argument of(int i) {
         return of(String.valueOf(i), i);
     }
 
     /**
-     * Method to create a Parameter containing a long
+     * Method to create a Argument containing a long
      *
      * @param l
      * @return
      */
-    static Parameter of(long l) {
+    static Argument of(long l) {
         return of(String.valueOf(l), l);
     }
 
     /**
-     * Method to create a Parameter containing a float
+     * Method to create a Argument containing a float
      *
      * @param f
      * @return
      */
-    static Parameter of(float f) {
+    static Argument of(float f) {
         return of(String.valueOf(f), f);
     }
 
     /**
-     * Method to create a Parameter containing a double
+     * Method to create a Argument containing a double
      *
      * @param d
      * @return
      */
-    static Parameter of(double d) {
+    static Argument of(double d) {
         return of(String.valueOf(d), d);
     }
 
     /**
-     * Method to create a Parameter containing a String
+     * Method to create a Argument containing a String
      *
      * @param value not null
      * @return
      */
-    static Parameter of(String value) {
+    static Argument of(String value) {
         if (value == null) {
-            return new ParameterImpl("((null))", null);
+            return new ArgumentImpl("((null))", null);
         } else if (value.trim().isEmpty()) {
-            return new ParameterImpl("((empty))", value);
+            return new ArgumentImpl("((empty))", value);
         } else {
-            return new ParameterImpl(value, value);
+            return new ArgumentImpl(value, value);
         }
     }
 }

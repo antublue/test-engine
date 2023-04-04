@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.stream.Stream;
@@ -12,19 +12,19 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class StreamOfTest {
 
-    private Parameter parameter;
+    private Argument argument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
+    @TestEngine.Arguments
+    public static Stream<Argument> arguments() {
         return Stream.of(
-                Parameter.of(1),
-                Parameter.of(2),
-                Parameter.of(3));
+                org.antublue.test.engine.api.Argument.of(1),
+                org.antublue.test.engine.api.Argument.of(2),
+                org.antublue.test.engine.api.Argument.of(3));
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
-        this.parameter = parameter;
+    @TestEngine.Argument
+    public void argument(Argument argument) {
+        this.argument = argument;
     }
 
     @TestEngine.BeforeAll
@@ -34,8 +34,8 @@ public class StreamOfTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter.value() + ")");
-        assertThat(parameter.value(Integer.class).getClass()).isEqualTo(Integer.class);
+        System.out.println("test1(" + argument.value() + ")");
+        assertThat(argument.value(Integer.class).getClass()).isEqualTo(Integer.class);
     }
 
     @TestEngine.AfterAll

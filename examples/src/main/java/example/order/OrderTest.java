@@ -1,6 +1,6 @@
 package example.order;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -33,21 +33,21 @@ public class OrderTest {
 
     private static final List<String> ACTUAL_LIST = new ArrayList<>();
 
-    private Parameter parameter;
+    private Argument argument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
+    @TestEngine.Arguments
+    public static Stream<Argument> arguments() {
+        Collection<Argument> collection = new ArrayList<>();
         for (int i = 0; i < 1; i++) {
             int value = i * 3;
-            collection.add(Parameter.of(String.valueOf(value)));
+            collection.add(org.antublue.test.engine.api.Argument.of(String.valueOf(value)));
         }
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
-        this.parameter = parameter;
+    @TestEngine.Argument
+    public void argument(Argument argument) {
+        this.argument = argument;
     }
 
     @TestEngine.BeforeClass
@@ -80,27 +80,27 @@ public class OrderTest {
 
     @TestEngine.Test
     public void testA() {
-        System.out.println("testA(" + parameter.value() + ")");
+        System.out.println("testA(" + argument.value() + ")");
         ACTUAL_LIST.add("testA");
     }
 
     @TestEngine.Test
     public void testB() {
-        System.out.println("testB(" + parameter.value() + ")");
+        System.out.println("testB(" + argument.value() + ")");
         ACTUAL_LIST.add("testB");
     }
 
     @TestEngine.Test
     @TestEngine.Order(2)
     public void test3() {
-        System.out.println("test3(" + parameter.value() + ")");
+        System.out.println("test3(" + argument.value() + ")");
         ACTUAL_LIST.add("test3");
     }
 
     @TestEngine.Test
     @TestEngine.Order(1)
     public void test2() {
-        System.out.println("test2(" + parameter.value() + ")");
+        System.out.println("test2(" + argument.value() + ")");
         ACTUAL_LIST.add("test2");
     }
 

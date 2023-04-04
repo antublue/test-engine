@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -12,23 +12,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Example test
  */
-public class ParameterOfFloatTest {
+public class ArgumentOfFloatTest {
 
-    private Parameter parameter;
+    private Argument argument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
+    @TestEngine.Arguments
+    public static Stream<Argument> arguments() {
+        Collection<Argument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             float value = i * 3f;
-            collection.add(Parameter.of(value));
+            collection.add(org.antublue.test.engine.api.Argument.of(value));
         }
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
-        this.parameter = parameter;
+    @TestEngine.Argument
+    public void argument(Argument argument) {
+        this.argument = argument;
     }
 
     @TestEngine.BeforeAll
@@ -38,8 +38,8 @@ public class ParameterOfFloatTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter.value() + ")");
-        assertThat(parameter.value(Float.class).getClass()).isEqualTo(Float.class);
+        System.out.println("test1(" + argument.value() + ")");
+        assertThat(argument.value(Float.class).getClass()).isEqualTo(Float.class);
     }
 
     @TestEngine.AfterAll

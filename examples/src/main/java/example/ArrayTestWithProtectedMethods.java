@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -14,21 +14,21 @@ public class ArrayTestWithProtectedMethods {
 
     private String[] values;
 
-    @TestEngine.ParameterSupplier
-    protected static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
+    @TestEngine.Arguments
+    protected static Stream<Argument> arguments() {
+        Collection<Argument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             collection.add(
-                    Parameter.of(
+                    org.antublue.test.engine.api.Argument.of(
                             "Array [" + i + "]",
                             new String[] { String.valueOf(i), String.valueOf(i * 2) }));
         }
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
-    protected void setParameter(Parameter parameter) {
-        values = parameter.value();
+    @TestEngine.Argument
+    protected void argument(Argument argument) {
+        values = argument.value();
     }
 
     @TestEngine.BeforeClass

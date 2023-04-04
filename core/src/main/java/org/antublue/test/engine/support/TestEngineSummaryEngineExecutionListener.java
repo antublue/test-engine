@@ -17,9 +17,9 @@
 package org.antublue.test.engine.support;
 
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.descriptor.TestEngineParameterTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineArgumentTestDescriptor;
 import org.antublue.test.engine.descriptor.TestEngineTestMethodTestDescriptor;
 import org.antublue.test.engine.support.logger.Logger;
 import org.antublue.test.engine.support.logger.LoggerFactory;
@@ -65,7 +65,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
         this.summaryGeneratingListener = new SummaryGeneratingListener();
         this.summaryGeneratingListener.testPlanExecutionStarted(testPlan);
 
-        Optional<String> optionalDetailOutput =testPlan.getConfigurationParameters().get("antublue.test.engine.output");
+        Optional<String> optionalDetailOutput = testPlan.getConfigurationParameters().get("antublue.test.engine.output");
         optionalDetailOutput.ifPresent(s -> detailedOutput = "detailed".equalsIgnoreCase(s));
     }
 
@@ -102,13 +102,13 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 testDescriptor,
                 Switch.switchCase(EngineDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestEngineClassTestDescriptor.class, consumer -> {}),
-                Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
-                    TestEngineParameterTestDescriptor testEngineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
-                    Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
-                    Parameter parameter = testEngineParameterTestDescriptor.getTestParameter();
-                    String parameterDisplayName = parameter.name();
+                Switch.switchCase(TestEngineArgumentTestDescriptor.class, consumer -> {
+                    TestEngineArgumentTestDescriptor testEngineArgumentTestDescriptor = (TestEngineArgumentTestDescriptor) testDescriptor;
+                    Class<?> testClass = testEngineArgumentTestDescriptor.getTestClass();
+                    Argument testArgument = testEngineArgumentTestDescriptor.getTestArgument();
+                    String testArgumentDisplayName = testArgument.name();
                     stringBuilder
-                            .append(parameterDisplayName)
+                            .append(testArgumentDisplayName)
                             .append(" | ")
                             .append(TEST)
                             .append(" ")
@@ -118,10 +118,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
                     Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
-                    Parameter parameter = testEngineTestMethodTestDescriptor.getTestParameter();
-                    String parameterDisplayName = parameter.name();
+                    Argument testArgument = testEngineTestMethodTestDescriptor.getTestArgument();
+                    String testArgumentDisplayName = testArgument.name();
                     stringBuilder
-                            .append(parameterDisplayName)
+                            .append(testArgumentDisplayName)
                             .append(" | ")
                             .append(TEST)
                             .append(" ")
@@ -147,13 +147,13 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 testDescriptor,
                 Switch.switchCase(EngineDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestEngineClassTestDescriptor.class, consumer -> {}),
-                Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
-                    TestEngineParameterTestDescriptor testengineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
-                    Class<?> testClass = testengineParameterTestDescriptor.getTestClass();
-                    Parameter parameter = testengineParameterTestDescriptor.getTestParameter();
-                    String parameterDisplayName = parameter.name();
+                Switch.switchCase(TestEngineArgumentTestDescriptor.class, consumer -> {
+                    TestEngineArgumentTestDescriptor testengineArgumentTestDescriptor = (TestEngineArgumentTestDescriptor) testDescriptor;
+                    Class<?> testClass = testengineArgumentTestDescriptor.getTestClass();
+                    Argument testArgument = testengineArgumentTestDescriptor.getTestArgument();
+                    String testArgumentDisplayName = testArgument.name();
                     stringBuilder
-                            .append(parameterDisplayName)
+                            .append(testArgumentDisplayName)
                             .append(" | ")
                             .append("%s ")
                             .append(testClass.getName());
@@ -162,10 +162,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
                     Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
                     Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
-                    Parameter parameter = testEngineTestMethodTestDescriptor.getTestParameter();
-                    String parameterDisplayName = parameter.name();
+                    Argument testArgument = testEngineTestMethodTestDescriptor.getTestArgument();
+                    String testArgumentDisplayName = testArgument.name();
                     stringBuilder
-                            .append(parameterDisplayName)
+                            .append(testArgumentDisplayName)
                             .append(" | ")
                             .append("%s ")
                             .append(testClass.getName())

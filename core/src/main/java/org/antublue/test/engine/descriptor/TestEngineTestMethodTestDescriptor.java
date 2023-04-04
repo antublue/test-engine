@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.descriptor;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.junit.platform.engine.UniqueId;
 
 import java.lang.reflect.Method;
@@ -24,18 +24,18 @@ import java.lang.reflect.Method;
 public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDescriptor {
 
     private final Class<?> testClass;
-    private final Parameter testParameter;
+    private final Argument testArgument;
     private final Method testMethod;
 
     public TestEngineTestMethodTestDescriptor(
             UniqueId uniqueId,
             String displayName,
             Class<?> testClass,
-            Parameter testParameter,
+            Argument testArgument,
             Method testMethod) {
         super(uniqueId, displayName);
         this.testClass = testClass;
-        this.testParameter = testParameter;
+        this.testArgument = testArgument;
         this.testMethod = testMethod;
     }
 
@@ -48,8 +48,8 @@ public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDe
         return testClass;
     }
 
-    public Parameter getTestParameter() {
-        return testParameter;
+    public Argument getTestArgument() {
+        return testArgument;
     }
 
     public Method getTestMethod() {
