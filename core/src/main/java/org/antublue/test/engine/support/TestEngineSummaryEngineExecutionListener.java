@@ -53,33 +53,11 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
 
     public TestEngineSummaryEngineExecutionListener(TestPlan testPlan) {
         this.testPlan = testPlan;
-
-        /*
-        Set<TestIdentifier> rootTestIdentifiers = testPlan.getRoots();
-        System.out.println("rootTestIdentifiers " + rootTestIdentifiers.size());
-        for (TestIdentifier testIdentifier : rootTestIdentifiers) {
-            print(testPlan, testIdentifier, 0);
-        }
-        */
-
         this.summaryGeneratingListener = new SummaryGeneratingListener();
         this.summaryGeneratingListener.testPlanExecutionStarted(testPlan);
 
         Optional<String> optionalDetailOutput = testPlan.getConfigurationParameters().get("antublue.test.engine.output");
         optionalDetailOutput.ifPresent(s -> detailedOutput = "detailed".equalsIgnoreCase(s));
-    }
-
-    private static void print(TestPlan testPlan, TestIdentifier testIdentifier, int offset) {
-        for (int i = 0; i < offset; i++) {
-            System.out.print(" ");
-        }
-        System.out.println("testIdentifier " + testIdentifier.getUniqueId());
-        System.out.flush();
-
-        Set<TestIdentifier> children = testPlan.getChildren(testIdentifier);
-        for (TestIdentifier child : children) {
-            print(testPlan, child, offset + 2);
-        }
     }
 
     @Override

@@ -102,7 +102,9 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         // resolve selectors, adding them to the engine descriptor
         new TestEngineDiscoverySelectorResolver().resolveSelectors(testEngineDiscoveryRequest, engineDescriptor);
 
-        walk(engineDescriptor);
+        if (LOGGER.isTraceEnabled()) {
+            walk(engineDescriptor);
+        }
 
         // Return the engine descriptor with all child test descriptors
         return engineDescriptor;
@@ -291,7 +293,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     }
 
     private static void walk(EngineDescriptor engineDescriptor) {
-        System.out.println("EngineDescriptor - > " + engineDescriptor.getUniqueId());
+        LOGGER.trace("EngineDescriptor - > " + engineDescriptor.getUniqueId());
         Set<? extends TestDescriptor> testDescriptors = engineDescriptor.getChildren();
         for (TestDescriptor testDescriptor : testDescriptors) {
             walk(testDescriptor, 2);
@@ -300,13 +302,13 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static void walk(TestDescriptor parentTestDescriptor, int indent) {
         if (parentTestDescriptor instanceof TestEngineClassTestDescriptor) {
-            System.out.println(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            LOGGER.trace(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
             Set<? extends TestDescriptor> testDescriptors = ((TestEngineClassTestDescriptor) parentTestDescriptor).getChildren();
             for (TestDescriptor childTestDescriptor : testDescriptors) {
                 walk(childTestDescriptor, indent + 2);
             }
         } else if (parentTestDescriptor instanceof TestEngineArgumentTestDescriptor) {
-            System.out.println(pad(indent) + "TestEngineArgumentTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            LOGGER.trace(pad(indent) + "TestEngineArgumentTestDescriptor - > " + parentTestDescriptor.getUniqueId());
             Set<? extends TestDescriptor> testDescriptors = ((TestEngineArgumentTestDescriptor) parentTestDescriptor).getChildren();
             for (TestDescriptor childTestDescriptor : testDescriptors) {
                 walk(childTestDescriptor, indent + 2);

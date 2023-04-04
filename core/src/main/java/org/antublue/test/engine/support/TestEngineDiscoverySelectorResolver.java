@@ -33,6 +33,7 @@ import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
 import org.junit.platform.engine.discovery.MethodSelector;
 import org.junit.platform.engine.discovery.PackageSelector;
+import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Method;
@@ -158,15 +159,15 @@ public class TestEngineDiscoverySelectorResolver {
      * @param engineDescriptor
      */
     public void resolveSelectors(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
-        LOGGER.trace("resolveSelectors()");
+        LOGGER.info("resolveSelectors()");
 
         // Test class to test method list mapping, sorted by test class name
         Map<Class<?>, Collection<Method>> testClassToMethodMap = new TreeMap<>(Comparator.comparing(Class::getName));
 
-        // For each test class that was selected, add all test methods
+        // For each all classes, add all test methods
         resolveClasspathRoot(engineDiscoveryRequest, testClassToMethodMap);
 
-        // For each test class that was selected, add all test methods
+        // For each test package that was selected, add all test methods
         resolvePackageSelector(engineDiscoveryRequest, testClassToMethodMap);
 
         // For each test class selected, add all test methods
@@ -174,6 +175,9 @@ public class TestEngineDiscoverySelectorResolver {
 
         // For each test method that was selected, add the test class and method
         resolveMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
+
+        // For test
+        resolveUniqueIdSelector(engineDiscoveryRequest, testClassToMethodMap);
 
         if (includeTestClassPredicate != null) {
             Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
@@ -315,10 +319,35 @@ public class TestEngineDiscoverySelectorResolver {
         }
     }
 
+    private void resolveUniqueIdSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
+        LOGGER.info("resolveUniqueIdSelector()");
+        
+        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class);
+        LOGGER.info(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
+
+        for (DiscoverySelector discoverySelector : discoverySelectorList) {
+            UniqueIdSelector uniqueIdSelector = (UniqueIdSelector) discoverySelector;
+            UniqueId uniqueId = uniqueIdSelector.getUniqueId();
+            LOGGER.info("uniqueId " + uniqueId);
+
+            /*
+            Class<?> clazz = method.getDeclaringClass();
+
+            if (IS_TEST_METHOD.test(method)) {
+                LOGGER.trace(String.format("  test class [%s] @TestEngine.Test method [%s]", clazz.getName(), method.getName()));
+                Collection<Method> methods = testClassToMethodMap.computeIfAbsent(clazz, k -> new ArrayList<>());
+
+                methods.add(method);
+            }
+            */
+        }
+    }
+
     private void processSelectors(
             EngineDescriptor engineDescriptor,
             Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.trace("processSelectors()");
+        LOGGER.info("processSelectors()");
+        LOGGER.info("testClassToMethodMap.size() [" + testClassToMethodMap.size() + "]");
 
         UniqueId uniqueId = engineDescriptor.getUniqueId();
 
@@ -340,7 +369,7 @@ public class TestEngineDiscoverySelectorResolver {
 
                 // Get the arguments methods
                 Collection<Method> argumentsMethods = TestEngineReflectionUtils.getArgumentsMethods(testClass);
-                LOGGER.trace(String.format("test class [%s] parameter supplier method count [%d]", testClass.getName(), argumentsMethods.size()));
+                LOGGER.trace(String.format("test class [%s] arguments method count [%d]", testClass.getName(), argumentsMethods.size()));
 
                 // Validate arguments method count
                 if (argumentsMethods.isEmpty()) {

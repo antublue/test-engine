@@ -30,14 +30,14 @@ public class TestEngineArgumentTestDescriptor extends TestEngineAbstractTestDesc
     private final Argument testArgument;
 
     public TestEngineArgumentTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Argument testArgument) {
-        super(uniqueId, testArgument.name());
+        super(uniqueId, displayName);
         this.testClass = testClass;
         this.testArgument = testArgument;
     }
 
     @Override
     public Optional<TestSource> getSource() {
-        return Optional.empty();
+        return Optional.of(ClassSource.from(testArgument.getClass()));
     }
 
     @Override
