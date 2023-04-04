@@ -292,7 +292,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     }
 
     private static void walk(EngineDescriptor engineDescriptor) {
-        LOGGER.info("EngineDescriptor - > " + engineDescriptor.getUniqueId());
+        LOGGER.trace("EngineDescriptor - > " + engineDescriptor.getUniqueId());
         Set<? extends TestDescriptor> testDescriptors = engineDescriptor.getChildren();
         for (TestDescriptor testDescriptor : testDescriptors) {
             walk(testDescriptor, 2);
@@ -301,19 +301,19 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static void walk(TestDescriptor parentTestDescriptor, int indent) {
         if (parentTestDescriptor instanceof TestEngineClassTestDescriptor) {
-            LOGGER.info(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            LOGGER.trace(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
             Set<? extends TestDescriptor> testDescriptors = ((TestEngineClassTestDescriptor) parentTestDescriptor).getChildren();
             for (TestDescriptor childTestDescriptor : testDescriptors) {
                 walk(childTestDescriptor, indent + 2);
             }
         } else if (parentTestDescriptor instanceof TestEngineParameterTestDescriptor) {
-            LOGGER.info(pad(indent) + "TestEngineParameterTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            LOGGER.trace(pad(indent) + "TestEngineParameterTestDescriptor - > " + parentTestDescriptor.getUniqueId());
             Set<? extends TestDescriptor> testDescriptors = ((TestEngineParameterTestDescriptor) parentTestDescriptor).getChildren();
             for (TestDescriptor childTestDescriptor : testDescriptors) {
                 walk(childTestDescriptor, indent + 2);
             }
         } else  {
-            LOGGER.info(pad(indent) + "TestEngineTestMethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            LOGGER.trace(pad(indent) + "TestEngineTestMethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
         }
     }
 

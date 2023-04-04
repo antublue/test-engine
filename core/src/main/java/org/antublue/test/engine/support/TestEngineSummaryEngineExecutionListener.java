@@ -41,10 +41,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
-    private static final String TEST = "(TEST)";
-    private static final String ABORT = "(ABORT)";
-    private static final String FAIL = "(FAIL)";
-    private static final String PASS = "(PASS)";
+    private static final String TEST = "TEST";
+    private static final String ABORT = "ABORT";
+    private static final String FAIL = "FAIL";
+    private static final String PASS = "PASS";
 
     private final TestPlan testPlan;
     private final SummaryGeneratingListener summaryGeneratingListener;
@@ -85,10 +85,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Parameter testParameter = testEngineParameterTestDescriptor.getTestParameter();
                     String testParameterName = testParameter.name();
                     stringBuilder
+                            .append(TEST)
+                            .append(" | ")
                             .append(testParameterName)
                             .append(" | ")
-                            .append(TEST)
-                            .append(" ")
                             .append(testClass.getName());
                 }),
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
@@ -98,10 +98,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Parameter testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
                     String testParameterName = testParameter.name();
                     stringBuilder
+                            .append(TEST)
+                            .append(" | ")
                             .append(testParameterName)
                             .append(" | ")
-                            .append(TEST)
-                            .append(" ")
                             .append(testClass.getName())
                             .append(" ")
                             .append(testMethod.getName())
@@ -110,7 +110,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
         );
 
         if (detailedOutput && (stringBuilder.length() > 0)) {
-            LOGGER.info(stringBuilder.toString());
+            LOGGER.rawInfo(stringBuilder.toString());
         }
     }
 
@@ -130,9 +130,9 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Parameter testParameter = testengineParameterTestDescriptor.getTestParameter();
                     String testParameterName = testParameter.name();
                     stringBuilder
+                            .append("%s | ")
                             .append(testParameterName)
                             .append(" | ")
-                            .append("%s ")
                             .append(testClass.getName());
                 }),
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
@@ -142,9 +142,9 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                     Parameter testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
                     String testParameterName = testParameter.name();
                     stringBuilder
+                            .append("%s | ")
                             .append(testParameterName)
                             .append(" | ")
-                            .append("%s ")
                             .append(testClass.getName())
                             .append(" ")
                             .append(testMethod.getName())
@@ -174,7 +174,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
             }
 
             if (detailedOutput && (string != null)) {
-                LOGGER.info(string);
+                LOGGER.rawInfo(string);
             }
         }
     }

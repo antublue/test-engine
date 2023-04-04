@@ -322,15 +322,15 @@ public class TestEngineDiscoverySelectorResolver {
     }
 
     private void resolveUniqueIdSelector(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.info("resolveUniqueIdSelector()");
+        LOGGER.trace("resolveUniqueIdSelector()");
 
         List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class);
-        LOGGER.info(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
+        LOGGER.trace(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
 
         for (DiscoverySelector discoverySelector : discoverySelectorList) {
             UniqueIdSelector uniqueIdSelector = (UniqueIdSelector) discoverySelector;
             UniqueId uniqueId = uniqueIdSelector.getUniqueId();
-            LOGGER.info("uniqueId [" + uniqueId + "]");
+            LOGGER.trace("uniqueId [" + uniqueId + "]");
 
             String classpath = System.getProperty("java.class.path");
             String[] classpathEntries = classpath.split(File.pathSeparator);
@@ -351,13 +351,13 @@ public class TestEngineDiscoverySelectorResolver {
 
             Optional<? extends TestDescriptor> optionalTestDescriptor = tempEngineDescriptor.findByUniqueId(uniqueId);
             if (optionalTestDescriptor.isPresent()) {
-                LOGGER.info("found testDescriptor");
+                LOGGER.trace("found testDescriptor");
 
                 TestDescriptor testDescriptor = ((TestEngineParameterTestDescriptor) optionalTestDescriptor.get()).copy();
-                LOGGER.info("testDescriptor -> " + testDescriptor.getUniqueId());
+                LOGGER.trace("testDescriptor -> " + testDescriptor.getUniqueId());
 
                 TestDescriptor parentTestDescriptor = ((TestEngineClassTestDescriptor) testDescriptor.getParent().get()).copy();
-                LOGGER.info("  testDescriptor -> " + parentTestDescriptor.getUniqueId());
+                LOGGER.trace("  testDescriptor -> " + parentTestDescriptor.getUniqueId());
 
                 parentTestDescriptor.addChild(testDescriptor);
                 engineDescriptor.addChild(parentTestDescriptor);
