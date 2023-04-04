@@ -152,7 +152,7 @@ public class TestEngineExecutor {
             Class<?> testClass = testEngineClassTestDescriptor.getTestClass();
 
             LOGGER.trace("executing @TestEngine.BeforeClass methods...");
-            for (Method beforeClass : TestEngineUtils.getBeforeClassMethods(testClass)) {
+            for (Method beforeClass : TestEngineReflectionUtils.getBeforeClassMethods(testClass)) {
                 LOGGER.trace(String.format("@TestEngine.BeforeClass method [%s]", beforeClass.getName()));
                 beforeClass.invoke(null, (Object[]) null);
                 flush();
@@ -175,7 +175,7 @@ public class TestEngineExecutor {
             testEngineExecutionContext.setTestInstance(null);
 
             LOGGER.trace("executing @TestEngine.AfterClass methods...");
-            for (Method afterClassMethod : TestEngineUtils.getAfterClassMethods(testClass)) {
+            for (Method afterClassMethod : TestEngineReflectionUtils.getAfterClassMethods(testClass)) {
                 LOGGER.trace(String.format("@TestEngine.AfterClass method [%s]", afterClassMethod.getName()));
                 afterClassMethod.invoke(null, (Object[]) null);
                 flush();
@@ -225,11 +225,11 @@ public class TestEngineExecutor {
 
         try {
             LOGGER.trace("executing @TestEngine.Argument method...");
-            Method testArgumentMethod = TestEngineUtils.getArgumentMethods(testClass).stream().findFirst().get();
+            Method testArgumentMethod = TestEngineReflectionUtils.getArgumentMethods(testClass).stream().findFirst().get();
             testArgumentMethod.invoke(testInstance, testArgument);
 
             LOGGER.trace("executing @TestEngine.BeforeAll methods...");
-            for (Method beforeAllMethod : TestEngineUtils.getBeforeAllMethods(testClass)) {
+            for (Method beforeAllMethod : TestEngineReflectionUtils.getBeforeAllMethods(testClass)) {
                 LOGGER.trace(String.format("@TestEngine.BeforeAll method [%s]", beforeAllMethod.getName()));
                 beforeAllMethod.invoke(testInstance, (Object[]) null);
                 flush();
@@ -262,7 +262,7 @@ public class TestEngineExecutor {
 
         try {
             LOGGER.trace("executing @TestEngine.AfterAll methods...");
-            for (Method afterAllMethod : TestEngineUtils.getAfterAllMethods(testClass)) {
+            for (Method afterAllMethod : TestEngineReflectionUtils.getAfterAllMethods(testClass)) {
                 LOGGER.trace(String.format("@TestEngine.AfterAll method [%s]", afterAllMethod.getName()));
                 afterAllMethod.invoke(testInstance, (Object[]) null);
                 flush();
@@ -307,7 +307,7 @@ public class TestEngineExecutor {
 
         try {
             LOGGER.trace("executing @TestEngine.BeforeEach methods...");
-            for (Method beforeEachMethod : TestEngineUtils.getBeforeEachMethods(testClass)) {
+            for (Method beforeEachMethod : TestEngineReflectionUtils.getBeforeEachMethods(testClass)) {
                 LOGGER.trace(String.format("@TestEngine.BeforeEach method [%s]", beforeEachMethod.getName()));
                 beforeEachMethod.invoke(testInstance, (Object[]) null);
                 flush();
@@ -336,7 +336,7 @@ public class TestEngineExecutor {
 
         try {
             LOGGER.trace("executing @TestEngine.AfterEach methods...");
-            for (Method afterEachMethod : TestEngineUtils.getAfterEachMethods(testClass)) {
+            for (Method afterEachMethod : TestEngineReflectionUtils.getAfterEachMethods(testClass)) {
                 LOGGER.trace(String.format("@TestEngine.AfterEach method [%s]", afterEachMethod.getName()));
                 afterEachMethod.invoke(testInstance, (Object[]) null);
                 flush();

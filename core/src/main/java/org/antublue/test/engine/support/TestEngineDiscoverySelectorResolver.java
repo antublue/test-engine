@@ -69,13 +69,13 @@ public class TestEngineDiscoverySelectorResolver {
      * Predicate to determine if a class is a test class (not abstract, has @TestEngine.Test methods)
      */
     private static final Predicate<Class<?>> IS_TEST_CLASS =
-            clazz -> !Modifier.isAbstract(clazz.getModifiers()) && !TestEngineUtils.getTestMethods(clazz).isEmpty();
+            clazz -> !Modifier.isAbstract(clazz.getModifiers()) && !TestEngineReflectionUtils.getTestMethods(clazz).isEmpty();
 
     /**
      * Predicate to determine if a method is a test method (declared class contains the method)
      */
     private static final Predicate<Method> IS_TEST_METHOD =
-            method -> TestEngineUtils.getTestMethods(method.getDeclaringClass()).contains(method);
+            method -> TestEngineReflectionUtils.getTestMethods(method.getDeclaringClass()).contains(method);
 
     public TestEngineDiscoverySelectorResolver() {
         String includeTestClassPredicateRegex =
@@ -256,7 +256,7 @@ public class TestEngineDiscoverySelectorResolver {
 
             for (Class<?> clazz : classList) {
                 LOGGER.trace(String.format("  class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
+                testClassToMethodMap.putIfAbsent(clazz, TestEngineReflectionUtils.getTestMethods(clazz));
             }
         }
     }
@@ -273,7 +273,7 @@ public class TestEngineDiscoverySelectorResolver {
 
             for (Class<?> clazz : classList) {
                 LOGGER.trace(String.format("  test class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
+                testClassToMethodMap.putIfAbsent(clazz, TestEngineReflectionUtils.getTestMethods(clazz));
             }
         }
     }
@@ -289,7 +289,7 @@ public class TestEngineDiscoverySelectorResolver {
 
             if (IS_TEST_CLASS.test(clazz)) {
                 LOGGER.trace(String.format("  test class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestEngineUtils.getTestMethods(clazz));
+                testClassToMethodMap.putIfAbsent(clazz, TestEngineReflectionUtils.getTestMethods(clazz));
             } else {
                 LOGGER.trace(String.format("  skipping [%s]", clazz.getName()));
             }
@@ -320,16 +320,18 @@ public class TestEngineDiscoverySelectorResolver {
             Map<Class<?>, Collection<Method>> testClassToMethodMap) {
         LOGGER.trace("processSelectors()");
 
+        UniqueId uniqueId = engineDescriptor.getUniqueId();
+
         try {
             for (Class<?> testClass : testClassToMethodMap.keySet()) {
                 LOGGER.trace(String.format("test class [%s]", testClass.getName()));
 
-                if (TestEngineUtils.isBaseClass(testClass)) {
+                if (TestEngineReflectionUtils.isBaseClass(testClass)) {
                     LOGGER.trace(String.format("test class [%s] is a base class not meant for execution", testClass.getName()));
                     continue;
                 }
 
-                if (TestEngineUtils.isDisabled(testClass)) {
+                if (TestEngineReflectionUtils.isDisabled(testClass)) {
                     LOGGER.trace(String.format("test class [%s] is disabled", testClass.getName()));
                     continue;
                 }
@@ -337,7 +339,7 @@ public class TestEngineDiscoverySelectorResolver {
                 LOGGER.trace(String.format("processing test class [%s]", testClass.getName()));
 
                 // Get the arguments methods
-                Collection<Method> argumentsMethods = TestEngineUtils.getArgumentsMethods(testClass);
+                Collection<Method> argumentsMethods = TestEngineReflectionUtils.getArgumentsMethods(testClass);
                 LOGGER.trace(String.format("test class [%s] parameter supplier method count [%d]", testClass.getName(), argumentsMethods.size()));
 
                 // Validate arguments method count
@@ -393,7 +395,7 @@ public class TestEngineDiscoverySelectorResolver {
                                     testClass.getName()));
                 }
 
-                Collection<Method> argumentMethods = TestEngineUtils.getArgumentMethods(testClass);
+                Collection<Method> argumentMethods = TestEngineReflectionUtils.getArgumentMethods(testClass);
                 LOGGER.trace(String.format("test class [%s] argument method count [%d]", testClass.getName(), argumentMethods.size()));
 
                 if (argumentMethods.isEmpty()) {
@@ -413,26 +415,28 @@ public class TestEngineDiscoverySelectorResolver {
                 // Build the test descriptor tree if we have test arguments
                 // i.e. Tests with an empty set of arguments will be ignored
 
+                uniqueId = uniqueId.append("class", testClass.getName());
+
                 TestEngineClassTestDescriptor testClassTestDescriptor =
                         new TestEngineClassTestDescriptor(
-                                createUniqueId(engineDescriptor, testClass),
+                                uniqueId,
                                 testClass.getName(),
                                 testClass);
 
                 List<Argument> testArgumentList = new ArrayList<>(testArguments);
                 for (Argument testArgument : testArgumentList) {
-                    // Build the test descriptor for each test class / test argument
                     String testArgumentName = testArgument.name();
+                    uniqueId = uniqueId.append("argument", testArgumentName);
 
                     TestEngineArgumentTestDescriptor testEngineArgumentTestDescriptor =
                             new TestEngineArgumentTestDescriptor(
-                                    createUniqueId(engineDescriptor, testClass, testArgument),
+                                    uniqueId,
                                     testArgumentName,
                                     testClass,
                                     testArgument);
 
                     for (Method testMethod : testClassToMethodMap.get(testClass)) {
-                        if (TestEngineUtils.isDisabled(testMethod)) {
+                        if (TestEngineReflectionUtils.isDisabled(testMethod)) {
                             LOGGER.trace(
                                     String.format(
                                             "test class [%s] test method [%s] is disabled",
@@ -441,56 +445,36 @@ public class TestEngineDiscoverySelectorResolver {
                             continue;
                         }
 
-                        // Build the test descriptor for each test class / test argument / test method
-                        String testMethodUniqueName = testArgumentName + "/" + UUID.randomUUID();
+                        uniqueId = uniqueId.append("method", testMethod.getName());
 
                         TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor =
                                 new TestEngineTestMethodTestDescriptor(
-                                        createUniqueId(engineDescriptor, testClass, testArgument, testMethod),
+                                        uniqueId,
                                         testMethod.getName(),
                                         testClass,
                                         testArgument,
                                         testMethod);
 
                         testEngineArgumentTestDescriptor.addChild(testEngineTestMethodTestDescriptor);
+
+                        uniqueId = uniqueId.removeLastSegment();
                     }
 
                     if (testEngineArgumentTestDescriptor.getChildren().size() > 0) {
                         testClassTestDescriptor.addChild(testEngineArgumentTestDescriptor);
                     }
+
+                    uniqueId = uniqueId.removeLastSegment();
                 }
 
                 if (testClassTestDescriptor.getChildren().size() > 0) {
                     engineDescriptor.addChild(testClassTestDescriptor);
                 }
+
+                uniqueId = uniqueId.removeLastSegment();
             }
         } catch (Throwable t) {
             throw new TestEngineException("Exception in TestEngine", t);
         }
-    }
-
-    private static UniqueId createUniqueId(EngineDescriptor engineDescriptor, Class<?> clazz) {
-        return createUniqueId(engineDescriptor, clazz, null, null);
-    }
-
-    private static UniqueId createUniqueId(EngineDescriptor engineDescriptor, Class<?> clazz, Object argument) {
-        return createUniqueId(engineDescriptor, clazz, argument, null);
-    }
-
-    private static UniqueId createUniqueId(EngineDescriptor engineDescriptor, Class<?> clazz, Object argument, Method method) {
-        UniqueId uniqueId = engineDescriptor.getUniqueId();
-        if (clazz != null) {
-            uniqueId = uniqueId.append("class", clazz.getName());
-        }
-
-        if (argument != null) {
-            uniqueId = uniqueId.append("argument", String.valueOf(argument.hashCode()));
-        }
-
-        if (method != null) {
-            uniqueId = uniqueId.append("method", method.getName());
-        }
-
-        return uniqueId;
     }
 }

@@ -16,7 +16,11 @@
 
 package org.antublue.test.engine.descriptor;
 
+import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.ClassSource;
+
+import java.util.Optional;
 
 public class TestEngineClassTestDescriptor extends TestEngineAbstractTestDescriptor {
 
@@ -28,8 +32,23 @@ public class TestEngineClassTestDescriptor extends TestEngineAbstractTestDescrip
     }
 
     @Override
+    public Optional<TestSource> getSource() {
+        return Optional.of(ClassSource.from(testClass));
+    }
+
+    @Override
     public Type getType() {
-        return Type.CONTAINER;
+        return Type.CONTAINER_AND_TEST;
+    }
+
+    @Override
+    public boolean isTest() {
+        return true;
+    }
+
+    @Override
+    public boolean isContainer() {
+        return true;
     }
 
     public Class<?> getTestClass() {

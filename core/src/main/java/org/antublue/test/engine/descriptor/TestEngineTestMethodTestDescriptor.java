@@ -17,9 +17,13 @@
 package org.antublue.test.engine.descriptor;
 
 import org.antublue.test.engine.api.Argument;
+import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.ClassSource;
+import org.junit.platform.engine.support.descriptor.MethodSource;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDescriptor {
 
@@ -40,8 +44,23 @@ public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDe
     }
 
     @Override
+    public Optional<TestSource> getSource() {
+        return Optional.of(MethodSource.from(testMethod));
+    }
+
+    @Override
     public Type getType() {
         return Type.TEST;
+    }
+
+    @Override
+    public boolean isTest() {
+        return true;
+    }
+
+    @Override
+    public boolean isContainer() {
+        return false;
     }
 
     public Class<?> getTestClass() {

@@ -16,6 +16,9 @@
 
 package org.antublue.test.engine;
 
+import org.antublue.test.engine.descriptor.TestEngineArgumentTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineTestMethodTestDescriptor;
 import org.antublue.test.engine.support.TestEngineConfiguration;
 import org.antublue.test.engine.support.TestEngineConfigurationParameters;
 import org.antublue.test.engine.support.TestEngineDiscoverySelectorResolver;
@@ -24,7 +27,7 @@ import org.antublue.test.engine.support.TestEngineException;
 import org.antublue.test.engine.support.TestEngineExecutor;
 import org.antublue.test.engine.support.TestEngineInformation;
 import org.antublue.test.engine.support.TestEngineSummaryEngineExecutionListener;
-import org.antublue.test.engine.support.TestEngineUtils;
+import org.antublue.test.engine.support.TestEngineReflectionUtils;
 import org.antublue.test.engine.support.logger.Logger;
 import org.antublue.test.engine.support.logger.LoggerFactory;
 import org.antublue.test.engine.support.util.HumanReadableTime;
@@ -98,6 +101,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         // Create a AntuBLUETestEngineDiscoverySelectorResolver and
         // resolve selectors, adding them to the engine descriptor
         new TestEngineDiscoverySelectorResolver().resolveSelectors(testEngineDiscoveryRequest, engineDescriptor);
+
+        walk(engineDescriptor);
 
         // Return the engine descriptor with all child test descriptors
         return engineDescriptor;
@@ -206,7 +211,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 System.exit(-2);
             }
 
-            TestPlan testPlan = TestEngineUtils.createTestPlan(testDescriptor, configurationParameters);
+            TestPlan testPlan = TestEngineReflectionUtils.createTestPlan(testDescriptor, configurationParameters);
 
             TestEngineSummaryEngineExecutionListener summaryEngineExecutionListener = new TestEngineSummaryEngineExecutionListener(testPlan);
 
@@ -283,5 +288,39 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 System.exit(0);
             }
         }
+    }
+
+    private static void walk(EngineDescriptor engineDescriptor) {
+        System.out.println("EngineDescriptor - > " + engineDescriptor.getUniqueId());
+        Set<? extends TestDescriptor> testDescriptors = engineDescriptor.getChildren();
+        for (TestDescriptor testDescriptor : testDescriptors) {
+            walk(testDescriptor, 2);
+        }
+    }
+
+    private static void walk(TestDescriptor parentTestDescriptor, int indent) {
+        if (parentTestDescriptor instanceof TestEngineClassTestDescriptor) {
+            System.out.println(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            Set<? extends TestDescriptor> testDescriptors = ((TestEngineClassTestDescriptor) parentTestDescriptor).getChildren();
+            for (TestDescriptor childTestDescriptor : testDescriptors) {
+                walk(childTestDescriptor, indent + 2);
+            }
+        } else if (parentTestDescriptor instanceof TestEngineArgumentTestDescriptor) {
+            System.out.println(pad(indent) + "TestEngineArgumentTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            Set<? extends TestDescriptor> testDescriptors = ((TestEngineArgumentTestDescriptor) parentTestDescriptor).getChildren();
+            for (TestDescriptor childTestDescriptor : testDescriptors) {
+                walk(childTestDescriptor, indent + 2);
+            }
+        } else  {
+            System.out.println(pad(indent) + "TestEngineTestMethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+        }
+    }
+
+    private static String pad(int length) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            stringBuilder.append(" ");
+        }
+        return stringBuilder.toString();
     }
 }

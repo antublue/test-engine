@@ -40,9 +40,9 @@ import java.util.stream.Stream;
  * Class to implement methods to get test class fields / methods, caching the information
  */
 @SuppressWarnings("PMD.GodClass")
-public final class TestEngineUtils {
+public final class TestEngineReflectionUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineReflectionUtils.class);
 
     private enum Scope { STATIC, NON_STATIC }
 
@@ -75,7 +75,7 @@ public final class TestEngineUtils {
     /**
      * Constructor
      */
-    private TestEngineUtils() {
+    private TestEngineReflectionUtils() {
         // DO NOTHING
     }
 
