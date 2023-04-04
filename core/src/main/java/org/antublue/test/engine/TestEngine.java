@@ -59,7 +59,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
-    private static final String ENGINE_ID = "antublue-test-engine";
+    public static final String ENGINE_ID = "antublue-test-engine";
     private static final String GROUP_ID = "org.antublue";
     private static final String ARTIFACT_ID = "test-engine";
     private static final String VERSION = TestEngineInformation.getVersion();

@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.support;
 
+import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
 import org.antublue.test.engine.descriptor.TestEngineArgumentTestDescriptor;
@@ -28,6 +29,7 @@ import org.antublue.test.engine.support.predicate.TestMethodPredicate;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
+import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
@@ -36,6 +38,7 @@ import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
@@ -43,8 +46,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -177,7 +183,7 @@ public class TestEngineDiscoverySelectorResolver {
         resolveMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
 
         // For test
-        resolveUniqueIdSelector(engineDiscoveryRequest, testClassToMethodMap);
+        resolveUniqueIdSelector(engineDiscoveryRequest, engineDescriptor, testClassToMethodMap);
 
         if (includeTestClassPredicate != null) {
             Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
@@ -257,7 +263,6 @@ public class TestEngineDiscoverySelectorResolver {
             LOGGER.trace(String.format("uri [%s]", uri));
 
             List<Class<?>> classList = ReflectionSupport.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true);
-
             for (Class<?> clazz : classList) {
                 LOGGER.trace(String.format("  class [%s]", clazz.getName()));
                 testClassToMethodMap.putIfAbsent(clazz, TestEngineReflectionUtils.getTestMethods(clazz));
@@ -319,37 +324,54 @@ public class TestEngineDiscoverySelectorResolver {
         }
     }
 
-    private void resolveUniqueIdSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.info("resolveUniqueIdSelector()");
-        
+    private void resolveUniqueIdSelector(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
+        LOGGER.trace("resolveUniqueIdSelector()");
+
         List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class);
-        LOGGER.info(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
+        LOGGER.trace(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
 
         for (DiscoverySelector discoverySelector : discoverySelectorList) {
             UniqueIdSelector uniqueIdSelector = (UniqueIdSelector) discoverySelector;
             UniqueId uniqueId = uniqueIdSelector.getUniqueId();
-            LOGGER.info("uniqueId " + uniqueId);
 
-            /*
-            Class<?> clazz = method.getDeclaringClass();
-
-            if (IS_TEST_METHOD.test(method)) {
-                LOGGER.trace(String.format("  test class [%s] @TestEngine.Test method [%s]", clazz.getName(), method.getName()));
-                Collection<Method> methods = testClassToMethodMap.computeIfAbsent(clazz, k -> new ArrayList<>());
-
-                methods.add(method);
+            String classpath = System.getProperty("java.class.path");
+            String[] classpathEntries = classpath.split(File.pathSeparator);
+            for (String classPathEntry : classpathEntries) {
+                URI uri = new File(classPathEntry).getAbsoluteFile().toURI();
+                List<Class<?>> classList = ReflectionSupport.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true);
+                for (Class<?> clazz : classList) {
+                    testClassToMethodMap.putIfAbsent(clazz, TestEngineReflectionUtils.getTestMethods(clazz));
+                }
             }
-            */
+
+            EngineDescriptor tempEngineDescriptor =
+                    new EngineDescriptor(UniqueId.forEngine(TestEngine.ENGINE_ID), TestEngine.ENGINE_ID);
+
+            processSelectors(tempEngineDescriptor, testClassToMethodMap);
+
+            testClassToMethodMap.clear();
+
+            Optional<? extends TestDescriptor> optionalTestDescriptor = tempEngineDescriptor.findByUniqueId(uniqueId);
+            if (optionalTestDescriptor.isPresent()) {
+                LOGGER.info("found testDescriptor");
+                TestDescriptor testDescriptor = ((TestEngineArgumentTestDescriptor) optionalTestDescriptor.get()).copy();
+                LOGGER.info("testDescriptor -> " + testDescriptor.getUniqueId());
+                TestDescriptor parentTestDescriptor = ((TestEngineClassTestDescriptor) testDescriptor.getParent().get()).copy();
+                LOGGER.info("  testDescriptor -> " + parentTestDescriptor.getUniqueId());
+
+                parentTestDescriptor.addChild(testDescriptor);
+                engineDescriptor.addChild(parentTestDescriptor);
+            }
         }
     }
 
     private void processSelectors(
-            EngineDescriptor engineDescriptor,
+            TestDescriptor testDescriptor,
             Map<Class<?>, Collection<Method>> testClassToMethodMap) {
         LOGGER.info("processSelectors()");
         LOGGER.info("testClassToMethodMap.size() [" + testClassToMethodMap.size() + "]");
 
-        UniqueId uniqueId = engineDescriptor.getUniqueId();
+        UniqueId uniqueId = testDescriptor.getUniqueId();
 
         try {
             for (Class<?> testClass : testClassToMethodMap.keySet()) {
@@ -497,7 +519,7 @@ public class TestEngineDiscoverySelectorResolver {
                 }
 
                 if (testClassTestDescriptor.getChildren().size() > 0) {
-                    engineDescriptor.addChild(testClassTestDescriptor);
+                    testDescriptor.addChild(testClassTestDescriptor);
                 }
 
                 uniqueId = uniqueId.removeLastSegment();

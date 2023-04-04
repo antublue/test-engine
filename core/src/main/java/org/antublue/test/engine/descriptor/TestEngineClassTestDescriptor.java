@@ -54,4 +54,8 @@ public class TestEngineClassTestDescriptor extends TestEngineAbstractTestDescrip
     public Class<?> getTestClass() {
         return testClass;
     }
+
+    public TestEngineClassTestDescriptor copy() {
+        return new TestEngineClassTestDescriptor(getUniqueId(), getDisplayName(), testClass);
+    }
 }

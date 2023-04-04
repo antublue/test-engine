@@ -62,4 +62,11 @@ public class TestEngineArgumentTestDescriptor extends TestEngineAbstractTestDesc
     public Argument getTestArgument() {
         return testArgument;
     }
+
+    public TestEngineArgumentTestDescriptor copy() {
+        TestEngineArgumentTestDescriptor copy = new TestEngineArgumentTestDescriptor(getUniqueId(), getDisplayName(), testClass, testArgument);
+        copy.setParent(getParent().get());
+        children.stream().forEach(child -> copy.addChild(child));
+        return copy;
+    }
 }
