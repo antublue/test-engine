@@ -1,6 +1,6 @@
 package example.order;
 
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ class BaseOrderTest {
 
     protected static final List<String> ACTUAL_LIST = new ArrayList<>();
 
-    protected Argument argument;
+    protected Parameter parameter;
 
     @TestEngine.BeforeClass
     @TestEngine.Order(1)
@@ -30,7 +30,7 @@ class BaseOrderTest {
     @TestEngine.Test
     @TestEngine.Order(1)
     public void test2() {
-        System.out.println("test2(" + argument.value() + ")");
+        System.out.println("test2(" + parameter.value() + ")");
         ConcreteOrderTest.ACTUAL_LIST.add("test2");
     }
 

@@ -16,28 +16,27 @@
 
 package org.antublue.test.engine.descriptor;
 
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Parameter;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
-import org.junit.platform.engine.support.descriptor.FilePosition;
 
 import java.util.Optional;
 
-public class TestEngineArgumentTestDescriptor extends TestEngineAbstractTestDescriptor {
+public class TestEngineParameterTestDescriptor extends TestEngineAbstractTestDescriptor {
 
     private final Class<?> testClass;
-    private final Argument testArgument;
+    private final Parameter testParameter;
 
-    public TestEngineArgumentTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Argument testArgument) {
+    public TestEngineParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Parameter testParameter) {
         super(uniqueId, displayName);
         this.testClass = testClass;
-        this.testArgument = testArgument;
+        this.testParameter = testParameter;
     }
 
     @Override
     public Optional<TestSource> getSource() {
-        return Optional.of(ClassSource.from(testArgument.getClass()));
+        return Optional.of(ClassSource.from(testParameter.getClass()));
     }
 
     @Override
@@ -59,12 +58,12 @@ public class TestEngineArgumentTestDescriptor extends TestEngineAbstractTestDesc
         return testClass;
     }
 
-    public Argument getTestArgument() {
-        return testArgument;
+    public Parameter getTestParameter() {
+        return testParameter;
     }
 
-    public TestEngineArgumentTestDescriptor copy() {
-        TestEngineArgumentTestDescriptor copy = new TestEngineArgumentTestDescriptor(getUniqueId(), getDisplayName(), testClass, testArgument);
+    public TestEngineParameterTestDescriptor copy() {
+        TestEngineParameterTestDescriptor copy = new TestEngineParameterTestDescriptor(getUniqueId(), getDisplayName(), testClass, testParameter);
         copy.setParent(getParent().get());
         children.stream().forEach(child -> copy.addChild(child));
         return copy;

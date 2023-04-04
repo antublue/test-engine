@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -10,23 +10,23 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class ArgumentTest {
+public class ParameterTest {
 
-    private Argument argument;
+    private Parameter parameter;
 
-    @TestEngine.Arguments
-    public static Stream<Argument> arguments() {
-        Collection<Argument> collection = new ArrayList<>();
+    @TestEngine.ParameterSupplier
+    public static Stream<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(org.antublue.test.engine.api.Argument.of(String.valueOf(value)));
+            collection.add(Parameter.of(String.valueOf(value)));
         }
         return collection.stream();
     }
 
-    @TestEngine.Argument
-    public void argument(Argument argument) {
-        this.argument = argument;
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
+        this.parameter = parameter;
     }
 
     @TestEngine.BeforeAll
@@ -36,12 +36,12 @@ public class ArgumentTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument.value() + ")");
+        System.out.println("test1(" + parameter.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + argument.value() + ")");
+        System.out.println("test2(" + parameter.value() + ")");
     }
 
     @TestEngine.AfterAll

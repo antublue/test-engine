@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -12,23 +12,23 @@ import java.util.stream.Stream;
  * Example test
  */
 @SuppressWarnings("unchecked")
-public class CustomArgumentTest {
+public class CustomParameterTest {
 
-    private CustomArgument argument;
+    private CustomParameter parameter;
 
-    @TestEngine.Arguments
-    public static Stream<Argument> arguments() {
-        Collection<Argument> collection = new ArrayList<>();
+    @TestEngine.ParameterSupplier
+    public static Stream<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(CustomArgument.of("CustomParameter(" + i + ") = " + value, String.valueOf(value)));
+            collection.add(CustomParameter.of("CustomParameter(" + i + ") = " + value, String.valueOf(value)));
         }
         return collection.stream();
     }
 
-    @TestEngine.Argument
-    public void argument(Argument argument) {
-        this.argument = (CustomArgument) argument;
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
+        this.parameter = (CustomParameter) parameter;
     }
 
     @TestEngine.BeforeAll
@@ -38,12 +38,12 @@ public class CustomArgumentTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument.value() + ")");
+        System.out.println("test1(" + parameter.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + argument.value() + ")");
+        System.out.println("test2(" + parameter.value() + ")");
     }
 
     @TestEngine.AfterAll
@@ -51,12 +51,12 @@ public class CustomArgumentTest {
         System.out.println("afterAll()");
     }
 
-    private static class CustomArgument implements Argument {
+    private static class CustomParameter implements Parameter {
 
         private final String name;
         private final String value;
 
-        private CustomArgument(String name, String value) {
+        private CustomParameter(String name, String value) {
             this.name = name;
             this.value = value;
         }
@@ -76,9 +76,9 @@ public class CustomArgumentTest {
             return clazz.cast(value());
         }
 
-        public static CustomArgument of(String name, String value) {
+        public static CustomParameter of(String name, String value) {
             Objects.requireNonNull(name);
-            return new CustomArgument(name, value);
+            return new CustomParameter(name, value);
         }
     }
 }

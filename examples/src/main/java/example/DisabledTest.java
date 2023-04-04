@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -13,16 +13,16 @@ import java.util.stream.Stream;
 @TestEngine.Disabled
 public class DisabledTest {
 
-    private Argument argument;
+    private Parameter parameter;
 
-    @TestEngine.Arguments
-    public static Stream<Argument> arguments() {
-        return StringArguments.stream();
+    @TestEngine.ParameterSupplier
+    public static Stream<Parameter> parameters() {
+        return StringParameterSupplier.parameter();
     }
 
-    @TestEngine.Argument
-    public void argument(Argument argument) {
-        this.argument = argument;
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
+        this.parameter = parameter;
     }
 
     @TestEngine.BeforeAll
@@ -37,12 +37,12 @@ public class DisabledTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument + ")");
+        System.out.println("test1(" + parameter + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + argument + ")");
+        System.out.println("test2(" + parameter + ")");
     }
 
     @TestEngine.AfterEach
@@ -55,12 +55,12 @@ public class DisabledTest {
         System.out.println("afterAll()");
     }
 
-    private static class StringArguments {
+    private static class StringParameterSupplier {
 
-        public static Stream<Argument> stream() {
-            Collection<Argument> collection = new ArrayList<>();
+        public static Stream<Parameter> parameter() {
+            Collection<Parameter> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(org.antublue.test.engine.api.Argument.of(String.valueOf(i)));
+                collection.add(Parameter.of(String.valueOf(i)));
             }
             return collection.stream();
         }

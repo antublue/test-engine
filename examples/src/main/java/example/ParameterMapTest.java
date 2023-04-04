@@ -1,7 +1,7 @@
 package example;
 
-import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.ArgumentMap;
+import org.antublue.test.engine.api.Map;
+import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -11,25 +11,25 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class ArgumentMapTest {
+public class ParameterMapTest {
 
-    private ArgumentMap argumentMap;
+    private Map map;
 
-    @TestEngine.Arguments
-    public static Stream<Argument> arguments() {
-        Collection<Argument> collection = new ArrayList<>();
+    @TestEngine.ParameterSupplier
+    public static Stream<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             collection.add(
-                    org.antublue.test.engine.api.Argument.of(
-                            "ArgumentMap[" + i + "]",
-                            new ArgumentMap().put("key", i)));
+                    Parameter.of(
+                            "Map[" + i + "]",
+                            new Map().put("key", i)));
         }
         return collection.stream();
     }
 
-    @TestEngine.Argument
-    public void argument(Argument argument) {
-        argumentMap = argument.value();
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
+        map = parameter.value();
     }
 
     @TestEngine.BeforeAll
@@ -39,13 +39,13 @@ public class ArgumentMapTest {
 
     @TestEngine.Test
     public void test1() {
-        int value = argumentMap.get("key");
+        int value = map.get("key");
         System.out.println("test1(" + value + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        int value = argumentMap.get("key");
+        int value = map.get("key");
         System.out.println("test2(" + value + ")");
     }
 

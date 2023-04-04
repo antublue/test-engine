@@ -16,9 +16,8 @@
 
 package org.antublue.test.engine;
 
-import org.antublue.test.engine.descriptor.TestEngineArgumentTestDescriptor;
 import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.descriptor.TestEngineTestMethodTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineParameterTestDescriptor;
 import org.antublue.test.engine.support.TestEngineConfiguration;
 import org.antublue.test.engine.support.TestEngineConfigurationParameters;
 import org.antublue.test.engine.support.TestEngineDiscoverySelectorResolver;
@@ -26,8 +25,8 @@ import org.antublue.test.engine.support.TestEngineEngineDiscoveryRequest;
 import org.antublue.test.engine.support.TestEngineException;
 import org.antublue.test.engine.support.TestEngineExecutor;
 import org.antublue.test.engine.support.TestEngineInformation;
-import org.antublue.test.engine.support.TestEngineSummaryEngineExecutionListener;
 import org.antublue.test.engine.support.TestEngineReflectionUtils;
+import org.antublue.test.engine.support.TestEngineSummaryEngineExecutionListener;
 import org.antublue.test.engine.support.logger.Logger;
 import org.antublue.test.engine.support.logger.LoggerFactory;
 import org.antublue.test.engine.support.util.HumanReadableTime;
@@ -102,9 +101,9 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         // resolve selectors, adding them to the engine descriptor
         new TestEngineDiscoverySelectorResolver().resolveSelectors(testEngineDiscoveryRequest, engineDescriptor);
 
-        if (LOGGER.isTraceEnabled()) {
+        //if (LOGGER.isTraceEnabled()) {
             walk(engineDescriptor);
-        }
+        //}
 
         // Return the engine descriptor with all child test descriptors
         return engineDescriptor;
@@ -293,7 +292,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     }
 
     private static void walk(EngineDescriptor engineDescriptor) {
-        LOGGER.trace("EngineDescriptor - > " + engineDescriptor.getUniqueId());
+        LOGGER.info("EngineDescriptor - > " + engineDescriptor.getUniqueId());
         Set<? extends TestDescriptor> testDescriptors = engineDescriptor.getChildren();
         for (TestDescriptor testDescriptor : testDescriptors) {
             walk(testDescriptor, 2);
@@ -302,19 +301,19 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static void walk(TestDescriptor parentTestDescriptor, int indent) {
         if (parentTestDescriptor instanceof TestEngineClassTestDescriptor) {
-            LOGGER.trace(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            LOGGER.info(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
             Set<? extends TestDescriptor> testDescriptors = ((TestEngineClassTestDescriptor) parentTestDescriptor).getChildren();
             for (TestDescriptor childTestDescriptor : testDescriptors) {
                 walk(childTestDescriptor, indent + 2);
             }
-        } else if (parentTestDescriptor instanceof TestEngineArgumentTestDescriptor) {
-            LOGGER.trace(pad(indent) + "TestEngineArgumentTestDescriptor - > " + parentTestDescriptor.getUniqueId());
-            Set<? extends TestDescriptor> testDescriptors = ((TestEngineArgumentTestDescriptor) parentTestDescriptor).getChildren();
+        } else if (parentTestDescriptor instanceof TestEngineParameterTestDescriptor) {
+            LOGGER.info(pad(indent) + "TestEngineParameterTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            Set<? extends TestDescriptor> testDescriptors = ((TestEngineParameterTestDescriptor) parentTestDescriptor).getChildren();
             for (TestDescriptor childTestDescriptor : testDescriptors) {
                 walk(childTestDescriptor, indent + 2);
             }
         } else  {
-            System.out.println(pad(indent) + "TestEngineTestMethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            LOGGER.info(pad(indent) + "TestEngineTestMethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
         }
     }
 

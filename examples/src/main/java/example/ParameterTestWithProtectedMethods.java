@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -10,23 +10,23 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class ArgumentTestWithProtectedMethods {
+public class ParameterTestWithProtectedMethods {
 
-    private Argument argument;
+    private Parameter parameter;
 
-    @TestEngine.Arguments
-    protected static Stream<Argument> arguments() {
-        Collection<Argument> collection = new ArrayList<>();
+    @TestEngine.ParameterSupplier
+    protected static Stream<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(org.antublue.test.engine.api.Argument.of(String.valueOf(value)));
+            collection.add(Parameter.of(String.valueOf(value)));
         }
         return collection.stream();
     }
 
-    @TestEngine.Argument
-    protected void argument(Argument argument) {
-        this.argument = argument;
+    @TestEngine.Parameter
+    protected void parameter(Parameter parameter) {
+        this.parameter = parameter;
     }
 
     @TestEngine.BeforeAll
@@ -36,12 +36,12 @@ public class ArgumentTestWithProtectedMethods {
 
     @TestEngine.Test
     protected void test1() {
-        System.out.println("test1(" + argument.value() + ")");
+        System.out.println("test1(" + parameter.value() + ")");
     }
 
     @TestEngine.Test
     protected void test2() {
-        System.out.println("test2(" + argument.value() + ")");
+        System.out.println("test2(" + parameter.value() + ")");
     }
 
     @TestEngine.AfterAll

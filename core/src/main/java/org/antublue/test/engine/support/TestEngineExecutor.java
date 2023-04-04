@@ -17,7 +17,7 @@
 package org.antublue.test.engine.support;
 
 import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.descriptor.TestEngineArgumentTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineParameterTestDescriptor;
 import org.antublue.test.engine.descriptor.TestEngineTestMethodTestDescriptor;
 import org.antublue.test.engine.support.logger.Logger;
 import org.antublue.test.engine.support.logger.LoggerFactory;
@@ -164,10 +164,10 @@ public class TestEngineExecutor {
 
             Set<? extends TestDescriptor> children = testEngineClassTestDescriptor.getChildren();
             for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof TestEngineArgumentTestDescriptor) {
-                    TestEngineArgumentTestDescriptor testEngineArgumentTestDescriptor = (TestEngineArgumentTestDescriptor) testDescriptor;
-                    execute(testEngineArgumentTestDescriptor, testEngineExecutionContext);
-                    testExecutionResultList.addAll(testEngineArgumentTestDescriptor.getTestExecutionResultList());
+                if (testDescriptor instanceof TestEngineParameterTestDescriptor) {
+                    TestEngineParameterTestDescriptor testEngineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
+                    execute(testEngineParameterTestDescriptor, testEngineExecutionContext);
+                    testExecutionResultList.addAll(testEngineParameterTestDescriptor.getTestExecutionResultList());
                 }
             }
 
@@ -206,27 +206,27 @@ public class TestEngineExecutor {
     /**
      * Method to execute a TestEngineArgumentTestDescriptor
      *
-     * @param testEngineArgumentTestDescriptor
+     * @param testEngineParameterTestDescriptor
      * @param testEngineExecutionContext
      */
     private void execute(
-            TestEngineArgumentTestDescriptor testEngineArgumentTestDescriptor,
+            TestEngineParameterTestDescriptor testEngineParameterTestDescriptor,
             TestEngineExecutionContext testEngineExecutionContext) {
-        LOGGER.trace("execute(TestEngineArgumentTestDescriptor, TestEngineExecutionContext)");
+        LOGGER.trace("execute(TestEngineParameterTestDescriptor, TestEngineExecutionContext)");
 
-        testEngineExecutionContext.getEngineExecutionListener().executionStarted(testEngineArgumentTestDescriptor);
+        testEngineExecutionContext.getEngineExecutionListener().executionStarted(testEngineParameterTestDescriptor);
 
-        List<TestExecutionResult> testExecutionResultList = testEngineArgumentTestDescriptor.getTestExecutionResultList();
+        List<TestExecutionResult> testExecutionResultList = testEngineParameterTestDescriptor.getTestExecutionResultList();
         testExecutionResultList.clear();
 
-        Class<?> testClass = testEngineArgumentTestDescriptor.getTestClass();
+        Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
         Object testInstance = testEngineExecutionContext.getTestInstance();
-        Object testArgument = testEngineArgumentTestDescriptor.getTestArgument();
+        Object testParameter = testEngineParameterTestDescriptor.getTestParameter();
 
         try {
-            LOGGER.trace("executing @TestEngine.Argument method...");
-            Method testArgumentMethod = TestEngineReflectionUtils.getArgumentMethods(testClass).stream().findFirst().get();
-            testArgumentMethod.invoke(testInstance, testArgument);
+            LOGGER.trace("executing @TestEngine.Parameter method...");
+            Method testParameterMethod = TestEngineReflectionUtils.getParameterMethods(testClass).stream().findFirst().get();
+            testParameterMethod.invoke(testInstance, testParameter);
 
             LOGGER.trace("executing @TestEngine.BeforeAll methods...");
             for (Method beforeAllMethod : TestEngineReflectionUtils.getBeforeAllMethods(testClass)) {
@@ -243,7 +243,7 @@ public class TestEngineExecutor {
         }
 
         if (testExecutionResultList.isEmpty()) {
-            Set<? extends TestDescriptor> children = testEngineArgumentTestDescriptor.getChildren();
+            Set<? extends TestDescriptor> children = testEngineParameterTestDescriptor.getChildren();
             for (TestDescriptor testDescriptor : children) {
                 if (testDescriptor instanceof TestEngineTestMethodTestDescriptor) {
                     TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
@@ -252,7 +252,7 @@ public class TestEngineExecutor {
                 }
             }
         } else {
-            Set<? extends TestDescriptor> children = testEngineArgumentTestDescriptor.getChildren();
+            Set<? extends TestDescriptor> children = testEngineParameterTestDescriptor.getChildren();
             for (TestDescriptor testDescriptor : children) {
                 if (testDescriptor instanceof TestEngineTestMethodTestDescriptor) {
                     testEngineExecutionContext.getEngineExecutionListener().executionSkipped(testDescriptor, "@TestEngine.BeforeAll method exception");
@@ -277,10 +277,10 @@ public class TestEngineExecutor {
 
         if (testExecutionResultList.isEmpty()) {
             testEngineExecutionContext.getEngineExecutionListener().executionFinished(
-                    testEngineArgumentTestDescriptor, TestExecutionResult.successful());
+                    testEngineParameterTestDescriptor, TestExecutionResult.successful());
         } else {
             testEngineExecutionContext.getEngineExecutionListener().executionFinished(
-                    testEngineArgumentTestDescriptor, testExecutionResultList.get(0));
+                    testEngineParameterTestDescriptor, testExecutionResultList.get(0));
         }
 
         testEngineExecutionContext.getTestExecutionResultList().addAll(testExecutionResultList);
@@ -386,11 +386,11 @@ public class TestEngineExecutor {
                                         .append(testMethodTestDescriptor.getTestMethod().getName())
                                         .append("()")),
                 Switch.switchCase(
-                        TestEngineArgumentTestDescriptor.class,
-                        testArgumentTestDescriptor ->
+                        TestEngineParameterTestDescriptor.class,
+                        testEngineParameterTestDescriptor ->
                                 stringBuilder
                                         .append("argument -> ")
-                                        .append(testArgumentTestDescriptor.getTestArgument())),
+                                        .append(testEngineParameterTestDescriptor.getTestParameter())),
                 Switch.switchCase(
                         TestEngineClassTestDescriptor.class,
                         testClassTestDescriptor ->

@@ -17,9 +17,9 @@
 package org.antublue.test.engine.support;
 
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.descriptor.TestEngineArgumentTestDescriptor;
+import org.antublue.test.engine.descriptor.TestEngineParameterTestDescriptor;
 import org.antublue.test.engine.descriptor.TestEngineTestMethodTestDescriptor;
 import org.antublue.test.engine.support.logger.Logger;
 import org.antublue.test.engine.support.logger.LoggerFactory;
@@ -46,13 +46,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -165,7 +162,7 @@ public class TestEngineDiscoverySelectorResolver {
      * @param engineDescriptor
      */
     public void resolveSelectors(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
-        LOGGER.info("resolveSelectors()");
+        LOGGER.trace("resolveSelectors()");
 
         // Test class to test method list mapping, sorted by test class name
         Map<Class<?>, Collection<Method>> testClassToMethodMap = new TreeMap<>(Comparator.comparing(Class::getName));
@@ -182,7 +179,7 @@ public class TestEngineDiscoverySelectorResolver {
         // For each test method that was selected, add the test class and method
         resolveMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
 
-        // For test
+        // For specific test argument selection
         resolveUniqueIdSelector(engineDiscoveryRequest, engineDescriptor, testClassToMethodMap);
 
         if (includeTestClassPredicate != null) {
@@ -325,14 +322,15 @@ public class TestEngineDiscoverySelectorResolver {
     }
 
     private void resolveUniqueIdSelector(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.trace("resolveUniqueIdSelector()");
+        LOGGER.info("resolveUniqueIdSelector()");
 
         List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class);
-        LOGGER.trace(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
+        LOGGER.info(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
 
         for (DiscoverySelector discoverySelector : discoverySelectorList) {
             UniqueIdSelector uniqueIdSelector = (UniqueIdSelector) discoverySelector;
             UniqueId uniqueId = uniqueIdSelector.getUniqueId();
+            LOGGER.info("uniqueId [" + uniqueId + "]");
 
             String classpath = System.getProperty("java.class.path");
             String[] classpathEntries = classpath.split(File.pathSeparator);
@@ -354,8 +352,10 @@ public class TestEngineDiscoverySelectorResolver {
             Optional<? extends TestDescriptor> optionalTestDescriptor = tempEngineDescriptor.findByUniqueId(uniqueId);
             if (optionalTestDescriptor.isPresent()) {
                 LOGGER.info("found testDescriptor");
-                TestDescriptor testDescriptor = ((TestEngineArgumentTestDescriptor) optionalTestDescriptor.get()).copy();
+
+                TestDescriptor testDescriptor = ((TestEngineParameterTestDescriptor) optionalTestDescriptor.get()).copy();
                 LOGGER.info("testDescriptor -> " + testDescriptor.getUniqueId());
+
                 TestDescriptor parentTestDescriptor = ((TestEngineClassTestDescriptor) testDescriptor.getParent().get()).copy();
                 LOGGER.info("  testDescriptor -> " + parentTestDescriptor.getUniqueId());
 
@@ -368,8 +368,7 @@ public class TestEngineDiscoverySelectorResolver {
     private void processSelectors(
             TestDescriptor testDescriptor,
             Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.info("processSelectors()");
-        LOGGER.info("testClassToMethodMap.size() [" + testClassToMethodMap.size() + "]");
+        LOGGER.trace("processSelectors()");
 
         UniqueId uniqueId = testDescriptor.getUniqueId();
 
@@ -389,82 +388,82 @@ public class TestEngineDiscoverySelectorResolver {
 
                 LOGGER.trace(String.format("processing test class [%s]", testClass.getName()));
 
-                // Get the arguments methods
-                Collection<Method> argumentsMethods = TestEngineReflectionUtils.getArgumentsMethods(testClass);
-                LOGGER.trace(String.format("test class [%s] arguments method count [%d]", testClass.getName(), argumentsMethods.size()));
+                // Get the parameter supplier methods
+                Collection<Method> parameterSupplierMethods = TestEngineReflectionUtils.getParameterSupplierMethod(testClass);
+                LOGGER.trace(String.format("test class [%s] parameter supplier method count [%d]", testClass.getName(), parameterSupplierMethods.size()));
 
-                // Validate arguments method count
-                if (argumentsMethods.isEmpty()) {
+                // Validate parameter supplier method count
+                if (parameterSupplierMethods.isEmpty()) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] must declare a @TestEngine.Arguments method",
+                                    "Test class [%s] must declare a @TestEngine.ParameterSupplier method",
                                     testClass.getName()));
                 }
 
-                // Validate arguments method count
-                if (argumentsMethods.size() > 1) {
+                // Validate parameter supplier method count
+                if (parameterSupplierMethods.size() > 1) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] declares more than one @TestEngine.Argument method",
+                                    "Test class [%s] declares more than one @TestEngine.ParameterSupplier method",
                                     testClass.getName()));
                 }
 
-                // Get arguments from the arguments method
-                Collection<Argument> testArguments;
+                // Get parameters from the parameter supplier method
+                Collection<Parameter> testParameters;
 
                 try {
-                    Stream<Argument> testArgumentStream =
-                            (Stream<Argument>) argumentsMethods
+                    Stream<Parameter> parameterSupplierMethodStream =
+                            (Stream<Parameter>) parameterSupplierMethods
                                     .stream()
                                     .findFirst()
                                     .get()
                                     .invoke(null, (Object[]) null);
 
-                    if (testArgumentStream == null) {
+                    if (parameterSupplierMethodStream == null) {
                         throw new TestClassConfigurationException(
                                 String.format(
-                                        "Test class [%s] @TestEngine.Arguments Stream is null",
+                                        "Test class [%s] @TestEngine.ParameterSupplier Stream is null",
                                         testClass.getName()));
                     }
 
-                    testArguments = testArgumentStream.collect(Collectors.toList());
+                    testParameters = parameterSupplierMethodStream.collect(Collectors.toList());
                 } catch (ClassCastException e) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] @TestEngine.Arguments method must return a Stream<Argument>",
+                                    "Test class [%s] @TestEngine.ParameterSupplier method must return a Stream<Parameter>",
                                     testClass.getName()),
                             e);
                 }
 
-                LOGGER.trace("test class argument count [%d]", testArguments.size());
+                LOGGER.trace("test class parameter count [%d]", testParameters.size());
 
                 // Validate we have
-                if (testArguments.isEmpty()) {
+                if (testParameters.isEmpty()) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] @TestEngine.Arguments Stream is empty",
+                                    "Test class [%s] @TestEngine.ParameterSupplier Stream is empty",
                                     testClass.getName()));
                 }
 
-                Collection<Method> argumentMethods = TestEngineReflectionUtils.getArgumentMethods(testClass);
-                LOGGER.trace(String.format("test class [%s] argument method count [%d]", testClass.getName(), argumentMethods.size()));
+                Collection<Method> parameterMethods = TestEngineReflectionUtils.getParameterMethods(testClass);
+                LOGGER.trace(String.format("test class [%s] parameter method count [%d]", testClass.getName(), parameterMethods.size()));
 
-                if (argumentMethods.isEmpty()) {
+                if (parameterMethods.isEmpty()) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] must declare a @TestEngine.Argument method",
+                                    "Test class [%s] must declare a @TestEngine.Parameter method",
                                     testClass.getName()));
                 }
 
-                if (argumentMethods.size() > 1) {
+                if (parameterMethods.size() > 1) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] declares more than one @TestEngine.Argument method",
+                                    "Test class [%s] declares more than one @TestEngine.Parameter method",
                                     testClass.getName()));
                 }
 
-                // Build the test descriptor tree if we have test arguments
-                // i.e. Tests with an empty set of arguments will be ignored
+                // Build the test descriptor tree if we have test parameters
+                // i.e. Tests with an empty set of parameters will be ignored
 
                 uniqueId = uniqueId.append("class", testClass.getName());
 
@@ -474,17 +473,20 @@ public class TestEngineDiscoverySelectorResolver {
                                 testClass.getName(),
                                 testClass);
 
-                List<Argument> testArgumentList = new ArrayList<>(testArguments);
-                for (Argument testArgument : testArgumentList) {
-                    String testArgumentName = testArgument.name();
-                    uniqueId = uniqueId.append("argument", testArgumentName);
+                List<Parameter> testParameterList = new ArrayList<>(testParameters);
+                int index = 0;
+                for (Parameter testParameter : testParameterList) {
+                    String testParameterName = testParameter.name();
 
-                    TestEngineArgumentTestDescriptor testEngineArgumentTestDescriptor =
-                            new TestEngineArgumentTestDescriptor(
+                    // We use generic value of "parameter-" + index since parameter names are not unique
+                    uniqueId = uniqueId.append("parameter", "parameter-" + index);
+
+                    TestEngineParameterTestDescriptor testEngineParameterTestDescriptor =
+                            new TestEngineParameterTestDescriptor(
                                     uniqueId,
-                                    testArgumentName,
+                                    testParameterName,
                                     testClass,
-                                    testArgument);
+                                    testParameter);
 
                     for (Method testMethod : testClassToMethodMap.get(testClass)) {
                         if (TestEngineReflectionUtils.isDisabled(testMethod)) {
@@ -503,19 +505,20 @@ public class TestEngineDiscoverySelectorResolver {
                                         uniqueId,
                                         testMethod.getName(),
                                         testClass,
-                                        testArgument,
+                                        testParameter,
                                         testMethod);
 
-                        testEngineArgumentTestDescriptor.addChild(testEngineTestMethodTestDescriptor);
+                        testEngineParameterTestDescriptor.addChild(testEngineTestMethodTestDescriptor);
 
                         uniqueId = uniqueId.removeLastSegment();
                     }
 
-                    if (testEngineArgumentTestDescriptor.getChildren().size() > 0) {
-                        testClassTestDescriptor.addChild(testEngineArgumentTestDescriptor);
+                    if (testEngineParameterTestDescriptor.getChildren().size() > 0) {
+                        testClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
                     }
 
                     uniqueId = uniqueId.removeLastSegment();
+                    index++;
                 }
 
                 if (testClassTestDescriptor.getChildren().size() > 0) {

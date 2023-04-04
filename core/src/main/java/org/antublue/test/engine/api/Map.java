@@ -17,21 +17,20 @@
 package org.antublue.test.engine.api;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
- * Class to implement an ArgumentMap
+ * Class to implement a Map to contains values that has casting capabilities
  */
 @SuppressWarnings("unchecked")
-public class ArgumentMap extends LinkedHashMap<String, Object> {
+public class Map extends LinkedHashMap<String, Object> {
 
     /**
      * Constructor
      */
-    public ArgumentMap() {
+    public Map() {
         super();
     }
 
@@ -53,7 +52,7 @@ public class ArgumentMap extends LinkedHashMap<String, Object> {
      * @param object
      * @return
      */
-    public ArgumentMap put(String key, Object object) {
+    public Map put(String key, Object object) {
         validateKey(key);
         super.put(key, object);
         return this;
@@ -64,11 +63,11 @@ public class ArgumentMap extends LinkedHashMap<String, Object> {
      *
      * @param map mappings to be stored in this map
      */
-    public void putAll(Map map) {
+    public void putAll(java.util.Map map) {
         Objects.requireNonNull(map);
 
-        Set<Map.Entry<Object, Object>> set = map.entrySet();
-        for (Map.Entry<Object, Object> entry : set) {
+        Set<java.util.Map.Entry<Object, Object>> set = map.entrySet();
+        for (java.util.Map.Entry<Object, Object> entry : set) {
             String key = validateKey(entry.getKey());
             put(key, entry.getValue());
         }

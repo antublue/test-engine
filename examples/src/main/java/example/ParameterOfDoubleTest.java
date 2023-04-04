@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -12,23 +12,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Example test
  */
-public class ArgumentOfDoubleTest {
+public class ParameterOfDoubleTest {
 
-    private Argument argument;
+    private Parameter parameter;
 
-    @TestEngine.Arguments
-    public static Stream<Argument> arguments() {
-        Collection<Argument> collection = new ArrayList<>();
+    @TestEngine.ParameterSupplier
+    public static Stream<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             double value = i * 3d;
-            collection.add(org.antublue.test.engine.api.Argument.of(value));
+            collection.add(Parameter.of(value));
         }
         return collection.stream();
     }
 
-    @TestEngine.Argument
-    public void argument(Argument argument) {
-        this.argument = argument;
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
+        this.parameter = parameter;
     }
 
     @TestEngine.BeforeAll
@@ -38,8 +38,8 @@ public class ArgumentOfDoubleTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument.value() + ")");
-        assertThat(argument.value(Double.class).getClass()).isEqualTo(Double.class);
+        System.out.println("test1(" + parameter.value() + ")");
+        assertThat(parameter.value(Double.class).getClass()).isEqualTo(Double.class);
     }
 
     @TestEngine.AfterAll

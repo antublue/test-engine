@@ -1,6 +1,6 @@
 package example.inheritance;
 
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -10,22 +10,22 @@ import java.util.stream.Stream;
 @TestEngine.BaseClass
 public class BaseTest {
 
-    protected Argument argument;
+    protected Parameter parameter;
 
-    @TestEngine.Arguments
-    protected static Stream<Argument> arguments() {
-        Collection<Argument> collection = new ArrayList<>();
+    @TestEngine.ParameterSupplier
+    protected static Stream<Parameter> parameters() {
+        Collection<Parameter> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            collection.add(org.antublue.test.engine.api.Argument.of("Array [" + i + "]", i));
+            collection.add(Parameter.of("Array [" + i + "]", i));
         }
 
         return collection.stream();
     }
 
-    @TestEngine.Argument
-    protected void argument(Argument argument) {
-        this.argument = argument;
+    @TestEngine.Parameter
+    protected void parameter(Parameter parameter) {
+        this.parameter = parameter;
     }
 
     @TestEngine.BeforeClass

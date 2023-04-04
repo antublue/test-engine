@@ -19,8 +19,8 @@ package org.antublue.test.engine.api.source;
 import com.univocity.parsers.common.processor.RowListProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
-import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.ArgumentMap;
+import org.antublue.test.engine.api.Map;
+import org.antublue.test.engine.api.Parameter;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Class to create a Stream of Argument from a CSV file with a header line
+ * Class to create a Stream of Parameters from a CSV file with a header line
  */
 public final class CsvSource {
 
@@ -46,27 +46,27 @@ public final class CsvSource {
     }
 
     /**
-     * Method to create a Stream of Arguments from a CSV file
+     * Method to create a Stream of Parameters from a CSV file
      *
      * @param file
      * @param charset
      * @return
      * @throws IOException
      */
-    public static Stream<Argument> of(File file, Charset charset) throws IOException {
+    public static Stream<Parameter> of(File file, Charset charset) throws IOException {
         try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
             return of(inputStream, charset);
         }
     }
 
     /**
-     * Method to create a Stream of Argument from an InputStream formatted as CSV
+     * Method to create a Stream of Parameters from an InputStream formatted as CSV
      *
      * @param reader
      * @return
      * @throws IOException
      */
-    public static Stream<Argument> of(Reader reader) throws IOException {
+    public static Stream<Parameter> of(Reader reader) throws IOException {
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.setLineSeparatorDetectionEnabled(true);
         RowListProcessor rowListProcessor = new RowListProcessor();
@@ -78,14 +78,14 @@ public final class CsvSource {
     }
 
     /**
-     * Method to create a Stream of Argument from a Reader formatted as CSV
+     * Method to create a Stream of Parameters from a Reader formatted as CSV
      *
      * @param inputStream
      * @param charset
      * @return
      * @throws IOException
      */
-    public static Stream<Argument> of(InputStream inputStream, Charset charset) throws IOException {
+    public static Stream<Parameter> of(InputStream inputStream, Charset charset) throws IOException {
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.setLineSeparatorDetectionEnabled(true);
         RowListProcessor rowListProcessor = new RowListProcessor();
@@ -96,13 +96,13 @@ public final class CsvSource {
         return process(rowListProcessor);
     }
 
-    private static Stream<Argument> process(RowListProcessor rowListProcessor) {
-        List<Argument> list = new ArrayList<>();
+    private static Stream<Parameter> process(RowListProcessor rowListProcessor) {
+        List<Parameter> list = new ArrayList<>();
 
         String[] headers = rowListProcessor.getHeaders();
         List<String[]> rows = rowListProcessor.getRows();
         for (int i = 0; i < rows.size(); i++){
-            ArgumentMap argumentMap = new ArgumentMap();
+            Map map = new Map();
             String[] row = rows.get(i);
             for (int j = 0; j < row.length; j++) {
                 // TODO clean up by checking the header length against the row length
@@ -116,9 +116,9 @@ public final class CsvSource {
                     header = "column[" + (j+1) + "]";
                 }
 
-                argumentMap.put(header, row[j]);
+                map.put(header, row[j]);
             }
-            list.add(Argument.of("row[" + (i + 1) + "]", argumentMap));
+            list.add(Parameter.of("row[" + (i + 1) + "]", map));
         }
 
         return list.stream();

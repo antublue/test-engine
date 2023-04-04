@@ -7,21 +7,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Example test
  */
-@TestEngine.Tag("/tag1/")
-public class TaggedClassTest {
+public class ParameterOfBooleanTest {
 
     private Parameter parameter;
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            int value = i * 3;
-            collection.add(Parameter.of(String.valueOf(value)));
-        }
+        collection.add(Parameter.of(true));
+        collection.add(Parameter.of(false));
         return collection.stream();
     }
 
@@ -38,11 +37,7 @@ public class TaggedClassTest {
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + parameter.value() + ")");
-    }
-
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + parameter.value() + ")");
+        assertThat(parameter.value(Boolean.class).getClass()).isEqualTo(Boolean.class);
     }
 
     @TestEngine.AfterAll

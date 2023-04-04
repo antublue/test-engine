@@ -16,12 +16,12 @@
 
 package org.antublue.test.engine.support.api;
 
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Parameter;
 
 import java.util.Objects;
 
 @SuppressWarnings("unchecked")
-public class ArgumentImpl implements Argument {
+public class ParameterImpl implements Parameter {
 
     private final String name;
     private final Object value;
@@ -32,7 +32,7 @@ public class ArgumentImpl implements Argument {
      * @param name
      * @param value
      */
-    public ArgumentImpl(String name, Object value) {
+    public ParameterImpl(String name, Object value) {
         Objects.requireNonNull(name);
 
         if (name.trim().isEmpty()) {
@@ -88,7 +88,7 @@ public class ArgumentImpl implements Argument {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ArgumentImpl named = (ArgumentImpl) o;
+        ParameterImpl named = (ParameterImpl) o;
         return Objects.equals(name, named.name) && Objects.equals(value, named.value);
     }
 

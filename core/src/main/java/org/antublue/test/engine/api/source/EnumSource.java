@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.api.source;
 
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Parameter;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -42,13 +42,13 @@ public final class EnumSource {
      * @param e
      * @return
      */
-    public static Stream<Argument> of(Class<? extends Enum> e) {
-        final List<Argument> list = new ArrayList<>();
+    public static Stream<Parameter> of(Class<? extends Enum> e) {
+        final List<Parameter> list = new ArrayList<>();
 
         EnumSet.allOf(e)
                 .forEach(o -> {
                     Enum ee = (Enum) o;
-                    list.add(Argument.of(ee.name(), ee.toString()));
+                    list.add(Parameter.of(ee.name(), ee.toString()));
                 });
 
         return list.stream();
