@@ -21,19 +21,19 @@ import org.antublue.test.engine.support.api.ParameterImpl;
 import java.util.Objects;
 
 /**
- * Interface to implement an Parameter
+ * Interface to implement a Parameter
  */
 public interface Parameter {
 
     /**
-     * Method to get the parameter name
+     * Method to get the Parameter name
      *
      * @return
      */
     String name();
 
     /**
-     * Method to get the parameter value cast as the return type
+     * Method to get the Parameter value cast as the return type
      *
      * @return
      * @param <T>
@@ -41,7 +41,7 @@ public interface Parameter {
     <T> T value();
 
     /**
-     * Method to get the parameter value cast to a specific type
+     * Method to get the Parameter value cast to a specific type
      *
      * @param clazz
      * @return

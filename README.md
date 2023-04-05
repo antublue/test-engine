@@ -216,11 +216,6 @@ Add the Test Engine jars (and dependencies)...
     <artifactId>junit-platform-launcher</artifactId>
     <version>1.9.2</version>
   </dependency>
-  <dependency>
-    <groupId>org.junit.jupiter</groupId>
-    <artifactId>junit-jupiter-engine</artifactId>
-    <version>5.9.2</version>
-  </dependency>
 </dependencies>
 ```
 

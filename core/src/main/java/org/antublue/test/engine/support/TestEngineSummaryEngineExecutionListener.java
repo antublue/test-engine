@@ -23,6 +23,7 @@ import org.antublue.test.engine.descriptor.TestEngineParameterTestDescriptor;
 import org.antublue.test.engine.descriptor.TestEngineTestMethodTestDescriptor;
 import org.antublue.test.engine.support.logger.Logger;
 import org.antublue.test.engine.support.logger.LoggerFactory;
+import org.antublue.test.engine.support.util.Cast;
 import org.antublue.test.engine.support.util.Switch;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
@@ -35,7 +36,6 @@ import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 import java.lang.reflect.Method;
-import java.util.Optional;
 
 public class TestEngineSummaryEngineExecutionListener implements EngineExecutionListener {
 
@@ -48,15 +48,25 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
 
     private final TestPlan testPlan;
     private final SummaryGeneratingListener summaryGeneratingListener;
-    private boolean detailedOutput = true;
+    private final boolean detailedOutput;
 
     public TestEngineSummaryEngineExecutionListener(TestPlan testPlan) {
         this.testPlan = testPlan;
         this.summaryGeneratingListener = new SummaryGeneratingListener();
+
         this.summaryGeneratingListener.testPlanExecutionStarted(testPlan);
 
-        Optional<String> optionalDetailOutput = testPlan.getConfigurationParameters().get("antublue.test.engine.output");
-        optionalDetailOutput.ifPresent(s -> detailedOutput = "detailed".equalsIgnoreCase(s));
+        this.detailedOutput =
+                testPlan.getConfigurationParameters()
+                        .get("antublue.test.engine.output")
+                        .map(value -> {
+                            try {
+                                return Boolean.parseBoolean(value);
+                            } catch (NumberFormatException e) {
+                                return true;
+                            }
+                        })
+                        .orElse(true);
     }
 
     @Override
@@ -71,7 +81,9 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
 
     @Override
     public void executionStarted(TestDescriptor testDescriptor) {
-        summaryGeneratingListener.executionStarted(TestIdentifier.from(testDescriptor));
+        if (testDescriptor instanceof TestEngineTestMethodTestDescriptor) {
+            summaryGeneratingListener.executionStarted(TestIdentifier.from(testDescriptor));
+        }
 
         final StringBuilder stringBuilder = new StringBuilder();
 
@@ -116,7 +128,9 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
 
     @Override
     public void executionFinished(TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-        summaryGeneratingListener.executionFinished(TestIdentifier.from(testDescriptor), testExecutionResult);
+        if (testDescriptor instanceof TestEngineTestMethodTestDescriptor) {
+            summaryGeneratingListener.executionFinished(TestIdentifier.from(testDescriptor), testExecutionResult);
+        }
 
         final StringBuilder stringBuilder = new StringBuilder();
 

@@ -18,9 +18,8 @@ package org.antublue.test.engine;
 
 import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
 import org.antublue.test.engine.descriptor.TestEngineParameterTestDescriptor;
-import org.antublue.test.engine.support.TestEngineConfiguration;
 import org.antublue.test.engine.support.TestEngineConfigurationParameters;
-import org.antublue.test.engine.support.TestEngineDiscoverySelectorResolver;
+import org.antublue.test.engine.support.TestEngineDiscoveryRequestProcessor;
 import org.antublue.test.engine.support.TestEngineEngineDiscoveryRequest;
 import org.antublue.test.engine.support.TestEngineException;
 import org.antublue.test.engine.support.TestEngineExecutor;
@@ -45,6 +44,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -59,9 +59,9 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
     public static final String ENGINE_ID = "antublue-test-engine";
-    private static final String GROUP_ID = "org.antublue";
-    private static final String ARTIFACT_ID = "test-engine";
-    private static final String VERSION = TestEngineInformation.getVersion();
+    public static final String GROUP_ID = "org.antublue";
+    public static final String ARTIFACT_ID = "test-engine";
+    public static final String VERSION = TestEngineInformation.getVersion();
 
     @Override
     public String getId() {
@@ -85,25 +85,22 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
-        // Create configuration parameters which first gets the
-        // discovery request parameters then merges System properties
-        TestEngineConfigurationParameters configurationParameters =
-                new TestEngineConfigurationParameters(engineDiscoveryRequest.getConfigurationParameters());
-
         // Wrap the discovery request
         TestEngineEngineDiscoveryRequest testEngineDiscoveryRequest =
-                new TestEngineEngineDiscoveryRequest(engineDiscoveryRequest, configurationParameters);
+                new TestEngineEngineDiscoveryRequest(
+                        engineDiscoveryRequest,
+                        TestEngineConfigurationParameters.getInstance());
 
         // Create a EngineDescriptor as the target
         EngineDescriptor engineDescriptor = new EngineDescriptor(UniqueId.forEngine(getId()), getId());
 
-        // Create a AntuBLUETestEngineDiscoverySelectorResolver and
+        // Create a TestEngineDiscoverySelectorResolver and
         // resolve selectors, adding them to the engine descriptor
-        new TestEngineDiscoverySelectorResolver().resolveSelectors(testEngineDiscoveryRequest, engineDescriptor);
+        new TestEngineDiscoveryRequestProcessor().processDiscoveryRequest(testEngineDiscoveryRequest, engineDescriptor);
 
-        //if (LOGGER.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled()) {
             walk(engineDescriptor);
-        //}
+        }
 
         // Return the engine descriptor with all child test descriptors
         return engineDescriptor;
@@ -111,29 +108,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        if (executionRequest.getRootTestDescriptor().getChildren().size() < 1) {
-            return;
-        }
-
-        int threadCount = Runtime.getRuntime().availableProcessors();
-
-        String threadCountValue =
-                TestEngineConfiguration.getConfigurationValue(
-                "antublue.test.engine.thread.count");
-
-        if (threadCountValue != null) {
-            try {
-                threadCount = Integer.parseInt(threadCountValue);
-            } catch (NumberFormatException e) {
-                throw new TestEngineException(String.format("Invalid thread count [%s]", threadCountValue), e);
-            }
-        }
-
-        if (threadCount < 1) {
-            throw new TestEngineException(String.format("Invalid thread count [%d]", threadCount));
-        }
-
-        new TestEngineExecutor(threadCount).execute(executionRequest);
+        new TestEngineExecutor().execute(executionRequest);
     }
 
     /**
@@ -186,13 +161,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 LOGGER.trace("jar [{}]", path.toAbsolutePath());
             }
 
-            TestEngineConfigurationParameters configurationParameters = new TestEngineConfigurationParameters();
-
             LauncherDiscoveryRequest launcherDiscoveryRequest =
                     LauncherDiscoveryRequestBuilder.request()
                             .selectors(DiscoverySelectors.selectClasspathRoots(classPathRoots))
                             .filters(includeClassNamePatterns(".*"))
-                            .configurationParameters(configurationParameters.getConfigurationMap())
+                            .configurationParameters(new HashMap<>())
                             .build();
 
             TestEngine testEngine = new TestEngine();
@@ -212,7 +185,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 System.exit(-2);
             }
 
-            TestPlan testPlan = TestEngineReflectionUtils.createTestPlan(testDescriptor, configurationParameters);
+            TestPlan testPlan =
+                    TestEngineReflectionUtils.createTestPlan(
+                            testDescriptor,
+                            TestEngineConfigurationParameters.getInstance());
 
             TestEngineSummaryEngineExecutionListener summaryEngineExecutionListener = new TestEngineSummaryEngineExecutionListener(testPlan);
 

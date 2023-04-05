@@ -52,7 +52,25 @@ public class TestEngineExecutor {
 
     private final ExecutorService executorService;
 
-    public TestEngineExecutor(int threadCount) {
+    public TestEngineExecutor() {
+        int threadCount =
+                TestEngineConfigurationParameters.getInstance()
+                        .get("antublue.test.engine.thread.count")
+                        .map(value -> {
+                            int intValue;
+                            try {
+                                intValue = Integer.parseInt(value);
+                                if (intValue > 1) {
+                                    return intValue;
+                                } else {
+                                    throw new TestEngineException(String.format("Invalid thread count [%d]", intValue));
+                                }
+                            } catch (NumberFormatException e) {
+                                throw new TestEngineException(String.format("Invalid thread count [%s]", value), e);
+                            }
+                        })
+                        .orElse(Runtime.getRuntime().availableProcessors());
+
         this.executorService = Executors.newFixedThreadPool(threadCount, new NamedThreadFactory());
     }
 
@@ -63,6 +81,10 @@ public class TestEngineExecutor {
      */
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest)");
+
+        if (executionRequest.getRootTestDescriptor().getChildren().size() < 1) {
+            return;
+        }
 
         EngineExecutionListener engineExecutionListener = executionRequest.getEngineExecutionListener();
 
