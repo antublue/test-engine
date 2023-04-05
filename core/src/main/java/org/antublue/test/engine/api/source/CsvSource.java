@@ -19,8 +19,8 @@ package org.antublue.test.engine.api.source;
 import com.univocity.parsers.common.processor.RowListProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
+import org.antublue.test.engine.api.Map;
 import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.api.ParameterMap;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -102,7 +102,7 @@ public final class CsvSource {
         String[] headers = rowListProcessor.getHeaders();
         List<String[]> rows = rowListProcessor.getRows();
         for (int i = 0; i < rows.size(); i++){
-            ParameterMap parameterMap = new ParameterMap();
+            Map map = new Map();
             String[] row = rows.get(i);
             for (int j = 0; j < row.length; j++) {
                 // TODO clean up by checking the header length against the row length
@@ -116,9 +116,9 @@ public final class CsvSource {
                     header = "column[" + (j+1) + "]";
                 }
 
-                parameterMap.put(header, row[j]);
+                map.put(header, row[j]);
             }
-            list.add(Parameter.of("row[" + (i + 1) + "]", parameterMap));
+            list.add(Parameter.of("row[" + (i + 1) + "]", map));
         }
 
         return list.stream();

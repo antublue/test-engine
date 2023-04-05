@@ -20,8 +20,8 @@ public class ParameterStreamOfTest {
                 Parameter.of(String.valueOf(3.0f)));
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
         this.parameter = parameter;
     }
 

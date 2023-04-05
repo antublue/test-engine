@@ -18,7 +18,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
  */
 public class ParameterWithMixedObjectTest {
 
-    private Object parameter;
+    private Object value;
 
     // Function to test... typically this would be core project code
     private static Function<Object, String> TO_SPECIAL_NAME = object -> {
@@ -50,9 +50,9 @@ public class ParameterWithMixedObjectTest {
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
-        this.parameter = parameter.value();
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
+        this.value = parameter.value();
     }
 
     @TestEngine.BeforeAll
@@ -62,21 +62,21 @@ public class ParameterWithMixedObjectTest {
 
     @TestEngine.Test
     public void test() {
-        System.out.println("[" + parameter + "]");
+        System.out.println("[" + value + "]");
 
-        if (parameter instanceof String) {
-            assertThat(TO_SPECIAL_NAME.apply(parameter)).isEqualTo("string/" + parameter);
-        } else if (parameter instanceof Integer) {
-            assertThat(TO_SPECIAL_NAME.apply(parameter)).isEqualTo("int/" + parameter);
-        } else if (parameter instanceof BigDecimal) {
-            assertThat(TO_SPECIAL_NAME.apply(parameter)).isEqualTo("bigDecimal/" + parameter);
-        } else if (parameter == null) {
-            assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> TO_SPECIAL_NAME.apply(parameter));
+        if (value instanceof String) {
+            assertThat(TO_SPECIAL_NAME.apply(value)).isEqualTo("string/" + value);
+        } else if (value instanceof Integer) {
+            assertThat(TO_SPECIAL_NAME.apply(value)).isEqualTo("int/" + value);
+        } else if (value instanceof BigDecimal) {
+            assertThat(TO_SPECIAL_NAME.apply(value)).isEqualTo("bigDecimal/" + value);
+        } else if (value == null) {
+            assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> TO_SPECIAL_NAME.apply(value));
         } else {
-            assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> TO_SPECIAL_NAME.apply(parameter));
+            assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> TO_SPECIAL_NAME.apply(value));
         }
 
-        System.out.println("[" + parameter + "] PASSED");
+        System.out.println("[" + value + "] PASSED");
     }
 
     @TestEngine.AfterAll

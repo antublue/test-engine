@@ -25,8 +25,8 @@ public class ParameterOfStringTest {
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
         this.parameter = parameter;
     }
 

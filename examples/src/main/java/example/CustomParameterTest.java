@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 @SuppressWarnings("unchecked")
 public class CustomParameterTest {
 
-    private CustomParameter customParameter;
+    private CustomParameter parameter;
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
@@ -26,9 +26,9 @@ public class CustomParameterTest {
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
-        customParameter = (CustomParameter) parameter;
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
+        this.parameter = (CustomParameter) parameter;
     }
 
     @TestEngine.BeforeAll
@@ -38,12 +38,12 @@ public class CustomParameterTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + customParameter.value() + ")");
+        System.out.println("test1(" + parameter.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + customParameter.value() + ")");
+        System.out.println("test2(" + parameter.value() + ")");
     }
 
     @TestEngine.AfterAll

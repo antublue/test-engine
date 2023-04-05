@@ -26,8 +26,8 @@ public class ArrayTestWithProtectedMethods {
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
-    protected void setParameter(Parameter parameter) {
+    @TestEngine.Parameter
+    protected void parameter(Parameter parameter) {
         values = parameter.value();
     }
 

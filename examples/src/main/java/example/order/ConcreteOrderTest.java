@@ -21,10 +21,6 @@ public class ConcreteOrderTest extends BaseOrderTest {
                     "beforeClass",
                     "beforeAll2",
                     "beforeAll",
-                    "test2",
-                    "test3",
-                    "testA",
-                    "testB",
                     "afterAll2",
                     "afterAll",
                     "afterClass2",
@@ -40,8 +36,8 @@ public class ConcreteOrderTest extends BaseOrderTest {
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
         this.parameter = parameter;
     }
 
@@ -62,20 +58,17 @@ public class ConcreteOrderTest extends BaseOrderTest {
     @TestEngine.Test
     public void testA() {
         System.out.println("testA(" + parameter.value() + ")");
-        ACTUAL_LIST.add("testA");
     }
 
     @TestEngine.Test
     public void testB() {
         System.out.println("testB(" + parameter.value() + ")");
-        ACTUAL_LIST.add("testB");
     }
 
     @TestEngine.Test
     @TestEngine.Order(2)
     public void test3() {
         System.out.println("test3(" + parameter.value() + ")");
-        ACTUAL_LIST.add("test3");
     }
 
     @TestEngine.AfterAll

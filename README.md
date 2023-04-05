@@ -17,23 +17,26 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v2.0.5](https://github.com/antublue/test-engine/releases/tag/v2.0.5)
+- General Availability (GA): [Test Engine v2.0.6](https://github.com/antublue/test-engine/releases/tag/v2.0.6)
 
 ## Common Annotations
 
-| Annotation                      | Scope  |  Required | Static | Example                                          |
-|---------------------------------|--------|-----------|--------|--------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | method | yes       | yes    | `public static Stream<Parameter> parameters();`  |
-| `@TestEngine.ParameterSetter`   | method | yes       | no     | `public void setParameter(Parameter parameter);` |
-| `@TestEngine.BeforeClass`       | method | no        | yes    | `public static void beforeClass();`              |
-| `@TestEngine.BeforeAll`         | method | no        | no     | `public void beforeAll();`                       |
-| `@TestEngine.BeforeEach`        | method | no        | no     | `public void beforeEach();`                      |
-| `@TestEngine.Test`              | method | yes       | no     | `public void test();`                            |
-| `@TestEngine.AfterEach`         | method | no        | no     | `public void afterEach();`                       |
-| `@TestEngine.AfterAll`          | method | no        | no     | `public void afterAll();`                        |
-| `@TestEngine.AfterClass`        | method | no        | yes    | `public static void afterClass();`               |
+| Annotation                      | Scope           |  Required | Static | Example                                                                    |
+|---------------------------------|-----------------|-----------|--------|----------------------------------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | method          | yes       | yes    | `public static Stream<Parameter> parameters();`                            |
+| `@TestEngine.Parameter`         | field or method | yes       | no     | `public Parameter parameter` `public void parameter(Parameter parameter);` |
+| `@TestEngine.BeforeClass`       | method          | no        | yes    | `public static void beforeClass();`                                        |
+| `@TestEngine.BeforeAll`         | method          | no        | no     | `public void beforeAll();`                                                 |
+| `@TestEngine.BeforeEach`        | method          | no        | no     | `public void beforeEach();`                                                |
+| `@TestEngine.Test`              | method          | yes       | no     | `public void test();`                                                      |
+| `@TestEngine.AfterEach`         | method          | no        | no     | `public void afterEach();`                                                 |
+| `@TestEngine.AfterAll`          | method          | no        | no     | `public void afterAll();`                                                  |
+| `@TestEngine.AfterClass`        | method          | no        | yes    | `public static void afterClass();`                                         |
 
 **NOTES**
+
+- `@TestEngine.ParameterSetter` has been deprecated, replaced with `@TestEngine.Parameter` which supports a field or method
+
 
 - `public` and `protected` methods are supported for `@TestEngine.X` annotations
 
@@ -57,7 +60,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 **Notes**
 
-- Only one `@TestEngine.Tag(<string>)` is supported for a test class.
+- Only one `@TestEngine.Tag(<string>)` is supported for a test class / test method
 
 
 - It's recommended to use a tag string format of `/tag1/tag2/tag3/`
@@ -70,10 +73,10 @@ The `Parameter` interface also has static methods to wrap an Object
 
 ### Usage of `Parameter`
 
-- `@TestEngine.ParameterSupplier` must return a `Stream<Parameter>`
+- `@TestEngine.Parameters` must return a `Stream<Parameter>`
 
 
-- `@TestEngine.ParameterSetter` requires single `Parameter` object
+- `@TestEngine.Parameter` requires single `Parameter` object as parameter
 
 
 - The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name 
@@ -90,14 +93,14 @@ The `Parameter` interface also has static methods to wrap an Object
 Example
 
 ```java
-    @TestEngine.ParameterSupplier
+    @TestEngine.Parameters
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             collection.add(
-                    Parameter.of(
-                            "Array [" + i + "]",
-                            new String[] { String.valueOf(i), String.valueOf(i * 2) }));
+                Parameter.of(
+                    "Array [" + i + "]",
+                    new String[] { String.valueOf(i), String.valueOf(i * 2) }));
         }
         return collection.stream();
     }
@@ -106,24 +109,26 @@ Example
 In this scenario, the value of the `Parameter` is a String[] array
 
 ```java
-String[] values = paramater.value();
+String[] values = parameter.value();
 ```
 
 ## Configuration values
 
 The Test Engine has seven configuration parameters
 
-| Configuration                   | Type         | Java System Property                          | Environment Variable                          |
-|---------------------------------|--------------|-----------------------------------------------|-----------------------------------------------|
-| thread count                    | integer      | antublue.test.engine.thread.count           | ANTUBLUE_TEST_ENGINE_THREAD_COUNT           |
-| test class name include filter  | regex string | antublue.test.engine.test.class.include     | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE     |
-| test class name exclude filter  | regex string | antublue.test.engine.test.class.exclude     | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE     |
-| test method name include filter | regex string | antublue.test.engine.test.method.include    | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE    |
-| test method name exclude filter | regex string | antublue.test.engine.test.method.exclude    | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE    |
-| test class tag include filter   | regex string | antublue.test.engine.test.class.tag.include | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE |
-| test class tag exclude filter   | regex string | antublue.test.engine.test.class.tag.exclude | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE |
+| Configuration                   | Type         | Java System Property                         | Environment Variable                         |
+|---------------------------------|--------------|----------------------------------------------|----------------------------------------------|
+| thread count                    | integer      | antublue.test.engine.thread.count            | ANTUBLUE_TEST_ENGINE_THREAD_COUNT            |
+| test class name include filter  | regex string | antublue.test.engine.test.class.include      | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE      |
+| test class name exclude filter  | regex string | antublue.test.engine.test.class.exclude      | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE      |
+| test method name include filter | regex string | antublue.test.engine.test.method.include     | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE     |
+| test method name exclude filter | regex string | antublue.test.engine.test.method.exclude     | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE     |
+| test class tag include filter   | regex string | antublue.test.engine.test.class.tag.include  | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE  |
+| test class tag exclude filter   | regex string | antublue.test.engine.test.class.tag.exclude  | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE  |
+| test method tag include filter  | regex string | antublue.test.engine.test.method.tag.include | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_INCLUDE |
+| test method tag exclude filter  | regex string | antublue.test.engine.test.method.tag.exclude | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_EXCLUDE |
 
-Using a combination of the properties allows for running individual test classes / test methods
+Using a combination of the properties (or environment variables) allows for including / excluding individual test classes / test methods
 
 **Notes**
 
@@ -152,20 +157,20 @@ public class ParameterTest {
 
   private Parameter parameter;
 
-  @TestEngine.ParameterSupplier
+  @TestEngine.Parameters
   public static Stream<Parameter> parameters() {
     Collection<Parameter> collection = new ArrayList<>();
 
     for (int i = 0; i < 10; i++) {
       int value = i * 3;
-      collection.add(Parameter.of("argument(" + i + ") = " + value, String.valueOf(value)));
+      collection.add(Parameter.of("parameter(" + i + ") = " + value, String.valueOf(value)));
     }
 
     return collection.stream();
   }
 
-  @TestEngine.ParameterSetter
-  public void setParameter(Parameter parameter) {
+  @TestEngine.Parameter
+  public void parameter(Parameter parameter) {
     this.parameter = parameter;
   }
 
@@ -204,7 +209,7 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>2.0.5</version>
+    <version>2.0.6</version>
   </dependency>
   <dependency>
     <groupId>org.junit.jupiter</groupId>
@@ -215,11 +220,6 @@ Add the Test Engine jars (and dependencies)...
     <groupId>org.junit.platform</groupId>
     <artifactId>junit-platform-launcher</artifactId>
     <version>1.9.2</version>
-  </dependency>
-  <dependency>
-    <groupId>org.junit.jupiter</groupId>
-    <artifactId>junit-jupiter-engine</artifactId>
-    <version>5.9.2</version>
   </dependency>
 </dependencies>
 ```
@@ -298,7 +298,7 @@ State Machine flow...
         
         for (each Parameter in the Stream<Parameter>) {
         
-            execute the "@TestEngine.ParameterSetter" method with the Parameter value
+            execute the "@TestEngine.Parameter" method with the Parameter object
             
             execute "@TestEngine.BeforeAll" methods
             

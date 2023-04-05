@@ -9,6 +9,13 @@ import java.lang.annotation.Target;
 
 public @interface TestEngine {
 
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD, ElementType.METHOD })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Parameter {
+
+    }
+
+    @Deprecated
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface ParameterSetter {
@@ -82,7 +89,7 @@ public @interface TestEngine {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Tag {
         String value();

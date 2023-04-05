@@ -23,8 +23,8 @@ public class BaseTest {
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
-    protected void setParameter(Parameter parameter) {
+    @TestEngine.Parameter
+    protected void parameter(Parameter parameter) {
         this.parameter = parameter;
     }
 
