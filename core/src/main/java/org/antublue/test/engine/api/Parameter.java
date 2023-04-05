@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.api;
 
-import org.antublue.test.engine.support.api.ParameterImpl;
+import org.antublue.test.engine.internal.api.ParameterImpl;
 
 import java.util.Objects;
 
@@ -26,13 +26,14 @@ import java.util.Objects;
 public interface Parameter {
 
     /**
-     * Method to get the parameter name
+     * Method to get the Parameter name
+     *
      * @return
      */
     String name();
 
     /**
-     * Method to get the parameter value cast as the return type
+     * Method to get the Parameter value cast as the return type
      *
      * @return
      * @param <T>
@@ -40,24 +41,13 @@ public interface Parameter {
     <T> T value();
 
     /**
-     * Method to get the parameter value cast to a specific type
+     * Method to get the Parameter value cast to a specific type
      *
      * @param clazz
      * @return
      * @param <T>
      */
     <T> T value(Class<T> clazz);
-
-    /**
-     * Method to create a Parameter object (useful for a static import)
-     *
-     * @param name
-     * @param value
-     * @return
-     */
-    static Parameter parameter(String name, Object value) {
-        return of(name, value);
-    }
 
     /**
      * Method to create a Parameter object

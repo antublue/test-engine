@@ -7,7 +7,7 @@
 
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>2.0.5</version>
+    <version>2.0.6</version>
     <packaging>jar</packaging>
     <name>AntuBLUE Test Engine</name>
 
@@ -197,14 +197,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M8</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>3.1.1</version>
                 <executions>
@@ -225,7 +217,7 @@
                     <localCheckout>true</localCheckout>
                     <pushChanges>false</pushChanges>
                     <mavenExecutorId>forked-path</mavenExecutorId>
-                    <arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
+                    <parameters>-Dgpg.passphrase=${gpg.passphrase}</parameters>
                 </configuration>
                 <dependencies>
                     <dependency>

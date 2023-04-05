@@ -16,11 +16,11 @@ public class DisabledMethodTest {
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
-        return StringParameterSupplier.values();
+        return StringParameterSupplier.parameters();
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
         this.parameter = parameter;
     }
 
@@ -57,7 +57,7 @@ public class DisabledMethodTest {
 
     private static class StringParameterSupplier {
 
-        public static Stream<Parameter> values() {
+        public static Stream<Parameter> parameters() {
             Collection<Parameter> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
                 collection.add(Parameter.of(String.valueOf(i)));

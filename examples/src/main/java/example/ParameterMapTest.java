@@ -1,7 +1,7 @@
 package example;
 
+import org.antublue.test.engine.api.Map;
 import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.api.ParameterMap;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.stream.Stream;
  */
 public class ParameterMapTest {
 
-    private ParameterMap parameterMap;
+    private Map map;
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
@@ -21,15 +21,15 @@ public class ParameterMapTest {
         for (int i = 0; i < 10; i++) {
             collection.add(
                     Parameter.of(
-                            "ParameterMap[" + i + "]",
-                            new ParameterMap().put("key", i)));
+                            "Map[" + i + "]",
+                            new Map().put("key", i)));
         }
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
-        parameterMap = parameter.value();
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
+        map = parameter.value();
     }
 
     @TestEngine.BeforeAll
@@ -39,13 +39,13 @@ public class ParameterMapTest {
 
     @TestEngine.Test
     public void test1() {
-        int value = parameterMap.get("key");
+        int value = map.get("key");
         System.out.println("test1(" + value + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        int value = parameterMap.get("key");
+        int value = map.get("key");
         System.out.println("test2(" + value + ")");
     }
 

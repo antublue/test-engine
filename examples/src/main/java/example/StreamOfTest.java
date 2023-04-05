@@ -22,8 +22,8 @@ public class StreamOfTest {
                 Parameter.of(3));
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
         this.parameter = parameter;
     }
 

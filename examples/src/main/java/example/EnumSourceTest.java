@@ -19,8 +19,8 @@ public class EnumSourceTest {
         return EnumSource.of(DaysOfTheWeek.class);
     }
 
-    @TestEngine.ParameterSetter
-    public void setParameter(Parameter parameter) {
+    @TestEngine.Parameter
+    public void parameter(Parameter parameter) {
         this.parameter = parameter;
     }
 
