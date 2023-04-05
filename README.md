@@ -35,6 +35,9 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 **NOTES**
 
+- `@TestEngine.ParameterSetter` has been deprecated, replaced with `@TestEngine.Parameter` which supports a field or method
+
+
 - `public` and `protected` methods are supported for `@TestEngine.X` annotations
 
 
@@ -57,7 +60,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 **Notes**
 
-- Only one `@TestEngine.Tag(<string>)` is supported for a test class.
+- Only one `@TestEngine.Tag(<string>)` is supported for a test class / test method
 
 
 - It's recommended to use a tag string format of `/tag1/tag2/tag3/`
