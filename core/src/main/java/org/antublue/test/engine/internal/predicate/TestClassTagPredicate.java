@@ -1,7 +1,7 @@
-package org.antublue.test.engine.support.predicate;
+package org.antublue.test.engine.internal.predicate;
 
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.support.TestEngineException;
+import org.antublue.test.engine.internal.TestEngineException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;

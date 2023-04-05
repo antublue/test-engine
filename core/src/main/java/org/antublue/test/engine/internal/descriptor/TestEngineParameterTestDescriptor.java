@@ -14,52 +14,44 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.descriptor;
+package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.api.Parameter;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.MethodSource;
+import org.junit.platform.engine.support.descriptor.ClassSource;
 
-import java.lang.reflect.Method;
 import java.util.Optional;
 
-public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDescriptor {
+public class TestEngineParameterTestDescriptor extends TestEngineAbstractTestDescriptor {
 
     private final Class<?> testClass;
     private final Parameter testParameter;
-    private final Method testMethod;
 
-    public TestEngineTestMethodTestDescriptor(
-            UniqueId uniqueId,
-            String displayName,
-            Class<?> testClass,
-            Parameter testParameter,
-            Method testMethod) {
+    public TestEngineParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Parameter testParameter) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testParameter = testParameter;
-        this.testMethod = testMethod;
     }
 
     @Override
     public Optional<TestSource> getSource() {
-        return Optional.of(MethodSource.from(testMethod));
+        return Optional.of(ClassSource.from(testParameter.getClass()));
     }
 
     @Override
     public Type getType() {
-        return Type.TEST;
+        return Type.CONTAINER;
     }
 
     @Override
     public boolean isTest() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isContainer() {
-        return false;
+        return true;
     }
 
     public Class<?> getTestClass() {
@@ -70,7 +62,10 @@ public class TestEngineTestMethodTestDescriptor extends TestEngineAbstractTestDe
         return testParameter;
     }
 
-    public Method getTestMethod() {
-        return testMethod;
+    public TestEngineParameterTestDescriptor copy() {
+        TestEngineParameterTestDescriptor copy = new TestEngineParameterTestDescriptor(getUniqueId(), getDisplayName(), testClass, testParameter);
+        copy.setParent(getParent().get());
+        children.stream().forEach(child -> copy.addChild(child));
+        return copy;
     }
 }

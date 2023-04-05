@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.support;
+package org.antublue.test.engine.internal;
 
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.descriptor.TestEngineParameterTestDescriptor;
-import org.antublue.test.engine.descriptor.TestEngineTestMethodTestDescriptor;
-import org.antublue.test.engine.support.logger.Logger;
-import org.antublue.test.engine.support.logger.LoggerFactory;
-import org.antublue.test.engine.support.predicate.TestClassPredicate;
-import org.antublue.test.engine.support.predicate.TestClassTagPredicate;
-import org.antublue.test.engine.support.predicate.TestMethodPredicate;
+import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.TestEngineTestMethodTestDescriptor;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.predicate.TestClassPredicate;
+import org.antublue.test.engine.internal.predicate.TestClassTagPredicate;
+import org.antublue.test.engine.internal.predicate.TestMethodPredicate;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;

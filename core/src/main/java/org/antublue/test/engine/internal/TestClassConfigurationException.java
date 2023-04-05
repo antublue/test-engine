@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.support;
+package org.antublue.test.engine.internal;
 
 public class TestClassConfigurationException extends RuntimeException {
 

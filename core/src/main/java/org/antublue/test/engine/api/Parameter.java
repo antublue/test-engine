@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.api;
 
-import org.antublue.test.engine.support.api.ParameterImpl;
+import org.antublue.test.engine.internal.api.ParameterImpl;
 
 import java.util.Objects;
 

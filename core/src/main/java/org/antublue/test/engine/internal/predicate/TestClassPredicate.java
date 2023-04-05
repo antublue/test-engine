@@ -1,4 +1,4 @@
-package org.antublue.test.engine.support.predicate;
+package org.antublue.test.engine.internal.predicate;
 
 public final class TestClassPredicate extends RegexPredicate<Class<?>> {
 

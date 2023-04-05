@@ -14,25 +14,35 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.support.util;
+package org.antublue.test.engine.internal;
 
-public class Cast {
+public class TestEngineException extends RuntimeException {
 
     /**
      * Constructor
+     *
+     * @param message
      */
-    private Cast() {
-        // DO NOTHING
+    public TestEngineException(String message) {
+        super(message);
     }
 
     /**
-     * Method to cast an Object to a another Object
+     * Constructor
      *
-     * @param object
-     * @return
-     * @param <T>
+     * @param message
+     * @param throwable
      */
-    public static <T> T cast(Object object) {
-        return (T) object;
+    public TestEngineException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param throwable
+     */
+    public TestEngineException(Throwable throwable) {
+        super(throwable);
     }
 }

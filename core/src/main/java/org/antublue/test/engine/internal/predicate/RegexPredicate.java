@@ -1,4 +1,4 @@
-package org.antublue.test.engine.support.predicate;
+package org.antublue.test.engine.internal.predicate;
 
 import java.util.function.Predicate;
 import java.util.regex.Matcher;

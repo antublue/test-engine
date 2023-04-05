@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.support;
+package org.antublue.test.engine.internal;
 
 import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.support.logger.Logger;
-import org.antublue.test.engine.support.logger.LoggerFactory;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.launcher.TestPlan;

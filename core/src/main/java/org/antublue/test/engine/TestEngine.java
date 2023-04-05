@@ -16,19 +16,18 @@
 
 package org.antublue.test.engine;
 
-import org.antublue.test.engine.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.descriptor.TestEngineParameterTestDescriptor;
-import org.antublue.test.engine.support.TestEngineConfigurationParameters;
-import org.antublue.test.engine.support.TestEngineDiscoveryRequestProcessor;
-import org.antublue.test.engine.support.TestEngineEngineDiscoveryRequest;
-import org.antublue.test.engine.support.TestEngineException;
-import org.antublue.test.engine.support.TestEngineExecutor;
-import org.antublue.test.engine.support.TestEngineInformation;
-import org.antublue.test.engine.support.TestEngineReflectionUtils;
-import org.antublue.test.engine.support.TestEngineSummaryEngineExecutionListener;
-import org.antublue.test.engine.support.logger.Logger;
-import org.antublue.test.engine.support.logger.LoggerFactory;
-import org.antublue.test.engine.support.util.HumanReadableTime;
+import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
+import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
+import org.antublue.test.engine.internal.TestEngineDiscoveryRequestProcessor;
+import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
+import org.antublue.test.engine.internal.TestEngineExecutor;
+import org.antublue.test.engine.internal.TestEngineInformation;
+import org.antublue.test.engine.internal.TestEngineReflectionUtils;
+import org.antublue.test.engine.internal.TestEngineSummaryEngineExecutionListener;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;

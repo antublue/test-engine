@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.descriptor;
+package org.antublue.test.engine.internal.descriptor;
 
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;

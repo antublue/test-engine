@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.support.logger;
+package org.antublue.test.engine.internal.logger;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
