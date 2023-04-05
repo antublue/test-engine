@@ -16,39 +16,69 @@
 
 package org.antublue.test.engine.internal.logger;
 
-import org.antublue.test.engine.TestEngineConstants;
-import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
+import org.antublue.test.engine.internal.util.Precondition;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Class to implement a LoggerFactory for Logback Classic
  */
 public final class LoggerFactory {
 
-    private static final Map<String, Level> LEVEL_MAP = new HashMap<>();
-    private static final Map<String, Logger> LOGGER_MAP = new HashMap<>();
-    private static final Level LEVEL;
+    private static final LoggerFactory INSTANCE = new LoggerFactory();
+    private static final String ANTUBLUE_TEST_ENGINE_LOG_LEVEL = "antublue.test.engine.log.level";
 
-    static {
-        LEVEL_MAP.put("ERROR", Level.ERROR);
-        LEVEL_MAP.put("WARN", Level.WARN);
-        LEVEL_MAP.put("INFO", Level.INFO);
-        LEVEL_MAP.put("DEBUG", Level.DEBUG);
-        LEVEL_MAP.put("TRACE", Level.TRACE);
-        LEVEL_MAP.put("ALL", Level.ALL);
-
-        LEVEL = getLevel();
-    }
+    private final Map<String, Logger> loggerMap = new HashMap<>();
+    private Level LEVEL;
 
     /**
      * Constructor
      */
     private LoggerFactory() {
-        // DO NOTHING
+        Map<String, Level> levelMap = new HashMap<>();
+        levelMap.put("ERROR", Level.ERROR);
+        levelMap.put("WARN", Level.WARN);
+        levelMap.put("INFO", Level.INFO);
+        levelMap.put("DEBUG", Level.DEBUG);
+        levelMap.put("TRACE", Level.TRACE);
+        levelMap.put("ALL", Level.ALL);
+
+        // Convert the system property to an environment variable and get the value
+        String value =
+                System.getenv(
+                        ANTUBLUE_TEST_ENGINE_LOG_LEVEL.toUpperCase(Locale.ENGLISH).replace('.', '_'));
+
+        if ((value != null) && (!value.trim().isEmpty())) {
+            LEVEL = levelMap.get(value.trim());
+        }
+
+        if (LEVEL == null) {
+            value = System.getProperty(ANTUBLUE_TEST_ENGINE_LOG_LEVEL);
+            if ((value != null) && (!value.trim().isEmpty())) {
+                LEVEL = levelMap.get(value);
+            }
+        }
+
+        if (LEVEL == null) {
+            LEVEL = Level.INFO;
+        }
+    }
+
+    /**
+     * Method to create a Logger
+     *
+     * @param name
+     * @return
+     */
+    private synchronized Logger createLogger(String name) {
+        Logger logger = loggerMap.get(name);
+        if (logger == null) {
+            logger = new Logger(name, LEVEL);
+            loggerMap.put(name, logger);
+        }
+        return logger;
     }
 
     /**
@@ -58,6 +88,8 @@ public final class LoggerFactory {
      * @return
      */
     public static Logger getLogger(Class<?> clazz) {
+        Precondition.notNull(clazz);
+
         return getLogger(clazz.getName());
     }
 
@@ -68,31 +100,9 @@ public final class LoggerFactory {
      * @return
      */
     public static Logger getLogger(String name) {
-        Logger logger;
+        Precondition.notNull(name);
+        Precondition.notBlank(name);
 
-        synchronized (LOGGER_MAP) {
-            logger = LOGGER_MAP.get(name);
-            if (logger == null) {
-                logger = new Logger(name, LEVEL);
-                LOGGER_MAP.put(name, logger);
-            }
-        }
-
-        return logger;
-    }
-
-    /**
-     * Method to get the configured log Level
-     *
-     * @return
-     */
-    private static Level getLevel() {
-        String logLevel =
-                TestEngineConfigurationParameters.getInstance()
-                    .get(TestEngineConstants.LOG_LEVEL)
-                    .map(value -> value.trim().toUpperCase(Locale.ENGLISH))
-                    .orElse(Level.INFO.toString());
-
-        return LEVEL_MAP.getOrDefault(logLevel, Level.INFO);
+        return INSTANCE.createLogger(name);
     }
 }
