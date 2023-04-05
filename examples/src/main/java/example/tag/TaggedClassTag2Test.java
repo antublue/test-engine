@@ -1,4 +1,4 @@
-package example;
+package example.tag;
 
 import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  * Example test
  */
 @TestEngine.Tag("/tag2/")
-public class TaggedClassTest2 {
+public class TaggedClassTag2Test {
 
     private Parameter parameter;
 
