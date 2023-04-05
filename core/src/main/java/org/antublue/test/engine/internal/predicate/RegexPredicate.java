@@ -16,5 +16,9 @@ public abstract class RegexPredicate<T> implements Predicate<T> {
         this.matcher = pattern.matcher("");
     }
 
+    public String getRegex() {
+        return regex;
+    }
+
     public abstract boolean test(T value);
 }

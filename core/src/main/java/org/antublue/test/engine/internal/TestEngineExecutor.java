@@ -228,7 +228,7 @@ public class TestEngineExecutor {
     }
 
     /**
-     * Method to execute a TestEngineArgumentTestDescriptor
+     * Method to execute a TestEngineParameterTestDescriptor
      *
      * @param testEngineParameterTestDescriptor
      * @param testEngineExecutionContext
@@ -423,7 +423,7 @@ public class TestEngineExecutor {
                         TestEngineParameterTestDescriptor.class,
                         testEngineParameterTestDescriptor ->
                                 stringBuilder
-                                        .append("argument -> ")
+                                        .append("parameter -> ")
                                         .append(testEngineParameterTestDescriptor.getTestParameter())),
                 Switch.switchCase(
                         TestEngineClassTestDescriptor.class,

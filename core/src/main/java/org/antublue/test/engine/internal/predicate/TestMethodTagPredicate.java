@@ -7,20 +7,20 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public final class TestClassTagPredicate extends RegexPredicate<Class<?>> {
+public final class TestMethodTagPredicate extends RegexPredicate<Method> {
 
-    private TestClassTagPredicate(String regex) {
+    private TestMethodTagPredicate(String regex) {
         super(regex);
     }
 
     @Override
-    public boolean test(Class<?> clazz) {
-        if (!clazz.isAnnotationPresent(TestEngine.Tag.class)) {
+    public boolean test(Method method) {
+        if (!method.isAnnotationPresent(TestEngine.Tag.class)) {
             return false;
         }
 
         try {
-            Annotation annotation = clazz.getAnnotation(TestEngine.Tag.class);
+            Annotation annotation = method.getAnnotation(TestEngine.Tag.class);
             Class<? extends Annotation> type = annotation.annotationType();
             Method valueMethod = type.getDeclaredMethod("value", (Class<?>[]) null);
             String tag = valueMethod.invoke(annotation, (Object[]) null).toString();
@@ -30,7 +30,7 @@ public final class TestClassTagPredicate extends RegexPredicate<Class<?>> {
         }
     }
 
-    public static TestClassTagPredicate of(String regex) {
-        return new TestClassTagPredicate(regex);
+    public static TestMethodTagPredicate of(String regex) {
+        return new TestMethodTagPredicate(regex);
     }
 }

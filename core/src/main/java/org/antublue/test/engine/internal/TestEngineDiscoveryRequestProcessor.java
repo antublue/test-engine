@@ -26,6 +26,7 @@ import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.predicate.TestClassPredicate;
 import org.antublue.test.engine.internal.predicate.TestClassTagPredicate;
 import org.antublue.test.engine.internal.predicate.TestMethodPredicate;
+import org.antublue.test.engine.internal.predicate.TestMethodTagPredicate;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -50,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +75,8 @@ public class TestEngineDiscoveryRequestProcessor {
     private final TestMethodPredicate excludeTestMethodPredicate;
     private final TestClassTagPredicate includeTestClassTagPredicate;
     private final TestClassTagPredicate excludeTestClassTagPredicate;
+    private final TestMethodTagPredicate includeTestMethodTagPredicate;
+    private final TestMethodTagPredicate excludeTestMethodTagPredicate;
 
     /**
      * Predicate to determine if a class is a test class (not abstract, has @TestEngine.Test methods)
@@ -146,6 +150,28 @@ public class TestEngineDiscoveryRequestProcessor {
                         })
                         .map(TestClassTagPredicate::of)
                         .orElse(null);
+
+        includeTestMethodTagPredicate =
+                TestEngineConfigurationParameters.getInstance()
+                        .get("antublue.test.engine.test.method.tag.include")
+                        .map(value -> {
+                            LOGGER.trace(String.format("antublue.test.engine.test.method.tag.include [%s]", value));
+                            return value;
+                        })
+                        .map(TestMethodTagPredicate::of)
+                        .orElse(null);
+
+
+
+        excludeTestMethodTagPredicate =
+                TestEngineConfigurationParameters.getInstance()
+                        .get("antublue.test.engine.test.method.tag.exclude")
+                        .map(value -> {
+                            LOGGER.trace(String.format("antublue.test.engine.test.method.tag.exclude [%s]", value));
+                            return value;
+                        })
+                        .map(TestMethodTagPredicate::of)
+                        .orElse(null);
     }
 
     /**
@@ -172,7 +198,7 @@ public class TestEngineDiscoveryRequestProcessor {
         // For each test method that was selected, add the test class and method
         processMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
 
-        // For a specific test argument selection
+        // For a specific test selection
         processUniqueIdSelector(engineDiscoveryRequest, engineDescriptor, testClassToMethodMap);
 
         // For a specific directory selection
@@ -182,8 +208,8 @@ public class TestEngineDiscoveryRequestProcessor {
         processPackageNameFilters(engineDiscoveryRequest, engineDescriptor, testClassToMethodMap);
 
         if (includeTestClassPredicate != null) {
-            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
+            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
+            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
                 if (!includeTestClassPredicate.test(clazz)) {
                     testClassToMethodMap.remove(clazz);
                 }
@@ -191,8 +217,8 @@ public class TestEngineDiscoveryRequestProcessor {
         }
 
         if (excludeTestClassPredicate != null) {
-            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
+            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
+            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
                 if (excludeTestClassPredicate.test(clazz)) {
                     testClassToMethodMap.remove(clazz);
                 }
@@ -200,11 +226,10 @@ public class TestEngineDiscoveryRequestProcessor {
         }
 
         if (includeTestMethodPredicate != null) {
-            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
+            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
+            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
                 Collection<Method> methods = new ArrayList<>(testClassToMethodMap.get(clazz));
                 methods.removeIf(method -> !includeTestMethodPredicate.test(method));
-
                 if (methods.isEmpty()) {
                     testClassToMethodMap.remove(clazz);
                 } else {
@@ -214,11 +239,10 @@ public class TestEngineDiscoveryRequestProcessor {
         }
 
         if (excludeTestMethodPredicate != null) {
-            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
-                Collection<Method> methods = new ArrayList<>(workingTestClassToMethodMap.get(clazz));
+            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
+            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
+                Collection<Method> methods = new ArrayList<>(tempTestClassToMethodMap.get(clazz));
                 methods.removeIf(excludeTestMethodPredicate);
-
                 if (methods.isEmpty()) {
                     testClassToMethodMap.remove(clazz);
                 } else {
@@ -228,8 +252,8 @@ public class TestEngineDiscoveryRequestProcessor {
         }
 
         if (includeTestClassTagPredicate != null) {
-            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
+            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
+            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
                 if (!includeTestClassTagPredicate.test(clazz)) {
                     testClassToMethodMap.remove(clazz);
                 }
@@ -237,10 +261,42 @@ public class TestEngineDiscoveryRequestProcessor {
         }
 
         if (excludeTestClassTagPredicate != null) {
-            Map<Class<?>, Collection<Method>> workingTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : workingTestClassToMethodMap.keySet()) {
+            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
+            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
                 if (excludeTestClassTagPredicate.test(clazz)) {
                     testClassToMethodMap.remove(clazz);
+                }
+            }
+        }
+
+        if (includeTestMethodTagPredicate != null) {
+            for (Class<?> clazz : new HashSet<>(testClassToMethodMap.keySet())) {
+                Collection<Method> testMethods = new ArrayList<>();
+                for (Method method : testClassToMethodMap.get(clazz)) {
+                    if (includeTestMethodTagPredicate.test(method)) {
+                        testMethods.add(method);
+                    }
+                }
+                if (testMethods.isEmpty()) {
+                    testClassToMethodMap.remove(clazz);
+                } else {
+                    testClassToMethodMap.put(clazz, testMethods);
+                }
+            }
+        }
+
+        if (excludeTestMethodTagPredicate != null) {
+            for (Class<?> clazz : new HashSet<>(testClassToMethodMap.keySet())) {
+                Collection<Method> testMethods = new ArrayList<>();
+                for (Method method : testClassToMethodMap.get(clazz)) {
+                    if (!excludeTestMethodTagPredicate.test(method)) {
+                        testMethods.add(method);
+                    }
+                }
+                if (testMethods.isEmpty()) {
+                    testClassToMethodMap.remove(clazz);
+                } else {
+                    testClassToMethodMap.put(clazz, testMethods);
                 }
             }
         }

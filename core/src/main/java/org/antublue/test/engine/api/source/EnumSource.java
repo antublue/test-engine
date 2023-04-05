@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Class to create a Stream of Arguments from an Enum
+ * Class to create a Stream of Parameters from an Enum
  */
 @SuppressWarnings("unchecked")
 public final class EnumSource {
@@ -37,7 +37,7 @@ public final class EnumSource {
     }
 
     /**
-     * Method to create a Stream of Arguments from an Enum
+     * Method to create a Stream of Parameters from an Enum
      *
      * @param e
      * @return

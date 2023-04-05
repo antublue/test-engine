@@ -113,17 +113,19 @@ String[] values = parameter.value();
 
 The Test Engine has seven configuration parameters
 
-| Configuration                   | Type         | Java System Property                          | Environment Variable                          |
-|---------------------------------|--------------|-----------------------------------------------|-----------------------------------------------|
-| thread count                    | integer      | antublue.test.engine.thread.count           | ANTUBLUE_TEST_ENGINE_THREAD_COUNT           |
-| test class name include filter  | regex string | antublue.test.engine.test.class.include     | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE     |
-| test class name exclude filter  | regex string | antublue.test.engine.test.class.exclude     | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE     |
-| test method name include filter | regex string | antublue.test.engine.test.method.include    | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE    |
-| test method name exclude filter | regex string | antublue.test.engine.test.method.exclude    | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE    |
-| test class tag include filter   | regex string | antublue.test.engine.test.class.tag.include | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE |
-| test class tag exclude filter   | regex string | antublue.test.engine.test.class.tag.exclude | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE |
+| Configuration                   | Type         | Java System Property                         | Environment Variable                         |
+|---------------------------------|--------------|----------------------------------------------|----------------------------------------------|
+| thread count                    | integer      | antublue.test.engine.thread.count            | ANTUBLUE_TEST_ENGINE_THREAD_COUNT            |
+| test class name include filter  | regex string | antublue.test.engine.test.class.include      | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE      |
+| test class name exclude filter  | regex string | antublue.test.engine.test.class.exclude      | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE      |
+| test method name include filter | regex string | antublue.test.engine.test.method.include     | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE     |
+| test method name exclude filter | regex string | antublue.test.engine.test.method.exclude     | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE     |
+| test class tag include filter   | regex string | antublue.test.engine.test.class.tag.include  | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE  |
+| test class tag exclude filter   | regex string | antublue.test.engine.test.class.tag.exclude  | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE  |
+| test method tag include filter  | regex string | antublue.test.engine.test.method.tag.include | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_INCLUDE |
+| test method tag exclude filter  | regex string | antublue.test.engine.test.method.tag.exclude | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_EXCLUDE |
 
-Using a combination of the properties allows for running individual test classes / test methods
+Using a combination of the properties (or environment variables) allows for including / excluding individual test classes / test methods
 
 **Notes**
 
