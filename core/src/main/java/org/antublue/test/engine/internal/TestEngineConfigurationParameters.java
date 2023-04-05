@@ -28,7 +28,7 @@ import java.util.function.Function;
 /**
  * Class to implement ConfigurationParameters
  */
-public class TestEngineConfigurationParameters implements ConfigurationParameters {
+public final class TestEngineConfigurationParameters implements ConfigurationParameters {
 
     private static final TestEngineConfigurationParameters INSTANCE = new TestEngineConfigurationParameters();
 

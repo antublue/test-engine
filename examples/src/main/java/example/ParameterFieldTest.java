@@ -13,14 +13,14 @@ import java.util.stream.Stream;
 public class ParameterFieldTest {
 
     @TestEngine.Parameter
-    private Parameter parameter;
+    protected Parameter parameter;
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(Parameter.of(String.valueOf(value)));
+            collection.add(org.antublue.test.engine.api.Parameter.of(String.valueOf(value)));
         }
         return collection.stream();
     }

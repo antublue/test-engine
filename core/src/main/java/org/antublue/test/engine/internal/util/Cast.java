@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.internal.util;
 
-public class Cast {
+public final class Cast {
 
     /**
      * Constructor
