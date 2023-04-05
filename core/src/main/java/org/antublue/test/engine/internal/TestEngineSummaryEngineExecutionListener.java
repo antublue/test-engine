@@ -17,6 +17,7 @@
 package org.antublue.test.engine.internal;
 
 import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
@@ -56,16 +57,16 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
         this.summaryGeneratingListener.testPlanExecutionStarted(testPlan);
 
         this.detailedOutput =
-                testPlan.getConfigurationParameters()
-                        .get("antublue.test.engine.output")
+                TestEngineConfigurationParameters.getInstance()
+                        .get(TestEngineConstants.CONSOLE_OUTPUT)
                         .map(value -> {
                             try {
                                 return Boolean.parseBoolean(value);
                             } catch (NumberFormatException e) {
-                                return true;
+                                return false;
                             }
                         })
-                        .orElse(true);
+                        .orElse(false);
     }
 
     @Override

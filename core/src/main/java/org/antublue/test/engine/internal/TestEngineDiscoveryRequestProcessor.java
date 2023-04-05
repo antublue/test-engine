@@ -17,6 +17,7 @@
 package org.antublue.test.engine.internal;
 
 import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
@@ -93,9 +94,9 @@ public class TestEngineDiscoveryRequestProcessor {
     public TestEngineDiscoveryRequestProcessor() {
         includeTestClassPredicate =
                 TestEngineConfigurationParameters.getInstance()
-                        .get("antublue.test.engine.test.class.include")
+                        .get(TestEngineConstants.TEST_CLASS_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("antublue.test.engine.test.class.include [%s]", value));
+                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_CLASS_INCLUDE, value));
                             return value;
                         })
                         .map(TestClassPredicate::of)
@@ -103,9 +104,9 @@ public class TestEngineDiscoveryRequestProcessor {
 
         excludeTestClassPredicate =
                 TestEngineConfigurationParameters.getInstance()
-                        .get("antublue.test.engine.test.class.exclude")
+                        .get(TestEngineConstants.TEST_CLASS_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("antublue.test.engine.test.class.exclude [%s]", value));
+                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_CLASS_EXCLUDE, value));
                             return value;
                         })
                         .map(TestClassPredicate::of)
@@ -113,9 +114,9 @@ public class TestEngineDiscoveryRequestProcessor {
 
         includeTestMethodPredicate =
                 TestEngineConfigurationParameters.getInstance()
-                        .get("antublue.test.engine.test.method.include")
+                        .get(TestEngineConstants.TEST_METHOD_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("antublue.test.engine.test.method.include [%s]", value));
+                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_METHOD_INCLUDE, value));
                             return value;
                         })
                         .map(TestMethodPredicate::of)
@@ -123,9 +124,9 @@ public class TestEngineDiscoveryRequestProcessor {
 
         excludeTestMethodPredicate =
                 TestEngineConfigurationParameters.getInstance()
-                        .get("antublue.test.engine.test.method.exclude")
+                        .get(TestEngineConstants.TEST_METHOD_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("antublue.test.engine.test.method.exclude [%s]", value));
+                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_METHOD_EXCLUDE, value));
                             return value;
                         })
                         .map(TestMethodPredicate::of)
@@ -133,9 +134,9 @@ public class TestEngineDiscoveryRequestProcessor {
 
         includeTestClassTagPredicate =
                 TestEngineConfigurationParameters.getInstance()
-                        .get("antublue.test.engine.test.class.tag.include")
+                        .get(TestEngineConstants.TEST_CLASS_TAG_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("antublue.test.engine.test.class.tag.include [%s]", value));
+                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_CLASS_TAG_INCLUDE, value));
                             return value;
                         })
                         .map(TestClassTagPredicate::of)
@@ -143,9 +144,9 @@ public class TestEngineDiscoveryRequestProcessor {
 
         excludeTestClassTagPredicate =
                 TestEngineConfigurationParameters.getInstance()
-                        .get("antublue.test.engine.test.class.tag.exclude")
+                        .get(TestEngineConstants.TEST_CLASS_TAG_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("antublue.test.engine.test.class.tag.exclude [%s]", value));
+                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_CLASS_TAG_EXCLUDE, value));
                             return value;
                         })
                         .map(TestClassTagPredicate::of)
@@ -153,9 +154,9 @@ public class TestEngineDiscoveryRequestProcessor {
 
         includeTestMethodTagPredicate =
                 TestEngineConfigurationParameters.getInstance()
-                        .get("antublue.test.engine.test.method.tag.include")
+                        .get(TestEngineConstants.TEST_METHOD_TAG_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("antublue.test.engine.test.method.tag.include [%s]", value));
+                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_METHOD_TAG_INCLUDE, value));
                             return value;
                         })
                         .map(TestMethodTagPredicate::of)
@@ -165,9 +166,9 @@ public class TestEngineDiscoveryRequestProcessor {
 
         excludeTestMethodTagPredicate =
                 TestEngineConfigurationParameters.getInstance()
-                        .get("antublue.test.engine.test.method.tag.exclude")
+                        .get(TestEngineConstants.TEST_METHOD_TAG_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("antublue.test.engine.test.method.tag.exclude [%s]", value));
+                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_METHOD_TAG_EXCLUDE, value));
                             return value;
                         })
                         .map(TestMethodTagPredicate::of)

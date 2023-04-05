@@ -16,9 +16,13 @@
 
 package org.antublue.test.engine.internal.logger;
 
+import org.antublue.test.engine.TestEngineConstants;
+import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Class to implement a LoggerFactory for Logback Classic
@@ -78,23 +82,17 @@ public final class LoggerFactory {
     }
 
     /**
-     * Method to get the configured Level
+     * Method to get the configured log Level
      *
      * @return
      */
     private static Level getLevel() {
-        String propertyName = "antublue.test.engine.log.level";
-        String propertyValue = System.getProperty(propertyName);
-        String environmentVariableValue =
-                System.getenv(
-                        propertyName.toUpperCase(Locale.ENGLISH).replace('.', '_'));
+        String logLevel =
+                TestEngineConfigurationParameters.getInstance()
+                    .get(TestEngineConstants.LOG_LEVEL)
+                    .map(value -> value.trim().toUpperCase(Locale.ENGLISH))
+                    .orElse(Level.INFO.toString());
 
-        if ((propertyValue != null) && !propertyValue.trim().isEmpty()) {
-            return LEVEL_MAP.getOrDefault(propertyValue.trim().toUpperCase(Locale.ENGLISH), Level.INFO);
-        } else if ((environmentVariableValue != null) && !environmentVariableValue.trim().isEmpty()) {
-            return LEVEL_MAP.getOrDefault(environmentVariableValue.toUpperCase(Locale.ENGLISH), Level.INFO);
-        }
-
-        return Level.INFO;
+        return LEVEL_MAP.getOrDefault(logLevel, Level.INFO);
     }
 }

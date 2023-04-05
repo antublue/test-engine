@@ -118,6 +118,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static void main(String[] args) {
         long startTimeMilliseconds = System.currentTimeMillis();
 
+        TestEngineConfigurationParameters.getInstance().put(TestEngineConstants.CONSOLE_OUTPUT, "true");
+
         PrintStream printStream = null;
         boolean failed = false;
 
