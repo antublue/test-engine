@@ -73,10 +73,13 @@ The `Parameter` interface also has static methods to wrap an Object
 
 ### Usage of `Parameter`
 
-- `@TestEngine.Parameters` must return a `Stream<Parameter>`
+- `@TestEngine.ParametersSupplier` must return a `Stream<Parameter>`
 
 
-- `@TestEngine.Parameter` requires single `Parameter` object as parameter
+- `@TestEngine.Parameter` methods requires single `Parameter` object as parameter
+
+
+- `@TestEngine.Parameter` field is a single `Parameter` object
 
 
 - The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name 
@@ -93,7 +96,7 @@ The `Parameter` interface also has static methods to wrap an Object
 Example
 
 ```java
-    @TestEngine.Parameters
+    @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -157,7 +160,7 @@ public class ParameterTest {
 
   private Parameter parameter;
 
-  @TestEngine.Parameters
+  @TestEngine.ParameterSupplier
   public static Stream<Parameter> parameters() {
     Collection<Parameter> collection = new ArrayList<>();
 
