@@ -138,7 +138,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             LOGGER.info(separator);
             LOGGER.info(banner);
             LOGGER.info(separator);
-            LOGGER.info("Scanning all classpath jars for tests...");
+            //LOGGER.info("Scanning all classpath jars for tests");
+            //LOGGER.info(separator);
 
             Set<Path> classPathRoots =
                     new TreeSet<>(Comparator.comparing(o -> o.toAbsolutePath().toFile().getAbsolutePath()));
