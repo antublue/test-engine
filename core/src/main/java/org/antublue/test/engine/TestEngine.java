@@ -84,6 +84,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
+        LOGGER.trace("discover(EngineDiscoveryRequest, UniqueId)");
+
         // Wrap the discovery request
         TestEngineEngineDiscoveryRequest testEngineDiscoveryRequest =
                 new TestEngineEngineDiscoveryRequest(
@@ -107,6 +109,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
+        LOGGER.trace("execute(ExecutionRequest)");
+
         new TestEngineExecutor().execute(executionRequest);
     }
 
