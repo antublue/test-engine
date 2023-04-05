@@ -87,83 +87,65 @@ public class TestEngineDiscoveryRequestProcessor {
             method -> TestEngineReflectionUtils.getTestMethods(method.getDeclaringClass()).contains(method);
 
     public TestEngineDiscoveryRequestProcessor() {
-        String includeTestClassPredicateRegex =
+        includeTestClassPredicate =
                 TestEngineConfigurationParameters.getInstance()
                         .get("antublue.test.engine.test.class.include")
+                        .map(value -> {
+                            LOGGER.trace(String.format("antublue.test.engine.test.class.include [%s]", value));
+                            return value;
+                        })
+                        .map(TestClassPredicate::of)
                         .orElse(null);
 
-        LOGGER.trace(String.format("antublue.test.engine.test.class.include [%s]", includeTestClassPredicateRegex));
-
-        if (includeTestClassPredicateRegex != null) {
-            includeTestClassPredicate = TestClassPredicate.of(includeTestClassPredicateRegex);
-        } else {
-            includeTestClassPredicate = null;
-        }
-
-        String excludeTestClassPredicateRegex =
+        excludeTestClassPredicate =
                 TestEngineConfigurationParameters.getInstance()
                         .get("antublue.test.engine.test.class.exclude")
+                        .map(value -> {
+                            LOGGER.trace(String.format("antublue.test.engine.test.class.exclude [%s]", value));
+                            return value;
+                        })
+                        .map(TestClassPredicate::of)
                         .orElse(null);
 
-        LOGGER.trace(String.format("antublue.test.engine.test.class.exclude [%s]", excludeTestClassPredicateRegex));
-
-        if (excludeTestClassPredicateRegex != null) {
-            excludeTestClassPredicate = TestClassPredicate.of(excludeTestClassPredicateRegex);
-        } else {
-            excludeTestClassPredicate = null;
-        }
-
-        String includeTestMethodPredicateRegex =
+        includeTestMethodPredicate =
                 TestEngineConfigurationParameters.getInstance()
                         .get("antublue.test.engine.test.method.include")
+                        .map(value -> {
+                            LOGGER.trace(String.format("antublue.test.engine.test.method.include [%s]", value));
+                            return value;
+                        })
+                        .map(TestMethodPredicate::of)
                         .orElse(null);
 
-        LOGGER.trace(String.format("antublue.test.engine.test.method.include [%s]", includeTestMethodPredicateRegex));
-
-        if (includeTestMethodPredicateRegex != null) {
-            includeTestMethodPredicate = TestMethodPredicate.of(includeTestMethodPredicateRegex);
-        } else {
-            includeTestMethodPredicate = null;
-        }
-
-        String excludeTestMethodPredicateRegex =
+        excludeTestMethodPredicate =
                 TestEngineConfigurationParameters.getInstance()
                         .get("antublue.test.engine.test.method.exclude")
+                        .map(value -> {
+                            LOGGER.trace(String.format("antublue.test.engine.test.method.exclude [%s]", value));
+                            return value;
+                        })
+                        .map(TestMethodPredicate::of)
                         .orElse(null);
 
-        LOGGER.trace(String.format("antublue.test.engine.test.method.exclude [%s]", excludeTestMethodPredicateRegex));
-
-        if (excludeTestMethodPredicateRegex != null) {
-            excludeTestMethodPredicate = TestMethodPredicate.of(excludeTestMethodPredicateRegex);
-        } else {
-            excludeTestMethodPredicate = null;
-        }
-
-        String includeTestClassTagsRegex =
+        includeTestClassTagPredicate =
                 TestEngineConfigurationParameters.getInstance()
                         .get("antublue.test.engine.test.class.tag.include")
+                        .map(value -> {
+                            LOGGER.trace(String.format("antublue.test.engine.test.class.tag.include [%s]", value));
+                            return value;
+                        })
+                        .map(TestClassTagPredicate::of)
                         .orElse(null);
 
-        LOGGER.trace(String.format("antublue.test.engine.test.class.tag.include [%s]", includeTestClassTagsRegex));
-
-        if (includeTestClassTagsRegex != null) {
-            includeTestClassTagPredicate = TestClassTagPredicate.of(includeTestClassTagsRegex);
-        } else {
-            includeTestClassTagPredicate = null;
-        }
-
-        String excludeTestClassTagsRegex =
+        excludeTestClassTagPredicate =
                 TestEngineConfigurationParameters.getInstance()
                         .get("antublue.test.engine.test.class.tag.exclude")
+                        .map(value -> {
+                            LOGGER.trace(String.format("antublue.test.engine.test.class.tag.exclude [%s]", value));
+                            return value;
+                        })
+                        .map(TestClassTagPredicate::of)
                         .orElse(null);
-
-        LOGGER.trace(String.format("antublue.test.engine.test.class.tag.exclude [%s]", excludeTestClassTagsRegex));
-
-        if (excludeTestClassTagsRegex != null) {
-            excludeTestClassTagPredicate = TestClassTagPredicate.of(excludeTestClassTagsRegex);
-        } else {
-            excludeTestClassTagPredicate = null;
-        }
     }
 
     /**
