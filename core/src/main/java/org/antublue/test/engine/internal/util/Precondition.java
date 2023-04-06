@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.internal.util;
 
-public class Precondition {
+public final class Precondition {
 
     private Precondition() {
         // DO NOTHING

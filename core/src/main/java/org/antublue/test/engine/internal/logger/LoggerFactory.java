@@ -31,7 +31,7 @@ public final class LoggerFactory {
     private static final String ANTUBLUE_TEST_ENGINE_LOG_LEVEL = "antublue.test.engine.log.level";
 
     private final Map<String, Logger> loggerMap = new HashMap<>();
-    private Level LEVEL;
+    private final Level level;
 
     /**
      * Constructor
@@ -50,22 +50,26 @@ public final class LoggerFactory {
                 System.getenv(
                         ANTUBLUE_TEST_ENGINE_LOG_LEVEL.toUpperCase(Locale.ENGLISH).replace('.', '_'));
 
+        Level level = null;
+
         if ((value != null) && (!value.trim().isEmpty())) {
             value = value.trim().toUpperCase(Locale.ENGLISH);
-            LEVEL = levelMap.get(value);
+            level = levelMap.get(value);
         }
 
-        if (LEVEL == null) {
+        if (level == null) {
             value = System.getProperty(ANTUBLUE_TEST_ENGINE_LOG_LEVEL);
             if ((value != null) && (!value.trim().isEmpty())) {
                 value = value.trim().toUpperCase(Locale.ENGLISH);
-                LEVEL = levelMap.get(value);
+                level = levelMap.get(value);
             }
         }
 
-        if (LEVEL == null) {
-            LEVEL = Level.INFO;
+        if (level == null) {
+            level = Level.INFO;
         }
+
+        this.level = level;
     }
 
     /**
@@ -74,13 +78,15 @@ public final class LoggerFactory {
      * @param name
      * @return
      */
-    private synchronized Logger createLogger(String name) {
-        Logger logger = loggerMap.get(name);
-        if (logger == null) {
-            logger = new Logger(name, LEVEL);
-            loggerMap.put(name, logger);
+    private Logger createLogger(String name) {
+        synchronized (this) {
+            Logger logger = loggerMap.get(name);
+            if (logger == null) {
+                logger = new Logger(name, level);
+                loggerMap.put(name, logger);
+            }
+            return logger;
         }
-        return logger;
     }
 
     /**
