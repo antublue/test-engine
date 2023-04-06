@@ -37,6 +37,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -180,19 +182,15 @@ public final class TestEngineReflectionUtils {
                     if (parameterTypes == null) {
                         return (method.getParameterTypes().length == 0);
                     }
-
                     if (parameterTypes.length != method.getParameterCount()) {
                         return false;
                     }
-
                     Class<?>[] methodParameterTypes = method.getParameterTypes();
-
                     for (int i = 0; i < parameterTypes.length; i++) {
                         if (!methodParameterTypes[i].isAssignableFrom(parameterTypes[i])) {
                             return false;
                         }
                     }
-
                     return true;
                 })
                 .filter(method -> {
@@ -231,20 +229,23 @@ public final class TestEngineReflectionUtils {
             Class<? extends Annotation> annotation,
             Class<?> fieldType,
             Set<Field> fieldSet) {
-        LOGGER.trace("resolveMethods(%s, %s, %s)", clazz.getName(), annotation.getName(), fieldType);
+        LOGGER.trace("resolveFields(%s, %s, %s)", clazz.getName(), annotation.getName(), fieldType);
 
-        // TODO convert to Stream syntax
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            int modifiers = field.getModifiers();
-            if (!Modifier.isFinal(modifiers)
-                    && !Modifier.isStatic(modifiers)
-                    && field.isAnnotationPresent(TestEngine.Parameter.class)
-                    && (field.getType() == fieldType)) {
-                field.setAccessible(true);
-                fieldSet.add(field);
-            }
-        }
+        Stream.of(clazz.getDeclaredFields())
+                .filter(field -> {
+                    int modifiers = field.getModifiers();
+                    if (!Modifier.isFinal(modifiers)
+                            && !Modifier.isStatic(modifiers)
+                            && field.isAnnotationPresent(annotation)
+                            && (field.getType() == fieldType)) {
+                        return true;
+                    }
+                    return false;
+                })
+                .forEach(field -> {
+                    field.setAccessible(true);
+                    fieldSet.add(field);
+                });
 
         Class<?> declaringClass = clazz.getSuperclass();
         if ((declaringClass != null) && !declaringClass.equals(Object.class)) {
