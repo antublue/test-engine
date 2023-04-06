@@ -27,6 +27,7 @@ import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.TestEngineSummaryEngineExecutionListener;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.DelegatingOutputStream;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
@@ -40,6 +41,8 @@ import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -61,6 +64,20 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static final String GROUP_ID = "org.antublue";
     public static final String ARTIFACT_ID = "test-engine";
     public static final String VERSION = TestEngineInformation.getVersion();
+
+    static {
+        /*
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream("antublue-test-engine.log");
+            DelegatingOutputStream delegatingOutputStream = new DelegatingOutputStream(System.out, fileOutputStream);
+            System.setOut(new PrintStream(delegatingOutputStream));
+            delegatingOutputStream = new DelegatingOutputStream(System.err, fileOutputStream);
+            System.setErr(new PrintStream(delegatingOutputStream));
+        } catch (IOException ioe) {
+            // DO NOTHING
+        }
+        */
+    }
 
     @Override
     public String getId() {
@@ -142,8 +159,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             LOGGER.info(separator);
             LOGGER.info(banner);
             LOGGER.info(separator);
-            //LOGGER.info("Scanning all classpath jars for tests");
-            //LOGGER.info(separator);
 
             Set<Path> classPathRoots =
                     new TreeSet<>(Comparator.comparing(o -> o.toAbsolutePath().toFile().getAbsolutePath()));
@@ -164,7 +179,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             }
 
             for (Path path : classPathRoots) {
-                LOGGER.trace("jar [{}]", path.toAbsolutePath());
+                LOGGER.trace("jar [%s]", path.toAbsolutePath());
             }
 
             LauncherDiscoveryRequest launcherDiscoveryRequest =
