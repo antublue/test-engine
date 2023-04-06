@@ -16,25 +16,41 @@
 
 package org.antublue.test.engine.internal.util;
 
+/**
+ * Class to check argument preconditions
+ */
 public final class Precondition {
 
+    /**
+     * Constructor
+     */
     private Precondition() {
         // DO NOTHING
     }
 
+    /**
+     * Method to validate an Object it not null
+     *
+     * @param object
+     */
     public static void notNull(Object object) {
         if (object == null) {
             throw new PreconditionException("object is null");
         }
     }
 
-    public static void notBlank(String message) {
-        if (message == null) {
-            throw new PreconditionException("message is null");
+    /**
+     * Method to validate a String is not null or blank
+     *
+     * @param string
+     */
+    public static void notBlank(String string) {
+        if (string == null) {
+            throw new PreconditionException("string is null");
         }
 
-        if (message.trim().isEmpty()) {
-            throw new PreconditionException("message is blank");
+        if (string.trim().isEmpty()) {
+            throw new PreconditionException("string is blank");
         }
     }
 }
