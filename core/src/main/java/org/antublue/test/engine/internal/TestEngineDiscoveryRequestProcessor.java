@@ -24,6 +24,7 @@ import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescr
 import org.antublue.test.engine.internal.descriptor.TestEngineTestMethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Level;
 import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.predicate.TestClassPredicate;
 import org.antublue.test.engine.internal.predicate.TestClassTagPredicate;
 import org.antublue.test.engine.internal.predicate.TestMethodPredicate;
@@ -67,8 +68,8 @@ import java.util.stream.Stream;
  */
 @SuppressWarnings("unchecked")
 public class TestEngineDiscoveryRequestProcessor {
-
-    private static final Logger LOGGER = new Logger(TestEngineDiscoveryRequestProcessor.class.getName(), Level.ALL); // LoggerFactory.getLogger(TestEngineDiscoveryRequestProcessor.class);
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineDiscoveryRequestProcessor.class);
 
     private final TestClassPredicate includeTestClassPredicate;
     private final TestClassPredicate excludeTestClassPredicate;
