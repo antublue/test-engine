@@ -22,6 +22,7 @@ import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestEngineTestMethodTestDescriptor;
+import org.antublue.test.engine.internal.logger.Level;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.predicate.TestClassPredicate;
@@ -68,7 +69,7 @@ import java.util.stream.Stream;
 @SuppressWarnings("unchecked")
 public class TestEngineDiscoveryRequestProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineDiscoveryRequestProcessor.class);
+    private static final Logger LOGGER = new Logger(TestEngineDiscoveryRequestProcessor.class.getName(), Level.ALL); // LoggerFactory.getLogger(TestEngineDiscoveryRequestProcessor.class);
 
     private final TestClassPredicate includeTestClassPredicate;
     private final TestClassPredicate excludeTestClassPredicate;
@@ -302,7 +303,7 @@ public class TestEngineDiscoveryRequestProcessor {
             }
         }
 
-        processTestDescriptor(engineDescriptor, testClassToMethodMap);
+        processTestDescriptors(engineDescriptor, testClassToMethodMap);
     }
 
     private void processClasspathRootSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
@@ -364,19 +365,17 @@ public class TestEngineDiscoveryRequestProcessor {
     private void processMethodSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
         LOGGER.trace("resolveMethodSelector()");
 
-        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class);
-        LOGGER.trace(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
-
-        discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(MethodSelector.class);
+        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(MethodSelector.class);
         LOGGER.trace(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
 
         for (DiscoverySelector discoverySelector : discoverySelectorList) {
             MethodSelector methodSelector = (MethodSelector) discoverySelector;
+            Class<?> clazz = methodSelector.getJavaClass();
             Method method = methodSelector.getJavaMethod();
             LOGGER.trace("method " + method.getName());
             if (IS_TEST_METHOD.test(method)) {
-                LOGGER.trace(String.format("  test class [%s] @TestEngine.Test method [%s]", method.getDeclaringClass().getName(), method.getName()));
-                Collection<Method> methods = testClassToMethodMap.computeIfAbsent(method.getClass(), k -> new ArrayList<>());
+                LOGGER.trace(String.format("  test class [%s] @TestEngine.Test method [%s]", clazz, method.getName()));
+                Collection<Method> methods = testClassToMethodMap.computeIfAbsent(clazz, k -> new ArrayList<>());
                 methods.add(method);
             }
         }
@@ -406,7 +405,7 @@ public class TestEngineDiscoveryRequestProcessor {
             EngineDescriptor tempEngineDescriptor =
                     new EngineDescriptor(UniqueId.forEngine(TestEngine.ENGINE_ID), TestEngine.ENGINE_ID);
 
-            processTestDescriptor(tempEngineDescriptor, testClassToMethodMap);
+            processTestDescriptors(tempEngineDescriptor, testClassToMethodMap);
 
             testClassToMethodMap.clear();
 
@@ -468,7 +467,7 @@ public class TestEngineDiscoveryRequestProcessor {
         }
     }
 
-    private void processTestDescriptor(
+    private void processTestDescriptors(
             TestDescriptor testDescriptor,
             Map<Class<?>, Collection<Method>> testClassToMethodMap) {
         LOGGER.trace("processSelectors()");
