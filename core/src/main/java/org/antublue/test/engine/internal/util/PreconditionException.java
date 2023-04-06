@@ -23,7 +23,7 @@ public class PreconditionException extends RuntimeException {
 
     /**
      * Constructor
-     * 
+     *
      * @param message
      */
     public PreconditionException(String message) {
