@@ -372,20 +372,11 @@ public class TestEngineDiscoveryRequestProcessor {
 
         for (DiscoverySelector discoverySelector : discoverySelectorList) {
             MethodSelector methodSelector = (MethodSelector) discoverySelector;
-            Class<?> c = ((MethodSelector) discoverySelector).getJavaClass();
-            LOGGER.trace("c " + c);
-            Method method = ((MethodSelector) discoverySelector).getJavaMethod();
+            Method method = methodSelector.getJavaMethod();
             LOGGER.trace("method " + method.getName());
-            Class<?> clazz = method.getDeclaringClass();
-
-            if ((c != null) && (c != clazz)) {
-                continue;
-            }
-
             if (IS_TEST_METHOD.test(method)) {
-                LOGGER.trace(String.format("  test class [%s] @TestEngine.Test method [%s]", clazz.getName(), method.getName()));
-                Collection<Method> methods = testClassToMethodMap.computeIfAbsent(clazz, k -> new ArrayList<>());
-
+                LOGGER.trace(String.format("  test class [%s] @TestEngine.Test method [%s]", method.getDeclaringClass().getName(), method.getName()));
+                Collection<Method> methods = testClassToMethodMap.computeIfAbsent(method.getClass(), k -> new ArrayList<>());
                 methods.add(method);
             }
         }
