@@ -16,8 +16,6 @@
 
 package org.antublue.test.engine.internal.logger;
 
-import org.antublue.test.engine.internal.util.Precondition;
-
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;

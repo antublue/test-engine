@@ -24,7 +24,6 @@ import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescr
 import org.antublue.test.engine.internal.descriptor.TestEngineTestMethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Level;
 import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.predicate.TestClassPredicate;
 import org.antublue.test.engine.internal.predicate.TestClassTagPredicate;
 import org.antublue.test.engine.internal.predicate.TestMethodPredicate;

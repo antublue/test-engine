@@ -16,8 +16,6 @@
 
 package org.antublue.test.engine;
 
-import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
 import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
 import org.antublue.test.engine.internal.TestEngineDiscoveryRequestProcessor;
 import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
@@ -25,9 +23,10 @@ import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.TestEngineSummaryEngineExecutionListener;
+import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.DelegatingOutputStream;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
