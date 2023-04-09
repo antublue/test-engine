@@ -267,6 +267,12 @@ public final class TestEngineReflectionUtils {
         }
     }
 
+    /**
+     * Method to get a Collection of @TestEngine.Parameter fields
+     *
+     * @param clazz
+     * @return
+     */
     public static Collection<Field> getParameterFields(Class<?> clazz) {
         synchronized (parameterFieldCache) {
             LOGGER.trace(String.format("getParameterFields(%s)", clazz.getName()));
@@ -585,7 +591,7 @@ public final class TestEngineReflectionUtils {
             boolean o2AnnotationPresent = o2.isAnnotationPresent(TestEngine.Order.class);
             if (o1AnnotationPresent) {
                 if (o2AnnotationPresent) {
-                    // Sort based on @TestEngine.Test.Order value
+                    // Sort based on @TestEngine.Order value
                     int o1Order = o1.getAnnotation(TestEngine.Order.class).value();
                     int o2Order = o2.getAnnotation(TestEngine.Order.class).value();
                     return (o1Order < o2Order) ? -1 : ((o1Order == o2Order) ? 0 : 1);
