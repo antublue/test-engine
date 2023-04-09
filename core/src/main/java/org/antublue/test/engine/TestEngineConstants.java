@@ -16,6 +16,9 @@
 
 package org.antublue.test.engine;
 
+/**
+ * Class to contain Test Engine configuration constants
+ */
 public final class TestEngineConstants {
 
     public static final String PREFIX = "antublue.test.engine";
