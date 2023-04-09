@@ -211,6 +211,14 @@ public final class TestEngineReflectionUtils {
         }
     }
 
+    /**
+     * Method to get a Collection of all fields from a Class and super Classes
+     *
+     * @param clazz
+     * @param annotation
+     * @param fieldType
+     * @return
+     */
     private static Collection<Field> getFields(
             Class<?> clazz,
             Class<? extends Annotation> annotation,
@@ -222,6 +230,14 @@ public final class TestEngineReflectionUtils {
         return fieldSet;
     }
 
+    /**
+     * Method to resursively resolve Fields
+     *
+     * @param clazz
+     * @param annotation
+     * @param fieldType
+     * @param fieldSet
+     */
     private static void resolveFields(
             Class<?> clazz,
             Class<? extends Annotation> annotation,
