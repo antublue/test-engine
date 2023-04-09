@@ -16,6 +16,11 @@
 
 package org.antublue.test.engine.internal.util;
 
+import java.util.function.Supplier;
+
+/**
+ * Class to cast an Object to another Object
+ */
 public final class Cast {
 
     /**
@@ -34,5 +39,21 @@ public final class Cast {
      */
     public static <T> T cast(Object object) {
         return (T) object;
+    }
+
+    /**
+     * Method to cast an Object to a another Object, throwing an Exception
+     * provided by the Supplier if there is a ClassCastException
+     *
+     * @param object
+     * @return
+     * @param <T>
+     */
+    public static <T> T cast(Object object, Supplier<RuntimeException> runtimeExceptionSupplier) {
+        try {
+            return (T) object;
+        } catch (ClassCastException e) {
+            throw runtimeExceptionSupplier.get();
+        }
     }
 }
