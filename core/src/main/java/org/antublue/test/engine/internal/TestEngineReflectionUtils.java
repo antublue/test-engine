@@ -304,9 +304,9 @@ public final class TestEngineReflectionUtils {
      * @param clazz
      * @return
      */
-    public static Collection<Method> getParameterSupplierMethod(Class<?> clazz) {
+    public static Collection<Method> getParameterSupplierMethods(Class<?> clazz) {
         synchronized (parameterSupplierMethodCache) {
-            LOGGER.trace(String.format("getParameterSupplierMethod(%s)", clazz.getName()));
+            LOGGER.trace(String.format("getParameterSupplierMethods(%s)", clazz.getName()));
 
             if (parameterSupplierMethodCache.containsKey(clazz)) {
                 return parameterSupplierMethodCache.get(clazz);

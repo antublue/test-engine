@@ -585,7 +585,7 @@ public class TestEngineDiscoveryRequestProcessor {
         Collection<Parameter> testParameters;
 
         // Get the parameter supplier methods
-        Collection<Method> parameterSupplierMethods = TestEngineReflectionUtils.getParameterSupplierMethod(testClass);
+        Collection<Method> parameterSupplierMethods = TestEngineReflectionUtils.getParameterSupplierMethods(testClass);
         LOGGER.trace(String.format("test class [%s] parameter supplier method count [%d]", testClass.getName(), parameterSupplierMethods.size()));
 
         // Validate parameter supplier method count
