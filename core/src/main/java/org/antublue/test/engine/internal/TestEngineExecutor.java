@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.internal;
 
+import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestEngineTestMethodTestDescriptor;
@@ -55,7 +56,7 @@ public class TestEngineExecutor {
     public TestEngineExecutor() {
         int threadCount =
                 TestEngineConfigurationParameters.getInstance()
-                        .get("antublue.test.engine.thread.count")
+                        .get(TestEngineConstants.THREAD_COUNT)
                         .map(value -> {
                             int intValue;
                             try {
