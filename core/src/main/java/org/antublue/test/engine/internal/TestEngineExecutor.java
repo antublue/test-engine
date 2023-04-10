@@ -53,6 +53,9 @@ public class TestEngineExecutor {
 
     private final ExecutorService executorService;
 
+    /**
+     * Constructor
+     */
     public TestEngineExecutor() {
         int threadCount =
                 TestEngineConfigurationParameters.getInstance()
@@ -103,7 +106,7 @@ public class TestEngineExecutor {
             TestDescriptor testDescriptor = rootTestDescriptor.getChildren().stream().findFirst().get();
 
             if (LOGGER.isTraceEnabled()) {
-                logTestHierarchy(testDescriptor, 0);
+                printTestHierarchy(testDescriptor, 0);
             }
 
             execute((TestEngineClassTestDescriptor) testDescriptor, testEngineExecutionContext, countDownLatch);
@@ -116,7 +119,7 @@ public class TestEngineExecutor {
         List<TestExecutionResult> testExecutionResultList = Collections.synchronizedList(new ArrayList<>());
 
         if (LOGGER.isTraceEnabled()) {
-            logTestHierarchy(rootTestDescriptor, 0);
+            printTestHierarchy(rootTestDescriptor, 0);
         }
 
         TestEngineExecutionContext testEngineExecutionContext =
@@ -402,7 +405,7 @@ public class TestEngineExecutor {
      * @param testDescriptor
      * @param indent
      */
-    private void logTestHierarchy(TestDescriptor testDescriptor, int indent) {
+    private void printTestHierarchy(TestDescriptor testDescriptor, int indent) {
         if (indent == 0) {
             LOGGER.trace("Test class hierarchy...");
         }
@@ -441,11 +444,19 @@ public class TestEngineExecutor {
 
         LOGGER.trace(stringBuilder.toString());
 
-        for (TestDescriptor child : testDescriptor.getChildren()) {
-            logTestHierarchy(child, indent + 2);
+        if (LOGGER.isTraceEnabled()) {
+            for (TestDescriptor child : testDescriptor.getChildren()) {
+                printTestHierarchy(child, indent + 2);
+            }
         }
     }
 
+    /**
+     * Method to resolve the root exception if the throwable is an InvocationTargetException
+     *
+     * @param t
+     * @return
+     */
     private static Throwable resolve(Throwable t) {
         if (t instanceof InvocationTargetException) {
             return t.getCause();
@@ -454,6 +465,12 @@ public class TestEngineExecutor {
         }
     }
 
+    /**
+     * Method to print a stack track, stopping at the test engine
+     * 
+     * @param t
+     * @param printStream
+     */
     public static void printStackTrace(Throwable t, PrintStream printStream) {
         printStream.println(t.getClass().getName() + ": " + t.getMessage());
 
@@ -478,10 +495,19 @@ public class TestEngineExecutor {
         System.out.flush();
     }
 
+    /**
+     * Class to implement a named ThreadFactory
+     */
     private static class NamedThreadFactory implements ThreadFactory {
 
         private int threadId = 1;
 
+        /**
+         * Method to create a new Thread
+         *
+         * @param r a runnable to be executed by new thread instance
+         * @return
+         */
         @Override
         public Thread newThread(Runnable r) {
             String threadName;
