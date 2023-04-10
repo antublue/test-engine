@@ -31,7 +31,7 @@ public final class Cast {
     }
 
     /**
-     * Method to cast an Object to a another Object
+     * Method to cast an Object to another Object
      *
      * @param object
      * @return
@@ -42,7 +42,7 @@ public final class Cast {
     }
 
     /**
-     * Method to cast an Object to a another Object, throwing an Exception
+     * Method to cast an Object to another Object, throwing an Exception
      * provided by the Supplier if there is a ClassCastException
      *
      * @param object
