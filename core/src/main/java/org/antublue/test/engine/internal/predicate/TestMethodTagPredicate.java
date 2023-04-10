@@ -62,7 +62,7 @@ public final class TestMethodTagPredicate extends RegexPredicate<Method> {
 
     /**
      * Method to create an instance of a TestMethodTagPredicate
-     * 
+     *
      * @param regex
      * @return
      */

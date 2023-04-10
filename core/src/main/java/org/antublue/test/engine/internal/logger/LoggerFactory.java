@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Class to implement a LoggerFactory for Logback Classic
+ * Class to implement a LoggerFactory
  */
 public final class LoggerFactory {
 
