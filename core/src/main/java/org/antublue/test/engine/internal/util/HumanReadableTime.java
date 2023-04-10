@@ -121,7 +121,7 @@ public final class HumanReadableTime {
 
     /**
      * Method to get the current time as a String
-     * 
+     *
      * @return
      */
     public static String now() {

@@ -34,6 +34,7 @@ public final class Switch {
 
     /**
      * Method to implement a "switch" based on an Object's class
+     * 
      * @param object
      * @param consumers
      * @param <T>
@@ -48,6 +49,7 @@ public final class Switch {
 
     /**
      * Method to implement a switch "case" based on an Object's class
+     *
      * @param clazz
      * @param consumer
      * @return
