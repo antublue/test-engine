@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
- * Class to implement a Map to contains values that has casting capabilities
+ * Class to implement a Map to contain values. Allows casting of values when using "get(String key)"
  */
 @SuppressWarnings("unchecked")
 public class Map extends LinkedHashMap<String, Object> {
