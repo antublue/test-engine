@@ -17,7 +17,7 @@
 package org.antublue.test.engine;
 
 /**
- * Class to contain Test Engine configuration constants
+ * Class to implment Test Engine configuration constants
  */
 public final class TestEngineConstants {
 
@@ -34,7 +34,10 @@ public final class TestEngineConstants {
     public static final String TEST_CLASS_TAG_EXCLUDE = PREFIX + ".test.class.tag.exclude";
     public static final String TEST_METHOD_TAG_INCLUDE = PREFIX + ".test.method.tag.include";
     public static final String TEST_METHOD_TAG_EXCLUDE = PREFIX + ".test.method.tag.exclude";
-    
+
+    /**
+     * Constructor
+     */
     private TestEngineConstants() {
         // DO NOTHING
     }
