@@ -96,6 +96,13 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         return Optional.of(VERSION);
     }
 
+    /**
+     * Method to discover test classes
+     *
+     * @param engineDiscoveryRequest
+     * @param uniqueId
+     * @return
+     */
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
         LOGGER.trace("discover(EngineDiscoveryRequest, UniqueId)");
@@ -114,13 +121,18 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         new TestEngineDiscoveryRequestProcessor().processDiscoveryRequest(testEngineDiscoveryRequest, engineDescriptor);
 
         if (LOGGER.isTraceEnabled()) {
-            walk(engineDescriptor);
+            print(engineDescriptor);
         }
 
         // Return the engine descriptor with all child test descriptors
         return engineDescriptor;
     }
 
+    /**
+     * Method to execute th ExecutionRequest
+     *
+     * @param executionRequest
+     */
     @Override
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest)");
@@ -285,32 +297,48 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         }
     }
 
-    private static void walk(EngineDescriptor engineDescriptor) {
+    /**
+     * Method to print the EngineDescriptor
+     *
+     * @param engineDescriptor
+     */
+    private static void print(EngineDescriptor engineDescriptor) {
         LOGGER.trace("EngineDescriptor - > " + engineDescriptor.getUniqueId());
         Set<? extends TestDescriptor> testDescriptors = engineDescriptor.getChildren();
         for (TestDescriptor testDescriptor : testDescriptors) {
-            walk(testDescriptor, 2);
+            print(testDescriptor, 2);
         }
     }
 
-    private static void walk(TestDescriptor parentTestDescriptor, int indent) {
+    /**
+     * Method to print a TestDescriptor
+     *
+     * @param parentTestDescriptor
+     * @param indent
+     */
+    private static void print(TestDescriptor parentTestDescriptor, int indent) {
         if (parentTestDescriptor instanceof TestEngineClassTestDescriptor) {
             LOGGER.trace(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
             Set<? extends TestDescriptor> testDescriptors = ((TestEngineClassTestDescriptor) parentTestDescriptor).getChildren();
             for (TestDescriptor childTestDescriptor : testDescriptors) {
-                walk(childTestDescriptor, indent + 2);
+                print(childTestDescriptor, indent + 2);
             }
         } else if (parentTestDescriptor instanceof TestEngineParameterTestDescriptor) {
             LOGGER.trace(pad(indent) + "TestEngineParameterTestDescriptor - > " + parentTestDescriptor.getUniqueId());
             Set<? extends TestDescriptor> testDescriptors = ((TestEngineParameterTestDescriptor) parentTestDescriptor).getChildren();
             for (TestDescriptor childTestDescriptor : testDescriptors) {
-                walk(childTestDescriptor, indent + 2);
+                print(childTestDescriptor, indent + 2);
             }
         } else  {
             LOGGER.trace(pad(indent) + "TestEngineTestMethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
         }
     }
 
+    /**
+     * Method to left padd a string with spaces
+     * @param length
+     * @return
+     */
     private static String pad(int length) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < length; i++) {
