@@ -38,6 +38,13 @@ public class TestEngineInformation {
         return getProperty(VERSION, UNKNOWN);
     }
 
+    /**
+     * Method to get value for a key from the test engine properties
+     *
+     * @param key
+     * @param defaultValue
+     * @return
+     */
     private static String getProperty(String key, String defaultValue) {
         String value = defaultValue;
 
