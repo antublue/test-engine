@@ -22,11 +22,12 @@ package org.antublue.test.engine;
 public final class TestEngineConstants {
 
     public static final String PREFIX = "antublue.test.engine";
+    public static final String EXPERIMENTAL = ".experimental";
     
     public static final String CONSOLE_OUTPUT = PREFIX + ".console.output";
     public static final String THREAD_COUNT = PREFIX + ".thread.count";
-    public static final String LOG_TEST_MESSAGES = PREFIX + ".log.test.messages";
-    public static final String LOG_PASS_MESSAGES = PREFIX + ".log.pass.messages";
+    public static final String LOG_TEST_MESSAGES = PREFIX + EXPERIMENTAL + ".log.test.messages";
+    public static final String LOG_PASS_MESSAGES = PREFIX + EXPERIMENTAL + ".log.pass.messages";
 
     public static final String TEST_CLASS_INCLUDE = PREFIX + ".test.class.include";
     public static final String TEST_CLASS_EXCLUDE = PREFIX + ".test.class.exclude";
