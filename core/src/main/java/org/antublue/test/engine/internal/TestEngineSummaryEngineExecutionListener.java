@@ -49,6 +49,8 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
     private final TestPlan testPlan;
     private final SummaryGeneratingListener summaryGeneratingListener;
     private final boolean detailedOutput;
+    private final boolean logTestMessages;
+    private final boolean logPassMessages;
 
     public TestEngineSummaryEngineExecutionListener(TestPlan testPlan) {
         this.testPlan = testPlan;
@@ -67,6 +69,30 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                             }
                         })
                         .orElse(false);
+
+        this.logTestMessages =
+                TestEngineConfigurationParameters.getInstance()
+                        .get(TestEngineConstants.LOG_TEST_MESSAGES)
+                        .map(value -> {
+                            try {
+                                return Boolean.parseBoolean(value);
+                            } catch (NumberFormatException e) {
+                                return true;
+                            }
+                        })
+                        .orElse(true);
+
+        this.logPassMessages =
+                TestEngineConfigurationParameters.getInstance()
+                        .get(TestEngineConstants.LOG_PASS_MESSAGES)
+                        .map(value -> {
+                            try {
+                                return Boolean.parseBoolean(value);
+                            } catch (NumberFormatException e) {
+                                return true;
+                            }
+                        })
+                        .orElse(true);
     }
 
     @Override
@@ -92,32 +118,36 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 Switch.switchCase(EngineDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestEngineClassTestDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
-                    TestEngineParameterTestDescriptor testEngineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
-                    Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
-                    Parameter testParameter = testEngineParameterTestDescriptor.getTestParameter();
-                    String testParameterName = testParameter.name();
-                    stringBuilder
-                            .append(TEST)
-                            .append(" | ")
-                            .append(testParameterName)
-                            .append(" | ")
-                            .append(testClass.getName());
+                    if (logTestMessages) {
+                        TestEngineParameterTestDescriptor testEngineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
+                        Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
+                        Parameter testParameter = testEngineParameterTestDescriptor.getTestParameter();
+                        String testParameterName = testParameter.name();
+                        stringBuilder
+                                .append(TEST)
+                                .append(" | ")
+                                .append(testParameterName)
+                                .append(" | ")
+                                .append(testClass.getName());
+                    }
                 }),
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
-                    TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
-                    Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
-                    Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
-                    Parameter testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
-                    String testParameterName = testParameter.name();
-                    stringBuilder
-                            .append(TEST)
-                            .append(" | ")
-                            .append(testParameterName)
-                            .append(" | ")
-                            .append(testClass.getName())
-                            .append(" ")
-                            .append(testMethod.getName())
-                            .append("()");
+                    if (logTestMessages) {
+                        TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
+                        Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
+                        Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
+                        Parameter testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
+                        String testParameterName = testParameter.name();
+                        stringBuilder
+                                .append(TEST)
+                                .append(" | ")
+                                .append(testParameterName)
+                                .append(" | ")
+                                .append(testClass.getName())
+                                .append(" ")
+                                .append(testMethod.getName())
+                                .append("()");
+                    }
                 })
         );
 
@@ -139,30 +169,34 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                 Switch.switchCase(EngineDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestEngineClassTestDescriptor.class, consumer -> {}),
                 Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
-                    TestEngineParameterTestDescriptor testengineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
-                    Class<?> testClass = testengineParameterTestDescriptor.getTestClass();
-                    Parameter testParameter = testengineParameterTestDescriptor.getTestParameter();
-                    String testParameterName = testParameter.name();
-                    stringBuilder
-                            .append("%s | ")
-                            .append(testParameterName)
-                            .append(" | ")
-                            .append(testClass.getName());
+                    if (logPassMessages) {
+                        TestEngineParameterTestDescriptor testengineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
+                        Class<?> testClass = testengineParameterTestDescriptor.getTestClass();
+                        Parameter testParameter = testengineParameterTestDescriptor.getTestParameter();
+                        String testParameterName = testParameter.name();
+                        stringBuilder
+                                .append("%s | ")
+                                .append(testParameterName)
+                                .append(" | ")
+                                .append(testClass.getName());
+                    }
                 }),
                 Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
-                    TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
-                    Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
-                    Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
-                    Parameter testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
-                    String testParameterName = testParameter.name();
-                    stringBuilder
-                            .append("%s | ")
-                            .append(testParameterName)
-                            .append(" | ")
-                            .append(testClass.getName())
-                            .append(" ")
-                            .append(testMethod.getName())
-                            .append("()");
+                    if (logPassMessages) {
+                        TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
+                        Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
+                        Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
+                        Parameter testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
+                        String testParameterName = testParameter.name();
+                        stringBuilder
+                                .append("%s | ")
+                                .append(testParameterName)
+                                .append(" | ")
+                                .append(testClass.getName())
+                                .append(" ")
+                                .append(testMethod.getName())
+                                .append("()");
+                    }
                 }));
 
         if (stringBuilder.length() > 0) {
