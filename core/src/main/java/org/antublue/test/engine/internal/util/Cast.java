@@ -16,11 +16,13 @@
 
 package org.antublue.test.engine.internal.util;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
  * Class to cast an Object to another Object
  */
+@SuppressWarnings("unchecked")
 public final class Cast {
 
     /**

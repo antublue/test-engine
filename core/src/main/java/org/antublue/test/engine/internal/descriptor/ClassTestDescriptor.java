@@ -16,37 +16,34 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import org.antublue.test.engine.api.Parameter;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 import java.util.Optional;
 
-public class TestEngineParameterTestDescriptor extends TestEngineAbstractTestDescriptor {
+public class ClassTestDescriptor extends AbstractTestDescriptor {
 
     private final Class<?> testClass;
-    private final Parameter testParameter;
 
-    public TestEngineParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Parameter testParameter) {
+    public ClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
         super(uniqueId, displayName);
         this.testClass = testClass;
-        this.testParameter = testParameter;
     }
 
     @Override
     public Optional<TestSource> getSource() {
-        return Optional.of(ClassSource.from(testParameter.getClass()));
+        return Optional.of(ClassSource.from(testClass));
     }
 
     @Override
     public Type getType() {
-        return Type.CONTAINER;
+        return Type.CONTAINER_AND_TEST;
     }
 
     @Override
     public boolean isTest() {
-        return false;
+        return true;
     }
 
     @Override
@@ -56,16 +53,5 @@ public class TestEngineParameterTestDescriptor extends TestEngineAbstractTestDes
 
     public Class<?> getTestClass() {
         return testClass;
-    }
-
-    public Parameter getTestParameter() {
-        return testParameter;
-    }
-
-    public TestEngineParameterTestDescriptor copy() {
-        TestEngineParameterTestDescriptor copy = new TestEngineParameterTestDescriptor(getUniqueId(), getDisplayName(), testClass, testParameter);
-        copy.setParent(getParent().get());
-        children.stream().forEach(child -> copy.addChild(child));
-        return copy;
     }
 }

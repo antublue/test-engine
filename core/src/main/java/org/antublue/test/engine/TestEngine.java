@@ -23,11 +23,10 @@ import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.TestEngineSummaryEngineExecutionListener;
-import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
+import org.antublue.test.engine.internal.util.Timer;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -118,11 +117,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         // Create a TestEngineDiscoverySelectorResolver and
         // resolve selectors, adding them to the engine descriptor
-        new TestEngineDiscoveryRequestProcessor().processDiscoveryRequest(testEngineDiscoveryRequest, engineDescriptor);
-
-        if (LOGGER.isTraceEnabled()) {
-            print(engineDescriptor);
-        }
+        new TestEngineDiscoveryRequestProcessor().processEngineDiscoveryRequest(testEngineDiscoveryRequest, engineDescriptor);
 
         // Return the engine descriptor with all child test descriptors
         return engineDescriptor;
@@ -148,6 +143,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static void main(String[] args) {
         long startTimeMilliseconds = System.currentTimeMillis();
 
+        boolean hasConsole = "true".equals(System.getenv("__ANTUBLUE_TEST_ENGINE_HAS_CONSOLE__"));
         TestEngineConfigurationParameters.getInstance().put(TestEngineConstants.CONSOLE_OUTPUT, "true");
 
         PrintStream printStream = null;
@@ -200,8 +196,13 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             TestEngine testEngine = new TestEngine();
 
+            Timer timer = new Timer();
+
             TestDescriptor testDescriptor =
                     testEngine.discover(launcherDiscoveryRequest, UniqueId.root("/", "/"));
+
+            LOGGER.info("Test class/method discovery/resolution time [%d] ms", timer.stop().duration().toMillis());
+            LOGGER.info(separator);
 
             if (testDescriptor.getChildren().size() == 0) {
                 long endTimeMilliseconds = System.currentTimeMillis();
@@ -295,55 +296,5 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 System.exit(0);
             }
         }
-    }
-
-    /**
-     * Method to print the EngineDescriptor
-     *
-     * @param engineDescriptor
-     */
-    private static void print(EngineDescriptor engineDescriptor) {
-        LOGGER.trace("EngineDescriptor - > " + engineDescriptor.getUniqueId());
-        Set<? extends TestDescriptor> testDescriptors = engineDescriptor.getChildren();
-        for (TestDescriptor testDescriptor : testDescriptors) {
-            print(testDescriptor, 2);
-        }
-    }
-
-    /**
-     * Method to print a TestDescriptor
-     *
-     * @param parentTestDescriptor
-     * @param indent
-     */
-    private static void print(TestDescriptor parentTestDescriptor, int indent) {
-        if (parentTestDescriptor instanceof TestEngineClassTestDescriptor) {
-            LOGGER.trace(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
-            Set<? extends TestDescriptor> testDescriptors = ((TestEngineClassTestDescriptor) parentTestDescriptor).getChildren();
-            for (TestDescriptor childTestDescriptor : testDescriptors) {
-                print(childTestDescriptor, indent + 2);
-            }
-        } else if (parentTestDescriptor instanceof TestEngineParameterTestDescriptor) {
-            LOGGER.trace(pad(indent) + "TestEngineParameterTestDescriptor - > " + parentTestDescriptor.getUniqueId());
-            Set<? extends TestDescriptor> testDescriptors = ((TestEngineParameterTestDescriptor) parentTestDescriptor).getChildren();
-            for (TestDescriptor childTestDescriptor : testDescriptors) {
-                print(childTestDescriptor, indent + 2);
-            }
-        } else  {
-            LOGGER.trace(pad(indent) + "TestEngineTestMethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
-        }
-    }
-
-    /**
-     * Method to left padd a string with spaces
-     * @param length
-     * @return
-     */
-    private static String pad(int length) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            stringBuilder.append(" ");
-        }
-        return stringBuilder.toString();
     }
 }

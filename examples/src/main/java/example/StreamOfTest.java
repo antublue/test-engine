@@ -50,7 +50,7 @@ public class StreamOfTest {
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(qq" + parameter.value() + ")");
+        System.out.println("test2(" + parameter.value() + ")");
         assertThat(parameter.value(Integer.class).getClass()).isEqualTo(Integer.class);
     }
 

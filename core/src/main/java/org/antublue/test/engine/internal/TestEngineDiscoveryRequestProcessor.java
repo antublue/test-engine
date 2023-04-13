@@ -16,54 +16,48 @@
 
 package org.antublue.test.engine.internal;
 
-import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.TestEngineTestMethodTestDescriptor;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.TestDescriptorFactory;
+import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.predicate.TestClassPredicate;
 import org.antublue.test.engine.internal.predicate.TestClassTagPredicate;
 import org.antublue.test.engine.internal.predicate.TestMethodPredicate;
 import org.antublue.test.engine.internal.predicate.TestMethodTagPredicate;
+import org.antublue.test.engine.internal.util.Cast;
 import org.junit.platform.commons.support.ReflectionSupport;
-import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
-import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
-import org.junit.platform.engine.discovery.DirectorySelector;
 import org.junit.platform.engine.discovery.MethodSelector;
 import org.junit.platform.engine.discovery.PackageNameFilter;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
-import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
+import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
- * Class to implement a code to discover tests
+ * Class to implement code to discover tests / build test tree
  */
 @SuppressWarnings("unchecked")
 public class TestEngineDiscoveryRequestProcessor {
@@ -82,15 +76,18 @@ public class TestEngineDiscoveryRequestProcessor {
     /**
      * Predicate to determine if a class is a test class (not abstract, has @TestEngine.Test methods)
      */
-    private static final Predicate<Class<?>> IS_TEST_CLASS =
-            clazz -> !Modifier.isAbstract(clazz.getModifiers()) && !TestEngineReflectionUtils.getTestMethods(clazz).isEmpty();
+    private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
+        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class) || clazz.isAnnotationPresent(TestEngine.Disabled.class)) {
+            return false;
+        }
+
+        int modifiers = clazz.getModifiers();
+        return !Modifier.isAbstract(modifiers) && !TestEngineReflectionUtils.getTestMethods(clazz).isEmpty();
+    };
 
     /**
-     * Predicate to determine if a method is a test method (declared class contains the method)
+     * Constructor
      */
-    private static final Predicate<Method> IS_TEST_METHOD =
-            method -> TestEngineReflectionUtils.getTestMethods(method.getDeclaringClass()).contains(method);
-
     public TestEngineDiscoveryRequestProcessor() {
         includeTestClassPredicate =
                 TestEngineConfigurationParameters.getInstance()
@@ -162,8 +159,6 @@ public class TestEngineDiscoveryRequestProcessor {
                         .map(TestMethodTagPredicate::of)
                         .orElse(null);
 
-
-
         excludeTestMethodTagPredicate =
                 TestEngineConfigurationParameters.getInstance()
                         .get(TestEngineConstants.TEST_METHOD_TAG_EXCLUDE)
@@ -176,469 +171,758 @@ public class TestEngineDiscoveryRequestProcessor {
     }
 
     /**
-     * Method to resolve test classes / methods, adding them to the EngineDescriptor
+     * Method to process the EngineDiscoveryRequest
      *
      * @param engineDiscoveryRequest
      * @param engineDescriptor
      */
-    public void processDiscoveryRequest(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
-        LOGGER.trace("processDiscoveryRequest()");
+    public void processEngineDiscoveryRequest(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
+        LOGGER.trace("processEngineDiscoveryRequest()");
 
-        // Test class to test method list mapping, sorted by test class name
-        Map<Class<?>, Collection<Method>> testClassToMethodMap = new TreeMap<>(Comparator.comparing(Class::getName));
+        try {
+            // Process potential selectors
+            processClasspathRootSelectors(engineDiscoveryRequest, engineDescriptor);
+            processPackageSelectors(engineDiscoveryRequest, engineDescriptor);
+            processClassSelectors(engineDiscoveryRequest, engineDescriptor);
+            processMethodSelectors(engineDiscoveryRequest, engineDescriptor);
+            processUniqueIdSelectors(engineDiscoveryRequest, engineDescriptor);
 
-        // For each all classes, add all test methods
-        processClasspathRootSelector(engineDiscoveryRequest, testClassToMethodMap);
+            // Filter based on package names
+            processPackageNameFilters(engineDiscoveryRequest, engineDescriptor);
 
-        // For each test package that was selected, add all test methods
-        processPackageSelector(engineDiscoveryRequest, testClassToMethodMap);
+            // Filter test classes based on class/method predicate
+            processTestClassPredicates(engineDescriptor);
+            processTestMethodPredicates(engineDescriptor);
 
-        // For each test class selected, add all test methods
-        processClassSelector(engineDiscoveryRequest, testClassToMethodMap);
+            // Filter test classes based on class/method tag predicates
+            processTestClassTagPredicates(engineDescriptor);
+            processTestMethodTagPredicates(engineDescriptor);
 
-        // For each test method that was selected, add the test class and method
-        processMethodSelector(engineDiscoveryRequest, testClassToMethodMap);
+            if (LOGGER.isTraceEnabled()) {
+                printTree(engineDescriptor);
+            }
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new TestEngineException("Exception processing engine discovery request", t);
+        }
+    }
 
-        // For a specific test selection
-        processUniqueIdSelector(engineDiscoveryRequest, engineDescriptor, testClassToMethodMap);
+    private void processClasspathRootSelectors(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) throws Throwable {
+        LOGGER.trace("processClasspathRootSelectors");
 
-        // For a specific directory selection
-        processDirectorySelector(engineDiscoveryRequest, engineDescriptor, testClassToMethodMap);
+        UniqueId uniqueId = engineDescriptor.getUniqueId();
+        Collection<ClasspathRootSelector> classpathRootSelectors = engineDiscoveryRequest.getSelectorsByType(ClasspathRootSelector.class);
+        LOGGER.trace("classpathRootSelectors.size() [%d]", classpathRootSelectors.size());
 
-        // Process package name filters
-        processPackageNameFilters(engineDiscoveryRequest, engineDescriptor, testClassToMethodMap);
+        for (ClasspathRootSelector classpathRootSelector : classpathRootSelectors) {
+            URI uri = classpathRootSelector.getClasspathRoot();
+            LOGGER.trace("uri [%s]", uri);
+
+            List<Class<?>> classes = new ArrayList<>(ReflectionSupport.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true));
+            classes.sort(Comparator.comparing(Class::getName));
+
+            for (Class<?> clazz : classes) {
+                LOGGER.trace(String.format("  class [%s]", clazz.getName()));
+
+                uniqueId = uniqueId.append("class", clazz.getName());
+
+                ClassTestDescriptor testEngineClassTestDescriptor =
+                        TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
+                                uniqueId,
+                                clazz);
+
+                engineDescriptor.addChild(testEngineClassTestDescriptor);
+
+                List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
+                for (int i = 0; i < parameters.size(); i++) {
+                    Parameter parameter = parameters.get(i);
+                    uniqueId = uniqueId.append("parameter", String.valueOf(i));
+
+                    ParameterTestDescriptor testEngineParameterTestDescriptor =
+                            TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                                    uniqueId,
+                                    clazz,
+                                    parameter);
+
+                    testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
+
+                    List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
+                    for (Method method : methods) {
+                        uniqueId = uniqueId.append("method", method.getName());
+
+                        MethodTestDescriptor methodTestDescriptor =
+                                TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
+                                        uniqueId,
+                                        clazz,
+                                        parameter,
+                                        method);
+
+                        testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
+
+                        uniqueId = uniqueId.removeLastSegment();
+                    }
+
+                    testEngineParameterTestDescriptor.prune();
+                    uniqueId = uniqueId.removeLastSegment();
+                }
+
+                testEngineClassTestDescriptor.prune();
+                uniqueId = uniqueId.removeLastSegment();
+            }
+        }
+    }
+
+    /**
+     * Method to process package selectors
+     *
+     * @param engineDiscoveryRequest
+     * @param engineDescriptor
+     */
+    private void processPackageSelectors(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) throws Throwable {
+        LOGGER.trace("processPackageSelectors");
+
+        UniqueId uniqueId = engineDescriptor.getUniqueId();
+        Collection<PackageSelector> packageSelectors = engineDiscoveryRequest.getSelectorsByType(PackageSelector.class);
+        LOGGER.trace("packageSelectors.size() [%d]", packageSelectors.size());
+
+        for (PackageSelector packageSelector : packageSelectors) {
+            String packageName = packageSelector.getPackageName();
+
+            List<Class<?>> classes = new ArrayList<>(ReflectionSupport.findAllClassesInPackage(packageName, IS_TEST_CLASS, name -> true));
+            classes.sort(Comparator.comparing(Class::getName));
+
+            for (Class<?> clazz : classes) {
+                LOGGER.trace(String.format("  class [%s]", clazz.getName()));
+
+                uniqueId = uniqueId.append("class", clazz.getName());
+
+                ClassTestDescriptor testEngineClassTestDescriptor =
+                        TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
+                                uniqueId,
+                                clazz);
+
+                engineDescriptor.addChild(testEngineClassTestDescriptor);
+
+                List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
+                for (int i = 0; i < parameters.size(); i++) {
+                    Parameter parameter = parameters.get(i);
+                    uniqueId = uniqueId.append("parameter", String.valueOf(i));
+
+                    ParameterTestDescriptor testEngineParameterTestDescriptor =
+                            TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                                    uniqueId,
+                                    clazz,
+                                    parameter);
+
+                    testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
+
+                    List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
+                    for (Method method : methods) {
+                        uniqueId = uniqueId.append("method", method.getName());
+
+                        MethodTestDescriptor methodTestDescriptor =
+                                TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
+                                        uniqueId,
+                                        clazz,
+                                        parameter,
+                                        method);
+
+                        testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
+
+                        uniqueId = uniqueId.removeLastSegment();
+                    }
+
+                    testEngineParameterTestDescriptor.prune();
+                    uniqueId = uniqueId.removeLastSegment();
+                }
+
+                testEngineClassTestDescriptor.prune();
+                uniqueId = uniqueId.removeLastSegment();
+            }
+        }
+    }
+
+    /**
+     * Method to process class selectors
+     *
+     * @param engineDiscoveryRequest
+     * @param engineDescriptor
+     */
+    private void processClassSelectors(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) throws Throwable {
+        LOGGER.trace("processClassSelectors");
+
+        UniqueId uniqueId = engineDescriptor.getUniqueId();
+        Collection<ClassSelector> classSelectors = engineDiscoveryRequest.getSelectorsByType(ClassSelector.class);
+        LOGGER.trace("classSelectors.size() [%d]", classSelectors.size());
+
+        for (ClassSelector classSelector : classSelectors) {
+            Class<?> clazz = classSelector.getJavaClass();
+            LOGGER.trace(String.format("  class [%s]", clazz.getName()));
+
+            uniqueId = uniqueId.append("class", clazz.getName());
+
+            ClassTestDescriptor testEngineClassTestDescriptor =
+                    TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
+                            uniqueId,
+                            clazz);
+
+            engineDescriptor.addChild(testEngineClassTestDescriptor);
+
+            List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
+            for (int i = 0; i < parameters.size(); i++) {
+                Parameter parameter = parameters.get(i);
+                uniqueId = uniqueId.append("parameter", String.valueOf(i));
+
+                ParameterTestDescriptor testEngineParameterTestDescriptor =
+                        TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                                uniqueId,
+                                clazz,
+                                parameter);
+
+                testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
+
+                List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
+                for (Method method : methods) {
+                    uniqueId = uniqueId.append("method", method.getName());
+
+                    MethodTestDescriptor methodTestDescriptor =
+                            TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
+                                    uniqueId,
+                                    clazz,
+                                    parameter,
+                                    method);
+
+                    testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
+
+                    uniqueId = uniqueId.removeLastSegment();
+                }
+
+                testEngineParameterTestDescriptor.prune();
+                uniqueId = uniqueId.removeLastSegment();
+            }
+        }
+    }
+
+    private void processMethodSelectors(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
+        LOGGER.trace("processMethodSelectors");
+
+        UniqueId uniqueId = engineDescriptor.getUniqueId();
+        LOGGER.trace("uniqueId [%s]", uniqueId);
+
+        Collection<MethodSelector> methodSelectors = engineDiscoveryRequest.getSelectorsByType(MethodSelector.class);
+        LOGGER.trace("methodSelectors.size() [%d]", methodSelectors.size());
+        for (MethodSelector methodSelector : methodSelectors) {
+            Class<?> clazz = methodSelector.getJavaClass();
+            Method method = methodSelector.getJavaMethod();
+            uniqueId = uniqueId.append("class", clazz.getName());
+
+            ClassTestDescriptor testEngineClassTestDescriptor =
+                    TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
+                            uniqueId,
+                            clazz);
+
+            List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
+            for (int i = 0; i < parameters.size(); i++) {
+                Parameter parameter = parameters.get(i);
+                uniqueId = uniqueId.append("parameter", String.valueOf(i));
+
+                ParameterTestDescriptor testEngineParameterTestDescriptor =
+                        TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                                uniqueId,
+                                clazz,
+                                parameter);
+
+                uniqueId = uniqueId.append("method", method.getName());
+
+                MethodTestDescriptor methodTestDescriptor =
+                        TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
+                                uniqueId,
+                                clazz,
+                                parameter,
+                                method);
+
+                uniqueId = uniqueId.removeLastSegment();
+                testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
+
+                uniqueId = uniqueId.removeLastSegment();
+                testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
+            }
+
+            uniqueId = uniqueId.removeLastSegment();
+
+            engineDescriptor.addChild(testEngineClassTestDescriptor);
+        }
+    }
+
+    /**
+     * Method to process uniqueId selectors
+     *
+     * @param engineDiscoveryRequest
+     * @param engineDescriptor
+     */
+    private void processUniqueIdSelectors(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
+        LOGGER.info("processUniqueIdSelectors");
+
+        String className = null;
+        Map<UniqueId, ClassTestDescriptor> classTestDescriptorMap = new LinkedHashMap<>();
+
+        try {
+            Collection<UniqueIdSelector> uniqueIdSelectors = engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class);
+            LOGGER.trace("uniqueIdSelectors.size() [%d]", uniqueIdSelectors.size());
+
+            for (UniqueIdSelector uniqueIdSelector : uniqueIdSelectors) {
+                UniqueId selectorUniqueId = uniqueIdSelector.getUniqueId();
+                LOGGER.info("selectorUniqueId [%s]", selectorUniqueId);
+
+                UniqueId.Segment segment = selectorUniqueId.getLastSegment();
+
+                if ("parameter".equals(segment.getType())) {
+                    LOGGER.info("parameter [%s] selected", segment.getValue());
+
+                    UniqueId classUniqueId = selectorUniqueId.removeLastSegment();
+                    UniqueId.Segment classSegment = classUniqueId.getLastSegment();
+                    className = classSegment.getValue();
+                    LOGGER.info("className [%s]", className);
+
+                    Class<?> clazz = Class.forName(className);
+
+                    ClassTestDescriptor classTestDescriptor;
+                    Optional<? extends TestDescriptor> optionalTestDescriptor = engineDescriptor.findByUniqueId(classUniqueId);
+                    if (optionalTestDescriptor.isPresent()) {
+                        classTestDescriptor = Cast.cast(optionalTestDescriptor.get());
+                    } else {
+                        classTestDescriptor =
+                                TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
+                                        classUniqueId,
+                                        clazz);
+                    }
+
+                    List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
+                    Parameter parameter = parameters.get(Integer.parseInt(segment.getValue()));
+
+                    ParameterTestDescriptor parameterTestDescriptor;
+
+                    optionalTestDescriptor = classTestDescriptor.findByUniqueId(selectorUniqueId);
+                    if (optionalTestDescriptor.isPresent()) {
+                        parameterTestDescriptor = Cast.cast(optionalTestDescriptor.get());
+                    } else {
+                        parameterTestDescriptor =
+                                TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                                        selectorUniqueId,
+                                        clazz,
+                                        parameter);
+                    }
+
+                    List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
+                    for (Method method : methods) {
+                        UniqueId methodUniqueId = selectorUniqueId.append("method", method.getName());
+
+                        MethodTestDescriptor methodTestDescriptor =
+                                TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
+                                        methodUniqueId,
+                                        clazz,
+                                        parameter,
+                                        method);
+
+                        parameterTestDescriptor.addChild(methodTestDescriptor);
+                    }
+
+                    classTestDescriptor.addChild(parameterTestDescriptor);
+                    engineDescriptor.addChild(classTestDescriptor);
+
+                    /*
+                    ParameterTestDescriptor testEngineParameterTestDescriptor =
+                            TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                                    uniqueId,
+                                    clazz,
+                                    parameter);
+                     */
+                }
+                /*
+
+                UniqueId parameterUniqueId = selectorUniqueId.removeLastSegment();
+                LOGGER.info("parameterUniqueId [%s]", parameterUniqueId);
+
+                UniqueId classUniqueId = parameterUniqueId.removeLastSegment();
+                LOGGER.info("classUniqueId [%s]", classUniqueId);
+
+                className = classUniqueId.getLastSegment().getValue();
+                LOGGER.info("className [%s]", className);
+
+                /*
+                className = clazzSegment.getValue();
+                Class clazz = Class.forName(className);
+
+                UniqueId.Segment parameterSegment = uniqueId.removeLastSegment().getLastSegment();
+                LOGGER.info("parameterSegment [%s]", parameterSegment.getValue());
+                int parameterIndex = Integer.parseInt(parameterSegment.getValue());
+
+                ClassTestDescriptor testEngineClassTestDescriptor =
+                        TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
+                                uniqueId.removeLastSegment(),
+                                clazz);
+
+                List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
+                Parameter parameter = parameters.get(parameterIndex);
+
+                ParameterTestDescriptor testEngineParameterTestDescriptor =
+                        TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                                uniqueId,
+                                clazz,
+                                parameter);
+
+                List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
+                for (Method method : methods) {
+                    MethodTestDescriptor methodTestDescriptor =
+                            TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
+                                    uniqueId.append("method", method.getName()),
+                                    clazz,
+                                    parameter,
+                                    method);
+
+                    testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
+                }
+
+                testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
+                engineDescriptor.addChild(testEngineClassTestDescriptor);
+                */
+            }
+        } catch (ClassNotFoundException e) {
+            throw new TestEngineException(
+                    String.format("Class [%s] not found", className),
+                    e);
+        }
+    }
+
+    /**
+     * Method to process package name filters
+     *
+     * @param engineDiscoveryRequest
+     * @param engineDescriptor
+     */
+    private void processPackageNameFilters(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
+        LOGGER.trace("processPackageNameFilters");
+
+        List<? extends PackageNameFilter> packageNameFilters = engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
+        LOGGER.trace("packageNameFilters size [%d]", packageNameFilters.size());
+        for (PackageNameFilter packageNameFilter : packageNameFilters) {
+            Set<? extends TestDescriptor> testDescriptors = new LinkedHashSet<>(engineDescriptor.getChildren());
+            for (TestDescriptor testDescriptor : testDescriptors) {
+                ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(testDescriptor);
+                Set<? extends TestDescriptor> testDescriptors2 = new LinkedHashSet<>(testEngineClassTestDescriptor.getChildren());
+                for (TestDescriptor testDescriptor2 : testDescriptors2) {
+                    ParameterTestDescriptor testEngineParameterTestDescriptor = Cast.cast(testDescriptor2);
+                    Set<? extends TestDescriptor> testDescriptors3 = new LinkedHashSet<>(testDescriptor2.getChildren());
+                    for (TestDescriptor testDescriptor3 : testDescriptors3) {
+                        MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor3);
+                        Class<?> clazz = methodTestDescriptor.getTestClass();
+                        String className = clazz.getName();
+                        if (packageNameFilter.apply(className).excluded()) {
+                            methodTestDescriptor.removeFromHierarchy();
+                        }
+                    }
+                    Class<?> clazz = testEngineParameterTestDescriptor.getTestClass();
+                    String className = clazz.getName();
+                    if (packageNameFilter.apply(className).excluded()) {
+                        testEngineParameterTestDescriptor.removeFromHierarchy();
+                    }
+                }
+                Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
+                String className = clazz.getName();
+                if (packageNameFilter.apply(className).excluded()) {
+                    testEngineClassTestDescriptor.removeFromHierarchy();
+                }
+            }
+        }
+
+        engineDescriptor.prune();
+    }
+
+    /**
+     * Method to process test class predicates
+     *
+     * @param engineDescriptor
+     */
+    private void processTestClassPredicates(EngineDescriptor engineDescriptor) {
+        LOGGER.trace("processTestClassPredicates");
 
         if (includeTestClassPredicate != null) {
-            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
-                if (!includeTestClassPredicate.test(clazz)) {
-                    testClassToMethodMap.remove(clazz);
+            LOGGER.trace("includeTestClassPredicate [%s]", includeTestClassPredicate.getRegex());
+
+            Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
+            for (TestDescriptor child : children) {
+                if (child instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
+                    UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
+                    Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
+
+                    if (includeTestClassPredicate.test(clazz)) {
+                        LOGGER.trace("  accept [%s]", uniqueId);
+                    } else {
+                        LOGGER.trace("  prune  [%s]", uniqueId);
+                        testEngineClassTestDescriptor.removeFromHierarchy();
+                    }
                 }
             }
         }
 
         if (excludeTestClassPredicate != null) {
-            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
-                if (excludeTestClassPredicate.test(clazz)) {
-                    testClassToMethodMap.remove(clazz);
+            LOGGER.trace("excludeTestClassPredicate [%s]", excludeTestClassPredicate.getRegex());
+
+            Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
+            for (TestDescriptor child : children) {
+                if (child instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
+                    UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
+                    Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
+
+                    if (excludeTestClassPredicate.test(clazz)) {
+                        LOGGER.trace("  prune  [%s]", uniqueId);
+                        testEngineClassTestDescriptor.removeFromHierarchy();
+                    } else {
+                        LOGGER.trace("  accept [%s]", uniqueId);
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * Method to process test method predicates
+     *
+     * @param engineDescriptor
+     */
+    private void processTestMethodPredicates(EngineDescriptor engineDescriptor) {
+        LOGGER.trace("processTestMethodPredicates");
 
         if (includeTestMethodPredicate != null) {
-            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
-                Collection<Method> methods = new ArrayList<>(testClassToMethodMap.get(clazz));
-                methods.removeIf(method -> !includeTestMethodPredicate.test(method));
-                if (methods.isEmpty()) {
-                    testClassToMethodMap.remove(clazz);
-                } else {
-                    testClassToMethodMap.put(clazz, methods);
+            LOGGER.trace("includeTestMethodPredicate [%s]", includeTestMethodPredicate.getRegex());
+
+            Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
+            for (TestDescriptor child : children) {
+                if (child instanceof ClassTestDescriptor) {
+                    Set<? extends TestDescriptor> grandChildren = child.getChildren();
+                    for (TestDescriptor grandChild : grandChildren) {
+                        if (grandChild instanceof ParameterTestDescriptor) {
+                            Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
+                            for (TestDescriptor greatGrandChild : greatGrandChildren) {
+                                if (greatGrandChild instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
+                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
+                                    Method method = methodTestDescriptor.getTestMethod();
+
+                                    if (includeTestMethodPredicate.test(method)) {
+                                        LOGGER.trace("  accept [%s]", uniqueId);
+                                    } else {
+                                        LOGGER.trace("  prune  [%s]", uniqueId);
+                                        methodTestDescriptor.removeFromHierarchy();
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
 
         if (excludeTestMethodPredicate != null) {
-            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
-                Collection<Method> methods = new ArrayList<>(tempTestClassToMethodMap.get(clazz));
-                methods.removeIf(excludeTestMethodPredicate);
-                if (methods.isEmpty()) {
-                    testClassToMethodMap.remove(clazz);
-                } else {
-                    testClassToMethodMap.put(clazz, methods);
+            LOGGER.trace("excludeTestMethodPredicate [%s]", excludeTestMethodPredicate.getRegex());
+
+            Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
+            for (TestDescriptor child : children) {
+                if (child instanceof ClassTestDescriptor) {
+                    Set<? extends TestDescriptor> grandChildren = child.getChildren();
+                    for (TestDescriptor grandChild : grandChildren) {
+                        if (grandChild instanceof ParameterTestDescriptor) {
+                            Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
+                            for (TestDescriptor greatGrandChild : greatGrandChildren) {
+                                if (greatGrandChild instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
+                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
+                                    Method method = methodTestDescriptor.getTestMethod();
+
+                                    if (excludeTestMethodPredicate.test(method)) {
+                                        LOGGER.trace("  prune  [%s]", uniqueId);
+                                        methodTestDescriptor.removeFromHierarchy();
+                                    } else {
+                                        LOGGER.trace("  accept [%s]", uniqueId);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * Method to process test class tag predicates
+     *
+     * @param engineDescriptor
+     */
+    private void processTestClassTagPredicates(EngineDescriptor engineDescriptor) {
+        LOGGER.trace("processTestClassTagPredicates");
 
         if (includeTestClassTagPredicate != null) {
-            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
-                if (!includeTestClassTagPredicate.test(clazz)) {
-                    testClassToMethodMap.remove(clazz);
+            LOGGER.trace("includeTestClassTagPredicate [%s]", includeTestClassTagPredicate.getRegex());
+
+            Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
+            for (TestDescriptor child : children) {
+                if (child instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
+                    UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
+                    Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
+
+                    if (includeTestClassTagPredicate.test(clazz)) {
+                        LOGGER.trace("  accept [%s]", uniqueId);
+                    } else {
+                        LOGGER.trace("  prune  [%s]", uniqueId);
+                        testEngineClassTestDescriptor.removeFromHierarchy();
+                    }
                 }
             }
         }
 
         if (excludeTestClassTagPredicate != null) {
-            Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new HashMap<>(testClassToMethodMap);
-            for (Class<?> clazz : tempTestClassToMethodMap.keySet()) {
-                if (excludeTestClassTagPredicate.test(clazz)) {
-                    testClassToMethodMap.remove(clazz);
+            LOGGER.trace("excludeTestClassTagPredicate [%s]", excludeTestClassTagPredicate.getRegex());
+
+            Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
+            for (TestDescriptor child : children) {
+                if (child instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
+                    UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
+                    Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
+
+                    if (excludeTestClassTagPredicate.test(clazz)) {
+                        LOGGER.trace("  prune  [%s]", uniqueId);
+                        testEngineClassTestDescriptor.removeFromHierarchy();
+                    } else {
+                        LOGGER.trace("  accept [%s]", uniqueId);
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * Method to process test method tag predicates
+     *
+     * @param engineDescriptor
+     */
+    private void processTestMethodTagPredicates(EngineDescriptor engineDescriptor) {
+        LOGGER.trace("processTestMethodTagPredicates");
 
         if (includeTestMethodTagPredicate != null) {
-            for (Class<?> clazz : new HashSet<>(testClassToMethodMap.keySet())) {
-                Collection<Method> testMethods = new ArrayList<>();
-                for (Method method : testClassToMethodMap.get(clazz)) {
-                    if (includeTestMethodTagPredicate.test(method)) {
-                        testMethods.add(method);
+            LOGGER.trace("includeTestMethodTagPredicate [%s]", includeTestMethodTagPredicate.getRegex());
+
+            Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
+            for (TestDescriptor child : children) {
+                if (child instanceof ClassTestDescriptor) {
+                    Set<? extends TestDescriptor> grandChildren = child.getChildren();
+                    for (TestDescriptor grandChild : grandChildren) {
+                        if (grandChild instanceof ParameterTestDescriptor) {
+                            Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
+                            for (TestDescriptor greatGrandChild : greatGrandChildren) {
+                                if (greatGrandChild instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
+                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
+                                    Method method = methodTestDescriptor.getTestMethod();
+
+                                    if (includeTestMethodTagPredicate.test(method)) {
+                                        LOGGER.trace("  accept [%s]", uniqueId);
+                                    } else {
+                                        LOGGER.trace("  prune  [%s]", uniqueId);
+                                        methodTestDescriptor.removeFromHierarchy();
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
-                if (testMethods.isEmpty()) {
-                    testClassToMethodMap.remove(clazz);
-                } else {
-                    testClassToMethodMap.put(clazz, testMethods);
                 }
             }
         }
 
         if (excludeTestMethodTagPredicate != null) {
-            for (Class<?> clazz : new HashSet<>(testClassToMethodMap.keySet())) {
-                Collection<Method> testMethods = new ArrayList<>();
-                for (Method method : testClassToMethodMap.get(clazz)) {
-                    if (!excludeTestMethodTagPredicate.test(method)) {
-                        testMethods.add(method);
-                    }
-                }
-                if (testMethods.isEmpty()) {
-                    testClassToMethodMap.remove(clazz);
-                } else {
-                    testClassToMethodMap.put(clazz, testMethods);
-                }
-            }
-        }
+            LOGGER.trace("excludeTestMethodTagPredicate [%s]", excludeTestMethodTagPredicate.getRegex());
 
-        processTestDescriptors(engineDescriptor, testClassToMethodMap);
-    }
+            Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
+            for (TestDescriptor child : children) {
+                if (child instanceof ClassTestDescriptor) {
+                    Set<? extends TestDescriptor> grandChildren = child.getChildren();
+                    for (TestDescriptor grandChild : grandChildren) {
+                        if (grandChild instanceof ParameterTestDescriptor) {
+                            Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
+                            for (TestDescriptor greatGrandChild : greatGrandChildren) {
+                                if (greatGrandChild instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
+                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
+                                    Method method = methodTestDescriptor.getTestMethod();
 
-    private void processClasspathRootSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.trace("resolveClasspathRoot()");
-
-        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(ClasspathRootSelector.class);
-        LOGGER.trace(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
-
-        for (DiscoverySelector discoverySelector : discoverySelectorList) {
-            LOGGER.trace("discoverySelector.class [%s]", discoverySelector.getClass());
-
-            URI uri = ((ClasspathRootSelector) discoverySelector).getClasspathRoot();
-            LOGGER.trace(String.format("uri [%s]", uri));
-
-            List<Class<?>> classList = ReflectionSupport.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true);
-            for (Class<?> clazz : classList) {
-                LOGGER.trace(String.format("  class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestEngineReflectionUtils.getTestMethods(clazz));
-            }
-        }
-    }
-
-    private void processPackageSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.trace("resolvePackageSelector()");
-
-        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(PackageSelector.class);
-        LOGGER.trace("discoverySelectorList size [%d]", discoverySelectorList.size());
-
-        for (DiscoverySelector discoverySelector : discoverySelectorList) {
-            String packageName = ((PackageSelector) discoverySelector).getPackageName();
-            LOGGER.trace("packageName [%s]", packageName);
-
-            List<Class<?>> classList = ReflectionSupport.findAllClassesInPackage(packageName, IS_TEST_CLASS, name -> true);
-            for (Class<?> clazz : classList) {
-                LOGGER.trace(String.format("  test class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestEngineReflectionUtils.getTestMethods(clazz));
-            }
-        }
-    }
-
-    private void processClassSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.trace("resolveClassSelector()");
-
-        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(ClassSelector.class);
-        LOGGER.trace("discoverySelectorList size [%d]", discoverySelectorList.size());
-
-        for (DiscoverySelector discoverySelector : discoverySelectorList) {
-            Class<?> clazz = ((ClassSelector) discoverySelector).getJavaClass();
-
-            if (IS_TEST_CLASS.test(clazz)) {
-                LOGGER.trace(String.format("  test class [%s]", clazz.getName()));
-                testClassToMethodMap.putIfAbsent(clazz, TestEngineReflectionUtils.getTestMethods(clazz));
-            } else {
-                LOGGER.trace(String.format("  skipping [%s]", clazz.getName()));
-            }
-        }
-    }
-
-    private void processMethodSelector(EngineDiscoveryRequest engineDiscoveryRequest, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.trace("resolveMethodSelector()");
-
-        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(MethodSelector.class);
-        LOGGER.trace(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
-
-        for (DiscoverySelector discoverySelector : discoverySelectorList) {
-            MethodSelector methodSelector = (MethodSelector) discoverySelector;
-            Class<?> clazz = methodSelector.getJavaClass();
-            Method method = methodSelector.getJavaMethod();
-            LOGGER.trace("method " + method.getName());
-            if (IS_TEST_METHOD.test(method)) {
-                LOGGER.trace(String.format("  test class [%s] @TestEngine.Test method [%s]", clazz, method.getName()));
-                Collection<Method> methods = testClassToMethodMap.computeIfAbsent(clazz, k -> new ArrayList<>());
-                methods.add(method);
-            }
-        }
-    }
-
-    private void processUniqueIdSelector(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.trace("resolveUniqueIdSelector()");
-
-        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class);
-        LOGGER.trace(String.format("discoverySelectorList size [%d]", discoverySelectorList.size()));
-
-        for (DiscoverySelector discoverySelector : discoverySelectorList) {
-            UniqueIdSelector uniqueIdSelector = (UniqueIdSelector) discoverySelector;
-            UniqueId uniqueId = uniqueIdSelector.getUniqueId();
-            LOGGER.trace("uniqueId [" + uniqueId + "]");
-
-            String classpath = System.getProperty("java.class.path");
-            String[] classpathEntries = classpath.split(File.pathSeparator);
-            for (String classPathEntry : classpathEntries) {
-                URI uri = new File(classPathEntry).getAbsoluteFile().toURI();
-                List<Class<?>> classList = ReflectionSupport.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true);
-                for (Class<?> clazz : classList) {
-                    testClassToMethodMap.putIfAbsent(clazz, TestEngineReflectionUtils.getTestMethods(clazz));
-                }
-            }
-
-            EngineDescriptor tempEngineDescriptor =
-                    new EngineDescriptor(UniqueId.forEngine(TestEngine.ENGINE_ID), TestEngine.ENGINE_ID);
-
-            processTestDescriptors(tempEngineDescriptor, testClassToMethodMap);
-
-            testClassToMethodMap.clear();
-
-            Optional<? extends TestDescriptor> optionalTestDescriptor = tempEngineDescriptor.findByUniqueId(uniqueId);
-            if (optionalTestDescriptor.isPresent()) {
-                LOGGER.trace("found testDescriptor");
-
-                TestDescriptor tempTestDescriptor =  optionalTestDescriptor.get();
-                if (tempTestDescriptor instanceof TestEngineClassTestDescriptor) {
-                    engineDescriptor.addChild(tempTestDescriptor);
-                } else {
-                    TestDescriptor testDescriptor = ((TestEngineParameterTestDescriptor) optionalTestDescriptor.get()).copy();
-                    LOGGER.trace("testDescriptor -> " + testDescriptor.getUniqueId());
-
-                    TestDescriptor parentTestDescriptor = ((TestEngineClassTestDescriptor) testDescriptor.getParent().get()).copy();
-                    LOGGER.trace("  testDescriptor -> " + parentTestDescriptor.getUniqueId());
-
-                    parentTestDescriptor.addChild(testDescriptor);
-                    engineDescriptor.addChild(parentTestDescriptor);
-                }
-            }
-        }
-    }
-
-    private static void processDirectorySelector(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.trace("resolveDirectorySelector()");
-
-        List<? extends DiscoverySelector> discoverySelectorList = engineDiscoveryRequest.getSelectorsByType(DirectorySelector.class);
-        LOGGER.trace("discoverySelectorList size [%d]", discoverySelectorList.size());
-
-        for (DiscoverySelector discoverySelector : discoverySelectorList) {
-            File directory = ((DirectorySelector) discoverySelector).getDirectory();
-            LOGGER.trace("directory [%s]", directory.getAbsolutePath());
-        }
-    }
-
-    private static void processPackageNameFilters(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor, Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.trace("processPackageNameFilters()");
-
-        List<? extends PackageNameFilter> packageNameFilters = engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
-        LOGGER.trace("packageNameFilters size [%d]", packageNameFilters.size());
-
-        Map<Class<?>, Collection<Method>> tempTestClassToMethodMap = new LinkedHashMap<>(testClassToMethodMap);
-
-        for (PackageNameFilter packageNameFilter : packageNameFilters) {
-            for (Map.Entry<Class<?>, Collection<Method>> entry : tempTestClassToMethodMap.entrySet()) {
-                Class<?> clazz = entry.getKey();
-                String className = clazz.getName();
-                LOGGER.trace("className [%s]", className);
-
-                FilterResult filterResult = packageNameFilter.apply(entry.getKey().getName());
-                if (filterResult.excluded()) {
-                    LOGGER.trace("excluded [true]");
-                    testClassToMethodMap.remove(entry.getKey());
-                } else {
-                    LOGGER.trace("excluded [false]");
-                }
-            }
-        }
-    }
-
-    private void processTestDescriptors(
-            TestDescriptor testDescriptor,
-            Map<Class<?>, Collection<Method>> testClassToMethodMap) {
-        LOGGER.trace("processSelectors()");
-
-        UniqueId uniqueId = testDescriptor.getUniqueId();
-
-        try {
-            for (Class<?> testClass : testClassToMethodMap.keySet()) {
-                LOGGER.trace(String.format("test class [%s]", testClass.getName()));
-
-                if (TestEngineReflectionUtils.isBaseClass(testClass)) {
-                    LOGGER.trace(String.format("test class [%s] is a base class not meant for execution", testClass.getName()));
-                    continue;
-                }
-
-                if (TestEngineReflectionUtils.isDisabled(testClass)) {
-                    LOGGER.trace(String.format("test class [%s] is disabled", testClass.getName()));
-                    continue;
-                }
-
-                LOGGER.trace(String.format("processing test class [%s]", testClass.getName()));
-
-                validateParameterFieldsAndOrMethods(testClass);
-
-                // Build the test descriptor tree if we have test parameters
-                // i.e. Tests with an empty set of parameters will be ignored
-
-                uniqueId = uniqueId.append("class", testClass.getName());
-
-                TestEngineClassTestDescriptor testClassTestDescriptor =
-                        new TestEngineClassTestDescriptor(
-                                uniqueId,
-                                testClass.getName(),
-                                testClass);
-
-                Collection<Parameter> testParameters = getTestParameters(testClass);
-
-                int index = 0;
-                for (Parameter testParameter : testParameters) {
-                    String testParameterName = testParameter.name();
-
-                    // We use generic value of "parameter-" + index since parameter names are not unique
-                    uniqueId = uniqueId.append("parameter", "parameter-" + index);
-
-                    TestEngineParameterTestDescriptor testEngineParameterTestDescriptor =
-                            new TestEngineParameterTestDescriptor(
-                                    uniqueId,
-                                    testParameterName,
-                                    testClass,
-                                    testParameter);
-
-                    for (Method testMethod : testClassToMethodMap.get(testClass)) {
-                        if (TestEngineReflectionUtils.isDisabled(testMethod)) {
-                            LOGGER.trace(
-                                    String.format(
-                                            "test class [%s] test method [%s] is disabled",
-                                            testClass.getName(),
-                                            testMethod.getName()));
-                            continue;
+                                    if (excludeTestMethodTagPredicate.test(method)) {
+                                        LOGGER.trace("  prune  [%s]", uniqueId);
+                                        methodTestDescriptor.removeFromHierarchy();
+                                    } else {
+                                        LOGGER.trace("  accept [%s]", uniqueId);
+                                    }
+                                }
+                            }
                         }
-
-                        uniqueId = uniqueId.append("method", testMethod.getName());
-
-                        TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor =
-                                new TestEngineTestMethodTestDescriptor(
-                                        uniqueId,
-                                        testMethod.getName(),
-                                        testClass,
-                                        testParameter,
-                                        testMethod);
-
-                        testEngineParameterTestDescriptor.addChild(testEngineTestMethodTestDescriptor);
-
-                        uniqueId = uniqueId.removeLastSegment();
                     }
-
-                    if (testEngineParameterTestDescriptor.getChildren().size() > 0) {
-                        testClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
-                    }
-
-                    uniqueId = uniqueId.removeLastSegment();
-                    index++;
                 }
-
-                if (testClassTestDescriptor.getChildren().size() > 0) {
-                    testDescriptor.addChild(testClassTestDescriptor);
-                }
-
-                uniqueId = uniqueId.removeLastSegment();
             }
-        } catch (Throwable t) {
-            throw new TestEngineException("Exception in TestEngine", t);
         }
     }
 
-    private static void validateParameterFieldsAndOrMethods(Class<?> testClass) {
-        Collection<Field> parameterFields = TestEngineReflectionUtils.getParameterFields(testClass);
-        LOGGER.trace(String.format("test class [%s] parameter field count [%d]", testClass.getName(), parameterFields.size()));
-
-        Collection<Method> parameterMethods = TestEngineReflectionUtils.getParameterMethods(testClass);
-        LOGGER.trace(String.format("test class [%s] parameter method count [%d]", testClass.getName(), parameterMethods.size()));
-
-        int count = parameterMethods.size() + parameterFields.size();
-        LOGGER.trace(String.format("test class [%s] parameter field + method count [%d]", testClass.getName(), count));
-
-        // Validate parameter method + field count
-        if (count == 0) {
-            throw new TestClassConfigurationException(
-                    String.format(
-                            "Test class [%s] must declare a @TestEngine.Parameter field or @TestEngine.Parameter method",
-                            testClass.getName()));
+    /**
+     * Method to print the test tree
+     *
+     * @param engineDescriptor
+     */
+    private static void printTree(EngineDescriptor engineDescriptor) {
+        LOGGER.trace("EngineDescriptor - > " + engineDescriptor.getUniqueId());
+        Set<? extends TestDescriptor> testDescriptors = engineDescriptor.getChildren();
+        for (TestDescriptor testDescriptor : testDescriptors) {
+            printTree(testDescriptor, 2);
         }
     }
 
-    private static Collection<Parameter> getTestParameters(Class<?> testClass) throws Throwable {
-        Collection<Parameter> testParameters;
-
-        // Get the parameter supplier methods
-        Collection<Method> parameterSupplierMethods = TestEngineReflectionUtils.getParameterSupplierMethods(testClass);
-        LOGGER.trace(String.format("test class [%s] parameter supplier method count [%d]", testClass.getName(), parameterSupplierMethods.size()));
-
-        // Validate parameter supplier method count
-        if (parameterSupplierMethods.isEmpty()) {
-            throw new TestClassConfigurationException(
-                    String.format(
-                            "Test class [%s] must declare a @TestEngine.ParameterSupplier method",
-                            testClass.getName()));
-        }
-
-        // Validate parameter supplier method count
-        if (parameterSupplierMethods.size() > 1) {
-            throw new TestClassConfigurationException(
-                    String.format(
-                            "Test class [%s] declares more than one @TestEngine.ParameterSupplier method",
-                            testClass.getName()));
-        }
-
-        // Get parameters from the parameter supplier method
-        try {
-            Stream<Parameter> parameterSupplierMethodStream =
-                    (Stream<Parameter>) parameterSupplierMethods
-                            .stream()
-                            .findFirst()
-                            .get()
-                            .invoke(null, (Object[]) null);
-
-            if (parameterSupplierMethodStream == null) {
-                throw new TestClassConfigurationException(
-                        String.format(
-                                "Test class [%s] @TestEngine.ParameterSupplier Stream is null",
-                                testClass.getName()));
+    /**
+     * Method to print a test descriptor
+     *
+     * @param parentTestDescriptor
+     * @param indent
+     */
+    private static void printTree(TestDescriptor parentTestDescriptor, int indent) {
+        if (parentTestDescriptor instanceof ClassTestDescriptor) {
+            LOGGER.trace(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            Set<? extends TestDescriptor> testDescriptors = ((ClassTestDescriptor) parentTestDescriptor).getChildren();
+            for (TestDescriptor childTestDescriptor : testDescriptors) {
+                printTree(childTestDescriptor, indent + 2);
             }
-
-            testParameters = parameterSupplierMethodStream.collect(Collectors.toList());
-        } catch (ClassCastException e) {
-            throw new TestClassConfigurationException(
-                    String.format(
-                            "Test class [%s] @TestEngine.ParameterSupplier method must return a Stream<Parameter>",
-                            testClass.getName()),
-                    e);
+        } else if (parentTestDescriptor instanceof ParameterTestDescriptor) {
+            LOGGER.trace(pad(indent) + "TestEngineParameterTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            Set<? extends TestDescriptor> testDescriptors = ((ParameterTestDescriptor) parentTestDescriptor).getChildren();
+            for (TestDescriptor childTestDescriptor : testDescriptors) {
+                printTree(childTestDescriptor, indent + 2);
+            }
+        } else  {
+            LOGGER.trace(pad(indent) + "TestEngineTestMethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
         }
+    }
 
-        LOGGER.trace("test class parameter count [%d]", testParameters.size());
-
-        // Validate we have test parameters
-        if (testParameters.isEmpty()) {
-            throw new TestClassConfigurationException(
-                    String.format(
-                            "Test class [%s] @TestEngine.ParameterSupplier Stream is empty",
-                            testClass.getName()));
+    /**
+     * Method to left pad a string with spaces
+     *
+     * @param length
+     * @return
+     */
+    private static String pad(int length) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            stringBuilder.append(" ");
         }
-
-        return testParameters;
+        return stringBuilder.toString();
     }
 }

@@ -180,16 +180,27 @@
                                         <exclude>META-INF/**</exclude>
                                     </excludes>
                                 </filter>
+                                <filter>
+                                    <artifact>org.hamcrest:hamcrest</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
                             </filters>
                             <artifactSet>
                                 <includes>
                                     <include>com.univocity:univocity-parsers</include>
+                                    <include>com.hamcrest:hamcrest</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
                                 <relocation>
                                     <pattern>com.univocity.</pattern>
                                     <shadedPattern>org.antublue.test.engine.com.univocity.</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.hamcrest.</pattern>
+                                    <shadedPattern>org.antublue.test.engine.org.hamcrest.</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -200,6 +211,11 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.0.1-jre</version>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -219,6 +235,11 @@
             <groupId>com.univocity</groupId>
             <artifactId>univocity-parsers</artifactId>
             <version>2.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.2</version>
         </dependency>
     </dependencies>
 

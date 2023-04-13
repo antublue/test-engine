@@ -18,16 +18,15 @@ package org.antublue.test.engine.internal.descriptor;
 
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class TestEngineAbstractTestDescriptor extends AbstractTestDescriptor {
+abstract class AbstractTestDescriptor extends org.junit.platform.engine.support.descriptor.AbstractTestDescriptor {
 
     private final List<TestExecutionResult> testExecutionResultList;
 
-    protected TestEngineAbstractTestDescriptor(UniqueId uniqueId, String displayName) {
+    protected AbstractTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
         this.testExecutionResultList = new ArrayList<>();
     }

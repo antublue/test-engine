@@ -19,9 +19,9 @@ package org.antublue.test.engine.internal;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.TestEngineTestMethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Switch;
@@ -107,7 +107,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
 
     @Override
     public void executionStarted(TestDescriptor testDescriptor) {
-        if (testDescriptor instanceof TestEngineTestMethodTestDescriptor) {
+        if (testDescriptor instanceof MethodTestDescriptor) {
             summaryGeneratingListener.executionStarted(TestIdentifier.from(testDescriptor));
         }
 
@@ -116,10 +116,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
         Switch.switchType(
                 testDescriptor,
                 Switch.switchCase(EngineDescriptor.class, consumer -> {}),
-                Switch.switchCase(TestEngineClassTestDescriptor.class, consumer -> {}),
-                Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
+                Switch.switchCase(ClassTestDescriptor.class, consumer -> {}),
+                Switch.switchCase(ParameterTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
-                        TestEngineParameterTestDescriptor testEngineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
+                        ParameterTestDescriptor testEngineParameterTestDescriptor = (ParameterTestDescriptor) testDescriptor;
                         Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
                         Parameter testParameter = testEngineParameterTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
@@ -131,12 +131,12 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                                 .append(testClass.getName());
                     }
                 }),
-                Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
+                Switch.switchCase(MethodTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
-                        TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
-                        Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
-                        Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
-                        Parameter testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
+                        MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
+                        Class<?> testClass = methodTestDescriptor.getTestClass();
+                        Method testMethod = methodTestDescriptor.getTestMethod();
+                        Parameter testParameter = methodTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
                         stringBuilder
                                 .append(TEST)
@@ -158,7 +158,7 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
 
     @Override
     public void executionFinished(TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-        if (testDescriptor instanceof TestEngineTestMethodTestDescriptor) {
+        if (testDescriptor instanceof MethodTestDescriptor) {
             summaryGeneratingListener.executionFinished(TestIdentifier.from(testDescriptor), testExecutionResult);
         }
 
@@ -167,10 +167,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
         Switch.switchType(
                 testDescriptor,
                 Switch.switchCase(EngineDescriptor.class, consumer -> {}),
-                Switch.switchCase(TestEngineClassTestDescriptor.class, consumer -> {}),
-                Switch.switchCase(TestEngineParameterTestDescriptor.class, consumer -> {
+                Switch.switchCase(ClassTestDescriptor.class, consumer -> {}),
+                Switch.switchCase(ParameterTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        TestEngineParameterTestDescriptor testengineParameterTestDescriptor = (TestEngineParameterTestDescriptor) testDescriptor;
+                        ParameterTestDescriptor testengineParameterTestDescriptor = (ParameterTestDescriptor) testDescriptor;
                         Class<?> testClass = testengineParameterTestDescriptor.getTestClass();
                         Parameter testParameter = testengineParameterTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
@@ -181,12 +181,12 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                                 .append(testClass.getName());
                     }
                 }),
-                Switch.switchCase(TestEngineTestMethodTestDescriptor.class, consumer -> {
+                Switch.switchCase(MethodTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        TestEngineTestMethodTestDescriptor testEngineTestMethodTestDescriptor = (TestEngineTestMethodTestDescriptor) testDescriptor;
-                        Class<?> testClass = testEngineTestMethodTestDescriptor.getTestClass();
-                        Method testMethod = testEngineTestMethodTestDescriptor.getTestMethod();
-                        Parameter testParameter = testEngineTestMethodTestDescriptor.getTestParameter();
+                        MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
+                        Class<?> testClass = methodTestDescriptor.getTestClass();
+                        Method testMethod = methodTestDescriptor.getTestMethod();
+                        Parameter testParameter = methodTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
                         stringBuilder
                                 .append("%s | ")
