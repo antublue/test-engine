@@ -25,6 +25,7 @@ import org.antublue.test.engine.internal.TestEngineSummaryEngineExecutionListene
 import org.antublue.test.engine.internal.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.antublue.test.engine.internal.util.Timer;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -152,7 +153,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             printStream = System.out;
 
-            String banner = "AntuBLUE Test Engine " + VERSION;
+            String banner = "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + VERSION;
 
             StringBuilder stringBuilder = new StringBuilder();
             for (int i = 0; i < banner.length(); i++) {
@@ -206,9 +207,9 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             if (testDescriptor.getChildren().size() == 0) {
                 long endTimeMilliseconds = System.currentTimeMillis();
-                LOGGER.info("");
+                //LOGGER.info("");
                 LOGGER.info(separator);
-                LOGGER.info("ERROR / NO TESTS FOUND");
+                LOGGER.info(AnsiColor.RED_BOLD_BRIGHT.apply("ERROR / NO TESTS FOUND"));
                 LOGGER.info(separator);
                 LOGGER.info("Total Time  : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
                 LOGGER.info("Finished At : " + HumanReadableTime.now());
@@ -233,7 +234,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             TestExecutionSummary testExecutionSummary = summaryEngineExecutionListener.getSummary();
 
-            banner = "AntuBLUE Test Engine " + VERSION + " Summary";
+            banner = "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + VERSION + " Summary";
 
             stringBuilder.setLength(0);
             for (int i = 0; i < banner.length(); i++) {
@@ -245,32 +246,32 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             LOGGER.info(separator);
             LOGGER.info(banner);
             LOGGER.info(separator);
-            LOGGER.info("");
+            //LOGGER.info("");
             LOGGER.info(
-                    "TESTS : "
+                    AnsiColor.WHITE_BRIGHT.apply("TESTS") + " : "
                             + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
                             + ", "
-                            + "PASSED"
+                            + AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED")
                             + " : "
                             + (testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount())
                             + ", "
-                            + "FAILED"
+                            + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED")
                             + " : "
                             + (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount())
                             + ", "
-                            + "SKIPPED"
+                            + AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED")
                             + " : "
                             + testExecutionSummary.getTestsSkippedCount());
 
-            LOGGER.info("");
+            //LOGGER.info("");
             LOGGER.info(separator);
 
             failed = (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
 
             if (failed) {
-                LOGGER.info("FAILED");
+                LOGGER.info(AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"));
             } else {
-                LOGGER.info("PASSED");
+                LOGGER.info(AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED"));
             }
 
             LOGGER.info(separator);

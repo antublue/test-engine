@@ -24,6 +24,7 @@ import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.Switch;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
@@ -41,10 +42,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
-    private static final String TEST = "TEST";
-    private static final String ABORT = "ABORT";
-    private static final String FAIL = "FAIL";
-    private static final String PASS = "PASS";
+    private static final String TEST = AnsiColor.WHITE_BRIGHT.apply("TEST");
+    private static final String ABORT = AnsiColor.YELLOW_BOLD_BRIGHT.apply("ABORT");
+    private static final String FAIL = AnsiColor.RED_BOLD_BRIGHT.apply("FAIL");
+    private static final String PASS = AnsiColor.GREEN_BOLD_BRIGHT.apply("PASS");
 
     private final TestPlan testPlan;
     private final SummaryGeneratingListener summaryGeneratingListener;
