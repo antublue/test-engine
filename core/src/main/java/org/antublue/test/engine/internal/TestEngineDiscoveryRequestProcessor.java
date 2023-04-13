@@ -228,7 +228,7 @@ public class TestEngineDiscoveryRequestProcessor {
                 uniqueId = uniqueId.append("class", clazz.getName());
 
                 ClassTestDescriptor testEngineClassTestDescriptor =
-                        TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
+                        TestDescriptorFactory.creaateClassTestDescriptor(
                                 uniqueId,
                                 clazz);
 
@@ -240,7 +240,7 @@ public class TestEngineDiscoveryRequestProcessor {
                     uniqueId = uniqueId.append("parameter", String.valueOf(i));
 
                     ParameterTestDescriptor testEngineParameterTestDescriptor =
-                            TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                            TestDescriptorFactory.createParameterTestDescriptor(
                                     uniqueId,
                                     clazz,
                                     parameter);
@@ -252,7 +252,7 @@ public class TestEngineDiscoveryRequestProcessor {
                         uniqueId = uniqueId.append("method", method.getName());
 
                         MethodTestDescriptor methodTestDescriptor =
-                                TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
+                                TestDescriptorFactory.createMethodTestDescriptor(
                                         uniqueId,
                                         clazz,
                                         parameter,
@@ -298,7 +298,7 @@ public class TestEngineDiscoveryRequestProcessor {
                 uniqueId = uniqueId.append("class", clazz.getName());
 
                 ClassTestDescriptor testEngineClassTestDescriptor =
-                        TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
+                        TestDescriptorFactory.creaateClassTestDescriptor(
                                 uniqueId,
                                 clazz);
 
@@ -310,7 +310,7 @@ public class TestEngineDiscoveryRequestProcessor {
                     uniqueId = uniqueId.append("parameter", String.valueOf(i));
 
                     ParameterTestDescriptor testEngineParameterTestDescriptor =
-                            TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                            TestDescriptorFactory.createParameterTestDescriptor(
                                     uniqueId,
                                     clazz,
                                     parameter);
@@ -322,7 +322,7 @@ public class TestEngineDiscoveryRequestProcessor {
                         uniqueId = uniqueId.append("method", method.getName());
 
                         MethodTestDescriptor methodTestDescriptor =
-                                TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
+                                TestDescriptorFactory.createMethodTestDescriptor(
                                         uniqueId,
                                         clazz,
                                         parameter,
@@ -363,7 +363,7 @@ public class TestEngineDiscoveryRequestProcessor {
             uniqueId = uniqueId.append("class", clazz.getName());
 
             ClassTestDescriptor testEngineClassTestDescriptor =
-                    TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
+                    TestDescriptorFactory.creaateClassTestDescriptor(
                             uniqueId,
                             clazz);
 
@@ -375,7 +375,7 @@ public class TestEngineDiscoveryRequestProcessor {
                 uniqueId = uniqueId.append("parameter", String.valueOf(i));
 
                 ParameterTestDescriptor testEngineParameterTestDescriptor =
-                        TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                        TestDescriptorFactory.createParameterTestDescriptor(
                                 uniqueId,
                                 clazz,
                                 parameter);
@@ -387,7 +387,7 @@ public class TestEngineDiscoveryRequestProcessor {
                     uniqueId = uniqueId.append("method", method.getName());
 
                     MethodTestDescriptor methodTestDescriptor =
-                            TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
+                            TestDescriptorFactory.createMethodTestDescriptor(
                                     uniqueId,
                                     clazz,
                                     parameter,
@@ -418,7 +418,7 @@ public class TestEngineDiscoveryRequestProcessor {
             uniqueId = uniqueId.append("class", clazz.getName());
 
             ClassTestDescriptor testEngineClassTestDescriptor =
-                    TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
+                    TestDescriptorFactory.creaateClassTestDescriptor(
                             uniqueId,
                             clazz);
 
@@ -428,7 +428,7 @@ public class TestEngineDiscoveryRequestProcessor {
                 uniqueId = uniqueId.append("parameter", String.valueOf(i));
 
                 ParameterTestDescriptor testEngineParameterTestDescriptor =
-                        TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                        TestDescriptorFactory.createParameterTestDescriptor(
                                 uniqueId,
                                 clazz,
                                 parameter);
@@ -436,7 +436,7 @@ public class TestEngineDiscoveryRequestProcessor {
                 uniqueId = uniqueId.append("method", method.getName());
 
                 MethodTestDescriptor methodTestDescriptor =
-                        TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
+                        TestDescriptorFactory.createMethodTestDescriptor(
                                 uniqueId,
                                 clazz,
                                 parameter,
@@ -493,7 +493,7 @@ public class TestEngineDiscoveryRequestProcessor {
                         classTestDescriptor = Cast.cast(optionalTestDescriptor.get());
                     } else {
                         classTestDescriptor =
-                                TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
+                                TestDescriptorFactory.creaateClassTestDescriptor(
                                         classUniqueId,
                                         clazz);
                     }
@@ -508,7 +508,7 @@ public class TestEngineDiscoveryRequestProcessor {
                         parameterTestDescriptor = Cast.cast(optionalTestDescriptor.get());
                     } else {
                         parameterTestDescriptor =
-                                TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
+                                TestDescriptorFactory.createParameterTestDescriptor(
                                         selectorUniqueId,
                                         clazz,
                                         parameter);
@@ -519,7 +519,7 @@ public class TestEngineDiscoveryRequestProcessor {
                         UniqueId methodUniqueId = selectorUniqueId.append("method", method.getName());
 
                         MethodTestDescriptor methodTestDescriptor =
-                                TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
+                                TestDescriptorFactory.createMethodTestDescriptor(
                                         methodUniqueId,
                                         clazz,
                                         parameter,

@@ -26,7 +26,7 @@ import java.util.Optional;
 public class ParameterTestDescriptor extends AbstractTestDescriptor {
 
     private final Class<?> testClass;
-    private Parameter testParameter;
+    private final Parameter testParameter;
 
     public ParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Parameter testParameter) {
         super(uniqueId, displayName);

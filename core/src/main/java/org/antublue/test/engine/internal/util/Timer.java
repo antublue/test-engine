@@ -21,7 +21,7 @@ import java.time.Duration;
 /**
  * Class to implement a timer
  */
-public class Timer {
+public final class Timer {
 
     private final boolean autoStart;
     private long startMs;

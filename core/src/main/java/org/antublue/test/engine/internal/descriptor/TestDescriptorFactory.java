@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 /**
  * Class to create test descriptors
  */
-public class TestDescriptorFactory {
+public final class TestDescriptorFactory {
 
     /**
      * Constructor
@@ -34,32 +34,32 @@ public class TestDescriptorFactory {
     }
 
     /**
-     * Method to create a test class test descriptor
+     * Method to create a ClassTestDescriptor
      *
      * @param uniqueId
      * @param clazz
      * @return
      */
-    public static ClassTestDescriptor createTestEngineTestClassTestDescriptor(
+    public static ClassTestDescriptor creaateClassTestDescriptor(
             UniqueId uniqueId, Class<?> clazz) {
         return new ClassTestDescriptor(uniqueId, clazz.getName(), clazz);
     }
 
     /**
-     * Method to create a test parameter test descriptor
+     * Method to create a ParameterTestDescriptor
      *
      * @param uniqueId
      * @param clazz
      * @param parameter
      * @return
      */
-    public static ParameterTestDescriptor createTestEngineTestParameterTestDescriptor(
+    public static ParameterTestDescriptor createParameterTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Parameter parameter) {
         return new ParameterTestDescriptor(uniqueId, parameter.name(), clazz, parameter);
     }
 
     /**
-     * Method to create a test method test descriptor
+     * Method to create a MethodTestDescriptor
      *
      * @param uniqueId
      * @param clazz
@@ -67,7 +67,7 @@ public class TestDescriptorFactory {
      * @param method
      * @return
      */
-    public static MethodTestDescriptor createTestEngineTestMethodTestDescriptor(
+    public static MethodTestDescriptor createMethodTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Parameter parameter, Method method) {
         return new MethodTestDescriptor(uniqueId, method.getName(), clazz, parameter, method);
     }
