@@ -34,6 +34,7 @@ public final class Switch {
 
     /**
      * Method to implement a "switch" based on an Object's class
+     *
      * @param object
      * @param consumers
      * @param <T>
@@ -48,12 +49,13 @@ public final class Switch {
 
     /**
      * Method to implement a switch "case" based on an Object's class
+     *
      * @param clazz
      * @param consumer
      * @return
      * @param <T>
      */
-    public static <T> Consumer switchCase(Class<T> clazz, Consumer<T> consumer) {
+    public static <T> Consumer<T> switchCase(Class<T> clazz, Consumer<T> consumer) {
         if ((clazz != null) && (consumer != null)){
             return object -> Optional.ofNullable(object).filter(clazz::isInstance).map(clazz::cast).ifPresent(consumer);
         } else {

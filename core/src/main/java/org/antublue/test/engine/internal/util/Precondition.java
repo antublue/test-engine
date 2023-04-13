@@ -16,45 +16,41 @@
 
 package org.antublue.test.engine.internal.util;
 
-import java.util.function.Supplier;
-
 /**
- * Class to cast an Object to another Object
+ * Class to check argument preconditions
  */
-@SuppressWarnings("unchecked")
-public final class Cast {
+public final class Precondition {
 
     /**
      * Constructor
      */
-    private Cast() {
+    private Precondition() {
         // DO NOTHING
     }
 
     /**
-     * Method to cast an Object to another Object
+     * Method to validate an Object it not null
      *
      * @param object
-     * @return
-     * @param <T>
      */
-    public static <T> T cast(Object object) {
-        return (T) object;
+    public static void notNull(Object object) {
+        if (object == null) {
+            throw new PreconditionException("object is null");
+        }
     }
 
     /**
-     * Method to cast an Object to another Object, throwing an Exception
-     * provided by the Supplier if there is a ClassCastException
+     * Method to validate a String is not null or blank
      *
-     * @param object
-     * @return
-     * @param <T>
+     * @param string
      */
-    public static <T> T cast(Object object, Supplier<RuntimeException> runtimeExceptionSupplier) {
-        try {
-            return (T) object;
-        } catch (ClassCastException e) {
-            throw runtimeExceptionSupplier.get();
+    public static void notBlank(String string) {
+        if (string == null) {
+            throw new PreconditionException("string is null");
+        }
+
+        if (string.trim().isEmpty()) {
+            throw new PreconditionException("string is blank");
         }
     }
 }

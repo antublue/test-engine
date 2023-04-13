@@ -25,7 +25,7 @@ public class TaggedClassTest {
         return collection.stream();
     }
 
-    @TestEngine.ParameterSetter
+    @TestEngine.Parameter
     public void setParameter(Parameter parameter) {
         this.parameter = parameter;
     }

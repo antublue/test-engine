@@ -21,11 +21,13 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Class to implement methods that get the TestEngine information
+ * Class to implement methods to get the TestEngine information
  */
 public class TestEngineInformation {
 
     private static final String RESOURCE_PATH = "/test-engine.properties";
+    private static final String VERSION = "version";
+    private static final String UNKNOWN = "Unknown";
 
     /**
      * Method to get the TestEngine version
@@ -33,9 +35,16 @@ public class TestEngineInformation {
      * @return
      */
     public static String getVersion() {
-        return getProperty("version", "Unknown");
+        return getProperty(VERSION, UNKNOWN);
     }
 
+    /**
+     * Method to get value for a key from the test engine properties
+     *
+     * @param key
+     * @param defaultValue
+     * @return
+     */
     private static String getProperty(String key, String defaultValue) {
         String value = defaultValue;
 

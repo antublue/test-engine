@@ -16,6 +16,9 @@
 
 package org.antublue.test.engine.internal;
 
+/**
+ * Class to implement a test class configuration exception
+ */
 public class TestClassConfigurationException extends RuntimeException {
 
     /**
@@ -35,14 +38,5 @@ public class TestClassConfigurationException extends RuntimeException {
      */
     public TestClassConfigurationException(String message, Throwable throwable) {
         super(message, throwable);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param throwable
-     */
-    public TestClassConfigurationException(Throwable throwable) {
-        super(throwable);
     }
 }

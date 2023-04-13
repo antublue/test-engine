@@ -65,7 +65,7 @@ public class Logger {
      *
      * @param name
      */
-    Logger(String name, Level level) {
+    public Logger(String name, Level level) {
         this.name = name;
         this.level = new AtomicReference<>(level);
     }

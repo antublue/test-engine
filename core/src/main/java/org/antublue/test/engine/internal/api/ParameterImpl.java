@@ -20,6 +20,9 @@ import org.antublue.test.engine.api.Parameter;
 
 import java.util.Objects;
 
+/**
+ * Class to implement a Parameter
+ */
 @SuppressWarnings("unchecked")
 public class ParameterImpl implements Parameter {
 

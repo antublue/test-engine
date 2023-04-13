@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.support.descriptor;
+package org.antublue.test.engine.internal.util;
 
-import org.junit.platform.engine.UniqueId;
+/**
+ * Class to implement an Exception for a Precondition failure
+ */
+public class PreconditionException extends RuntimeException {
 
-public class TestEngineClassTestDescriptor extends TestEngineAbstractTestDescriptor {
-
-    private final Class<?> testClass;
-
-    public TestEngineClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
-        super(uniqueId, displayName);
-        this.testClass = testClass;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.CONTAINER;
-    }
-
-    public Class<?> getTestClass() {
-        return testClass;
+    /**
+     * Constructor
+     *
+     * @param message
+     */
+    public PreconditionException(String message) {
+        super(message);
     }
 }
