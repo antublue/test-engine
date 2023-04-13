@@ -201,8 +201,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             TestDescriptor testDescriptor =
                     testEngine.discover(launcherDiscoveryRequest, UniqueId.root("/", "/"));
 
-            LOGGER.info("Test class/method discovery/resolution time [%d] ms", timer.stop().duration().toMillis());
-            LOGGER.info(separator);
+            LOGGER.trace("Test class/method discovery/resolution time [%d] ms", timer.stop().duration().toMillis());
+            LOGGER.trace(separator);
 
             if (testDescriptor.getChildren().size() == 0) {
                 long endTimeMilliseconds = System.currentTimeMillis();
