@@ -49,13 +49,6 @@ public class MethodTestDescriptor extends AbstractTestDescriptor {
     @Override
     public Optional<TestSource> getSource() {
         return Optional.of(MethodSource.from(testMethod));
-        /*
-        try {
-            return Optional.of(UriSource.from(new URI("urn:" + testMethod.getName() + "/" + testParameter.hashCode())));
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        */
     }
 
     @Override
