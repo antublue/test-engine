@@ -102,7 +102,7 @@ public class AnsiColor {
         }
     }
 
-    private String escapeString;
+    private final String escapeString;
 
     /**
      * Constructor
