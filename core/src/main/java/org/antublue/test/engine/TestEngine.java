@@ -17,12 +17,12 @@
 package org.antublue.test.engine;
 
 import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
-import org.antublue.test.engine.internal.TestEngineDiscoveryRequestProcessor;
 import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
 import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.TestEngineSummaryEngineExecutionListener;
+import org.antublue.test.engine.internal.discovery.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
@@ -117,7 +117,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         // Create a TestEngineDiscoverySelectorResolver and
         // resolve selectors, adding them to the engine descriptor
-        new TestEngineDiscoveryRequestProcessor().processEngineDiscoveryRequest(testEngineDiscoveryRequest, engineDescriptor);
+        new TestEngineDiscoveryRequestResolver().resolve(testEngineDiscoveryRequest, engineDescriptor);
 
         // Return the engine descriptor with all child test descriptors
         return engineDescriptor;

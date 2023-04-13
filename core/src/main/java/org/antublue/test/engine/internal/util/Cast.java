@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.util;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
