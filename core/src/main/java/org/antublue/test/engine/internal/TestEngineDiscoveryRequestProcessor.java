@@ -198,9 +198,9 @@ public class TestEngineDiscoveryRequestProcessor {
             processTestClassTagPredicates(engineDescriptor);
             processTestMethodTagPredicates(engineDescriptor);
 
-            if (LOGGER.isTraceEnabled()) {
+            //if (LOGGER.isTraceEnabled()) {
                 printTree(engineDescriptor);
-            }
+            //}
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable t) {
@@ -462,7 +462,7 @@ public class TestEngineDiscoveryRequestProcessor {
      * @param engineDescriptor
      */
     private void processUniqueIdSelectors(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
-        LOGGER.info("processUniqueIdSelectors");
+        LOGGER.trace("processUniqueIdSelectors");
 
         String className = null;
         Map<UniqueId, ClassTestDescriptor> classTestDescriptorMap = new LinkedHashMap<>();
@@ -473,17 +473,17 @@ public class TestEngineDiscoveryRequestProcessor {
 
             for (UniqueIdSelector uniqueIdSelector : uniqueIdSelectors) {
                 UniqueId selectorUniqueId = uniqueIdSelector.getUniqueId();
-                LOGGER.info("selectorUniqueId [%s]", selectorUniqueId);
+                LOGGER.trace("selectorUniqueId [%s]", selectorUniqueId);
 
                 UniqueId.Segment segment = selectorUniqueId.getLastSegment();
 
                 if ("parameter".equals(segment.getType())) {
-                    LOGGER.info("parameter [%s] selected", segment.getValue());
+                    LOGGER.trace("parameter [%s] selected", segment.getValue());
 
                     UniqueId classUniqueId = selectorUniqueId.removeLastSegment();
                     UniqueId.Segment classSegment = classUniqueId.getLastSegment();
                     className = classSegment.getValue();
-                    LOGGER.info("className [%s]", className);
+                    LOGGER.trace("className [%s]", className);
 
                     Class<?> clazz = Class.forName(className);
 
@@ -530,63 +530,53 @@ public class TestEngineDiscoveryRequestProcessor {
 
                     classTestDescriptor.addChild(parameterTestDescriptor);
                     engineDescriptor.addChild(classTestDescriptor);
+                } else if ("class".equals(segment.getType())) {
+                    className = segment.getValue();
+                    LOGGER.trace("className [%s]", className);
 
-                    /*
-                    ParameterTestDescriptor testEngineParameterTestDescriptor =
-                            TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
-                                    uniqueId,
-                                    clazz,
-                                    parameter);
-                     */
+                    Class<?> clazz = Class.forName(className);
+
+                    ClassTestDescriptor classTestDescriptor;
+                    Optional<? extends TestDescriptor> optionalTestDescriptor = engineDescriptor.findByUniqueId(selectorUniqueId);
+                    if (optionalTestDescriptor.isPresent()) {
+                        classTestDescriptor = Cast.cast(optionalTestDescriptor.get());
+                    } else {
+                        classTestDescriptor =
+                                TestDescriptorFactory.creaateClassTestDescriptor(
+                                        selectorUniqueId,
+                                        clazz);
+                    }
+
+                    List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
+                    for (int i = 0; i < parameters.size(); i++) {
+                        Parameter parameter = parameters.get(i);
+                        UniqueId parameterUniqueId = selectorUniqueId.append("parameter", String.valueOf(i));
+
+                        ParameterTestDescriptor parameterTestDescriptor =
+                                TestDescriptorFactory.createParameterTestDescriptor(
+                                        parameterUniqueId,
+                                        clazz,
+                                        parameter);
+
+                        List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
+                        for (Method method : methods) {
+                            UniqueId methodUniqueId = parameterUniqueId.append("method", method.getName());
+
+                            MethodTestDescriptor methodTestDescriptor =
+                                    TestDescriptorFactory.createMethodTestDescriptor(
+                                            methodUniqueId,
+                                            clazz,
+                                            parameter,
+                                            method);
+
+                            parameterTestDescriptor.addChild(methodTestDescriptor);
+                        }
+
+                        classTestDescriptor.addChild(parameterTestDescriptor);
+                    }
+
+                    engineDescriptor.addChild(classTestDescriptor);
                 }
-                /*
-
-                UniqueId parameterUniqueId = selectorUniqueId.removeLastSegment();
-                LOGGER.info("parameterUniqueId [%s]", parameterUniqueId);
-
-                UniqueId classUniqueId = parameterUniqueId.removeLastSegment();
-                LOGGER.info("classUniqueId [%s]", classUniqueId);
-
-                className = classUniqueId.getLastSegment().getValue();
-                LOGGER.info("className [%s]", className);
-
-                /*
-                className = clazzSegment.getValue();
-                Class clazz = Class.forName(className);
-
-                UniqueId.Segment parameterSegment = uniqueId.removeLastSegment().getLastSegment();
-                LOGGER.info("parameterSegment [%s]", parameterSegment.getValue());
-                int parameterIndex = Integer.parseInt(parameterSegment.getValue());
-
-                ClassTestDescriptor testEngineClassTestDescriptor =
-                        TestDescriptorFactory.createTestEngineTestClassTestDescriptor(
-                                uniqueId.removeLastSegment(),
-                                clazz);
-
-                List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
-                Parameter parameter = parameters.get(parameterIndex);
-
-                ParameterTestDescriptor testEngineParameterTestDescriptor =
-                        TestDescriptorFactory.createTestEngineTestParameterTestDescriptor(
-                                uniqueId,
-                                clazz,
-                                parameter);
-
-                List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
-                for (Method method : methods) {
-                    MethodTestDescriptor methodTestDescriptor =
-                            TestDescriptorFactory.createTestEngineTestMethodTestDescriptor(
-                                    uniqueId.append("method", method.getName()),
-                                    clazz,
-                                    parameter,
-                                    method);
-
-                    testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
-                }
-
-                testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
-                engineDescriptor.addChild(testEngineClassTestDescriptor);
-                */
             }
         } catch (ClassNotFoundException e) {
             throw new TestEngineException(
@@ -896,19 +886,19 @@ public class TestEngineDiscoveryRequestProcessor {
      */
     private static void printTree(TestDescriptor parentTestDescriptor, int indent) {
         if (parentTestDescriptor instanceof ClassTestDescriptor) {
-            LOGGER.trace(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            LOGGER.trace(pad(indent) + "ClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
             Set<? extends TestDescriptor> testDescriptors = ((ClassTestDescriptor) parentTestDescriptor).getChildren();
             for (TestDescriptor childTestDescriptor : testDescriptors) {
                 printTree(childTestDescriptor, indent + 2);
             }
         } else if (parentTestDescriptor instanceof ParameterTestDescriptor) {
-            LOGGER.trace(pad(indent) + "TestEngineParameterTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            LOGGER.trace(pad(indent) + "ParameterTestDescriptor - > " + parentTestDescriptor.getUniqueId());
             Set<? extends TestDescriptor> testDescriptors = ((ParameterTestDescriptor) parentTestDescriptor).getChildren();
             for (TestDescriptor childTestDescriptor : testDescriptors) {
                 printTree(childTestDescriptor, indent + 2);
             }
         } else  {
-            LOGGER.trace(pad(indent) + "TestEngineTestMethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
+            LOGGER.trace(pad(indent) + "MethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
         }
     }
 

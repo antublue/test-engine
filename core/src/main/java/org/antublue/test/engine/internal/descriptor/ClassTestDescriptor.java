@@ -38,12 +38,12 @@ public class ClassTestDescriptor extends AbstractTestDescriptor {
 
     @Override
     public Type getType() {
-        return Type.CONTAINER_AND_TEST;
+        return Type.CONTAINER;
     }
 
     @Override
     public boolean isTest() {
-        return true;
+        return false;
     }
 
     @Override
