@@ -347,6 +347,12 @@ To install to your local repository
 mvn clean package install
 ```
 
+## Known issues
+
+IntelliJ doesn't properly handle all possible test selection scenarios from the Test Run window.
+
+- https://youtrack.jetbrains.com/issue/IDEA-317561/IntelliJ-test-method-selections-fails-for-hierarchical-test-in-test-output-window
+
 ## Getting Help
 
 GitHub's Discussions is the current mechanism for help / support
