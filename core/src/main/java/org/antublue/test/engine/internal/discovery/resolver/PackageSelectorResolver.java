@@ -62,7 +62,7 @@ public class PackageSelectorResolver {
      * @param engineDescriptor
      */
     public void resolve(PackageSelector packageSelector, EngineDescriptor engineDescriptor) {
-        LOGGER.trace("resolve");
+        LOGGER.trace(String.format("resolve [%s]", packageSelector.getPackageName()));
 
         UniqueId uniqueId = engineDescriptor.getUniqueId();
         String packageName = packageSelector.getPackageName();

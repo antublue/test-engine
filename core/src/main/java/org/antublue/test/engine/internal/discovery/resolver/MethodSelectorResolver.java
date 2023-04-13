@@ -62,7 +62,7 @@ public class MethodSelectorResolver {
      * @param engineDescriptor
      */
     public void resolve(MethodSelector methodSelector, EngineDescriptor engineDescriptor) {
-        LOGGER.trace("resolve");
+        LOGGER.trace(String.format("resolve [%s]", methodSelector.getJavaMethod().getName()));
 
         UniqueId uniqueId = engineDescriptor.getUniqueId();
         Class<?> clazz = methodSelector.getJavaClass();

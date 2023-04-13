@@ -45,7 +45,7 @@ public class ClassSelectorResolver {
      * @param engineDescriptor
      */
     public void resolve(ClassSelector classSelector, EngineDescriptor engineDescriptor) {
-        LOGGER.trace("resolve");
+        LOGGER.trace(String.format("resolve [%s]", classSelector.getClassName()));
 
         UniqueId uniqueId = engineDescriptor.getUniqueId();
         Class<?> clazz = classSelector.getJavaClass();

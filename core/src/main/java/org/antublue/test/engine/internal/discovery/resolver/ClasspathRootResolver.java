@@ -64,7 +64,7 @@ public class ClasspathRootResolver {
      * @param engineDescriptor
      */
     public void resolve(ClasspathRootSelector classpathRootSelector, EngineDescriptor engineDescriptor) {
-        LOGGER.trace("resolve");
+        LOGGER.trace(String.format("resolve [%s]", classpathRootSelector.getClasspathRoot()));
 
         UniqueId uniqueId = engineDescriptor.getUniqueId();
         URI uri = classpathRootSelector.getClasspathRoot();
