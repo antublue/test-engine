@@ -16,18 +16,17 @@
 
 package org.antublue.test.engine;
 
-import org.antublue.test.engine.internal.descriptor.TestEngineClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.TestEngineParameterTestDescriptor;
 import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
-import org.antublue.test.engine.internal.TestEngineDiscoveryRequestProcessor;
 import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
 import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.TestEngineSummaryEngineExecutionListener;
+import org.antublue.test.engine.internal.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
+import org.antublue.test.engine.internal.util.Timer;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -62,6 +61,20 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static final String ARTIFACT_ID = "test-engine";
     public static final String VERSION = TestEngineInformation.getVersion();
 
+    static {
+        /*
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream("antublue-test-engine.log");
+            DelegatingOutputStream delegatingOutputStream = new DelegatingOutputStream(System.out, fileOutputStream);
+            System.setOut(new PrintStream(delegatingOutputStream));
+            delegatingOutputStream = new DelegatingOutputStream(System.err, fileOutputStream);
+            System.setErr(new PrintStream(delegatingOutputStream));
+        } catch (IOException ioe) {
+            // DO NOTHING
+        }
+        */
+    }
+
     @Override
     public String getId() {
         return ENGINE_ID;
@@ -82,8 +95,17 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         return Optional.of(VERSION);
     }
 
+    /**
+     * Method to discover test classes
+     *
+     * @param engineDiscoveryRequest
+     * @param uniqueId
+     * @return
+     */
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
+        LOGGER.trace("discover(EngineDiscoveryRequest, UniqueId)");
+
         // Wrap the discovery request
         TestEngineEngineDiscoveryRequest testEngineDiscoveryRequest =
                 new TestEngineEngineDiscoveryRequest(
@@ -95,18 +117,21 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         // Create a TestEngineDiscoverySelectorResolver and
         // resolve selectors, adding them to the engine descriptor
-        new TestEngineDiscoveryRequestProcessor().processDiscoveryRequest(testEngineDiscoveryRequest, engineDescriptor);
-
-        if (LOGGER.isTraceEnabled()) {
-            walk(engineDescriptor);
-        }
+        new TestEngineDiscoveryRequestResolver().resolve(testEngineDiscoveryRequest, engineDescriptor);
 
         // Return the engine descriptor with all child test descriptors
         return engineDescriptor;
     }
 
+    /**
+     * Method to execute th ExecutionRequest
+     *
+     * @param executionRequest
+     */
     @Override
     public void execute(ExecutionRequest executionRequest) {
+        LOGGER.trace("execute(ExecutionRequest)");
+
         new TestEngineExecutor().execute(executionRequest);
     }
 
@@ -117,6 +142,9 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      */
     public static void main(String[] args) {
         long startTimeMilliseconds = System.currentTimeMillis();
+
+        boolean hasConsole = "true".equals(System.getenv("__ANTUBLUE_TEST_ENGINE_HAS_CONSOLE__"));
+        TestEngineConfigurationParameters.getInstance().put(TestEngineConstants.CONSOLE_OUTPUT, "true");
 
         PrintStream printStream = null;
         boolean failed = false;
@@ -136,7 +164,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             LOGGER.info(separator);
             LOGGER.info(banner);
             LOGGER.info(separator);
-            LOGGER.info("Scanning all classpath jars for tests...");
 
             Set<Path> classPathRoots =
                     new TreeSet<>(Comparator.comparing(o -> o.toAbsolutePath().toFile().getAbsolutePath()));
@@ -157,7 +184,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             }
 
             for (Path path : classPathRoots) {
-                LOGGER.trace("jar [{}]", path.toAbsolutePath());
+                LOGGER.trace("jar [%s]", path.toAbsolutePath());
             }
 
             LauncherDiscoveryRequest launcherDiscoveryRequest =
@@ -169,8 +196,13 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             TestEngine testEngine = new TestEngine();
 
+            Timer timer = new Timer();
+
             TestDescriptor testDescriptor =
                     testEngine.discover(launcherDiscoveryRequest, UniqueId.root("/", "/"));
+
+            LOGGER.trace("Test class/method discovery/resolution time [%d] ms", timer.stop().duration().toMillis());
+            LOGGER.trace(separator);
 
             if (testDescriptor.getChildren().size() == 0) {
                 long endTimeMilliseconds = System.currentTimeMillis();
@@ -264,39 +296,5 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 System.exit(0);
             }
         }
-    }
-
-    private static void walk(EngineDescriptor engineDescriptor) {
-        LOGGER.trace("EngineDescriptor - > " + engineDescriptor.getUniqueId());
-        Set<? extends TestDescriptor> testDescriptors = engineDescriptor.getChildren();
-        for (TestDescriptor testDescriptor : testDescriptors) {
-            walk(testDescriptor, 2);
-        }
-    }
-
-    private static void walk(TestDescriptor parentTestDescriptor, int indent) {
-        if (parentTestDescriptor instanceof TestEngineClassTestDescriptor) {
-            LOGGER.trace(pad(indent) + "TestEngineClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
-            Set<? extends TestDescriptor> testDescriptors = ((TestEngineClassTestDescriptor) parentTestDescriptor).getChildren();
-            for (TestDescriptor childTestDescriptor : testDescriptors) {
-                walk(childTestDescriptor, indent + 2);
-            }
-        } else if (parentTestDescriptor instanceof TestEngineParameterTestDescriptor) {
-            LOGGER.trace(pad(indent) + "TestEngineParameterTestDescriptor - > " + parentTestDescriptor.getUniqueId());
-            Set<? extends TestDescriptor> testDescriptors = ((TestEngineParameterTestDescriptor) parentTestDescriptor).getChildren();
-            for (TestDescriptor childTestDescriptor : testDescriptors) {
-                walk(childTestDescriptor, indent + 2);
-            }
-        } else  {
-            LOGGER.trace(pad(indent) + "TestEngineTestMethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
-        }
-    }
-
-    private static String pad(int length) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            stringBuilder.append(" ");
-        }
-        return stringBuilder.toString();
     }
 }

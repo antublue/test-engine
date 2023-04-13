@@ -17,7 +17,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v2.0.6](https://github.com/antublue/test-engine/releases/tag/v2.0.6)
+- General Availability (GA): [Test Engine v2.0.7](https://github.com/antublue/test-engine/releases/tag/v2.0.7)
 
 ## Common Annotations
 
@@ -50,15 +50,18 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Additional Annotations
 
-| Annotation                  | Scope           | Required | Usage                                                                               |
-|-----------------------------|-----------------|----------|-------------------------------------------------------------------------------------|
-| `@TestEngine.Disabled`      | class or method | no       | Marks a test class or method disabled                                               |
-| `@TestEngine.BaseClass`     | class           | no       | Marks a test class as being a base class (skips direct execution)                   |
-| `@TestEngine.Order(<int>)`  | method          | no       | Provides a way to order methods  relative to other methods with the same annotation |
-| `@TestEngine.Tag(<string>)` | class           | no       | Provides a way to tag a test class or test method                                   | 
+| Annotation                  | Scope           | Required | Usage                                                                              |
+|-----------------------------|-----------------|----------|------------------------------------------------------------------------------------|
+| `@TestEngine.Disabled`      | class or method | no       | Marks a test class or method disabled                                              |
+| `@TestEngine.BaseClass`     | class           | no       | Marks a test class as being a base class (skips direct execution)                  |
+| `@TestEngine.Order(<int>)`  | method          | no       | Provides a way to order methods relative to other methods with the same annotation |
+| `@TestEngine.Tag(<string>)` | class           | no       | Provides a way to tag a test class or test method                                  | 
 
 
 **Notes**
+
+- `@TestEngine.Order(<int>)` is inheritance agnostic
+
 
 - Only one `@TestEngine.Tag(<string>)` is supported for a test class / test method
 
@@ -212,7 +215,7 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>2.0.6</version>
+    <version>2.0.7</version>
   </dependency>
   <dependency>
     <groupId>org.junit.jupiter</groupId>
@@ -343,6 +346,12 @@ To install to your local repository
 ```shell
 mvn clean package install
 ```
+
+## Known issues
+
+IntelliJ doesn't properly handle all possible test selection scenarios from the Test Run window.
+
+- https://youtrack.jetbrains.com/issue/IDEA-317561/IntelliJ-test-method-selections-fails-for-hierarchical-test-in-test-output-window
 
 ## Getting Help
 

@@ -21,12 +21,25 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Class to create a human-readable time from a duration
+ */
 public final class HumanReadableTime {
 
+    /**
+     * Constructor
+     */
     private HumanReadableTime() {
         // DO NOTHING
     }
 
+    /**
+     * Method to convert a duration into a human-readable time
+     *
+     * @param duration
+     * @param useShortFormat
+     * @return
+     */
     public static String toHumanReadable(long duration, boolean useShortFormat) {
         long durationPositive = duration > 0 ? duration : -duration;
 
@@ -106,6 +119,11 @@ public final class HumanReadableTime {
         return result;
     }
 
+    /**
+     * Method to get the current time as a String
+     *
+     * @return
+     */
     public static String now() {
         SimpleDateFormat simpleDateFormat =
                 new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ENGLISH);

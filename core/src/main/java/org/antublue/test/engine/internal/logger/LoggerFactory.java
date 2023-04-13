@@ -16,35 +16,77 @@
 
 package org.antublue.test.engine.internal.logger;
 
+import org.antublue.test.engine.internal.util.Precondition;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 /**
- * Class to implement a LoggerFactory for Logback Classic
+ * Class to implement a LoggerFactory
  */
 public final class LoggerFactory {
 
-    private static final Map<String, Level> LEVEL_MAP = new HashMap<>();
-    private static final Map<String, Logger> LOGGER_MAP = new HashMap<>();
-    private static final Level LEVEL;
+    private static final LoggerFactory INSTANCE = new LoggerFactory();
+    private static final String ANTUBLUE_TEST_ENGINE_LOG_LEVEL = "antublue.test.engine.log.level";
 
-    static {
-        LEVEL_MAP.put("ERROR", Level.ERROR);
-        LEVEL_MAP.put("WARN", Level.WARN);
-        LEVEL_MAP.put("INFO", Level.INFO);
-        LEVEL_MAP.put("DEBUG", Level.DEBUG);
-        LEVEL_MAP.put("TRACE", Level.TRACE);
-        LEVEL_MAP.put("ALL", Level.ALL);
-
-        LEVEL = getLevel();
-    }
+    private final Map<String, Logger> loggerMap = new HashMap<>();
+    private final Level level;
 
     /**
      * Constructor
      */
     private LoggerFactory() {
-        // DO NOTHING
+        Map<String, Level> levelMap = new HashMap<>();
+        levelMap.put("ERROR", Level.ERROR);
+        levelMap.put("WARN", Level.WARN);
+        levelMap.put("INFO", Level.INFO);
+        levelMap.put("DEBUG", Level.DEBUG);
+        levelMap.put("TRACE", Level.TRACE);
+        levelMap.put("ALL", Level.ALL);
+
+        // Convert the system property to an environment variable and get the value
+        String value =
+                System.getenv(
+                        ANTUBLUE_TEST_ENGINE_LOG_LEVEL.toUpperCase(Locale.ENGLISH).replace('.', '_'));
+
+        Level level = null;
+
+        if ((value != null) && (!value.trim().isEmpty())) {
+            value = value.trim().toUpperCase(Locale.ENGLISH);
+            level = levelMap.get(value);
+        }
+
+        if (level == null) {
+            value = System.getProperty(ANTUBLUE_TEST_ENGINE_LOG_LEVEL);
+            if ((value != null) && (!value.trim().isEmpty())) {
+                value = value.trim().toUpperCase(Locale.ENGLISH);
+                level = levelMap.get(value);
+            }
+        }
+
+        if (level == null) {
+            level = Level.INFO;
+        }
+
+        this.level = level;
+    }
+
+    /**
+     * Method to create a Logger
+     *
+     * @param name
+     * @return
+     */
+    private Logger createLogger(String name) {
+        synchronized (this) {
+            Logger logger = loggerMap.get(name);
+            if (logger == null) {
+                logger = new Logger(name, level);
+                loggerMap.put(name, logger);
+            }
+            return logger;
+        }
     }
 
     /**
@@ -54,6 +96,8 @@ public final class LoggerFactory {
      * @return
      */
     public static Logger getLogger(Class<?> clazz) {
+        Precondition.notNull(clazz);
+
         return getLogger(clazz.getName());
     }
 
@@ -64,37 +108,9 @@ public final class LoggerFactory {
      * @return
      */
     public static Logger getLogger(String name) {
-        Logger logger;
+        Precondition.notNull(name);
+        Precondition.notBlank(name);
 
-        synchronized (LOGGER_MAP) {
-            logger = LOGGER_MAP.get(name);
-            if (logger == null) {
-                logger = new Logger(name, LEVEL);
-                LOGGER_MAP.put(name, logger);
-            }
-        }
-
-        return logger;
-    }
-
-    /**
-     * Method to get the configured Level
-     *
-     * @return
-     */
-    private static Level getLevel() {
-        String propertyName = "antublue.test.engine.log.level";
-        String propertyValue = System.getProperty(propertyName);
-        String environmentVariableValue =
-                System.getenv(
-                        propertyName.toUpperCase(Locale.ENGLISH).replace('.', '_'));
-
-        if ((propertyValue != null) && !propertyValue.trim().isEmpty()) {
-            return LEVEL_MAP.getOrDefault(propertyValue.trim().toUpperCase(Locale.ENGLISH), Level.INFO);
-        } else if ((environmentVariableValue != null) && !environmentVariableValue.trim().isEmpty()) {
-            return LEVEL_MAP.getOrDefault(environmentVariableValue.toUpperCase(Locale.ENGLISH), Level.INFO);
-        }
-
-        return Level.INFO;
+        return INSTANCE.createLogger(name);
     }
 }
