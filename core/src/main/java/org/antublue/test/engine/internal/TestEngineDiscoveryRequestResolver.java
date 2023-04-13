@@ -45,10 +45,12 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Class to implement code to discover tests / build test tree
@@ -190,23 +192,38 @@ public class TestEngineDiscoveryRequestResolver {
 
             engineDiscoveryRequest
                     .getSelectorsByType(ClasspathRootSelector.class)
+                    .stream()
+                    .sorted(Comparator.comparing(o -> o.getClasspathRoot()))
+                    .collect(Collectors.toList())
                     .forEach(classpathRootSelector ->
                             classpathRootResolver.resolve(classpathRootSelector, engineDescriptor));
 
             engineDiscoveryRequest
                     .getSelectorsByType(PackageSelector.class)
+                    .stream()
+                    .sorted(Comparator.comparing(o -> o.getPackageName()))
+                    .collect(Collectors.toList())
                     .forEach(packageSelector -> packageSelectorResolver.resolve(packageSelector, engineDescriptor));
 
             engineDiscoveryRequest
                     .getSelectorsByType(ClassSelector.class)
+                    .stream()
+                    .sorted(Comparator.comparing(o -> o.getJavaClass().getName()))
+                    .collect(Collectors.toList())
                     .forEach(classSelector -> classSelectorResolver.resolve(classSelector, engineDescriptor));
 
             engineDiscoveryRequest
                     .getSelectorsByType(MethodSelector.class)
+                    .stream()
+                    .sorted(Comparator.comparing(o -> o.getJavaMethod().getName()))
+                    .collect(Collectors.toList())
                     .forEach(methodSelector -> methodSelectorResolver.resolve(methodSelector, engineDescriptor));
 
             engineDiscoveryRequest
                     .getSelectorsByType(UniqueIdSelector.class)
+                    .stream()
+                    .sorted(Comparator.comparing(o -> o.getUniqueId().toString()))
+                    .collect(Collectors.toList())
                     .forEach(uniqueIdSelector -> uniqueIdSelectorResolver.resolve(uniqueIdSelector, engineDescriptor));
 
             // Filter based on package names
