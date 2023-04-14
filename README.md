@@ -17,7 +17,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v2.0.8](https://github.com/antublue/test-engine/releases/tag/v2.0.8)
+- General Availability (GA): [Test Engine v3.0.0](https://github.com/antublue/test-engine/releases/tag/v3.0.0)
 
 ## Common Annotations
 
@@ -208,28 +208,6 @@ https://github.com/antublue/test-engine/tree/main/examples/src/main/java/example
 
 ## Maven Usage
 
-Add the Test Engine jars (and dependencies)...
-
-```xml
-<dependencies>
-  <dependency>
-    <groupId>org.antublue</groupId>
-    <artifactId>test-engine</artifactId>
-    <version>2.0.8</version>
-  </dependency>
-  <dependency>
-    <groupId>org.junit.jupiter</groupId>
-    <artifactId>junit-jupiter-api</artifactId>
-    <version>5.9.2</version>
-  </dependency>
-  <dependency>
-    <groupId>org.junit.platform</groupId>
-    <artifactId>junit-platform-launcher</artifactId>
-    <version>1.9.2</version>
-  </dependency>
-</dependencies>
-```
-
 Disable the Maven Surefire plugin...
 
 ```xml
@@ -249,7 +227,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-maven-plugin</artifactId>
-    <version>0.0.3</version>
+    <version>3.0.0</version>
     <executions>
         <execution>
             <phase>integration-test</phase>
@@ -260,6 +238,35 @@ Add the Test Engine Maven Plugin...
     </executions>
 </plugin>
 ```
+
+Add the Test Engine jars (and dependencies)...
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>org.antublue</groupId>
+    <artifactId>test-engine</artifactId>
+    <version>3.0.0</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter-api</artifactId>
+    <version>5.9.2</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.junit.platform</groupId>
+    <artifactId>junit-platform-launcher</artifactId>
+    <version>1.9.2</version>
+    <scope>test</scope>
+  </dependency>
+</dependencies>
+```
+
+**Notes**
+
+- The `test-engine` and `test-engine-maven-plugin` version must match starting with 3.0.0
 
 Build and test your project...
 
