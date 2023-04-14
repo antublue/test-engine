@@ -21,6 +21,7 @@ import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
 import org.antublue.test.engine.internal.TestEngineExecutionListener;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -29,6 +30,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.properties.internal.SystemProperties;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
@@ -45,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
@@ -56,11 +59,14 @@ import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNa
 @SuppressWarnings("unused")
 public class TestEngineMavenPlugin extends AbstractMojo {
 
-    @Parameter(property ="project",required = true, readonly = true)
+    private static final String GROUP_ID = "org.antublue";
+    private static final String ARTIFACT_ID = "test-engine-maven-plugin";
+
+    @Parameter(property ="project", required = true, readonly = true)
     protected MavenProject mavenProject;
 
-    @Parameter(property="java")
-    protected Java java;
+    @Parameter(property = "properties")
+    protected Map<String, String> properties;
 
     /**
      * Method to execute the plugin
@@ -126,6 +132,14 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
             ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
             Thread.currentThread().setContextClassLoader(classLoader);
+
+            if (properties != null) {
+                for (String key : properties.keySet()) {
+                    String value = properties.get(key);
+                    log.debug(String.format("property [%s] = [%s]", key, value));
+                    System.setProperty(key, value);
+                }
+            }
 
             LauncherDiscoveryRequest launcherDiscoveryRequest =
                     LauncherDiscoveryRequestBuilder.request()
