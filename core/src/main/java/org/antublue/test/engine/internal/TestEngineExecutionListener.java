@@ -43,10 +43,14 @@ public class TestEngineExecutionListener implements EngineExecutionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
+    private static final String INFO = AnsiColor.WHITE_BRIGHT.apply("[")
+            + AnsiColor.BLUE_BOLD.apply("INFO")
+            + AnsiColor.WHITE_BRIGHT.apply("]");
+
     private static final String TEST = AnsiColor.WHITE_BRIGHT.apply("TEST");
-    private static final String ABORT = AnsiColor.YELLOW_BOLD_BRIGHT.apply("ABORT");
-    private static final String FAIL = AnsiColor.RED_BOLD_BRIGHT.apply("FAIL");
-    private static final String PASS = AnsiColor.GREEN_BOLD_BRIGHT.apply("PASS");
+    private static final String ABORT = AnsiColor.YELLOW_BOLD.apply("ABORT");
+    private static final String FAIL = AnsiColor.RED_BOLD.apply("FAIL");
+    private static final String PASS = AnsiColor.GREEN_BOLD.apply("PASS");
 
     private final TestPlan testPlan;
     private final SummaryGeneratingListener summaryGeneratingListener;
@@ -157,7 +161,8 @@ public class TestEngineExecutionListener implements EngineExecutionListener {
         );
 
         if (detailedOutput && (stringBuilder.length() > 0)) {
-            LOGGER.rawInfo(stringBuilder.toString());
+            //LOGGER.rawInfo(stringBuilder.toString());
+            System.out.println(INFO + " " + Thread.currentThread().getName() + " | " + stringBuilder);
         }
     }
 
@@ -227,7 +232,7 @@ public class TestEngineExecutionListener implements EngineExecutionListener {
             }
 
             if (detailedOutput && (string != null)) {
-                LOGGER.rawInfo(string);
+                System.out.println(INFO + " " + Thread.currentThread().getName() + " | " + string);
             }
         }
     }
@@ -247,9 +252,9 @@ public class TestEngineExecutionListener implements EngineExecutionListener {
         }
 
         String separator = stringBuilder.toString();
-        LOGGER.info(separator);
-        LOGGER.info(banner);
-        LOGGER.info(separator);
+        System.out.println(INFO + " " + separator);
+        System.out.println(INFO + " " + banner);
+        System.out.println(INFO + " " + separator);
     }
 
     public void executionFinished() {
@@ -269,10 +274,10 @@ public class TestEngineExecutionListener implements EngineExecutionListener {
 
         String separator = stringBuilder.toString();
 
-        LOGGER.info(separator);
-        LOGGER.info(banner);
-        LOGGER.info(separator);
-        LOGGER.info(
+        System.out.println(INFO + " " + separator);
+        System.out.println(INFO + " " + banner);
+        System.out.println(INFO + " " + separator);
+        System.out.println(INFO + " " +
                 AnsiColor.WHITE_BOLD_BRIGHT.apply("TESTS")
                         + " : "
                         + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
@@ -288,19 +293,19 @@ public class TestEngineExecutionListener implements EngineExecutionListener {
                         + AnsiColor.YELLOW_BOLD_BRIGHT.apply("FAILED")
                         + " : "
                         + testExecutionSummary.getTestsSkippedCount());
-        LOGGER.info(separator);
+        System.out.println(INFO + " " + separator);
 
         boolean failed = (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
 
         if (failed) {
-            LOGGER.info("FAILED");
+            System.out.println(INFO + " " + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"));
         } else {
-            LOGGER.info("PASSED");
+            System.out.println(INFO + " " + AnsiColor.GREEN_BOLD.apply("PASSED"));
         }
 
-        LOGGER.info(separator);
-        LOGGER.info("Total Time  : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
-        LOGGER.info("Finished At : " + HumanReadableTime.now());
-        LOGGER.info(separator);
+        System.out.println(INFO + " " + separator);
+        System.out.println(INFO + " " + "Total Time  : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
+        System.out.println(INFO + " " + "Finished At : " + HumanReadableTime.now());
+        System.out.println(INFO + " " + separator);
     }
 }
