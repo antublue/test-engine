@@ -14,14 +14,7 @@ public @interface TestEngine {
     @interface Parameter {
 
     }
-
-    @Deprecated
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface ParameterSetter {
-
-    }
-
+    
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface ParameterSupplier {

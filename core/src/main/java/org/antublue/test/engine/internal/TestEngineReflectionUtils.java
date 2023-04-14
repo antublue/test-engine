@@ -178,19 +178,6 @@ public final class TestEngineReflectionUtils {
                             Void.class,
                             Parameter.class);
 
-            // Support deprecated @TestEngine.ParameterSetter
-
-            List<Method> methods2 =
-                    getMethods(
-                            clazz,
-                            TestEngine.ParameterSetter.class,
-                            Scope.NON_STATIC,
-                            Void.class,
-                            Parameter.class);
-
-
-
-            methods.addAll(methods2);
             sortByOrderAnnotation(methods);
             methods = Collections.unmodifiableList(methods);
             parameterMethodCache.put(clazz, methods);
