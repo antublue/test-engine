@@ -1,17 +1,17 @@
 #!/bin/bash
 
-cd api
-mvn clean package install
-cd ..
+cd api || exit 1
+mvn clean package install || exit 1
+cd .. || exit 1
 
-cd core
-mvn clean package install
-cd ..
+cd core || exit 1
+mvn clean package install || exit 1
+cd ..  || exit 1
 
 cd plugin
-mvn clean package install
-cd ..
+mvn clean package install || exit 1
+cd .. || exit 1
 
-cd examples
-mvn clean verify
-cd ..
+cd examples || exit 1
+mvn clean verify || exit 1
+cd ..  || exit 1
