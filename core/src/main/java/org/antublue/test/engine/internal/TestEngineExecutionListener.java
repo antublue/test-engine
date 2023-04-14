@@ -25,6 +25,7 @@ import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.AnsiColor;
+import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.antublue.test.engine.internal.util.Switch;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
@@ -38,7 +39,7 @@ import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 import java.lang.reflect.Method;
 
-public class TestEngineSummaryEngineExecutionListener implements EngineExecutionListener {
+public class TestEngineExecutionListener implements EngineExecutionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
@@ -52,25 +53,14 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
     private final boolean detailedOutput;
     private final boolean logTestMessages;
     private final boolean logPassMessages;
+    private final long startTimeMilliseconds;
 
-    public TestEngineSummaryEngineExecutionListener(TestPlan testPlan) {
+    public TestEngineExecutionListener(TestPlan testPlan) {
         LOGGER.trace("TestEngineSummaryEngineExecutionListener constructor()");
 
-        String banner = "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
-
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < banner.length(); i++) {
-            stringBuilder.append("-");
-        }
-
-        String separator = stringBuilder.toString();
-        LOGGER.info(separator);
-        LOGGER.info(banner);
-        LOGGER.info(separator);
-
         this.testPlan = testPlan;
+        this.startTimeMilliseconds = System.currentTimeMillis();
         this.summaryGeneratingListener = new SummaryGeneratingListener();
-
         this.summaryGeneratingListener.testPlanExecutionStarted(testPlan);
 
         this.detailedOutput =
@@ -247,8 +237,70 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
         summaryGeneratingListener.reportingEntryPublished(TestIdentifier.from(testDescriptor), entry);
     }
 
-    public TestExecutionSummary getSummary() {
+    public void executionStarted() {
+        String asciiBanner = "AntuBLUE Test Engine " + TestEngine.VERSION;
+        String banner = "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < asciiBanner.length(); i++) {
+            stringBuilder.append("-");
+        }
+
+        String separator = stringBuilder.toString();
+        LOGGER.info(separator);
+        LOGGER.info(banner);
+        LOGGER.info(separator);
+    }
+
+    public void executionFinished() {
+        long endTimeMilliseconds = System.currentTimeMillis();
+
         summaryGeneratingListener.testPlanExecutionFinished(testPlan);
-        return summaryGeneratingListener.getSummary();
+
+        TestExecutionSummary testExecutionSummary = summaryGeneratingListener.getSummary();
+
+        String asciiBanner = "AntuBLUE Test Engine " + TestEngine.VERSION + " Summary";
+        String banner = "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION + " Summary";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < asciiBanner.length(); i++) {
+            stringBuilder.append("-");
+        }
+
+        String separator = stringBuilder.toString();
+
+        LOGGER.info(separator);
+        LOGGER.info(banner);
+        LOGGER.info(separator);
+        LOGGER.info(
+                AnsiColor.WHITE_BOLD_BRIGHT.apply("TESTS")
+                        + " : "
+                        + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
+                        + ", "
+                        + AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED")
+                        + " : "
+                        + (testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount())
+                        + ", "
+                        + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED")
+                        + " : "
+                        + (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount())
+                        + ", "
+                        + AnsiColor.YELLOW_BOLD_BRIGHT.apply("FAILED")
+                        + " : "
+                        + testExecutionSummary.getTestsSkippedCount());
+        LOGGER.info(separator);
+
+        boolean failed = (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
+
+        if (failed) {
+            LOGGER.info("FAILED");
+        } else {
+            LOGGER.info("PASSED");
+        }
+
+        LOGGER.info(separator);
+        LOGGER.info("Total Time  : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
+        LOGGER.info("Finished At : " + HumanReadableTime.now());
+        LOGGER.info(separator);
     }
 }

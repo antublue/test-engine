@@ -18,9 +18,8 @@ package org.antublue.test.engine.maven.plugin;
 
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
+import org.antublue.test.engine.internal.TestEngineExecutionListener;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
-import org.antublue.test.engine.internal.TestEngineSummaryEngineExecutionListener;
-import org.antublue.test.engine.internal.util.AnsiColor;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -30,7 +29,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
@@ -38,7 +36,6 @@ import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.TestPlan;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
-import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 import java.io.File;
 import java.net.URL;
@@ -72,6 +69,8 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      * @throws MojoExecutionException general exception
      */
     public void execute() throws MojoExecutionException {
+        TestEngineExecutionListener summaryEngineExecutionListener = null;
+
         try {
             Log log = getLog();
 
@@ -149,19 +148,21 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                 throw new MojoExecutionException("No tests found");
             }
 
-            TestEngineSummaryEngineExecutionListener summaryEngineExecutionListener =
-                    new TestEngineSummaryEngineExecutionListener(testPlan);
+            summaryEngineExecutionListener = new TestEngineExecutionListener(testPlan);
+            summaryEngineExecutionListener.executionStarted();
 
             testEngine.execute(
                     ExecutionRequest.create(
                             testDescriptor,
                             summaryEngineExecutionListener,
                             launcherDiscoveryRequest.getConfigurationParameters()));
-
-            TestExecutionSummary testExecutionSummary = summaryEngineExecutionListener.getSummary();
         } catch (Throwable t) {
             t.printStackTrace();
             throw new MojoExecutionException("General AntuBLUE Test Engine Maven Plugin Exception", t);
+        } finally {
+            if (summaryEngineExecutionListener != null) {
+                summaryEngineExecutionListener.executionFinished();
+            }
         }
     }
 }
