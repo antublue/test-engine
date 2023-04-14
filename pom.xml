@@ -26,6 +26,7 @@
 
     <modules>
         <module>core</module>
+        <module>plugin</module>
         <module>examples</module>
     </modules>
 
