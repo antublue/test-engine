@@ -6,10 +6,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.antublue</groupId>
-    <artifactId>test-engine</artifactId>
+    <artifactId>test-engine-api</artifactId>
     <version>3.0.0</version>
     <packaging>jar</packaging>
-    <name>AntuBLUE Test Engine</name>
+    <name>AntuBLUE Test Engine API</name>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -180,17 +180,9 @@
                                         <exclude>META-INF/**</exclude>
                                     </excludes>
                                 </filter>
-                                <filter>
-                                    <artifact>org.hamcrest:hamcrest</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/**</exclude>
-                                    </excludes>
-                                </filter>
                             </filters>
                             <artifactSet>
                                 <includes>
-                                    <!-- <include>org.antublue:test-engine-api</include> -->
-                                    <include>org.reflections:reflections</include>
                                     <include>com.univocity:univocity-parsers</include>
                                 </includes>
                             </artifactSet>
@@ -209,29 +201,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.antublue</groupId>
-            <artifactId>test-engine-api</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.univocity</groupId>
-            <artifactId>univocity-parsers</artifactId>
-            <version>2.9.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.9.2</version>
         </dependency>
         <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-launcher</artifactId>
-            <version>1.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
+            <groupId>com.univocity</groupId>
+            <artifactId>univocity-parsers</artifactId>
+            <version>2.9.1</version>
         </dependency>
     </dependencies>
 

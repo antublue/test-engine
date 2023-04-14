@@ -28,6 +28,7 @@
         <module>core</module>
         <module>plugin</module>
         <module>examples</module>
+        <module>api</module>
     </modules>
 
 </project>

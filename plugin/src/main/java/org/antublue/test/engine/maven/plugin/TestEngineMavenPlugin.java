@@ -16,11 +16,12 @@
 
 package org.antublue.test.engine.maven.plugin;
 
+import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
+import org.antublue.test.engine.internal.TestEngineReflectionUtils;
+import org.antublue.test.engine.internal.TestEngineSummaryEngineExecutionListener;
+import org.antublue.test.engine.internal.util.AnsiColor;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -29,20 +30,32 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
+import org.junit.platform.engine.DiscoverySelector;
+import org.junit.platform.engine.ExecutionRequest;
+import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.discovery.DiscoverySelectors;
+import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.launcher.TestPlan;
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
+import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
+
+import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
 /**
  * Class to implement a Maven plugin to run the AntuBLUE Test Engine
  */
-@Mojo(name = "test", threadSafe = true)
+@Mojo(name = "test", threadSafe = true, requiresDependencyResolution = ResolutionScope.RUNTIME)
 @SuppressWarnings("unused")
 public class TestEngineMavenPlugin extends AbstractMojo {
 
@@ -58,134 +71,94 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      * @throws MojoFailureException tests failed
      * @throws MojoExecutionException general exception
      */
-    public void execute() throws MojoFailureException, MojoExecutionException {
+    public void execute() throws MojoExecutionException {
         try {
             Log log = getLog();
 
-            boolean hasConsole = System.console() != null;
-            log.debug(String.format("hasConsole [%s]", hasConsole));
-
-            String javaBinary = java.getBinary();
-            if ((javaBinary == null) || (javaBinary.trim().isEmpty())) {
-                String operatingSystem = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
-                if (operatingSystem.contains("win")) {
-                    javaBinary = "java.exe";
-                } else {
-                    javaBinary = "java";
-                }
-            }
-
-            log.debug(String.format("java.binary [%s]", javaBinary.trim()));
-
-            Set<String> artifactPathSet = new LinkedHashSet<>();
-
-            Artifact projectArtifact = mavenProject.getArtifact();
-            artifactPathSet.add(projectArtifact.getFile().getAbsolutePath());
-
-            for (Artifact artifact : mavenProject.getArtifacts()) {
-                String path = artifact.getFile().getAbsolutePath();
-                log.debug(String.format("artifact [%s]", path));
-                artifactPathSet.add(path);
-            }
-
-            for (Artifact artifact : mavenProject.getAttachedArtifacts()) {
-                String path = artifact.getFile().getAbsolutePath();
-                log.debug(String.format("artifact [%s]", path));
-                artifactPathSet.add(path);
-            }
+            Set<Path> artifactPaths = new LinkedHashSet<>();
 
             List<String> classpathElements = mavenProject.getCompileClasspathElements();
             for (String classpathElement : classpathElements) {
-                String path = new File(classpathElement).getAbsolutePath();
-                log.debug(String.format("artifact [%s]", path));
-                artifactPathSet.add(path);
+                Path path = new File(classpathElement).toPath();
+                artifactPaths.add(path);
             }
 
             classpathElements = mavenProject.getRuntimeClasspathElements();
             for (String classpathElement : classpathElements) {
-                String path = new File(classpathElement).getAbsolutePath();
-                log.debug(String.format("artifact [%s]", path));
-                artifactPathSet.add(path);
+                Path path = new File(classpathElement).toPath();
+                artifactPaths.add(path);
             }
 
             classpathElements = mavenProject.getTestClasspathElements();
             for (String classpathElement : classpathElements) {
-                String path = new File(classpathElement).getAbsolutePath();
-                log.debug(String.format("artifact [%s]", path));
-                artifactPathSet.add(path);
+                Path path = new File(classpathElement).toPath();
+                artifactPaths.add(path);
+            }
+
+            Artifact projectArtifact = mavenProject.getArtifact();
+            if (projectArtifact != null) {
+                Path path = projectArtifact.getFile().toPath();
+                artifactPaths.add(path);
+            }
+
+            for (Artifact artifact : mavenProject.getArtifacts()) {
+                Path path = artifact.getFile().toPath();
+                artifactPaths.add(path);
             }
 
             for (Artifact artifact : mavenProject.getDependencyArtifacts()) {
-                String path = artifact.getFile().getAbsolutePath();
-                artifactPathSet.add(path);
+                Path path = artifact.getFile().toPath();
+                artifactPaths.add(path);
             }
 
-            StringBuilder classPathStringBuilder = new StringBuilder();
-            for (String artifactPath : artifactPathSet) {
-                log.debug(String.format("artifact [%s]", artifactPath));
-                classPathStringBuilder.append(artifactPath).append(File.pathSeparator);
+            for (Artifact artifact : mavenProject.getAttachedArtifacts()) {
+                Path path = artifact.getFile().toPath();
+                artifactPaths.add(path);
             }
 
-            String classPath = classPathStringBuilder.toString();
-            if (classPath.endsWith(File.pathSeparator)) {
-                classPath = classPath.substring(0, classPath.length() - File.pathSeparator.length());
+            artifactPaths.forEach(path -> log.debug(String.format("classpath [%s]", path)));
+
+            final List<URL> urls = new ArrayList<>();
+            for (Path path : artifactPaths) {
+                URL url = path.toUri().toURL();
+                log.debug(String.format("url [%s]", url));
+                urls.add(url);
             }
 
-            log.debug(String.format("classPath [%s]", classPath));
+            ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+            Thread.currentThread().setContextClassLoader(classLoader);
 
-            List<String> systemPropertyList = new ArrayList<>();
-            SystemProperty[] systemProperties = java.getSystemProperties();
+            LauncherDiscoveryRequest launcherDiscoveryRequest =
+                    LauncherDiscoveryRequestBuilder.request()
+                            .selectors(DiscoverySelectors.selectClasspathRoots(artifactPaths))
+                            .filters(includeClassNamePatterns(".*"))
+                            .configurationParameters(new HashMap<>())
+                            .build();
 
-            if (systemProperties != null) {
-                for (SystemProperty systemProperty : systemProperties) {
-                    String key = systemProperty.getKey();
-                    String value = systemProperty.getValue();
+            TestEngine testEngine = new TestEngine();
 
-                    if ((key != null) && !key.trim().isEmpty()) {
-                        if ((value != null) && !value.trim().isEmpty()) {
-                            log.debug(String.format("java [-D%s] = [%s]", key, value));
-                            systemPropertyList.add("-D" + key + "=" + value);
-                        } else {
-                            log.debug(String.format("java [-D%s]", key));
-                            systemPropertyList.add("-D" + key);
-                        }
-                    }
-                }
+            TestDescriptor testDescriptor =
+                    testEngine.discover(launcherDiscoveryRequest, UniqueId.root("/", "/"));
+
+            TestPlan testPlan =
+                    TestEngineReflectionUtils.createTestPlan(
+                            testDescriptor,
+                            TestEngineConfigurationParameters.getInstance());
+
+            if (!testPlan.containsTests()) {
+                throw new MojoExecutionException("No tests found");
             }
 
-            List<String> commandList = new ArrayList<>();
-            commandList.add(javaBinary);
-            commandList.addAll(systemPropertyList);
-            commandList.add("-cp");
-            commandList.add(classPath);
-            commandList.add("org.antublue.test.engine.TestEngine");
+            TestEngineSummaryEngineExecutionListener summaryEngineExecutionListener =
+                    new TestEngineSummaryEngineExecutionListener(testPlan);
 
-            StringBuilder stringBuilder = new StringBuilder();
-            for (String command : commandList) {
-                if (command.indexOf("*") > 0) {
-                    command = "\"" + command + "\"";
-                }
-                stringBuilder.append(command);
-                stringBuilder.append(" ");
-            }
+            testEngine.execute(
+                    ExecutionRequest.create(
+                            testDescriptor,
+                            summaryEngineExecutionListener,
+                            launcherDiscoveryRequest.getConfigurationParameters()));
 
-            log.debug(String.format("command [%s]", stringBuilder.toString().trim()));
-
-            String[] commands = commandList.toArray(new String[0]);
-
-            ProcessBuilder processBuilder = new ProcessBuilder().command(commands).inheritIO();
-
-            if (hasConsole) {
-                processBuilder.environment().put("__ANTUBLUE_TEST_ENGINE_HAS_CONSOLE__", String.valueOf(hasConsole));
-            }
-
-            int exitCode = processBuilder.start().waitFor();
-
-            if (exitCode != 0) {
-                throw new MojoFailureException("Failed tests");
-            }
-        } catch (MojoFailureException e) {
-            throw e;
+            TestExecutionSummary testExecutionSummary = summaryEngineExecutionListener.getSummary();
         } catch (Throwable t) {
             t.printStackTrace();
             throw new MojoExecutionException("General AntuBLUE Test Engine Maven Plugin Exception", t);

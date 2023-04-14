@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.api;
+package org.antublue.test.engine.api.internal;
 
 import org.antublue.test.engine.api.Parameter;
 

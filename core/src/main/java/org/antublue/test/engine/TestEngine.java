@@ -17,38 +17,19 @@
 package org.antublue.test.engine;
 
 import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
+import org.antublue.test.engine.internal.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
 import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
-import org.antublue.test.engine.internal.TestEngineReflectionUtils;
-import org.antublue.test.engine.internal.TestEngineSummaryEngineExecutionListener;
-import org.antublue.test.engine.internal.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.AnsiColor;
-import org.antublue.test.engine.internal.util.HumanReadableTime;
-import org.antublue.test.engine.internal.util.Timer;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
-import org.junit.platform.launcher.LauncherDiscoveryRequest;
-import org.junit.platform.launcher.TestPlan;
-import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
-import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
-import java.io.File;
-import java.io.PrintStream;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-
-import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
 /**
  * Class to implement a TestEngine
@@ -141,6 +122,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      *
      * @param args
      */
+    /*
     public static void main(String[] args) {
         long startTimeMilliseconds = System.currentTimeMillis();
 
@@ -298,4 +280,5 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             }
         }
     }
+    */
 }

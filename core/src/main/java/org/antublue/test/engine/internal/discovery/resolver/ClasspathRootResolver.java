@@ -25,7 +25,7 @@ import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestDescriptorFactory;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.junit.platform.commons.support.ReflectionSupport;
+import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
@@ -49,12 +49,12 @@ public class ClasspathRootResolver {
      * Predicate to determine if a class is a test class (not abstract, has @TestEngine.Test methods)
      */
     private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
-        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class) || clazz.isAnnotationPresent(TestEngine.Disabled.class)) {
+        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
+                || clazz.isAnnotationPresent(TestEngine.Disabled.class)) {
             return false;
         }
 
-        int modifiers = clazz.getModifiers();
-        return !Modifier.isAbstract(modifiers) && !TestEngineReflectionUtils.getTestMethods(clazz).isEmpty();
+        return !Modifier.isAbstract(clazz.getModifiers()) && !TestEngineReflectionUtils.getTestMethods(clazz).isEmpty();
     };
 
     /**
@@ -64,13 +64,15 @@ public class ClasspathRootResolver {
      * @param engineDescriptor
      */
     public void resolve(ClasspathRootSelector classpathRootSelector, EngineDescriptor engineDescriptor) {
-        LOGGER.trace(String.format("resolve [%s]", classpathRootSelector.getClasspathRoot()));
+        LOGGER.trace(String.format("resolve [%s]", classpathRootSelector));
 
         UniqueId uniqueId = engineDescriptor.getUniqueId();
         URI uri = classpathRootSelector.getClasspathRoot();
         LOGGER.trace("uri [%s]", uri);
 
-        List<Class<?>> classes = new ArrayList<>(ReflectionSupport.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true));
+        List<Class<?>> classes = new ArrayList<>(ReflectionUtils.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true));
+        LOGGER.trace("classes.size() [%d]", classes.size());
+
         classes.sort(Comparator.comparing(Class::getName));
 
         for (Class<?> clazz : classes) {

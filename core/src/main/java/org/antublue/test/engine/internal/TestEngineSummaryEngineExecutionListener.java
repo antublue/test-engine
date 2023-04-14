@@ -54,6 +54,20 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
     private final boolean logPassMessages;
 
     public TestEngineSummaryEngineExecutionListener(TestPlan testPlan) {
+        LOGGER.trace("TestEngineSummaryEngineExecutionListener constructor()");
+
+        String banner = "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < banner.length(); i++) {
+            stringBuilder.append("-");
+        }
+
+        String separator = stringBuilder.toString();
+        LOGGER.info(separator);
+        LOGGER.info(banner);
+        LOGGER.info(separator);
+
         this.testPlan = testPlan;
         this.summaryGeneratingListener = new SummaryGeneratingListener();
 
@@ -66,10 +80,10 @@ public class TestEngineSummaryEngineExecutionListener implements EngineExecution
                             try {
                                 return Boolean.parseBoolean(value);
                             } catch (NumberFormatException e) {
-                                return false;
+                                return true;
                             }
                         })
-                        .orElse(false);
+                        .orElse(true);
 
         this.logTestMessages =
                 TestEngineConfigurationParameters.getInstance()

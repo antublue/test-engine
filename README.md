@@ -10,9 +10,12 @@
 
 The Test Engine is a JUnit 5 based test engine that allows for parameterized testing at the test class level.
 
-## Why ?
+## Goals
 
-Currently, JUnit 5 does not support parameterized tests at the test class level
+The goal of the Test Engine is for integration testing
+
+Currently, JUnit 5 does not support parameterized tests at the test class level (common for integration testing)
+
 - https://github.com/junit-team/junit5/issues/878
 
 ## Latest Releases
@@ -21,22 +24,19 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 ## Common Annotations
 
-| Annotation                      | Scope           |  Required | Static | Example                                                                    |
-|---------------------------------|-----------------|-----------|--------|----------------------------------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | method          | yes       | yes    | `public static Stream<Parameter> parameters();`                            |
-| `@TestEngine.Parameter`         | field or method | yes       | no     | `public Parameter parameter` `public void parameter(Parameter parameter);` |
-| `@TestEngine.BeforeClass`       | method          | no        | yes    | `public static void beforeClass();`                                        |
-| `@TestEngine.BeforeAll`         | method          | no        | no     | `public void beforeAll();`                                                 |
-| `@TestEngine.BeforeEach`        | method          | no        | no     | `public void beforeEach();`                                                |
-| `@TestEngine.Test`              | method          | yes       | no     | `public void test();`                                                      |
-| `@TestEngine.AfterEach`         | method          | no        | no     | `public void afterEach();`                                                 |
-| `@TestEngine.AfterAll`          | method          | no        | no     | `public void afterAll();`                                                  |
-| `@TestEngine.AfterClass`        | method          | no        | yes    | `public static void afterClass();`                                         |
+| Annotation                      | Scope             | Required     | Static | Example                                                                          |
+|---------------------------------|-------------------|--------------|--------|----------------------------------------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | method            | yes          | yes    | `public static Stream<Parameter> parameters();`                                  |
+| `@TestEngine.Parameter`         | field<br/> method | yes (either) | no     | `public Parameter parameter;`<br/> `public void parameter(Parameter parameter);` |
+| `@TestEngine.BeforeClass`       | method            | no           | yes    | `public static void beforeClass();`                                              |
+| `@TestEngine.BeforeAll`         | method            | no           | no     | `public void beforeAll();`                                                       |
+| `@TestEngine.BeforeEach`        | method            | no           | no     | `public void beforeEach();`                                                      |
+| `@TestEngine.Test`              | method            | yes          | no     | `public void test();`                                                            |
+| `@TestEngine.AfterEach`         | method            | no           | no     | `public void afterEach();`                                                       |
+| `@TestEngine.AfterAll`          | method            | no           | no     | `public void afterAll();`                                                        |
+| `@TestEngine.AfterClass`        | method            | no           | yes    | `public static void afterClass();`                                               |
 
-**NOTES**
-
-- `@TestEngine.ParameterSetter` has been deprecated, replaced with `@TestEngine.Parameter` which supports a field or method
-
+**Notes**
 
 - `public` and `protected` methods are supported for `@TestEngine.X` annotations
 
@@ -46,16 +46,17 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 - `@TestEngine.Order` can be used to control method order
   - Methods are sorted by the annotation value first, then alphabetically by the test method name
+    - In scenarios where `@TestEngine.Order` values are duplicated, methods with the same value are sorted alphabetically
   - Method order is relative to other methods with the same annotation
 
 ## Additional Annotations
 
-| Annotation                  | Scope           | Required | Usage                                                                              |
-|-----------------------------|-----------------|----------|------------------------------------------------------------------------------------|
-| `@TestEngine.Disabled`      | class or method | no       | Marks a test class or method disabled                                              |
-| `@TestEngine.BaseClass`     | class           | no       | Marks a test class as being a base class (skips direct execution)                  |
-| `@TestEngine.Order(<int>)`  | method          | no       | Provides a way to order methods relative to other methods with the same annotation |
-| `@TestEngine.Tag(<string>)` | class           | no       | Provides a way to tag a test class or test method                                  | 
+| Annotation                  | Scope             | Required | Usage                                                                              |
+|-----------------------------|-------------------|----------|------------------------------------------------------------------------------------|
+| `@TestEngine.Disabled`      | class<br/> method | no       | Marks a test class or method disabled                                              |
+| `@TestEngine.BaseClass`     | class             | no       | Marks a test class as being a base test class (skips direct execution)             |
+| `@TestEngine.Order(<int>)`  | method            | no       | Provides a way to order methods relative to other methods with the same annotation |
+| `@TestEngine.Tag(<string>)` | class             | no       | Provides a way to tag a test class or test method                                  | 
 
 
 **Notes**
@@ -67,6 +68,42 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 
 
 - It's recommended to use a tag string format of `/tag1/tag2/tag3/`
+
+## Configuration Values
+
+The Test Engine has seven configuration parameters
+
+| Configuration                   | Type         | Java System Property                         | Environment Variable                         |
+|---------------------------------|--------------|----------------------------------------------|----------------------------------------------|
+| thread count                    | integer      | antublue.test.engine.thread.count            | ANTUBLUE_TEST_ENGINE_THREAD_COUNT            |
+| test class name include filter  | regex string | antublue.test.engine.test.class.include      | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE      |
+| test class name exclude filter  | regex string | antublue.test.engine.test.class.exclude      | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE      |
+| test method name include filter | regex string | antublue.test.engine.test.method.include     | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE     |
+| test method name exclude filter | regex string | antublue.test.engine.test.method.exclude     | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE     |
+| test class tag include filter   | regex string | antublue.test.engine.test.class.tag.include  | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE  |
+| test class tag exclude filter   | regex string | antublue.test.engine.test.class.tag.exclude  | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE  |
+| test method tag include filter  | regex string | antublue.test.engine.test.method.tag.include | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_INCLUDE |
+| test method tag exclude filter  | regex string | antublue.test.engine.test.method.tag.exclude | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_EXCLUDE |
+
+Using a combination of the properties (or environment variables) allows for including / excluding individual test classes / test methods
+
+The Test Engine as two experimental configuration parameters
+
+| Configuration                 | Type    | Default | Java System Property                                | Environment Variable                                |
+|-------------------------------|---------|---------|-----------------------------------------------------|-----------------------------------------------------|
+| disable console TEST messages | boolean | true    | antublue.test.engine.experimental.log.test.messages | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_TEST_MESSAGES |
+| disable console PASS messages | boolean | true    | antublue.test.engine.experimental.log.pass.messages | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_PASS_MESSAGES |
+
+**Notes**
+
+- Environment variables take precedence over Java system properties
+
+- If all test methods are excluded, then the test class will be excluded
+
+- If no test classes are found, an error exit code of -2 is returned
+
+- Experimental configuration values are subject to change at any time
+
 
 ## What is a `Parameter` ?
 
@@ -117,32 +154,6 @@ In this scenario, the value of the `Parameter` is a String[] array
 ```java
 String[] values = parameter.value();
 ```
-
-## Configuration values
-
-The Test Engine has seven configuration parameters
-
-| Configuration                   | Type         | Java System Property                         | Environment Variable                         |
-|---------------------------------|--------------|----------------------------------------------|----------------------------------------------|
-| thread count                    | integer      | antublue.test.engine.thread.count            | ANTUBLUE_TEST_ENGINE_THREAD_COUNT            |
-| test class name include filter  | regex string | antublue.test.engine.test.class.include      | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE      |
-| test class name exclude filter  | regex string | antublue.test.engine.test.class.exclude      | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE      |
-| test method name include filter | regex string | antublue.test.engine.test.method.include     | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE     |
-| test method name exclude filter | regex string | antublue.test.engine.test.method.exclude     | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE     |
-| test class tag include filter   | regex string | antublue.test.engine.test.class.tag.include  | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE  |
-| test class tag exclude filter   | regex string | antublue.test.engine.test.class.tag.exclude  | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE  |
-| test method tag include filter  | regex string | antublue.test.engine.test.method.tag.include | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_INCLUDE |
-| test method tag exclude filter  | regex string | antublue.test.engine.test.method.tag.exclude | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_EXCLUDE |
-
-Using a combination of the properties (or environment variables) allows for including / excluding individual test classes / test methods
-
-**Notes**
-
-- Environment variables take precedence over Java system properties
-
-- If all test methods are excluded, then the test class will be excluded
-
-- If no test classes are found, an error exit code of -2 is returned
 
 ## Example Test Class
 
@@ -204,7 +215,7 @@ public class ParameterTest {
 
 Additional test examples...
 
-https://github.com/antublue/test-engine/tree/main/examples/src/main/java/example
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example
 
 ## Maven Usage
 
@@ -243,24 +254,41 @@ Add the Test Engine jars (and dependencies)...
 
 ```xml
 <dependencies>
-  <dependency>
-    <groupId>org.antublue</groupId>
-    <artifactId>test-engine</artifactId>
-    <version>3.0.0</version>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
-    <groupId>org.junit.jupiter</groupId>
-    <artifactId>junit-jupiter-api</artifactId>
-    <version>5.9.2</version>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
-    <groupId>org.junit.platform</groupId>
-    <artifactId>junit-platform-launcher</artifactId>
-    <version>1.9.2</version>
-    <scope>test</scope>
-  </dependency>
+    <dependency>
+        <groupId>org.antublue</groupId>
+        <artifactId>test-engine-api</artifactId>
+        <version>3.0.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.antublue</groupId>
+        <artifactId>test-engine</artifactId>
+        <version>3.0.0</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>3.24.2</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-commons</artifactId>
+        <version>1.9.2</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-launcher</artifactId>
+        <version>1.9.2</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-engine</artifactId>
+        <version>1.9.2</version>
+        <scope>test</scope>
+    </dependency>
 </dependencies>
 ```
 
@@ -277,18 +305,6 @@ mvn clean package integration-test
 **Notes**
 
 - The Test Engine requires core JUnit 5 jars as dependencies
-
-## Command Line (standalone) Usage
-
-The Test Engine has the ability to run as a standalone executable, provided all dependencies are on the classpath
-
-Example:
-
-```bash
-java \
-  -cp "<directory of all your dependencies>/*" \
-  org.antublue.test.engine.TestEngine
-```
 
 ## Design
 
@@ -369,6 +385,7 @@ GitHub's Discussions is the current mechanism for help / support
 Contributions to the Test Engine are both welcomed and appreciated.
 
 The project uses a simplified GitFlow branching strategy
+
 - `main` is the latest release
 - `development-<NEXT RELEASE>` is the next release
 
@@ -376,3 +393,10 @@ For changes, you should...
 - Create a branch based on `development-<NEXT RELEASE>`
 - Make your changes
 - Open a PR against `development-<NEXT RELEASE>`
+
+**Notes**
+
+- Snapshots are not used
+
+
+- The goal of the `development-<NEXT RELEASE>` branch is to be buildable/deployable as the next release
