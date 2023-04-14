@@ -24,7 +24,7 @@ public class AnsiColor {
 
     // Regular Colors
     public static final AnsiColor BLACK = new AnsiColor("\033[0;30m");   // BLACK
-    public static final AnsiColor RED = new AnsiColor("\033[0;31m");     // RED
+    public static final AnsiColor RED = new AnsiColor("\033[0;38;5;160m");     // RED
     public static final AnsiColor GREEN = new AnsiColor("\033[0;32m");   // GREEN
     public static final AnsiColor YELLOW = new AnsiColor("\033[0;33m");  // YELLOW
     public static final AnsiColor BLUE = new AnsiColor("\033[0;34m");    // BLUE
@@ -63,24 +63,24 @@ public class AnsiColor {
     public static final AnsiColor WHITE_BACKGROUND = new AnsiColor("\033[47m");  // WHITE
 
     // High Intensity
-    public static final AnsiColor BLACK_BRIGHT = new AnsiColor("\033[0;90m");  // BLACK
-    public static final AnsiColor RED_BRIGHT = new AnsiColor("\033[0;91m");    // RED
-    public static final AnsiColor GREEN_BRIGHT = new AnsiColor("\033[0;92m");  // GREEN
-    public static final AnsiColor YELLOW_BRIGHT = new AnsiColor("\033[0;93m"); // YELLOW
-    public static final AnsiColor BLUE_BRIGHT = new AnsiColor("\033[0;94m");   // BLUE
-    public static final AnsiColor PURPLE_BRIGHT = new AnsiColor("\033[0;95m"); // PURPLE
-    public static final AnsiColor CYAN_BRIGHT = new AnsiColor("\033[0;96m");   // CYAN
-    public static final AnsiColor WHITE_BRIGHT = new AnsiColor("\033[1;97m");  //"\033[38;2;255;255;255m");  // WHITE
+    public static final AnsiColor BLACK_BRIGHT = new AnsiColor("\033[0;90m");     // BLACK
+    public static final AnsiColor RED_BRIGHT = new AnsiColor("\033[0;38;5;196m"); // RED
+    public static final AnsiColor GREEN_BRIGHT = new AnsiColor("\033[0;92m");     // GREEN
+    public static final AnsiColor YELLOW_BRIGHT = new AnsiColor("\033[0;93m");    // YELLOW
+    public static final AnsiColor BLUE_BRIGHT = new AnsiColor("\033[0;94m");      // BLUE
+    public static final AnsiColor PURPLE_BRIGHT = new AnsiColor("\033[0;95m");    // PURPLE
+    public static final AnsiColor CYAN_BRIGHT = new AnsiColor("\033[0;96m");      // CYAN
+    public static final AnsiColor WHITE_BRIGHT = new AnsiColor("\033[1;97m");     //"\033[38;2;255;255;255m");  // WHITE
 
     // Bold High Intensity
-    public static final AnsiColor BLACK_BOLD_BRIGHT = new AnsiColor("\033[1;90m");  // BLACK
-    public static final AnsiColor RED_BOLD_BRIGHT = new AnsiColor("\033[1;91m");    // RED
-    public static final AnsiColor GREEN_BOLD_BRIGHT = new AnsiColor("\033[1;92m");  // GREEN
-    public static final AnsiColor YELLOW_BOLD_BRIGHT = new AnsiColor("\033[1;93m"); // YELLOW
-    public static final AnsiColor BLUE_BOLD_BRIGHT = new AnsiColor("\033[1;94m");   // BLUE
-    public static final AnsiColor PURPLE_BOLD_BRIGHT = new AnsiColor("\033[1;95m"); // PURPLE
-    public static final AnsiColor CYAN_BOLD_BRIGHT = new AnsiColor("\033[1;96m");   // CYAN
-    public static final AnsiColor WHITE_BOLD_BRIGHT = new AnsiColor("\033[1;97m");  // WHITE
+    public static final AnsiColor BLACK_BOLD_BRIGHT = new AnsiColor("\033[1;90m");   // BLACK
+    public static final AnsiColor RED_BOLD_BRIGHT = new AnsiColor("\033[1;38;5;160m"); // RED
+    public static final AnsiColor GREEN_BOLD_BRIGHT = new AnsiColor("\033[1;92m");   // GREEN
+    public static final AnsiColor YELLOW_BOLD_BRIGHT = new AnsiColor("\033[1;93m");  // YELLOW
+    public static final AnsiColor BLUE_BOLD_BRIGHT = new AnsiColor("\033[1;94m");    // BLUE
+    public static final AnsiColor PURPLE_BOLD_BRIGHT = new AnsiColor("\033[1;95m");  // PURPLE
+    public static final AnsiColor CYAN_BOLD_BRIGHT = new AnsiColor("\033[1;96m");    // CYAN
+    public static final AnsiColor WHITE_BOLD_BRIGHT = new AnsiColor("\033[1;97m");   // WHITE
 
     // High Intensity backgrounds
     public static final AnsiColor BLACK_BACKGROUND_BRIGHT = new AnsiColor("\033[0;100m");  // BLACK
