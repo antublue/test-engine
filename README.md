@@ -33,7 +33,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level
 | `@TestEngine.AfterAll`          | method          | no        | no     | `public void afterAll();`                                                  |
 | `@TestEngine.AfterClass`        | method          | no        | yes    | `public static void afterClass();`                                         |
 
-**NOTES**
+**Notes**
 
 - `@TestEngine.ParameterSetter` has been deprecated, replaced with `@TestEngine.Parameter` which supports a field or method
 
@@ -206,6 +206,10 @@ Additional test examples...
 
 https://github.com/antublue/test-engine/tree/main/examples/src/main/java/example
 
+**Notes**
+
+- The test code should be in `src/main` (not `src/test`)
+
 ## Maven Usage
 
 Add the Test Engine jars (and dependencies)...
@@ -229,6 +233,10 @@ Add the Test Engine jars (and dependencies)...
   </dependency>
 </dependencies>
 ```
+
+**Notes**
+
+- The scope must be empty or `compile`
 
 Disable the Maven Surefire plugin...
 
