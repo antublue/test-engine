@@ -8,7 +8,7 @@ cd core || exit 1
 mvn clean package install || exit 1
 cd ..  || exit 1
 
-cd plugin
+cd plugin || exit 1
 mvn clean package install || exit 1
 cd .. || exit 1
 
