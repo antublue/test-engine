@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Class to implement methods to get the TestEngine information
+ * Class to get TestEngine information
  */
 public class TestEngineInformation {
 
