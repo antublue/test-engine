@@ -38,6 +38,7 @@ import java.lang.reflect.Method;
 /**
  * Class to collect metrics and output test execution status
  */
+@SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
 public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
 
     private static final String INFO = AnsiColor.WHITE_BRIGHT.apply("[")
