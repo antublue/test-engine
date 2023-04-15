@@ -25,10 +25,10 @@
     </build>
 
     <modules>
-        <module>core</module>
+        <module>api</module>
+        <module>engine</module>
         <module>plugin</module>
         <module>examples</module>
-        <module>api</module>
     </modules>
 
 </project>
