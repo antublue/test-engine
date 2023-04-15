@@ -50,6 +50,9 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
     private static final String FAIL = AnsiColor.RED_BOLD.apply("FAIL");
     private static final String PASS = AnsiColor.GREEN_BOLD.apply("PASS");
 
+    private static final String SEPARATOR =
+            AnsiColor.WHITE_BRIGHT.apply("------------------------------------------------------------------------");
+
     private final boolean detailedOutput;
     private final boolean logTestMessages;
     private final boolean logPassMessages;
@@ -104,23 +107,16 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
      */
     @Override
     public void testPlanExecutionStarted(TestPlan testPlan) {
-        startTimeMilliseconds = System.currentTimeMillis();
         super.testPlanExecutionStarted(testPlan);
 
         this.testPlan = testPlan;
+        startTimeMilliseconds = System.currentTimeMillis();
 
-        String asciiBanner = "AntuBLUE Test Engine " + TestEngine.VERSION;
         String banner = "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
 
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < asciiBanner.length(); i++) {
-            stringBuilder.append("-");
-        }
-
-        String separator = stringBuilder.toString();
-        System.out.println(INFO + " " + separator);
+        System.out.println(INFO + " " + SEPARATOR);
         System.out.println(INFO + " " + banner);
-        System.out.println(INFO + " " + separator);
+        System.out.println(INFO + " " + SEPARATOR);
     }
 
     /**
@@ -280,24 +276,16 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
      */
     @Override
     public void testPlanExecutionFinished(TestPlan testPlan) {
-        long endTimeMilliseconds = System.currentTimeMillis();
-
         super.testPlanExecutionFinished(testPlan);
+
+        long endTimeMilliseconds = System.currentTimeMillis();
         TestExecutionSummary testExecutionSummary = getSummary();
 
-        String asciiBanner = "AntuBLUE Test Engine " + TestEngine.VERSION + " Summary";
         String banner = "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION + " Summary";
 
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < asciiBanner.length(); i++) {
-            stringBuilder.append("-");
-        }
-
-        String separator = stringBuilder.toString();
-
-        System.out.println(INFO + " " + separator);
+        System.out.println(INFO + " " + SEPARATOR);
         System.out.println(INFO + " " + banner);
-        System.out.println(INFO + " " + separator);
+        System.out.println(INFO + " " + SEPARATOR);
         System.out.println(INFO + " " +
                 AnsiColor.WHITE_BRIGHT.apply("TESTS")
                         + " : "
@@ -314,7 +302,7 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
                         + AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED")
                         + " : "
                         + testExecutionSummary.getTestsSkippedCount());
-        System.out.println(INFO + " " + separator);
+        System.out.println(INFO + " " + SEPARATOR);
 
         boolean failed = (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
 
@@ -324,9 +312,8 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
             System.out.println(INFO + " " + AnsiColor.GREEN_BOLD.apply("PASSED"));
         }
 
-        System.out.println(INFO + " " + separator);
-        System.out.println(INFO + " " + "Total Time  : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
-        System.out.println(INFO + " " + "Finished At : " + HumanReadableTime.now());
-        System.out.println(INFO + " " + separator);
+        System.out.println(INFO + " " + SEPARATOR);
+        System.out.println(INFO + " " + "Total Test Time : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
+        System.out.println(INFO + " " + "Finished At     : " + HumanReadableTime.now());
     }
 }
