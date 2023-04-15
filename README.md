@@ -136,17 +136,17 @@ The `Parameter` interface also has static methods to wrap an Object
 Example
 
 ```java
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            collection.add(
-                Parameter.of(
-                    "Array [" + i + "]",
-                    new String[] { String.valueOf(i), String.valueOf(i * 2) }));
-        }
-        return collection.stream();
+@TestEngine.ParameterSupplier
+public static Stream<Parameter> parameters() {
+    Collection<Parameter> collection = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+        collection.add(
+            Parameter.of(
+                "Array [" + i + "]",
+                new String[] { String.valueOf(i), String.valueOf(i * 2) }));
     }
+    return collection.stream();
+}
 ```
 
 In this scenario, the value of the `Parameter` is a String[] array
@@ -294,7 +294,7 @@ Add the Test Engine jars (and dependencies)...
 
 **Notes**
 
-- The `test-engine` and `test-engine-maven-plugin` version must match starting with 3.0.0
+- The `test-engine-api`, `test-engine`, and `test-engine-maven-plugin` version must match starting with 3.0.0
 
 Build and test your project...
 
