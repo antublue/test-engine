@@ -20,7 +20,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level 
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v3.0.0](https://github.com/antublue/test-engine/releases/tag/v3.0.0)
+- General Availability (GA): [Test Engine v3.0.1](https://github.com/antublue/test-engine/releases/tag/v3.0.1)
 
 ## Common Annotations
 
@@ -225,7 +225,7 @@ Disable the Maven Surefire plugin...
 <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-surefire-plugin</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <configuration>
         <skipTests>true</skipTests>
     </configuration>
@@ -238,7 +238,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-maven-plugin</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <executions>
         <execution>
             <phase>integration-test</phase>
@@ -257,12 +257,12 @@ Add the Test Engine jars (and dependencies)...
     <dependency>
         <groupId>org.antublue</groupId>
         <artifactId>test-engine-api</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.1</version>
     </dependency>
     <dependency>
         <groupId>org.antublue</groupId>
         <artifactId>test-engine</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.1</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -294,7 +294,7 @@ Add the Test Engine jars (and dependencies)...
 
 **Notes**
 
-- The `test-engine-api`, `test-engine`, and `test-engine-maven-plugin` versions must match starting with 3.0.0
+- The `test-engine-api`, `test-engine`, and `test-engine-maven-plugin` versions must match starting with 3.0.1
 
 Build and test your project...
 
