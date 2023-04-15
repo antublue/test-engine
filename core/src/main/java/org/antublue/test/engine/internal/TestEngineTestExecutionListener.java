@@ -298,7 +298,7 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
         System.out.println(INFO + " " + banner);
         System.out.println(INFO + " " + separator);
         System.out.println(INFO + " " +
-                AnsiColor.WHITE_BOLD_BRIGHT.apply("TESTS")
+                AnsiColor.WHITE_BRIGHT.apply("TESTS")
                         + " : "
                         + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
                         + ", "
@@ -310,7 +310,7 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
                         + " : "
                         + (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount())
                         + ", "
-                        + AnsiColor.YELLOW_BOLD_BRIGHT.apply("FAILED")
+                        + AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED")
                         + " : "
                         + testExecutionSummary.getTestsSkippedCount());
         System.out.println(INFO + " " + separator);
