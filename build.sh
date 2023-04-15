@@ -4,7 +4,7 @@ cd api || exit 1
 mvn clean package install || exit 1
 cd .. || exit 1
 
-cd core || exit 1
+cd engine || exit 1
 mvn clean package install || exit 1
 cd ..  || exit 1
 
