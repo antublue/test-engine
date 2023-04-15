@@ -16,28 +16,21 @@
 
 package org.antublue.test.engine.maven.plugin;
 
-import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
-import org.antublue.test.engine.internal.TestEngineExecutionListener;
-import org.antublue.test.engine.internal.TestEngineReflectionUtils;
+import org.antublue.test.engine.internal.TestEngineTestExecutionListener;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.properties.internal.SystemProperties;
-import org.junit.platform.engine.ExecutionRequest;
-import org.junit.platform.engine.TestDescriptor;
-import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
-import org.junit.platform.launcher.TestPlan;
+import org.junit.platform.launcher.LauncherSession;
+import org.junit.platform.launcher.core.LauncherConfig;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
+import org.junit.platform.launcher.core.LauncherFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -74,8 +67,6 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      * @throws MojoExecutionException execution exception
      */
     public void execute() throws MojoExecutionException {
-        TestEngineExecutionListener summaryEngineExecutionListener = null;
-
         try {
             Log log = getLog();
 
@@ -140,6 +131,11 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                 }
             }
 
+            LauncherConfig launcherConfig =
+                    LauncherConfig.builder()
+                            .addTestExecutionListeners(new TestEngineTestExecutionListener())
+                            .build();
+
             LauncherDiscoveryRequest launcherDiscoveryRequest =
                     LauncherDiscoveryRequestBuilder.request()
                             .selectors(DiscoverySelectors.selectClasspathRoots(artifactPaths))
@@ -147,35 +143,12 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             .configurationParameters(new HashMap<>())
                             .build();
 
-            TestEngine testEngine = new TestEngine();
-
-            TestDescriptor testDescriptor =
-                    testEngine.discover(launcherDiscoveryRequest, UniqueId.root("/", "/"));
-
-            TestPlan testPlan =
-                    TestEngineReflectionUtils.createTestPlan(
-                            testDescriptor,
-                            TestEngineConfigurationParameters.getInstance());
-
-            if (!testPlan.containsTests()) {
-                throw new MojoExecutionException("No tests found");
+            try (LauncherSession launcherSession = LauncherFactory.openSession(launcherConfig)) {
+                launcherSession.getLauncher().execute(launcherDiscoveryRequest);
             }
-
-            summaryEngineExecutionListener = new TestEngineExecutionListener(testPlan);
-            summaryEngineExecutionListener.executionStarted();
-
-            testEngine.execute(
-                    ExecutionRequest.create(
-                            testDescriptor,
-                            summaryEngineExecutionListener,
-                            launcherDiscoveryRequest.getConfigurationParameters()));
         } catch (Throwable t) {
             t.printStackTrace();
             throw new MojoExecutionException("General AntuBLUE Test Engine Maven Plugin Exception", t);
-        } finally {
-            if (summaryEngineExecutionListener != null) {
-                summaryEngineExecutionListener.executionFinished();
-            }
         }
     }
 }

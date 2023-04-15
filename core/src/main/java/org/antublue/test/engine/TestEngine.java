@@ -21,6 +21,7 @@ import org.antublue.test.engine.internal.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
 import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
+import org.antublue.test.engine.internal.TestEngineTestDescriptorStore;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -100,6 +101,9 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         // Create a TestEngineDiscoverySelectorResolver and
         // resolve selectors, adding them to the engine descriptor
         new TestEngineDiscoveryRequestResolver().resolve(testEngineDiscoveryRequest, engineDescriptor);
+
+        // Store the test descriptors
+        TestEngineTestDescriptorStore.getInstance().put(engineDescriptor);
 
         // Return the engine descriptor with all child test descriptors
         return engineDescriptor;
