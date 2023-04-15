@@ -294,7 +294,7 @@ Add the Test Engine jars (and dependencies)...
 
 **Notes**
 
-- The `test-engine-api`, `test-engine`, and `test-engine-maven-plugin` version must match starting with 3.0.0
+- The `test-engine-api`, `test-engine`, and `test-engine-maven-plugin` versions must match starting with 3.0.0
 
 Build and test your project...
 
