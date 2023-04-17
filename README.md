@@ -123,7 +123,7 @@ The `Parameter` interface also has static methods to wrap an Object
 - `@TestEngine.Parameter` field is a single `Parameter` object
 
 
-- The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name 
+- The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name
   - `boolean`
   - `byte`
   - `char`
@@ -139,15 +139,15 @@ Example
 ```java
 @TestEngine.ParameterSupplier
 public static Stream<Parameter> parameters() {
-    Collection<Parameter> collection = new ArrayList<>();
-    for (int i = 0; i < 10; i++) {
+        Collection<Parameter> collection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
         collection.add(
-            Parameter.of(
-                "Array [" + i + "]",
-                new String[] { String.valueOf(i), String.valueOf(i * 2) }));
-    }
-    return collection.stream();
-}
+        Parameter.of(
+        "Array [" + i + "]",
+        new String[] { String.valueOf(i), String.valueOf(i * 2) }));
+        }
+        return collection.stream();
+        }
 ```
 
 In this scenario, the value of the `Parameter` is a String[] array
@@ -224,12 +224,12 @@ Disable the Maven Surefire plugin...
 
 ```xml
 <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-surefire-plugin</artifactId>
-    <version>3.0.1</version>
-    <configuration>
-        <skipTests>true</skipTests>
-    </configuration>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-surefire-plugin</artifactId>
+  <version>3.0.1</version>
+  <configuration>
+    <skipTests>true</skipTests>
+  </configuration>
 </plugin>
 ```
 
@@ -237,17 +237,17 @@ Add the Test Engine Maven Plugin...
 
 ```xml
 <plugin>
-    <groupId>org.antublue</groupId>
-    <artifactId>test-engine-maven-plugin</artifactId>
-    <version>3.0.1</version>
-    <executions>
-        <execution>
-            <phase>integration-test</phase>
-            <goals>
-                <goal>test</goal>
-            </goals>
-        </execution>
-    </executions>
+  <groupId>org.antublue</groupId>
+  <artifactId>test-engine-maven-plugin</artifactId>
+  <version>3.0.1</version>
+  <executions>
+    <execution>
+      <phase>integration-test</phase>
+      <goals>
+        <goal>test</goal>
+      </goals>
+    </execution>
+  </executions>
 </plugin>
 ```
 
@@ -255,41 +255,41 @@ Add the Test Engine jars (and dependencies)...
 
 ```xml
 <dependencies>
-    <dependency>
-        <groupId>org.antublue</groupId>
-        <artifactId>test-engine-api</artifactId>
-        <version>3.0.1</version>
-    </dependency>
-    <dependency>
-        <groupId>org.antublue</groupId>
-        <artifactId>test-engine</artifactId>
-        <version>3.0.1</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.assertj</groupId>
-        <artifactId>assertj-core</artifactId>
-        <version>3.24.2</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.junit.platform</groupId>
-        <artifactId>junit-platform-commons</artifactId>
-        <version>1.9.2</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.junit.platform</groupId>
-        <artifactId>junit-platform-launcher</artifactId>
-        <version>1.9.2</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.junit.platform</groupId>
-        <artifactId>junit-platform-engine</artifactId>
-        <version>1.9.2</version>
-        <scope>test</scope>
-    </dependency>
+  <dependency>
+    <groupId>org.antublue</groupId>
+    <artifactId>test-engine-api</artifactId>
+    <version>3.0.1</version>
+  </dependency>
+  <dependency>
+    <groupId>org.antublue</groupId>
+    <artifactId>test-engine</artifactId>
+    <version>3.0.1</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.assertj</groupId>
+    <artifactId>assertj-core</artifactId>
+    <version>3.24.2</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.junit.platform</groupId>
+    <artifactId>junit-platform-commons</artifactId>
+    <version>1.9.2</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.junit.platform</groupId>
+    <artifactId>junit-platform-launcher</artifactId>
+    <version>1.9.2</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.junit.platform</groupId>
+    <artifactId>junit-platform-engine</artifactId>
+    <version>1.9.2</version>
+    <scope>test</scope>
+  </dependency>
 </dependencies>
 ```
 
