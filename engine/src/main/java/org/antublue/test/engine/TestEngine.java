@@ -95,7 +95,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         engineDiscoveryRequest,
                         TestEngineConfigurationParameters.getInstance());
 
-        // Create a EngineDescriptor as the target
+        // Create an EngineDescriptor as the target
         EngineDescriptor engineDescriptor = new EngineDescriptor(UniqueId.forEngine(getId()), getId());
 
         // Create a TestEngineDiscoverySelectorResolver and
