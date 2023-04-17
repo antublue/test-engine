@@ -304,7 +304,6 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
         long endTimeMilliseconds = System.currentTimeMillis();
         TestExecutionSummary testExecutionSummary = getSummary();
 
-        System.out.println(INFO);
         System.out.println(INFO + " " + SEPARATOR);
         System.out.println(INFO + " " + BANNER + " Summary");
         System.out.println(INFO + " " + SEPARATOR);
