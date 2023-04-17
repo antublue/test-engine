@@ -180,17 +180,9 @@
                                         <exclude>META-INF/**</exclude>
                                     </excludes>
                                 </filter>
-                                <filter>
-                                    <artifact>org.hamcrest:hamcrest</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/**</exclude>
-                                    </excludes>
-                                </filter>
                             </filters>
                             <artifactSet>
                                 <includes>
-                                    <!-- <include>org.antublue:test-engine-api</include> -->
-                                    <include>org.reflections:reflections</include>
                                     <include>com.univocity:univocity-parsers</include>
                                 </includes>
                             </artifactSet>
@@ -201,6 +193,24 @@
                                 </relocation>
                             </relocations>
                         </configuration>
+                    </execution>
+                </executions>
+	        </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.20.0</version>
+                <configuration>
+                    <linkXRef>false</linkXRef>
+                    <format>txt</format>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pmd-scan</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

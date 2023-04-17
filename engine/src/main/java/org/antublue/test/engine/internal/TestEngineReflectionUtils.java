@@ -439,7 +439,7 @@ public final class TestEngineReflectionUtils {
                     if (!Modifier.isFinal(modifiers)
                             && !Modifier.isStatic(modifiers)
                             && field.isAnnotationPresent(annotation)
-                            && (field.getType() == fieldType)) {
+                            && field.getType() == fieldType) {
                         return true;
                     }
                     return false;
@@ -450,7 +450,7 @@ public final class TestEngineReflectionUtils {
                 });
 
         Class<?> declaringClass = clazz.getSuperclass();
-        if ((declaringClass != null) && !declaringClass.equals(Object.class)) {
+        if (declaringClass != null && !declaringClass.equals(Object.class)) {
             resolveFields(declaringClass, annotation, fieldType, fieldSet);
         }
     }
@@ -549,7 +549,7 @@ public final class TestEngineReflectionUtils {
                 })
                 .filter(method -> {
                     if (parameterTypes == null) {
-                        return (method.getParameterTypes().length == 0);
+                        return method.getParameterTypes().length == 0;
                     }
                     if (parameterTypes.length != method.getParameterCount()) {
                         return false;
@@ -577,7 +577,7 @@ public final class TestEngineReflectionUtils {
                 });
 
         Class<?> declaringClass = clazz.getSuperclass();
-        if ((declaringClass != null) && !declaringClass.equals(Object.class)) {
+        if (declaringClass != null && !declaringClass.equals(Object.class)) {
             resolveMethods(declaringClass, annotation, scope, returnType, parameterTypes, methodMap);
         }
     }
@@ -596,7 +596,7 @@ public final class TestEngineReflectionUtils {
                     // Sort based on @TestEngine.Order value
                     int o1Order = o1.getAnnotation(TestEngine.Order.class).value();
                     int o2Order = o2.getAnnotation(TestEngine.Order.class).value();
-                    return (o1Order < o2Order) ? -1 : ((o1Order == o2Order) ? 0 : 1);
+                    return o1Order < o2Order ? -1 : o1Order == o2Order ? 0 : 1;
                 } else {
                     return -1;
                 }

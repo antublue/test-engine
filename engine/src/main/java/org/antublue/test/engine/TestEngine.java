@@ -44,8 +44,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static final String ARTIFACT_ID = "test-engine";
     public static final String VERSION = TestEngineInformation.getVersion();
 
+    /*
     static {
-        /*
         try {
             FileOutputStream fileOutputStream = new FileOutputStream("antublue-test-engine.log");
             DelegatingOutputStream delegatingOutputStream = new DelegatingOutputStream(System.out, fileOutputStream);
@@ -55,8 +55,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         } catch (IOException ioe) {
             // DO NOTHING
         }
-        */
     }
+    */
 
     @Override
     public String getId() {

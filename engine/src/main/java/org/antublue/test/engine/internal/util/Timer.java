@@ -23,7 +23,6 @@ import java.time.Duration;
  */
 public final class Timer {
 
-    private final boolean autoStart;
     private long startMs;
     private long stopMs;
 
@@ -40,7 +39,6 @@ public final class Timer {
      * @param autoStart
      */
     public Timer(boolean autoStart) {
-        this.autoStart = autoStart;
         if (autoStart) {
              start();
         }

@@ -395,8 +395,7 @@ public class Logger {
             dateTime = SIMPLE_DATE_FORMAT.format(new Date());
         }
 
-        return java.lang.String.format(
-                "%s | %s | %s | %s",
+        return String.format("%s | %s | %s | %s",
                 dateTime,
                 Thread.currentThread().getName(),
                 level.toString(),
@@ -417,11 +416,7 @@ public class Logger {
             dateTime = SIMPLE_DATE_FORMAT.format(new Date());
         }
 
-        return java.lang.String.format(
-                "%s | %s | %s",
-                dateTime,
-                Thread.currentThread().getName(),
-                message);
+        return String.format("%s | %s | %s", dateTime, Thread.currentThread().getName(), message);
     }
 
     /**

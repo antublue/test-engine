@@ -23,6 +23,7 @@ import java.util.Properties;
 /**
  * Class to get TestEngine information
  */
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public class TestEngineInformation {
 
     private static final String RESOURCE_PATH = "/test-engine.properties";

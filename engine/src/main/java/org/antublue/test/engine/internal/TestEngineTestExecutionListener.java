@@ -193,7 +193,7 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
                     })
             );
 
-            if (detailedOutput && (stringBuilder.length() > 0)) {
+            if (detailedOutput && stringBuilder.length() > 0) {
                 //LOGGER.rawInfo(stringBuilder.toString());
                 System.out.println(INFO + " " + Thread.currentThread().getName() + " | " + stringBuilder);
             }
@@ -285,7 +285,7 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
                     }
                 }
 
-                if (detailedOutput && (string != null)) {
+                if (detailedOutput && string != null) {
                     System.out.println(INFO + " " + Thread.currentThread().getName() + " | " + string);
                 }
             }
@@ -335,7 +335,9 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
                 + testExecutionSummary.getTestsSkippedCount());
         System.out.println(INFO + " " + SEPARATOR);
 
-        boolean failed = (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
+        boolean failed =
+                testClasses.size() == 0
+                || (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
 
         if (failed) {
             System.out.println(INFO + " " + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"));

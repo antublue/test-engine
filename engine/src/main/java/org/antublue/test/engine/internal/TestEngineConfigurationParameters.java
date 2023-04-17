@@ -101,9 +101,9 @@ public final class TestEngineConfigurationParameters implements ConfigurationPar
         String systemPropertyValue = System.getProperty(key);
 
         // Check the environment value first
-        if ((environmentVariableValue != null) && !environmentVariableValue.trim().isEmpty()) {
+        if (environmentVariableValue != null && !environmentVariableValue.trim().isEmpty()) {
             return environmentVariableValue;
-        } else if ((systemPropertyValue != null) && !systemPropertyValue.trim().isEmpty()) {
+        } else if (systemPropertyValue != null && !systemPropertyValue.trim().isEmpty()) {
             return systemPropertyValue;
         }
 
