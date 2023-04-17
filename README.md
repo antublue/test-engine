@@ -1,6 +1,4 @@
 [![Build](https://github.com/antublue/test-engine/actions/workflows/build.yml/badge.svg)](https://github.com/antublue/test-engine/actions/workflows/build.yml)
-[![Code Quality](https://api.codiga.io/project/36230/score/svg)](https://app.codiga.io/hub/project/36230/test-engine)
-[![Code Grade](https://api.codiga.io/project/36230/status/svg)](https://app.codiga.io/hub/project/36230/test-engine)
 
 <br/>
 
