@@ -36,9 +36,7 @@ import org.junit.platform.launcher.listeners.TestExecutionSummary;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Class to collect metrics and output test execution status
