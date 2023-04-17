@@ -34,6 +34,11 @@ import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Class to collect metrics and output test execution status
@@ -41,7 +46,11 @@ import java.lang.reflect.Method;
 @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
 public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
 
-    private static final String INFO = AnsiColor.WHITE_BRIGHT.apply("[")
+    private static String BANNER =
+            "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
+
+    private static final String INFO =
+            AnsiColor.WHITE_BRIGHT.apply("[")
             + AnsiColor.BLUE_BOLD.apply("INFO")
             + AnsiColor.WHITE_BRIGHT.apply("]");
 
@@ -51,18 +60,21 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
     private static final String PASS = AnsiColor.GREEN_BOLD.apply("PASS");
 
     private static final String SEPARATOR =
-            AnsiColor.WHITE_BRIGHT.apply("------------------------------------------------------------------------");
+            AnsiColor.WHITE_BRIGHT.apply(
+                    "------------------------------------------------------------------------");
 
     private final boolean detailedOutput;
     private final boolean logTestMessages;
     private final boolean logPassMessages;
-    private TestPlan testPlan;
     private long startTimeMilliseconds;
+    private final Set<Class<?>> testClasses;
 
     /**
      * Constructor
      */
     public TestEngineTestExecutionListener() {
+        this.testClasses = Collections.synchronizedSet(new HashSet());
+
         this.detailedOutput =
                 TestEngineConfigurationParameters.getInstance()
                         .get(TestEngineConstants.CONSOLE_OUTPUT)
@@ -109,13 +121,10 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
     public void testPlanExecutionStarted(TestPlan testPlan) {
         super.testPlanExecutionStarted(testPlan);
 
-        this.testPlan = testPlan;
         startTimeMilliseconds = System.currentTimeMillis();
 
-        String banner = "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
-
         System.out.println(INFO + " " + SEPARATOR);
-        System.out.println(INFO + " " + banner);
+        System.out.println(INFO + " " + BANNER);
         System.out.println(INFO + " " + SEPARATOR);
     }
 
@@ -142,12 +151,21 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
                     Switch.switchCase(EngineDescriptor.class, consumer -> {
                     }),
                     Switch.switchCase(ClassTestDescriptor.class, consumer -> {
+                        ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
+                        Class<?> testClass = classTestDescriptor.getTestClass();
+                        testClasses.add(testClass);
+                        if (logTestMessages) {
+                            stringBuilder
+                                    .append(TEST)
+                                    .append(" | ")
+                                    .append(testClass.getName());
+                        }
                     }),
                     Switch.switchCase(ParameterTestDescriptor.class, consumer -> {
                         if (logTestMessages) {
-                            ParameterTestDescriptor testEngineParameterTestDescriptor = (ParameterTestDescriptor) testDescriptor;
-                            Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
-                            Parameter testParameter = testEngineParameterTestDescriptor.getTestParameter();
+                            ParameterTestDescriptor parameterTestDescriptor = (ParameterTestDescriptor) testDescriptor;
+                            Class<?> testClass = parameterTestDescriptor.getTestClass();
+                            Parameter testParameter = parameterTestDescriptor.getTestParameter();
                             String testParameterName = testParameter.name();
                             stringBuilder
                                     .append(TEST)
@@ -208,12 +226,19 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
                     Switch.switchCase(EngineDescriptor.class, consumer -> {
                     }),
                     Switch.switchCase(ClassTestDescriptor.class, consumer -> {
+                        if (logPassMessages) {
+                            ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
+                            Class<?> testClass = classTestDescriptor.getTestClass();
+                            stringBuilder
+                                    .append("%s | ")
+                                    .append(testClass.getName());
+                        }
                     }),
                     Switch.switchCase(ParameterTestDescriptor.class, consumer -> {
                         if (logPassMessages) {
-                            ParameterTestDescriptor testengineParameterTestDescriptor = (ParameterTestDescriptor) testDescriptor;
-                            Class<?> testClass = testengineParameterTestDescriptor.getTestClass();
-                            Parameter testParameter = testengineParameterTestDescriptor.getTestParameter();
+                            ParameterTestDescriptor parameterTestDescriptor = (ParameterTestDescriptor) testDescriptor;
+                            Class<?> testClass = parameterTestDescriptor.getTestClass();
+                            Parameter testParameter = parameterTestDescriptor.getTestParameter();
                             String testParameterName = testParameter.name();
                             stringBuilder
                                     .append("%s | ")
@@ -281,27 +306,35 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
         long endTimeMilliseconds = System.currentTimeMillis();
         TestExecutionSummary testExecutionSummary = getSummary();
 
-        String banner = "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION + " Summary";
+        System.out.println(INFO);
+        System.out.println(INFO + " " + SEPARATOR);
+        System.out.println(INFO + " " + BANNER + " Summary");
+        System.out.println(INFO + " " + SEPARATOR);
+        System.out.println(
+                INFO
+                + " "
+                + AnsiColor.WHITE_BRIGHT.apply("Test Classes")
+                + "    : "
+                + testClasses.size());
 
-        System.out.println(INFO + " " + SEPARATOR);
-        System.out.println(INFO + " " + banner);
-        System.out.println(INFO + " " + SEPARATOR);
-        System.out.println(INFO + " " +
-                AnsiColor.WHITE_BRIGHT.apply("TESTS")
-                        + " : "
-                        + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
-                        + ", "
-                        + AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED")
-                        + " : "
-                        + (testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount())
-                        + ", "
-                        + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED")
-                        + " : "
-                        + (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount())
-                        + ", "
-                        + AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED")
-                        + " : "
-                        + testExecutionSummary.getTestsSkippedCount());
+        System.out.println(
+                INFO
+                + " "
+                +  AnsiColor.WHITE_BRIGHT.apply("Test Executions")
+                + " : "
+                + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
+                + ", "
+                + AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED")
+                + " : "
+                + (testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount())
+                + ", "
+                + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED")
+                + " : "
+                + (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount())
+                + ", "
+                + AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED")
+                + " : "
+                + testExecutionSummary.getTestsSkippedCount());
         System.out.println(INFO + " " + SEPARATOR);
 
         boolean failed = (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
@@ -315,5 +348,6 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
         System.out.println(INFO + " " + SEPARATOR);
         System.out.println(INFO + " " + "Total Test Time : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
         System.out.println(INFO + " " + "Finished At     : " + HumanReadableTime.now());
+        System.out.println(INFO + " " + SEPARATOR);
     }
 }
