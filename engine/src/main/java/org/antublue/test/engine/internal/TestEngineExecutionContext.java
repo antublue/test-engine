@@ -22,7 +22,7 @@ import org.junit.platform.engine.TestExecutionResult;
 import java.util.List;
 
 /**
- * Class to implement a execution context
+ * Class to implement a TestEngineExecutionContext
  */
 public class TestEngineExecutionContext {
 
