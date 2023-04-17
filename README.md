@@ -61,6 +61,9 @@ Currently, JUnit 5 does not support parameterized tests at the test class level 
 
 **Notes**
 
+- Abstract test classes are not executed
+
+
 - `@TestEngine.Order(<int>)` is inheritance agnostic
 
 
@@ -89,10 +92,10 @@ Using a combination of the properties (or environment variables) allows for incl
 
 The Test Engine as two experimental configuration parameters
 
-| Configuration                 | Type    | Default | Java System Property                                | Environment Variable                                |
-|-------------------------------|---------|---------|-----------------------------------------------------|-----------------------------------------------------|
-| disable console TEST messages | boolean | true    | antublue.test.engine.experimental.log.test.messages | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_TEST_MESSAGES |
-| disable console PASS messages | boolean | true    | antublue.test.engine.experimental.log.pass.messages | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_PASS_MESSAGES |
+| Configuration         | Type    | Default | Java System Property                                | Environment Variable                                |
+|-----------------------|---------|---------|-----------------------------------------------------|-----------------------------------------------------|
+| console TEST messages | boolean | true    | antublue.test.engine.experimental.log.test.messages | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_TEST_MESSAGES |
+| console PASS messages | boolean | true    | antublue.test.engine.experimental.log.pass.messages | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_PASS_MESSAGES |
 
 **Notes**
 
