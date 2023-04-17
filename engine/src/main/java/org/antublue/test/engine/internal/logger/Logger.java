@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Class to implement logger
+ * Class to implement a Logger
  */
 @SuppressWarnings("PMD.GodClass")
 public class Logger {
