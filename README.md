@@ -139,15 +139,17 @@ Example
 ```java
 @TestEngine.ParameterSupplier
 public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-        collection.add(
-        Parameter.of(
-        "Array [" + i + "]",
-        new String[] { String.valueOf(i), String.valueOf(i * 2) }));
-        }
-        return collection.stream();
-        }
+  Collection<Parameter> collection = new ArrayList<>();
+  
+  for (int i = 0; i < 10; i++) {
+    collection.add(
+      Parameter.of(
+        "Array [" + i + "]", // name
+          new String[] { String.valueOf(i), String.valueOf(i * 2) })); // value
+  }
+  
+  return collection.stream();
+}
 ```
 
 In this scenario, the value of the `Parameter` is a String[] array
