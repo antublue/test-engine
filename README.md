@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine that allows for parameterized tes
 
 ## Goals
 
-The goal of the Test Engine is for integration testing
+The Test Engine is designed for integration testing
 
 Currently, JUnit 5 does not support parameterized tests at the test class level (common for integration testing)
 
