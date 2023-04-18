@@ -457,37 +457,39 @@ The test execution flow...
     
     thread {
     
-        call "@TestEngine.ParameterSupplier" method to get a Stream<Parameter>
+        invoke the "@TestEngine.ParameterSupplier" method to get a Stream<Parameter>
     
-        execute "@TestEngine.BeforeClass" methods 
+        invoke "@TestEngine.BeforeClass" methods 
      
         create a single instance of the test class
         
         for (each Parameter in the Stream<Parameter>) {
         
-            execute the "@TestEngine.Parameter" method with the Parameter object
+            set all "@TestEngine.Parameter" fields to the Parameter object
+        
+            invoke all "@TestEngine.Parameter" methods with the Parameter object
             
-            execute "@TestEngine.BeforeAll" methods
+            invoke all "@TestEngine.BeforeAll" methods
             
             for (each "@TestEngine.Test" method in the test class) {
             
-                execute "@TestEngine.BeforeEach" methods
+                invoke all "@TestEngine.BeforeEach" methods
             
-                execute "@TestEngine.Test" method
+                invoke the "@TestEngine.Test" method
                 
-                execute "@TestEngine.AfterEach" methods
+                invoke all "@TestEngine.AfterEach" methods
             }
             
-            execute "@TestEngine.AfterAll" method
+            invoke all "@TestEngine.AfterAll" method
         }
         
-        execute "@TestEngine.AfterClass" methods
+        invoke all "@TestEngine.AfterClass" methods
     }
  }
 ```
 
 **Notes**
 
-- Each parameterized test class will be executed sequentially, but different test classes are executed in parallel threads
+- Each parameterized test class will be executed sequentially in a thread, but different test classes are executed in parallel threads
   - By default, thread count is equal to number of available processors as reported by Java
   - The thread count can be changed by the Java system property or environment variable
