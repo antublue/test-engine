@@ -26,7 +26,9 @@ Currently, JUnit 5 does not support parameterized tests at the test class level 
 
 - https://github.com/junit-team/junit5/issues/878
 
-The JUnit team is working on the functionality, but appears to be designed for a more generic/broader use case. (2023-04-17)
+The JUnit team is working on the functionality, but appears to be designed for a more generic/broader use case.
+
+- As of 2023-04-17
 
 ## Common Annotations
 
