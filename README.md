@@ -54,7 +54,7 @@ The JUnit team is working on the functionality, but appears to be designed for a
 
 - `@TestEngine.Order` can be used to control method order
   - Methods are sorted by the annotation value first, then alphabetically by the test method name
-    - In scenarios where `@TestEngine.Order` values are duplicated, methods with the same value are sorted alphabetically
+    - In scenarios where `@TestEngine.Order` values are duplicated, methods with the same name are sorted alphabetically
   - Method order is relative to other methods with the same annotation
 
 ## Additional Annotations
