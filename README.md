@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for integra
 
 ## Goals
 
-Integration testing specific test engine.
+The Test Engine is designed specifically for integration testing.
 
 ## Non-Goals
 
