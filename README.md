@@ -406,13 +406,6 @@ cd test-engine
 ./build.sh
 ```
 
-To install to your local repository
-
-```shell
-./build
-mvn install
-```
-
 ## Known issues
 
 IntelliJ doesn't properly handle all possible test selection scenarios from the Test Run window.
