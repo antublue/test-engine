@@ -8,6 +8,10 @@
 
 The Test Engine is a JUnit 5 based test engine designed specifically for integration testing by allowing parameterization at the test class level.
 
+## Latest Releases
+
+- General Availability (GA): [Test Engine v3.0.1](https://github.com/antublue/test-engine/releases/tag/v3.0.1)
+
 ## Goals
 
 The Test Engine is designed specifically for integration testing.
@@ -23,10 +27,6 @@ Currently, JUnit 5 does not support parameterized tests at the test class level 
 - https://github.com/junit-team/junit5/issues/878
 
 The JUnit team is working on the functionality, but appears to be designed for a more generic/broader use case. (2023-04-17)
-
-## Latest Releases
-
-- General Availability (GA): [Test Engine v3.0.1](https://github.com/antublue/test-engine/releases/tag/v3.0.1)
 
 ## Common Annotations
 
