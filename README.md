@@ -26,9 +26,11 @@ Currently, JUnit 5 does not support parameterized tests at the test class level 
 
 - https://github.com/junit-team/junit5/issues/878
 
-The JUnit team is working on the functionality, but appears to be designed for a more generic/broader use case.
 
-- As of 2023-04-17
+- The JUnit team is working on the functionality, but appears to be designed for a more generic/broader use case (2023-04-18)
+
+
+- JUnit 5 doesn't provide annotations to run before/after the class (static methods) and before/after all tests (non-static) in a test class (2023-04-18)
 
 ## Common Annotations
 
