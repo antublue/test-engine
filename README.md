@@ -70,95 +70,7 @@ Currently, JUnit 5 does not support parameterized tests at the test class level 
 
 - It's recommended to use a tag string format of `/tag1/tag2/tag3/`
 
-## Configuration Values
-
-The Test Engine has seven configuration parameters
-
-| Configuration                   | Type         | Java System Property                         | Environment Variable                         |
-|---------------------------------|--------------|----------------------------------------------|----------------------------------------------|
-| thread count                    | integer      | antublue.test.engine.thread.count            | ANTUBLUE_TEST_ENGINE_THREAD_COUNT            |
-| test class name include filter  | regex string | antublue.test.engine.test.class.include      | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE      |
-| test class name exclude filter  | regex string | antublue.test.engine.test.class.exclude      | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE      |
-| test method name include filter | regex string | antublue.test.engine.test.method.include     | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE     |
-| test method name exclude filter | regex string | antublue.test.engine.test.method.exclude     | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE     |
-| test class tag include filter   | regex string | antublue.test.engine.test.class.tag.include  | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE  |
-| test class tag exclude filter   | regex string | antublue.test.engine.test.class.tag.exclude  | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE  |
-| test method tag include filter  | regex string | antublue.test.engine.test.method.tag.include | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_INCLUDE |
-| test method tag exclude filter  | regex string | antublue.test.engine.test.method.tag.exclude | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_EXCLUDE |
-
-Using a combination of the properties (or environment variables) allows for including / excluding individual test classes / test methods
-
-The Test Engine as two experimental configuration parameters
-
-| Configuration         | Type    | Default | Java System Property                                | Environment Variable                                |
-|-----------------------|---------|---------|-----------------------------------------------------|-----------------------------------------------------|
-| console TEST messages | boolean | true    | antublue.test.engine.experimental.log.test.messages | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_TEST_MESSAGES |
-| console PASS messages | boolean | true    | antublue.test.engine.experimental.log.pass.messages | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_PASS_MESSAGES |
-
-**Notes**
-
-- Environment variables take precedence over Java system properties
-
-- If all test methods are excluded, then the test class will be excluded
-
-- If no test classes are found, an error exit code of -2 is returned
-
-- Experimental configuration values are subject to change at any time
-
-
-## What is a `Parameter` ?
-
-`Parameter` is an interface all parameter objects must implement to allow for parameter name and value resolution
-
-The `Parameter` interface also has static methods to wrap an Object
-
-### Usage of `Parameter`
-
-- `@TestEngine.ParametersSupplier` must return a `Stream<Parameter>`
-
-
-- `@TestEngine.Parameter` methods requires single `Parameter` object as parameter
-
-
-- `@TestEngine.Parameter` field is a single `Parameter` object
-
-
-- The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name
-  - `boolean`
-  - `byte`
-  - `char`
-  - `short`
-  - `int`
-  - `long`
-  - `float`
-  - `double`
-  - `String`
-
-Example
-
-```java
-@TestEngine.ParameterSupplier
-public static Stream<Parameter> parameters() {
-  Collection<Parameter> collection = new ArrayList<>();
-  
-  for (int i = 0; i < 10; i++) {
-    collection.add(
-      Parameter.of(
-        "Array [" + i + "]", // name
-          new String[] { String.valueOf(i), String.valueOf(i * 2) })); // value
-  }
-  
-  return collection.stream();
-}
-```
-
-In this scenario, the value of the `Parameter` is a String[] array
-
-```java
-String[] values = parameter.value();
-```
-
-## Example Test Class
+## Usage Example
 
 ```java
 package org.antublue.test.engine.test.example;
@@ -220,7 +132,174 @@ Additional test examples...
 
 https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example
 
-## Maven Usage
+## What is a `Parameter`?
+
+`Parameter` is an interface all parameter objects must implement to allow for parameter name and value resolution
+
+The `Parameter` interface also has static methods to wrap an Object
+
+
+- `@TestEngine.ParameterSupplier` must return a `Stream<Parameter>`
+
+
+- `@TestEngine.Parameter` field is a single `Parameter` object
+
+
+- `@TestEngine.Parameter` methods requires single `Parameter` object as parameter
+
+
+- The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name
+  - `boolean`
+  - `byte`
+  - `char`
+  - `short`
+  - `int`
+  - `long`
+  - `float`
+  - `double`
+  - `String`
+
+Example
+
+```java
+@TestEngine.ParameterSupplier
+public static Stream<Parameter> parameters() {
+  Collection<Parameter> collection = new ArrayList<>();
+  
+  for (int i = 0; i < 10; i++) {
+    collection.add(
+      Parameter.of(
+        "Array [" + i + "]", // name
+          new String[] { String.valueOf(i), String.valueOf(i * 2) })); // value
+  }
+  
+  return collection.stream();
+}
+```
+
+In this scenario, the value of the `Parameter` is a String[] array
+
+```java
+String[] values = parameter.value();
+```
+
+## Configuration
+
+The Test Engine has seven configuration parameters
+<br/>
+<br/>
+
+| Thread count         |                                   |
+|----------------------|-----------------------------------|
+| Environment variable | ANTUBLUE_TEST_ENGINE_THREAD_COUNT |
+| System property      | antublue.test.engine.thread.count |
+| Type                 | integer                           |
+
+<br/>
+
+| <nowrap>Test class name include filter</nowrap> |                                         |
+|-------------------------------------------------|-----------------------------------------|
+| Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE |
+| System property                                 | antublue.test.engine.test.class.include |
+| Type                                            | regex string                            |
+
+<br/>
+
+| <nowrap>Test class name exclude filter</nowrap> |                                         |
+|-------------------------------------------------|-----------------------------------------|
+| Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE |
+| System property                                 | antublue.test.engine.test.class.exclude |
+| Type                                            | regex string                            |
+
+<br/>
+
+| <nowrap>Test method name include filter</nowrap> |                                          |
+|--------------------------------------------------|------------------------------------------|
+| Environment variable                             | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE |
+| System property                                  | antublue.test.engine.test.method.include |
+| Type                                             | regex string                             |
+
+<br/>
+
+| <nowrap>Test method name exclude filter</nowrap> |                                          |
+|--------------------------------------------------|------------------------------------------|
+| Environment variable                             | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE |
+| System property                                  | antublue.test.engine.test.method.exclude |
+| Type                                             | regex string                             |
+
+<br/>
+
+
+| <nowrap>Test class tag include filter</nowrap> |                                             |
+|------------------------------------------------|---------------------------------------------|
+| Environment variable                           | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE |
+| System property                                | antublue.test.engine.test.class.tag.include |
+| Type                                           | regex string                                |
+
+<br/>
+
+| <nowrap>Test class tag exclude filter</nowrap> |                                             |
+|------------------------------------------------|---------------------------------------------|
+| Environment variable                           | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE |
+| System property                                | antublue.test.engine.test.class.tag.exclude |
+| Type                                           | regex string                                |
+
+<br/>
+
+| <nowrap>Test method tag include filter</nowrap> |                                              |
+|-------------------------------------------------|----------------------------------------------|
+| Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_INCLUDE |
+| System property                                 | antublue.test.engine.test.method.tag.include |
+| Type                                            | regex string                                 |
+
+<br/>
+
+| <nowrap>Test method tag exclude filter</nowrap> |                                              |
+|-------------------------------------------------|----------------------------------------------|
+| Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_EXCLUDE |
+| System property                                 | antublue.test.engine.test.method.tag.exclude |
+| Type                                            | regex string                                 |
+
+Using a combination of the properties (or environment variables) allows for including / excluding individual test classes / test methods
+
+## Experimental Configuration
+
+The Test Engine as two experimental configuration parameters
+
+
+| <nowrap>Output console TEST messages</nowrap> |                                                     |
+|-----------------------------------------------|-----------------------------------------------------|
+| Environment variable                          | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_TEST_MESSAGES |
+| System property                               | antublue.test.engine.experimental.log.test.messages |
+| Type                                          | boolean                                             |
+| Default                                       | true                                                |
+
+<br/>
+
+| <nowrap>Output console PASS messages</nowrap> |                                                     |
+|-----------------------------------------------|-----------------------------------------------------|
+| Environment variable                          | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_PASS_MESSAGES |
+| System property                               | antublue.test.engine.experimental.log.pass.messages |
+| Type                                          | boolean                                             |
+| Default                                       | true                                                |
+
+<br/>
+
+**Notes**
+
+- Environment variables take precedence over Java system properties
+
+
+- If all test methods are excluded, then the test class will be excluded
+
+
+- If no test classes are found, an error exit code of -2 is returned
+
+
+- Experimental configuration values are subject to change at any time
+
+
+## Maven Configuration
 
 Disable the Maven Surefire plugin...
 
@@ -297,7 +376,7 @@ Add the Test Engine jars (and dependencies)...
 
 **Notes**
 
-- The `test-engine-api`, `test-engine`, and `test-engine-maven-plugin` versions must match starting with 3.0.1
+- The `test-engine-api`, `test-engine`, and `test-engine-maven-plugin` versions must match
 
 Build and test your project...
 
@@ -309,9 +388,57 @@ mvn clean package integration-test
 
 - The Test Engine requires core JUnit 5 jars as dependencies
 
+# Building
+
+You need Java 8 or greater to build
+
+```shell
+git clone https://github.com/antublue/test-engine
+cd test-engine
+./build.sh
+```
+
+To install to your local repository
+
+```shell
+./build
+mvn install
+```
+
+## Known issues
+
+IntelliJ doesn't properly handle all possible test selection scenarios from the Test Run window.
+
+- https://youtrack.jetbrains.com/issue/IDEA-317561/IntelliJ-test-method-selections-fails-for-hierarchical-test-in-test-output-window
+
+## Getting Help
+
+GitHub's Discussions is the current mechanism for help / support
+
+## Contributing
+
+Contributions to the Test Engine are both welcomed and appreciated.
+
+The project uses a simplified GitFlow branching strategy
+
+- `main` is the latest release
+- `development-<NEXT RELEASE>` is the next release
+
+For changes, you should...
+- Create a branch based on `development-<NEXT RELEASE>`
+- Make your changes
+- Open a PR against `development-<NEXT RELEASE>`
+
+**Notes**
+
+- Snapshots are not used
+
+
+- The goal of the `development-<NEXT RELEASE>` branch is to be buildable/deployable as the next release
+
 ## Design
 
-State Machine flow...
+The test execution flow...
 
 ```
  Scan all classpath jars for test classes that contains a method annotated with "@TestEngine.Test"
@@ -356,50 +483,3 @@ State Machine flow...
 - Each parameterized test class will be executed sequentially, but different test classes are executed in parallel threads
   - By default, thread count is equal to number of available processors as reported by Java
   - The thread count can be changed by the Java system property or environment variable
-
-# Building
-
-You need Java 8 or greater to build
-
-```shell
-git clone https://github.com/antublue/test-engine
-cd test-engine
-mvn clean package
-```
-
-To install to your local repository
-
-```shell
-mvn clean package install
-```
-
-## Known issues
-
-IntelliJ doesn't properly handle all possible test selection scenarios from the Test Run window.
-
-- https://youtrack.jetbrains.com/issue/IDEA-317561/IntelliJ-test-method-selections-fails-for-hierarchical-test-in-test-output-window
-
-## Getting Help
-
-GitHub's Discussions is the current mechanism for help / support
-
-## Contributing
-
-Contributions to the Test Engine are both welcomed and appreciated.
-
-The project uses a simplified GitFlow branching strategy
-
-- `main` is the latest release
-- `development-<NEXT RELEASE>` is the next release
-
-For changes, you should...
-- Create a branch based on `development-<NEXT RELEASE>`
-- Make your changes
-- Open a PR against `development-<NEXT RELEASE>`
-
-**Notes**
-
-- Snapshots are not used
-
-
-- The goal of the `development-<NEXT RELEASE>` branch is to be buildable/deployable as the next release
