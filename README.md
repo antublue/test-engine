@@ -30,17 +30,17 @@ The JUnit team is working on the functionality, but appears to be designed for a
 
 ## Common Annotations
 
-| Annotation                      | Scope             | Required     | Static | Example                                                                          |
-|---------------------------------|-------------------|--------------|--------|----------------------------------------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | method            | yes          | yes    | `public static Stream<Parameter> parameters();`                                  |
-| `@TestEngine.Parameter`         | field<br/> method | yes (either) | no     | `public Parameter parameter;`<br/> `public void parameter(Parameter parameter);` |
-| `@TestEngine.BeforeClass`       | method            | no           | yes    | `public static void beforeClass();`                                              |
-| `@TestEngine.BeforeAll`         | method            | no           | no     | `public void beforeAll();`                                                       |
-| `@TestEngine.BeforeEach`        | method            | no           | no     | `public void beforeEach();`                                                      |
-| `@TestEngine.Test`              | method            | yes          | no     | `public void test();`                                                            |
-| `@TestEngine.AfterEach`         | method            | no           | no     | `public void afterEach();`                                                       |
-| `@TestEngine.AfterAll`          | method            | no           | no     | `public void afterAll();`                                                        |
-| `@TestEngine.AfterClass`        | method            | no           | yes    | `public static void afterClass();`                                               |
+| Annotation                      | Scope             | Required                               | Static | Example                                                                          |
+|---------------------------------|-------------------|----------------------------------------|--------|----------------------------------------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | method            | yes                                    | yes    | <nobr>`public static Stream<Parameter> parameters();`</nobr>                     |
+| `@TestEngine.Parameter`         | field<br/> method | yes <br/><nobr>(either or both)</nobr> | no     | `public Parameter parameter;`<br/> `public void parameter(Parameter parameter);` |
+| `@TestEngine.BeforeClass`       | method            | no                                     | yes    | `public static void beforeClass();`                                              |
+| `@TestEngine.BeforeAll`         | method            | no                                     | no     | `public void beforeAll();`                                                       |
+| `@TestEngine.BeforeEach`        | method            | no                                     | no     | `public void beforeEach();`                                                      |
+| `@TestEngine.Test`              | method            | yes                                    | no     | `public void test();`                                                            |
+| `@TestEngine.AfterEach`         | method            | no                                     | no     | `public void afterEach();`                                                       |
+| `@TestEngine.AfterAll`          | method            | no                                     | no     | `public void afterAll();`                                                        |
+| `@TestEngine.AfterClass`        | method            | no                                     | yes    | `public static void afterClass();`                                               |
 
 **Notes**
 
@@ -205,7 +205,7 @@ The Test Engine has seven configuration parameters
 
 <br/>
 
-| <nowrap>Test class name include filter</nowrap> |                                         |
+| <nobr>Test class name include filter</nobr> |                                         |
 |-------------------------------------------------|-----------------------------------------|
 | Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE |
 | System property                                 | antublue.test.engine.test.class.include |
@@ -213,7 +213,7 @@ The Test Engine has seven configuration parameters
 
 <br/>
 
-| <nowrap>Test class name exclude filter</nowrap> |                                         |
+| <nobr>Test class name exclude filter</nobr> |                                         |
 |-------------------------------------------------|-----------------------------------------|
 | Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE |
 | System property                                 | antublue.test.engine.test.class.exclude |
@@ -221,7 +221,7 @@ The Test Engine has seven configuration parameters
 
 <br/>
 
-| <nowrap>Test method name include filter</nowrap> |                                          |
+| <nobr>Test method name include filter</nobr> |                                          |
 |--------------------------------------------------|------------------------------------------|
 | Environment variable                             | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE |
 | System property                                  | antublue.test.engine.test.method.include |
@@ -229,7 +229,7 @@ The Test Engine has seven configuration parameters
 
 <br/>
 
-| <nowrap>Test method name exclude filter</nowrap> |                                          |
+| <nobr>Test method name exclude filter</nobr> |                                          |
 |--------------------------------------------------|------------------------------------------|
 | Environment variable                             | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE |
 | System property                                  | antublue.test.engine.test.method.exclude |
@@ -238,7 +238,7 @@ The Test Engine has seven configuration parameters
 <br/>
 
 
-| <nowrap>Test class tag include filter</nowrap> |                                             |
+| <nobr>Test class tag include filter</nobr> |                                             |
 |------------------------------------------------|---------------------------------------------|
 | Environment variable                           | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE |
 | System property                                | antublue.test.engine.test.class.tag.include |
@@ -246,7 +246,7 @@ The Test Engine has seven configuration parameters
 
 <br/>
 
-| <nowrap>Test class tag exclude filter</nowrap> |                                             |
+| <nobr>Test class tag exclude filter</nobr> |                                             |
 |------------------------------------------------|---------------------------------------------|
 | Environment variable                           | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE |
 | System property                                | antublue.test.engine.test.class.tag.exclude |
@@ -254,7 +254,7 @@ The Test Engine has seven configuration parameters
 
 <br/>
 
-| <nowrap>Test method tag include filter</nowrap> |                                              |
+| <nobr>Test method tag include filter</nobr> |                                              |
 |-------------------------------------------------|----------------------------------------------|
 | Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_INCLUDE |
 | System property                                 | antublue.test.engine.test.method.tag.include |
@@ -262,7 +262,7 @@ The Test Engine has seven configuration parameters
 
 <br/>
 
-| <nowrap>Test method tag exclude filter</nowrap> |                                              |
+| <nobr>Test method tag exclude filter</nobr> |                                              |
 |-------------------------------------------------|----------------------------------------------|
 | Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_EXCLUDE |
 | System property                                 | antublue.test.engine.test.method.tag.exclude |
@@ -275,7 +275,7 @@ Using a combination of the properties (or environment variables) allows for incl
 The Test Engine as two experimental configuration parameters
 
 
-| <nowrap>Output console TEST messages</nowrap> |                                                     |
+| <nobr>Output console TEST messages</nobr> |                                                     |
 |-----------------------------------------------|-----------------------------------------------------|
 | Environment variable                          | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_TEST_MESSAGES |
 | System property                               | antublue.test.engine.experimental.log.test.messages |
@@ -284,7 +284,7 @@ The Test Engine as two experimental configuration parameters
 
 <br/>
 
-| <nowrap>Output console PASS messages</nowrap> |                                                     |
+| <nobr>Output console PASS messages</nobr> |                                                     |
 |-----------------------------------------------|-----------------------------------------------------|
 | Environment variable                          | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_PASS_MESSAGES |
 | System property                               | antublue.test.engine.experimental.log.pass.messages |
