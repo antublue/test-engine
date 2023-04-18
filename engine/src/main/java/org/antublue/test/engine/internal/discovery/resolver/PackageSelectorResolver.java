@@ -63,7 +63,7 @@ public class PackageSelectorResolver {
      * @param engineDescriptor
      */
     public void resolve(PackageSelector packageSelector, EngineDescriptor engineDescriptor) {
-        LOGGER.trace(String.format("resolve [%s]", packageSelector.getPackageName()));
+        LOGGER.trace("resolve [%s]", packageSelector.getPackageName());
 
         UniqueId uniqueId = engineDescriptor.getUniqueId();
         String packageName = packageSelector.getPackageName();
@@ -72,7 +72,7 @@ public class PackageSelectorResolver {
         classes.sort(Comparator.comparing(Class::getName));
 
         for (Class<?> clazz : classes) {
-            LOGGER.trace(String.format("  class [%s]", clazz.getName()));
+            LOGGER.trace("  class [%s]", clazz.getName());
 
             uniqueId = uniqueId.append("class", clazz.getName());
 

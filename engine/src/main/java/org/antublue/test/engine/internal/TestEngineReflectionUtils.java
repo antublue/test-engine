@@ -60,8 +60,6 @@ public final class TestEngineReflectionUtils {
     private static final Map<Class<?>, List<Method>> afterEachMethodCache;
     private static final Map<Class<?>, List<Method>> afterAllMethodCache;
     private static final Map<Class<?>, List<Method>> afterClassMethodCache;
-    //private static final Map<Class<?>, String> classDisplayNameCache;
-    //private static final Map<Method, String> methodDisplayNameCache;
 
     static {
         parameterSupplierMethodCache = new HashMap<>();
@@ -74,8 +72,6 @@ public final class TestEngineReflectionUtils {
         afterEachMethodCache = new HashMap<>();
         afterAllMethodCache = new HashMap<>();
         afterClassMethodCache = new HashMap<>();
-        //classDisplayNameCache = new HashMap<>();
-        //methodDisplayNameCache = new HashMap<>();
     }
 
     /**
@@ -105,14 +101,14 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a List of @TestEngine.Parameter fields
+     * Method to get a List of @TestEngine.Parameter Fields
      *
      * @param clazz
      * @return
      */
     public static List<Field> getParameterFields(Class<?> clazz) {
         synchronized (parameterFieldCache) {
-            LOGGER.trace(String.format("getParameterFields(%s)", clazz.getName()));
+            LOGGER.trace("getParameterFields(%s)", clazz.getName());
 
             if (parameterFieldCache.containsKey(clazz)) {
                 return parameterFieldCache.get(clazz);
@@ -133,7 +129,7 @@ public final class TestEngineReflectionUtils {
      */
     public static List<Method> getBeforeClassMethods(Class<?> clazz) {
         synchronized (beforeClassMethodCache) {
-            LOGGER.trace(String.format("getBeforeClassMethods(%s)", clazz.getName()));
+            LOGGER.trace("getBeforeClassMethods(%s)", clazz.getName());
 
             if (beforeClassMethodCache.containsKey(clazz)) {
                 return beforeClassMethodCache.get(clazz);
@@ -164,7 +160,7 @@ public final class TestEngineReflectionUtils {
     @SuppressWarnings("deprecation")
     public static List<Method> getParameterMethods(Class<?> clazz) {
         synchronized (parameterMethodCache) {
-            LOGGER.trace(String.format("getParameterMethods(%s)", clazz.getName()));
+            LOGGER.trace("getParameterMethods(%s)", clazz.getName());
 
             if (parameterMethodCache.containsKey(clazz)) {
                 return parameterMethodCache.get(clazz);
@@ -250,7 +246,7 @@ public final class TestEngineReflectionUtils {
      */
     public static List<Method> getTestMethods(Class<?> clazz) {
         synchronized (testMethodCache) {
-            LOGGER.trace(String.format("getTestMethods(%s)", clazz.getName()));
+            LOGGER.trace("getTestMethods(%s)", clazz.getName());
 
             if (testMethodCache.containsKey(clazz)) {
                 return testMethodCache.get(clazz);
@@ -371,7 +367,7 @@ public final class TestEngineReflectionUtils {
      */
     private static Method getParameterSupplierMethod(Class<?> clazz) {
         synchronized (parameterSupplierMethodCache) {
-            LOGGER.trace(String.format("getParameterSupplierMethod(%s)", clazz.getName()));
+            LOGGER.trace("getParameterSupplierMethod(%s)", clazz.getName());
 
             if (parameterSupplierMethodCache.containsKey(clazz)) {
                 return parameterSupplierMethodCache.get(clazz);

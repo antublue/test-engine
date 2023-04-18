@@ -23,7 +23,7 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 
 import java.util.Optional;
 
-public class ParameterTestDescriptor extends AbstractTestDescriptor {
+public final class ParameterTestDescriptor extends AbstractTestDescriptor {
 
     private final Class<?> testClass;
     private final Parameter testParameter;

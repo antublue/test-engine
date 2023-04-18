@@ -49,7 +49,7 @@ public class UniqueIdSelectorResolver {
      * @param engineDescriptor
      */
     public void resolve(UniqueIdSelector uniqueIdSelector, EngineDescriptor engineDescriptor) {
-        LOGGER.trace(String.format("resolve [%s]", uniqueIdSelector.getUniqueId()));
+        LOGGER.trace("resolve [%s]", uniqueIdSelector.getUniqueId());
 
         String className = null;
 
