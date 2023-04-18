@@ -41,7 +41,7 @@ import java.util.Set;
 /**
  * Class to collect metrics and output test execution status
  */
-@SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
+@SuppressWarnings({"unchecked", "PMD.AvoidDeeplyNestedIfStmts"})
 public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
 
     private static String BANNER =
@@ -113,7 +113,7 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
     /**
      * Method to indicate execution of a TestPlan as started
      *
-     * @param testPlan
+     * @param testPlan the TestPlan
      */
     @Override
     public void testPlanExecutionStarted(TestPlan testPlan) {
@@ -129,7 +129,7 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
     /**
      * Method to indicate execution of a TestIdentifier as started
      *
-     * @param testIdentifier
+     * @param testIdentifier the TestIdentifier
      */
     @Override
     public void executionStarted(TestIdentifier testIdentifier) {
@@ -203,8 +203,8 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
     /**
      * Method to indicate execution of a TestPlan as finished
      *
-     * @param testIdentifier
-     * @param testExecutionResult
+     * @param testIdentifier the TestIdentifier
+     * @param testExecutionResult the TestExecutionResult
      */
     @Override
     public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
@@ -295,7 +295,7 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
     /**
      * Method to indicate execution of a TestPlan as finished
      *
-     * @param testPlan
+     * @param testPlan the TestPlan
      */
     @Override
     public void testPlanExecutionFinished(TestPlan testPlan) {

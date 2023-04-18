@@ -428,16 +428,17 @@ The project uses a simplified GitFlow branching strategy
 - `development-<NEXT RELEASE>` is the next release
 
 For changes, you should...
+
 - Create a branch based on `development-<NEXT RELEASE>`
 - Make your changes
 - Open a PR against `development-<NEXT RELEASE>`
 
 **Notes**
 
+- Google checkstyle formatted code is required
+
+
 - Snapshots are not used
-
-
-- The goal of the `development-<NEXT RELEASE>` branch is to be buildable/deployable as the next release
 
 ## Design
 
@@ -487,4 +488,4 @@ The test execution flow...
 
 - Each parameterized test class will be executed sequentially in a thread, but different test classes are executed in parallel threads
   - By default, thread count is equal to number of available processors as reported by Java
-  - The thread count can be changed by the Java system property or environment variable
+  - The thread count can be changed via a configuration value
