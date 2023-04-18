@@ -42,7 +42,7 @@ import java.util.Set;
  * Class to collect metrics and output test execution status
  */
 @SuppressWarnings({"unchecked", "PMD.AvoidDeeplyNestedIfStmts"})
-public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
+public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingListener {
 
     private static String BANNER =
             "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
@@ -70,7 +70,7 @@ public class TestEngineTestExecutionListener extends SummaryGeneratingListener {
     /**
      * Constructor
      */
-    public TestEngineTestExecutionListener() {
+    public TestEngineConsoleTestExecutionListener() {
         this.testClasses = Collections.synchronizedSet(new HashSet());
 
         this.detailedOutput =

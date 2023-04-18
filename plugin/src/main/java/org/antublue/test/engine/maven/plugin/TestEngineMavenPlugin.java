@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.maven.plugin;
 
-import org.antublue.test.engine.internal.TestEngineTestExecutionListener;
+import org.antublue.test.engine.internal.TestEngineConsoleTestExecutionListener;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -134,7 +134,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
             LauncherConfig launcherConfig =
                     LauncherConfig.builder()
-                            .addTestExecutionListeners(new TestEngineTestExecutionListener())
+                            .addTestExecutionListeners(new TestEngineConsoleTestExecutionListener())
                             .build();
 
             LauncherDiscoveryRequest launcherDiscoveryRequest =
