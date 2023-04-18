@@ -268,7 +268,7 @@ The Test Engine has seven configuration parameters
 | System property                                 | antublue.test.engine.test.method.tag.exclude |
 | Type                                            | regex string                                 |
 
-Using a combination of the properties (or environment variables) allows for including / excluding individual test classes / test methods
+Using a combination of the system properties (and/or environment variables) allows for including / excluding individual test classes / test methods
 
 ## Experimental Configuration
 
