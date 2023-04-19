@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Example using Kafka and testcontainers-java
+ * Example using testcontainers-java and Apache Kafka
  */
 public class KafkaTest {
 
