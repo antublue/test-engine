@@ -41,16 +41,17 @@ import java.util.Set;
 /**
  * Class to collect metrics and output test execution status
  */
-@SuppressWarnings({"unchecked", "PMD.AvoidDeeplyNestedIfStmts"})
+@SuppressWarnings({"PMD.AvoidDeeplyNestedIfStmts"})
 public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingListener {
 
-    private static String BANNER =
+    private static final String BANNER =
             "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
 
     private static final String INFO =
             AnsiColor.WHITE_BRIGHT.apply("[")
             + AnsiColor.BLUE_BOLD.apply("INFO")
-            + AnsiColor.WHITE_BRIGHT.apply("]");
+            + AnsiColor.WHITE_BRIGHT.apply("]")
+            + " ";
 
     private static final String TEST = AnsiColor.WHITE_BRIGHT.apply("TEST");
     private static final String ABORT = AnsiColor.YELLOW_BOLD.apply("ABORT");
@@ -64,14 +65,13 @@ public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingLis
     private final boolean detailedOutput;
     private final boolean logTestMessages;
     private final boolean logPassMessages;
-    private long startTimeMilliseconds;
     private final Set<Class<?>> testClasses;
 
     /**
      * Constructor
      */
     public TestEngineConsoleTestExecutionListener() {
-        this.testClasses = Collections.synchronizedSet(new HashSet());
+        this.testClasses = Collections.synchronizedSet(new HashSet<>());
 
         this.detailedOutput =
                 TestEngineConfigurationParameters.getInstance()
@@ -119,11 +119,9 @@ public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingLis
     public void testPlanExecutionStarted(TestPlan testPlan) {
         super.testPlanExecutionStarted(testPlan);
 
-        startTimeMilliseconds = System.currentTimeMillis();
-
-        System.out.println(INFO + " " + SEPARATOR);
-        System.out.println(INFO + " " + BANNER);
-        System.out.println(INFO + " " + SEPARATOR);
+        System.out.println(INFO + SEPARATOR);
+        System.out.println(INFO + BANNER);
+        System.out.println(INFO + SEPARATOR);
     }
 
     /**
@@ -195,7 +193,7 @@ public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingLis
 
             if (detailedOutput && stringBuilder.length() > 0) {
                 //LOGGER.rawInfo(stringBuilder.toString());
-                System.out.println(INFO + " " + Thread.currentThread().getName() + " | " + stringBuilder);
+                System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
             }
         }
     }
@@ -286,7 +284,7 @@ public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingLis
                 }
 
                 if (detailedOutput && string != null) {
-                    System.out.println(INFO + " " + Thread.currentThread().getName() + " | " + string);
+                    System.out.println(INFO + Thread.currentThread().getName() + " | " + string);
                 }
             }
         }
@@ -301,38 +299,37 @@ public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingLis
     public void testPlanExecutionFinished(TestPlan testPlan) {
         super.testPlanExecutionFinished(testPlan);
 
-        long endTimeMilliseconds = System.currentTimeMillis();
         TestExecutionSummary testExecutionSummary = getSummary();
 
-        System.out.println(INFO + " " + SEPARATOR);
-        System.out.println(INFO + " " + BANNER + " Summary");
-        System.out.println(INFO + " " + SEPARATOR);
+        System.out.println(INFO + SEPARATOR);
+        System.out.println(INFO + BANNER + " Summary");
+        System.out.println(INFO + SEPARATOR);
+
         System.out.println(
                 INFO
-                + " "
                 + AnsiColor.WHITE_BRIGHT.apply("Test Classes")
                 + "    : "
                 + testClasses.size());
 
         System.out.println(
                 INFO
-                + " "
                 +  AnsiColor.WHITE_BRIGHT.apply("Test Executions")
                 + " : "
-                + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
+                + (testExecutionSummary.getTestsFoundCount())
                 + ", "
                 + AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED")
                 + " : "
-                + (testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount())
+                + (testExecutionSummary.getTestsSucceededCount())
                 + ", "
                 + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED")
                 + " : "
-                + (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount())
+                + (testExecutionSummary.getTestsFailedCount())
                 + ", "
                 + AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED")
                 + " : "
                 + testExecutionSummary.getTestsSkippedCount());
-        System.out.println(INFO + " " + SEPARATOR);
+
+        System.out.println(INFO + SEPARATOR);
 
         boolean failed =
                 testClasses.size() == 0
@@ -344,9 +341,13 @@ public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingLis
             System.out.println(INFO + " " + AnsiColor.GREEN_BOLD.apply("PASSED"));
         }
 
-        System.out.println(INFO + " " + SEPARATOR);
-        System.out.println(INFO + " " + "Total Test Time : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
-        System.out.println(INFO + " " + "Finished At     : " + HumanReadableTime.now());
-        System.out.println(INFO + " " + SEPARATOR);
+        long elapsedTime = testExecutionSummary.getTimeFinished() - testExecutionSummary.getTimeStarted();
+        System.out.println(INFO + String.format("elapsedTime [%d]", elapsedTime));
+
+        System.out.println(INFO + SEPARATOR);
+        System.out.println(INFO + "Total Test Time : "
+                + HumanReadableTime.toHumanReadable(elapsedTime, false));
+        System.out.println(INFO + "Finished At     : " + HumanReadableTime.now());
+        System.out.println(INFO + SEPARATOR);
     }
 }
