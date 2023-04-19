@@ -49,7 +49,7 @@ import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNa
  * Class to implement a Maven plugin to run the AntuBLUE Test Engine
  */
 @SuppressWarnings({"unused", "PMD.CloseResource" })
-@Mojo(name = "test", threadSafe = true, requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(name = "test", threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST)
 public class TestEngineMavenPlugin extends AbstractMojo {
 
     private static final String GROUP_ID = "org.antublue";
