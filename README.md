@@ -148,6 +148,10 @@ public class ParameterTest {
 }
 ```
 
+Real integration test example using `testcontainers-java` and Apache Kafka ...
+
+https://github.com/antublue/test-engine/blob/main/examples/src/test/java/example/testcontainers/KafkaTest.java
+
 Additional test examples...
 
 https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example

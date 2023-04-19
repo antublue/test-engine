@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Example using Kafka and testcontainers-java
+ * Example using testcontainers-java and Apache Kafka
  */
 public class KafkaTest {
 
@@ -60,8 +60,8 @@ public class KafkaTest {
     }
 
     @TestEngine.BeforeAll
-    public void createContainer() {
-        System.out.println("createContainer()");
+    public void createKafkaServer() {
+        System.out.println("createKafkaServer()");
         kafkaContainer = new KafkaContainer(DockerImageName.parse(parameter.value(String.class)));
         kafkaContainer.withNetwork(network);
         kafkaContainer.withEmbeddedZookeeper();
@@ -70,8 +70,13 @@ public class KafkaTest {
     }
 
     @TestEngine.Test
-    @TestEngine.Order(1)
-    public void produceTest() throws ExecutionException, InterruptedException {
+    public void produceConsumeTest() throws Throwable {
+        System.out.println("produceConsumeTest()");
+        produce();
+        consume();
+    }
+
+    private void produce() throws Throwable {
         message = randomString(16);
         System.out.println(String.format("produce message [%s]", message));
 
@@ -94,9 +99,7 @@ public class KafkaTest {
         }
     }
 
-    @TestEngine.Test
-    @TestEngine.Order(2)
-    public void consumeTest() {
+    private void consume() throws Throwable {
         String groupId = "test-group-id";
         String topic = "test";
 
@@ -129,8 +132,8 @@ public class KafkaTest {
     }
 
     @TestEngine.AfterAll
-    public void destroyContainer() {
-        System.out.println("destroyContainer()");
+    public void destroyKafkaServer() {
+        System.out.println("destroyKafkaServer()");
         if (kafkaContainer != null) {
             kafkaContainer.stop();
             kafkaContainer.close();
