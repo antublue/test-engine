@@ -74,41 +74,34 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
             List<String> classpathElements = mavenProject.getCompileClasspathElements();
             for (String classpathElement : classpathElements) {
-                Path path = new File(classpathElement).toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(new File(classpathElement).toPath());
             }
 
             classpathElements = mavenProject.getRuntimeClasspathElements();
             for (String classpathElement : classpathElements) {
-                Path path = new File(classpathElement).toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(new File(classpathElement).toPath());
             }
 
             classpathElements = mavenProject.getTestClasspathElements();
             for (String classpathElement : classpathElements) {
-                Path path = new File(classpathElement).toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(new File(classpathElement).toPath());
             }
 
             Artifact projectArtifact = mavenProject.getArtifact();
             if (projectArtifact != null) {
-                Path path = projectArtifact.getFile().toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(projectArtifact.getFile().toPath());
             }
 
             for (Artifact artifact : mavenProject.getArtifacts()) {
-                Path path = artifact.getFile().toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(artifact.getFile().toPath());
             }
 
             for (Artifact artifact : mavenProject.getDependencyArtifacts()) {
-                Path path = artifact.getFile().toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(artifact.getFile().toPath());
             }
 
             for (Artifact artifact : mavenProject.getAttachedArtifacts()) {
-                Path path = artifact.getFile().toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(artifact.getFile().toPath());
             }
 
             artifactPaths.forEach(path -> DEBUG("classpath entry [%s]", path));
