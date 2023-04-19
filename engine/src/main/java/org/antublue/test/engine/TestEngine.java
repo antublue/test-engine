@@ -17,11 +17,11 @@
 package org.antublue.test.engine;
 
 import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
-import org.antublue.test.engine.internal.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
 import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
 import org.antublue.test.engine.internal.TestEngineTestDescriptorStore;
+import org.antublue.test.engine.internal.discovery.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.EngineDiscoveryRequest;

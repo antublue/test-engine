@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal;
+package org.antublue.test.engine.internal.discovery;
 
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
+import org.antublue.test.engine.internal.TestEngineException;
+import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
