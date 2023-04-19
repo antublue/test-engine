@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -258,14 +257,10 @@ public final class TestEngineReflectionUtils {
                             TestEngine.Test.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            (Class<?>[]) null);
-
-            Iterator<Method> iterator = methods.iterator();
-            while (iterator.hasNext()) {
-                if (iterator.next().isAnnotationPresent(TestEngine.Disabled.class)) {
-                    iterator.remove();
-                }
-            }
+                            (Class<?>[]) null)
+                    .stream()
+                    .filter(method -> !method.isAnnotationPresent(TestEngine.Disabled.class))
+                    .collect(Collectors.toList());
 
             sortByOrderAnnotation(methods);
             methods = Collections.unmodifiableList(methods);
