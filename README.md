@@ -455,43 +455,43 @@ For changes, you should...
 The test execution flow...
 
 ```
- Scan all classpath jars for test classes that contains a method annotated with "@TestEngine.Test"
- 
- for (each test class in the Collection<Class>) {
- 
-    for each test class, create a thread
-    
-    thread {
-    
-        invoke the "@TestEngine.ParameterSupplier" method to get a Stream<Parameter>
-    
-        invoke "@TestEngine.BeforeClass" methods 
-     
-        create a single instance of the test class
-        
-        for (each Parameter in the Stream<Parameter>) {
-        
-            set all "@TestEngine.Parameter" fields to the Parameter object
-        
-            invoke all "@TestEngine.Parameter" methods with the Parameter object
-            
-            invoke all "@TestEngine.BeforeAll" methods
-            
-            for (each "@TestEngine.Test" method in the test class) {
-            
-                invoke all "@TestEngine.BeforeEach" methods
-            
-                invoke the "@TestEngine.Test" method
-                
-                invoke all "@TestEngine.AfterEach" methods
-            }
-            
-            invoke all "@TestEngine.AfterAll" method
-        }
-        
-        invoke all "@TestEngine.AfterClass" methods
-    }
- }
+Scan all classpath jars for test classes that contains a method annotated with "@TestEngine.Test"
+
+for (each test class in the Collection<Class<?>>) {
+
+  for each test class, create a thread (default thread count = machine processor count)
+  
+  thread {
+  
+      invoke the test class "@TestEngine.ParameterSupplier" method to get a Stream<Parameter>
+  
+      invoke the test class "@TestEngine.BeforeClass" methods 
+   
+      create a single instance of the test class
+      
+      for (each Parameter in the Stream<Parameter>) {
+      
+          set all test instance "@TestEngine.Parameter" fields to the Parameter object
+      
+          invoke all test instance "@TestEngine.Parameter" methods with the Parameter object
+          
+          invoke all test instance "@TestEngine.BeforeAll" methods
+          
+          for (each "@TestEngine.Test" method in the test class) {
+          
+              invoke all test instance "@TestEngine.BeforeEach" methods
+          
+              invoke the test instance "@TestEngine.Test" method
+              
+              invoke all test instance "@TestEngine.AfterEach" methods
+          }
+          
+          invoke all test instance "@TestEngine.AfterAll" methods
+      }
+      
+      invoke all test class "@TestEngine.AfterClass" methods
+  }
+}
 ```
 
 **Notes**
