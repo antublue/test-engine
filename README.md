@@ -52,6 +52,8 @@ Junit 4 does provide test class level parameterization via `@RunWith(Parameteriz
 | `@TestEngine.AfterAll`          | method            | no                                     | no     | `public void afterAll();`                                                        |
 | `@TestEngine.AfterClass`        | method            | no                                     | yes    | `public static void afterClass();`                                               |
 
+Reference the [Design](https://github.com/antublue/test-engine#design) for the state machine flow
+
 **Notes**
 
 - `public` and `protected` methods are supported for `@TestEngine.X` annotations
