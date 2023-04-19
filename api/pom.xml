@@ -7,7 +7,7 @@
 
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <packaging>jar</packaging>
     <name>AntuBLUE Test Engine API</name>
 
@@ -193,6 +193,46 @@
                                 </relocation>
                             </relocations>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.20.0</version>
+                <configuration>
+                    <linkXRef>false</linkXRef>
+                    <format>txt</format>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pmd-scan</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.2.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>10.9.3</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <configLocation>checkstyle/google_checks.xml</configLocation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

@@ -45,8 +45,8 @@ public final class HumanReadableTime {
 
         long hours = TimeUnit.MILLISECONDS.toHours(durationPositive);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(durationPositive) - (hours * 60);
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(durationPositive) - ((hours * 60 * 60) + (minutes * 60));
-        long milliseconds = durationPositive - ((hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(durationPositive) - (hours * 60 * 60) + (minutes * 60);
+        long milliseconds = durationPositive - (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
 
         StringBuilder stringBuilder = new StringBuilder();
 

@@ -62,7 +62,7 @@ public class MethodSelectorResolver {
      * @param engineDescriptor
      */
     public void resolve(MethodSelector methodSelector, EngineDescriptor engineDescriptor) {
-        LOGGER.trace(String.format("resolve [%s]", methodSelector.getJavaMethod().getName()));
+        LOGGER.trace("resolve [%s]", methodSelector.getJavaMethod().getName());
 
         UniqueId uniqueId = engineDescriptor.getUniqueId();
         Class<?> clazz = methodSelector.getJavaClass();
@@ -70,7 +70,7 @@ public class MethodSelectorResolver {
         uniqueId = uniqueId.append("class", clazz.getName());
 
         ClassTestDescriptor testEngineClassTestDescriptor =
-                TestDescriptorFactory.creaateClassTestDescriptor(
+                TestDescriptorFactory.createClassTestDescriptor(
                         uniqueId,
                         clazz);
 

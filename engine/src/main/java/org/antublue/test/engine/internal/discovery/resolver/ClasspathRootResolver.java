@@ -64,7 +64,7 @@ public class ClasspathRootResolver {
      * @param engineDescriptor
      */
     public void resolve(ClasspathRootSelector classpathRootSelector, EngineDescriptor engineDescriptor) {
-        LOGGER.trace(String.format("resolve [%s]", classpathRootSelector));
+        LOGGER.trace("resolve [%s]", classpathRootSelector);
 
         UniqueId uniqueId = engineDescriptor.getUniqueId();
         URI uri = classpathRootSelector.getClasspathRoot();
@@ -76,12 +76,12 @@ public class ClasspathRootResolver {
         classes.sort(Comparator.comparing(Class::getName));
 
         for (Class<?> clazz : classes) {
-            LOGGER.trace(String.format("  class [%s]", clazz.getName()));
+            LOGGER.trace("  class [%s]", clazz.getName());
 
             uniqueId = uniqueId.append("class", clazz.getName());
 
             ClassTestDescriptor testEngineClassTestDescriptor =
-                    TestDescriptorFactory.creaateClassTestDescriptor(
+                    TestDescriptorFactory.createClassTestDescriptor(
                             uniqueId,
                             clazz);
 

@@ -25,7 +25,6 @@ import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestDescriptorFactory;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.Cast;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.UniqueIdSelector;
@@ -33,7 +32,7 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Class to resolve a UniqueIdSelector
@@ -49,7 +48,7 @@ public class UniqueIdSelectorResolver {
      * @param engineDescriptor
      */
     public void resolve(UniqueIdSelector uniqueIdSelector, EngineDescriptor engineDescriptor) {
-        LOGGER.trace(String.format("resolve [%s]", uniqueIdSelector.getUniqueId()));
+        LOGGER.trace("resolve [%s]", uniqueIdSelector.getUniqueId());
 
         String className = null;
 
@@ -69,32 +68,27 @@ public class UniqueIdSelectorResolver {
 
                 Class<?> clazz = Class.forName(className);
 
-                ClassTestDescriptor classTestDescriptor;
-                Optional<? extends TestDescriptor> optionalTestDescriptor = engineDescriptor.findByUniqueId(classUniqueId);
-                if (optionalTestDescriptor.isPresent()) {
-                    classTestDescriptor = Cast.cast(optionalTestDescriptor.get());
-                } else {
-                    classTestDescriptor =
-                            TestDescriptorFactory.creaateClassTestDescriptor(
-                                    classUniqueId,
-                                    clazz);
-                }
+                ClassTestDescriptor classTestDescriptor =
+                        engineDescriptor
+                                .findByUniqueId(classUniqueId)
+                                .map((Function<TestDescriptor, ClassTestDescriptor>) testDescriptor ->
+                                        (ClassTestDescriptor) testDescriptor)
+                                .orElseGet(() ->
+                                        TestDescriptorFactory.createClassTestDescriptor(classUniqueId, clazz));
 
                 List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
                 Parameter parameter = parameters.get(Integer.parseInt(segment.getValue()));
 
-                ParameterTestDescriptor parameterTestDescriptor;
-
-                optionalTestDescriptor = classTestDescriptor.findByUniqueId(selectorUniqueId);
-                if (optionalTestDescriptor.isPresent()) {
-                    parameterTestDescriptor = Cast.cast(optionalTestDescriptor.get());
-                } else {
-                    parameterTestDescriptor =
-                            TestDescriptorFactory.createParameterTestDescriptor(
-                                    selectorUniqueId,
-                                    clazz,
-                                    parameter);
-                }
+                ParameterTestDescriptor parameterTestDescriptor =
+                        classTestDescriptor
+                                .findByUniqueId(selectorUniqueId)
+                                .map((Function<TestDescriptor, ParameterTestDescriptor>) testDescriptor ->
+                                        (ParameterTestDescriptor) testDescriptor)
+                                .orElseGet(() ->
+                                        TestDescriptorFactory.createParameterTestDescriptor(
+                                                selectorUniqueId,
+                                                clazz,
+                                                parameter));
 
                 List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
                 for (Method method : methods) {
@@ -118,16 +112,16 @@ public class UniqueIdSelectorResolver {
 
                 Class<?> clazz = Class.forName(className);
 
-                ClassTestDescriptor classTestDescriptor;
-                Optional<? extends TestDescriptor> optionalTestDescriptor = engineDescriptor.findByUniqueId(selectorUniqueId);
-                if (optionalTestDescriptor.isPresent()) {
-                    classTestDescriptor = Cast.cast(optionalTestDescriptor.get());
-                } else {
-                    classTestDescriptor =
-                            TestDescriptorFactory.creaateClassTestDescriptor(
-                                    selectorUniqueId,
-                                    clazz);
-                }
+                ClassTestDescriptor classTestDescriptor =
+                        engineDescriptor
+                                .findByUniqueId(selectorUniqueId)
+                                .map((Function<TestDescriptor, ClassTestDescriptor>) testDescriptor ->
+                                        (ClassTestDescriptor) testDescriptor)
+                                .orElseGet(() ->
+                                        TestDescriptorFactory.createClassTestDescriptor(
+                                        selectorUniqueId,
+                                        clazz));
+
 
                 List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
                 for (int i = 0; i < parameters.size(); i++) {

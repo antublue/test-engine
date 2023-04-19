@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal;
+package org.antublue.test.engine.internal.discovery;
 
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
+import org.antublue.test.engine.internal.TestEngineException;
+import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
@@ -102,7 +105,7 @@ public class TestEngineDiscoveryRequestResolver {
                 TestEngineConfigurationParameters.getInstance()
                         .get(TestEngineConstants.TEST_CLASS_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_CLASS_INCLUDE, value));
+                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_INCLUDE, value);
                             return value;
                         })
                         .map(TestClassPredicate::of)
@@ -112,7 +115,7 @@ public class TestEngineDiscoveryRequestResolver {
                 TestEngineConfigurationParameters.getInstance()
                         .get(TestEngineConstants.TEST_CLASS_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_CLASS_EXCLUDE, value));
+                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_EXCLUDE, value);
                             return value;
                         })
                         .map(TestClassPredicate::of)
@@ -122,7 +125,7 @@ public class TestEngineDiscoveryRequestResolver {
                 TestEngineConfigurationParameters.getInstance()
                         .get(TestEngineConstants.TEST_METHOD_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_METHOD_INCLUDE, value));
+                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_INCLUDE, value);
                             return value;
                         })
                         .map(TestMethodPredicate::of)
@@ -132,7 +135,7 @@ public class TestEngineDiscoveryRequestResolver {
                 TestEngineConfigurationParameters.getInstance()
                         .get(TestEngineConstants.TEST_METHOD_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_METHOD_EXCLUDE, value));
+                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_EXCLUDE, value);
                             return value;
                         })
                         .map(TestMethodPredicate::of)
@@ -142,7 +145,7 @@ public class TestEngineDiscoveryRequestResolver {
                 TestEngineConfigurationParameters.getInstance()
                         .get(TestEngineConstants.TEST_CLASS_TAG_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_CLASS_TAG_INCLUDE, value));
+                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_TAG_INCLUDE, value);
                             return value;
                         })
                         .map(TestClassTagPredicate::of)
@@ -152,7 +155,7 @@ public class TestEngineDiscoveryRequestResolver {
                 TestEngineConfigurationParameters.getInstance()
                         .get(TestEngineConstants.TEST_CLASS_TAG_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_CLASS_TAG_EXCLUDE, value));
+                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_TAG_EXCLUDE, value);
                             return value;
                         })
                         .map(TestClassTagPredicate::of)
@@ -162,7 +165,7 @@ public class TestEngineDiscoveryRequestResolver {
                 TestEngineConfigurationParameters.getInstance()
                         .get(TestEngineConstants.TEST_METHOD_TAG_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_METHOD_TAG_INCLUDE, value));
+                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_TAG_INCLUDE, value);
                             return value;
                         })
                         .map(TestMethodTagPredicate::of)
@@ -172,7 +175,7 @@ public class TestEngineDiscoveryRequestResolver {
                 TestEngineConfigurationParameters.getInstance()
                         .get(TestEngineConstants.TEST_METHOD_TAG_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace(String.format("%s [%s]", TestEngineConstants.TEST_METHOD_TAG_EXCLUDE, value));
+                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_TAG_EXCLUDE, value);
                             return value;
                         })
                         .map(TestMethodTagPredicate::of)

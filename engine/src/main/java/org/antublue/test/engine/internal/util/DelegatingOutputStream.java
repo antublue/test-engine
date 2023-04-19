@@ -49,7 +49,7 @@ public class DelegatingOutputStream extends OutputStream {
         outputStream.write(b);
         synchronized (fileOutputStream) {
             fileOutputStream.write(b);
-            fileOutputStream.flush();;
+            fileOutputStream.flush();
         }
     }
 }

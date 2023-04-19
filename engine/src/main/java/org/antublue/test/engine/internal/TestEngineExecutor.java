@@ -152,7 +152,9 @@ public class TestEngineExecutor {
                 }
             } else {
                 // Only one test class, run in the main thread
-                execute((ClassTestDescriptor) rootTestDescriptor.getChildren().stream().findFirst().get(), testEngineExecutionContext, countDownLatch);
+                execute((ClassTestDescriptor) rootTestDescriptor.getChildren().stream().findFirst().get(),
+                        testEngineExecutionContext,
+                        countDownLatch);
                 flush();
             }
         }
@@ -180,10 +182,15 @@ public class TestEngineExecutor {
 
         try {
             Class<?> testClass = testEngineClassTestDescriptor.getTestClass();
+            String testClassName = testClass.getName();
 
-            LOGGER.trace("executing @TestEngine.BeforeClass methods...");
+            LOGGER.trace("invoking [%s] @TestEngine.BeforeClass methods ...", testClassName);
             for (Method beforeClass : TestEngineReflectionUtils.getBeforeClassMethods(testClass)) {
-                LOGGER.trace(String.format("@TestEngine.BeforeClass method [%s]", beforeClass.getName()));
+                LOGGER.trace(
+                        String.format(
+                                "invoking [%s] @TestEngine.BeforeClass method [%s] ...",
+                                testClassName,
+                                beforeClass.getName()));
                 beforeClass.invoke(null, (Object[]) null);
                 flush();
             }
@@ -204,9 +211,13 @@ public class TestEngineExecutor {
             // Remove the test instance to allow garbage collection
             testEngineExecutionContext.setTestInstance(null);
 
-            LOGGER.trace("executing @TestEngine.AfterClass methods...");
+            LOGGER.trace("invoking [%s] @TestEngine.AfterClass methods ...", testClassName);
             for (Method afterClassMethod : TestEngineReflectionUtils.getAfterClassMethods(testClass)) {
-                LOGGER.trace(String.format("@TestEngine.AfterClass method [%s]", afterClassMethod.getName()));
+                LOGGER.trace(
+                        String.format(
+                                "invoking [%s] @TestEngine.AfterClass method [%s] ...",
+                                testClassName,
+                                afterClassMethod.getName()));
                 afterClassMethod.invoke(null, (Object[]) null);
                 flush();
             }
@@ -246,31 +257,43 @@ public class TestEngineExecutor {
 
         testEngineExecutionContext.getEngineExecutionListener().executionStarted(testEngineParameterTestDescriptor);
 
-        List<TestExecutionResult> testExecutionResultList = testEngineParameterTestDescriptor.getTestExecutionResultList();
+        List<TestExecutionResult> testExecutionResultList =
+                testEngineParameterTestDescriptor.getTestExecutionResultList();
+
         testExecutionResultList.clear();
 
         Class<?> testClass = testEngineParameterTestDescriptor.getTestClass();
+        String testClassName = testClass.getName();
         Object testInstance = testEngineExecutionContext.getTestInstance();
         Object testParameter = testEngineParameterTestDescriptor.getTestParameter();
 
         try {
-            LOGGER.trace("injecting @TestEngine.Parameter field...");
+            LOGGER.trace("injecting [%s] @TestEngine.Parameter fields ...", testClassName);
             Collection<Field> testParameterFields = TestEngineReflectionUtils.getParameterFields(testClass);
             for (Field testParameterField : testParameterFields) {
-                LOGGER.trace("  field [%s]", testParameterField.getName());
+                LOGGER.trace(
+                        "injecting [%s] @TestEngine.Parameter field [%s] ...",
+                        testClassName,
+                        testParameterField.getName());
                 testParameterField.set(testInstance, testParameter);
             }
 
-            LOGGER.trace("executing @TestEngine.Parameter method...");
+            LOGGER.trace("invoking [%s] @TestEngine.Parameter methods ...", testClassName);
             Collection<Method> testParameterMethods = TestEngineReflectionUtils.getParameterMethods(testClass);
             for (Method testParameterMethod : testParameterMethods) {
-                LOGGER.trace("  method [%s]", testParameterMethod.getName());
+                LOGGER.trace(
+                        "invoking [%s] @TestEngine.Parameter method [%s] ...",
+                        testClassName,
+                        testParameterMethod.getName());
                 testParameterMethod.invoke(testInstance, testParameter);
             }
 
-            LOGGER.trace("executing @TestEngine.BeforeAll methods...");
+            LOGGER.trace("invoking [%s] @TestEngine.BeforeAll methods ...", testClassName);
             for (Method beforeAllMethod : TestEngineReflectionUtils.getBeforeAllMethods(testClass)) {
-                LOGGER.trace(String.format("@TestEngine.BeforeAll method [%s]", beforeAllMethod.getName()));
+                LOGGER.trace(
+                        "invoking [%s] @TestEngine.BeforeAll method [%s] ...",
+                        testClassName,
+                        beforeAllMethod.getName());
                 beforeAllMethod.invoke(testInstance, (Object[]) null);
                 flush();
             }
@@ -295,15 +318,19 @@ public class TestEngineExecutor {
             Set<? extends TestDescriptor> children = testEngineParameterTestDescriptor.getChildren();
             for (TestDescriptor testDescriptor : children) {
                 if (testDescriptor instanceof MethodTestDescriptor) {
-                    testEngineExecutionContext.getEngineExecutionListener().executionSkipped(testDescriptor, "@TestEngine.BeforeAll method exception");
+                    testEngineExecutionContext.getEngineExecutionListener().executionSkipped(
+                            testDescriptor, "@TestEngine.BeforeAll method exception");
                 }
             }
         }
 
         try {
-            LOGGER.trace("executing @TestEngine.AfterAll methods...");
+            LOGGER.trace("invoking [%s] @TestEngine.AfterAll methods ...", testClassName);
             for (Method afterAllMethod : TestEngineReflectionUtils.getAfterAllMethods(testClass)) {
-                LOGGER.trace(String.format("@TestEngine.AfterAll method [%s]", afterAllMethod.getName()));
+                LOGGER.trace(
+                        "invoking [%s] @TestEngine.AfterAll method [%s] ...",
+                        testClassName,
+                        afterAllMethod.getName());
                 afterAllMethod.invoke(testInstance, (Object[]) null);
                 flush();
             }
@@ -343,12 +370,16 @@ public class TestEngineExecutor {
         testExecutionResultList.clear();
 
         Class<?> testClass = methodTestDescriptor.getTestClass();
+        String testClassName = testClass.getName();
         Object testInstance = testEngineExecutionContext.getTestInstance();
 
         try {
-            LOGGER.trace("executing @TestEngine.BeforeEach methods...");
+            LOGGER.trace("invoking [%s] @TestEngine.BeforeEach methods ...", testClassName);
             for (Method beforeEachMethod : TestEngineReflectionUtils.getBeforeEachMethods(testClass)) {
-                LOGGER.trace(String.format("@TestEngine.BeforeEach method [%s]", beforeEachMethod.getName()));
+                LOGGER.trace(
+                        "invoking [%s] @TestEngine.BeforeEach method [%s] ...",
+                        testClassName,
+                        beforeEachMethod.getName());
                 beforeEachMethod.invoke(testInstance, (Object[]) null);
                 flush();
             }
@@ -361,9 +392,8 @@ public class TestEngineExecutor {
         }
 
         try {
-            LOGGER.trace("executing @TestEngine.Test methods");
             Method testMethod = methodTestDescriptor.getTestMethod();
-            LOGGER.trace(String.format("@TestEngine.Test method [%s]", testMethod.getName()));
+            LOGGER.trace("invoking [%s] @TestEngine.Test method [%s] ...", testClassName, testMethod.getName());
             testMethod.invoke(testInstance, (Object[]) null);
             flush();
         } catch (Throwable t) {
@@ -375,9 +405,12 @@ public class TestEngineExecutor {
         }
 
         try {
-            LOGGER.trace("executing @TestEngine.AfterEach methods...");
+            LOGGER.trace("invoking [%s] @TestEngine.AfterEach methods ...", testClassName);
             for (Method afterEachMethod : TestEngineReflectionUtils.getAfterEachMethods(testClass)) {
-                LOGGER.trace(String.format("@TestEngine.AfterEach method [%s]", afterEachMethod.getName()));
+                LOGGER.trace(
+                        "invoking [%s] @TestEngine.AfterEach method [%s] ...",
+                        testClassName,
+                        afterEachMethod.getName());
                 afterEachMethod.invoke(testInstance, (Object[]) null);
                 flush();
             }
@@ -409,7 +442,7 @@ public class TestEngineExecutor {
      */
     private void printTestHierarchy(TestDescriptor testDescriptor, int indent) {
         if (indent == 0) {
-            LOGGER.trace("Test class hierarchy...");
+            LOGGER.trace("Test class hierarchy ...");
         }
 
         StringBuilder stringBuilder = new StringBuilder();

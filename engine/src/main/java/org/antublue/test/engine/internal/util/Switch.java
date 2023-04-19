@@ -56,7 +56,7 @@ public final class Switch {
      * @param <T>
      */
     public static <T> Consumer<T> switchCase(Class<T> clazz, Consumer<T> consumer) {
-        if ((clazz != null) && (consumer != null)){
+        if (clazz != null && consumer != null) {
             return object -> Optional.ofNullable(object).filter(clazz::isInstance).map(clazz::cast).ifPresent(consumer);
         } else {
             return null;

@@ -7,7 +7,7 @@
 
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <packaging>jar</packaging>
     <name>AntuBLUE Test Engine Core</name>
 
@@ -180,17 +180,9 @@
                                         <exclude>META-INF/**</exclude>
                                     </excludes>
                                 </filter>
-                                <filter>
-                                    <artifact>org.hamcrest:hamcrest</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/**</exclude>
-                                    </excludes>
-                                </filter>
                             </filters>
                             <artifactSet>
                                 <includes>
-                                    <!-- <include>org.antublue:test-engine-api</include> -->
-                                    <include>org.reflections:reflections</include>
                                     <include>com.univocity:univocity-parsers</include>
                                 </includes>
                             </artifactSet>
@@ -203,6 +195,46 @@
                         </configuration>
                     </execution>
                 </executions>
+	        </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.20.0</version>
+                <configuration>
+                    <linkXRef>false</linkXRef>
+                    <format>txt</format>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pmd-scan</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.2.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>10.9.3</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <configLocation>checkstyle/google_checks.xml</configLocation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -211,7 +243,7 @@
         <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine-api</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.univocity</groupId>

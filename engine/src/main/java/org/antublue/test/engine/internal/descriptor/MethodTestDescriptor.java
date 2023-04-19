@@ -27,7 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
-public class MethodTestDescriptor extends AbstractTestDescriptor {
+public final class MethodTestDescriptor extends AbstractTestDescriptor {
 
     private final Class<?> testClass;
     private final Parameter testParameter;

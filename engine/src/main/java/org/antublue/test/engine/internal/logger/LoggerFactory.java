@@ -52,14 +52,14 @@ public final class LoggerFactory {
 
         Level level = null;
 
-        if ((value != null) && (!value.trim().isEmpty())) {
+        if (value != null && !value.trim().isEmpty()) {
             value = value.trim().toUpperCase(Locale.ENGLISH);
             level = levelMap.get(value);
         }
 
         if (level == null) {
             value = System.getProperty(ANTUBLUE_TEST_ENGINE_LOG_LEVEL);
-            if ((value != null) && (!value.trim().isEmpty())) {
+            if (value != null && !value.trim().isEmpty()) {
                 value = value.trim().toUpperCase(Locale.ENGLISH);
                 level = levelMap.get(value);
             }
