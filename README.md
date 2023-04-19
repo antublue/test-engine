@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for integra
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v3.0.2](https://github.com/antublue/test-engine/releases/tag/v3.0.2)
+- General Availability (GA): [Test Engine v3.0.3](https://github.com/antublue/test-engine/releases/tag/v3.0.3)
 
 ## Goals
 
@@ -327,7 +327,7 @@ Disable the Maven Surefire plugin...
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-surefire-plugin</artifactId>
-  <version>3.0.2</version>
+  <version>3.0.3</version>
   <configuration>
     <skipTests>true</skipTests>
   </configuration>
@@ -340,7 +340,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>3.0.2</version>
+  <version>3.0.3</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -359,12 +359,12 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <scope>test</scope>
   </dependency>
   <dependency>
