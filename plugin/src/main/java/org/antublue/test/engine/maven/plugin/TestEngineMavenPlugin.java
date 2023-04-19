@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.maven.plugin;
 
-import org.antublue.test.engine.internal.TestEngineTestExecutionListener;
+import org.antublue.test.engine.internal.TestEngineConsoleTestExecutionListener;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -37,7 +37,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +48,8 @@ import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNa
 /**
  * Class to implement a Maven plugin to run the AntuBLUE Test Engine
  */
-@Mojo(name = "test", threadSafe = true, requiresDependencyResolution = ResolutionScope.RUNTIME)
 @SuppressWarnings({"unused", "PMD.CloseResource" })
+@Mojo(name = "test", threadSafe = true, requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class TestEngineMavenPlugin extends AbstractMojo {
 
     private static final String GROUP_ID = "org.antublue";
@@ -61,6 +61,8 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     @Parameter(property = "properties")
     protected Map<String, String> properties;
 
+    private Log log;
+
     /**
      * Method to execute the plugin
      *
@@ -68,79 +70,71 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      */
     public void execute() throws MojoExecutionException {
         try {
-            Log log = getLog();
-
             Set<Path> artifactPaths = new LinkedHashSet<>();
 
             List<String> classpathElements = mavenProject.getCompileClasspathElements();
             for (String classpathElement : classpathElements) {
-                Path path = new File(classpathElement).toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(new File(classpathElement).toPath());
             }
 
             classpathElements = mavenProject.getRuntimeClasspathElements();
             for (String classpathElement : classpathElements) {
-                Path path = new File(classpathElement).toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(new File(classpathElement).toPath());
             }
 
             classpathElements = mavenProject.getTestClasspathElements();
             for (String classpathElement : classpathElements) {
-                Path path = new File(classpathElement).toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(new File(classpathElement).toPath());
             }
 
             Artifact projectArtifact = mavenProject.getArtifact();
             if (projectArtifact != null) {
-                Path path = projectArtifact.getFile().toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(projectArtifact.getFile().toPath());
             }
 
             for (Artifact artifact : mavenProject.getArtifacts()) {
-                Path path = artifact.getFile().toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(artifact.getFile().toPath());
             }
 
             for (Artifact artifact : mavenProject.getDependencyArtifacts()) {
-                Path path = artifact.getFile().toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(artifact.getFile().toPath());
             }
 
             for (Artifact artifact : mavenProject.getAttachedArtifacts()) {
-                Path path = artifact.getFile().toPath();
-                artifactPaths.add(path);
+                artifactPaths.add(artifact.getFile().toPath());
             }
 
-            artifactPaths.forEach(path -> log.debug(String.format("classpath [%s]", path)));
+            artifactPaths.forEach(path -> DEBUG("classpath entry [%s]", path));
 
             final List<URL> urls = new ArrayList<>();
             for (Path path : artifactPaths) {
                 URL url = path.toUri().toURL();
-                log.debug(String.format("url [%s]", url));
+                DEBUG("classpath entry URL [%s]", url);
                 urls.add(url);
             }
 
+            // Build a classloader for subsequent calls
             ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
             Thread.currentThread().setContextClassLoader(classLoader);
 
             if (properties != null) {
                 for (String key : properties.keySet()) {
                     String value = properties.get(key);
-                    log.debug(String.format("property [%s] = [%s]", key, value));
+                    DEBUG("plugin property [%s] = [%s]", key, value);
                     System.setProperty(key, value);
                 }
             }
 
             LauncherConfig launcherConfig =
                     LauncherConfig.builder()
-                            .addTestExecutionListeners(new TestEngineTestExecutionListener())
+                            .addTestExecutionListeners(new TestEngineConsoleTestExecutionListener())
                             .build();
 
             LauncherDiscoveryRequest launcherDiscoveryRequest =
                     LauncherDiscoveryRequestBuilder.request()
                             .selectors(DiscoverySelectors.selectClasspathRoots(artifactPaths))
                             .filters(includeClassNamePatterns(".*"))
-                            .configurationParameters(new HashMap<>())
+                            .configurationParameters(Collections.emptyMap())
                             .build();
 
             try (LauncherSession launcherSession = LauncherFactory.openSession(launcherConfig)) {
@@ -149,6 +143,50 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         } catch (Throwable t) {
             t.printStackTrace();
             throw new MojoExecutionException("General AntuBLUE Test Engine Maven Plugin Exception", t);
+        }
+    }
+
+    /**
+     * Method to set the plugin Log
+     *
+     * @param log
+     */
+    public void setLog(Log log) {
+        this.log = log;
+    }
+
+    /**
+     * Method to log a DEBUG message
+     *
+     * @param format
+     * @param object
+     */
+    private void DEBUG(String format, Object object) {
+        if (log.isDebugEnabled()) {
+            DEBUG(format, new Object[]{object});
+        }
+    }
+
+    /**
+     * Method to log a DEBUG message
+     *
+     * @param format
+     * @param objects
+     */
+    private void DEBUG(String format, Object ... objects) {
+        if (log.isDebugEnabled()) {
+            DEBUG(String.format(format, objects));
+        }
+    }
+
+    /**
+     * Method to log a DEBUG message
+     *
+     * @param message
+     */
+    private void DEBUG(String message) {
+        if (log.isDebugEnabled()) {
+            log.debug(message);
         }
     }
 }

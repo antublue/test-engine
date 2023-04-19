@@ -17,11 +17,11 @@
 package org.antublue.test.engine;
 
 import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
-import org.antublue.test.engine.internal.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
 import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
 import org.antublue.test.engine.internal.TestEngineTestDescriptorStore;
+import org.antublue.test.engine.internal.discovery.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -44,8 +44,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static final String ARTIFACT_ID = "test-engine";
     public static final String VERSION = TestEngineInformation.getVersion();
 
+    /*
     static {
-        /*
         try {
             FileOutputStream fileOutputStream = new FileOutputStream("antublue-test-engine.log");
             DelegatingOutputStream delegatingOutputStream = new DelegatingOutputStream(System.out, fileOutputStream);
@@ -55,8 +55,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         } catch (IOException ioe) {
             // DO NOTHING
         }
-        */
     }
+    */
 
     @Override
     public String getId() {
@@ -95,7 +95,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         engineDiscoveryRequest,
                         TestEngineConfigurationParameters.getInstance());
 
-        // Create a EngineDescriptor as the target
+        // Create an EngineDescriptor as the target
         EngineDescriptor engineDescriptor = new EngineDescriptor(UniqueId.forEngine(getId()), getId());
 
         // Create a TestEngineDiscoverySelectorResolver and

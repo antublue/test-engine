@@ -1,7 +1,6 @@
 name: Build
 on:
   push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 jobs:
@@ -16,4 +15,4 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build
-      run: mvn clean package
+      run: ./build.sh

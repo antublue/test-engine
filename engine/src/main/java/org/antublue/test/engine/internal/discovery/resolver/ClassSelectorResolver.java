@@ -45,16 +45,16 @@ public class ClassSelectorResolver {
      * @param engineDescriptor
      */
     public void resolve(ClassSelector classSelector, EngineDescriptor engineDescriptor) {
-        LOGGER.trace(String.format("resolve [%s]", classSelector.getClassName()));
+        LOGGER.trace("resolve [%s]", classSelector.getClassName());
 
         UniqueId uniqueId = engineDescriptor.getUniqueId();
         Class<?> clazz = classSelector.getJavaClass();
-        LOGGER.trace(String.format("  class [%s]", clazz.getName()));
+        LOGGER.trace("  class [%s]", clazz.getName());
 
         uniqueId = uniqueId.append("class", clazz.getName());
 
         ClassTestDescriptor testEngineClassTestDescriptor =
-                TestDescriptorFactory.creaateClassTestDescriptor(
+                TestDescriptorFactory.createClassTestDescriptor(
                         uniqueId,
                         clazz);
 

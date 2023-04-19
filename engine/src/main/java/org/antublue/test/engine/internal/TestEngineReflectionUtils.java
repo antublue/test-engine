@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -60,8 +59,6 @@ public final class TestEngineReflectionUtils {
     private static final Map<Class<?>, List<Method>> afterEachMethodCache;
     private static final Map<Class<?>, List<Method>> afterAllMethodCache;
     private static final Map<Class<?>, List<Method>> afterClassMethodCache;
-    //private static final Map<Class<?>, String> classDisplayNameCache;
-    //private static final Map<Method, String> methodDisplayNameCache;
 
     static {
         parameterSupplierMethodCache = new HashMap<>();
@@ -74,8 +71,6 @@ public final class TestEngineReflectionUtils {
         afterEachMethodCache = new HashMap<>();
         afterAllMethodCache = new HashMap<>();
         afterClassMethodCache = new HashMap<>();
-        //classDisplayNameCache = new HashMap<>();
-        //methodDisplayNameCache = new HashMap<>();
     }
 
     /**
@@ -105,14 +100,14 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a List of @TestEngine.Parameter fields
+     * Method to get a List of @TestEngine.Parameter Fields
      *
      * @param clazz
      * @return
      */
     public static List<Field> getParameterFields(Class<?> clazz) {
         synchronized (parameterFieldCache) {
-            LOGGER.trace(String.format("getParameterFields(%s)", clazz.getName()));
+            LOGGER.trace("getParameterFields(%s)", clazz.getName());
 
             if (parameterFieldCache.containsKey(clazz)) {
                 return parameterFieldCache.get(clazz);
@@ -133,7 +128,7 @@ public final class TestEngineReflectionUtils {
      */
     public static List<Method> getBeforeClassMethods(Class<?> clazz) {
         synchronized (beforeClassMethodCache) {
-            LOGGER.trace(String.format("getBeforeClassMethods(%s)", clazz.getName()));
+            LOGGER.trace("getBeforeClassMethods(%s)", clazz.getName());
 
             if (beforeClassMethodCache.containsKey(clazz)) {
                 return beforeClassMethodCache.get(clazz);
@@ -164,7 +159,7 @@ public final class TestEngineReflectionUtils {
     @SuppressWarnings("deprecation")
     public static List<Method> getParameterMethods(Class<?> clazz) {
         synchronized (parameterMethodCache) {
-            LOGGER.trace(String.format("getParameterMethods(%s)", clazz.getName()));
+            LOGGER.trace("getParameterMethods(%s)", clazz.getName());
 
             if (parameterMethodCache.containsKey(clazz)) {
                 return parameterMethodCache.get(clazz);
@@ -250,7 +245,7 @@ public final class TestEngineReflectionUtils {
      */
     public static List<Method> getTestMethods(Class<?> clazz) {
         synchronized (testMethodCache) {
-            LOGGER.trace(String.format("getTestMethods(%s)", clazz.getName()));
+            LOGGER.trace("getTestMethods(%s)", clazz.getName());
 
             if (testMethodCache.containsKey(clazz)) {
                 return testMethodCache.get(clazz);
@@ -262,14 +257,10 @@ public final class TestEngineReflectionUtils {
                             TestEngine.Test.class,
                             Scope.NON_STATIC,
                             Void.class,
-                            (Class<?>[]) null);
-
-            Iterator<Method> iterator = methods.iterator();
-            while (iterator.hasNext()) {
-                if (iterator.next().isAnnotationPresent(TestEngine.Disabled.class)) {
-                    iterator.remove();
-                }
-            }
+                            (Class<?>[]) null)
+                    .stream()
+                    .filter(method -> !method.isAnnotationPresent(TestEngine.Disabled.class))
+                    .collect(Collectors.toList());
 
             sortByOrderAnnotation(methods);
             methods = Collections.unmodifiableList(methods);
@@ -371,7 +362,7 @@ public final class TestEngineReflectionUtils {
      */
     private static Method getParameterSupplierMethod(Class<?> clazz) {
         synchronized (parameterSupplierMethodCache) {
-            LOGGER.trace(String.format("getParameterSupplierMethod(%s)", clazz.getName()));
+            LOGGER.trace("getParameterSupplierMethod(%s)", clazz.getName());
 
             if (parameterSupplierMethodCache.containsKey(clazz)) {
                 return parameterSupplierMethodCache.get(clazz);
@@ -439,7 +430,7 @@ public final class TestEngineReflectionUtils {
                     if (!Modifier.isFinal(modifiers)
                             && !Modifier.isStatic(modifiers)
                             && field.isAnnotationPresent(annotation)
-                            && (field.getType() == fieldType)) {
+                            && field.getType() == fieldType) {
                         return true;
                     }
                     return false;
@@ -450,7 +441,7 @@ public final class TestEngineReflectionUtils {
                 });
 
         Class<?> declaringClass = clazz.getSuperclass();
-        if ((declaringClass != null) && !declaringClass.equals(Object.class)) {
+        if (declaringClass != null && !declaringClass.equals(Object.class)) {
             resolveFields(declaringClass, annotation, fieldType, fieldSet);
         }
     }
@@ -549,7 +540,7 @@ public final class TestEngineReflectionUtils {
                 })
                 .filter(method -> {
                     if (parameterTypes == null) {
-                        return (method.getParameterTypes().length == 0);
+                        return method.getParameterTypes().length == 0;
                     }
                     if (parameterTypes.length != method.getParameterCount()) {
                         return false;
@@ -577,7 +568,7 @@ public final class TestEngineReflectionUtils {
                 });
 
         Class<?> declaringClass = clazz.getSuperclass();
-        if ((declaringClass != null) && !declaringClass.equals(Object.class)) {
+        if (declaringClass != null && !declaringClass.equals(Object.class)) {
             resolveMethods(declaringClass, annotation, scope, returnType, parameterTypes, methodMap);
         }
     }
@@ -596,7 +587,7 @@ public final class TestEngineReflectionUtils {
                     // Sort based on @TestEngine.Order value
                     int o1Order = o1.getAnnotation(TestEngine.Order.class).value();
                     int o2Order = o2.getAnnotation(TestEngine.Order.class).value();
-                    return (o1Order < o2Order) ? -1 : ((o1Order == o2Order) ? 0 : 1);
+                    return o1Order < o2Order ? -1 : o1Order == o2Order ? 0 : 1;
                 } else {
                     return -1;
                 }
