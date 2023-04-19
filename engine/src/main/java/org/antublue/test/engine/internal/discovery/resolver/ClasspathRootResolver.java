@@ -81,7 +81,7 @@ public class ClasspathRootResolver {
             uniqueId = uniqueId.append("class", clazz.getName());
 
             ClassTestDescriptor testEngineClassTestDescriptor =
-                    TestDescriptorFactory.creaateClassTestDescriptor(
+                    TestDescriptorFactory.createClassTestDescriptor(
                             uniqueId,
                             clazz);
 

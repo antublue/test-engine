@@ -40,7 +40,7 @@ public final class TestDescriptorFactory {
      * @param clazz
      * @return
      */
-    public static ClassTestDescriptor creaateClassTestDescriptor(
+    public static ClassTestDescriptor createClassTestDescriptor(
             UniqueId uniqueId, Class<?> clazz) {
         return new ClassTestDescriptor(uniqueId, clazz.getName(), clazz);
     }
