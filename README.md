@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for integra
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v3.0.3](https://github.com/antublue/test-engine/releases/tag/v3.0.3)
+- General Availability (GA): [Test Engine v3.0.4](https://github.com/antublue/test-engine/releases/tag/v3.0.4)
 
 ## Goals
 
@@ -359,7 +359,7 @@ Disable the Maven Surefire plugin...
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-surefire-plugin</artifactId>
-  <version>3.0.3</version>
+  <version>3.0.4</version>
   <configuration>
     <skipTests>true</skipTests>
   </configuration>
@@ -372,7 +372,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>3.0.3</version>
+  <version>3.0.4</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -391,12 +391,12 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>3.0.3</version>
+    <version>3.0.4</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>3.0.3</version>
+    <version>3.0.4</version>
     <scope>test</scope>
   </dependency>
   <dependency>
@@ -446,7 +446,7 @@ When running via Maven in a Linux console, the Test Engine will report a summary
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v3.0.3 Summary
+[INFO] AntuBLUE Test Engine v3.0.4 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes    :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
 [INFO] Test Parameters : 119, PASSED : 119, FAILED : 0, SKIPPED : 0
