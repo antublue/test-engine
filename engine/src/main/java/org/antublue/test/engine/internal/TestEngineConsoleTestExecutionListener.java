@@ -19,38 +19,39 @@ package org.antublue.test.engine.internal;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
+import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.antublue.test.engine.internal.util.Switch;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
-import org.junit.platform.engine.support.descriptor.EngineDescriptor;
+import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestIdentifier;
 import org.junit.platform.launcher.TestPlan;
-import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
-import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Class to collect metrics and output test execution status
+ * Class to collect test information and output a test execution summary
  */
-@SuppressWarnings({"unchecked", "PMD.AvoidDeeplyNestedIfStmts"})
-public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingListener {
+@SuppressWarnings({"PMD.AvoidDeeplyNestedIfStmts"})
+public class TestEngineConsoleTestExecutionListener implements TestExecutionListener {
 
-    private static String BANNER =
+    private static final String BANNER =
             "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
 
     private static final String INFO =
             AnsiColor.WHITE_BRIGHT.apply("[")
-            + AnsiColor.BLUE_BOLD.apply("INFO")
-            + AnsiColor.WHITE_BRIGHT.apply("]");
+                    + AnsiColor.BLUE_BOLD.apply("INFO")
+                    + AnsiColor.WHITE_BRIGHT.apply("]")
+                    + " ";
 
     private static final String TEST = AnsiColor.WHITE_BRIGHT.apply("TEST");
     private static final String ABORT = AnsiColor.YELLOW_BOLD.apply("ABORT");
@@ -64,14 +65,14 @@ public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingLis
     private final boolean detailedOutput;
     private final boolean logTestMessages;
     private final boolean logPassMessages;
-    private long startTimeMilliseconds;
-    private final Set<Class<?>> testClasses;
+
+    private final Summary summary;
 
     /**
      * Constructor
      */
     public TestEngineConsoleTestExecutionListener() {
-        this.testClasses = Collections.synchronizedSet(new HashSet());
+        this.summary = new Summary();
 
         this.detailedOutput =
                 TestEngineConfigurationParameters.getInstance()
@@ -111,19 +112,45 @@ public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingLis
     }
 
     /**
+     * Method to check if the test execution listener captured any errors
+     *
+     * @return
+     */
+    public boolean hasFailures() {
+        if (summary.getTestClassCount() == 0) {
+            return true;
+        }
+
+        return summary.getTestClassesFailedCount()
+                + summary.getParametersFailedCount()
+                + summary.getTestsFailedCount() > 0;
+    }
+
+    /**
      * Method to indicate execution of a TestPlan as started
      *
      * @param testPlan the TestPlan
      */
     @Override
     public void testPlanExecutionStarted(TestPlan testPlan) {
-        super.testPlanExecutionStarted(testPlan);
+        summary.testPlanExecutionStarted(testPlan);
 
-        startTimeMilliseconds = System.currentTimeMillis();
+        Set<TestIdentifier> testIdentifiers = testPlan.getRoots();
+        for (TestIdentifier testIdentifier : testIdentifiers) {
+            TestDescriptor testDescriptor =
+                    TestEngineTestDescriptorStore
+                            .getInstance()
+                            .get(testIdentifier.getUniqueIdObject())
+                            .orElse(null);
 
-        System.out.println(INFO + " " + SEPARATOR);
-        System.out.println(INFO + " " + BANNER);
-        System.out.println(INFO + " " + SEPARATOR);
+            if (testDescriptor != null) {
+                TestDescriptorUtils.log(testDescriptor);
+            }
+        }
+
+        System.out.println(INFO + SEPARATOR);
+        System.out.println(INFO + BANNER);
+        System.out.println(INFO + SEPARATOR);
     }
 
     /**
@@ -133,71 +160,80 @@ public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingLis
      */
     @Override
     public void executionStarted(TestIdentifier testIdentifier) {
-        super.executionStarted(testIdentifier);
-
         TestDescriptor testDescriptor =
                 TestEngineTestDescriptorStore
                         .getInstance()
                         .get(testIdentifier.getUniqueIdObject())
                         .orElse(null);
 
-        if (testDescriptor != null) {
-            final StringBuilder stringBuilder = new StringBuilder();
+        summary.executionStarted(testDescriptor);
 
-            Switch.switchType(
-                    testDescriptor,
-                    Switch.switchCase(EngineDescriptor.class, consumer -> {
-                    }),
-                    Switch.switchCase(ClassTestDescriptor.class, consumer -> {
-                        ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
-                        Class<?> testClass = classTestDescriptor.getTestClass();
-                        testClasses.add(testClass);
-                        if (logTestMessages) {
-                            stringBuilder
-                                    .append(TEST)
-                                    .append(" | ")
-                                    .append(testClass.getName());
-                        }
-                    }),
-                    Switch.switchCase(ParameterTestDescriptor.class, consumer -> {
-                        if (logTestMessages) {
-                            ParameterTestDescriptor parameterTestDescriptor = (ParameterTestDescriptor) testDescriptor;
-                            Class<?> testClass = parameterTestDescriptor.getTestClass();
-                            Parameter testParameter = parameterTestDescriptor.getTestParameter();
-                            String testParameterName = testParameter.name();
-                            stringBuilder
-                                    .append(TEST)
-                                    .append(" | ")
-                                    .append(testParameterName)
-                                    .append(" | ")
-                                    .append(testClass.getName());
-                        }
-                    }),
-                    Switch.switchCase(MethodTestDescriptor.class, consumer -> {
-                        if (logTestMessages) {
-                            MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
-                            Class<?> testClass = methodTestDescriptor.getTestClass();
-                            Method testMethod = methodTestDescriptor.getTestMethod();
-                            Parameter testParameter = methodTestDescriptor.getTestParameter();
-                            String testParameterName = testParameter.name();
-                            stringBuilder
-                                    .append(TEST)
-                                    .append(" | ")
-                                    .append(testParameterName)
-                                    .append(" | ")
-                                    .append(testClass.getName())
-                                    .append(" ")
-                                    .append(testMethod.getName())
-                                    .append("()");
-                        }
-                    })
-            );
+        StringBuilder stringBuilder = new StringBuilder();
 
-            if (detailedOutput && stringBuilder.length() > 0) {
-                //LOGGER.rawInfo(stringBuilder.toString());
-                System.out.println(INFO + " " + Thread.currentThread().getName() + " | " + stringBuilder);
-            }
+        Switch.switchType(
+                testDescriptor,
+                Switch.switchCase(RunnableEngineDescriptor.class, consumer -> {
+                    // DO NOTHING
+                }),
+                Switch.switchCase(RunnableClassTestDescriptor.class, consumer -> {
+                    RunnableClassTestDescriptor classTestDescriptor = (RunnableClassTestDescriptor) testDescriptor;
+                    Class<?> testClass = classTestDescriptor.getTestClass();
+                    if (logTestMessages) {
+                        stringBuilder
+                                .append(TEST)
+                                .append(" | ")
+                                .append(testClass.getName());
+                    }
+                }),
+                Switch.switchCase(RunnableParameterTestDescriptor.class, consumer -> {
+                    if (logTestMessages) {
+                        RunnableParameterTestDescriptor parameterTestDescriptor = (RunnableParameterTestDescriptor) testDescriptor;
+                        Class<?> testClass = parameterTestDescriptor.getTestClass();
+                        Parameter testParameter = parameterTestDescriptor.getTestParameter();
+                        String testParameterName = testParameter.name();
+                        stringBuilder
+                                .append(TEST)
+                                .append(" | ")
+                                .append(testParameterName)
+                                .append(" | ")
+                                .append(testClass.getName());
+                    }
+                }),
+                Switch.switchCase(RunnableMethodTestDescriptor.class, consumer -> {
+                    if (logTestMessages) {
+                        RunnableMethodTestDescriptor methodTestDescriptor = (RunnableMethodTestDescriptor) testDescriptor;
+                        Class<?> testClass = methodTestDescriptor.getTestClass();
+                        Method testMethod = methodTestDescriptor.getTestMethod();
+                        Parameter testParameter = methodTestDescriptor.getTestParameter();
+                        String testParameterName = testParameter.name();
+                        stringBuilder
+                                .append(TEST)
+                                .append(" | ")
+                                .append(testParameterName)
+                                .append(" | ")
+                                .append(testClass.getName())
+                                .append(" ")
+                                .append(testMethod.getName())
+                                .append("()");
+                    }
+                })
+        );
+
+        if (detailedOutput && stringBuilder.length() > 0) {
+            System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
         }
+    }
+
+    @Override
+    public void executionSkipped(TestIdentifier testIdentifier, String reason) {
+        TestDescriptor testDescriptor =
+                TestEngineTestDescriptorStore
+                        .getInstance()
+                        .get(testIdentifier.getUniqueIdObject())
+                        .orElse(null);
+
+        summary.executionSkipped(testDescriptor, reason);
+        // TODO log skipped?
     }
 
     /**
@@ -208,86 +244,85 @@ public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingLis
      */
     @Override
     public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
-        super.executionFinished(testIdentifier, testExecutionResult);
-
         TestDescriptor testDescriptor =
                 TestEngineTestDescriptorStore
                         .getInstance()
                         .get(testIdentifier.getUniqueIdObject())
                         .orElse(null);
 
-        if (testDescriptor != null) {
-            final StringBuilder stringBuilder = new StringBuilder();
+        summary.executionFinished(testDescriptor, testExecutionResult);
 
-            Switch.switchType(
-                    testDescriptor,
-                    Switch.switchCase(EngineDescriptor.class, consumer -> {
-                    }),
-                    Switch.switchCase(ClassTestDescriptor.class, consumer -> {
-                        if (logPassMessages) {
-                            ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
-                            Class<?> testClass = classTestDescriptor.getTestClass();
-                            stringBuilder
-                                    .append("%s | ")
-                                    .append(testClass.getName());
-                        }
-                    }),
-                    Switch.switchCase(ParameterTestDescriptor.class, consumer -> {
-                        if (logPassMessages) {
-                            ParameterTestDescriptor parameterTestDescriptor = (ParameterTestDescriptor) testDescriptor;
-                            Class<?> testClass = parameterTestDescriptor.getTestClass();
-                            Parameter testParameter = parameterTestDescriptor.getTestParameter();
-                            String testParameterName = testParameter.name();
-                            stringBuilder
-                                    .append("%s | ")
-                                    .append(testParameterName)
-                                    .append(" | ")
-                                    .append(testClass.getName());
-                        }
-                    }),
-                    Switch.switchCase(MethodTestDescriptor.class, consumer -> {
-                        if (logPassMessages) {
-                            MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
-                            Class<?> testClass = methodTestDescriptor.getTestClass();
-                            Method testMethod = methodTestDescriptor.getTestMethod();
-                            Parameter testParameter = methodTestDescriptor.getTestParameter();
-                            String testParameterName = testParameter.name();
-                            stringBuilder
-                                    .append("%s | ")
-                                    .append(testParameterName)
-                                    .append(" | ")
-                                    .append(testClass.getName())
-                                    .append(" ")
-                                    .append(testMethod.getName())
-                                    .append("()");
-                        }
-                    }));
+        StringBuilder stringBuilder = new StringBuilder();
 
-            if (stringBuilder.length() > 0) {
-                TestExecutionResult.Status status = testExecutionResult.getStatus();
-                String string = null;
-                switch (status) {
-                    case ABORTED: {
-                        string = String.format(stringBuilder.toString(), ABORT);
-                        break;
+        Switch.switchType(
+                testDescriptor,
+                Switch.switchCase(RunnableEngineDescriptor.class, consumer -> {
+                    // DO NOTHING
+                }),
+                Switch.switchCase(RunnableClassTestDescriptor.class, consumer -> {
+                    if (logPassMessages) {
+                        RunnableClassTestDescriptor classTestDescriptor = (RunnableClassTestDescriptor) testDescriptor;
+                        Class<?> testClass = classTestDescriptor.getTestClass();
+                        stringBuilder
+                                .append("%s | ")
+                                .append(testClass.getName());
                     }
-                    case FAILED: {
-                        string = String.format(stringBuilder.toString(), FAIL);
-                        break;
+                }),
+                Switch.switchCase(RunnableParameterTestDescriptor.class, consumer -> {
+                    if (logPassMessages) {
+                        RunnableParameterTestDescriptor parameterTestDescriptor = (RunnableParameterTestDescriptor) testDescriptor;
+                        Class<?> testClass = parameterTestDescriptor.getTestClass();
+                        Parameter testParameter = parameterTestDescriptor.getTestParameter();
+                        String testParameterName = testParameter.name();
+                        stringBuilder
+                                .append("%s | ")
+                                .append(testParameterName)
+                                .append(" | ")
+                                .append(testClass.getName());
                     }
-                    case SUCCESSFUL: {
-                        string = String.format(stringBuilder.toString(), PASS);
-                        break;
+                }),
+                Switch.switchCase(RunnableMethodTestDescriptor.class, consumer -> {
+                    if (logPassMessages) {
+                        RunnableMethodTestDescriptor methodTestDescriptor = (RunnableMethodTestDescriptor) testDescriptor;
+                        Class<?> testClass = methodTestDescriptor.getTestClass();
+                        Method testMethod = methodTestDescriptor.getTestMethod();
+                        Parameter testParameter = methodTestDescriptor.getTestParameter();
+                        String testParameterName = testParameter.name();
+                        stringBuilder
+                                .append("%s | ")
+                                .append(testParameterName)
+                                .append(" | ")
+                                .append(testClass.getName())
+                                .append(" ")
+                                .append(testMethod.getName())
+                                .append("()");
                     }
-                    default: {
-                        // DO NOTHING
-                        break;
-                    }
+                }));
+
+        if (stringBuilder.length() > 0) {
+            TestExecutionResult.Status status = testExecutionResult.getStatus();
+            String string = null;
+            switch (status) {
+                case ABORTED: {
+                    string = String.format(stringBuilder.toString(), ABORT);
+                    break;
                 }
-
-                if (detailedOutput && string != null) {
-                    System.out.println(INFO + " " + Thread.currentThread().getName() + " | " + string);
+                case FAILED: {
+                    string = String.format(stringBuilder.toString(), FAIL);
+                    break;
                 }
+                case SUCCESSFUL: {
+                    string = String.format(stringBuilder.toString(), PASS);
+                    break;
+                }
+                default: {
+                    // DO NOTHING
+                    break;
+                }
+            }
+
+            if (detailedOutput && string != null) {
+                System.out.println(INFO + Thread.currentThread().getName() + " | " + string);
             }
         }
     }
@@ -299,54 +334,361 @@ public class TestEngineConsoleTestExecutionListener extends SummaryGeneratingLis
      */
     @Override
     public void testPlanExecutionFinished(TestPlan testPlan) {
-        super.testPlanExecutionFinished(testPlan);
+        summary.testPlanExecutionFinished(testPlan);
 
-        long endTimeMilliseconds = System.currentTimeMillis();
-        TestExecutionSummary testExecutionSummary = getSummary();
+        System.out.println(INFO + SEPARATOR);
+        System.out.println(INFO + BANNER + " Summary");
+        System.out.println(INFO + SEPARATOR);
 
-        System.out.println(INFO + " " + SEPARATOR);
-        System.out.println(INFO + " " + BANNER + " Summary");
-        System.out.println(INFO + " " + SEPARATOR);
-        System.out.println(
-                INFO
-                + " "
-                + AnsiColor.WHITE_BRIGHT.apply("Test Classes")
-                + "    : "
-                + testClasses.size());
+        if (summary.getTestClassCount() != 0) {
+            long column1Width =
+                    getColumnWith(
+                            summary.getTestClassCount(),
+                            summary.getParametersFoundCount(),
+                            summary.getTestsFoundCount());
 
-        System.out.println(
-                INFO
-                + " "
-                +  AnsiColor.WHITE_BRIGHT.apply("Test Executions")
-                + " : "
-                + (testExecutionSummary.getTestsFoundCount() + testExecutionSummary.getContainersFailedCount())
-                + ", "
-                + AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED")
-                + " : "
-                + (testExecutionSummary.getTestsSucceededCount() - testExecutionSummary.getContainersFailedCount())
-                + ", "
-                + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED")
-                + " : "
-                + (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount())
-                + ", "
-                + AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED")
-                + " : "
-                + testExecutionSummary.getTestsSkippedCount());
-        System.out.println(INFO + " " + SEPARATOR);
+            long column2Width =
+                    getColumnWith(
+                            summary.getTestClassesSucceededCount(),
+                            summary.getParametersSucceededCount(),
+                            summary.getTestsSucceededCount());
 
-        boolean failed =
-                testClasses.size() == 0
-                || (testExecutionSummary.getTestsFailedCount() + testExecutionSummary.getContainersFailedCount()) > 0;
+            long column3Width =
+                    getColumnWith(
+                            summary.getTestClassesFailedCount(),
+                            summary.getParametersFailedCount(),
+                            summary.getTestsFailedCount());
 
-        if (failed) {
-            System.out.println(INFO + " " + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"));
+            long column4Width =
+                    getColumnWith(
+                            summary.getTestClassesSkippedCount(),
+                            summary.getParametersSkippedCount(),
+                            summary.getTestsSkippedCount());
+
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder
+                    .append(INFO)
+                    .append(AnsiColor.WHITE_BRIGHT.apply("Test Classes"))
+                    .append("    : ")
+                    .append(pad(summary.getTestClassCount(), column1Width))
+                    .append(", ")
+                    .append(AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED"))
+                    .append(" : ")
+                    .append(pad(summary.getTestClassesSucceededCount(), column2Width))
+                    .append(", ")
+                    .append(AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"))
+                    .append(" : ")
+                    .append(pad(summary.getTestClassesFailedCount(), column3Width))
+                    .append(", ")
+                    .append(AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED"))
+                    .append(" : ")
+                    .append(pad(summary.getTestClassesSkippedCount(), column4Width));
+
+            System.out.println(stringBuilder);
+
+            stringBuilder.setLength(0);
+
+            stringBuilder
+                    .append(INFO)
+                    .append(AnsiColor.WHITE_BRIGHT.apply("Test Parameters"))
+                    .append(" : ")
+                    .append(pad(summary.getParametersFoundCount(), column1Width))
+                    .append(", ")
+                    .append(AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED"))
+                    .append(" : ")
+                    .append(pad(summary.getParametersSucceededCount(), column2Width))
+                    .append(", ")
+                    .append(AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"))
+                    .append(" : ")
+                    .append(pad(summary.getParametersFailedCount(), column3Width))
+                    .append(", ")
+                    .append(AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED"))
+                    .append(" : ")
+                    .append(pad(summary.getParametersSkippedCount(), column4Width));
+
+            System.out.println(stringBuilder);
+
+            stringBuilder.setLength(0);
+
+            stringBuilder
+                    .append(INFO)
+                    .append(AnsiColor.WHITE_BRIGHT.apply("Test Methods"))
+                    .append("    : ")
+                    .append(pad(summary.getTestsFoundCount(), column1Width))
+                    .append(", ")
+                    .append(AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED"))
+                    .append(" : ")
+                    .append(pad(summary.getTestsSucceededCount(), column2Width))
+                    .append(", ")
+                    .append(AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"))
+                    .append(" : ")
+                    .append(pad(summary.getTestsFailedCount(), column3Width))
+                    .append(", ")
+                    .append(AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED"))
+                    .append(" : ")
+                    .append(pad(summary.getTestsSkippedCount(), column4Width));
+
+            System.out.println(stringBuilder);
         } else {
-            System.out.println(INFO + " " + AnsiColor.GREEN_BOLD.apply("PASSED"));
+            System.out.println(INFO + AnsiColor.RED_BOLD_BRIGHT.apply("NO TESTS FOUND"));
         }
 
-        System.out.println(INFO + " " + SEPARATOR);
-        System.out.println(INFO + " " + "Total Test Time : " + HumanReadableTime.toHumanReadable(endTimeMilliseconds - startTimeMilliseconds, false));
-        System.out.println(INFO + " " + "Finished At     : " + HumanReadableTime.now());
-        System.out.println(INFO + " " + SEPARATOR);
+        System.out.println(INFO + SEPARATOR);
+
+        boolean failed =
+                summary.getTestClassCount() == 0
+                        || (summary.getTestsFailedCount() + summary.getParametersFailedCount()) > 0;
+
+        if (failed) {
+            System.out.println(INFO + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"));
+        } else {
+            System.out.println(INFO + AnsiColor.GREEN_BOLD.apply("PASSED"));
+        }
+
+        long elapsedTime = summary.getTimeFinished() - summary.getTimeStarted();
+
+        System.out.println(INFO + SEPARATOR);
+
+        System.out.println(
+                INFO
+                + "Total Test Time : "
+                + HumanReadableTime.toHumanReadable(elapsedTime, false));
+
+        System.out.println(INFO + "Finished At     : " + HumanReadableTime.now());
+
+        if (!hasFailures()) {
+            System.out.println(INFO + SEPARATOR);
+        }
+    }
+
+    /**
+     * Method to column width of long values as Strings
+     *
+     * @param values
+     * @return
+     */
+    private long getColumnWith(long ... values) {
+        long width = 0;
+
+        for (long value : values) {
+            width = Math.max(String.valueOf(value).length(), width);
+        }
+
+        return width;
+    }
+
+    /**
+     * Method to get a String that is the value passed to a specific width
+     *
+     * @param value
+     * @param width
+     * @return
+     */
+    private String pad(long value, long width) {
+        String stringValue = String.valueOf(value);
+
+        StringBuilder paddingStringBuilder = new StringBuilder();
+        while ((paddingStringBuilder.length() + stringValue.length()) < width) {
+            paddingStringBuilder.append(" ");
+        }
+
+        return paddingStringBuilder.append(stringValue).toString();
+    }
+
+    private static class Summary {
+
+        private TestPlan testPlan;
+        private long startMilliseconds;
+        private long finishedMilliseconds;
+
+        private Set<Class<?>> testClasses;
+        private AtomicLong testClassesFound;
+        private AtomicLong testClassesSuccess;
+        private AtomicLong testClassesFailed;
+        private AtomicLong testClassesSkipped;
+
+        private AtomicLong parametersFound;
+        private AtomicLong parametersSuccess;
+        private AtomicLong parametersFailed;
+        private AtomicLong parametersSkipped;
+
+        private AtomicLong methodsFound;
+        private AtomicLong methodsSuccess;
+        private AtomicLong methodsFailed;
+        private AtomicLong methodsSkipped;
+
+        public Summary() {
+            testClasses = Collections.synchronizedSet(new HashSet<>());
+
+            testClassesFound = new AtomicLong();
+            testClassesSuccess = new AtomicLong();
+            testClassesFailed = new AtomicLong();
+            testClassesSkipped = new AtomicLong();
+
+            parametersFound = new AtomicLong();
+            parametersSuccess = new AtomicLong();
+            parametersFailed = new AtomicLong();
+            parametersSkipped = new AtomicLong();
+
+            methodsFound = new AtomicLong();
+            methodsSuccess = new AtomicLong();
+            methodsFailed = new AtomicLong();
+            methodsSkipped = new AtomicLong();
+        }
+
+        public long getTimeStarted() {
+            return startMilliseconds;
+        }
+
+        public long getTestClassCount() {
+            return testClassesFound.get();
+        }
+
+        public long getTestClassesSucceededCount() {
+            return testClassesSuccess.get();
+        }
+
+        public long getTestClassesFailedCount() {
+            return testClassesFailed.get();
+        }
+
+        public long getTestClassesSkippedCount() {
+            return testClassesSkipped.get();
+        }
+
+        public long getParametersFoundCount() {
+            return parametersFound.get();
+        }
+
+        public long getParametersSucceededCount() {
+            return parametersSuccess.get();
+        }
+
+        public long getParametersFailedCount() {
+            return parametersFailed.get();
+        }
+
+        public long getParametersSkippedCount() {
+            return parametersSkipped.get();
+        }
+
+        public long getTestsFoundCount() {
+            return methodsFound.get();
+        }
+
+        public long getTestsSucceededCount() {
+            return methodsSuccess.get();
+        }
+
+        public long getTestsFailedCount() {
+            return methodsFailed.get();
+        }
+
+        public long getTestsSkippedCount() {
+            return methodsSkipped.get();
+        }
+
+        public long getTimeFinished() {
+            return finishedMilliseconds;
+        }
+
+        public void testPlanExecutionStarted(TestPlan testPlan) {
+            this.testPlan = testPlan;
+            startMilliseconds = System.currentTimeMillis();
+            finishedMilliseconds = startMilliseconds;
+        }
+
+        public void executionStarted(TestDescriptor testDescriptor) {
+            if (testDescriptor instanceof RunnableClassTestDescriptor) {
+                testClasses.add(((RunnableClassTestDescriptor) testDescriptor).getTestClass());
+                testClassesFound.set(testClasses.size());
+                return;
+            }
+
+            if (testDescriptor instanceof RunnableParameterTestDescriptor) {
+                parametersFound.incrementAndGet();
+                return;
+            }
+
+            if (testDescriptor instanceof RunnableMethodTestDescriptor) {
+                methodsFound.incrementAndGet();
+            }
+        }
+
+        public void executionSkipped(TestDescriptor testDescriptor, String reason) {
+            if (testDescriptor instanceof RunnableParameterTestDescriptor) {
+                parametersFound.incrementAndGet();
+                parametersSkipped.incrementAndGet();
+                return;
+            }
+
+            if (testDescriptor instanceof RunnableMethodTestDescriptor) {
+                methodsFound.incrementAndGet();
+                methodsSkipped.incrementAndGet();
+            }
+        }
+
+        public void executionFinished(TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
+            if (testDescriptor instanceof RunnableClassTestDescriptor) {
+                TestExecutionResult.Status status = testExecutionResult.getStatus();
+                switch (status) {
+                    case SUCCESSFUL: {
+                        testClassesSuccess.incrementAndGet();
+                        break;
+                    }
+                    case FAILED: {
+                        testClassesFailed.incrementAndGet();
+                        break;
+                    }
+                    case ABORTED: {
+                        testClassesSkipped.incrementAndGet();
+                        break;
+                    }
+                }
+
+                return;
+            }
+
+            if (testDescriptor instanceof RunnableParameterTestDescriptor) {
+                TestExecutionResult.Status status = testExecutionResult.getStatus();
+                switch (status) {
+                    case SUCCESSFUL: {
+                        parametersSuccess.incrementAndGet();
+                        break;
+                    }
+                    case FAILED: {
+                        parametersFailed.incrementAndGet();
+                        break;
+                    }
+                    case ABORTED: {
+                        parametersSkipped.incrementAndGet();
+                        break;
+                    }
+                }
+            }
+
+            if (testDescriptor instanceof RunnableMethodTestDescriptor) {
+                TestExecutionResult.Status status = testExecutionResult.getStatus();
+                switch (status) {
+                    case SUCCESSFUL: {
+                        methodsSuccess.incrementAndGet();
+                        break;
+                    }
+                    case FAILED: {
+                        methodsFailed.incrementAndGet();
+                        break;
+                    }
+                    case ABORTED: {
+                        methodsSkipped.incrementAndGet();
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void testPlanExecutionFinished(TestPlan testPlan) {
+            finishedMilliseconds = System.currentTimeMillis();
+        }
     }
 }

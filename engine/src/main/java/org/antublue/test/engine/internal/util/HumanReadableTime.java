@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Class to create a human-readable time from a duration
  */
+// Suppress PMD.UselessParentheses - PMD has bug around UselessParentheses calculating milliseconds
+@SuppressWarnings("PMD.UselessParentheses")
 public final class HumanReadableTime {
 
     /**
@@ -31,6 +33,16 @@ public final class HumanReadableTime {
      */
     private HumanReadableTime() {
         // DO NOTHING
+    }
+
+    /**
+     * Method to convert a duration into a human-readable time
+     *
+     * @param duration
+     * @return
+     */
+    public static String toHumanReadable(long duration) {
+        return toHumanReadable(duration, false);
     }
 
     /**
@@ -45,8 +57,8 @@ public final class HumanReadableTime {
 
         long hours = TimeUnit.MILLISECONDS.toHours(durationPositive);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(durationPositive) - (hours * 60);
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(durationPositive) - (hours * 60 * 60) + (minutes * 60);
-        long milliseconds = durationPositive - (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(durationPositive) - ((hours * 60 * 60) + (minutes * 60));
+        long milliseconds = durationPositive - ((hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
 
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -126,7 +138,7 @@ public final class HumanReadableTime {
      */
     public static String now() {
         SimpleDateFormat simpleDateFormat =
-                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ENGLISH);
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.ENGLISH);
 
         return simpleDateFormat.format(new Date());
     }

@@ -21,6 +21,7 @@ import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
 import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
 import org.antublue.test.engine.internal.TestEngineTestDescriptorStore;
+import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
 import org.antublue.test.engine.internal.discovery.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -28,7 +29,6 @@ import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.util.Optional;
 
@@ -96,17 +96,17 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         TestEngineConfigurationParameters.getInstance());
 
         // Create an EngineDescriptor as the target
-        EngineDescriptor engineDescriptor = new EngineDescriptor(UniqueId.forEngine(getId()), getId());
+        RunnableEngineDescriptor runnableEngineDescriptor = new RunnableEngineDescriptor(UniqueId.forEngine(getId()), getId());
 
         // Create a TestEngineDiscoverySelectorResolver and
         // resolve selectors, adding them to the engine descriptor
-        new TestEngineDiscoveryRequestResolver().resolve(testEngineDiscoveryRequest, engineDescriptor);
+        new TestEngineDiscoveryRequestResolver().resolve(testEngineDiscoveryRequest, runnableEngineDescriptor);
 
         // Store the test descriptors
-        TestEngineTestDescriptorStore.getInstance().put(engineDescriptor);
+        TestEngineTestDescriptorStore.getInstance().put(runnableEngineDescriptor);
 
         // Return the engine descriptor with all child test descriptors
-        return engineDescriptor;
+        return runnableEngineDescriptor;
     }
 
     /**

@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for integra
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v3.0.2](https://github.com/antublue/test-engine/releases/tag/v3.0.2)
+- General Availability (GA): [Test Engine v3.0.3](https://github.com/antublue/test-engine/releases/tag/v3.0.3)
 
 ## Goals
 
@@ -32,11 +32,17 @@ Currently, JUnit 5 does not support parameterized tests at the test class level 
 
 - It doesn't provide annotations to run static methods before/after the class **and** instance methods before/after all tests in a test class (2023-04-18)
 
+
+- It doesn't provide the summary information typically wanted or integration testing
+
 ## Why not use Junit 4?
 
 Junit 4 does provide test class level parameterization via `@RunWith(Parameterized.class)`
 
 - It doesn't provide annotations to run static methods before/after the class **and** instance methods before/after all tests in a test class
+
+
+- It doesn't provide the summary information typically wanted or integration testing
 
 ## Common Annotations
 
@@ -62,9 +68,10 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - By default, methods are executed in alphabetical order based on a method name, regardless of where they are declared (class or superclasses)
 
 
-- `@TestEngine.Order` can be used to control method order
+- `@TestEngine.Order` can be used to control test method order
   - Methods are sorted by the annotation value first, then alphabetically by the test method name
     - In scenarios where `@TestEngine.Order` values are duplicated, methods with the same name are sorted alphabetically
+    - Declaration of test methods (class or superclass) are ignored
   - Method order is relative to other methods with the same annotation
 
 ## Additional Annotations
@@ -207,6 +214,27 @@ In this scenario, the value of the `Parameter` is a String[] array
 String[] values = parameter.value();
 ```
 
+## What is a `ParameterMap` ?
+
+A `ParameterMap` is `Map` object that implements `Parameter` and allows you to add keys/values using a fluent pattern
+
+```java
+@TestEngine.ParameterSupplier
+public static Stream<Parameter> parameters() {
+  Collection<Parameter> collection = new ArrayList<>();
+
+  for (int i = 0; i < 10; i++) {
+    collection.add(
+      ParameterMap
+        .named("Map[" + i + "]")
+        .put("key", i)
+        .parameter());
+  }
+
+  return collection.stream();
+}
+```
+
 ## Configuration
 
 The Test Engine has seven configuration parameters
@@ -331,7 +359,7 @@ Disable the Maven Surefire plugin...
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-surefire-plugin</artifactId>
-  <version>3.0.2</version>
+  <version>3.0.3</version>
   <configuration>
     <skipTests>true</skipTests>
   </configuration>
@@ -344,7 +372,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>3.0.2</version>
+  <version>3.0.3</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -363,12 +391,12 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <scope>test</scope>
   </dependency>
   <dependency>
@@ -412,7 +440,43 @@ mvn clean package integration-test
 
 - The Test Engine requires core JUnit 5 jars as dependencies
 
-# Building
+## Maven Summary
+
+When running via Maven in a Linux console, the Test Engine will report a summary
+
+```bash
+[INFO] ------------------------------------------------------------------------
+[INFO] AntuBLUE Test Engine v3.0.3 Summary
+[INFO] ------------------------------------------------------------------------
+[INFO] Test Classes    :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
+[INFO] Test Parameters : 119, PASSED : 119, FAILED : 0, SKIPPED : 0
+[INFO] Test Methods    : 476, PASSED : 476, FAILED : 0, SKIPPED : 0
+[INFO] ------------------------------------------------------------------------
+[INFO] PASSED
+[INFO] ------------------------------------------------------------------------
+[INFO] Total Test Time : 1 minute, 24 seconds, 608 ms
+[INFO] Finished At     : 2023-04-19T14:36:05.124
+[INFO] ------------------------------------------------------------------------
+
+```
+
+Test Classes
+
+- Total number of test classes
+
+Test Parameters
+
+- Total number of test parameters (all test classes)
+
+Test Methods
+
+- Total number of test methods (all parameters / all test classes)
+
+**Notes**
+
+- Test classes can/may different test parameters, so you can't necessarily extrapolate the math in reverse
+
+## Building
 
 You need Java 8 or greater to build
 
