@@ -251,31 +251,6 @@ public class Logger {
     /**
      * Method to log an INFO message
      *
-     * @param format
-     * @param object
-     */
-    public void rawInfo(String format, Object object) {
-        if (isInfoEnabled()) {
-            rawInfo(format, new Object[]{object});
-        }
-    }
-
-    /**
-     * Method to log an INFO message
-     *
-     * @param format
-     * @param objects
-     */
-    public void rawInfo(String format, Object... objects) {
-        if (isInfoEnabled()) {
-            Objects.requireNonNull(format);
-            log(System.out, createMessage(String.format(format, objects)));
-        }
-    }
-
-    /**
-     * Method to log an INFO message
-     *
      * @param message
      * @param throwable
      */
@@ -395,28 +370,12 @@ public class Logger {
             dateTime = SIMPLE_DATE_FORMAT.format(new Date());
         }
 
-        return String.format("%s | %s | %s | %s",
+        return String.format("%s | %s | %s | %s | %s ",
                 dateTime,
                 Thread.currentThread().getName(),
                 level.toString(),
+                name,
                 message);
-    }
-
-    /**
-     * Method to create a log message
-     *
-     * @apram level
-     * @param message
-     * @return
-     */
-    private String createMessage(String message) {
-        String dateTime;
-
-        synchronized (SIMPLE_DATE_FORMAT) {
-            dateTime = SIMPLE_DATE_FORMAT.format(new Date());
-        }
-
-        return String.format("%s | %s | %s", dateTime, Thread.currentThread().getName(), message);
     }
 
     /**

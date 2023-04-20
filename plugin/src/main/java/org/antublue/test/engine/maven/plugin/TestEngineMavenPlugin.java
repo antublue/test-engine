@@ -26,6 +26,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
+import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.LauncherSession;
 import org.junit.platform.launcher.core.LauncherConfig;
@@ -125,9 +126,11 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                 }
             }
 
+            TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener = new TestEngineConsoleTestExecutionListener();
+
             LauncherConfig launcherConfig =
-                    LauncherConfig.builder()
-                            .addTestExecutionListeners(new TestEngineConsoleTestExecutionListener())
+                    LauncherConfig
+                            .builder()
                             .build();
 
             LauncherDiscoveryRequest launcherDiscoveryRequest =
@@ -138,8 +141,16 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             .build();
 
             try (LauncherSession launcherSession = LauncherFactory.openSession(launcherConfig)) {
-                launcherSession.getLauncher().execute(launcherDiscoveryRequest);
+                Launcher launcher = launcherSession.getLauncher();
+                launcher.registerTestExecutionListeners(testEngineConsoleTestExecutionListener);
+                launcher.execute(launcherDiscoveryRequest);
             }
+
+            if (testEngineConsoleTestExecutionListener.hasFailures()) {
+                throw new SuppressedStackTraceMojoExecutionException("Test failures");
+            }
+        } catch (SuppressedStackTraceMojoExecutionException e) {
+            throw e;
         } catch (Throwable t) {
             t.printStackTrace();
             throw new MojoExecutionException("General AntuBLUE Test Engine Maven Plugin Exception", t);

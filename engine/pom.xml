@@ -7,9 +7,9 @@
 
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
-    <name>AntuBLUE Test Engine Core</name>
+    <name>AntuBLUE Test Engine</name>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -243,7 +243,7 @@
         <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine-api</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
         </dependency>
         <dependency>
             <groupId>com.univocity</groupId>
@@ -259,11 +259,6 @@
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
             <version>1.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
         </dependency>
     </dependencies>
 
