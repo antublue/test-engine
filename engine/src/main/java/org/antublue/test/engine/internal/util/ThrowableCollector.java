@@ -20,30 +20,61 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Class to collect a list of Throwable
+ */
 public class ThrowableCollector {
 
     private final List<Throwable> throwables;
 
+    /**
+     * Constructor
+     */
     public ThrowableCollector() {
         throwables = new ArrayList<>();
     }
 
+    /**
+     * Method to collect a Throwable
+     *
+     * @param throwable
+     */
     public void add(Throwable throwable) {
         throwables.add(throwable);
     }
 
+    /**
+     * Method to collect Throwable from another ThrowableCollector
+     *
+     * @param throwableCollector
+     */
     public void addAll(ThrowableCollector throwableCollector) {
         throwables.addAll(throwableCollector.getList());
     }
 
+    /**
+     * Method to get the number of Throwable collected
+     *
+     * @return
+     */
     public int size() {
         return throwables.size();
     }
 
+    /**
+     * Method to return whether the collector has any Throwable
+     *
+     * @return
+     */
     public boolean isEmpty() {
         return throwables.isEmpty();
     }
 
+    /**
+     * Method to get the first Throwable or null
+     *
+     * @return
+     */
     public Optional<Throwable> getFirst() {
         if (throwables.isEmpty()) {
             return Optional.empty();
@@ -52,6 +83,11 @@ public class ThrowableCollector {
         }
     }
 
+    /**
+     * Method to get the list of Throwable
+     *
+     * @return
+     */
     public List<Throwable> getList() {
         return throwables;
     }
