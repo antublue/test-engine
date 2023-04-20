@@ -18,11 +18,11 @@ package org.antublue.test.engine.internal.discovery.resolver;
 
 import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
-import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.commons.util.ReflectionUtils;

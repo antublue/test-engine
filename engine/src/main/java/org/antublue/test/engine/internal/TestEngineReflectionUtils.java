@@ -20,9 +20,6 @@ import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.junit.platform.engine.ConfigurationParameters;
-import org.junit.platform.engine.TestDescriptor;
-import org.junit.platform.launcher.TestPlan;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -608,6 +605,12 @@ public final class TestEngineReflectionUtils {
         });
     }
 
+    /**
+     * Method to get a display name for an Annoation
+     * 
+     * @param annotation
+     * @return
+     */
     private static String getAnnotationDisplayName(Class<? extends Annotation> annotation) {
         return String.format(
                 "@%s.%s",

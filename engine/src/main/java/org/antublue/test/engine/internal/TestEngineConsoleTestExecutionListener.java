@@ -115,14 +115,19 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         .orElse(true);
     }
 
+    /**
+     * Method to check if the test execution listener captured any errors
+     *
+     * @return
+     */
     public boolean hasFailures() {
         if (summary.getTestClassCount() == 0) {
             return true;
         }
 
-        return (summary.getTestClassesFailedCount()
+        return summary.getTestClassesFailedCount()
                 + summary.getParametersFailedCount()
-                + summary.getTestsFailedCount() > 0);
+                + summary.getTestsFailedCount() > 0;
     }
 
     /**
