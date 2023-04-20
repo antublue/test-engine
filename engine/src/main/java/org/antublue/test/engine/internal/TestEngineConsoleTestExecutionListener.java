@@ -23,8 +23,6 @@ import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.antublue.test.engine.internal.util.Switch;
@@ -45,8 +43,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @SuppressWarnings({"PMD.AvoidDeeplyNestedIfStmts"})
 public class TestEngineConsoleTestExecutionListener implements TestExecutionListener {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineConsoleTestExecutionListener.class);
 
     private static final String BANNER =
             "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
@@ -501,8 +497,6 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     }
 
     private static class Summary {
-
-        private static final Logger LOGGER = LoggerFactory.getLogger(Summary.class);
 
         private TestPlan testPlan;
         private long startMilliseconds;
