@@ -230,8 +230,6 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
 
     @Override
     public void executionSkipped(TestIdentifier testIdentifier, String reason) {
-        LOGGER.info("executionSkipped [%s] reason [%s]", testIdentifier.getUniqueId(), reason);
-
         TestDescriptor testDescriptor =
                 TestEngineTestDescriptorStore
                         .getInstance()
@@ -625,8 +623,6 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
         }
 
         public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-            LOGGER.info("execution skipped [%s] reason [%s]", testDescriptor.getUniqueId(), reason);
-
             if (testDescriptor instanceof RunnableParameterTestDescriptor) {
                 parametersFound.incrementAndGet();
                 parametersSkipped.incrementAndGet();
