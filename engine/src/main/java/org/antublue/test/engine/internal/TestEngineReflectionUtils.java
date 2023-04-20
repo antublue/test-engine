@@ -20,9 +20,6 @@ import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.junit.platform.engine.ConfigurationParameters;
-import org.junit.platform.engine.TestDescriptor;
-import org.junit.platform.launcher.TestPlan;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -89,7 +86,6 @@ public final class TestEngineReflectionUtils {
     public static List<Parameter> getParameters(Class<?> clazz) {
         try {
             Method method = getParameterSupplierMethod(clazz);
-
             Stream<Parameter> stream = (Stream<Parameter>) method.invoke(null, (Object[]) null);
             return stream.collect(Collectors.toList());
         } catch (TestClassConfigurationException e) {
@@ -360,7 +356,7 @@ public final class TestEngineReflectionUtils {
      * @param clazz
      * @return
      */
-    private static Method getParameterSupplierMethod(Class<?> clazz) {
+    public static Method getParameterSupplierMethod(Class<?> clazz) {
         synchronized (parameterSupplierMethodCache) {
             LOGGER.trace("getParameterSupplierMethod(%s)", clazz.getName());
 
@@ -531,11 +527,21 @@ public final class TestEngineReflectionUtils {
                 })
                 .filter(method -> {
                     int modifiers = method.getModifiers();
-                    if (scope == Scope.STATIC) {
-                        return Modifier.isStatic(modifiers);
+                    if (scope == Scope.STATIC && !Modifier.isStatic(modifiers)) {
+                        throw new TestClassConfigurationException(
+                                String.format(
+                                    "%s method [%s] must be declared static",
+                                    getAnnotationDisplayName(annotation),
+                                    method.getName()));
                     }
-                    else {
-                        return !Modifier.isStatic(modifiers);
+                    else if (scope != Scope.STATIC && Modifier.isStatic(modifiers)) {
+                        throw new TestClassConfigurationException(
+                                String.format(
+                                        "%s method [%s] must be not be declared static",
+                                        getAnnotationDisplayName(annotation),
+                                        method.getName()));
+                    } else {
+                        return true;
                     }
                 })
                 .filter(method -> {
@@ -600,13 +606,15 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to create a TestPlan from a TestDescriptor
-     *
-     * @param testDescriptor
-     * @param configurationParameters
+     * Method to get a display name for an Annoation
+     * 
+     * @param annotation
      * @return
      */
-    public static TestPlan createTestPlan(TestDescriptor testDescriptor, ConfigurationParameters configurationParameters) {
-        return TestPlan.from(Collections.singleton(testDescriptor), configurationParameters);
+    private static String getAnnotationDisplayName(Class<? extends Annotation> annotation) {
+        return String.format(
+                "@%s.%s",
+                annotation.getDeclaringClass().getSimpleName(),
+                annotation.getSimpleName());
     }
 }
