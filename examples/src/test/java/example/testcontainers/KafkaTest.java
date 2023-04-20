@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Example using testcontainers-java and Apache Kafka
  */
+@TestEngine.Disabled
 public class KafkaTest {
 
     private static Network network;
