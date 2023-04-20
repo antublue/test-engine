@@ -17,13 +17,11 @@
 package org.antublue.test.engine.internal.discovery;
 
 import org.antublue.test.engine.TestEngineConstants;
-import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
 import org.antublue.test.engine.internal.TestEngineException;
-import org.antublue.test.engine.internal.TestEngineReflectionUtils;
-import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
 import org.antublue.test.engine.internal.discovery.resolver.ClassSelectorResolver;
 import org.antublue.test.engine.internal.discovery.resolver.ClasspathRootResolver;
 import org.antublue.test.engine.internal.discovery.resolver.MethodSelectorResolver;
@@ -48,12 +46,10 @@ import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -78,18 +74,6 @@ public class TestEngineDiscoveryRequestResolver {
     private final TestClassTagPredicate excludeTestClassTagPredicate;
     private final TestMethodTagPredicate includeTestMethodTagPredicate;
     private final TestMethodTagPredicate excludeTestMethodTagPredicate;
-
-    /**
-     * Predicate to determine if a class is a test class (not abstract, has @TestEngine.Test methods)
-     */
-    private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
-        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class) || clazz.isAnnotationPresent(TestEngine.Disabled.class)) {
-            return false;
-        }
-
-        int modifiers = clazz.getModifiers();
-        return !Modifier.isAbstract(modifiers) && !TestEngineReflectionUtils.getTestMethods(clazz).isEmpty();
-    };
 
     /**
      * Constructor
@@ -189,7 +173,7 @@ public class TestEngineDiscoveryRequestResolver {
      * @param engineDescriptor
      */
     public void resolve(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
-        LOGGER.trace("resolve()");
+        LOGGER.trace("resolve(EngineDiscoveryRequest, EngineDescriptor)");
 
         try {
             // Resolve selectors
@@ -230,6 +214,10 @@ public class TestEngineDiscoveryRequestResolver {
                     .collect(Collectors.toList())
                     .forEach(uniqueIdSelector -> uniqueIdSelectorResolver.resolve(uniqueIdSelector, engineDescriptor));
 
+            /**
+             * TODO refactor code to use a visitor pattern to apply the predicate filters
+             */
+
             // Filter based on package names
             processPackageNameFilters(engineDiscoveryRequest, engineDescriptor);
 
@@ -240,10 +228,6 @@ public class TestEngineDiscoveryRequestResolver {
             // Filter test classes based on class/method tag predicates
             processTestClassTagPredicates(engineDescriptor);
             processTestMethodTagPredicates(engineDescriptor);
-
-            if (LOGGER.isTraceEnabled()) {
-                printTree(engineDescriptor);
-            }
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable t) {
@@ -265,29 +249,29 @@ public class TestEngineDiscoveryRequestResolver {
         for (PackageNameFilter packageNameFilter : packageNameFilters) {
             Set<? extends TestDescriptor> testDescriptors = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor testDescriptor : testDescriptors) {
-                ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(testDescriptor);
-                Set<? extends TestDescriptor> testDescriptors2 = new LinkedHashSet<>(testEngineClassTestDescriptor.getChildren());
+                RunnableClassTestDescriptor runnableClassTestDescriptor = Cast.cast(testDescriptor);
+                Set<? extends TestDescriptor> testDescriptors2 = new LinkedHashSet<>(runnableClassTestDescriptor.getChildren());
                 for (TestDescriptor testDescriptor2 : testDescriptors2) {
-                    ParameterTestDescriptor testEngineParameterTestDescriptor = Cast.cast(testDescriptor2);
+                    RunnableParameterTestDescriptor runnableParameterTestDescriptor = Cast.cast(testDescriptor2);
                     Set<? extends TestDescriptor> testDescriptors3 = new LinkedHashSet<>(testDescriptor2.getChildren());
                     for (TestDescriptor testDescriptor3 : testDescriptors3) {
-                        MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor3);
-                        Class<?> clazz = methodTestDescriptor.getTestClass();
+                        RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(testDescriptor3);
+                        Class<?> clazz = runnableMethodTestDescriptor.getTestClass();
                         String className = clazz.getName();
                         if (packageNameFilter.apply(className).excluded()) {
-                            methodTestDescriptor.removeFromHierarchy();
+                            runnableMethodTestDescriptor.removeFromHierarchy();
                         }
                     }
-                    Class<?> clazz = testEngineParameterTestDescriptor.getTestClass();
+                    Class<?> clazz = runnableParameterTestDescriptor.getTestClass();
                     String className = clazz.getName();
                     if (packageNameFilter.apply(className).excluded()) {
-                        testEngineParameterTestDescriptor.removeFromHierarchy();
+                        runnableParameterTestDescriptor.removeFromHierarchy();
                     }
                 }
-                Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
+                Class<?> clazz = runnableClassTestDescriptor.getTestClass();
                 String className = clazz.getName();
                 if (packageNameFilter.apply(className).excluded()) {
-                    testEngineClassTestDescriptor.removeFromHierarchy();
+                    runnableClassTestDescriptor.removeFromHierarchy();
                 }
             }
         }
@@ -308,16 +292,16 @@ public class TestEngineDiscoveryRequestResolver {
 
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
-                if (child instanceof ClassTestDescriptor) {
-                    ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
-                    UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
-                    Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
+                if (child instanceof RunnableClassTestDescriptor) {
+                    RunnableClassTestDescriptor runnableClassTestDescriptor = Cast.cast(child);
+                    UniqueId uniqueId = runnableClassTestDescriptor.getUniqueId();
+                    Class<?> clazz = runnableClassTestDescriptor.getTestClass();
 
                     if (includeTestClassPredicate.test(clazz)) {
                         LOGGER.trace("  accept [%s]", uniqueId);
                     } else {
                         LOGGER.trace("  prune  [%s]", uniqueId);
-                        testEngineClassTestDescriptor.removeFromHierarchy();
+                        runnableClassTestDescriptor.removeFromHierarchy();
                     }
                 }
             }
@@ -328,14 +312,14 @@ public class TestEngineDiscoveryRequestResolver {
 
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
-                if (child instanceof ClassTestDescriptor) {
-                    ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
-                    UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
-                    Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
+                if (child instanceof RunnableClassTestDescriptor) {
+                    RunnableClassTestDescriptor runnableClassTestDescriptor = Cast.cast(child);
+                    UniqueId uniqueId = runnableClassTestDescriptor.getUniqueId();
+                    Class<?> clazz = runnableClassTestDescriptor.getTestClass();
 
                     if (excludeTestClassPredicate.test(clazz)) {
                         LOGGER.trace("  prune  [%s]", uniqueId);
-                        testEngineClassTestDescriptor.removeFromHierarchy();
+                        runnableClassTestDescriptor.removeFromHierarchy();
                     } else {
                         LOGGER.trace("  accept [%s]", uniqueId);
                     }
@@ -357,22 +341,22 @@ public class TestEngineDiscoveryRequestResolver {
 
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
-                if (child instanceof ClassTestDescriptor) {
+                if (child instanceof RunnableClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof ParameterTestDescriptor) {
+                        if (grandChild instanceof RunnableParameterTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
-                                if (greatGrandChild instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
-                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
-                                    Method method = methodTestDescriptor.getTestMethod();
+                                if (greatGrandChild instanceof RunnableMethodTestDescriptor) {
+                                    RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
+                                    UniqueId uniqueId = runnableMethodTestDescriptor.getUniqueId();
+                                    Method method = runnableMethodTestDescriptor.getTestMethod();
 
                                     if (includeTestMethodPredicate.test(method)) {
                                         LOGGER.trace("  accept [%s]", uniqueId);
                                     } else {
                                         LOGGER.trace("  prune  [%s]", uniqueId);
-                                        methodTestDescriptor.removeFromHierarchy();
+                                        runnableMethodTestDescriptor.removeFromHierarchy();
                                     }
                                 }
                             }
@@ -387,20 +371,20 @@ public class TestEngineDiscoveryRequestResolver {
 
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
-                if (child instanceof ClassTestDescriptor) {
+                if (child instanceof RunnableClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof ParameterTestDescriptor) {
+                        if (grandChild instanceof RunnableParameterTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
-                                if (greatGrandChild instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
-                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
-                                    Method method = methodTestDescriptor.getTestMethod();
+                                if (greatGrandChild instanceof RunnableMethodTestDescriptor) {
+                                    RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
+                                    UniqueId uniqueId = runnableMethodTestDescriptor.getUniqueId();
+                                    Method method = runnableMethodTestDescriptor.getTestMethod();
 
                                     if (excludeTestMethodPredicate.test(method)) {
                                         LOGGER.trace("  prune  [%s]", uniqueId);
-                                        methodTestDescriptor.removeFromHierarchy();
+                                        runnableMethodTestDescriptor.removeFromHierarchy();
                                     } else {
                                         LOGGER.trace("  accept [%s]", uniqueId);
                                     }
@@ -426,8 +410,8 @@ public class TestEngineDiscoveryRequestResolver {
 
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
-                if (child instanceof ClassTestDescriptor) {
-                    ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
+                if (child instanceof RunnableClassTestDescriptor) {
+                    RunnableClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
                     UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
                     Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
 
@@ -446,8 +430,8 @@ public class TestEngineDiscoveryRequestResolver {
 
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
-                if (child instanceof ClassTestDescriptor) {
-                    ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
+                if (child instanceof RunnableClassTestDescriptor) {
+                    RunnableClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
                     UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
                     Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
 
@@ -475,22 +459,22 @@ public class TestEngineDiscoveryRequestResolver {
 
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
-                if (child instanceof ClassTestDescriptor) {
+                if (child instanceof RunnableClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof ParameterTestDescriptor) {
+                        if (grandChild instanceof RunnableParameterTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
-                                if (greatGrandChild instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
-                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
-                                    Method method = methodTestDescriptor.getTestMethod();
+                                if (greatGrandChild instanceof RunnableMethodTestDescriptor) {
+                                    RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
+                                    UniqueId uniqueId = runnableMethodTestDescriptor.getUniqueId();
+                                    Method method = runnableMethodTestDescriptor.getTestMethod();
 
                                     if (includeTestMethodTagPredicate.test(method)) {
                                         LOGGER.trace("  accept [%s]", uniqueId);
                                     } else {
                                         LOGGER.trace("  prune  [%s]", uniqueId);
-                                        methodTestDescriptor.removeFromHierarchy();
+                                        runnableMethodTestDescriptor.removeFromHierarchy();
                                     }
                                 }
                             }
@@ -505,20 +489,20 @@ public class TestEngineDiscoveryRequestResolver {
 
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
-                if (child instanceof ClassTestDescriptor) {
+                if (child instanceof RunnableClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof ParameterTestDescriptor) {
+                        if (grandChild instanceof RunnableParameterTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
-                                if (greatGrandChild instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
-                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
-                                    Method method = methodTestDescriptor.getTestMethod();
+                                if (greatGrandChild instanceof RunnableMethodTestDescriptor) {
+                                    RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
+                                    UniqueId uniqueId = runnableMethodTestDescriptor.getUniqueId();
+                                    Method method = runnableMethodTestDescriptor.getTestMethod();
 
                                     if (excludeTestMethodTagPredicate.test(method)) {
                                         LOGGER.trace("  prune  [%s]", uniqueId);
-                                        methodTestDescriptor.removeFromHierarchy();
+                                        runnableMethodTestDescriptor.removeFromHierarchy();
                                     } else {
                                         LOGGER.trace("  accept [%s]", uniqueId);
                                     }
@@ -529,56 +513,5 @@ public class TestEngineDiscoveryRequestResolver {
                 }
             }
         }
-    }
-
-    /**
-     * Method to print the test tree
-     *
-     * @param engineDescriptor
-     */
-    private static void printTree(EngineDescriptor engineDescriptor) {
-        LOGGER.trace("EngineDescriptor - > " + engineDescriptor.getUniqueId());
-        Set<? extends TestDescriptor> testDescriptors = engineDescriptor.getChildren();
-        for (TestDescriptor testDescriptor : testDescriptors) {
-            printTree(testDescriptor, 2);
-        }
-    }
-
-    /**
-     * Method to print a test descriptor
-     *
-     * @param parentTestDescriptor
-     * @param indent
-     */
-    private static void printTree(TestDescriptor parentTestDescriptor, int indent) {
-        if (parentTestDescriptor instanceof ClassTestDescriptor) {
-            LOGGER.trace(pad(indent) + "ClassTestDescriptor - > " + parentTestDescriptor.getUniqueId());
-            Set<? extends TestDescriptor> testDescriptors = ((ClassTestDescriptor) parentTestDescriptor).getChildren();
-            for (TestDescriptor childTestDescriptor : testDescriptors) {
-                printTree(childTestDescriptor, indent + 2);
-            }
-        } else if (parentTestDescriptor instanceof ParameterTestDescriptor) {
-            LOGGER.trace(pad(indent) + "ParameterTestDescriptor - > " + parentTestDescriptor.getUniqueId());
-            Set<? extends TestDescriptor> testDescriptors = ((ParameterTestDescriptor) parentTestDescriptor).getChildren();
-            for (TestDescriptor childTestDescriptor : testDescriptors) {
-                printTree(childTestDescriptor, indent + 2);
-            }
-        } else  {
-            LOGGER.trace(pad(indent) + "MethodTestDescriptor - > " + parentTestDescriptor.getUniqueId());
-        }
-    }
-
-    /**
-     * Method to left pad a string with spaces
-     *
-     * @param length
-     * @return
-     */
-    private static String pad(int length) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            stringBuilder.append(" ");
-        }
-        return stringBuilder.toString();
     }
 }
