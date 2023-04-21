@@ -28,6 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Method to execute an ExecutionRequest
@@ -101,7 +102,7 @@ public class TestEngineExecutor {
      */
     private static class NamedThreadFactory implements ThreadFactory {
 
-        private int threadId = 1;
+        private final AtomicInteger threadId = new AtomicInteger();
 
         /**
          * Method to create a new Thread
@@ -111,14 +112,8 @@ public class TestEngineExecutor {
          */
         @Override
         public Thread newThread(Runnable r) {
-            String threadName;
-            synchronized (this) {
-                threadName = String.format("test-engine-%02d", this.threadId);
-                this.threadId++;
-            }
-
             Thread thread = new Thread(r);
-            thread.setName(threadName);
+            thread.setName(String.format("test-engine-%02d", threadId.getAndIncrement()));
             thread.setDaemon(true);
             return thread;
         }
