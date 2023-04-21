@@ -103,7 +103,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         new TestEngineDiscoveryRequestResolver().resolve(testEngineDiscoveryRequest, runnableEngineDescriptor);
 
         // Store the test descriptors
-        TestEngineTestDescriptorStore.getInstance().put(runnableEngineDescriptor);
+        TestEngineTestDescriptorStore.getInstance().store(runnableEngineDescriptor);
 
         // Return the engine descriptor with all child test descriptors
         return runnableEngineDescriptor;
