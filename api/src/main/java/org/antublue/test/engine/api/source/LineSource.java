@@ -32,8 +32,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Class to create a Stream of Parameters where each Parameter
- * value is a line, skipping lines that start with a "#"
+ * Class to create a Stream of Parameters where each Parameter value is a line,
+ * <br/>
+ * Skipped lines that start with a "#", but accept empty lines
  */
 public final class LineSource {
 
