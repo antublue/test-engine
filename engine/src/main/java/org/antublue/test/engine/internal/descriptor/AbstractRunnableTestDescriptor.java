@@ -26,14 +26,17 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Class to implement a Runnable test descriptor
+ */
 @SuppressWarnings("unchecked")
 abstract class AbstractRunnableTestDescriptor
         extends org.junit.platform.engine.support.descriptor.AbstractTestDescriptor
         implements Runnable {
 
+    private final ThrowableCollector throwableCollector;
     private TestExecutionContext testExecutionContext;
-    private ThrowableCollector throwableCollector;
-
+    
     /**
      * Constructor
      *
@@ -46,7 +49,8 @@ abstract class AbstractRunnableTestDescriptor
     }
 
     /**
-     * Method to get children casted as a specific class
+     * Method to get a List of children cast as a specific class
+     *
      * @param clazz
      * @return
      * @param <T>
@@ -58,20 +62,46 @@ abstract class AbstractRunnableTestDescriptor
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Method to set the TestExecutionContext
+     *
+     * @param testExecutionContext
+     */
     public void setTestExecutionContext(TestExecutionContext testExecutionContext) {
         this.testExecutionContext = testExecutionContext;
     }
 
+    /**
+     * Method to get the TestExecutionContext
+     *
+     * @return
+     */
     protected TestExecutionContext getTestExecutionContext() {
         return testExecutionContext;
     }
 
+    /**
+     * Method to get the test descriptors ThrowableCollector
+     *
+     * @return
+     */
     protected ThrowableCollector getThrowableCollector() {
         return throwableCollector;
     }
 
+    /**
+     * Method to run the test descriptor
+     * <br/>
+     * The TestExecutionContext must be set prior to the call
+     */
     public abstract void run();
 
+    /**
+     * Method to resolve an Exception to the underlying Exception
+     *
+     * @param t
+     * @return
+     */
     protected static Throwable resolve(Throwable t) {
         if (t instanceof RuntimeException) {
             t = t.getCause();
@@ -84,6 +114,9 @@ abstract class AbstractRunnableTestDescriptor
         return t;
     }
 
+    /**
+     * Method to flush System.out and System.err PrintStreams
+     */
     public void flush() {
         synchronized (System.out) {
             synchronized (System.err) {
