@@ -85,6 +85,7 @@ public class ClasspathRootResolver {
 
                         engineDescriptor.addChild(testEngineClassTestDescriptor);
 
+                        // TODO refactor to use forEach
                         List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
                         for (int i = 0; i < parameters.size(); i++) {
                             Parameter parameter = parameters.get(i);
@@ -98,6 +99,7 @@ public class ClasspathRootResolver {
 
                             testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
 
+                            // TODO refactor to use forEach
                             List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
                             for (Method method : methods) {
                                 uniqueId = uniqueId.append("method", method.getName());

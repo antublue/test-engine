@@ -27,8 +27,6 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
-import java.lang.reflect.Method;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -64,32 +62,31 @@ public class ClassSelectorResolver {
         TestEngineReflectionUtils
                 .getParameters(clazz)
                 .forEach(parameter -> {
-                    UniqueId uniqueId =
+                    UniqueId parameterDescriptoruniqueId =
                             classDescriptorUniqueId.append("parameter", String.valueOf(index.get()));
 
                     RunnableParameterTestDescriptor testEngineParameterTestDescriptor =
                             TestDescriptorUtils.createParameterTestDescriptor(
-                                    uniqueId,
+                                    parameterDescriptoruniqueId,
                                     clazz,
                                     parameter);
 
                     testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
 
-                    List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
-                    for (Method method : methods) {
-                        uniqueId = uniqueId.append("method", method.getName());
+                    TestEngineReflectionUtils
+                            .getTestMethods(clazz)
+                            .forEach(method -> {
+                                UniqueId uniqueId = parameterDescriptoruniqueId.append("method", method.getName());
 
-                        RunnableMethodTestDescriptor methodTestDescriptor =
-                                TestDescriptorUtils.createMethodTestDescriptor(
-                                        uniqueId,
-                                        clazz,
-                                        parameter,
-                                        method);
+                                RunnableMethodTestDescriptor methodTestDescriptor =
+                                        TestDescriptorUtils.createMethodTestDescriptor(
+                                                uniqueId,
+                                                clazz,
+                                                parameter,
+                                                method);
 
-                        testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
-
-                        uniqueId = uniqueId.removeLastSegment();
-                    }
+                                testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
+                            });
 
                     testEngineParameterTestDescriptor.prune();
                     index.incrementAndGet();

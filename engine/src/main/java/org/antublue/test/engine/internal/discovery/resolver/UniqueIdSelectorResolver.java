@@ -90,6 +90,7 @@ public class UniqueIdSelectorResolver {
                                                 clazz,
                                                 parameter));
 
+                // TODO refactor to use forEach
                 List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
                 for (Method method : methods) {
                     UniqueId methodUniqueId = selectorUniqueId.append("method", method.getName());
@@ -122,7 +123,7 @@ public class UniqueIdSelectorResolver {
                                         selectorUniqueId,
                                         clazz));
 
-
+                // TODO refactor to use forEach
                 List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
                 for (int i = 0; i < parameters.size(); i++) {
                     Parameter parameter = parameters.get(i);
@@ -134,6 +135,7 @@ public class UniqueIdSelectorResolver {
                                     clazz,
                                     parameter);
 
+                    // TODO refactor to use forEach
                     List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
                     for (Method method : methods) {
                         UniqueId methodUniqueId = parameterUniqueId.append("method", method.getName());

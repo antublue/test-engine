@@ -293,6 +293,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (includeTestClassPredicate != null) {
             LOGGER.trace("includeTestClassPredicate [%s]", includeTestClassPredicate.getRegex());
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
@@ -311,6 +312,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (excludeTestClassPredicate != null) {
             LOGGER.trace("excludeTestClassPredicate [%s]", excludeTestClassPredicate.getRegex());
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
@@ -338,6 +340,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (includeTestMethodPredicate != null) {
             LOGGER.trace("includeTestMethodPredicate [%s]", includeTestMethodPredicate.getRegex());
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
@@ -366,6 +369,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (excludeTestMethodPredicate != null) {
             LOGGER.trace("excludeTestMethodPredicate [%s]", excludeTestMethodPredicate.getRegex());
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
@@ -404,6 +408,7 @@ public class TestEngineDiscoveryRequestResolver {
         if (includeTestClassTagPredicate != null) {
             LOGGER.trace("includeTestClassTagPredicate [%s]", includeTestClassTagPredicate.getRegex());
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
+            // TODO refactor to use forEach
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
                     RunnableClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
@@ -422,6 +427,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (excludeTestClassTagPredicate != null) {
             LOGGER.trace("excludeTestClassTagPredicate [%s]", excludeTestClassTagPredicate.getRegex());
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
@@ -450,6 +456,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (includeTestMethodTagPredicate != null) {
             LOGGER.trace("includeTestMethodTagPredicate [%s]", includeTestMethodTagPredicate.getRegex());
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
@@ -479,6 +486,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (excludeTestMethodTagPredicate != null) {
             LOGGER.trace("excludeTestMethodTagPredicate [%s]", excludeTestMethodTagPredicate.getRegex());
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
