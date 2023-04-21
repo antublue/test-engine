@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.descriptor;
+package org.antublue.test.engine.internal.util;
 
 import java.util.ArrayList;
 import java.util.List;

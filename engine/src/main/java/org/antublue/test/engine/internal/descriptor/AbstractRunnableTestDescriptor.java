@@ -17,13 +17,14 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.internal.TestExecutionContext;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 abstract class AbstractRunnableTestDescriptor
@@ -33,19 +34,54 @@ abstract class AbstractRunnableTestDescriptor
     private TestExecutionContext testExecutionContext;
     private ThrowableCollector throwableCollector;
 
+    /**
+     * Constructor
+     *
+     * @param uniqueId
+     * @param displayName
+     */
     protected AbstractRunnableTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
         throwableCollector = new ThrowableCollector();
     }
 
+    /**
+     * Method to get children casted as a specific class
+     * @param clazz
+     * @return
+     * @param <T>
+     */
     public <T> List<T> getChildren(Class<T> clazz) {
-        final List<T> list = new ArrayList<>();
-        getChildren().forEach((Consumer<TestDescriptor>) testDescriptor -> list.add((T) testDescriptor));
-        return list;
+        return getChildren()
+                .stream()
+                .map((Function<TestDescriptor, T>) testDescriptor -> (T) testDescriptor)
+                .collect(Collectors.toList());
     }
 
     public void setTestExecutionContext(TestExecutionContext testExecutionContext) {
         this.testExecutionContext = testExecutionContext;
+    }
+
+    protected TestExecutionContext getTestExecutionContext() {
+        return testExecutionContext;
+    }
+
+    protected ThrowableCollector getThrowableCollector() {
+        return throwableCollector;
+    }
+
+    public abstract void run();
+
+    protected static Throwable resolve(Throwable t) {
+        if (t instanceof RuntimeException) {
+            t = t.getCause();
+        }
+
+        if (t instanceof InvocationTargetException) {
+            return t.getCause();
+        }
+
+        return t;
     }
 
     public void flush() {
@@ -57,21 +93,4 @@ abstract class AbstractRunnableTestDescriptor
         }
     }
 
-    public abstract void run();
-
-    protected TestExecutionContext getTestExecutionContext() {
-        return testExecutionContext;
-    }
-
-    protected ThrowableCollector getThrowableCollector() {
-        return throwableCollector;
-    }
-
-    protected static Throwable resolve(Throwable t) {
-        if (t instanceof InvocationTargetException) {
-            return t.getCause();
-        } else {
-            return t;
-        }
-    }
 }

@@ -20,6 +20,8 @@ import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.TestExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
+import org.antublue.test.engine.internal.util.ThrowableConsumer;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -60,6 +62,9 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
         return true;
     }
 
+    /**
+     * Method to run the test descriptor
+     */
     public void run() {
         TestExecutionContext testExecutionContext = getTestExecutionContext();
         ThrowableCollector throwableCollector = getThrowableCollector();
@@ -77,19 +82,22 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
             testExecutionContext.setTestInstance(testInstance);
 
             LOGGER.trace("invoking [%s] @TestEngine.BeforeClass methods ...", testClassName);
-            for (Method beforeClass : TestEngineReflectionUtils.getBeforeClassMethods(testClass)) {
-                LOGGER.trace(
-                        String.format(
-                                "invoking [%s] @TestEngine.BeforeClass method [%s] ...",
-                                testClassName,
-                                beforeClass.getName()));
 
-                try {
-                    beforeClass.invoke(null, (Object[]) null);
-                } finally {
-                    flush();
-                }
-            }
+            TestEngineReflectionUtils
+                    .getBeforeClassMethods(testClass)
+                    .forEach((ThrowableConsumer<Method>) method -> {
+                        LOGGER.trace(
+                                String.format(
+                                        "invoking [%s] @TestEngine.BeforeClass method [%s] ...",
+                                        testClassName,
+                                        method.getName()));
+
+                        try {
+                            method.invoke(null, (Object[]) null);
+                        } finally {
+                            flush();
+                        }
+                    });
         } catch (Throwable t) {
             throwableCollector.add(t);
             resolve(t).printStackTrace();
@@ -106,19 +114,22 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
 
         try {
             LOGGER.trace("invoking [%s] @TestEngine.AfterClass methods ...", testClassName);
-            for (Method afterClassMethod : TestEngineReflectionUtils.getAfterClassMethods(testClass)) {
-                LOGGER.trace(
-                        String.format(
-                                "invoking [%s] @TestEngine.AfterClass method [%s] ...",
-                                testClassName,
-                                afterClassMethod.getName()));
 
-                try {
-                    afterClassMethod.invoke(testInstance, (Object[]) null);
-                } finally {
-                    flush();
-                }
-            }
+            TestEngineReflectionUtils
+                    .getAfterClassMethods(testClass)
+                    .forEach((ThrowableConsumer<Method>) method -> {
+                        LOGGER.trace(
+                                String.format(
+                                        "invoking [%s] @TestEngine.AfterClass method [%s] ...",
+                                        testClassName,
+                                        method.getName()));
+
+                        try {
+                            method.invoke(null, (Object[]) null);
+                        } finally {
+                            flush();
+                        }
+                    });
         } catch (Throwable t) {
             throwableCollector.add(t);
             resolve(t).printStackTrace();

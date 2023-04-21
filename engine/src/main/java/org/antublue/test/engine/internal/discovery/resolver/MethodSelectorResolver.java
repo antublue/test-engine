@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.discovery.resolver;
 
-import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
@@ -31,7 +30,7 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 /**
@@ -64,43 +63,46 @@ public class MethodSelectorResolver {
     public void resolve(MethodSelector methodSelector, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolve [%s]", methodSelector.getJavaMethod().getName());
 
-        UniqueId uniqueId = engineDescriptor.getUniqueId();
+        UniqueId engineDescriptorUniqueId = engineDescriptor.getUniqueId();
         Class<?> clazz = methodSelector.getJavaClass();
         Method method = methodSelector.getJavaMethod();
-        uniqueId = uniqueId.append("class", clazz.getName());
+        final UniqueId classDescriptorUniqueId = engineDescriptorUniqueId.append("class", clazz.getName());
 
         RunnableClassTestDescriptor testEngineClassTestDescriptor =
                 TestDescriptorUtils.createClassTestDescriptor(
-                        uniqueId,
+                        classDescriptorUniqueId,
                         clazz);
 
-        List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
-        for (int i = 0; i < parameters.size(); i++) {
-            Parameter parameter = parameters.get(i);
-            uniqueId = uniqueId.append("parameter", String.valueOf(i));
+        final AtomicInteger index = new AtomicInteger();
+        TestEngineReflectionUtils
+                .getParameters(clazz)
+                .forEach(parameter -> {
+                    UniqueId uniqueId =
+                            classDescriptorUniqueId.append("parameter", String.valueOf(index.get()));
 
-            RunnableParameterTestDescriptor testEngineParameterTestDescriptor =
-                    TestDescriptorUtils.createParameterTestDescriptor(
-                            uniqueId,
-                            clazz,
-                            parameter);
+                    RunnableParameterTestDescriptor testEngineParameterTestDescriptor =
+                            TestDescriptorUtils.createParameterTestDescriptor(
+                                    uniqueId,
+                                    clazz,
+                                    parameter);
 
-            uniqueId = uniqueId.append("method", method.getName());
+                    uniqueId = uniqueId.append("method", method.getName());
 
-            RunnableMethodTestDescriptor methodTestDescriptor =
-                    TestDescriptorUtils.createMethodTestDescriptor(
-                            uniqueId,
-                            clazz,
-                            parameter,
-                            method);
+                    RunnableMethodTestDescriptor methodTestDescriptor =
+                            TestDescriptorUtils.createMethodTestDescriptor(
+                                    uniqueId,
+                                    clazz,
+                                    parameter,
+                                    method);
 
-            uniqueId = uniqueId.removeLastSegment();
-            testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
+                    uniqueId = uniqueId.removeLastSegment();
+                    testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
 
-            uniqueId = uniqueId.removeLastSegment();
-            testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
-        }
+                    uniqueId.removeLastSegment();
+                    testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
 
-        engineDescriptor.addChild(testEngineClassTestDescriptor);
+                    engineDescriptor.addChild(testEngineClassTestDescriptor);
+                    index.incrementAndGet();
+                });
     }
 }

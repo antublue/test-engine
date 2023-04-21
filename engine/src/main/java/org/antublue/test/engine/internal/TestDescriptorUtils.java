@@ -28,6 +28,7 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Method;
+import java.util.function.Consumer;
 
 public final class TestDescriptorUtils {
 
@@ -88,9 +89,7 @@ public final class TestDescriptorUtils {
             LOGGER.trace("--------------------");
             LOGGER.trace("Test descriptor tree");
             LOGGER.trace("--------------------");
-
             log(testDescriptor, 0);
-
             LOGGER.trace("------------------------");
         }
     }
@@ -136,8 +135,8 @@ public final class TestDescriptorUtils {
 
         LOGGER.trace(stringBuilder.toString());
 
-        for (TestDescriptor child : testDescriptor.getChildren()) {
-            log(child, indent + 2);
-        }
+        testDescriptor
+                .getChildren()
+                .forEach((Consumer<TestDescriptor>) testDescriptor1 -> log(testDescriptor1, indent + 2));
     }
 }

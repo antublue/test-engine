@@ -135,18 +135,18 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     public void testPlanExecutionStarted(TestPlan testPlan) {
         summary.testPlanExecutionStarted(testPlan);
 
-        Set<TestIdentifier> testIdentifiers = testPlan.getRoots();
-        for (TestIdentifier testIdentifier : testIdentifiers) {
-            TestDescriptor testDescriptor =
-                    TestEngineTestDescriptorStore
-                            .getInstance()
-                            .get(testIdentifier.getUniqueIdObject())
-                            .orElse(null);
+        testPlan.getRoots()
+                .forEach(testIdentifier -> {
+                    TestDescriptor testDescriptor =
+                            TestEngineTestDescriptorStore
+                                    .getInstance()
+                                    .get(testIdentifier.getUniqueIdObject())
+                                    .orElse(null);
 
-            if (testDescriptor != null) {
-                TestDescriptorUtils.log(testDescriptor);
-            }
-        }
+                    if (testDescriptor != null) {
+                        TestDescriptorUtils.log(testDescriptor);
+                    }
+                });
 
         System.out.println(INFO + SEPARATOR);
         System.out.println(INFO + BANNER);
@@ -436,11 +436,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
 
         System.out.println(INFO + SEPARATOR);
 
-        boolean failed =
-                summary.getTestClassCount() == 0
-                        || (summary.getTestsFailedCount() + summary.getParametersFailedCount()) > 0;
-
-        if (failed) {
+        if (hasFailures()) {
             System.out.println(INFO + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"));
         } else {
             System.out.println(INFO + AnsiColor.GREEN_BOLD.apply("PASSED"));
@@ -498,25 +494,24 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
 
     private static class Summary {
 
-        private TestPlan testPlan;
         private long startMilliseconds;
         private long finishedMilliseconds;
 
-        private Set<Class<?>> testClasses;
-        private AtomicLong testClassesFound;
-        private AtomicLong testClassesSuccess;
-        private AtomicLong testClassesFailed;
-        private AtomicLong testClassesSkipped;
+        private final Set<Class<?>> testClasses;
+        private final AtomicLong testClassesFound;
+        private final AtomicLong testClassesSuccess;
+        private final AtomicLong testClassesFailed;
+        private final AtomicLong testClassesSkipped;
 
-        private AtomicLong parametersFound;
-        private AtomicLong parametersSuccess;
-        private AtomicLong parametersFailed;
-        private AtomicLong parametersSkipped;
+        private final AtomicLong parametersFound;
+        private final AtomicLong parametersSuccess;
+        private final AtomicLong parametersFailed;
+        private final AtomicLong parametersSkipped;
 
-        private AtomicLong methodsFound;
-        private AtomicLong methodsSuccess;
-        private AtomicLong methodsFailed;
-        private AtomicLong methodsSkipped;
+        private final AtomicLong methodsFound;
+        private final AtomicLong methodsSuccess;
+        private final AtomicLong methodsFailed;
+        private final AtomicLong methodsSkipped;
 
         public Summary() {
             testClasses = Collections.synchronizedSet(new HashSet<>());
@@ -594,7 +589,6 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
         }
 
         public void testPlanExecutionStarted(TestPlan testPlan) {
-            this.testPlan = testPlan;
             startMilliseconds = System.currentTimeMillis();
             finishedMilliseconds = startMilliseconds;
         }

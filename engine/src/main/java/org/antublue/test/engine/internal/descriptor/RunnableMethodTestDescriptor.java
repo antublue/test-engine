@@ -21,6 +21,8 @@ import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.TestExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
+import org.antublue.test.engine.internal.util.ThrowableConsumer;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -80,23 +82,26 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
 
         engineExecutionListener.executionStarted(this);
 
-        Object testInstance = testExecutionContext.getTestInstance();
-        Class<?> testClass = testInstance.getClass();
-        String testClassName = testClass.getName();
+        final Object testInstance = testExecutionContext.getTestInstance();
+        final Class<?> testClass = testInstance.getClass();
+        final String testClassName = testClass.getName();
 
         try {
             LOGGER.trace("invoking [%s] @TestEngine.BeforeEach methods ...", testClassName);
-            for (Method beforeEachMethod : TestEngineReflectionUtils.getBeforeEachMethods(testClass)) {
-                LOGGER.trace(
-                        "invoking [%s] @TestEngine.BeforeEach method [%s] ...",
-                        testClassName,
-                        beforeEachMethod.getName());
-                try {
-                    beforeEachMethod.invoke(testInstance, (Object[]) null);
-                } finally {
-                    flush();
-                }
-            }
+
+            TestEngineReflectionUtils
+                    .getBeforeEachMethods(testClass)
+                    .forEach((ThrowableConsumer<Method>) method -> {
+                        LOGGER.trace(
+                                "invoking [%s] @TestEngine.BeforeEach method [%s] ...",
+                                testClassName,
+                                method.getName());
+                        try {
+                            method.invoke(testInstance, (Object[]) null);
+                        } finally {
+                            flush();
+                        }
+                    });
         } catch (Throwable t) {
             throwableCollector.add(t);
             resolve(t).printStackTrace();
@@ -118,17 +123,20 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
 
         try {
             LOGGER.trace("invoking [%s] @TestEngine.AfterEach methods ...", testClassName);
-            for (Method afterEachMethod : TestEngineReflectionUtils.getAfterEachMethods(testClass)) {
-                LOGGER.trace(
-                        "invoking [%s] @TestEngine.AfterEach method [%s] ...",
-                        testClassName,
-                        afterEachMethod.getName());
-                try {
-                    afterEachMethod.invoke(testInstance, (Object[]) null);
-                } finally {
-                    flush();
-                }
-            }
+
+            TestEngineReflectionUtils
+                    .getAfterEachMethods(testClass)
+                    .forEach((ThrowableConsumer<Method>) method -> {
+                        LOGGER.trace(
+                                "invoking [%s] @TestEngine.AfterEach method [%s] ...",
+                                testClassName,
+                                method.getName());
+                        try {
+                            method.invoke(testInstance, (Object[]) null);
+                        } finally {
+                            flush();
+                        }
+                    });
         } catch (Throwable t) {
             throwableCollector.add(t);
             resolve(t).printStackTrace();

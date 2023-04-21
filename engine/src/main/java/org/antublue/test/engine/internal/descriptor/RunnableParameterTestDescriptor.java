@@ -21,6 +21,8 @@ import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.TestExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
+import org.antublue.test.engine.internal.util.ThrowableConsumer;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -29,7 +31,6 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Optional;
 
 @SuppressWarnings("unchecked")
@@ -66,6 +67,9 @@ public final class RunnableParameterTestDescriptor extends AbstractRunnableTestD
         return true;
     }
 
+    /**
+     * Method to run the test descriptor
+     */
     public void run() {
         TestExecutionContext testExecutionContext = getTestExecutionContext();
         ThrowableCollector throwableCollector = getThrowableCollector();
@@ -75,43 +79,44 @@ public final class RunnableParameterTestDescriptor extends AbstractRunnableTestD
 
         engineExecutionListener.executionStarted(this);
 
-        Object testInstance = null;
-        Class<?> testClass = null;
-        String testClassName = null;
+        final Object testInstance = testExecutionContext.getTestInstance();
+        final Class<?> testClass = testInstance.getClass();
+        final String testClassName = testClass.getName();
 
         try {
-            testInstance = testExecutionContext.getTestInstance();
-            testClass = testInstance.getClass();
-            testClassName = testClass.getName();
-
             testExecutionContext.setTestInstance(testInstance);
 
-            Collection<Field> testParameterFields = TestEngineReflectionUtils.getParameterFields(testClass);
-            for (Field testParameterField : testParameterFields) {
-                LOGGER.trace(
-                        "injecting [%s] @TestEngine.Parameter field [%s] ...",
-                        testClassName,
-                        testParameterField.getName());
-                try {
-                    testParameterField.set(testInstance, testParameter);
-                } finally {
-                    flush();
-                }
-            }
+            LOGGER.trace("injecting [%s] @TestEngine.Parameter fields ...", testClassName);
+
+            TestEngineReflectionUtils
+                    .getParameterFields(testClass)
+                    .forEach((ThrowableConsumer<Field>) field -> {
+                        LOGGER.trace(
+                                "injecting [%s] @TestEngine.Parameter field [%s] ...",
+                                testClassName,
+                                field.getName());
+                        try {
+                            field.set(testInstance, testParameter);
+                        } finally {
+                            flush();
+                        }
+                    });
 
             LOGGER.trace("invoking [%s] @TestEngine.Parameter methods ...", testClassName);
-            Collection<Method> testParameterMethods = TestEngineReflectionUtils.getParameterMethods(testClass);
-            for (Method testParameterMethod : testParameterMethods) {
-                LOGGER.trace(
-                        "invoking [%s] @TestEngine.Parameter method [%s] ...",
-                        testClassName,
-                        testParameterMethod.getName());
-                try {
-                    testParameterMethod.invoke(testInstance, testParameter);
-                } finally {
-                    flush();
-                }
-            }
+
+            TestEngineReflectionUtils
+                    .getParameterMethods(testClass)
+                    .forEach((ThrowableConsumer<Method>) method -> {
+                        LOGGER.trace(
+                                "invoking [%s] @TestEngine.Parameter method [%s] ...",
+                                testClassName,
+                                method.getName());
+                        try {
+                            method.invoke(testInstance, testParameter);
+                        } finally {
+                            flush();
+                        }
+                    });
         } catch (Throwable t) {
             throwableCollector.add(t);
             resolve(t).printStackTrace();
@@ -119,18 +124,19 @@ public final class RunnableParameterTestDescriptor extends AbstractRunnableTestD
 
         if (throwableCollector.isEmpty()) {
             try {
-                Collection<Method> beforeAllMethods = TestEngineReflectionUtils.getBeforeAllMethods(testClass);
-                for (Method beforeAllMethod : beforeAllMethods) {
-                    LOGGER.trace(
-                            "invoking [%s] @TestEngine.BeforeAll method [%s] ...",
-                            testClassName,
-                            beforeAllMethod.getName());
-                    try {
-                        beforeAllMethod.invoke(testInstance, (Object[]) null);
-                    } finally {
-                        flush();
-                    }
-                }
+                TestEngineReflectionUtils
+                        .getBeforeAllMethods(testClass)
+                        .forEach((ThrowableConsumer<Method>) method -> {
+                            LOGGER.trace(
+                                    "invoking [%s] @TestEngine.BeforeAll method [%s] ...",
+                                    testClassName,
+                                    method.getName());
+                            try {
+                                method.invoke(testInstance, (Object[]) null);
+                            } finally {
+                                flush();
+                            }
+                        });
 
                 getChildren(RunnableMethodTestDescriptor.class)
                         .forEach(executableMethodTestDescriptor -> {
@@ -145,18 +151,19 @@ public final class RunnableParameterTestDescriptor extends AbstractRunnableTestD
         }
 
         try {
-            Collection<Method> afterAllMethods = TestEngineReflectionUtils.getAfterAllMethods(testClass);
-            for (Method afterAllMethod : afterAllMethods) {
-                LOGGER.trace(
-                        "invoking [%s] @TestEngine.AfterAll method [%s] ...",
-                        testClassName,
-                        afterAllMethod.getName());
-                try {
-                    afterAllMethod.invoke(testInstance, (Object[]) null);
-                } finally {
-                    flush();
-                }
-            }
+            TestEngineReflectionUtils
+                    .getAfterAllMethods(testClass)
+                    .forEach((ThrowableConsumer<Method>) method -> {
+                        LOGGER.trace(
+                                "invoking [%s] @TestEngine.AfterAll method [%s] ...",
+                                testClassName,
+                                method.getName());
+                        try {
+                            method.invoke(testInstance, (Object[]) null);
+                        } finally {
+                            flush();
+                        }
+                    });
         } catch (Throwable t) {
             throwableCollector.add(t);
             resolve(t).printStackTrace();
