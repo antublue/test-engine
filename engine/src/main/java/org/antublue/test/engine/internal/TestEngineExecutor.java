@@ -21,6 +21,7 @@ import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.Cast;
 import org.junit.platform.engine.ExecutionRequest;
 
 import java.util.List;
@@ -74,8 +75,7 @@ public class TestEngineExecutor {
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest)");
 
-        RunnableEngineDescriptor runnableEngineDescriptor =
-                (RunnableEngineDescriptor) executionRequest.getRootTestDescriptor();
+        RunnableEngineDescriptor runnableEngineDescriptor = Cast.cast(executionRequest.getRootTestDescriptor());
 
         TestDescriptorUtils.trace(runnableEngineDescriptor);
 
