@@ -518,15 +518,15 @@ When running via Maven in a Linux console, the Test Engine will report a summary
 
 Test Classes
 
-- Total number of test classes
+- Total number of test classes tested
 
 Test Parameters
 
-- Total number of test parameters (all test classes)
+- Total number of test parameters tested (all test classes)
 
 Test Methods
 
-- Total number of test methods (all parameters / all test classes)
+- Total number of test methods tested (all parameters / all test classes)
 
 **Notes**
 
