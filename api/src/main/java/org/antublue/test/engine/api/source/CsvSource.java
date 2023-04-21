@@ -19,7 +19,6 @@ package org.antublue.test.engine.api.source;
 import com.univocity.parsers.common.processor.RowListProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
-import org.antublue.test.engine.api.Map;
 import org.antublue.test.engine.api.Parameter;
 
 import java.io.BufferedInputStream;
@@ -31,6 +30,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 /**
@@ -99,27 +99,13 @@ public final class CsvSource {
     private static Stream<Parameter> process(RowListProcessor rowListProcessor) {
         List<Parameter> list = new ArrayList<>();
 
-        String[] headers = rowListProcessor.getHeaders();
-        List<String[]> rows = rowListProcessor.getRows();
-        for (int i = 0; i < rows.size(); i++){
-            Map map = new Map();
-            String[] row = rows.get(i);
-            for (int j = 0; j < row.length; j++) {
-                // TODO clean up by checking the header length against the row length
-                String header = null;
-                try {
-                    header = headers[j];
-                    if (header.trim().isEmpty()) {
-                        header = "column[" + (j+1) + "]";
-                    }
-                } catch (Throwable t) {
-                    header = "column[" + (j+1) + "]";
-                }
+        // Add the header row
+        list.add(Parameter.of("header", rowListProcessor.getHeaders()));
 
-                map.put(header, row[j]);
-            }
-            list.add(Parameter.of("row[" + (i + 1) + "]", map));
-        }
+        AtomicInteger index = new AtomicInteger(1);
+        rowListProcessor
+                .getRows()
+                .forEach(strings -> list.add(Parameter.of("row[" + index.getAndIncrement() + "]", strings)));
 
         return list.stream();
     }
