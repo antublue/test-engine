@@ -256,7 +256,13 @@ String[] values = parameter.value();
 
 ## What is a `ParameterMap` ?
 
-A `ParameterMap` is `Map` object that implements `Parameter` and allows you to add keys/values using a fluent pattern
+A `ParameterMap` is `Map` Object that implements the `Parameter` interface
+
+- It allows you to add keys/values using a fluent pattern
+
+
+- It allows you to get a value casted to a specific type
+
 
 ```java
 @TestEngine.ParameterSupplier
@@ -272,6 +278,16 @@ public static Stream<Parameter> parameters() {
   }
 
   return collection.stream();
+}
+```
+
+```java
+String value = map.get("key");
+```
+
+```java
+if (map.get("key", String.class).length() == 0) {
+    // handle empty string
 }
 ```
 
