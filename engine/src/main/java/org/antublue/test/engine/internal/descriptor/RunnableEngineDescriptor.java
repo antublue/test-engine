@@ -17,13 +17,10 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.internal.TestExecutionContext;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
-import org.junit.platform.launcher.TestExecutionListener;
 
 import java.util.ArrayList;
 import java.util.List;
