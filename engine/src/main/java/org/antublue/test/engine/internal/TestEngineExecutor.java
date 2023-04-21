@@ -61,7 +61,7 @@ public class TestEngineExecutor {
                         })
                         .orElse(Runtime.getRuntime().availableProcessors());
 
-        LOGGER.trace("thread count [%d]", threadCount);
+        LOGGER.trace("[%s] = [%d]", TestEngineConstants.THREAD_COUNT, threadCount);
 
         this.executorService = Executors.newFixedThreadPool(threadCount, new NamedThreadFactory());
     }
