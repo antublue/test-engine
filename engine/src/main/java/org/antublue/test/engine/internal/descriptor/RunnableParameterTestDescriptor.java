@@ -33,6 +33,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
+/**
+ * Class to implement a Runnable parameter test descriptor
+ */
 @SuppressWarnings("unchecked")
 public final class RunnableParameterTestDescriptor extends AbstractRunnableTestDescriptor {
 
@@ -41,34 +44,80 @@ public final class RunnableParameterTestDescriptor extends AbstractRunnableTestD
     private final Class<?> testClass;
     private final Parameter testParameter;
 
+    /**
+     * Constructor
+     *
+     * @param uniqueId
+     * @param displayName
+     * @param testClass
+     * @param testParameter
+     */
     public RunnableParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Parameter testParameter) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testParameter = testParameter;
     }
 
+    /**
+     * Method to get the TestSource
+     *
+     * @return
+     */
     @Override
     public Optional<TestSource> getSource() {
         return Optional.of(MethodSource.from(TestEngineReflectionUtils.getParameterSupplierMethod(testClass)));
     }
 
+    /**
+     * Method to get the test descriptor Type
+     * @return
+     */
     @Override
     public Type getType() {
         return Type.CONTAINER;
     }
 
+    /**
+     * Method to return whether the test descriptor is a test
+     *
+     * @return
+     */
     @Override
     public boolean isTest() {
         return false;
     }
 
+    /**
+     * Method to return whether the test descriptor is a container
+     *
+     * @return
+     */
     @Override
     public boolean isContainer() {
         return true;
     }
 
     /**
+     * Method to get the test class
+     *
+     * @return
+     */
+    public Class<?> getTestClass() {
+        return testClass;
+    }
+
+    /**
+     * Method to get the test parameter
+     * @return
+     */
+    public Parameter getTestParameter() {
+        return testParameter;
+    }
+
+    /**
      * Method to run the test descriptor
+     * <br/>
+     * The TestExecutionContext must be set prior to the call
      */
     public void run() {
         TestExecutionContext testExecutionContext = getTestExecutionContext();
@@ -174,13 +223,5 @@ public final class RunnableParameterTestDescriptor extends AbstractRunnableTestD
         } else {
             engineExecutionListener.executionFinished(this, TestExecutionResult.failed(throwableCollector.getFirst().get()));
         }
-    }
-
-    public Class<?> getTestClass() {
-        return testClass;
-    }
-
-    public Parameter getTestParameter() {
-        return testParameter;
     }
 }

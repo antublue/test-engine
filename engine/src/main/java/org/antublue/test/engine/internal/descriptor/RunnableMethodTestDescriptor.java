@@ -32,6 +32,9 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
+/**
+ * Class to implement a Runnable test method descriptor
+ */
 public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RunnableMethodTestDescriptor.class);
@@ -40,6 +43,15 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
     private final Parameter testParameter;
     private final Method testMethod;
 
+    /**
+     * Constructor
+     *
+     * @param uniqueId
+     * @param displayName
+     * @param testClass
+     * @param testParameter
+     * @param testMethod
+     */
     public RunnableMethodTestDescriptor(
             UniqueId uniqueId,
             String displayName,
@@ -53,26 +65,78 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
         this.testMethod.setAccessible(true);
     }
 
+    /**
+     * Method to get the TestSource
+     *
+     * @return
+     */
     @Override
     public Optional<TestSource> getSource() {
         return Optional.of(MethodSource.from(testMethod));
     }
 
+    /**
+     * Method to get the test descriptor Type
+     *
+     * @return
+     */
     @Override
     public Type getType() {
         return Type.TEST;
     }
 
+    /**
+     * Method to return whether the test descriptor is a test
+     *
+     * @return
+     */
     @Override
     public boolean isTest() {
         return true;
     }
 
+    /**
+     * Method to return whether the test descriptor is a container
+     *
+     * @return
+     */
     @Override
     public boolean isContainer() {
         return false;
     }
 
+    /**
+     * Method to get the test class
+     *
+     * @return
+     */
+    public Class<?> getTestClass() {
+        return testClass;
+    }
+
+    /**
+     * Method to get the test parameter
+     *
+     * @return
+     */
+    public Parameter getTestParameter() {
+        return testParameter;
+    }
+
+    /**
+     * Method to get the test method
+     *
+     * @return
+     */
+    public Method getTestMethod() {
+        return testMethod;
+    }
+
+    /**
+     * Method to run the test descriptor
+     * <br/>
+     * The TestExecutionContext must be set prior to the call
+     */
     public void run() {
         TestExecutionContext testExecutionContext = getTestExecutionContext();
         ThrowableCollector throwableCollector = getThrowableCollector();
@@ -147,17 +211,5 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
         } else {
             engineExecutionListener.executionFinished(this, TestExecutionResult.failed(throwableCollector.getFirst().get()));
         }
-    }
-
-    public Class<?> getTestClass() {
-        return testClass;
-    }
-
-    public Method getTestMethod() {
-        return testMethod;
-    }
-
-    public Parameter getTestParameter() {
-        return testParameter;
     }
 }

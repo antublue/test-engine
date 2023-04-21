@@ -63,7 +63,7 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
     }
 
     /**
-     * Method to get the Type
+     * Method to get the test descriptor Type
      *
      * @return
      */
@@ -103,6 +103,8 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
 
     /**
      * Method to run the test descriptor
+     * <br/>
+     * The TestExecutionContext must be set prior to the call
      */
     public void run() {
         TestExecutionContext testExecutionContext = getTestExecutionContext();
