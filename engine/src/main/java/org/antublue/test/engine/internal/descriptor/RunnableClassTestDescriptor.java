@@ -31,35 +31,74 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
+/**
+ * Class to implement a Runnable class test descriptor
+ */
 public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RunnableClassTestDescriptor.class);
 
     private final Class<?> testClass;
 
+    /**
+     * Constructor
+     *
+     * @param uniqueId
+     * @param displayName
+     * @param testClass
+     */
     public RunnableClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
         super(uniqueId, displayName);
         this.testClass = testClass;
     }
 
+    /**
+     * Method to get the TestSource
+     *
+     * @return
+     */
     @Override
     public Optional<TestSource> getSource() {
         return Optional.of(ClassSource.from(testClass));
     }
 
+    /**
+     * Method to get the Type
+     *
+     * @return
+     */
     @Override
     public Type getType() {
         return Type.CONTAINER;
     }
 
+    /**
+     * Method to return whether the test descriptor is a test
+     *
+     * @return
+     */
     @Override
     public boolean isTest() {
         return false;
     }
 
+    /**
+     * Method to return whether the test descriptor is a container
+     *
+     * @return
+     */
     @Override
     public boolean isContainer() {
         return true;
+    }
+
+    /**
+     * Method to get the test class
+     *
+     * @return
+     */
+    public Class<?> getTestClass() {
+        return testClass;
     }
 
     /**
@@ -144,9 +183,5 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
         testExecutionContext.setTestInstance(null);
 
         getTestExecutionContext().getCountDownLatch().countDown();
-    }
-
-    public Class<?> getTestClass() {
-        return testClass;
     }
 }

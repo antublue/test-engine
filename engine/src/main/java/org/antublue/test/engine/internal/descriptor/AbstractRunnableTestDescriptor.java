@@ -36,7 +36,7 @@ abstract class AbstractRunnableTestDescriptor
 
     private final ThrowableCollector throwableCollector;
     private TestExecutionContext testExecutionContext;
-    
+
     /**
      * Constructor
      *
