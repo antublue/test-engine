@@ -496,7 +496,7 @@ mvn clean package integration-test
 
 - The Test Engine requires core JUnit 5 jars as dependencies
 
-## Maven Summary
+## Test Engine Summary
 
 When running via Maven in a Linux console, the Test Engine will report a summary
 
@@ -530,7 +530,7 @@ Test Methods
 
 **Notes**
 
-- Test classes can/may different test parameters, so you can't necessarily extrapolate the math in reverse
+- Test classes can/may different use different test parameters, so you can't necessarily extrapolate the math in reverse
 
 ## Building
 
