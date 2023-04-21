@@ -132,9 +132,6 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - `@TestEngine.Order(<int>)` is inheritance agnostic
 
 
-- Only one `@TestEngine.Tag(<string>)` is supported for a test class / test method
-
-
 - It's recommended to use a tag string format of `/tag1/tag2/tag3/`
 
 ## Usage Example
