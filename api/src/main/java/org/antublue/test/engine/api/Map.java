@@ -25,6 +25,7 @@ import java.util.function.BiFunction;
  * Class to implement a Map to contain values. Allows casting of values when using "get(String key)"
  */
 @SuppressWarnings("unchecked")
+@Deprecated
 public class Map extends LinkedHashMap<String, Object> {
 
     /**
