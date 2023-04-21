@@ -6,7 +6,7 @@
 
 # Test Engine
 
-The Test Engine is a JUnit 5 based test engine designed specifically for integration testing by allowing parameterization at the test class level.
+The Test Engine is a JUnit 5 based test engine designed specifically for parameterized integration testing by allowing parameterization at the test class level.
 
 ## Latest Releases
 
@@ -14,7 +14,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for integra
 
 ## Goals
 
-The Test Engine is designed specifically for integration testing.
+The Test Engine is designed specifically for parameterized integration testing.
 
 ## Non-Goals
 
@@ -22,18 +22,18 @@ The Test Engine is not meant to replace JUnit for unit tests.
 
 ## Why not use JUnit 5?
 
-Currently, JUnit 5 does not support parameterized tests at the test class level (common for integration testing)
+Currently, JUnit 5 does not support parameterized tests at the test class level (common for parameterized integration testing)
 
 - https://github.com/junit-team/junit5/issues/878
 
 
-- The JUnit team is working on the functionality, but it's not clear if it will satisfy the common integration testing use cases (2023-04-18)
+- The JUnit team is working on the functionality, but it's not clear if it will satisfy the common parameterized integration testing use cases (2023-04-18)
 
 
 - It doesn't provide annotations to run static methods before/after the class **and** instance methods before/after all tests in a test class (2023-04-18)
 
 
-- It doesn't provide the summary information typically wanted or integration testing
+- It doesn't provide the summary information typically wanted for parameterized integration testing
 
 ## Why not use Junit 4?
 
@@ -42,9 +42,49 @@ Junit 4 does provide test class level parameterization via `@RunWith(Parameteriz
 - It doesn't provide annotations to run static methods before/after the class **and** instance methods before/after all tests in a test class
 
 
-- It doesn't provide the summary information typically wanted or integration testing
+- It doesn't provide the summary information typically wanted for parameterized integration testing
 
-## Common Annotations
+## What is parameterized integration testing?
+
+Parameterized integration testing is most common when you...
+
+1. Want to perform integration testing of the application in various environments
+
+
+2. You want to test workflow oriented scenarios of the application
+
+
+- various environments could involve different operation systems versions and/or different runtime versions
+
+---
+
+A text book example...
+
+1. You have developed a networked based application: ApplicationX
+
+
+2. You want to test that the behavior of the ApplicationX is various runtime environments
+
+
+3. You want to test workflow scenarios
+
+
+The parameters in this scenario are the various runtime environments
+
+---
+
+A reference example...
+
+https://github.com/antublue/test-engine/blob/main/examples/src/test/java/example/testcontainers/KafkaTest.java
+
+This test is testing functionality of an Apache Kafka Producer and Consumer against four Apache Kafka servers.
+
+- The test is very basic, with a single test method that declare the logic client logic, but you could test multiple scenarios using ordered test methods
+
+
+- This example is really testing Apache Kafka
+
+## Common Test Annotations
 
 | Annotation                      | Scope             | Required                               | Static | Example                                                                          |
 |---------------------------------|-------------------|----------------------------------------|--------|----------------------------------------------------------------------------------|
@@ -74,7 +114,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
     - Declaration of test methods (class or superclass) are ignored
   - Method order is relative to other methods with the same annotation
 
-## Additional Annotations
+## Additional Test Annotations
 
 | Annotation                  | Scope             | Required | Usage                                                                              |
 |-----------------------------|-------------------|----------|------------------------------------------------------------------------------------|
@@ -216,7 +256,13 @@ String[] values = parameter.value();
 
 ## What is a `ParameterMap` ?
 
-A `ParameterMap` is `Map` object that implements `Parameter` and allows you to add keys/values using a fluent pattern
+A `ParameterMap` is `Map` Object that implements the `Parameter` interface
+
+- It allows you to add keys/values using a fluent pattern
+
+
+- It allows you to get a value casted to a specific type
+
 
 ```java
 @TestEngine.ParameterSupplier
@@ -235,7 +281,17 @@ public static Stream<Parameter> parameters() {
 }
 ```
 
-## Configuration
+```java
+String value = map.get("key");
+```
+
+```java
+if (map.get("key", String.class).length() == 0) {
+    // handle empty string
+}
+```
+
+## Test Engine Configuration
 
 The Test Engine has seven configuration parameters
 <br/>
@@ -314,7 +370,7 @@ The Test Engine has seven configuration parameters
 
 Using a combination of the system properties (and/or environment variables) allows for including / excluding individual test classes / test methods
 
-## Experimental Configuration
+## Experimental Test Engine Configuration
 
 The Test Engine as two experimental configuration parameters
 
@@ -328,12 +384,12 @@ The Test Engine as two experimental configuration parameters
 
 <br/>
 
-| <nobr>Output console PASS messages</nobr> |                                                     |
-|-----------------------------------------------|-----------------------------------------------------|
-| Environment variable                          | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_PASS_MESSAGES |
-| System property                               | antublue.test.engine.experimental.log.pass.messages |
-| Type                                          | boolean                                             |
-| Default                                       | true                                                |
+| <nobr>Output console PASS / FAIL messages</nobr> |                                                     |
+|--------------------------------------------------|-----------------------------------------------------|
+| Environment variable                             | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_PASS_MESSAGES |
+| System property                                  | antublue.test.engine.experimental.log.pass.messages |
+| Type                                             | boolean                                             |
+| Default                                          | true                                                |
 
 <br/>
 
@@ -440,7 +496,7 @@ mvn clean package integration-test
 
 - The Test Engine requires core JUnit 5 jars as dependencies
 
-## Maven Summary
+## Test Engine Summary
 
 When running via Maven in a Linux console, the Test Engine will report a summary
 
@@ -462,19 +518,19 @@ When running via Maven in a Linux console, the Test Engine will report a summary
 
 Test Classes
 
-- Total number of test classes
+- Total number of test classes tested
 
 Test Parameters
 
-- Total number of test parameters (all test classes)
+- Total number of test parameters tested (all test classes)
 
 Test Methods
 
-- Total number of test methods (all parameters / all test classes)
+- Total number of test methods tested (all parameters / all test classes)
 
 **Notes**
 
-- Test classes can/may different test parameters, so you can't necessarily extrapolate the math in reverse
+- Test classes can/may different use different test parameters, so you can't necessarily extrapolate the math in reverse
 
 ## Building
 
@@ -507,9 +563,10 @@ The project uses a simplified GitFlow branching strategy
 
 For changes, you should...
 
+- Fork the repository
 - Create a branch based on `development-<NEXT RELEASE>`
-- Make your changes
-- Open a PR against `development-<NEXT RELEASE>`
+- Make changes on your branch
+- Open a PR against the source repository branch `development-<NEXT RELEASE>`
 
 **Notes**
 
