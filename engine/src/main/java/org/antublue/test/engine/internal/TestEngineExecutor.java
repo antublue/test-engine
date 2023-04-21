@@ -79,14 +79,15 @@ public class TestEngineExecutor {
 
         TestDescriptorUtils.trace(runnableEngineDescriptor);
 
-        List<RunnableClassTestDescriptor> executableClassTestDescriptors =
+        List<RunnableClassTestDescriptor> runnableClassTestDescriptors =
                 runnableEngineDescriptor.getChildren(RunnableClassTestDescriptor.class);
 
-        CountDownLatch countDownLatch = new CountDownLatch(executableClassTestDescriptors.size());
+        CountDownLatch countDownLatch = new CountDownLatch(runnableClassTestDescriptors.size());
 
-        executableClassTestDescriptors
+        runnableClassTestDescriptors
                 .forEach(runnableClassTestDescriptor -> {
-                        runnableClassTestDescriptor.setTestExecutionContext(new TestExecutionContext(executionRequest, countDownLatch));
+                        runnableClassTestDescriptor.setTestExecutionContext(
+                                new TestExecutionContext(executionRequest, countDownLatch));
                         executorService.submit(runnableClassTestDescriptor);
                 });
 

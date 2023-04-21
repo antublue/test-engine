@@ -144,10 +144,10 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
 
         if (throwableCollector.isEmpty()) {
             getChildren(RunnableParameterTestDescriptor.class)
-                    .forEach(executableParameterTestDescriptor -> {
-                        executableParameterTestDescriptor.setTestExecutionContext(testExecutionContext);
-                        executableParameterTestDescriptor.run();
-                        throwableCollector.addAll(executableParameterTestDescriptor.getThrowableCollector());
+                    .forEach(runnableParameterTestDescriptor -> {
+                        runnableParameterTestDescriptor.setTestExecutionContext(testExecutionContext);
+                        runnableParameterTestDescriptor.run();
+                        throwableCollector.addAll(runnableParameterTestDescriptor.getThrowableCollector());
                     });
         }
 

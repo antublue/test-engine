@@ -56,6 +56,7 @@ abstract class AbstractRunnableTestDescriptor
      * @param <T>
      */
     public <T> List<T> getChildren(Class<T> clazz) {
+        // Clazz is not used directly, but required to make Stream semantics work
         return getChildren()
                 .stream()
                 .map((Function<TestDescriptor, T>) testDescriptor -> (T) testDescriptor)

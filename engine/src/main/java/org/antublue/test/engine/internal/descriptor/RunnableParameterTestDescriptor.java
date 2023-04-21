@@ -139,10 +139,10 @@ public final class RunnableParameterTestDescriptor extends AbstractRunnableTestD
                         });
 
                 getChildren(RunnableMethodTestDescriptor.class)
-                        .forEach(executableMethodTestDescriptor -> {
-                            executableMethodTestDescriptor.setTestExecutionContext(testExecutionContext);
-                            executableMethodTestDescriptor.run();
-                            throwableCollector.addAll(executableMethodTestDescriptor.getThrowableCollector());
+                        .forEach(runnableMethodTestDescriptor -> {
+                            runnableMethodTestDescriptor.setTestExecutionContext(testExecutionContext);
+                            runnableMethodTestDescriptor.run();
+                            throwableCollector.addAll(runnableMethodTestDescriptor.getThrowableCollector());
                         });
             } catch (Throwable t) {
                 throwableCollector.add(t);
