@@ -144,7 +144,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                                     .orElse(null);
 
                     if (testDescriptor != null) {
-                        TestDescriptorUtils.log(testDescriptor);
+                        TestDescriptorUtils.trace(testDescriptor);
                     }
                 });
 

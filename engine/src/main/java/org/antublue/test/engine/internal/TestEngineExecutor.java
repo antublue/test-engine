@@ -77,7 +77,7 @@ public class TestEngineExecutor {
         RunnableEngineDescriptor runnableEngineDescriptor =
                 (RunnableEngineDescriptor) executionRequest.getRootTestDescriptor();
 
-        TestDescriptorUtils.log(runnableEngineDescriptor);
+        TestDescriptorUtils.trace(runnableEngineDescriptor);
 
         List<RunnableClassTestDescriptor> executableClassTestDescriptors =
                 runnableEngineDescriptor.getChildren(RunnableClassTestDescriptor.class);
