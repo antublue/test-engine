@@ -33,6 +33,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -91,7 +92,11 @@ public final class TestEngineReflectionUtils {
         } catch (TestClassConfigurationException e) {
             throw e;
         } catch (Throwable t) {
-            throw new TestClassConfigurationException("Class [%s]] exception getting Stream<Parameter>", t);
+            throw new TestClassConfigurationException(
+                    String.format(
+                            "Can't get Stream<Parameter> from class [%s]",
+                            clazz.getName(),
+                            t));
         }
     }
 
@@ -373,7 +378,10 @@ public final class TestEngineReflectionUtils {
                             (Class<?>[]) null);
 
             if (methodList.size() != 1) {
-                throw new TestClassConfigurationException("Class [%s] must define one @TestEngine.ParameterSupplier method");
+                throw new TestClassConfigurationException(
+                        String.format(
+                                "Class [%s] must define one @TestEngine.ParameterSupplier method",
+                                clazz.getName()));
             }
 
             Method method = methodList.get(0);
