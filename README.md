@@ -114,7 +114,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
     - Declaration of test methods (class or superclass) are ignored
   - Method order is relative to other methods with the same annotation
 
-## Additional Annotations
+## Additional Test Annotations
 
 | Annotation                  | Scope             | Required | Usage                                                                              |
 |-----------------------------|-------------------|----------|------------------------------------------------------------------------------------|
