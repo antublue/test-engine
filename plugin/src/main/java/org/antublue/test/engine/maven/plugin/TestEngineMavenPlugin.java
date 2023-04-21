@@ -36,11 +36,9 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -109,7 +107,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                     .get()
                     .forEach(artifact -> artifactPaths.add(artifact.getFile().toPath()));
 
-            List<URL> urls = new ArrayList<>();
+            Set<URL> urls = new LinkedHashSet<>();
             for (Path path : artifactPaths) {
                 URL url = path.toUri().toURL();
                 DEBUG("classpath entry URL [%s]", url);
