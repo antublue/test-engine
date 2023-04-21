@@ -102,7 +102,7 @@ public class TestEngineExecutor {
      */
     private static class NamedThreadFactory implements ThreadFactory {
 
-        private final AtomicInteger threadId = new AtomicInteger();
+        private final AtomicInteger threadId = new AtomicInteger(1);
 
         /**
          * Method to create a new Thread
