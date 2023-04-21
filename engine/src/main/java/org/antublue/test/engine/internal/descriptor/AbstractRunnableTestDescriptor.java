@@ -20,6 +20,7 @@ import org.antublue.test.engine.internal.TestExecutionContext;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -30,9 +31,7 @@ import java.util.stream.Collectors;
  * Class to implement a Runnable test descriptor
  */
 @SuppressWarnings("unchecked")
-abstract class AbstractRunnableTestDescriptor
-        extends org.junit.platform.engine.support.descriptor.AbstractTestDescriptor
-        implements Runnable {
+abstract class AbstractRunnableTestDescriptor extends AbstractTestDescriptor implements Runnable {
 
     private final ThrowableCollector throwableCollector;
     private TestExecutionContext testExecutionContext;
