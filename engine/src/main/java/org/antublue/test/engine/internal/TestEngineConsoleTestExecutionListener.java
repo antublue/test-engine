@@ -24,6 +24,7 @@ import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
 import org.antublue.test.engine.internal.util.AnsiColor;
+import org.antublue.test.engine.internal.util.Cast;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.antublue.test.engine.internal.util.Switch;
 import org.junit.platform.engine.TestDescriptor;
@@ -176,7 +177,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                     // DO NOTHING
                 }),
                 Switch.switchCase(RunnableClassTestDescriptor.class, consumer -> {
-                    RunnableClassTestDescriptor classTestDescriptor = (RunnableClassTestDescriptor) testDescriptor;
+                    RunnableClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
                     Class<?> testClass = classTestDescriptor.getTestClass();
                     if (logTestMessages) {
                         stringBuilder
@@ -187,7 +188,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(RunnableParameterTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
-                        RunnableParameterTestDescriptor parameterTestDescriptor = (RunnableParameterTestDescriptor) testDescriptor;
+                        RunnableParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = parameterTestDescriptor.getTestClass();
                         Parameter testParameter = parameterTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
@@ -201,7 +202,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(RunnableMethodTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
-                        RunnableMethodTestDescriptor methodTestDescriptor = (RunnableMethodTestDescriptor) testDescriptor;
+                        RunnableMethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = methodTestDescriptor.getTestClass();
                         Method testMethod = methodTestDescriptor.getTestMethod();
                         Parameter testParameter = methodTestDescriptor.getTestParameter();
@@ -261,7 +262,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(RunnableClassTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        RunnableClassTestDescriptor classTestDescriptor = (RunnableClassTestDescriptor) testDescriptor;
+                        RunnableClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = classTestDescriptor.getTestClass();
                         stringBuilder
                                 .append("%s | ")
@@ -270,7 +271,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(RunnableParameterTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        RunnableParameterTestDescriptor parameterTestDescriptor = (RunnableParameterTestDescriptor) testDescriptor;
+                        RunnableParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = parameterTestDescriptor.getTestClass();
                         Parameter testParameter = parameterTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
@@ -283,7 +284,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(RunnableMethodTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        RunnableMethodTestDescriptor methodTestDescriptor = (RunnableMethodTestDescriptor) testDescriptor;
+                        RunnableMethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = methodTestDescriptor.getTestClass();
                         Method testMethod = methodTestDescriptor.getTestMethod();
                         Parameter testParameter = methodTestDescriptor.getTestParameter();
