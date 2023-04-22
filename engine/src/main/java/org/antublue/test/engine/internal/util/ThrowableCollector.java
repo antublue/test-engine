@@ -25,13 +25,13 @@ import java.util.Optional;
  */
 public class ThrowableCollector {
 
-    private final List<Throwable> throwables;
+    private final List<Throwable> throwableList;
 
     /**
      * Constructor
      */
     public ThrowableCollector() {
-        throwables = new ArrayList<>();
+        throwableList = new ArrayList<>();
     }
 
     /**
@@ -40,7 +40,7 @@ public class ThrowableCollector {
      * @param throwable
      */
     public void add(Throwable throwable) {
-        throwables.add(throwable);
+        throwableList.add(throwable);
     }
 
     /**
@@ -49,7 +49,7 @@ public class ThrowableCollector {
      * @param throwableCollector
      */
     public void addAll(ThrowableCollector throwableCollector) {
-        throwables.addAll(throwableCollector.getList());
+        throwableList.addAll(throwableCollector.getList());
     }
 
     /**
@@ -58,7 +58,7 @@ public class ThrowableCollector {
      * @return
      */
     public int size() {
-        return throwables.size();
+        return throwableList.size();
     }
 
     /**
@@ -67,7 +67,7 @@ public class ThrowableCollector {
      * @return
      */
     public boolean isEmpty() {
-        return throwables.isEmpty();
+        return throwableList.isEmpty();
     }
 
     /**
@@ -76,10 +76,10 @@ public class ThrowableCollector {
      * @return
      */
     public Optional<Throwable> getFirst() {
-        if (throwables.isEmpty()) {
+        if (throwableList.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(throwables.get(0));
+            return Optional.of(throwableList.get(0));
         }
     }
 
@@ -89,6 +89,6 @@ public class ThrowableCollector {
      * @return
      */
     public List<Throwable> getList() {
-        return throwables;
+        return throwableList;
     }
 }
