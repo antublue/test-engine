@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * Class to implement ConfigurationParameters
+ * Class to implement TestEngineConfiguration
  */
 public final class TestEngineConfiguration implements ConfigurationParameters {
 
@@ -35,12 +35,21 @@ public final class TestEngineConfiguration implements ConfigurationParameters {
     private final Map<String, String> map;
 
     /**
+     * Method to get a singleton instance of TestEngineConfiguration
+     *
+     * @return
+     */
+    public static TestEngineConfiguration getInstance() {
+        return INSTANCE;
+    }
+
+    /**
      * Constructor
      */
     private TestEngineConfiguration() {
         map = new LinkedHashMap<>();
     }
-    
+
     @Override
     public Optional<String> get(String key) {
         return Optional.ofNullable(resolve(key));
@@ -69,10 +78,11 @@ public final class TestEngineConfiguration implements ConfigurationParameters {
         throw new UnsupportedOperationException();
     }
 
-    public static TestEngineConfiguration getInstance() {
-        return INSTANCE;
-    }
-
+    /**
+     * Nethod to resolve a configuration key first as a Java property, then as an environment variable
+     * @param key
+     * @return
+     */
     private String resolve(String key) {
         String value = map.get(key);
         if (value != null && !value.trim().isEmpty()) {
