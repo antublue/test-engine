@@ -45,7 +45,7 @@ public class TestEngineExecutor {
      */
     public TestEngineExecutor() {
         int threadCount =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration.getInstance()
                         .get(TestEngineConstants.THREAD_COUNT)
                         .map(value -> {
                             int intValue;

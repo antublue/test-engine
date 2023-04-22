@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine;
 
-import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
+import org.antublue.test.engine.internal.TestEngineConfiguration;
 import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
 import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
@@ -99,7 +99,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         TestEngineEngineDiscoveryRequest testEngineDiscoveryRequest =
                 new TestEngineEngineDiscoveryRequest(
                         engineDiscoveryRequest,
-                        TestEngineConfigurationParameters.getInstance());
+                        TestEngineConfiguration.getInstance());
 
         // Create an EngineDescriptor as the target
         RunnableEngineDescriptor runnableEngineDescriptor = new RunnableEngineDescriptor(UniqueId.forEngine(getId()), getId());

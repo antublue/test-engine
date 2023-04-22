@@ -76,7 +76,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
         this.summary = new Summary();
 
         this.detailedOutput =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration.getInstance()
                         .get(TestEngineConstants.CONSOLE_OUTPUT)
                         .map(value -> {
                             try {
@@ -88,7 +88,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         .orElse(true);
 
         this.logTestMessages =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration.getInstance()
                         .get(TestEngineConstants.LOG_TEST_MESSAGES)
                         .map(value -> {
                             try {
@@ -100,7 +100,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         .orElse(true);
 
         this.logPassMessages =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration.getInstance()
                         .get(TestEngineConstants.LOG_PASS_MESSAGES)
                         .map(value -> {
                             try {

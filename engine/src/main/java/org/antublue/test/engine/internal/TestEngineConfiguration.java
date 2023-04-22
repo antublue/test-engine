@@ -28,16 +28,16 @@ import java.util.function.Function;
 /**
  * Class to implement ConfigurationParameters
  */
-public final class TestEngineConfigurationParameters implements ConfigurationParameters {
+public final class TestEngineConfiguration implements ConfigurationParameters {
 
-    private static final TestEngineConfigurationParameters INSTANCE = new TestEngineConfigurationParameters();
+    private static final TestEngineConfiguration INSTANCE = new TestEngineConfiguration();
 
     private final Map<String, String> map;
 
     /**
      * Constructor
      */
-    private TestEngineConfigurationParameters() {
+    private TestEngineConfiguration() {
         map = new LinkedHashMap<>();
     }
 
@@ -82,7 +82,7 @@ public final class TestEngineConfigurationParameters implements ConfigurationPar
         throw new UnsupportedOperationException();
     }
 
-    public static TestEngineConfigurationParameters getInstance() {
+    public static TestEngineConfiguration getInstance() {
         return INSTANCE;
     }
 
