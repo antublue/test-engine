@@ -44,13 +44,7 @@ public final class EnumSource {
      */
     public static Stream<Parameter> of(Class<? extends Enum> e) {
         final List<Parameter> list = new ArrayList<>();
-
-        EnumSet.allOf(e)
-                .forEach(o -> {
-                    Enum ee = (Enum) o;
-                    list.add(Parameter.of(ee.name(), ee.toString()));
-                });
-
+        EnumSet.allOf(e).forEach(o -> list.add(Parameter.of(((Enum<?>) o).name(), o.toString())));
         return list.stream();
     }
 }
