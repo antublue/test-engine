@@ -44,35 +44,41 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static final String ARTIFACT_ID = "test-engine";
     public static final String VERSION = TestEngineInformation.getVersion();
 
-    /*
-    static {
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream("antublue-test-engine.log");
-            DelegatingOutputStream delegatingOutputStream = new DelegatingOutputStream(System.out, fileOutputStream);
-            System.setOut(new PrintStream(delegatingOutputStream));
-            delegatingOutputStream = new DelegatingOutputStream(System.err, fileOutputStream);
-            System.setErr(new PrintStream(delegatingOutputStream));
-        } catch (IOException ioe) {
-            // DO NOTHING
-        }
-    }
-    */
-
+    /**
+     * Method to get the test engine id
+     *
+     * @return
+     */
     @Override
     public String getId() {
         return ENGINE_ID;
     }
 
+    /**
+     * Method to get the test engine group id
+     *
+     * @return
+     */
     @Override
     public Optional<String> getGroupId() {
         return Optional.of(GROUP_ID);
     }
 
+    /**
+     * Method to get the test engine artifact id
+     *
+     * @return
+     */
     @Override
     public Optional<String> getArtifactId() {
         return Optional.of(ARTIFACT_ID);
     }
 
+    /**
+     * Method to get the test engine version
+     *
+     * @return
+     */
     @Override
     public Optional<String> getVersion() {
         return Optional.of(VERSION);
@@ -110,7 +116,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     }
 
     /**
-     * Method to execute th ExecutionRequest
+     * Method to execute an ExecutionRequest
      *
      * @param executionRequest
      */
