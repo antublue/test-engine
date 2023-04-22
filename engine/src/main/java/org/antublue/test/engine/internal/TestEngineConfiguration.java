@@ -87,24 +87,21 @@ public final class TestEngineConfigurationParameters implements ConfigurationPar
     }
 
     private String resolve(String key) {
-        String mapValue = map.get(key);
-        if (mapValue != null) {
-            return mapValue;
+        String value = map.get(key);
+        if (value != null && !value.trim().isEmpty()) {
+            return value.trim();
         }
 
         // Convert the system property to an environment variable and get the value
-        String environmentVariableValue =
-                System.getenv(
-                        key.toUpperCase(Locale.ENGLISH).replace('.', '_'));
+        value = System.getenv(key.toUpperCase(Locale.ENGLISH).replace('.', '_'));
+        if (value != null && !value.trim().isEmpty()) {
+            return value.trim();
+        }
 
         // Get the system property value
-        String systemPropertyValue = System.getProperty(key);
-
-        // Check the environment value first
-        if (environmentVariableValue != null && !environmentVariableValue.trim().isEmpty()) {
-            return environmentVariableValue;
-        } else if (systemPropertyValue != null && !systemPropertyValue.trim().isEmpty()) {
-            return systemPropertyValue;
+        value = System.getProperty(key);
+        if (value != null && !value.trim().isEmpty()) {
+            return value.trim();
         }
 
         return null;
