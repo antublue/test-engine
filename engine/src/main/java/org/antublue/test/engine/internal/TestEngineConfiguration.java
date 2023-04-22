@@ -40,20 +40,7 @@ public final class TestEngineConfiguration implements ConfigurationParameters {
     private TestEngineConfiguration() {
         map = new LinkedHashMap<>();
     }
-
-    public void put(String key, String value) {
-        map.put(key, value);
-    }
-
-    /**
-     * Method to get the configuration parameters as a Map
-     *
-     * @return
-     */
-    public Map<String, String> getConfigurationMap() {
-        throw new UnsupportedOperationException();
-    }
-
+    
     @Override
     public Optional<String> get(String key) {
         return Optional.ofNullable(resolve(key));
