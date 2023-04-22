@@ -77,10 +77,8 @@ public final class LineSource {
                     break;
                 }
 
-                if (!line.startsWith("#")) {
-                    list.add(Parameter.of("line [" + index + "]", line));
-                    index++;
-                }
+                list.add(Parameter.of("line [" + index + "]", line));
+                index++;
             }
         }
 
