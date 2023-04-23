@@ -111,7 +111,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - `@TestEngine.Order` can be used to control test method order
   - Methods are sorted by the annotation value first, then alphabetically by the test method name
     - In scenarios where `@TestEngine.Order` values are duplicated, methods with the same name are sorted alphabetically
-    - If a test method is annotated with `@TestEngine.DisplayName`, the annotation value will be used for ordering 
+    - The test method name can be changed by using the `@TestEngine.DisplayName` annotation
   - Method order is relative to other methods with the same annotation
 
 ## Additional Test Annotations
