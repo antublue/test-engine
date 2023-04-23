@@ -297,10 +297,10 @@ public class TestEngineDiscoveryRequestResolver {
      * @param engineDescriptor
      */
     private void processTestClassPredicates(EngineDescriptor engineDescriptor) {
-        LOGGER.info("processTestClassPredicates");
+        LOGGER.trace("processTestClassPredicates");
 
         if (includeTestClassPredicate != null) {
-            LOGGER.info("includeTestClassPredicate [%s]", includeTestClassPredicate.getRegex());
+            LOGGER.trace("includeTestClassPredicate [%s]", includeTestClassPredicate.getRegex());
             // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
@@ -309,9 +309,9 @@ public class TestEngineDiscoveryRequestResolver {
                     UniqueId uniqueId = runnableClassTestDescriptor.getUniqueId();
                     Class<?> clazz = runnableClassTestDescriptor.getTestClass();
                     if (includeTestClassPredicate.test(clazz)) {
-                        LOGGER.info("  accept [%s]", uniqueId);
+                        LOGGER.trace("  accept [%s]", uniqueId);
                     } else {
-                        LOGGER.info("  prune  [%s]", uniqueId);
+                        LOGGER.trace("  prune  [%s]", uniqueId);
                         runnableClassTestDescriptor.removeFromHierarchy();
                     }
                 }
