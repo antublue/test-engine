@@ -130,7 +130,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - Abstract test classes are not executed
 
 
-- `@TestEngine.Order(<int>)` is inheritance agnostic
+- `@TestEngine.Order(<int>)` is inheritance agnostic (test class and super classes are treated equally)
 
 
 - It's recommended to use a tag string format of `/tag1/tag2/tag3/`
