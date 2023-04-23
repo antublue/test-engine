@@ -25,6 +25,7 @@ import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor
 import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.Cast;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.UniqueIdSelector;
@@ -72,7 +73,7 @@ public class UniqueIdSelectorResolver {
                         engineDescriptor
                                 .findByUniqueId(classUniqueId)
                                 .map((Function<TestDescriptor, RunnableClassTestDescriptor>) testDescriptor ->
-                                        (RunnableClassTestDescriptor) testDescriptor)
+                                        Cast.cast(testDescriptor))
                                 .orElseGet(() ->
                                         TestDescriptorUtils.createClassTestDescriptor(classUniqueId, clazz));
 
@@ -83,7 +84,7 @@ public class UniqueIdSelectorResolver {
                         classTestDescriptor
                                 .findByUniqueId(selectorUniqueId)
                                 .map((Function<TestDescriptor, RunnableParameterTestDescriptor>) testDescriptor ->
-                                        (RunnableParameterTestDescriptor) testDescriptor)
+                                        Cast.cast(testDescriptor))
                                 .orElseGet(() ->
                                         TestDescriptorUtils.createParameterTestDescriptor(
                                                 selectorUniqueId,
@@ -117,7 +118,7 @@ public class UniqueIdSelectorResolver {
                         engineDescriptor
                                 .findByUniqueId(selectorUniqueId)
                                 .map((Function<TestDescriptor, RunnableClassTestDescriptor>) testDescriptor ->
-                                        (RunnableClassTestDescriptor) testDescriptor)
+                                        Cast.cast(testDescriptor))
                                 .orElseGet(() ->
                                         TestDescriptorUtils.createClassTestDescriptor(
                                         selectorUniqueId,

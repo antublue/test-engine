@@ -410,6 +410,25 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
+     * Method to get a test method display name
+     *
+     * @param clazz
+     * @return
+     */
+    public static String getDisplayName(Class<?> clazz) {
+        String displayName = clazz.getName();
+
+        if (clazz.isAnnotationPresent(TestEngine.DisplayName.class)) {
+            String value = clazz.getAnnotation(TestEngine.DisplayName.class).value();
+            if (value != null && !value.trim().isEmpty()) {
+                displayName = value.trim();
+            }
+        }
+
+        return displayName;
+    }
+
+    /**
      * Method to get a List of all fields from a Class and super Classes
      *
      * @param clazz

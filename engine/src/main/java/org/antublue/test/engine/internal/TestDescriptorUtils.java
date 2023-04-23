@@ -50,7 +50,10 @@ public final class TestDescriptorUtils {
      */
     public static RunnableClassTestDescriptor createClassTestDescriptor(
             UniqueId uniqueId, Class<?> clazz) {
-        return new RunnableClassTestDescriptor(uniqueId, clazz.getName(), clazz);
+        return new RunnableClassTestDescriptor(
+                uniqueId,
+                TestEngineReflectionUtils.getDisplayName(clazz),
+                clazz);
     }
 
     /**

@@ -76,7 +76,8 @@ public class ClassSelectorResolver {
                     TestEngineReflectionUtils
                             .getTestMethods(clazz)
                             .forEach(method -> {
-                                UniqueId uniqueId = parameterDescriptoruniqueId.append("method", method.getName());
+                                UniqueId uniqueId =
+                                        parameterDescriptoruniqueId.append("method", method.getName());
 
                                 RunnableMethodTestDescriptor methodTestDescriptor =
                                         TestDescriptorUtils.createMethodTestDescriptor(
