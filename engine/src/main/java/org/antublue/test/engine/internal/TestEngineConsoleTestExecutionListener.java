@@ -493,6 +493,9 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
         return paddingStringBuilder.append(stringValue).toString();
     }
 
+    /**
+     * Class to implement test summary metrics
+     */
     private static class Summary {
 
         private long startMilliseconds;
