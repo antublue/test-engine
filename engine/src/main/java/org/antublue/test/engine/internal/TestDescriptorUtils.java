@@ -77,7 +77,12 @@ public final class TestDescriptorUtils {
      */
     public static RunnableMethodTestDescriptor createMethodTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Parameter parameter, Method method) {
-        return new RunnableMethodTestDescriptor(uniqueId, method.getName(), clazz, parameter, method);
+        return new RunnableMethodTestDescriptor(
+                uniqueId,
+                TestEngineReflectionUtils.getDisplayName(method),
+                clazz,
+                parameter,
+                method);
     }
 
     /**

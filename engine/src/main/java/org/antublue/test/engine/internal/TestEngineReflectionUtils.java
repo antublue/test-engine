@@ -391,6 +391,25 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
+     * Method to get a test method display name
+     *
+     * @param method
+     * @return
+     */
+    public static String getDisplayName(Method method) {
+        String displayName = method.getName();
+
+        if (method.isAnnotationPresent(TestEngine.DisplayName.class)) {
+            String value = method.getAnnotation(TestEngine.DisplayName.class).value();
+            if (value != null && !value.trim().isEmpty()) {
+                displayName = value.trim();
+            }
+        }
+
+        return displayName;
+    }
+
+    /**
      * Method to get a List of all fields from a Class and super Classes
      *
      * @param clazz
@@ -607,7 +626,12 @@ public final class TestEngineReflectionUtils {
             } else if (o2AnnotationPresent) {
                 return 1;
             } else {
-                return o1.getName().compareTo(o2.getName());
+                // Order by display name which is either
+                // the name declared by @TestEngine.DisplayName
+                // or the real method name
+                String o1DisplayName = getDisplayName(o1);
+                String o2DisplayName = getDisplayName(o2);
+                return o1DisplayName.compareTo(o2DisplayName);
             }
         });
     }

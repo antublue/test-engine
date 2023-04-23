@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for paramet
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v3.0.4](https://github.com/antublue/test-engine/releases/tag/v3.0.4)
+- General Availability (GA): [Test Engine v3.1.0](https://github.com/antublue/test-engine/releases/tag/v3.1.0)
 
 ## Goals
 
@@ -86,7 +86,7 @@ This test is testing functionality of an Apache Kafka Producer and Consumer agai
 
 ## Common Test Annotations
 
-| Annotation                      | Scope             | Required                               | Static | Example                                                                          |
+| Annotation                      | Scope             | Required                               | Static | Example Method                                                                   |
 |---------------------------------|-------------------|----------------------------------------|--------|----------------------------------------------------------------------------------|
 | `@TestEngine.ParameterSupplier` | method            | yes                                    | yes    | <nobr>`public static Stream<Parameter> parameters();`</nobr>                     |
 | `@TestEngine.Parameter`         | field<br/> method | yes <br/><nobr>(either or both)</nobr> | no     | `public Parameter parameter;`<br/> `public void parameter(Parameter parameter);` |
@@ -111,7 +111,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - `@TestEngine.Order` can be used to control test method order
   - Methods are sorted by the annotation value first, then alphabetically by the test method name
     - In scenarios where `@TestEngine.Order` values are duplicated, methods with the same name are sorted alphabetically
-    - Declaration of test methods (class or superclass) are ignored
+    - If a test method is annotated with `@TestEngine.DisplayName`, the annotation value will be used for ordering 
   - Method order is relative to other methods with the same annotation
 
 ## Additional Test Annotations
@@ -122,6 +122,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 | `@TestEngine.BaseClass`     | class             | no       | Marks a test class as being a base test class (skips direct execution)             |
 | `@TestEngine.Order(<int>)`  | method            | no       | Provides a way to order methods relative to other methods with the same annotation |
 | `@TestEngine.Tag(<string>)` | class             | no       | Provides a way to tag a test class or test method                                  | 
+| `@TestEngine.DisplayName`   | method            | no       | Provided a way to override a test method name                                      |                                                                                  |
 
 
 **Notes**
@@ -412,7 +413,7 @@ Disable the Maven Surefire plugin...
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-surefire-plugin</artifactId>
-  <version>3.0.4</version>
+  <version>3.1.0</version>
   <configuration>
     <skipTests>true</skipTests>
   </configuration>
@@ -425,7 +426,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>3.0.4</version>
+  <version>3.1.0</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -444,12 +445,12 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>3.0.4</version>
+    <version>3.1.0</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>3.0.4</version>
+    <version>3.1.0</version>
     <scope>test</scope>
   </dependency>
   <dependency>
@@ -499,7 +500,7 @@ When running via Maven in a Linux console, the Test Engine will report a summary
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v3.0.4 Summary
+[INFO] AntuBLUE Test Engine v3.1.0 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes    :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
 [INFO] Test Parameters : 119, PASSED : 119, FAILED : 0, SKIPPED : 0
