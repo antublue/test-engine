@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 /**
  * Class to implement methods to get test class fields / methods, caching the information
  */
-@SuppressWarnings({"unchecked", "PMD.GodClass"})
+@SuppressWarnings("unchecked")
 public final class TestEngineReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineReflectionUtils.class);

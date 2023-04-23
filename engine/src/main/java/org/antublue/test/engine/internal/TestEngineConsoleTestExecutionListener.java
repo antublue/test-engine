@@ -42,7 +42,6 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Class to collect test information and output a test execution summary
  */
-@SuppressWarnings({"PMD.AvoidDeeplyNestedIfStmts"})
 public class TestEngineConsoleTestExecutionListener implements TestExecutionListener {
 
     private static final String BANNER =
