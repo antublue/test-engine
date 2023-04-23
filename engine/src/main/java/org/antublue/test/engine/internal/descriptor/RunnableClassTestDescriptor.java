@@ -103,7 +103,7 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
 
     /**
      * Method to run the test descriptor
-     * <br/>
+     * <br>
      * The TestExecutionContext must be set prior to the call
      */
     public void run() {

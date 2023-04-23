@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 
 /**
  * Class to implement code to discover tests / build test descriptor tree
- * <br/>
+ * <br>
  * The current paradigm is to build a complete test descriptor tree,
  * then remove filter (remove) test descriptor
  */

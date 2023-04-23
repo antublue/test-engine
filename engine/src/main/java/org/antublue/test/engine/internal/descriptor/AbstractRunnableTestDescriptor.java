@@ -91,7 +91,7 @@ abstract class AbstractRunnableTestDescriptor extends AbstractTestDescriptor imp
 
     /**
      * Method to run the test descriptor
-     * <br/>
+     * <br>
      * The TestExecutionContext must be set prior to the call
      */
     public abstract void run();
