@@ -94,8 +94,8 @@ public final class TestEngineReflectionUtils {
             throw new TestClassConfigurationException(
                     String.format(
                             "Can't get Stream<Parameter> from class [%s]",
-                            clazz.getName(),
-                            t));
+                            clazz.getName()),
+                            t);
         }
     }
 
@@ -156,7 +156,6 @@ public final class TestEngineReflectionUtils {
      * @param clazz
      * @return
      */
-    @SuppressWarnings("deprecation")
     public static List<Method> getParameterMethods(Class<?> clazz) {
         synchronized (parameterMethodCache) {
             LOGGER.trace("getParameterMethods(%s)", clazz.getName());
@@ -468,13 +467,10 @@ public final class TestEngineReflectionUtils {
         Stream.of(clazz.getDeclaredFields())
                 .filter(field -> {
                     int modifiers = field.getModifiers();
-                    if (!Modifier.isFinal(modifiers)
+                    return !Modifier.isFinal(modifiers)
                             && !Modifier.isStatic(modifiers)
                             && field.isAnnotationPresent(annotation)
-                            && field.getType() == fieldType) {
-                        return true;
-                    }
-                    return false;
+                            && field.getType() == fieldType;
                 })
                 .forEach(field -> {
                     field.setAccessible(true);
@@ -630,7 +626,7 @@ public final class TestEngineReflectionUtils {
      * @param methods
      */
     private static void sortByOrderAnnotation(List<Method> methods) {
-        Collections.sort(methods, (o1, o2) -> {
+        methods.sort((o1, o2) -> {
             boolean o1AnnotationPresent = o1.isAnnotationPresent(TestEngine.Order.class);
             boolean o2AnnotationPresent = o2.isAnnotationPresent(TestEngine.Order.class);
             if (o1AnnotationPresent) {
@@ -638,7 +634,7 @@ public final class TestEngineReflectionUtils {
                     // Sort based on @TestEngine.Order value
                     int o1Order = o1.getAnnotation(TestEngine.Order.class).value();
                     int o2Order = o2.getAnnotation(TestEngine.Order.class).value();
-                    return o1Order < o2Order ? -1 : o1Order == o2Order ? 0 : 1;
+                    return Integer.compare(o1Order, o2Order);
                 } else {
                     return -1;
                 }
@@ -656,7 +652,7 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a display name for an Annoation
+     * Method to get a display name for an Annotation
      * 
      * @param annotation
      * @return
