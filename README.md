@@ -448,33 +448,14 @@ Add the Test Engine jars (and dependencies)...
     <version>3.1.0</version>
   </dependency>
   <dependency>
-    <groupId>org.antublue</groupId>
-    <artifactId>test-engine</artifactId>
-    <version>3.1.0</version>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
     <groupId>org.assertj</groupId>
     <artifactId>assertj-core</artifactId>
     <version>3.24.2</version>
-    <scope>test</scope>
   </dependency>
   <dependency>
-    <groupId>org.junit.platform</groupId>
-    <artifactId>junit-platform-commons</artifactId>
-    <version>1.9.2</version>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
-    <groupId>org.junit.platform</groupId>
-    <artifactId>junit-platform-launcher</artifactId>
-    <version>1.9.2</version>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
-    <groupId>org.junit.platform</groupId>
-    <artifactId>junit-platform-engine</artifactId>
-    <version>1.9.2</version>
+    <groupId>org.antublue</groupId>
+    <artifactId>test-engine</artifactId>
+    <version>3.1.0</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
