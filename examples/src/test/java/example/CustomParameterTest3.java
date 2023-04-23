@@ -76,17 +76,17 @@ public class CustomParameterTest3 {
             return (T) this;
         }
 
+        @Override
+        public <T> T value(Class<T> clazz) {
+            return clazz.cast(value());
+        }
+
         public String getFirstName() {
             return firstName;
         }
 
         public String getLastName() {
             return lastName;
-        }
-
-        @Override
-        public <T> T value(Class<T> clazz) {
-            return clazz.cast(value());
         }
 
         public static CustomParameter of(String name, String firstName, String lastName) {
