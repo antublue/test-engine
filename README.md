@@ -448,11 +448,6 @@ Add the Test Engine jars (and dependencies)...
     <version>3.1.0</version>
   </dependency>
   <dependency>
-    <groupId>org.assertj</groupId>
-    <artifactId>assertj-core</artifactId>
-    <version>3.24.2</version>
-  </dependency>
-  <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
     <version>3.1.0</version>
