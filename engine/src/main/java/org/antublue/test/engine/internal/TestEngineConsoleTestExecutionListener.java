@@ -24,6 +24,7 @@ import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.util.AnsiColor;
+import org.antublue.test.engine.internal.util.AnsiColorString;
 import org.antublue.test.engine.internal.util.Cast;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.antublue.test.engine.internal.util.Switch;
@@ -45,13 +46,25 @@ import java.util.concurrent.atomic.AtomicLong;
 public class TestEngineConsoleTestExecutionListener implements TestExecutionListener {
 
     private static final String BANNER =
-            "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
+            new AnsiColorString()
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append("Antu")
+                    .color(AnsiColor.BLUE_BOLD_BRIGHT)
+                    .append("BLUE")
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append(" Test Engine ")
+                    .append(TestEngine.VERSION)
+                    .toString();
 
     private static final String INFO =
-            AnsiColor.WHITE_BRIGHT.apply("[")
-                    + AnsiColor.BLUE_BOLD.apply("INFO")
-                    + AnsiColor.WHITE_BRIGHT.apply("]")
-                    + " ";
+            new AnsiColorString()
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append("[")
+                    .color(AnsiColor.BLUE_BOLD)
+                    .append("INFO")
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append("] ")
+                    .toString();
 
     private static final String TEST = AnsiColor.WHITE_BRIGHT.apply("TEST");
     private static final String PASS = AnsiColor.GREEN_BOLD.apply("PASS");
@@ -403,7 +416,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
         summary.testPlanExecutionFinished(testPlan);
 
         System.out.println(INFO + SEPARATOR);
-        System.out.println(INFO + BANNER + " Summary");
+        System.out.println(INFO + BANNER + AnsiColor.WHITE_BRIGHT.apply(" Summary"));
         System.out.println(INFO + SEPARATOR);
 
         if (summary.getTestClassCount() != 0) {
@@ -431,71 +444,88 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                             summary.getParametersSkippedCount(),
                             summary.getTestsSkippedCount());
 
-            StringBuilder stringBuilder = new StringBuilder();
+            AnsiColorString ansiColorString = new AnsiColorString();
 
-            stringBuilder
+            ansiColorString
                     .append(INFO)
-                    .append(AnsiColor.WHITE_BRIGHT.apply("Test Classes"))
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append("Test Classes")
                     .append("    : ")
                     .append(pad(summary.getTestClassCount(), column1Width))
                     .append(", ")
-                    .append(AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED"))
+                    .color(AnsiColor.GREEN_BOLD_BRIGHT)
+                    .append("PASSED")
+                    .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
                     .append(pad(summary.getTestClassesSucceededCount(), column2Width))
                     .append(", ")
-                    .append(AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"))
+                    .color(AnsiColor.RED_BOLD_BRIGHT)
+                    .append("FAILED")
+                    .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
                     .append(pad(summary.getTestClassesFailedCount(), column3Width))
                     .append(", ")
-                    .append(AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED"))
+                    .color(AnsiColor.YELLOW_BOLD_BRIGHT)
+                    .append("SKIPPED")
+                    .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
                     .append(pad(summary.getTestClassesSkippedCount(), column4Width));
 
-            System.out.println(stringBuilder);
+            System.out.println(ansiColorString);
 
-            stringBuilder.setLength(0);
-
-            stringBuilder
+            ansiColorString
                     .append(INFO)
-                    .append(AnsiColor.WHITE_BRIGHT.apply("Test Parameters"))
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append("Test Parameters")
                     .append(" : ")
                     .append(pad(summary.getParametersFoundCount(), column1Width))
                     .append(", ")
-                    .append(AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED"))
+                    .color(AnsiColor.GREEN_BOLD_BRIGHT)
+                    .append("PASSED")
+                    .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
                     .append(pad(summary.getParametersSucceededCount(), column2Width))
                     .append(", ")
-                    .append(AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"))
+                    .color(AnsiColor.RED_BOLD_BRIGHT)
+                    .append("FAILED")
+                    .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
                     .append(pad(summary.getParametersFailedCount(), column3Width))
                     .append(", ")
-                    .append(AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED"))
+                    .color(AnsiColor.YELLOW_BOLD_BRIGHT)
+                    .append("SKIPPED")
+                    .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
                     .append(pad(summary.getParametersSkippedCount(), column4Width));
 
-            System.out.println(stringBuilder);
+            System.out.println(ansiColorString);
 
-            stringBuilder.setLength(0);
-
-            stringBuilder
+            ansiColorString
                     .append(INFO)
-                    .append(AnsiColor.WHITE_BRIGHT.apply("Test Methods"))
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append("Test Methods")
                     .append("    : ")
                     .append(pad(summary.getTestsFoundCount(), column1Width))
                     .append(", ")
-                    .append(AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED"))
+                    .color(AnsiColor.GREEN_BOLD_BRIGHT)
+                    .append("PASSED")
+                    .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
                     .append(pad(summary.getTestsSucceededCount(), column2Width))
                     .append(", ")
-                    .append(AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"))
+                    .color(AnsiColor.RED_BOLD_BRIGHT)
+                    .append("FAILED")
+                    .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
                     .append(pad(summary.getTestsFailedCount(), column3Width))
                     .append(", ")
-                    .append(AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIPPED"))
+                    .color(AnsiColor.YELLOW_BOLD_BRIGHT)
+                    .append("SKIPPED")
+                    .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
                     .append(pad(summary.getTestsSkippedCount(), column4Width));
 
-            System.out.println(stringBuilder);
+            System.out.println(ansiColorString);
         } else {
             System.out.println(INFO + AnsiColor.RED_BOLD_BRIGHT.apply("NO TESTS FOUND"));
         }
@@ -514,10 +544,11 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
 
         System.out.println(
                 INFO
-                + "Total Test Time : "
-                + HumanReadableTime.toHumanReadable(elapsedTime, false));
+                + AnsiColor.WHITE_BRIGHT.apply(
+                        "Total Test Time : "
+                                + HumanReadableTime.toHumanReadable(elapsedTime, false)));
 
-        System.out.println(INFO + "Finished At     : " + HumanReadableTime.now());
+        System.out.println(INFO + AnsiColor.WHITE_BRIGHT.apply("Finished At     : " + HumanReadableTime.now()));
 
         if (!hasFailures()) {
             System.out.println(INFO + SEPARATOR);
