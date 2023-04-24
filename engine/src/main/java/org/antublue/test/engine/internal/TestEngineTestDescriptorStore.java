@@ -54,8 +54,8 @@ public final class TestEngineTestDescriptorStore {
      *
      * @param engineDescriptor
      */
-    public void put(EngineDescriptor engineDescriptor) {
-        store(engineDescriptor);
+    public void store(EngineDescriptor engineDescriptor) {
+        recursivelyStore(engineDescriptor);
     }
 
     /**
@@ -73,8 +73,8 @@ public final class TestEngineTestDescriptorStore {
      *
      * @param testDescriptor
      */
-    private void store(TestDescriptor testDescriptor) {
+    private void recursivelyStore(TestDescriptor testDescriptor) {
         testDescriptorMap.put(testDescriptor.getUniqueId(), testDescriptor);
-        testDescriptor.getChildren().forEach((Consumer<TestDescriptor>) testDescriptor1 -> store(testDescriptor1));
+        testDescriptor.getChildren().forEach((Consumer<TestDescriptor>) child -> recursivelyStore(child));
     }
 }

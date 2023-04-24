@@ -17,7 +17,6 @@
 package org.antublue.test.engine.maven.plugin;
 
 import org.antublue.test.engine.internal.TestEngineConsoleTestExecutionListener;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -37,11 +36,11 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
@@ -49,7 +48,7 @@ import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNa
 /**
  * Class to implement a Maven plugin to run the AntuBLUE Test Engine
  */
-@SuppressWarnings({"unused", "PMD.CloseResource" })
+@SuppressWarnings("unused")
 @Mojo(name = "test", threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST)
 public class TestEngineMavenPlugin extends AbstractMojo {
 
@@ -73,41 +72,42 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         try {
             Set<Path> artifactPaths = new LinkedHashSet<>();
 
-            List<String> classpathElements = mavenProject.getCompileClasspathElements();
-            for (String classpathElement : classpathElements) {
-                artifactPaths.add(new File(classpathElement).toPath());
-            }
+            Optional.ofNullable(mavenProject.getCompileClasspathElements())
+                    .map(Collection::stream)
+                    .get()
+                    .forEach(string -> artifactPaths.add(new File(string).toPath()));
 
-            classpathElements = mavenProject.getRuntimeClasspathElements();
-            for (String classpathElement : classpathElements) {
-                artifactPaths.add(new File(classpathElement).toPath());
-            }
 
-            classpathElements = mavenProject.getTestClasspathElements();
-            for (String classpathElement : classpathElements) {
-                artifactPaths.add(new File(classpathElement).toPath());
-            }
+            Optional.ofNullable(mavenProject.getRuntimeClasspathElements())
+                    .map(Collection::stream)
+                    .get()
+                    .forEach(string -> artifactPaths.add(new File(string).toPath()));
 
-            Artifact projectArtifact = mavenProject.getArtifact();
-            if (projectArtifact != null) {
-                artifactPaths.add(projectArtifact.getFile().toPath());
-            }
+            Optional.ofNullable(mavenProject.getTestClasspathElements())
+                    .map(Collection::stream)
+                    .get()
+                    .forEach(string -> artifactPaths.add(new File(string).toPath()));
 
-            for (Artifact artifact : mavenProject.getArtifacts()) {
-                artifactPaths.add(artifact.getFile().toPath());
-            }
+            Optional.ofNullable(mavenProject.getArtifact())
+                    .ifPresent(artifact -> artifactPaths.add(artifact.getFile().toPath()));
 
-            for (Artifact artifact : mavenProject.getDependencyArtifacts()) {
-                artifactPaths.add(artifact.getFile().toPath());
-            }
 
-            for (Artifact artifact : mavenProject.getAttachedArtifacts()) {
-                artifactPaths.add(artifact.getFile().toPath());
-            }
+            Optional.ofNullable(mavenProject.getArtifacts())
+                            .map(Collection::stream)
+                            .get()
+                            .forEach(artifact -> artifactPaths.add(artifact.getFile().toPath()));
 
-            artifactPaths.forEach(path -> DEBUG("classpath entry [%s]", path));
+            Optional.ofNullable(mavenProject.getDependencyArtifacts())
+                    .map(Collection::stream)
+                    .get()
+                    .forEach(artifact -> artifactPaths.add(artifact.getFile().toPath()));
 
-            final List<URL> urls = new ArrayList<>();
+            Optional.ofNullable(mavenProject.getAttachedArtifacts())
+                    .map(Collection::stream)
+                    .get()
+                    .forEach(artifact -> artifactPaths.add(artifact.getFile().toPath()));
+
+            Set<URL> urls = new LinkedHashSet<>();
             for (Path path : artifactPaths) {
                 URL url = path.toUri().toURL();
                 DEBUG("classpath entry URL [%s]", url);
@@ -118,13 +118,11 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
             Thread.currentThread().setContextClassLoader(classLoader);
 
-            if (properties != null) {
-                for (String key : properties.keySet()) {
-                    String value = properties.get(key);
-                    DEBUG("plugin property [%s] = [%s]", key, value);
-                    System.setProperty(key, value);
-                }
-            }
+            Optional.ofNullable(properties)
+                    .ifPresent(map -> map.entrySet().forEach(entry -> {
+                        DEBUG("plugin property [%s] = [%s]", entry.getKey(), entry.getValue());
+                        System.setProperty(entry.getKey(), entry.getValue());
+                    }));
 
             TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener = new TestEngineConsoleTestExecutionListener();
 

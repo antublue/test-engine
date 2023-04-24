@@ -10,8 +10,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@TestEngine.Tag("/tag1/tags2/" +
-        "")
+@TestEngine.Tag("/tag1/tags2/")
 public class TaggedClassTag1and2Test {
 
     private Parameter parameter;

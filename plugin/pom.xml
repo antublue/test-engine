@@ -4,7 +4,7 @@
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>3.0.3</version>
+    <version>3.1.0</version>
     <name>AntuBLUE Test Engine Maven Plugin</name>
 
     <properties>
@@ -203,18 +203,20 @@
         <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine-api</artifactId>
-            <version>3.0.3</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine</artifactId>
-            <version>3.0.3</version>
+            <version>3.1.0</version>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
             <version>1.9.2</version>
         </dependency>
+        -->
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>

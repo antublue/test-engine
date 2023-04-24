@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for paramet
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v3.0.3](https://github.com/antublue/test-engine/releases/tag/v3.0.3)
+- General Availability (GA): [Test Engine v3.1.0](https://github.com/antublue/test-engine/releases/tag/v3.1.0)
 
 ## Goals
 
@@ -67,7 +67,7 @@ A text book example...
 
 
 3. You want to test workflow scenarios
- 
+
 
 The parameters in this scenario are the various runtime environments
 
@@ -86,7 +86,7 @@ This test is testing functionality of an Apache Kafka Producer and Consumer agai
 
 ## Common Test Annotations
 
-| Annotation                      | Scope             | Required                               | Static | Example                                                                          |
+| Annotation                      | Scope             | Required                               | Static | Example Method                                                                   |
 |---------------------------------|-------------------|----------------------------------------|--------|----------------------------------------------------------------------------------|
 | `@TestEngine.ParameterSupplier` | method            | yes                                    | yes    | <nobr>`public static Stream<Parameter> parameters();`</nobr>                     |
 | `@TestEngine.Parameter`         | field<br/> method | yes <br/><nobr>(either or both)</nobr> | no     | `public Parameter parameter;`<br/> `public void parameter(Parameter parameter);` |
@@ -111,17 +111,18 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - `@TestEngine.Order` can be used to control test method order
   - Methods are sorted by the annotation value first, then alphabetically by the test method name
     - In scenarios where `@TestEngine.Order` values are duplicated, methods with the same name are sorted alphabetically
-    - Declaration of test methods (class or superclass) are ignored
+    - The test method name can be changed by using the `@TestEngine.DisplayName` annotation
   - Method order is relative to other methods with the same annotation
 
 ## Additional Test Annotations
 
-| Annotation                  | Scope             | Required | Usage                                                                              |
-|-----------------------------|-------------------|----------|------------------------------------------------------------------------------------|
-| `@TestEngine.Disabled`      | class<br/> method | no       | Marks a test class or method disabled                                              |
-| `@TestEngine.BaseClass`     | class             | no       | Marks a test class as being a base test class (skips direct execution)             |
-| `@TestEngine.Order(<int>)`  | method            | no       | Provides a way to order methods relative to other methods with the same annotation |
-| `@TestEngine.Tag(<string>)` | class             | no       | Provides a way to tag a test class or test method                                  | 
+| Annotation                  | Scope            | Required | Usage                                                                              |
+|-----------------------------|------------------|----------|------------------------------------------------------------------------------------|
+| `@TestEngine.Disabled`      | class<br/>method | no       | Marks a test class or method disabled                                              |
+| `@TestEngine.BaseClass`     | class            | no       | Marks a test class as being a base test class (skips direct execution)             |
+| `@TestEngine.Order(<int>)`  | method           | no       | Provides a way to order methods relative to other methods with the same annotation |
+| `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                  | 
+| `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name           |
 
 
 **Notes**
@@ -129,10 +130,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - Abstract test classes are not executed
 
 
-- `@TestEngine.Order(<int>)` is inheritance agnostic
-
-
-- Only one `@TestEngine.Tag(<string>)` is supported for a test class / test method
+- `@TestEngine.Order(<int>)` is inheritance agnostic (test class and super classes are treated equally)
 
 
 - It's recommended to use a tag string format of `/tag1/tag2/tag3/`
@@ -415,7 +413,7 @@ Disable the Maven Surefire plugin...
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-surefire-plugin</artifactId>
-  <version>3.0.3</version>
+  <version>3.1.0</version>
   <configuration>
     <skipTests>true</skipTests>
   </configuration>
@@ -428,7 +426,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>3.0.3</version>
+  <version>3.1.0</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -447,36 +445,12 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>3.0.3</version>
+    <version>3.1.0</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>3.0.3</version>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
-    <groupId>org.assertj</groupId>
-    <artifactId>assertj-core</artifactId>
-    <version>3.24.2</version>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
-    <groupId>org.junit.platform</groupId>
-    <artifactId>junit-platform-commons</artifactId>
-    <version>1.9.2</version>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
-    <groupId>org.junit.platform</groupId>
-    <artifactId>junit-platform-launcher</artifactId>
-    <version>1.9.2</version>
-    <scope>test</scope>
-  </dependency>
-  <dependency>
-    <groupId>org.junit.platform</groupId>
-    <artifactId>junit-platform-engine</artifactId>
-    <version>1.9.2</version>
+    <version>3.1.0</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -502,7 +476,7 @@ When running via Maven in a Linux console, the Test Engine will report a summary
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v3.0.3 Summary
+[INFO] AntuBLUE Test Engine v3.1.0 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes    :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
 [INFO] Test Parameters : 119, PASSED : 119, FAILED : 0, SKIPPED : 0

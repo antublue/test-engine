@@ -1,6 +1,7 @@
-Line 1
+# comment
+Line
 foo
 bar
-# comment
+
 testing
 1 2 3

@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 /**
  * Class to implement methods to get test class fields / methods, caching the information
  */
-@SuppressWarnings({"unchecked", "PMD.GodClass"})
+@SuppressWarnings("unchecked")
 public final class TestEngineReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineReflectionUtils.class);
@@ -91,7 +91,11 @@ public final class TestEngineReflectionUtils {
         } catch (TestClassConfigurationException e) {
             throw e;
         } catch (Throwable t) {
-            throw new TestClassConfigurationException("Class [%s]] exception getting Stream<Parameter>", t);
+            throw new TestClassConfigurationException(
+                    String.format(
+                            "Can't get Stream<Parameter> from class [%s]",
+                            clazz.getName()),
+                            t);
         }
     }
 
@@ -152,7 +156,6 @@ public final class TestEngineReflectionUtils {
      * @param clazz
      * @return
      */
-    @SuppressWarnings("deprecation")
     public static List<Method> getParameterMethods(Class<?> clazz) {
         synchronized (parameterMethodCache) {
             LOGGER.trace("getParameterMethods(%s)", clazz.getName());
@@ -373,7 +376,10 @@ public final class TestEngineReflectionUtils {
                             (Class<?>[]) null);
 
             if (methodList.size() != 1) {
-                throw new TestClassConfigurationException("Class [%s] must define one @TestEngine.ParameterSupplier method");
+                throw new TestClassConfigurationException(
+                        String.format(
+                                "Class [%s] must define one @TestEngine.ParameterSupplier method",
+                                clazz.getName()));
             }
 
             Method method = methodList.get(0);
@@ -381,6 +387,44 @@ public final class TestEngineReflectionUtils {
 
             return method;
         }
+    }
+
+    /**
+     * Method to get a test method display name
+     *
+     * @param method
+     * @return
+     */
+    public static String getDisplayName(Method method) {
+        String displayName = method.getName();
+
+        if (method.isAnnotationPresent(TestEngine.DisplayName.class)) {
+            String value = method.getAnnotation(TestEngine.DisplayName.class).value();
+            if (value != null && !value.trim().isEmpty()) {
+                displayName = value.trim();
+            }
+        }
+
+        return displayName;
+    }
+
+    /**
+     * Method to get a test method display name
+     *
+     * @param clazz
+     * @return
+     */
+    public static String getDisplayName(Class<?> clazz) {
+        String displayName = clazz.getName();
+
+        if (clazz.isAnnotationPresent(TestEngine.DisplayName.class)) {
+            String value = clazz.getAnnotation(TestEngine.DisplayName.class).value();
+            if (value != null && !value.trim().isEmpty()) {
+                displayName = value.trim();
+            }
+        }
+
+        return displayName;
     }
 
     /**
@@ -423,13 +467,10 @@ public final class TestEngineReflectionUtils {
         Stream.of(clazz.getDeclaredFields())
                 .filter(field -> {
                     int modifiers = field.getModifiers();
-                    if (!Modifier.isFinal(modifiers)
+                    return !Modifier.isFinal(modifiers)
                             && !Modifier.isStatic(modifiers)
                             && field.isAnnotationPresent(annotation)
-                            && field.getType() == fieldType) {
-                        return true;
-                    }
-                    return false;
+                            && field.getType() == fieldType;
                 })
                 .forEach(field -> {
                     field.setAccessible(true);
@@ -585,7 +626,7 @@ public final class TestEngineReflectionUtils {
      * @param methods
      */
     private static void sortByOrderAnnotation(List<Method> methods) {
-        Collections.sort(methods, (o1, o2) -> {
+        methods.sort((o1, o2) -> {
             boolean o1AnnotationPresent = o1.isAnnotationPresent(TestEngine.Order.class);
             boolean o2AnnotationPresent = o2.isAnnotationPresent(TestEngine.Order.class);
             if (o1AnnotationPresent) {
@@ -593,20 +634,25 @@ public final class TestEngineReflectionUtils {
                     // Sort based on @TestEngine.Order value
                     int o1Order = o1.getAnnotation(TestEngine.Order.class).value();
                     int o2Order = o2.getAnnotation(TestEngine.Order.class).value();
-                    return o1Order < o2Order ? -1 : o1Order == o2Order ? 0 : 1;
+                    return Integer.compare(o1Order, o2Order);
                 } else {
                     return -1;
                 }
             } else if (o2AnnotationPresent) {
                 return 1;
             } else {
-                return o1.getName().compareTo(o2.getName());
+                // Order by display name which is either
+                // the name declared by @TestEngine.DisplayName
+                // or the real method name
+                String o1DisplayName = getDisplayName(o1);
+                String o2DisplayName = getDisplayName(o2);
+                return o1DisplayName.compareTo(o2DisplayName);
             }
         });
     }
 
     /**
-     * Method to get a display name for an Annoation
+     * Method to get a display name for an Annotation
      * 
      * @param annotation
      * @return

@@ -17,7 +17,7 @@
 package org.antublue.test.engine.internal.discovery;
 
 import org.antublue.test.engine.TestEngineConstants;
-import org.antublue.test.engine.internal.TestEngineConfigurationParameters;
+import org.antublue.test.engine.internal.TestEngineConfiguration;
 import org.antublue.test.engine.internal.TestEngineException;
 import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
@@ -53,7 +53,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Class to implement code to discover tests / build test tree
+ * Class to implement code to discover tests / build test descriptor tree
+ * <br>
+ * The current paradigm is to build a complete test descriptor tree,
+ * then remove filter (remove) test descriptor
  */
 @SuppressWarnings("unchecked")
 public class TestEngineDiscoveryRequestResolver {
@@ -86,7 +89,8 @@ public class TestEngineDiscoveryRequestResolver {
         uniqueIdSelectorResolver = new UniqueIdSelectorResolver();
 
         includeTestClassPredicate =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration
+                        .getInstance()
                         .get(TestEngineConstants.TEST_CLASS_INCLUDE)
                         .map(value -> {
                             LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_INCLUDE, value);
@@ -96,7 +100,8 @@ public class TestEngineDiscoveryRequestResolver {
                         .orElse(null);
 
         excludeTestClassPredicate =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration
+                        .getInstance()
                         .get(TestEngineConstants.TEST_CLASS_EXCLUDE)
                         .map(value -> {
                             LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_EXCLUDE, value);
@@ -106,7 +111,8 @@ public class TestEngineDiscoveryRequestResolver {
                         .orElse(null);
 
         includeTestMethodPredicate =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration
+                        .getInstance()
                         .get(TestEngineConstants.TEST_METHOD_INCLUDE)
                         .map(value -> {
                             LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_INCLUDE, value);
@@ -116,7 +122,8 @@ public class TestEngineDiscoveryRequestResolver {
                         .orElse(null);
 
         excludeTestMethodPredicate =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration
+                        .getInstance()
                         .get(TestEngineConstants.TEST_METHOD_EXCLUDE)
                         .map(value -> {
                             LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_EXCLUDE, value);
@@ -126,7 +133,8 @@ public class TestEngineDiscoveryRequestResolver {
                         .orElse(null);
 
         includeTestClassTagPredicate =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration
+                        .getInstance()
                         .get(TestEngineConstants.TEST_CLASS_TAG_INCLUDE)
                         .map(value -> {
                             LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_TAG_INCLUDE, value);
@@ -136,7 +144,8 @@ public class TestEngineDiscoveryRequestResolver {
                         .orElse(null);
 
         excludeTestClassTagPredicate =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration
+                        .getInstance()
                         .get(TestEngineConstants.TEST_CLASS_TAG_EXCLUDE)
                         .map(value -> {
                             LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_TAG_EXCLUDE, value);
@@ -146,7 +155,8 @@ public class TestEngineDiscoveryRequestResolver {
                         .orElse(null);
 
         includeTestMethodTagPredicate =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration
+                        .getInstance()
                         .get(TestEngineConstants.TEST_METHOD_TAG_INCLUDE)
                         .map(value -> {
                             LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_TAG_INCLUDE, value);
@@ -156,7 +166,8 @@ public class TestEngineDiscoveryRequestResolver {
                         .orElse(null);
 
         excludeTestMethodTagPredicate =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration
+                        .getInstance()
                         .get(TestEngineConstants.TEST_METHOD_TAG_EXCLUDE)
                         .map(value -> {
                             LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_TAG_EXCLUDE, value);
@@ -215,7 +226,8 @@ public class TestEngineDiscoveryRequestResolver {
                     .forEach(uniqueIdSelector -> uniqueIdSelectorResolver.resolve(uniqueIdSelector, engineDescriptor));
 
             /**
-             * TODO refactor code to use a visitor pattern to apply the predicate filters
+             * TODO refactor code to use a visitor pattern to apply
+             *      the predicate filters or possibly do it during the resolution phase
              */
 
             // Filter based on package names
@@ -236,7 +248,7 @@ public class TestEngineDiscoveryRequestResolver {
     }
 
     /**
-     * Method to process package name filters
+     * Method to process PackageNameFilters
      *
      * @param engineDiscoveryRequest
      * @param engineDescriptor
@@ -289,14 +301,13 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (includeTestClassPredicate != null) {
             LOGGER.trace("includeTestClassPredicate [%s]", includeTestClassPredicate.getRegex());
-
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
                     RunnableClassTestDescriptor runnableClassTestDescriptor = Cast.cast(child);
                     UniqueId uniqueId = runnableClassTestDescriptor.getUniqueId();
                     Class<?> clazz = runnableClassTestDescriptor.getTestClass();
-
                     if (includeTestClassPredicate.test(clazz)) {
                         LOGGER.trace("  accept [%s]", uniqueId);
                     } else {
@@ -309,14 +320,13 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (excludeTestClassPredicate != null) {
             LOGGER.trace("excludeTestClassPredicate [%s]", excludeTestClassPredicate.getRegex());
-
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
                     RunnableClassTestDescriptor runnableClassTestDescriptor = Cast.cast(child);
                     UniqueId uniqueId = runnableClassTestDescriptor.getUniqueId();
                     Class<?> clazz = runnableClassTestDescriptor.getTestClass();
-
                     if (excludeTestClassPredicate.test(clazz)) {
                         LOGGER.trace("  prune  [%s]", uniqueId);
                         runnableClassTestDescriptor.removeFromHierarchy();
@@ -338,7 +348,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (includeTestMethodPredicate != null) {
             LOGGER.trace("includeTestMethodPredicate [%s]", includeTestMethodPredicate.getRegex());
-
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
@@ -351,7 +361,6 @@ public class TestEngineDiscoveryRequestResolver {
                                     RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
                                     UniqueId uniqueId = runnableMethodTestDescriptor.getUniqueId();
                                     Method method = runnableMethodTestDescriptor.getTestMethod();
-
                                     if (includeTestMethodPredicate.test(method)) {
                                         LOGGER.trace("  accept [%s]", uniqueId);
                                     } else {
@@ -368,7 +377,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (excludeTestMethodPredicate != null) {
             LOGGER.trace("excludeTestMethodPredicate [%s]", excludeTestMethodPredicate.getRegex());
-
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
@@ -381,7 +390,6 @@ public class TestEngineDiscoveryRequestResolver {
                                     RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
                                     UniqueId uniqueId = runnableMethodTestDescriptor.getUniqueId();
                                     Method method = runnableMethodTestDescriptor.getTestMethod();
-
                                     if (excludeTestMethodPredicate.test(method)) {
                                         LOGGER.trace("  prune  [%s]", uniqueId);
                                         runnableMethodTestDescriptor.removeFromHierarchy();
@@ -407,8 +415,8 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (includeTestClassTagPredicate != null) {
             LOGGER.trace("includeTestClassTagPredicate [%s]", includeTestClassTagPredicate.getRegex());
-
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
+            // TODO refactor to use forEach
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
                     RunnableClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
@@ -427,7 +435,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (excludeTestClassTagPredicate != null) {
             LOGGER.trace("excludeTestClassTagPredicate [%s]", excludeTestClassTagPredicate.getRegex());
-
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
@@ -456,7 +464,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (includeTestMethodTagPredicate != null) {
             LOGGER.trace("includeTestMethodTagPredicate [%s]", includeTestMethodTagPredicate.getRegex());
-
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
@@ -486,7 +494,7 @@ public class TestEngineDiscoveryRequestResolver {
 
         if (excludeTestMethodTagPredicate != null) {
             LOGGER.trace("excludeTestMethodTagPredicate [%s]", excludeTestMethodTagPredicate.getRegex());
-
+            // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
                 if (child instanceof RunnableClassTestDescriptor) {
