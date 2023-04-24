@@ -25,11 +25,20 @@ import org.junit.platform.engine.EngineDiscoveryRequest;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Class to implement a TestEngineEngineDiscoveryRequest
+ */
 public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest {
 
     private final EngineDiscoveryRequest engineDiscoveryRequest;
     private final ConfigurationParameters configurationParameters;
 
+    /**
+     * Constructor
+     *
+     * @param engineDiscoveryRequest
+     * @param configurationParameters
+     */
     public TestEngineEngineDiscoveryRequest(EngineDiscoveryRequest engineDiscoveryRequest, ConfigurationParameters configurationParameters) {
         Objects.requireNonNull(engineDiscoveryRequest);
 

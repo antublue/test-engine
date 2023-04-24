@@ -28,8 +28,10 @@ import org.junit.platform.engine.ExecutionRequest;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -65,13 +67,18 @@ public class TestEngineExecutor {
 
         LOGGER.trace("[%s] = [%d]", TestEngineConstants.THREAD_COUNT, threadCount);
 
-        this.executorService = Executors.newFixedThreadPool(threadCount, new NamedThreadFactory());
+        executorService = new ThreadPoolExecutor(
+                threadCount,
+                threadCount, 60L,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(threadCount * 10),
+                new NamedThreadFactory());
     }
 
     /**
      * Method to execute the ExecutionRequest
      *
-     * @param executionRequest
+     * @param executionRequest the execution request
      */
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest)");
@@ -86,15 +93,20 @@ public class TestEngineExecutor {
         CountDownLatch countDownLatch = new CountDownLatch(classTestDescriptors.size());
 
         classTestDescriptors
-                .forEach(classTestDescriptor -> executorService.submit(
-                        new RunnableAdapter(
-                                new TestExecutionContext(executionRequest, countDownLatch),
-                                classTestDescriptor)));
+                .forEach(classTestDescriptor ->
+                        executorService.submit(
+                                new RunnableAdapter(
+                                        classTestDescriptor, new TestExecutionContext(executionRequest, countDownLatch)
+                                )));
 
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
             throw new TestEngineException("Test execution interrupted");
+        } finally {
+            if (executorService != null) {
+                executorService.shutdown();
+            }
         }
     }
 
@@ -109,7 +121,7 @@ public class TestEngineExecutor {
          * Method to create a new Thread
          *
          * @param r a runnable to be executed by new thread instance
-         * @return
+         * @return the Thread
          */
         @Override
         public Thread newThread(Runnable r) {

@@ -41,7 +41,7 @@ public final class TestMethodTagPredicate extends RegexPredicate<Method> {
      * Method to test the Predicate
      *
      * @param method the input argument
-     * @return
+     * @return whether to accept the method
      */
     @Override
     public boolean test(Method method) {

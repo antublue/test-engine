@@ -72,12 +72,12 @@ public class PackageSelectorResolver {
                 .forEach(clazz -> {
                     LOGGER.trace("  class [%s]", clazz.getName());
 
-                    UniqueId classDescriptorUniqueId =
+                    UniqueId classTestDescriptorUniqueId =
                             engineDescriptorUniqueId.append("class", clazz.getName());
 
                     ClassTestDescriptor testEngineClassTestDescriptor =
                             TestDescriptorUtils.createClassTestDescriptor(
-                                    classDescriptorUniqueId,
+                                    classTestDescriptorUniqueId,
                                     clazz);
 
                     engineDescriptor.addChild(testEngineClassTestDescriptor);
@@ -86,13 +86,15 @@ public class PackageSelectorResolver {
                     TestEngineReflectionUtils
                             .getParameters(clazz)
                             .forEach(parameter -> {
-                                UniqueId parameterDescriptorUniqueId =
-                                        classDescriptorUniqueId
-                                                .append("parameter", String.valueOf(index.get()));
+                                UniqueId parameterTestDescriptorUniqueId =
+                                        classTestDescriptorUniqueId
+                                                .append(
+                                                        "parameter",
+                                                        String.valueOf(index.getAndIncrement()));
 
                                 ParameterTestDescriptor testEngineParameterTestDescriptor =
                                         TestDescriptorUtils.createParameterTestDescriptor(
-                                                parameterDescriptorUniqueId,
+                                                parameterTestDescriptorUniqueId,
                                                 clazz,
                                                 parameter);
 
@@ -101,13 +103,13 @@ public class PackageSelectorResolver {
                                 TestEngineReflectionUtils
                                         .getTestMethods(clazz)
                                         .forEach(method -> {
-                                            UniqueId uniqueId =
-                                                    parameterDescriptorUniqueId
+                                            UniqueId methodTestDescriptorUniqueId =
+                                                    parameterTestDescriptorUniqueId
                                                             .append("method", method.getName());
 
                                             MethodTestDescriptor methodTestDescriptor =
                                                     TestDescriptorUtils.createMethodTestDescriptor(
-                                                            uniqueId,
+                                                            methodTestDescriptorUniqueId,
                                                             clazz,
                                                             parameter,
                                                             method);
@@ -117,7 +119,6 @@ public class PackageSelectorResolver {
 
                                 testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
                                 testEngineParameterTestDescriptor.prune();
-                                index.incrementAndGet();
                             });
                         testEngineClassTestDescriptor.prune();
                     });

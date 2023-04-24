@@ -306,12 +306,12 @@ public class TestEngineDiscoveryRequestResolver {
             for (TestDescriptor child : children) {
                 if (child instanceof ClassTestDescriptor) {
                     ClassTestDescriptor classTestDescriptor = Cast.cast(child);
-                    UniqueId uniqueId = classTestDescriptor.getUniqueId();
+                    UniqueId classTestDescriptorUniqueId = classTestDescriptor.getUniqueId();
                     Class<?> clazz = classTestDescriptor.getTestClass();
                     if (includeTestClassPredicate.test(clazz)) {
-                        LOGGER.trace("  accept [%s]", uniqueId);
+                        LOGGER.trace("  accept [%s]", classTestDescriptorUniqueId);
                     } else {
-                        LOGGER.trace("  prune  [%s]", uniqueId);
+                        LOGGER.trace("  prune  [%s]", classTestDescriptorUniqueId);
                         classTestDescriptor.removeFromHierarchy();
                     }
                 }
@@ -325,13 +325,13 @@ public class TestEngineDiscoveryRequestResolver {
             for (TestDescriptor child : children) {
                 if (child instanceof ClassTestDescriptor) {
                     ClassTestDescriptor classTestDescriptor = Cast.cast(child);
-                    UniqueId uniqueId = classTestDescriptor.getUniqueId();
+                    UniqueId classTestDescriptorUniqueId = classTestDescriptor.getUniqueId();
                     Class<?> clazz = classTestDescriptor.getTestClass();
                     if (excludeTestClassPredicate.test(clazz)) {
-                        LOGGER.trace("  prune  [%s]", uniqueId);
+                        LOGGER.trace("  prune  [%s]", classTestDescriptorUniqueId);
                         classTestDescriptor.removeFromHierarchy();
                     } else {
-                        LOGGER.trace("  accept [%s]", uniqueId);
+                        LOGGER.trace("  accept [%s]", classTestDescriptorUniqueId);
                     }
                 }
             }
@@ -359,12 +359,12 @@ public class TestEngineDiscoveryRequestResolver {
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
                                 if (greatGrandChild instanceof MethodTestDescriptor) {
                                     MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
-                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
+                                    UniqueId methodTestDescriptorUniqueId = methodTestDescriptor.getUniqueId();
                                     Method method = methodTestDescriptor.getTestMethod();
                                     if (includeTestMethodPredicate.test(method)) {
-                                        LOGGER.trace("  accept [%s]", uniqueId);
+                                        LOGGER.trace("  accept [%s]", methodTestDescriptorUniqueId);
                                     } else {
-                                        LOGGER.trace("  prune  [%s]", uniqueId);
+                                        LOGGER.trace("  prune  [%s]", methodTestDescriptorUniqueId);
                                         methodTestDescriptor.removeFromHierarchy();
                                     }
                                 }
@@ -388,13 +388,13 @@ public class TestEngineDiscoveryRequestResolver {
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
                                 if (greatGrandChild instanceof MethodTestDescriptor) {
                                     MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
-                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
+                                    UniqueId methodTestDescriptorUniqueId = methodTestDescriptor.getUniqueId();
                                     Method method = methodTestDescriptor.getTestMethod();
                                     if (excludeTestMethodPredicate.test(method)) {
-                                        LOGGER.trace("  prune  [%s]", uniqueId);
+                                        LOGGER.trace("  prune  [%s]", methodTestDescriptorUniqueId);
                                         methodTestDescriptor.removeFromHierarchy();
                                     } else {
-                                        LOGGER.trace("  accept [%s]", uniqueId);
+                                        LOGGER.trace("  accept [%s]", methodTestDescriptorUniqueId);
                                     }
                                 }
                             }
@@ -420,13 +420,12 @@ public class TestEngineDiscoveryRequestResolver {
             for (TestDescriptor child : children) {
                 if (child instanceof ClassTestDescriptor) {
                     ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
-                    UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
+                    UniqueId classTestDescriptorUniqueId = testEngineClassTestDescriptor.getUniqueId();
                     Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
-
                     if (includeTestClassTagPredicate.test(clazz)) {
-                        LOGGER.trace("  accept [%s]", uniqueId);
+                        LOGGER.trace("  accept [%s]", classTestDescriptorUniqueId);
                     } else {
-                        LOGGER.trace("  prune  [%s]", uniqueId);
+                        LOGGER.trace("  prune  [%s]", classTestDescriptorUniqueId);
                         testEngineClassTestDescriptor.removeFromHierarchy();
                     }
                 }
@@ -440,14 +439,13 @@ public class TestEngineDiscoveryRequestResolver {
             for (TestDescriptor child : children) {
                 if (child instanceof ClassTestDescriptor) {
                     ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
-                    UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
+                    UniqueId classTestDescriptorUniqueId = testEngineClassTestDescriptor.getUniqueId();
                     Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
-
                     if (excludeTestClassTagPredicate.test(clazz)) {
-                        LOGGER.trace("  prune  [%s]", uniqueId);
+                        LOGGER.trace("  prune  [%s]", classTestDescriptorUniqueId);
                         testEngineClassTestDescriptor.removeFromHierarchy();
                     } else {
-                        LOGGER.trace("  accept [%s]", uniqueId);
+                        LOGGER.trace("  accept [%s]", classTestDescriptorUniqueId);
                     }
                 }
             }
@@ -475,13 +473,12 @@ public class TestEngineDiscoveryRequestResolver {
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
                                 if (greatGrandChild instanceof MethodTestDescriptor) {
                                     MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
-                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
+                                    UniqueId methodTestDescriptorUniqueId = methodTestDescriptor.getUniqueId();
                                     Method method = methodTestDescriptor.getTestMethod();
-
                                     if (includeTestMethodTagPredicate.test(method)) {
-                                        LOGGER.trace("  accept [%s]", uniqueId);
+                                        LOGGER.trace("  accept [%s]", methodTestDescriptorUniqueId);
                                     } else {
-                                        LOGGER.trace("  prune  [%s]", uniqueId);
+                                        LOGGER.trace("  prune  [%s]", methodTestDescriptorUniqueId);
                                         methodTestDescriptor.removeFromHierarchy();
                                     }
                                 }
@@ -505,14 +502,13 @@ public class TestEngineDiscoveryRequestResolver {
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
                                 if (greatGrandChild instanceof MethodTestDescriptor) {
                                     MethodTestDescriptor methodTestDescriptor = Cast.cast(greatGrandChild);
-                                    UniqueId uniqueId = methodTestDescriptor.getUniqueId();
+                                    UniqueId methodTestDescriptorUniqueId = methodTestDescriptor.getUniqueId();
                                     Method method = methodTestDescriptor.getTestMethod();
-
                                     if (excludeTestMethodTagPredicate.test(method)) {
-                                        LOGGER.trace("  prune  [%s]", uniqueId);
+                                        LOGGER.trace("  prune  [%s]", methodTestDescriptorUniqueId);
                                         methodTestDescriptor.removeFromHierarchy();
                                     } else {
-                                        LOGGER.trace("  accept [%s]", uniqueId);
+                                        LOGGER.trace("  accept [%s]", methodTestDescriptorUniqueId);
                                     }
                                 }
                             }

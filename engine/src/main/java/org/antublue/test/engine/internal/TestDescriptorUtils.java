@@ -28,8 +28,10 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Method;
-import java.util.function.Consumer;
 
+/**
+ * Class to contain TestDescriptor utility methods
+ */
 public final class TestDescriptorUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptorUtils.class);
@@ -145,6 +147,6 @@ public final class TestDescriptorUtils {
 
         testDescriptor
                 .getChildren()
-                .forEach((Consumer<TestDescriptor>) testDescriptor1 -> trace(testDescriptor1, indent + 2));
+                .forEach(t -> trace(t, indent + 2));
     }
 }

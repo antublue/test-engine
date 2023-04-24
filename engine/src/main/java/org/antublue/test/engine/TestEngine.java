@@ -33,7 +33,7 @@ import org.junit.platform.engine.UniqueId;
 import java.util.Optional;
 
 /**
- * Class to implement a TestEngine
+ * Class to implement the AntuBLUE Test Engine
  */
 public class TestEngine implements org.junit.platform.engine.TestEngine {
 
@@ -102,7 +102,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         TestEngineConfiguration.getInstance());
 
         // Create an EngineDescriptor as the target
-        ExtendedEngineDescriptor extendedEngineDescriptor = new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
+        ExtendedEngineDescriptor extendedEngineDescriptor =
+                new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
 
         // Create a TestEngineDiscoverySelectorResolver and
         // resolve selectors, adding them to the engine descriptor

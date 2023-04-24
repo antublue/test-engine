@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
@@ -24,7 +23,6 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Class to implement a extended EngineDescriptor
@@ -90,9 +88,8 @@ public final class ExtendedEngineDescriptor extends EngineDescriptor {
      * @param <T>
      */
     public <T> List<T> getChildren(Class<T> clazz) {
-        // Clazz is not used directly, but required to make Stream semantics work
         final List<T> list = new ArrayList<>();
-        getChildren().forEach((Consumer<TestDescriptor>) testDescriptor -> list.add((T) testDescriptor));
+        getChildren().forEach(testDescriptor -> list.add((T) testDescriptor));
         return list;
     }
 }

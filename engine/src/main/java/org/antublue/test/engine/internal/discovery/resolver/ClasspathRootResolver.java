@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.discovery.resolver;
 
-import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
@@ -30,12 +29,11 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 /**
@@ -76,51 +74,53 @@ public class ClasspathRootResolver {
                 .forEach(clazz -> {
                     LOGGER.trace("  class [%s]", clazz.getName());
 
-                    UniqueId uniqueId = engineDescriptorUniqueId.append("class", clazz.getName());
+                    final UniqueId classTestDescriptorUniqueId =
+                            engineDescriptorUniqueId.append("class", clazz.getName());
 
-                    ClassTestDescriptor testEngineClassTestDescriptor =
+                    ClassTestDescriptor classTestDescriptor =
                             TestDescriptorUtils.createClassTestDescriptor(
-                                    uniqueId,
+                                    classTestDescriptorUniqueId,
                                     clazz);
 
-                    engineDescriptor.addChild(testEngineClassTestDescriptor);
+                    engineDescriptor.addChild(classTestDescriptor);
 
-                    // TODO refactor to use forEach
-                    List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
-                    for (int i = 0; i < parameters.size(); i++) {
-                        Parameter parameter = parameters.get(i);
-                        uniqueId = uniqueId.append("parameter", String.valueOf(i));
+                    AtomicInteger index = new AtomicInteger();
+                    TestEngineReflectionUtils
+                            .getParameters(clazz)
+                            .forEach(parameter -> {
+                                UniqueId parameterTestDescriptorUniqueId =
+                                        classTestDescriptorUniqueId.append(
+                                                "parameter",
+                                                String.valueOf(index.getAndIncrement()));
 
-                        ParameterTestDescriptor testEngineParameterTestDescriptor =
-                                TestDescriptorUtils.createParameterTestDescriptor(
-                                        uniqueId,
-                                        clazz,
-                                        parameter);
+                                ParameterTestDescriptor parameterTestDescriptor =
+                                        TestDescriptorUtils.createParameterTestDescriptor(
+                                                parameterTestDescriptorUniqueId,
+                                                clazz,
+                                                parameter);
 
-                        testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
+                                classTestDescriptor.addChild(parameterTestDescriptor);
 
-                        // TODO refactor to use forEach
-                        List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
-                        for (Method method : methods) {
-                            uniqueId = uniqueId.append("method", method.getName());
+                                TestEngineReflectionUtils
+                                        .getTestMethods(clazz)
+                                        .forEach(method -> {
+                                            UniqueId methodTestDescriptorUniqueId =
+                                                    parameterTestDescriptorUniqueId.append("method", method.getName());
 
-                            MethodTestDescriptor methodTestDescriptor =
-                                    TestDescriptorUtils.createMethodTestDescriptor(
-                                            uniqueId,
-                                            clazz,
-                                            parameter,
-                                            method);
+                                            MethodTestDescriptor methodTestDescriptor =
+                                                    TestDescriptorUtils.createMethodTestDescriptor(
+                                                            methodTestDescriptorUniqueId,
+                                                            clazz,
+                                                            parameter,
+                                                            method);
 
-                            testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
+                                            parameterTestDescriptor.addChild(methodTestDescriptor);
+                                        });
 
-                            uniqueId = uniqueId.removeLastSegment();
-                        }
+                                parameterTestDescriptor.prune();
+                            });
 
-                        testEngineParameterTestDescriptor.prune();
-                        uniqueId = uniqueId.removeLastSegment();
-                    }
-
-                    testEngineClassTestDescriptor.prune();
+                    classTestDescriptor.prune();
                 });
     }
 }

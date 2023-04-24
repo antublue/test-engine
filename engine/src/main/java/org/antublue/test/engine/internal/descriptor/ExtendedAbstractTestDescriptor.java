@@ -28,7 +28,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Class to implement an extended abstract test descriptor
+ * Class to implement an extended AbstractTestDescriptor
  */
 @SuppressWarnings("unchecked")
 abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
@@ -47,7 +47,7 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     }
 
     /**
-     * Method to get a List of children cast as a specific class
+     * Method to get a List of children cast as a specific Class
      *
      * @param clazz
      * @return
@@ -101,14 +101,14 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     }
 
     /**
-     * Method to test the test descriptor
+     * Method to test the TestDescriptor
      *
-     * @paramter testExecutionContext
+     * @param testExecutionContext
      */
-    public abstract void test(TestExecutionContext testExecutionContext);
+    public abstract void execute(TestExecutionContext testExecutionContext);
 
     /**
-     * Method to skip the test descriptor's children, then the test descriptor
+     * Method to skip the TestDescriptor's children, then the TestDescriptor (recursively)
      *
      * @param testExecutionContext
      */

@@ -46,6 +46,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Class to collect test information and output a test execution summary
  */
+// TODO sync code with TestEngineConsoleTestExecutionListener
 public class TestEngineConsoleDisplayNameTestExecutionListener implements TestExecutionListener {
 
     private static final String BANNER =

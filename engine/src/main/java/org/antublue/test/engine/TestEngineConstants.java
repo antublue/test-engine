@@ -17,7 +17,7 @@
 package org.antublue.test.engine;
 
 /**
- * Class to contain Test Engine configuration constants
+ * Class that contains Test Engine configuration constants
  */
 public final class TestEngineConstants {
 

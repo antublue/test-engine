@@ -66,43 +66,41 @@ public class MethodSelectorResolver {
         UniqueId engineDescriptorUniqueId = engineDescriptor.getUniqueId();
         Class<?> clazz = methodSelector.getJavaClass();
         Method method = methodSelector.getJavaMethod();
-        final UniqueId classDescriptorUniqueId = engineDescriptorUniqueId.append("class", clazz.getName());
+        UniqueId classTestDescriptorUniqueId = engineDescriptorUniqueId.append("class", clazz.getName());
 
-        ClassTestDescriptor testEngineClassTestDescriptor =
+        ClassTestDescriptor classTestDescriptor =
                 TestDescriptorUtils.createClassTestDescriptor(
-                        classDescriptorUniqueId,
+                        classTestDescriptorUniqueId,
                         clazz);
 
         final AtomicInteger index = new AtomicInteger();
         TestEngineReflectionUtils
                 .getParameters(clazz)
                 .forEach(parameter -> {
-                    UniqueId uniqueId =
-                            classDescriptorUniqueId.append("parameter", String.valueOf(index.get()));
+                    UniqueId parameterTestDescriptorUniqueId =
+                            classTestDescriptorUniqueId.append(
+                                    "parameter",
+                                    String.valueOf(index.getAndIncrement()));
 
-                    ParameterTestDescriptor testEngineParameterTestDescriptor =
+                    ParameterTestDescriptor parameterTestDescriptor =
                             TestDescriptorUtils.createParameterTestDescriptor(
-                                    uniqueId,
+                                    parameterTestDescriptorUniqueId,
                                     clazz,
                                     parameter);
 
-                    uniqueId = uniqueId.append("method", method.getName());
+                    UniqueId methodTestDescriptorUniqueId =
+                            parameterTestDescriptorUniqueId.append("method", method.getName());
 
                     MethodTestDescriptor methodTestDescriptor =
                             TestDescriptorUtils.createMethodTestDescriptor(
-                                    uniqueId,
+                                    methodTestDescriptorUniqueId,
                                     clazz,
                                     parameter,
                                     method);
 
-                    uniqueId = uniqueId.removeLastSegment();
-                    testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
-
-                    uniqueId.removeLastSegment();
-                    testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
-
-                    engineDescriptor.addChild(testEngineClassTestDescriptor);
-                    index.incrementAndGet();
+                    parameterTestDescriptor.addChild(methodTestDescriptor);
+                    classTestDescriptor.addChild(parameterTestDescriptor);
+                    engineDescriptor.addChild(classTestDescriptor);
                 });
     }
 }

@@ -106,7 +106,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param testExecutionContext
      */
-    public void test(TestExecutionContext testExecutionContext) {
+    public void execute(TestExecutionContext testExecutionContext) {
         ThrowableCollector throwableCollector = getThrowableCollector();
 
         EngineExecutionListener engineExecutionListener =
@@ -146,7 +146,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         if (throwableCollector.isEmpty()) {
             getChildren(ParameterTestDescriptor.class)
                     .forEach(parameterTestDescriptor -> {
-                        parameterTestDescriptor.test(testExecutionContext);
+                        parameterTestDescriptor.execute(testExecutionContext);
                         throwableCollector.addAll(parameterTestDescriptor.getThrowableCollector());
                     });
         } else {
@@ -180,11 +180,15 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
         } else {
-            engineExecutionListener.executionFinished(this, TestExecutionResult.failed(throwableCollector.getFirst().get()));
+            engineExecutionListener.executionFinished(
+                    this,
+                    TestExecutionResult.failed(
+                            throwableCollector
+                                    .getFirst()
+                                    .orElse(null)));
         }
 
         testExecutionContext.setTestInstance(null);
-
         testExecutionContext.getCountDownLatch().countDown();
     }
 }

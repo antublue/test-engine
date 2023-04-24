@@ -42,9 +42,9 @@ public class TestEngineInformation {
     /**
      * Method to get value for a key from the test engine properties
      *
-     * @param key
-     * @param defaultValue
-     * @return
+     * @param key the property key
+     * @param defaultValue the default value
+     * @return the value
      */
     private static String getProperty(String key, String defaultValue) {
         String value = defaultValue;

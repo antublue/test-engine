@@ -36,12 +36,11 @@ public final class TestMethodPredicate extends RegexPredicate<Method> {
      * Method to test the Predicate
      *
      * @param method the input argument
-     * @return
+     * @return whether to accept the Method
      */
     @Override
     public boolean test(Method method) {
-        matcher.reset(method.getName());
-        return matcher.find();
+        return matcher.reset(method.getName()).find();
     }
 
     /**

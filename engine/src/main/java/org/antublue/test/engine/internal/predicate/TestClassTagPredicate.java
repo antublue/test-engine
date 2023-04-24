@@ -24,7 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Class to implement a tst class tag Predicate
+ * Class to implement a test class tag Predicate
  */
 public final class TestClassTagPredicate extends RegexPredicate<Class<?>> {
 
@@ -41,7 +41,7 @@ public final class TestClassTagPredicate extends RegexPredicate<Class<?>> {
      * Method to test the Predicate
      *
      * @param clazz the input argument
-     * @return
+     * @return whether to accept the Class
      */
     @Override
     public boolean test(Class<?> clazz) {
