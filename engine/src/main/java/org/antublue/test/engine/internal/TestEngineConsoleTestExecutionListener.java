@@ -19,10 +19,10 @@ package org.antublue.test.engine.internal;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
+import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.Cast;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
@@ -54,9 +54,9 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                     + " ";
 
     private static final String TEST = AnsiColor.WHITE_BRIGHT.apply("TEST");
-    private static final String ABORT = AnsiColor.YELLOW_BOLD.apply("ABORT");
-    private static final String FAIL = AnsiColor.RED_BOLD.apply("FAIL");
     private static final String PASS = AnsiColor.GREEN_BOLD.apply("PASS");
+    private static final String SKIP = AnsiColor.YELLOW_BOLD_BRIGHT.apply("SKIP");
+    private static final String FAIL = AnsiColor.RED_BOLD.apply("FAIL");
 
     private static final String SEPARATOR =
             AnsiColor.WHITE_BRIGHT.apply(
@@ -65,6 +65,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     private final boolean detailedOutput;
     private final boolean logTestMessages;
     private final boolean logPassMessages;
+    private final boolean logSkipMessages;
 
     private final Summary summary;
 
@@ -101,6 +102,18 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
         this.logPassMessages =
                 TestEngineConfiguration.getInstance()
                         .get(TestEngineConstants.LOG_PASS_MESSAGES)
+                        .map(value -> {
+                            try {
+                                return Boolean.parseBoolean(value);
+                            } catch (NumberFormatException e) {
+                                return true;
+                            }
+                        })
+                        .orElse(true);
+
+        this.logSkipMessages =
+                TestEngineConfiguration.getInstance()
+                        .get(TestEngineConstants.LOG_SKIP_MESSAGES)
                         .map(value -> {
                             try {
                                 return Boolean.parseBoolean(value);
@@ -172,11 +185,11 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
 
         Switch.switchType(
                 testDescriptor,
-                Switch.switchCase(RunnableEngineDescriptor.class, consumer -> {
+                Switch.switchCase(ExtendedEngineDescriptor.class, consumer -> {
                     // DO NOTHING
                 }),
-                Switch.switchCase(RunnableClassTestDescriptor.class, consumer -> {
-                    RunnableClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
+                Switch.switchCase(ClassTestDescriptor.class, consumer -> {
+                    ClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
                     Class<?> testClass = classTestDescriptor.getTestClass();
                     if (logTestMessages) {
                         stringBuilder
@@ -185,9 +198,9 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                                 .append(testClass.getName());
                     }
                 }),
-                Switch.switchCase(RunnableParameterTestDescriptor.class, consumer -> {
+                Switch.switchCase(ParameterTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
-                        RunnableParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
+                        ParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = parameterTestDescriptor.getTestClass();
                         Parameter testParameter = parameterTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
@@ -199,9 +212,9 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                                 .append(testClass.getName());
                     }
                 }),
-                Switch.switchCase(RunnableMethodTestDescriptor.class, consumer -> {
+                Switch.switchCase(MethodTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
-                        RunnableMethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
+                        MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = methodTestDescriptor.getTestClass();
                         Method testMethod = methodTestDescriptor.getTestMethod();
                         Parameter testParameter = methodTestDescriptor.getTestParameter();
@@ -233,7 +246,60 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         .orElse(null);
 
         summary.executionSkipped(testDescriptor, reason);
-        // TODO log skipped?
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        Switch.switchType(
+                testDescriptor,
+                Switch.switchCase(ExtendedEngineDescriptor.class, consumer -> {
+                    // DO NOTHING
+                }),
+                Switch.switchCase(ClassTestDescriptor.class, consumer -> {
+                    if (logSkipMessages) {
+                        ClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
+                        Class<?> testClass = classTestDescriptor.getTestClass();
+                        stringBuilder
+                                .append(SKIP)
+                                .append(" | ")
+                                .append(testClass.getName());
+                    }
+                }),
+                Switch.switchCase(ParameterTestDescriptor.class, consumer -> {
+                    if (logSkipMessages) {
+                        ParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
+                        Class<?> testClass = parameterTestDescriptor.getTestClass();
+                        Parameter testParameter = parameterTestDescriptor.getTestParameter();
+                        String testParameterName = testParameter.name();
+                        stringBuilder
+                                .append(SKIP)
+                                .append(" | ")
+                                .append(testParameterName)
+                                .append(" | ")
+                                .append(testClass.getName());
+                    }
+                }),
+                Switch.switchCase(MethodTestDescriptor.class, consumer -> {
+                    if (logSkipMessages) {
+                        MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
+                        Class<?> testClass = methodTestDescriptor.getTestClass();
+                        Method testMethod = methodTestDescriptor.getTestMethod();
+                        Parameter testParameter = methodTestDescriptor.getTestParameter();
+                        String testParameterName = testParameter.name();
+                        stringBuilder
+                                .append(SKIP)
+                                .append(" | ")
+                                .append(testParameterName)
+                                .append(" | ")
+                                .append(testClass.getName())
+                                .append(" ")
+                                .append(testMethod.getName())
+                                .append("()");
+                    }
+                }));
+
+        if (detailedOutput && stringBuilder.length() > 0) {
+            System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
+        }
     }
 
     /**
@@ -256,21 +322,21 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
 
         Switch.switchType(
                 testDescriptor,
-                Switch.switchCase(RunnableEngineDescriptor.class, consumer -> {
+                Switch.switchCase(ExtendedEngineDescriptor.class, consumer -> {
                     // DO NOTHING
                 }),
-                Switch.switchCase(RunnableClassTestDescriptor.class, consumer -> {
+                Switch.switchCase(ClassTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        RunnableClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
+                        ClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = classTestDescriptor.getTestClass();
                         stringBuilder
                                 .append("%s | ")
                                 .append(testClass.getName());
                     }
                 }),
-                Switch.switchCase(RunnableParameterTestDescriptor.class, consumer -> {
+                Switch.switchCase(ParameterTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        RunnableParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
+                        ParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = parameterTestDescriptor.getTestClass();
                         Parameter testParameter = parameterTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
@@ -281,9 +347,9 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                                 .append(testClass.getName());
                     }
                 }),
-                Switch.switchCase(RunnableMethodTestDescriptor.class, consumer -> {
+                Switch.switchCase(MethodTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        RunnableMethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
+                        MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = methodTestDescriptor.getTestClass();
                         Method testMethod = methodTestDescriptor.getTestMethod();
                         Parameter testParameter = methodTestDescriptor.getTestParameter();
@@ -304,7 +370,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
             String string = null;
             switch (status) {
                 case ABORTED: {
-                    string = String.format(stringBuilder.toString(), ABORT);
+                    string = String.format(stringBuilder.toString(), SKIP);
                     break;
                 }
                 case FAILED: {
@@ -597,37 +663,37 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
         }
 
         public void executionStarted(TestDescriptor testDescriptor) {
-            if (testDescriptor instanceof RunnableClassTestDescriptor) {
-                testClasses.add(((RunnableClassTestDescriptor) testDescriptor).getTestClass());
+            if (testDescriptor instanceof ClassTestDescriptor) {
+                testClasses.add(((ClassTestDescriptor) testDescriptor).getTestClass());
                 testClassesFound.set(testClasses.size());
                 return;
             }
 
-            if (testDescriptor instanceof RunnableParameterTestDescriptor) {
+            if (testDescriptor instanceof ParameterTestDescriptor) {
                 parametersFound.incrementAndGet();
                 return;
             }
 
-            if (testDescriptor instanceof RunnableMethodTestDescriptor) {
+            if (testDescriptor instanceof MethodTestDescriptor) {
                 methodsFound.incrementAndGet();
             }
         }
 
         public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-            if (testDescriptor instanceof RunnableParameterTestDescriptor) {
+            if (testDescriptor instanceof ParameterTestDescriptor) {
                 parametersFound.incrementAndGet();
                 parametersSkipped.incrementAndGet();
                 return;
             }
 
-            if (testDescriptor instanceof RunnableMethodTestDescriptor) {
+            if (testDescriptor instanceof MethodTestDescriptor) {
                 methodsFound.incrementAndGet();
                 methodsSkipped.incrementAndGet();
             }
         }
 
         public void executionFinished(TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-            if (testDescriptor instanceof RunnableClassTestDescriptor) {
+            if (testDescriptor instanceof ClassTestDescriptor) {
                 TestExecutionResult.Status status = testExecutionResult.getStatus();
                 switch (status) {
                     case SUCCESSFUL: {
@@ -647,7 +713,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 return;
             }
 
-            if (testDescriptor instanceof RunnableParameterTestDescriptor) {
+            if (testDescriptor instanceof ParameterTestDescriptor) {
                 TestExecutionResult.Status status = testExecutionResult.getStatus();
                 switch (status) {
                     case SUCCESSFUL: {
@@ -665,7 +731,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }
             }
 
-            if (testDescriptor instanceof RunnableMethodTestDescriptor) {
+            if (testDescriptor instanceof MethodTestDescriptor) {
                 TestExecutionResult.Status status = testExecutionResult.getStatus();
                 switch (status) {
                     case SUCCESSFUL: {

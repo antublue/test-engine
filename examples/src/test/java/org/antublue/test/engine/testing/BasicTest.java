@@ -38,23 +38,8 @@ public class BasicTest {
     }
 
     @TestEngine.Test
-    public void test1() {
-        System.out.println("test1(" + parameter.value() + ")");
-    }
-
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + parameter.value() + ")");
-    }
-
-    @TestEngine.Test
-    public void test3() {
-        System.out.println("test3(" + parameter.value() + ")");
-    }
-
-    @TestEngine.Test
-    public void test4() {
-        System.out.println("test4(" + parameter.value() + ")");
+    public void test() {
+        System.out.println("test(" + parameter.value() + ")");
     }
 
     @TestEngine.AfterEach

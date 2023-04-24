@@ -33,11 +33,11 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
- * Class to implement a Runnable test method descriptor
+ * Class to implement an extended test method descriptor
  */
-public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDescriptor {
+public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RunnableMethodTestDescriptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodTestDescriptor.class);
 
     private final Class<?> testClass;
     private final Parameter testParameter;
@@ -52,7 +52,7 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
      * @param testParameter
      * @param testMethod
      */
-    public RunnableMethodTestDescriptor(
+    public MethodTestDescriptor(
             UniqueId uniqueId,
             String displayName,
             Class<?> testClass,
@@ -133,12 +133,11 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
     }
 
     /**
-     * Method to run the test descriptor
-     * <br>
-     * The TestExecutionContext must be set prior to the call
+     * Method to test the test descriptor
+     *
+     * @param testExecutionContext
      */
-    public void run() {
-        TestExecutionContext testExecutionContext = getTestExecutionContext();
+    public void test(TestExecutionContext testExecutionContext) {
         ThrowableCollector throwableCollector = getThrowableCollector();
 
         EngineExecutionListener engineExecutionListener =
