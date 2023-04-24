@@ -20,14 +20,14 @@ public class ParameterFieldTest {
         Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(org.antublue.test.engine.api.Parameter.of(String.valueOf(value)));
+            collection.add(Parameter.of(String.valueOf(value)));
         }
         return collection.stream();
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll()");
+        System.out.println("beforeAll(" + parameter.value() + ")");
     }
 
     @TestEngine.Test
@@ -42,6 +42,6 @@ public class ParameterFieldTest {
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll()");
+        System.out.println("afterAll(" + parameter.value() + ")");
     }
 }
