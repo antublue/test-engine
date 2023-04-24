@@ -54,7 +54,7 @@ Parameterized integration testing is most common when you...
 2. You want to test workflow oriented scenarios of the application
 
 
-- various environments could involve different operation systems versions and/or different runtime versions
+- various environments could involve different operating systems versions and/or different application runtime versions
 
 ---
 
