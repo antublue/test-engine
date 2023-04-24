@@ -1,4 +1,4 @@
-package org.antublue.test.engine.testing;
+package example;
 
 import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class BasicTest {
+public class ExampleTest {
 
     private Parameter parameter;
 
@@ -29,12 +29,12 @@ public class BasicTest {
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll()");
+        System.out.println("beforeAll(" + parameter.value() + ")");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println("beforeEach()");
+        System.out.println("beforeEach(" + parameter.value() + ")");
     }
 
     @TestEngine.Test
@@ -44,12 +44,12 @@ public class BasicTest {
 
     @TestEngine.AfterEach
     public void afterEach() {
-        System.out.println("afterEach()");
+        System.out.println("afterEach(" + parameter.value() + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll()");
+        System.out.println("afterAll(" + parameter.value() + ")");
     }
 
     @TestEngine.AfterClass
