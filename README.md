@@ -280,11 +280,11 @@ public static Stream<Parameter> parameters() {
 ```
 
 ```java
-String value = map.get("key");
+String value = parameterMap.get("key");
 ```
 
 ```java
-if (map.get("key", String.class).length() == 0) {
+if (parameterMap.get("key", String.class).length() == 0) {
     // handle empty string
 }
 ```
