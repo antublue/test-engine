@@ -162,17 +162,10 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
         summary.testPlanExecutionStarted(testPlan);
 
         testPlan.getRoots()
-                .forEach(testIdentifier -> {
-                    TestDescriptor testDescriptor =
-                            TestEngineTestDescriptorStore
-                                    .getInstance()
-                                    .get(testIdentifier.getUniqueIdObject())
-                                    .orElse(null);
-
-                    if (testDescriptor != null) {
-                        TestDescriptorUtils.trace(testDescriptor);
-                    }
-                });
+                .forEach(testIdentifier ->
+                        TestEngineTestDescriptorStore
+                                .getInstance()
+                                .get(testIdentifier.getUniqueIdObject()).ifPresent(TestDescriptorUtils::trace));
 
         System.out.println(INFO + SEPARATOR);
         System.out.println(INFO + BANNER);
