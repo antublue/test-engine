@@ -522,6 +522,10 @@ IntelliJ doesn't properly handle all possible test selection scenarios from the 
 
 - https://youtrack.jetbrains.com/issue/IDEA-317561/IntelliJ-test-method-selections-fails-for-hierarchical-test-in-test-output-window
 
+IntelliJ doesn't properly display the correct test class display name when a single test class is selected.
+
+- https://youtrack.jetbrains.com/issue/IDEA-318733/IntelliJ-test-class-display-name-is-incorrect-when-selecting-a-specific-test-class
+
 ## Getting Help
 
 GitHub's Discussions is the current mechanism for help / support
