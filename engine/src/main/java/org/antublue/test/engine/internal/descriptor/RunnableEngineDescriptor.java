@@ -17,52 +17,81 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.internal.TestExecutionContext;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
-import org.junit.platform.launcher.TestExecutionListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * Class to implement a Runnable EngineDescriptor
+ */
 @SuppressWarnings("unchecked")
 public final class RunnableEngineDescriptor extends EngineDescriptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RunnableEngineDescriptor.class);
-
-    private TestExecutionListener testExecutionListener;
-
-
+    /***
+     * Constructor
+     *
+     * @param uniqueId
+     * @param displayName
+     */
     public RunnableEngineDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
     }
 
+    /**
+     * Method to get the TestSource
+     *
+     * @return
+     */
     @Override
     public Optional<TestSource> getSource() {
         return Optional.ofNullable(null);
     }
 
+    /**
+     * Method to get the test descriptor Type
+     *
+     * @return
+     */
     @Override
     public Type getType() {
         return Type.CONTAINER;
     }
 
+    /**
+     * Method to return whether the test descriptor is a test
+     *
+     * @return
+     */
     @Override
     public boolean isTest() {
         return false;
     }
 
+    /**
+     * Method to return whether the test descriptor is a container
+     *
+     * @return
+     */
     @Override
     public boolean isContainer() {
         return true;
     }
 
+    /**
+     * Method to get a List of children cast as a specific class
+     *
+     * @param clazz
+     * @return
+     * @param <T>
+     */
     public <T> List<T> getChildren(Class<T> clazz) {
+        // Clazz is not used directly, but required to make Stream semantics work
         final List<T> list = new ArrayList<>();
         getChildren().forEach((Consumer<TestDescriptor>) testDescriptor -> list.add((T) testDescriptor));
         return list;
@@ -70,10 +99,10 @@ public final class RunnableEngineDescriptor extends EngineDescriptor {
 
     public void run() {
         getChildren(RunnableClassTestDescriptor.class)
-                .forEach(executableClassTestDescriptor -> {
-                    TestExecutionContext testExecutionContext = executableClassTestDescriptor.getTestExecutionContext();
-                    executableClassTestDescriptor.setTestExecutionContext(testExecutionContext);
-                    executableClassTestDescriptor.run();
+                .forEach(runnableClassTestDescriptor -> {
+                    TestExecutionContext testExecutionContext = runnableClassTestDescriptor.getTestExecutionContext();
+                    runnableClassTestDescriptor.setTestExecutionContext(testExecutionContext);
+                    runnableClassTestDescriptor.run();
                 });
     }
 }

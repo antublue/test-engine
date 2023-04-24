@@ -14,37 +14,30 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.source;
-
-import org.antublue.test.engine.api.Parameter;
-
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.stream.Stream;
+package org.antublue.test.engine.internal.util;
 
 /**
- * Class to create a Stream of Parameters from an Enum
+ * Class to implement Throwable utilities
  */
-@SuppressWarnings("unchecked")
-public final class EnumSource {
+public final class ThrowableUtils {
 
     /**
      * Constructor
      */
-    private EnumSource() {
+    private ThrowableUtils() {
         // DO NOTHING
     }
 
     /**
-     * Method to create a Stream of Parameters from an Enum
+     * Method to throw a checked (RuntimeException) if a Throwable it checked
      *
-     * @param e
-     * @return
+     * @param t
      */
-    public static Stream<Parameter> of(Class<? extends Enum> e) {
-        final List<Parameter> list = new ArrayList<>();
-        EnumSet.allOf(e).forEach(o -> list.add(Parameter.of(((Enum<?>) o).name(), o.toString())));
-        return list.stream();
+    public static void throwUnchecked(Throwable t) {
+        if (t instanceof RuntimeException) {
+            throw (RuntimeException) t;
+        } else {
+            throw new RuntimeException(t);
+        }
     }
 }

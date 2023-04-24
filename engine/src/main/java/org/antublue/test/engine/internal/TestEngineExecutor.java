@@ -21,6 +21,7 @@ import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.Cast;
 import org.junit.platform.engine.ExecutionRequest;
 
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Method to execute an ExecutionRequest
@@ -43,7 +45,7 @@ public class TestEngineExecutor {
      */
     public TestEngineExecutor() {
         int threadCount =
-                TestEngineConfigurationParameters.getInstance()
+                TestEngineConfiguration.getInstance()
                         .get(TestEngineConstants.THREAD_COUNT)
                         .map(value -> {
                             int intValue;
@@ -60,7 +62,7 @@ public class TestEngineExecutor {
                         })
                         .orElse(Runtime.getRuntime().availableProcessors());
 
-        LOGGER.trace("thread count [%d]", threadCount);
+        LOGGER.trace("[%s] = [%d]", TestEngineConstants.THREAD_COUNT, threadCount);
 
         this.executorService = Executors.newFixedThreadPool(threadCount, new NamedThreadFactory());
     }
@@ -73,19 +75,19 @@ public class TestEngineExecutor {
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest)");
 
-        RunnableEngineDescriptor runnableEngineDescriptor =
-                (RunnableEngineDescriptor) executionRequest.getRootTestDescriptor();
+        RunnableEngineDescriptor runnableEngineDescriptor = Cast.cast(executionRequest.getRootTestDescriptor());
 
-        TestDescriptorUtils.log(runnableEngineDescriptor);
+        TestDescriptorUtils.trace(runnableEngineDescriptor);
 
-        List<RunnableClassTestDescriptor> executableClassTestDescriptors =
+        List<RunnableClassTestDescriptor> runnableClassTestDescriptors =
                 runnableEngineDescriptor.getChildren(RunnableClassTestDescriptor.class);
 
-        CountDownLatch countDownLatch = new CountDownLatch(executableClassTestDescriptors.size());
+        CountDownLatch countDownLatch = new CountDownLatch(runnableClassTestDescriptors.size());
 
-        executableClassTestDescriptors
+        runnableClassTestDescriptors
                 .forEach(runnableClassTestDescriptor -> {
-                        runnableClassTestDescriptor.setTestExecutionContext(new TestExecutionContext(executionRequest, countDownLatch));
+                        runnableClassTestDescriptor.setTestExecutionContext(
+                                new TestExecutionContext(executionRequest, countDownLatch));
                         executorService.submit(runnableClassTestDescriptor);
                 });
 
@@ -101,7 +103,7 @@ public class TestEngineExecutor {
      */
     private static class NamedThreadFactory implements ThreadFactory {
 
-        private int threadId = 1;
+        private final AtomicInteger threadId = new AtomicInteger(1);
 
         /**
          * Method to create a new Thread
@@ -111,14 +113,8 @@ public class TestEngineExecutor {
          */
         @Override
         public Thread newThread(Runnable r) {
-            String threadName;
-            synchronized (this) {
-                threadName = String.format("test-engine-%02d", this.threadId);
-                this.threadId++;
-            }
-
             Thread thread = new Thread(r);
-            thread.setName(threadName);
+            thread.setName(String.format("test-engine-%02d", threadId.getAndIncrement()));
             thread.setDaemon(true);
             return thread;
         }

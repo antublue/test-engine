@@ -17,37 +17,106 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.internal.TestExecutionContext;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+/**
+ * Class to implement a Runnable test descriptor
+ */
 @SuppressWarnings("unchecked")
-abstract class AbstractRunnableTestDescriptor
-        extends org.junit.platform.engine.support.descriptor.AbstractTestDescriptor
-        implements Runnable {
+abstract class AbstractRunnableTestDescriptor extends AbstractTestDescriptor implements Runnable {
 
+    private final ThrowableCollector throwableCollector;
     private TestExecutionContext testExecutionContext;
-    private ThrowableCollector throwableCollector;
 
+    /**
+     * Constructor
+     *
+     * @param uniqueId
+     * @param displayName
+     */
     protected AbstractRunnableTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
         throwableCollector = new ThrowableCollector();
     }
 
+    /**
+     * Method to get a List of children cast as a specific class
+     *
+     * @param clazz
+     * @return
+     * @param <T>
+     */
     public <T> List<T> getChildren(Class<T> clazz) {
-        final List<T> list = new ArrayList<>();
-        getChildren().forEach((Consumer<TestDescriptor>) testDescriptor -> list.add((T) testDescriptor));
-        return list;
+        // Clazz is not used directly, but required to make Stream semantics work
+        return getChildren()
+                .stream()
+                .map((Function<TestDescriptor, T>) testDescriptor -> (T) testDescriptor)
+                .collect(Collectors.toList());
     }
 
+    /**
+     * Method to set the TestExecutionContext
+     *
+     * @param testExecutionContext
+     */
     public void setTestExecutionContext(TestExecutionContext testExecutionContext) {
         this.testExecutionContext = testExecutionContext;
     }
 
+    /**
+     * Method to get the TestExecutionContext
+     *
+     * @return
+     */
+    protected TestExecutionContext getTestExecutionContext() {
+        return testExecutionContext;
+    }
+
+    /**
+     * Method to get the test descriptors ThrowableCollector
+     *
+     * @return
+     */
+    protected ThrowableCollector getThrowableCollector() {
+        return throwableCollector;
+    }
+
+    /**
+     * Method to run the test descriptor
+     * <br>
+     * The TestExecutionContext must be set prior to the call
+     */
+    public abstract void run();
+
+    /**
+     * Method to resolve an Exception to the underlying Exception
+     *
+     * @param t
+     * @return
+     */
+    protected static Throwable resolve(Throwable t) {
+        if (t instanceof RuntimeException) {
+            t = t.getCause();
+        }
+
+        if (t instanceof InvocationTargetException) {
+            return t.getCause();
+        }
+
+        return t;
+    }
+
+    /**
+     * Method to flush System.out and System.err PrintStreams
+     */
     public void flush() {
         synchronized (System.out) {
             synchronized (System.err) {
@@ -57,21 +126,4 @@ abstract class AbstractRunnableTestDescriptor
         }
     }
 
-    public abstract void run();
-
-    protected TestExecutionContext getTestExecutionContext() {
-        return testExecutionContext;
-    }
-
-    protected ThrowableCollector getThrowableCollector() {
-        return throwableCollector;
-    }
-
-    protected static Throwable resolve(Throwable t) {
-        if (t instanceof InvocationTargetException) {
-            return t.getCause();
-        } else {
-            return t;
-        }
-    }
 }

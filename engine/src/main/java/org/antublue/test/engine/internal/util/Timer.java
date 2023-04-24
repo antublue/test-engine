@@ -19,7 +19,7 @@ package org.antublue.test.engine.internal.util;
 import java.time.Duration;
 
 /**
- * Class to implement a timer
+ * Class to implement a Timer
  */
 public final class Timer {
 
@@ -45,7 +45,7 @@ public final class Timer {
     }
 
     /**
-     * Method to start the timer
+     * Method to start the Timer
      *
      * @return
      */
@@ -56,7 +56,7 @@ public final class Timer {
     }
 
     /**
-     * Method to stop the timer
+     * Method to stop the Timer
      *
      * @return
      */
@@ -66,7 +66,7 @@ public final class Timer {
     }
 
     /**
-     * Method to get the timer duration
+     * Method to get the Timer duration
      * @return
      */
     public Duration duration() {

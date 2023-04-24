@@ -28,6 +28,7 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Method;
+import java.util.function.Consumer;
 
 public final class TestDescriptorUtils {
 
@@ -49,7 +50,10 @@ public final class TestDescriptorUtils {
      */
     public static RunnableClassTestDescriptor createClassTestDescriptor(
             UniqueId uniqueId, Class<?> clazz) {
-        return new RunnableClassTestDescriptor(uniqueId, clazz.getName(), clazz);
+        return new RunnableClassTestDescriptor(
+                uniqueId,
+                TestEngineReflectionUtils.getDisplayName(clazz),
+                clazz);
     }
 
     /**
@@ -76,21 +80,24 @@ public final class TestDescriptorUtils {
      */
     public static RunnableMethodTestDescriptor createMethodTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Parameter parameter, Method method) {
-        return new RunnableMethodTestDescriptor(uniqueId, method.getName(), clazz, parameter, method);
+        return new RunnableMethodTestDescriptor(
+                uniqueId,
+                TestEngineReflectionUtils.getDisplayName(method),
+                clazz,
+                parameter,
+                method);
     }
 
     /**
      *
      * @param testDescriptor
      */
-    public static void log(TestDescriptor testDescriptor) {
+    public static void trace(TestDescriptor testDescriptor) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("--------------------");
             LOGGER.trace("Test descriptor tree");
             LOGGER.trace("--------------------");
-
-            log(testDescriptor, 0);
-
+            trace(testDescriptor, 0);
             LOGGER.trace("------------------------");
         }
     }
@@ -101,7 +108,7 @@ public final class TestDescriptorUtils {
      * @param testDescriptor
      * @param indent
      */
-    private static void log(TestDescriptor testDescriptor, int indent) {
+    private static void trace(TestDescriptor testDescriptor, int indent) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < indent; i++) {
             stringBuilder.append(" ");
@@ -136,8 +143,8 @@ public final class TestDescriptorUtils {
 
         LOGGER.trace(stringBuilder.toString());
 
-        for (TestDescriptor child : testDescriptor.getChildren()) {
-            log(child, indent + 2);
-        }
+        testDescriptor
+                .getChildren()
+                .forEach((Consumer<TestDescriptor>) testDescriptor1 -> trace(testDescriptor1, indent + 2));
     }
 }

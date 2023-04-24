@@ -66,62 +66,61 @@ public class ClasspathRootResolver {
     public void resolve(ClasspathRootSelector classpathRootSelector, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolve [%s]", classpathRootSelector);
 
-        UniqueId uniqueId = engineDescriptor.getUniqueId();
+        final UniqueId engineDescriptorUniqueId = engineDescriptor.getUniqueId();
         URI uri = classpathRootSelector.getClasspathRoot();
         LOGGER.trace("uri [%s]", uri);
 
-        List<Class<?>> classes = new ArrayList<>(ReflectionUtils.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true));
-        LOGGER.trace("classes.size() [%d]", classes.size());
+        new ArrayList<>(ReflectionUtils.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true))
+                .stream()
+                .sorted(Comparator.comparing(TestEngineReflectionUtils::getDisplayName))
+                .forEach(clazz -> {
+                    LOGGER.trace("  class [%s]", clazz.getName());
 
-        classes.sort(Comparator.comparing(Class::getName));
+                    UniqueId uniqueId = engineDescriptorUniqueId.append("class", clazz.getName());
 
-        for (Class<?> clazz : classes) {
-            LOGGER.trace("  class [%s]", clazz.getName());
-
-            uniqueId = uniqueId.append("class", clazz.getName());
-
-            RunnableClassTestDescriptor testEngineClassTestDescriptor =
-                    TestDescriptorUtils.createClassTestDescriptor(
-                            uniqueId,
-                            clazz);
-
-            engineDescriptor.addChild(testEngineClassTestDescriptor);
-
-            List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
-            for (int i = 0; i < parameters.size(); i++) {
-                Parameter parameter = parameters.get(i);
-                uniqueId = uniqueId.append("parameter", String.valueOf(i));
-
-                RunnableParameterTestDescriptor testEngineParameterTestDescriptor =
-                        TestDescriptorUtils.createParameterTestDescriptor(
-                                uniqueId,
-                                clazz,
-                                parameter);
-
-                testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
-
-                List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
-                for (Method method : methods) {
-                    uniqueId = uniqueId.append("method", method.getName());
-
-                    RunnableMethodTestDescriptor methodTestDescriptor =
-                            TestDescriptorUtils.createMethodTestDescriptor(
+                    RunnableClassTestDescriptor testEngineClassTestDescriptor =
+                            TestDescriptorUtils.createClassTestDescriptor(
                                     uniqueId,
-                                    clazz,
-                                    parameter,
-                                    method);
+                                    clazz);
 
-                    testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
+                    engineDescriptor.addChild(testEngineClassTestDescriptor);
 
-                    uniqueId = uniqueId.removeLastSegment();
-                }
+                    // TODO refactor to use forEach
+                    List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
+                    for (int i = 0; i < parameters.size(); i++) {
+                        Parameter parameter = parameters.get(i);
+                        uniqueId = uniqueId.append("parameter", String.valueOf(i));
 
-                testEngineParameterTestDescriptor.prune();
-                uniqueId = uniqueId.removeLastSegment();
-            }
+                        RunnableParameterTestDescriptor testEngineParameterTestDescriptor =
+                                TestDescriptorUtils.createParameterTestDescriptor(
+                                        uniqueId,
+                                        clazz,
+                                        parameter);
 
-            testEngineClassTestDescriptor.prune();
-            uniqueId = uniqueId.removeLastSegment();
-        }
+                        testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
+
+                        // TODO refactor to use forEach
+                        List<Method> methods = TestEngineReflectionUtils.getTestMethods(clazz);
+                        for (Method method : methods) {
+                            uniqueId = uniqueId.append("method", method.getName());
+
+                            RunnableMethodTestDescriptor methodTestDescriptor =
+                                    TestDescriptorUtils.createMethodTestDescriptor(
+                                            uniqueId,
+                                            clazz,
+                                            parameter,
+                                            method);
+
+                            testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
+
+                            uniqueId = uniqueId.removeLastSegment();
+                        }
+
+                        testEngineParameterTestDescriptor.prune();
+                        uniqueId = uniqueId.removeLastSegment();
+                    }
+
+                    testEngineClassTestDescriptor.prune();
+                });
     }
 }

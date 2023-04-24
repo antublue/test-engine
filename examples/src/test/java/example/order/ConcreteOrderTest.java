@@ -17,13 +17,13 @@ public class ConcreteOrderTest extends BaseOrderTest {
 
     private static final List<String> EXPECTED_LIST =
             listOf(
-                    "beforeClass2",
+                    "baseOrderTest.beforeClass2",
                     "beforeClass",
-                    "beforeAll2",
+                    "baseOrderTest.beforeAll2",
                     "beforeAll",
-                    "afterAll2",
+                    "baseOrderTest.afterAll2",
                     "afterAll",
-                    "afterClass2",
+                    "baseOrderTest.afterClass2",
                     "afterClass");
 
     @TestEngine.ParameterSupplier

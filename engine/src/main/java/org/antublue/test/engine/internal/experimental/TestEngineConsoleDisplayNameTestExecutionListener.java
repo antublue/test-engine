@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal;
+package org.antublue.test.engine.internal.experimental;
 
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.internal.TestDescriptorUtils;
+import org.antublue.test.engine.internal.TestEngineConfiguration;
+import org.antublue.test.engine.internal.TestEngineReflectionUtils;
+import org.antublue.test.engine.internal.TestEngineTestDescriptorStore;
 import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
 import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
@@ -42,7 +46,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Class to collect test information and output a test execution summary
  */
-public class TestEngineConsoleTestExecutionListener implements TestExecutionListener {
+public class TestEngineConsoleDisplayNameTestExecutionListener implements TestExecutionListener {
 
     private static final String BANNER =
             "Antu" + AnsiColor.BLUE_BOLD_BRIGHT.apply("BLUE") + " Test Engine " + TestEngine.VERSION;
@@ -71,7 +75,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     /**
      * Constructor
      */
-    public TestEngineConsoleTestExecutionListener() {
+    public TestEngineConsoleDisplayNameTestExecutionListener() {
         this.summary = new Summary();
 
         this.detailedOutput =
@@ -178,17 +182,27 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 Switch.switchCase(RunnableClassTestDescriptor.class, consumer -> {
                     RunnableClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
                     Class<?> testClass = classTestDescriptor.getTestClass();
+                    String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
+                    String className = testClass.getName();
+                    if (!testClassDisplayName.equals(className)) {
+                        testClassDisplayName = className + " (" + testClassDisplayName + ")";
+                    }
                     if (logTestMessages) {
                         stringBuilder
                                 .append(TEST)
                                 .append(" | ")
-                                .append(testClass.getName());
+                                .append(testClassDisplayName);
                     }
                 }),
                 Switch.switchCase(RunnableParameterTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
                         RunnableParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = parameterTestDescriptor.getTestClass();
+                        String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
+                        String className = testClass.getName();
+                        if (!testClassDisplayName.equals(className)) {
+                            testClassDisplayName = className + " (" + testClassDisplayName + ")";
+                        }
                         Parameter testParameter = parameterTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
                         stringBuilder
@@ -196,25 +210,36 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                                 .append(" | ")
                                 .append(testParameterName)
                                 .append(" | ")
-                                .append(testClass.getName());
+                                .append(testClassDisplayName);
                     }
                 }),
                 Switch.switchCase(RunnableMethodTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
                         RunnableMethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = methodTestDescriptor.getTestClass();
-                        Method testMethod = methodTestDescriptor.getTestMethod();
+                        String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
+                        String className = testClass.getName();
+                        if (!testClassDisplayName.equals(className)) {
+                            testClassDisplayName = className + " (" + testClassDisplayName + ")";
+                        }
                         Parameter testParameter = methodTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
+                        Method testMethod = methodTestDescriptor.getTestMethod();
+                        String testMethodDisplayName = TestEngineReflectionUtils.getDisplayName(testMethod);
+                        String methodName = testMethod.getName();
+                        if (!testMethodDisplayName.equals(methodName)) {
+                            testMethodDisplayName = methodName + "() (" + testMethodDisplayName + ")";
+                        } else {
+                            testMethodDisplayName = methodName + "()";
+                        }
                         stringBuilder
                                 .append(TEST)
                                 .append(" | ")
                                 .append(testParameterName)
                                 .append(" | ")
-                                .append(testClass.getName())
+                                .append(testClassDisplayName)
                                 .append(" ")
-                                .append(testMethod.getName())
-                                .append("()");
+                                .append(testMethodDisplayName);
                     }
                 })
         );
@@ -263,39 +288,60 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                     if (logPassMessages) {
                         RunnableClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = classTestDescriptor.getTestClass();
+                        String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
+                        String className = testClass.getName();
+                        if (!testClassDisplayName.equals(className)) {
+                            testClassDisplayName = className + " (" + testClassDisplayName + ")";
+                        }
                         stringBuilder
                                 .append("%s | ")
-                                .append(testClass.getName());
+                                .append(testClassDisplayName);
                     }
                 }),
                 Switch.switchCase(RunnableParameterTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
                         RunnableParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = parameterTestDescriptor.getTestClass();
+                        String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
+                        String className = testClass.getName();
+                        if (!testClassDisplayName.equals(className)) {
+                            testClassDisplayName = className + " (" + testClassDisplayName + ")";
+                        }
                         Parameter testParameter = parameterTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
                         stringBuilder
                                 .append("%s | ")
                                 .append(testParameterName)
                                 .append(" | ")
-                                .append(testClass.getName());
+                                .append(testClassDisplayName);
                     }
                 }),
                 Switch.switchCase(RunnableMethodTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
                         RunnableMethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = methodTestDescriptor.getTestClass();
-                        Method testMethod = methodTestDescriptor.getTestMethod();
+                        String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
+                        String className = testClass.getName();
+                        if (!testClassDisplayName.equals(className)) {
+                            testClassDisplayName = className + " (" + testClassDisplayName + ")";
+                        }
                         Parameter testParameter = methodTestDescriptor.getTestParameter();
                         String testParameterName = testParameter.name();
+                        Method testMethod = methodTestDescriptor.getTestMethod();
+                        String testMethodDisplayName = TestEngineReflectionUtils.getDisplayName(testMethod);
+                        String methodName = testMethod.getName();
+                        if (!testMethodDisplayName.equals(methodName)) {
+                            testMethodDisplayName = methodName + "() (" + testMethodDisplayName + ")";
+                        } else {
+                            testMethodDisplayName = methodName + "()";
+                        }
                         stringBuilder
                                 .append("%s | ")
                                 .append(testParameterName)
                                 .append(" | ")
-                                .append(testClass.getName())
+                                .append(testClassDisplayName)
                                 .append(" ")
-                                .append(testMethod.getName())
-                                .append("()");
+                                .append(testMethodDisplayName);
                     }
                 }));
 

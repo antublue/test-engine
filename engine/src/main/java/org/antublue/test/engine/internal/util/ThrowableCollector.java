@@ -14,45 +14,81 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.descriptor;
+package org.antublue.test.engine.internal.util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Class to collect a list of Throwable
+ */
 public class ThrowableCollector {
 
-    private final List<Throwable> throwables;
+    private final List<Throwable> throwableList;
 
+    /**
+     * Constructor
+     */
     public ThrowableCollector() {
-        throwables = new ArrayList<>();
+        throwableList = new ArrayList<>();
     }
 
+    /**
+     * Method to collect a Throwable
+     *
+     * @param throwable
+     */
     public void add(Throwable throwable) {
-        throwables.add(throwable);
+        throwableList.add(throwable);
     }
 
+    /**
+     * Method to collect Throwable from another ThrowableCollector
+     *
+     * @param throwableCollector
+     */
     public void addAll(ThrowableCollector throwableCollector) {
-        throwables.addAll(throwableCollector.getList());
+        throwableList.addAll(throwableCollector.getList());
     }
 
+    /**
+     * Method to get the number of Throwable collected
+     *
+     * @return
+     */
     public int size() {
-        return throwables.size();
+        return throwableList.size();
     }
 
+    /**
+     * Method to return whether the collector has any Throwable
+     *
+     * @return
+     */
     public boolean isEmpty() {
-        return throwables.isEmpty();
+        return throwableList.isEmpty();
     }
 
+    /**
+     * Method to get the first Throwable or null
+     *
+     * @return
+     */
     public Optional<Throwable> getFirst() {
-        if (throwables.isEmpty()) {
+        if (throwableList.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(throwables.get(0));
+            return Optional.of(throwableList.get(0));
         }
     }
 
+    /**
+     * Method to get the list of Throwable
+     *
+     * @return
+     */
     public List<Throwable> getList() {
-        return throwables;
+        return throwableList;
     }
 }
