@@ -32,11 +32,11 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
- * Class to implement a Runnable class test descriptor
+ * Class to implement a class test descriptor
  */
-public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescriptor {
+public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RunnableClassTestDescriptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassTestDescriptor.class);
 
     private final Class<?> testClass;
 
@@ -47,7 +47,7 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
      * @param displayName
      * @param testClass
      */
-    public RunnableClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
+    public ClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
         super(uniqueId, displayName);
         this.testClass = testClass;
     }
@@ -102,12 +102,11 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
     }
 
     /**
-     * Method to run the test descriptor
-     * <br>
-     * The TestExecutionContext must be set prior to the call
+     * Method to test the test descriptor
+     *
+     * @param testExecutionContext
      */
-    public void run() {
-        TestExecutionContext testExecutionContext = getTestExecutionContext();
+    public void test(TestExecutionContext testExecutionContext) {
         ThrowableCollector throwableCollector = getThrowableCollector();
 
         EngineExecutionListener engineExecutionListener =
@@ -116,7 +115,7 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
         engineExecutionListener.executionStarted(this);
 
         String testClassName = testClass.getName();
-        Object testInstance = null;
+        Object testInstance;
 
         try {
             testInstance = testClass.getDeclaredConstructor((Class<?>[]) null).newInstance((Object[]) null);
@@ -145,12 +144,14 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
         }
 
         if (throwableCollector.isEmpty()) {
-            getChildren(RunnableParameterTestDescriptor.class)
-                    .forEach(runnableParameterTestDescriptor -> {
-                        runnableParameterTestDescriptor.setTestExecutionContext(testExecutionContext);
-                        runnableParameterTestDescriptor.run();
-                        throwableCollector.addAll(runnableParameterTestDescriptor.getThrowableCollector());
+            getChildren(ParameterTestDescriptor.class)
+                    .forEach(parameterTestDescriptor -> {
+                        parameterTestDescriptor.test(testExecutionContext);
+                        throwableCollector.addAll(parameterTestDescriptor.getThrowableCollector());
                     });
+        } else {
+            getChildren(ParameterTestDescriptor.class)
+                    .forEach(parameterTestDescriptor -> parameterTestDescriptor.skip(testExecutionContext));
         }
 
         try {
@@ -184,6 +185,6 @@ public final class RunnableClassTestDescriptor extends AbstractRunnableTestDescr
 
         testExecutionContext.setTestInstance(null);
 
-        getTestExecutionContext().getCountDownLatch().countDown();
+        testExecutionContext.getCountDownLatch().countDown();
     }
 }

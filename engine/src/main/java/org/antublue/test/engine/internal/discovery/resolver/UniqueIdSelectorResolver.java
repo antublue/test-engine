@@ -20,9 +20,9 @@ import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineException;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
-import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Cast;
@@ -69,10 +69,10 @@ public class UniqueIdSelectorResolver {
 
                 Class<?> clazz = Class.forName(className);
 
-                RunnableClassTestDescriptor classTestDescriptor =
+                ClassTestDescriptor classTestDescriptor =
                         engineDescriptor
                                 .findByUniqueId(classUniqueId)
-                                .map((Function<TestDescriptor, RunnableClassTestDescriptor>) testDescriptor ->
+                                .map((Function<TestDescriptor, ClassTestDescriptor>) testDescriptor ->
                                         Cast.cast(testDescriptor))
                                 .orElseGet(() ->
                                         TestDescriptorUtils.createClassTestDescriptor(classUniqueId, clazz));
@@ -80,10 +80,10 @@ public class UniqueIdSelectorResolver {
                 List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
                 Parameter parameter = parameters.get(Integer.parseInt(segment.getValue()));
 
-                RunnableParameterTestDescriptor parameterTestDescriptor =
+                ParameterTestDescriptor parameterTestDescriptor =
                         classTestDescriptor
                                 .findByUniqueId(selectorUniqueId)
-                                .map((Function<TestDescriptor, RunnableParameterTestDescriptor>) testDescriptor ->
+                                .map((Function<TestDescriptor, ParameterTestDescriptor>) testDescriptor ->
                                         Cast.cast(testDescriptor))
                                 .orElseGet(() ->
                                         TestDescriptorUtils.createParameterTestDescriptor(
@@ -96,7 +96,7 @@ public class UniqueIdSelectorResolver {
                 for (Method method : methods) {
                     UniqueId methodUniqueId = selectorUniqueId.append("method", method.getName());
 
-                    RunnableMethodTestDescriptor methodTestDescriptor =
+                    MethodTestDescriptor methodTestDescriptor =
                             TestDescriptorUtils.createMethodTestDescriptor(
                                     methodUniqueId,
                                     clazz,
@@ -114,10 +114,10 @@ public class UniqueIdSelectorResolver {
 
                 Class<?> clazz = Class.forName(className);
 
-                RunnableClassTestDescriptor classTestDescriptor =
+                ClassTestDescriptor classTestDescriptor =
                         engineDescriptor
                                 .findByUniqueId(selectorUniqueId)
-                                .map((Function<TestDescriptor, RunnableClassTestDescriptor>) testDescriptor ->
+                                .map((Function<TestDescriptor, ClassTestDescriptor>) testDescriptor ->
                                         Cast.cast(testDescriptor))
                                 .orElseGet(() ->
                                         TestDescriptorUtils.createClassTestDescriptor(
@@ -130,7 +130,7 @@ public class UniqueIdSelectorResolver {
                     Parameter parameter = parameters.get(i);
                     UniqueId parameterUniqueId = selectorUniqueId.append("parameter", String.valueOf(i));
 
-                    RunnableParameterTestDescriptor parameterTestDescriptor =
+                    ParameterTestDescriptor parameterTestDescriptor =
                             TestDescriptorUtils.createParameterTestDescriptor(
                                     parameterUniqueId,
                                     clazz,
@@ -141,7 +141,7 @@ public class UniqueIdSelectorResolver {
                     for (Method method : methods) {
                         UniqueId methodUniqueId = parameterUniqueId.append("method", method.getName());
 
-                        RunnableMethodTestDescriptor methodTestDescriptor =
+                        MethodTestDescriptor methodTestDescriptor =
                                 TestDescriptorUtils.createMethodTestDescriptor(
                                         methodUniqueId,
                                         clazz,

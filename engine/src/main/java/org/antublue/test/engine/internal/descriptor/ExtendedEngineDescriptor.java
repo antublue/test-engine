@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import org.antublue.test.engine.internal.TestExecutionContext;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -28,10 +27,10 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * Class to implement a Runnable EngineDescriptor
+ * Class to implement a extended EngineDescriptor
  */
 @SuppressWarnings("unchecked")
-public final class RunnableEngineDescriptor extends EngineDescriptor {
+public final class ExtendedEngineDescriptor extends EngineDescriptor {
 
     /***
      * Constructor
@@ -39,7 +38,7 @@ public final class RunnableEngineDescriptor extends EngineDescriptor {
      * @param uniqueId
      * @param displayName
      */
-    public RunnableEngineDescriptor(UniqueId uniqueId, String displayName) {
+    public ExtendedEngineDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
     }
 
@@ -95,14 +94,5 @@ public final class RunnableEngineDescriptor extends EngineDescriptor {
         final List<T> list = new ArrayList<>();
         getChildren().forEach((Consumer<TestDescriptor>) testDescriptor -> list.add((T) testDescriptor));
         return list;
-    }
-
-    public void run() {
-        getChildren(RunnableClassTestDescriptor.class)
-                .forEach(runnableClassTestDescriptor -> {
-                    TestExecutionContext testExecutionContext = runnableClassTestDescriptor.getTestExecutionContext();
-                    runnableClassTestDescriptor.setTestExecutionContext(testExecutionContext);
-                    runnableClassTestDescriptor.run();
-                });
     }
 }

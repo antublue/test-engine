@@ -34,12 +34,11 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
- * Class to implement a Runnable parameter test descriptor
+ * Class to implement an extended parameter test descriptor
  */
-@SuppressWarnings("unchecked")
-public final class RunnableParameterTestDescriptor extends AbstractRunnableTestDescriptor {
+public final class ParameterTestDescriptor extends ExtendedAbstractTestDescriptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RunnableParameterTestDescriptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParameterTestDescriptor.class);
 
     private final Class<?> testClass;
     private final Parameter testParameter;
@@ -52,7 +51,7 @@ public final class RunnableParameterTestDescriptor extends AbstractRunnableTestD
      * @param testClass
      * @param testParameter
      */
-    public RunnableParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Parameter testParameter) {
+    public ParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Parameter testParameter) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testParameter = testParameter;
@@ -115,12 +114,11 @@ public final class RunnableParameterTestDescriptor extends AbstractRunnableTestD
     }
 
     /**
-     * Method to run the test descriptor
-     * <br>
-     * The TestExecutionContext must be set prior to the call
+     * Method to test the test descriptor
+     *
+     * @param testExecutionContext
      */
-    public void run() {
-        TestExecutionContext testExecutionContext = getTestExecutionContext();
+    public void test(TestExecutionContext testExecutionContext) {
         ThrowableCollector throwableCollector = getThrowableCollector();
 
         EngineExecutionListener engineExecutionListener =
@@ -186,17 +184,27 @@ public final class RunnableParameterTestDescriptor extends AbstractRunnableTestD
                                 flush();
                             }
                         });
-
-                getChildren(RunnableMethodTestDescriptor.class)
-                        .forEach(runnableMethodTestDescriptor -> {
-                            runnableMethodTestDescriptor.setTestExecutionContext(testExecutionContext);
-                            runnableMethodTestDescriptor.run();
-                            throwableCollector.addAll(runnableMethodTestDescriptor.getThrowableCollector());
-                        });
             } catch (Throwable t) {
                 throwableCollector.add(t);
                 resolve(t).printStackTrace();
             }
+
+            if (!throwableCollector.isEmpty()) {
+                getChildren(MethodTestDescriptor.class)
+                        .forEach(methodTestDescriptor -> methodTestDescriptor.skip(testExecutionContext));
+            }
+
+        } else {
+            getChildren(MethodTestDescriptor.class)
+                    .forEach(methodTestDescriptor -> methodTestDescriptor.skip(testExecutionContext));
+        }
+
+        if (throwableCollector.isEmpty()) {
+            getChildren(MethodTestDescriptor.class)
+                    .forEach(methodTestDescriptor -> {
+                        methodTestDescriptor.test(testExecutionContext);
+                        throwableCollector.addAll(methodTestDescriptor.getThrowableCollector());
+                    });
         }
 
         try {

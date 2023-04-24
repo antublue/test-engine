@@ -19,9 +19,9 @@ package org.antublue.test.engine.internal.discovery;
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.internal.TestEngineConfiguration;
 import org.antublue.test.engine.internal.TestEngineException;
-import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.discovery.resolver.ClassSelectorResolver;
 import org.antublue.test.engine.internal.discovery.resolver.ClasspathRootResolver;
 import org.antublue.test.engine.internal.discovery.resolver.MethodSelectorResolver;
@@ -261,13 +261,13 @@ public class TestEngineDiscoveryRequestResolver {
         for (PackageNameFilter packageNameFilter : packageNameFilters) {
             Set<? extends TestDescriptor> testDescriptors = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor testDescriptor : testDescriptors) {
-                RunnableClassTestDescriptor runnableClassTestDescriptor = Cast.cast(testDescriptor);
+                ClassTestDescriptor runnableClassTestDescriptor = Cast.cast(testDescriptor);
                 Set<? extends TestDescriptor> testDescriptors2 = new LinkedHashSet<>(runnableClassTestDescriptor.getChildren());
                 for (TestDescriptor testDescriptor2 : testDescriptors2) {
-                    RunnableParameterTestDescriptor runnableParameterTestDescriptor = Cast.cast(testDescriptor2);
+                    ParameterTestDescriptor runnableParameterTestDescriptor = Cast.cast(testDescriptor2);
                     Set<? extends TestDescriptor> testDescriptors3 = new LinkedHashSet<>(testDescriptor2.getChildren());
                     for (TestDescriptor testDescriptor3 : testDescriptors3) {
-                        RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(testDescriptor3);
+                        MethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(testDescriptor3);
                         Class<?> clazz = runnableMethodTestDescriptor.getTestClass();
                         String className = clazz.getName();
                         if (packageNameFilter.apply(className).excluded()) {
@@ -304,8 +304,8 @@ public class TestEngineDiscoveryRequestResolver {
             // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
-                if (child instanceof RunnableClassTestDescriptor) {
-                    RunnableClassTestDescriptor runnableClassTestDescriptor = Cast.cast(child);
+                if (child instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor runnableClassTestDescriptor = Cast.cast(child);
                     UniqueId uniqueId = runnableClassTestDescriptor.getUniqueId();
                     Class<?> clazz = runnableClassTestDescriptor.getTestClass();
                     if (includeTestClassPredicate.test(clazz)) {
@@ -323,8 +323,8 @@ public class TestEngineDiscoveryRequestResolver {
             // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
-                if (child instanceof RunnableClassTestDescriptor) {
-                    RunnableClassTestDescriptor runnableClassTestDescriptor = Cast.cast(child);
+                if (child instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor runnableClassTestDescriptor = Cast.cast(child);
                     UniqueId uniqueId = runnableClassTestDescriptor.getUniqueId();
                     Class<?> clazz = runnableClassTestDescriptor.getTestClass();
                     if (excludeTestClassPredicate.test(clazz)) {
@@ -351,14 +351,14 @@ public class TestEngineDiscoveryRequestResolver {
             // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
-                if (child instanceof RunnableClassTestDescriptor) {
+                if (child instanceof ClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof RunnableParameterTestDescriptor) {
+                        if (grandChild instanceof ParameterTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
-                                if (greatGrandChild instanceof RunnableMethodTestDescriptor) {
-                                    RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
+                                if (greatGrandChild instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
                                     UniqueId uniqueId = runnableMethodTestDescriptor.getUniqueId();
                                     Method method = runnableMethodTestDescriptor.getTestMethod();
                                     if (includeTestMethodPredicate.test(method)) {
@@ -380,14 +380,14 @@ public class TestEngineDiscoveryRequestResolver {
             // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
-                if (child instanceof RunnableClassTestDescriptor) {
+                if (child instanceof ClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof RunnableParameterTestDescriptor) {
+                        if (grandChild instanceof ParameterTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
-                                if (greatGrandChild instanceof RunnableMethodTestDescriptor) {
-                                    RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
+                                if (greatGrandChild instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
                                     UniqueId uniqueId = runnableMethodTestDescriptor.getUniqueId();
                                     Method method = runnableMethodTestDescriptor.getTestMethod();
                                     if (excludeTestMethodPredicate.test(method)) {
@@ -418,8 +418,8 @@ public class TestEngineDiscoveryRequestResolver {
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             // TODO refactor to use forEach
             for (TestDescriptor child : children) {
-                if (child instanceof RunnableClassTestDescriptor) {
-                    RunnableClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
+                if (child instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
                     UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
                     Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
 
@@ -438,8 +438,8 @@ public class TestEngineDiscoveryRequestResolver {
             // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor child : children) {
-                if (child instanceof RunnableClassTestDescriptor) {
-                    RunnableClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
+                if (child instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor testEngineClassTestDescriptor = Cast.cast(child);
                     UniqueId uniqueId = testEngineClassTestDescriptor.getUniqueId();
                     Class<?> clazz = testEngineClassTestDescriptor.getTestClass();
 
@@ -467,14 +467,14 @@ public class TestEngineDiscoveryRequestResolver {
             // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
-                if (child instanceof RunnableClassTestDescriptor) {
+                if (child instanceof ClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof RunnableParameterTestDescriptor) {
+                        if (grandChild instanceof ParameterTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
-                                if (greatGrandChild instanceof RunnableMethodTestDescriptor) {
-                                    RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
+                                if (greatGrandChild instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
                                     UniqueId uniqueId = runnableMethodTestDescriptor.getUniqueId();
                                     Method method = runnableMethodTestDescriptor.getTestMethod();
 
@@ -497,14 +497,14 @@ public class TestEngineDiscoveryRequestResolver {
             // TODO refactor to use forEach
             Set<? extends TestDescriptor> children = engineDescriptor.getChildren();
             for (TestDescriptor child : children) {
-                if (child instanceof RunnableClassTestDescriptor) {
+                if (child instanceof ClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof RunnableParameterTestDescriptor) {
+                        if (grandChild instanceof ParameterTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
-                                if (greatGrandChild instanceof RunnableMethodTestDescriptor) {
-                                    RunnableMethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
+                                if (greatGrandChild instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor runnableMethodTestDescriptor = Cast.cast(greatGrandChild);
                                     UniqueId uniqueId = runnableMethodTestDescriptor.getUniqueId();
                                     Method method = runnableMethodTestDescriptor.getTestMethod();
 

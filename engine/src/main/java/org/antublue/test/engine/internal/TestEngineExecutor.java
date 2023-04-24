@@ -17,8 +17,9 @@
 package org.antublue.test.engine.internal;
 
 import org.antublue.test.engine.TestEngineConstants;
-import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
+import org.antublue.test.engine.internal.descriptor.RunnableAdapter;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Cast;
@@ -75,21 +76,20 @@ public class TestEngineExecutor {
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest)");
 
-        RunnableEngineDescriptor runnableEngineDescriptor = Cast.cast(executionRequest.getRootTestDescriptor());
+        ExtendedEngineDescriptor extendedEngineDescriptor = Cast.cast(executionRequest.getRootTestDescriptor());
 
-        TestDescriptorUtils.trace(runnableEngineDescriptor);
+        TestDescriptorUtils.trace(extendedEngineDescriptor);
 
-        List<RunnableClassTestDescriptor> runnableClassTestDescriptors =
-                runnableEngineDescriptor.getChildren(RunnableClassTestDescriptor.class);
+        List<ClassTestDescriptor> runnableClassTestDescriptors =
+                extendedEngineDescriptor.getChildren(ClassTestDescriptor.class);
 
         CountDownLatch countDownLatch = new CountDownLatch(runnableClassTestDescriptors.size());
 
         runnableClassTestDescriptors
-                .forEach(runnableClassTestDescriptor -> {
-                        runnableClassTestDescriptor.setTestExecutionContext(
-                                new TestExecutionContext(executionRequest, countDownLatch));
-                        executorService.submit(runnableClassTestDescriptor);
-                });
+                .forEach(runnableClassTestDescriptor -> executorService.submit(
+                        new RunnableAdapter(
+                                new TestExecutionContext(executionRequest, countDownLatch),
+                                runnableClassTestDescriptor)));
 
         try {
             countDownLatch.await();

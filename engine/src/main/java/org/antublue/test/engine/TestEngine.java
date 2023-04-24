@@ -21,7 +21,7 @@ import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
 import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
 import org.antublue.test.engine.internal.TestEngineTestDescriptorStore;
-import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
+import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
 import org.antublue.test.engine.internal.discovery.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -102,17 +102,17 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         TestEngineConfiguration.getInstance());
 
         // Create an EngineDescriptor as the target
-        RunnableEngineDescriptor runnableEngineDescriptor = new RunnableEngineDescriptor(UniqueId.forEngine(getId()), getId());
+        ExtendedEngineDescriptor extendedEngineDescriptor = new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
 
         // Create a TestEngineDiscoverySelectorResolver and
         // resolve selectors, adding them to the engine descriptor
-        new TestEngineDiscoveryRequestResolver().resolve(testEngineDiscoveryRequest, runnableEngineDescriptor);
+        new TestEngineDiscoveryRequestResolver().resolve(testEngineDiscoveryRequest, extendedEngineDescriptor);
 
         // Store the test descriptors
-        TestEngineTestDescriptorStore.getInstance().store(runnableEngineDescriptor);
+        TestEngineTestDescriptorStore.getInstance().store(extendedEngineDescriptor);
 
         // Return the engine descriptor with all child test descriptors
-        return runnableEngineDescriptor;
+        return extendedEngineDescriptor;
     }
 
     /**

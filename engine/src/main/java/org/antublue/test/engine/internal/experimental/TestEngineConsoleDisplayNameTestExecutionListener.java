@@ -23,10 +23,10 @@ import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineConfiguration;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.TestEngineTestDescriptorStore;
-import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
+import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.Cast;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
@@ -176,11 +176,11 @@ public class TestEngineConsoleDisplayNameTestExecutionListener implements TestEx
 
         Switch.switchType(
                 testDescriptor,
-                Switch.switchCase(RunnableEngineDescriptor.class, consumer -> {
+                Switch.switchCase(ExtendedEngineDescriptor.class, consumer -> {
                     // DO NOTHING
                 }),
-                Switch.switchCase(RunnableClassTestDescriptor.class, consumer -> {
-                    RunnableClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
+                Switch.switchCase(ClassTestDescriptor.class, consumer -> {
+                    ClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
                     Class<?> testClass = classTestDescriptor.getTestClass();
                     String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
                     String className = testClass.getName();
@@ -194,9 +194,9 @@ public class TestEngineConsoleDisplayNameTestExecutionListener implements TestEx
                                 .append(testClassDisplayName);
                     }
                 }),
-                Switch.switchCase(RunnableParameterTestDescriptor.class, consumer -> {
+                Switch.switchCase(ParameterTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
-                        RunnableParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
+                        ParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = parameterTestDescriptor.getTestClass();
                         String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
                         String className = testClass.getName();
@@ -213,9 +213,9 @@ public class TestEngineConsoleDisplayNameTestExecutionListener implements TestEx
                                 .append(testClassDisplayName);
                     }
                 }),
-                Switch.switchCase(RunnableMethodTestDescriptor.class, consumer -> {
+                Switch.switchCase(MethodTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
-                        RunnableMethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
+                        MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = methodTestDescriptor.getTestClass();
                         String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
                         String className = testClass.getName();
@@ -281,12 +281,12 @@ public class TestEngineConsoleDisplayNameTestExecutionListener implements TestEx
 
         Switch.switchType(
                 testDescriptor,
-                Switch.switchCase(RunnableEngineDescriptor.class, consumer -> {
+                Switch.switchCase(ExtendedEngineDescriptor.class, consumer -> {
                     // DO NOTHING
                 }),
-                Switch.switchCase(RunnableClassTestDescriptor.class, consumer -> {
+                Switch.switchCase(ClassTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        RunnableClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
+                        ClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = classTestDescriptor.getTestClass();
                         String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
                         String className = testClass.getName();
@@ -298,9 +298,9 @@ public class TestEngineConsoleDisplayNameTestExecutionListener implements TestEx
                                 .append(testClassDisplayName);
                     }
                 }),
-                Switch.switchCase(RunnableParameterTestDescriptor.class, consumer -> {
+                Switch.switchCase(ParameterTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        RunnableParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
+                        ParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = parameterTestDescriptor.getTestClass();
                         String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
                         String className = testClass.getName();
@@ -316,9 +316,9 @@ public class TestEngineConsoleDisplayNameTestExecutionListener implements TestEx
                                 .append(testClassDisplayName);
                     }
                 }),
-                Switch.switchCase(RunnableMethodTestDescriptor.class, consumer -> {
+                Switch.switchCase(MethodTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        RunnableMethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
+                        MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
                         Class<?> testClass = methodTestDescriptor.getTestClass();
                         String testClassDisplayName = TestEngineReflectionUtils.getDisplayName(testClass);
                         String className = testClass.getName();
@@ -643,37 +643,37 @@ public class TestEngineConsoleDisplayNameTestExecutionListener implements TestEx
         }
 
         public void executionStarted(TestDescriptor testDescriptor) {
-            if (testDescriptor instanceof RunnableClassTestDescriptor) {
-                testClasses.add(((RunnableClassTestDescriptor) testDescriptor).getTestClass());
+            if (testDescriptor instanceof ClassTestDescriptor) {
+                testClasses.add(((ClassTestDescriptor) testDescriptor).getTestClass());
                 testClassesFound.set(testClasses.size());
                 return;
             }
 
-            if (testDescriptor instanceof RunnableParameterTestDescriptor) {
+            if (testDescriptor instanceof ParameterTestDescriptor) {
                 parametersFound.incrementAndGet();
                 return;
             }
 
-            if (testDescriptor instanceof RunnableMethodTestDescriptor) {
+            if (testDescriptor instanceof MethodTestDescriptor) {
                 methodsFound.incrementAndGet();
             }
         }
 
         public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-            if (testDescriptor instanceof RunnableParameterTestDescriptor) {
+            if (testDescriptor instanceof ParameterTestDescriptor) {
                 parametersFound.incrementAndGet();
                 parametersSkipped.incrementAndGet();
                 return;
             }
 
-            if (testDescriptor instanceof RunnableMethodTestDescriptor) {
+            if (testDescriptor instanceof MethodTestDescriptor) {
                 methodsFound.incrementAndGet();
                 methodsSkipped.incrementAndGet();
             }
         }
 
         public void executionFinished(TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-            if (testDescriptor instanceof RunnableClassTestDescriptor) {
+            if (testDescriptor instanceof ClassTestDescriptor) {
                 TestExecutionResult.Status status = testExecutionResult.getStatus();
                 switch (status) {
                     case SUCCESSFUL: {
@@ -693,7 +693,7 @@ public class TestEngineConsoleDisplayNameTestExecutionListener implements TestEx
                 return;
             }
 
-            if (testDescriptor instanceof RunnableParameterTestDescriptor) {
+            if (testDescriptor instanceof ParameterTestDescriptor) {
                 TestExecutionResult.Status status = testExecutionResult.getStatus();
                 switch (status) {
                     case SUCCESSFUL: {
@@ -711,7 +711,7 @@ public class TestEngineConsoleDisplayNameTestExecutionListener implements TestEx
                 }
             }
 
-            if (testDescriptor instanceof RunnableMethodTestDescriptor) {
+            if (testDescriptor instanceof MethodTestDescriptor) {
                 TestExecutionResult.Status status = testExecutionResult.getStatus();
                 switch (status) {
                     case SUCCESSFUL: {

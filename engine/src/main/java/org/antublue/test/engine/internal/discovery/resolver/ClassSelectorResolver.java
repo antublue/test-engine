@@ -18,9 +18,9 @@ package org.antublue.test.engine.internal.discovery.resolver;
 
 import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
-import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.UniqueId;
@@ -51,7 +51,7 @@ public class ClassSelectorResolver {
 
         final UniqueId classDescriptorUniqueId = engineDescriptorUniqueId.append("class", clazz.getName());
 
-        RunnableClassTestDescriptor testEngineClassTestDescriptor =
+        ClassTestDescriptor testEngineClassTestDescriptor =
                 TestDescriptorUtils.createClassTestDescriptor(
                         classDescriptorUniqueId,
                         clazz);
@@ -65,7 +65,7 @@ public class ClassSelectorResolver {
                     UniqueId parameterDescriptoruniqueId =
                             classDescriptorUniqueId.append("parameter", String.valueOf(index.get()));
 
-                    RunnableParameterTestDescriptor testEngineParameterTestDescriptor =
+                    ParameterTestDescriptor testEngineParameterTestDescriptor =
                             TestDescriptorUtils.createParameterTestDescriptor(
                                     parameterDescriptoruniqueId,
                                     clazz,
@@ -79,7 +79,7 @@ public class ClassSelectorResolver {
                                 UniqueId uniqueId =
                                         parameterDescriptoruniqueId.append("method", method.getName());
 
-                                RunnableMethodTestDescriptor methodTestDescriptor =
+                                MethodTestDescriptor methodTestDescriptor =
                                         TestDescriptorUtils.createMethodTestDescriptor(
                                                 uniqueId,
                                                 clazz,
