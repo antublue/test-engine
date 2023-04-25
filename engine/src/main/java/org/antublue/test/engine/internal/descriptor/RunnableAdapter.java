@@ -19,7 +19,7 @@ package org.antublue.test.engine.internal.descriptor;
 import org.antublue.test.engine.internal.TestExecutionContext;
 
 /**
- * Class to implement a RunnableAdapter to test a class test descriptor in a Thread
+ * Class to implement a RunnableAdapter to test a ClassTestDescriptor in a Thread
  */
 public final class RunnableAdapter implements Runnable {
 
