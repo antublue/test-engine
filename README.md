@@ -472,7 +472,7 @@ mvn clean package integration-test
 
 ## Test Engine Summary
 
-When running via Maven in a Linux console, the Test Engine will report a summary
+When running via Maven in a Linux console, the Test Engine will report a summary similar to...
 
 ```bash
 [INFO] ------------------------------------------------------------------------
