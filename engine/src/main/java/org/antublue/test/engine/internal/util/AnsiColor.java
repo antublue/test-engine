@@ -107,7 +107,7 @@ public class AnsiColor {
     /**
      * Constructor
      *
-     * @param escapeString
+     * @param escapeString escapeString
      */
     public AnsiColor(String escapeString) {
         this.escapeString = escapeString;
@@ -116,8 +116,8 @@ public class AnsiColor {
     /**
      * Method to wrap a String with an ANSI color escape sequence
      *
-     * @param object
-     * @return
+     * @param object object
+     * @return the return value
      */
     public String apply(Object object) {
         if (ANSI_COLOR_SUPPORTED) {
@@ -130,7 +130,7 @@ public class AnsiColor {
     /**
      * Method to get the ANSI color escape sequence String
      *
-     * @return
+     * @return the return value
      */
     @Override
     public String toString() {
@@ -144,7 +144,7 @@ public class AnsiColor {
     /**
      * Method to indicate whether ANSI color sequences are supported
      *
-     * @return
+     * @return the return value
      */
     public static boolean isSupported() {
         return ANSI_COLOR_SUPPORTED;

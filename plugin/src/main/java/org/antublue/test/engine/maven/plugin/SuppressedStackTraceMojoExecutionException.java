@@ -28,7 +28,7 @@ public class SuppressedStackTraceMojoExecutionException extends MojoExecutionExc
     /**
      * Constructor
      *
-     * @param message
+     * @param message message
      */
     public SuppressedStackTraceMojoExecutionException(String message) {
         super(message);

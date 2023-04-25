@@ -29,8 +29,8 @@ public final class ClassTestDescriptorRunnableAdapter implements Runnable {
     /**
      * Constructor
      *
-     * @param classTestDescriptor
-     * @param testExecutionContext
+     * @param classTestDescriptor classTestDescriptor
+     * @param testExecutionContext testExecutionContext
      */
     public ClassTestDescriptorRunnableAdapter(
             ClassTestDescriptor classTestDescriptor, TestExecutionContext testExecutionContext) {

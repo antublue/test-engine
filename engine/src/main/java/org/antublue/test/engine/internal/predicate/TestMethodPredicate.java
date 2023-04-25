@@ -26,7 +26,7 @@ public final class TestMethodPredicate extends RegexPredicate<Method> {
     /**
      * Constructor
      *
-     * @param regex
+     * @param regex regex
      */
     private TestMethodPredicate(String regex) {
         super(regex);
@@ -46,8 +46,8 @@ public final class TestMethodPredicate extends RegexPredicate<Method> {
     /**
      * Method to create an instance of a TestMethodPredicate
      *
-     * @param regex
-     * @return
+     * @param regex regex
+     * @return the return value
      */
     public static TestMethodPredicate of(String regex) {
         return new TestMethodPredicate(regex);

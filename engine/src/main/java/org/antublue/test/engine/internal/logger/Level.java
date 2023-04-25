@@ -34,8 +34,8 @@ public final class Level {
     /**
      * Constructor
      *
-     * @param level
-     * @param string
+     * @param level level
+     * @param string string
      */
     private Level(int level, String string) {
         this.level = level;
@@ -45,7 +45,7 @@ public final class Level {
     /**
      * Method to get the Level as an int
      *
-     * @return
+     * @return the return value
      */
     public int toInt() {
         return level;
@@ -54,7 +54,7 @@ public final class Level {
     /**
      * Method to get the Level string
      *
-     * @return
+     * @return the return value
      */
     @Override
     public String toString() {

@@ -39,8 +39,8 @@ public class ClassSelectorResolver {
     /**
      * Method to resolve a ClassSelector
      *
-     * @param classSelector
-     * @param engineDescriptor
+     * @param classSelector classSelector
+     * @param engineDescriptor engineDescriptor
      */
     public void resolve(ClassSelector classSelector, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolve [%s]", classSelector.getClassName());

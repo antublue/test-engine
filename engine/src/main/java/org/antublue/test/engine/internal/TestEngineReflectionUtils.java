@@ -357,7 +357,7 @@ public final class TestEngineReflectionUtils {
      * Method to get a @TestEngine.ParameterSupplier Method
      *
      * @param clazz class to inspect
-     * @return Method
+     * @return Method the return value
      */
     public static Method getParameterSupplierMethod(Class<?> clazz) {
         synchronized (parameterSupplierMethodCache) {

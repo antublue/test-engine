@@ -32,8 +32,8 @@ public class TestExecutionContext {
     /**
      * Constructor
      *
-     * @param executionRequest
-     * @param countDownLatch
+     * @param executionRequest executionRequest
+     * @param countDownLatch countDownLatch
      */
     public TestExecutionContext(ExecutionRequest executionRequest, CountDownLatch countDownLatch) {
         this.executionRequest = executionRequest;
@@ -43,7 +43,7 @@ public class TestExecutionContext {
     /**
      * Method to get the ExecutionRequest
      *
-     * @return
+     * @return the return value
      */
     public ExecutionRequest getExecutionRequest() {
         return executionRequest;
@@ -52,7 +52,7 @@ public class TestExecutionContext {
     /**
      * Method to get the CountDownLatch
      *
-     * @return
+     * @return the return value
      */
     public CountDownLatch getCountDownLatch() {
         return countDownLatch;
@@ -61,7 +61,7 @@ public class TestExecutionContext {
     /**
      * Method to set the test instance Object
      *
-     * @param testInstance
+     * @param testInstance testInstance
      */
     public void setTestInstance(Object testInstance) {
         this.testInstance = testInstance;
@@ -70,7 +70,7 @@ public class TestExecutionContext {
     /**
      * Method to get the test instance Object
      *
-     * @return
+     * @return the return value
      */
     public Object getTestInstance() {
         return testInstance;

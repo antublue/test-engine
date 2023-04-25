@@ -48,10 +48,10 @@ public final class LineSource {
     /**
      * Method to get a Stream of Parameters from a File
      *
-     * @param file
-     * @param charset
-     * @return
-     * @throws IOException
+     * @param file file
+     * @param charset charset
+     * @return the return value
+     * @throws IOException IOException
      */
     public static Stream<Parameter> of(File file, Charset charset) throws IOException {
         try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
@@ -62,9 +62,9 @@ public final class LineSource {
     /**
      * Method to get a Stream of Parameters from a Reader
      *
-     * @param reader
-     * @return
-     * @throws IOException
+     * @param reader reader
+     * @return the return value
+     * @throws IOException IOException
      */
     public static Stream<Parameter> of(Reader reader) throws IOException {
         List<Parameter> list = new ArrayList<>();
@@ -88,10 +88,10 @@ public final class LineSource {
     /**
      * Method to get a Stream of Parameters from an InputStream
      *
-     * @param inputStream
-     * @param charset
-     * @return
-     * @throws IOException
+     * @param inputStream inputStream
+     * @param charset charset
+     * @return the return value
+     * @throws IOException IOException
      */
     public static Stream<Parameter> of(InputStream inputStream, Charset charset) throws IOException {
         try (Reader reader = new InputStreamReader(inputStream, charset)) {

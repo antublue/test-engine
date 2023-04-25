@@ -37,7 +37,7 @@ public final class TestEngineConfiguration implements ConfigurationParameters {
     /**
      * Method to get a singleton instance of TestEngineConfiguration
      *
-     * @return
+     * @return the return value
      */
     public static TestEngineConfiguration getInstance() {
         return INSTANCE;
@@ -81,8 +81,8 @@ public final class TestEngineConfiguration implements ConfigurationParameters {
     /**
      * Method to resolve a configuration key first as a Java property, then as an environment variable
      *
-     * @param key
-     * @return
+     * @param key key
+     * @return the return value
      */
     private String resolve(String key) {
         String value = map.get(key);

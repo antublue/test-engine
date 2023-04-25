@@ -57,8 +57,8 @@ public class MethodSelectorResolver {
     /**
      * Method to resolve a MethodSelector
      *
-     * @param methodSelector
-     * @param engineDescriptor
+     * @param methodSelector methodSelector
+     * @param engineDescriptor engineDescriptor
      */
     public void resolve(MethodSelector methodSelector, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolve [%s]", methodSelector.getJavaMethod().getName());
