@@ -240,8 +240,10 @@ public class TestEngineDiscoveryRequestResolver {
             // Filter test classes based on class/method tag predicates
             processTestClassTagPredicates(engineDescriptor);
             processTestMethodTagPredicates(engineDescriptor);
-        } catch (RuntimeException e) {
+        } catch (TestEngineException e) {
             throw e;
+        } catch (RuntimeException e) {
+            throw new TestEngineException("Exception processing engine discovery request", e);
         } catch (Throwable t) {
             throw new TestEngineException("Exception processing engine discovery request", t);
         }
