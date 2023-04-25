@@ -24,8 +24,6 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
