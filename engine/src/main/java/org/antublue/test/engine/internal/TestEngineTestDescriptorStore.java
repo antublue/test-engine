@@ -23,7 +23,6 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Class to store TestDescriptors based on UniqueId
@@ -36,7 +35,8 @@ public final class TestEngineTestDescriptorStore {
 
     /**
      * Method to get an instance of the TestEngineTestDescriptorStore
-     * @return
+     *
+     * @return the singleton instance of a TestEngineTestDescriptorStore
      */
     public static TestEngineTestDescriptorStore getInstance() {
         return INSTANCE;
@@ -52,7 +52,7 @@ public final class TestEngineTestDescriptorStore {
     /**
      * Method to store the EngineDescriptor and all children
      *
-     * @param engineDescriptor
+     * @param engineDescriptor the engine descriptor
      */
     public void store(EngineDescriptor engineDescriptor) {
         recursivelyStore(engineDescriptor);
@@ -61,8 +61,8 @@ public final class TestEngineTestDescriptorStore {
     /**
      * Method to get a TestDescriptor based on UniqueId
      *
-     * @param uniqueId
-     * @return
+     * @param uniqueId the unique id
+     * @return an Optional that may contain a TestDescriptor
      */
     public Optional<TestDescriptor> get(UniqueId uniqueId) {
         return Optional.ofNullable(testDescriptorMap.get(uniqueId));
@@ -71,10 +71,10 @@ public final class TestEngineTestDescriptorStore {
     /**
      * Method to recursively store TestDescriptors
      *
-     * @param testDescriptor
+     * @param testDescriptor the test descriptoro
      */
     private void recursivelyStore(TestDescriptor testDescriptor) {
         testDescriptorMap.put(testDescriptor.getUniqueId(), testDescriptor);
-        testDescriptor.getChildren().forEach((Consumer<TestDescriptor>) child -> recursivelyStore(child));
+        testDescriptor.getChildren().forEach(this::recursivelyStore);
     }
 }

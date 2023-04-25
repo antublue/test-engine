@@ -21,7 +21,7 @@ import org.junit.platform.engine.ExecutionRequest;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Class to implement a TestExecutionContext for multi-threaded execution
+ * Class to implement a TestExecutionContext for multithreaded execution
  */
 public class TestExecutionContext {
 

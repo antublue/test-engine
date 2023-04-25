@@ -28,13 +28,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Class to implement a Runnable test descriptor
+ * Class to implement an extended AbstractTestDescriptor
  */
 @SuppressWarnings("unchecked")
-abstract class AbstractRunnableTestDescriptor extends AbstractTestDescriptor implements Runnable {
+abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
 
     private final ThrowableCollector throwableCollector;
-    private TestExecutionContext testExecutionContext;
 
     /**
      * Constructor
@@ -42,13 +41,13 @@ abstract class AbstractRunnableTestDescriptor extends AbstractTestDescriptor imp
      * @param uniqueId
      * @param displayName
      */
-    protected AbstractRunnableTestDescriptor(UniqueId uniqueId, String displayName) {
+    protected ExtendedAbstractTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
         throwableCollector = new ThrowableCollector();
     }
 
     /**
-     * Method to get a List of children cast as a specific class
+     * Method to get a List of children cast as a specific Class
      *
      * @param clazz
      * @return
@@ -63,24 +62,6 @@ abstract class AbstractRunnableTestDescriptor extends AbstractTestDescriptor imp
     }
 
     /**
-     * Method to set the TestExecutionContext
-     *
-     * @param testExecutionContext
-     */
-    public void setTestExecutionContext(TestExecutionContext testExecutionContext) {
-        this.testExecutionContext = testExecutionContext;
-    }
-
-    /**
-     * Method to get the TestExecutionContext
-     *
-     * @return
-     */
-    protected TestExecutionContext getTestExecutionContext() {
-        return testExecutionContext;
-    }
-
-    /**
      * Method to get the test descriptors ThrowableCollector
      *
      * @return
@@ -88,13 +69,6 @@ abstract class AbstractRunnableTestDescriptor extends AbstractTestDescriptor imp
     protected ThrowableCollector getThrowableCollector() {
         return throwableCollector;
     }
-
-    /**
-     * Method to run the test descriptor
-     * <br>
-     * The TestExecutionContext must be set prior to the call
-     */
-    public abstract void run();
 
     /**
      * Method to resolve an Exception to the underlying Exception
@@ -126,4 +100,25 @@ abstract class AbstractRunnableTestDescriptor extends AbstractTestDescriptor imp
         }
     }
 
+    /**
+     * Method to test the TestDescriptor
+     *
+     * @param testExecutionContext
+     */
+    public abstract void execute(TestExecutionContext testExecutionContext);
+
+    /**
+     * Method to skip the TestDescriptor's children, then the TestDescriptor (recursively)
+     *
+     * @param testExecutionContext
+     */
+    public void skip(TestExecutionContext testExecutionContext) {
+        getChildren(ExtendedAbstractTestDescriptor.class).forEach(
+                testDescriptor -> testDescriptor.skip(testExecutionContext));
+
+        testExecutionContext
+                .getExecutionRequest()
+                .getEngineExecutionListener()
+                .executionSkipped(this, "Parent failures");
+    }
 }

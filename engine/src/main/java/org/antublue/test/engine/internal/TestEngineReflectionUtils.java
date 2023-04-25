@@ -80,8 +80,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of Parameters for a Class
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return list of Parameters
      */
     public static List<Parameter> getParameters(Class<?> clazz) {
         try {
@@ -102,8 +102,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of @TestEngine.Parameter Fields
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return list of Fields
      */
     public static List<Field> getParameterFields(Class<?> clazz) {
         synchronized (parameterFieldCache) {
@@ -123,8 +123,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of @TestEngine.BeforeClass Methods sorted alphabetically
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return list of Methods
      */
     public static List<Method> getBeforeClassMethods(Class<?> clazz) {
         synchronized (beforeClassMethodCache) {
@@ -153,8 +153,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of @TestEngine.Parameter Methods sorted alphabetically
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return list of Methods
      */
     public static List<Method> getParameterMethods(Class<?> clazz) {
         synchronized (parameterMethodCache) {
@@ -183,8 +183,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of @TestEngine.BeforeAll Methods sorted alphabetically
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return list of Methods
      */
     public static List<Method> getBeforeAllMethods(Class<?> clazz) {
         synchronized (beforeAllMethodCache) {
@@ -211,8 +211,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of @TestEngine.BeforeEach Methods sorted alphabetically
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return list of Methods
      */
     public static List<Method> getBeforeEachMethods(Class<?> clazz) {
         synchronized (beforeEachMethodCache) {
@@ -239,8 +239,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of @TestEngine.Test Methods sorted alphabetically
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return list of Methods
      */
     public static List<Method> getTestMethods(Class<?> clazz) {
         synchronized (testMethodCache) {
@@ -272,8 +272,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of @TestEngine.AfterEach Methods sorted alphabetically
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return list of Methods
      */
     public static List<Method> getAfterEachMethods(Class<?> clazz) {
         synchronized (afterEachMethodCache) {
@@ -300,8 +300,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of @TestEngine.AfterAll Methods sorted alphabetically
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return list of Methods
      */
     public static List<Method> getAfterAllMethods(Class<?> clazz) {
         synchronized (afterAllMethodCache) {
@@ -328,8 +328,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of @TestEngine.AfterClass Methods sorted alphabetically
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return list of Methods
      */
     public static List<Method> getAfterClassMethods(Class<?> clazz) {
         synchronized (afterClassMethodCache) {
@@ -356,8 +356,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a @TestEngine.ParameterSupplier Method
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return Method
      */
     public static Method getParameterSupplierMethod(Class<?> clazz) {
         synchronized (parameterSupplierMethodCache) {
@@ -392,8 +392,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a test method display name
      *
-     * @param method
-     * @return
+     * @param method method to get the display name for
+     * @return the display name
      */
     public static String getDisplayName(Method method) {
         String displayName = method.getName();
@@ -411,8 +411,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a test method display name
      *
-     * @param clazz
-     * @return
+     * @param clazz class to get the display name for
+     * @return the display name
      */
     public static String getDisplayName(Class<?> clazz) {
         String displayName = clazz.getName();
@@ -430,10 +430,10 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of all fields from a Class and super Classes
      *
-     * @param clazz
-     * @param annotation
-     * @param fieldType
-     * @return
+     * @param clazz class to inspect
+     * @param annotation annotation that is required
+     * @param fieldType field type that is required
+     * @return list of Fields
      */
     private static List<Field> getFields(
             Class<?> clazz,
@@ -452,10 +452,10 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to recursively resolve Fields
      *
-     * @param clazz
-     * @param annotation
-     * @param fieldType
-     * @param fieldSet
+     * @param clazz class to inspect
+     * @param annotation annotation that is required
+     * @param fieldType field type that is required
+     * @param fieldSet set of Fields
      */
     private static void resolveFields(
             Class<?> clazz,
@@ -486,8 +486,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a List of all methods from a Class and super Classes
      *
-     * @param clazz
-     * @return
+     * @param clazz class to inspect
+     * @return list of Methods
      */
     private static List<Method> getMethods(
             Class<?> clazz,
@@ -526,12 +526,12 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to recursively resolve Methods
      *
-     * @param clazz
-     * @param annotation
-     * @param scope
-     * @param returnType
-     * @param parameterTypes
-     * @param methodMap
+     * @param clazz class to inspect
+     * @param annotation annotation that is required
+     * @param scope method scope that is required
+     * @param returnType method return type that is required
+     * @param parameterTypes parameter types that are requireed
+     * @param methodMap map of Methods
      */
     private static void resolveMethods(
             Class<?> clazz,
@@ -601,7 +601,6 @@ public final class TestEngineReflectionUtils {
                     return true;
                 })
                 .filter(method -> {
-                    // TODO understand why void is special
                     if (returnType == Void.class) {
                         return method.getReturnType().getName().equals("void");
                     } else {
@@ -623,7 +622,7 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to sort a List of methods first by @TestEngine.Order annotation, then alphabetically
      *
-     * @param methods
+     * @param methods list of Methods to sort
      */
     private static void sortByOrderAnnotation(List<Method> methods) {
         methods.sort((o1, o2) -> {
@@ -654,8 +653,8 @@ public final class TestEngineReflectionUtils {
     /**
      * Method to get a display name for an Annotation
      * 
-     * @param annotation
-     * @return
+     * @param annotation to look for
+     * @return the display name
      */
     private static String getAnnotationDisplayName(Class<? extends Annotation> annotation) {
         return String.format(

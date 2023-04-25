@@ -29,19 +29,19 @@ import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
- * Class to implement a Runnable test method descriptor
+ * Class to implement an extended parameter test descriptor
  */
-public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDescriptor {
+public final class ParameterTestDescriptor extends ExtendedAbstractTestDescriptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RunnableMethodTestDescriptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParameterTestDescriptor.class);
 
     private final Class<?> testClass;
     private final Parameter testParameter;
-    private final Method testMethod;
 
     /**
      * Constructor
@@ -50,19 +50,11 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
      * @param displayName
      * @param testClass
      * @param testParameter
-     * @param testMethod
      */
-    public RunnableMethodTestDescriptor(
-            UniqueId uniqueId,
-            String displayName,
-            Class<?> testClass,
-            Parameter testParameter,
-            Method testMethod) {
+    public ParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Parameter testParameter) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testParameter = testParameter;
-        this.testMethod = testMethod;
-        this.testMethod.setAccessible(true);
     }
 
     /**
@@ -72,17 +64,16 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
      */
     @Override
     public Optional<TestSource> getSource() {
-        return Optional.of(MethodSource.from(testMethod));
+        return Optional.of(MethodSource.from(TestEngineReflectionUtils.getParameterSupplierMethod(testClass)));
     }
 
     /**
      * Method to get the test descriptor Type
-     *
      * @return
      */
     @Override
     public Type getType() {
-        return Type.TEST;
+        return Type.CONTAINER;
     }
 
     /**
@@ -92,7 +83,7 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
      */
     @Override
     public boolean isTest() {
-        return true;
+        return false;
     }
 
     /**
@@ -102,7 +93,7 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
      */
     @Override
     public boolean isContainer() {
-        return false;
+        return true;
     }
 
     /**
@@ -116,7 +107,6 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
 
     /**
      * Method to get the test parameter
-     *
      * @return
      */
     public Parameter getTestParameter() {
@@ -124,21 +114,11 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
     }
 
     /**
-     * Method to get the test method
+     * Method to test the test descriptor
      *
-     * @return
+     * @param testExecutionContext
      */
-    public Method getTestMethod() {
-        return testMethod;
-    }
-
-    /**
-     * Method to run the test descriptor
-     * <br>
-     * The TestExecutionContext must be set prior to the call
-     */
-    public void run() {
-        TestExecutionContext testExecutionContext = getTestExecutionContext();
+    public void execute(TestExecutionContext testExecutionContext) {
         ThrowableCollector throwableCollector = getThrowableCollector();
 
         EngineExecutionListener engineExecutionListener =
@@ -151,17 +131,35 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
         final String testClassName = testClass.getName();
 
         try {
-            LOGGER.trace("invoking [%s] @TestEngine.BeforeEach methods ...", testClassName);
+            testExecutionContext.setTestInstance(testInstance);
+
+            LOGGER.trace("injecting [%s] @TestEngine.Parameter fields ...", testClassName);
 
             TestEngineReflectionUtils
-                    .getBeforeEachMethods(testClass)
+                    .getParameterFields(testClass)
+                    .forEach((ThrowableConsumer<Field>) field -> {
+                        LOGGER.trace(
+                                "injecting [%s] @TestEngine.Parameter field [%s] ...",
+                                testClassName,
+                                field.getName());
+                        try {
+                            field.set(testInstance, testParameter);
+                        } finally {
+                            flush();
+                        }
+                    });
+
+            LOGGER.trace("invoking [%s] @TestEngine.Parameter methods ...", testClassName);
+
+            TestEngineReflectionUtils
+                    .getParameterMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.BeforeEach method [%s] ...",
+                                "invoking [%s] @TestEngine.Parameter method [%s] ...",
                                 testClassName,
                                 method.getName());
                         try {
-                            method.invoke(testInstance, (Object[]) null);
+                            method.invoke(testInstance, testParameter);
                         } finally {
                             flush();
                         }
@@ -173,26 +171,48 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
 
         if (throwableCollector.isEmpty()) {
             try {
-                LOGGER.trace("invoking [%s] @TestEngine.Test method [%s] ...", testClassName, testMethod.getName());
-                try {
-                    testMethod.invoke(testInstance, (Object[]) null);
-                } finally {
-                    flush();
-                }
+                TestEngineReflectionUtils
+                        .getBeforeAllMethods(testClass)
+                        .forEach((ThrowableConsumer<Method>) method -> {
+                            LOGGER.trace(
+                                    "invoking [%s] @TestEngine.BeforeAll method [%s] ...",
+                                    testClassName,
+                                    method.getName());
+                            try {
+                                method.invoke(testInstance, (Object[]) null);
+                            } finally {
+                                flush();
+                            }
+                        });
             } catch (Throwable t) {
                 throwableCollector.add(t);
                 resolve(t).printStackTrace();
             }
+
+            if (!throwableCollector.isEmpty()) {
+                getChildren(MethodTestDescriptor.class)
+                        .forEach(methodTestDescriptor -> methodTestDescriptor.skip(testExecutionContext));
+            }
+
+        } else {
+            getChildren(MethodTestDescriptor.class)
+                    .forEach(methodTestDescriptor -> methodTestDescriptor.skip(testExecutionContext));
+        }
+
+        if (throwableCollector.isEmpty()) {
+            getChildren(MethodTestDescriptor.class)
+                    .forEach(methodTestDescriptor -> {
+                        methodTestDescriptor.execute(testExecutionContext);
+                        throwableCollector.addAll(methodTestDescriptor.getThrowableCollector());
+                    });
         }
 
         try {
-            LOGGER.trace("invoking [%s] @TestEngine.AfterEach methods ...", testClassName);
-
             TestEngineReflectionUtils
-                    .getAfterEachMethods(testClass)
+                    .getAfterAllMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.AfterEach method [%s] ...",
+                                "invoking [%s] @TestEngine.AfterAll method [%s] ...",
                                 testClassName,
                                 method.getName());
                         try {
@@ -209,7 +229,12 @@ public final class RunnableMethodTestDescriptor extends AbstractRunnableTestDesc
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
         } else {
-            engineExecutionListener.executionFinished(this, TestExecutionResult.failed(throwableCollector.getFirst().get()));
+            engineExecutionListener.executionFinished(
+                    this,
+                    TestExecutionResult.failed(
+                            throwableCollector
+                                    .getFirst()
+                                    .orElse(null)));
         }
     }
 }

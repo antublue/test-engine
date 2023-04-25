@@ -17,9 +17,9 @@
 package org.antublue.test.engine.internal;
 
 import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableMethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableParameterTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Switch;
@@ -28,8 +28,10 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Method;
-import java.util.function.Consumer;
 
+/**
+ * Class to contain TestDescriptor utility methods
+ */
 public final class TestDescriptorUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptorUtils.class);
@@ -48,9 +50,9 @@ public final class TestDescriptorUtils {
      * @param clazz
      * @return
      */
-    public static RunnableClassTestDescriptor createClassTestDescriptor(
+    public static ClassTestDescriptor createClassTestDescriptor(
             UniqueId uniqueId, Class<?> clazz) {
-        return new RunnableClassTestDescriptor(
+        return new ClassTestDescriptor(
                 uniqueId,
                 TestEngineReflectionUtils.getDisplayName(clazz),
                 clazz);
@@ -64,9 +66,9 @@ public final class TestDescriptorUtils {
      * @param parameter
      * @return
      */
-    public static RunnableParameterTestDescriptor createParameterTestDescriptor(
+    public static ParameterTestDescriptor createParameterTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Parameter parameter) {
-        return new RunnableParameterTestDescriptor(uniqueId, parameter.name(), clazz, parameter);
+        return new ParameterTestDescriptor(uniqueId, parameter.name(), clazz, parameter);
     }
 
     /**
@@ -78,9 +80,9 @@ public final class TestDescriptorUtils {
      * @param method
      * @return
      */
-    public static RunnableMethodTestDescriptor createMethodTestDescriptor(
+    public static MethodTestDescriptor createMethodTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Parameter parameter, Method method) {
-        return new RunnableMethodTestDescriptor(
+        return new MethodTestDescriptor(
                 uniqueId,
                 TestEngineReflectionUtils.getDisplayName(method),
                 clazz,
@@ -116,20 +118,20 @@ public final class TestDescriptorUtils {
 
         Switch.switchType(testDescriptor,
                 Switch.switchCase(
-                        RunnableMethodTestDescriptor.class,
+                        MethodTestDescriptor.class,
                         testMethodTestDescriptor ->
                                 stringBuilder
                                         .append("method -> ")
                                         .append(testMethodTestDescriptor.getUniqueId())
                                         .append("()")),
                 Switch.switchCase(
-                        RunnableParameterTestDescriptor.class,
+                        ParameterTestDescriptor.class,
                         testEngineParameterTestDescriptor ->
                                 stringBuilder
                                         .append("parameter -> ")
                                         .append(testEngineParameterTestDescriptor.getUniqueId())),
                 Switch.switchCase(
-                        RunnableClassTestDescriptor.class,
+                        ClassTestDescriptor.class,
                         testClassTestDescriptor ->
                                 stringBuilder
                                         .append("class -> ")
@@ -145,6 +147,6 @@ public final class TestDescriptorUtils {
 
         testDescriptor
                 .getChildren()
-                .forEach((Consumer<TestDescriptor>) testDescriptor1 -> trace(testDescriptor1, indent + 2));
+                .forEach(t -> trace(t, indent + 2));
     }
 }

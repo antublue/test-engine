@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Class to collect a list of Throwable
+ * Class to collect a list of Throwable Exceptions
  */
 public class ThrowableCollector {
 
@@ -35,7 +35,7 @@ public class ThrowableCollector {
     }
 
     /**
-     * Method to collect a Throwable
+     * Method to collect a Throwable Exceptions
      *
      * @param throwable
      */
@@ -44,7 +44,7 @@ public class ThrowableCollector {
     }
 
     /**
-     * Method to collect Throwable from another ThrowableCollector
+     * Method to add a ThrowableCollector's Throwable Exceptions to this ThrowableCollector
      *
      * @param throwableCollector
      */
@@ -53,7 +53,7 @@ public class ThrowableCollector {
     }
 
     /**
-     * Method to get the number of Throwable collected
+     * Method to get the number of Throwable Exception collected
      *
      * @return
      */
@@ -62,7 +62,7 @@ public class ThrowableCollector {
     }
 
     /**
-     * Method to return whether the collector has any Throwable
+     * Method to return whether the ThrowableCollector has any Throwable Exceptions
      *
      * @return
      */
@@ -71,7 +71,7 @@ public class ThrowableCollector {
     }
 
     /**
-     * Method to get the first Throwable or null
+     * Method to get the first Throwable Exception
      *
      * @return
      */
@@ -84,7 +84,7 @@ public class ThrowableCollector {
     }
 
     /**
-     * Method to get the list of Throwable
+     * Method to get the List of Throwable Exceptions
      *
      * @return
      */
