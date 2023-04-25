@@ -79,7 +79,8 @@ public final class TestEngineConfiguration implements ConfigurationParameters {
     }
 
     /**
-     * Nethod to resolve a configuration key first as a Java property, then as an environment variable
+     * Method to resolve a configuration key first as a Java property, then as an environment variable
+     *
      * @param key
      * @return
      */

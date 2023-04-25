@@ -34,7 +34,7 @@ public abstract class RegexPredicate<T> implements Predicate<T> {
     /**
      * Constructor
      *
-     * @param regex
+     * @param regex the regular expression
      */
     protected RegexPredicate(String regex) {
         this.regex = regex;
@@ -45,7 +45,7 @@ public abstract class RegexPredicate<T> implements Predicate<T> {
     /**
      * Method to get the regex
      *
-     * @return
+     * @return the regular expression
      */
     public String getRegex() {
         return regex;
@@ -55,7 +55,7 @@ public abstract class RegexPredicate<T> implements Predicate<T> {
      * Method to test the value using the regex
      *
      * @param value the input argument
-     * @return
+     * @return whether to accept the input argument
      */
     public abstract boolean test(T value);
 }

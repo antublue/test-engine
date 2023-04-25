@@ -34,12 +34,11 @@ public final class TestClassPredicate extends RegexPredicate<Class<?>> {
      * Method to test the Predicate
      *
      * @param clazz the input argument
-     * @return
+     * @return whether to accept the Class
      */
     @Override
     public boolean test(Class<?> clazz) {
-        matcher.reset(clazz.getName());
-        return matcher.find();
+        return matcher.reset(clazz.getName()).find();
     }
 
     /**

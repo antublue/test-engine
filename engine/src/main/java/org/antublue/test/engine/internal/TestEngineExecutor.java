@@ -17,8 +17,9 @@
 package org.antublue.test.engine.internal;
 
 import org.antublue.test.engine.TestEngineConstants;
-import org.antublue.test.engine.internal.descriptor.RunnableClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableEngineDescriptor;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
+import org.antublue.test.engine.internal.descriptor.RunnableAdapter;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Cast;
@@ -27,8 +28,10 @@ import org.junit.platform.engine.ExecutionRequest;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -64,37 +67,46 @@ public class TestEngineExecutor {
 
         LOGGER.trace("[%s] = [%d]", TestEngineConstants.THREAD_COUNT, threadCount);
 
-        this.executorService = Executors.newFixedThreadPool(threadCount, new NamedThreadFactory());
+        executorService = new ThreadPoolExecutor(
+                threadCount,
+                threadCount, 60L,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(threadCount * 10),
+                new NamedThreadFactory());
     }
 
     /**
      * Method to execute the ExecutionRequest
      *
-     * @param executionRequest
+     * @param executionRequest the execution request
      */
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest)");
 
-        RunnableEngineDescriptor runnableEngineDescriptor = Cast.cast(executionRequest.getRootTestDescriptor());
+        ExtendedEngineDescriptor extendedEngineDescriptor = Cast.cast(executionRequest.getRootTestDescriptor());
 
-        TestDescriptorUtils.trace(runnableEngineDescriptor);
+        TestDescriptorUtils.trace(extendedEngineDescriptor);
 
-        List<RunnableClassTestDescriptor> runnableClassTestDescriptors =
-                runnableEngineDescriptor.getChildren(RunnableClassTestDescriptor.class);
+        List<ClassTestDescriptor> classTestDescriptors =
+                extendedEngineDescriptor.getChildren(ClassTestDescriptor.class);
 
-        CountDownLatch countDownLatch = new CountDownLatch(runnableClassTestDescriptors.size());
+        CountDownLatch countDownLatch = new CountDownLatch(classTestDescriptors.size());
 
-        runnableClassTestDescriptors
-                .forEach(runnableClassTestDescriptor -> {
-                        runnableClassTestDescriptor.setTestExecutionContext(
-                                new TestExecutionContext(executionRequest, countDownLatch));
-                        executorService.submit(runnableClassTestDescriptor);
-                });
+        classTestDescriptors
+                .forEach(classTestDescriptor ->
+                        executorService.submit(
+                                new RunnableAdapter(
+                                        classTestDescriptor, new TestExecutionContext(executionRequest, countDownLatch)
+                                )));
 
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
             throw new TestEngineException("Test execution interrupted");
+        } finally {
+            if (executorService != null) {
+                executorService.shutdown();
+            }
         }
     }
 
@@ -109,7 +121,7 @@ public class TestEngineExecutor {
          * Method to create a new Thread
          *
          * @param r a runnable to be executed by new thread instance
-         * @return
+         * @return the Thread
          */
         @Override
         public Thread newThread(Runnable r) {
