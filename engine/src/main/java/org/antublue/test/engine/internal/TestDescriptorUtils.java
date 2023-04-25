@@ -68,6 +68,21 @@ public final class TestDescriptorUtils {
      */
     public static ParameterTestDescriptor createParameterTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Parameter parameter) {
+        if (TestEngineReflectionUtils.getParameterSupplierMethod(clazz) == null) {
+            throw new TestClassConfigurationException(
+                    String.format(
+                            "Test class [%s] must declare an @TestEngine.ParameterSupplier method",
+                            clazz.getName()));
+        }
+
+        if (TestEngineReflectionUtils.getParameterFields(clazz).isEmpty()
+            && TestEngineReflectionUtils.getParameterMethods(clazz).isEmpty()) {
+            throw new TestClassConfigurationException(
+                    String.format(
+                            "Test class [%s] must declare a @TestEngine.Parameter field or method",
+                            clazz.getName()));
+        }
+
         return new ParameterTestDescriptor(uniqueId, parameter.name(), clazz, parameter);
     }
 
