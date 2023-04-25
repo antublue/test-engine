@@ -32,8 +32,8 @@ public interface ThrowableConsumer<T> extends Consumer<T> {
 
     /**
      * Method to accept a value that may throw a Throwable
-     * @param t
-     * @throws Throwable
+     * @param t t
+     * @throws Throwable Throwable
      */
     void acceptThrowable(T t) throws Throwable;
 }

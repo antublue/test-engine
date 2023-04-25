@@ -4,7 +4,7 @@
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
     <name>AntuBLUE Test Engine Maven Plugin</name>
 
     <properties>
@@ -145,7 +145,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.1.2</version>
                 <executions>
                     <execution>
                         <id>default-deploy</id>
@@ -203,12 +203,12 @@
         <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine-api</artifactId>
-            <version>3.1.1</version>
+            <version>3.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine</artifactId>
-            <version>3.1.1</version>
+            <version>3.1.2</version>
         </dependency>
         <!--
         <dependency>

@@ -58,8 +58,8 @@ public class ClasspathRootResolver {
     /**
      * Method to resolve a ClasspathRootSelector
      *
-     * @param classpathRootSelector
-     * @param engineDescriptor
+     * @param classpathRootSelector classpathRootSelector
+     * @param engineDescriptor engineDescriptor
      */
     public void resolve(ClasspathRootSelector classpathRootSelector, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolve [%s]", classpathRootSelector);

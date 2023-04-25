@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Example test
  */
@@ -32,11 +34,13 @@ public class ParameterFieldTest {
 
     @TestEngine.Test
     public void test1() {
+        assertThat(parameter).isNotNull();
         System.out.println("test1(" + parameter.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
+        assertThat(parameter).isNotNull();
         System.out.println("test2(" + parameter.value() + ")");
     }
 

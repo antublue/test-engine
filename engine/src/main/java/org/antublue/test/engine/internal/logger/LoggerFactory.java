@@ -75,8 +75,8 @@ public final class LoggerFactory {
     /**
      * Method to create a Logger
      *
-     * @param name
-     * @return
+     * @param name name
+     * @return the return value
      */
     private Logger createLogger(String name) {
         synchronized (this) {
@@ -92,8 +92,8 @@ public final class LoggerFactory {
     /**
      * Method to get a Logger by Class name
      *
-     * @param clazz
-     * @return
+     * @param clazz clazz
+     * @return the return value
      */
     public static Logger getLogger(Class<?> clazz) {
         Precondition.notNull(clazz);
@@ -104,8 +104,8 @@ public final class LoggerFactory {
     /**
      * Method to get a Logger by name
      *
-     * @param name
-     * @return
+     * @param name name
+     * @return the return value
      */
     public static Logger getLogger(String name) {
         Precondition.notNull(name);

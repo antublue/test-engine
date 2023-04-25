@@ -34,9 +34,9 @@ public final class Cast {
     /**
      * Method to cast an Object to another Object
      *
-     * @param object
-     * @return
-     * @param <T>
+     * @param object object
+     * @return the return value
+     * @param <T> the return type
      */
     public static <T> T cast(Object object) {
         return (T) object;
@@ -46,9 +46,10 @@ public final class Cast {
      * Method to cast an Object to another Object, throwing an Exception
      * provided by the Supplier if there is a ClassCastException
      *
-     * @param object
-     * @return
-     * @param <T>
+     * @param object object
+     * @param runtimeExceptionSupplier runtimeExceptionSupplier
+     * @return the return value
+     * @param <T> the return type
      */
     public static <T> T cast(Object object, Supplier<RuntimeException> runtimeExceptionSupplier) {
         try {

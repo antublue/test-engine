@@ -110,21 +110,24 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             Set<URL> urls = new LinkedHashSet<>();
             for (Path path : artifactPaths) {
                 URL url = path.toUri().toURL();
-                DEBUG("classpath entry URL [%s]", url);
+                debug("classpath entry URL [%s]", url);
                 urls.add(url);
             }
 
             // Build a classloader for subsequent calls
-            ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+            ClassLoader classLoader =
+                    new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+
             Thread.currentThread().setContextClassLoader(classLoader);
 
             Optional.ofNullable(properties)
                     .ifPresent(map -> map.entrySet().forEach(entry -> {
-                        DEBUG("plugin property [%s] = [%s]", entry.getKey(), entry.getValue());
+                        debug("plugin property [%s] = [%s]", entry.getKey(), entry.getValue());
                         System.setProperty(entry.getKey(), entry.getValue());
                     }));
 
-            TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener = new TestEngineConsoleTestExecutionListener();
+            TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener =
+                    new TestEngineConsoleTestExecutionListener();
 
             LauncherConfig launcherConfig =
                     LauncherConfig
@@ -158,7 +161,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     /**
      * Method to set the plugin Log
      *
-     * @param log
+     * @param log log
      */
     public void setLog(Log log) {
         this.log = log;
@@ -167,33 +170,33 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     /**
      * Method to log a DEBUG message
      *
-     * @param format
-     * @param object
+     * @param format format
+     * @param object object
      */
-    private void DEBUG(String format, Object object) {
+    private void debug(String format, Object object) {
         if (log.isDebugEnabled()) {
-            DEBUG(format, new Object[]{object});
+            debug(format, new Object[]{object});
         }
     }
 
     /**
      * Method to log a DEBUG message
      *
-     * @param format
-     * @param objects
+     * @param format format
+     * @param objects objects
      */
-    private void DEBUG(String format, Object ... objects) {
+    private void debug(String format, Object ... objects) {
         if (log.isDebugEnabled()) {
-            DEBUG(String.format(format, objects));
+            debug(String.format(format, objects));
         }
     }
 
     /**
      * Method to log a DEBUG message
      *
-     * @param message
+     * @param message message
      */
-    private void DEBUG(String message) {
+    private void debug(String message) {
         if (log.isDebugEnabled()) {
             log.debug(message);
         }

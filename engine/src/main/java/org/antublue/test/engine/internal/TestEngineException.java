@@ -24,7 +24,7 @@ public class TestEngineException extends RuntimeException {
     /**
      * Constructor
      *
-     * @param message
+     * @param message message
      */
     public TestEngineException(String message) {
         super(message);
@@ -33,8 +33,8 @@ public class TestEngineException extends RuntimeException {
     /**
      * Constructor
      *
-     * @param message
-     * @param throwable
+     * @param message message
+     * @param throwable throwable
      */
     public TestEngineException(String message, Throwable throwable) {
         super(message, throwable);
@@ -43,7 +43,7 @@ public class TestEngineException extends RuntimeException {
     /**
      * Constructor
      *
-     * @param throwable
+     * @param throwable throwable
      */
     public TestEngineException(Throwable throwable) {
         super(throwable);

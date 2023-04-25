@@ -38,8 +38,8 @@ public final class HumanReadableTime {
     /**
      * Method to convert a duration into a human-readable time
      *
-     * @param duration
-     * @return
+     * @param duration duration
+     * @return the return value
      */
     public static String toHumanReadable(long duration) {
         return toHumanReadable(duration, false);
@@ -48,9 +48,9 @@ public final class HumanReadableTime {
     /**
      * Method to convert a duration into a human-readable time
      *
-     * @param duration
-     * @param useShortFormat
-     * @return
+     * @param duration duration
+     * @param useShortFormat useShortFormat
+     * @return the return value
      */
     public static String toHumanReadable(long duration, boolean useShortFormat) {
         long durationPositive = duration > 0 ? duration : -duration;
@@ -134,7 +134,7 @@ public final class HumanReadableTime {
     /**
      * Method to get the current time as a String
      *
-     * @return
+     * @return the return value
      */
     public static String now() {
         SimpleDateFormat simpleDateFormat =

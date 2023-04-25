@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 /**
  * Class to implement a regex Predicate
  *
- * @param <T>
+ * @param <T> the return type
  */
 public abstract class RegexPredicate<T> implements Predicate<T> {
 

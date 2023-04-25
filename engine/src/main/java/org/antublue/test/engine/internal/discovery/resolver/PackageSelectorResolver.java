@@ -57,8 +57,8 @@ public class PackageSelectorResolver {
     /**
      * Method to resolve a PackageSelector
      *
-     * @param packageSelector
-     * @param engineDescriptor
+     * @param packageSelector packageSelector
+     * @param engineDescriptor engineDescriptor
      */
     public void resolve(PackageSelector packageSelector, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolve [%s]", packageSelector.getPackageName());

@@ -31,7 +31,7 @@ public final class ThrowableUtils {
     /**
      * Method to throw a checked (RuntimeException) if a Throwable it checked
      *
-     * @param t
+     * @param t t
      */
     public static void throwUnchecked(Throwable t) {
         if (t instanceof RuntimeException) {

@@ -140,7 +140,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     /**
      * Method to check if the test execution listener captured any errors
      *
-     * @return
+     * @return the return value
      */
     public boolean hasFailures() {
         if (summary.getTestClassCount() == 0) {
@@ -551,8 +551,8 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     /**
      * Method to column width of long values as Strings
      *
-     * @param values
-     * @return
+     * @param values values
+     * @return the return value
      */
     private long getColumnWith(long ... values) {
         long width = 0;
@@ -567,9 +567,9 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     /**
      * Method to get a String that is the value passed to a specific width
      *
-     * @param value
-     * @param width
-     * @return
+     * @param value value
+     * @param width width
+     * @return the return value
      */
     private String pad(long value, long width) {
         String stringValue = String.valueOf(value);

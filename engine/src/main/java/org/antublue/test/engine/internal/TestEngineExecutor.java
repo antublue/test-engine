@@ -18,8 +18,8 @@ package org.antublue.test.engine.internal;
 
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptorRunnableAdapter;
 import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
-import org.antublue.test.engine.internal.descriptor.RunnableAdapter;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Cast;
@@ -95,7 +95,7 @@ public class TestEngineExecutor {
         classTestDescriptors
                 .forEach(classTestDescriptor ->
                         executorService.submit(
-                                new RunnableAdapter(
+                                new ClassTestDescriptorRunnableAdapter(
                                         classTestDescriptor, new TestExecutionContext(executionRequest, countDownLatch)
                                 )));
 

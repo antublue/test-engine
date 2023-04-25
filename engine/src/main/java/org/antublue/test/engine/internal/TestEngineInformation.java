@@ -33,7 +33,7 @@ public class TestEngineInformation {
     /**
      * Method to get the TestEngine version
      *
-     * @return
+     * @return the return value
      */
     public static String getVersion() {
         return getProperty(VERSION, UNKNOWN);

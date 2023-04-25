@@ -16,8 +16,6 @@
 
 package org.antublue.test.engine.internal.util;
 
-import java.time.Duration;
-
 /**
  * Class to implement a Timer
  */
@@ -36,7 +34,7 @@ public final class Timer {
     /**
      * Constructor
      *
-     * @param autoStart
+     * @param autoStart autoStart
      */
     public Timer(boolean autoStart) {
         if (autoStart) {
@@ -47,7 +45,7 @@ public final class Timer {
     /**
      * Method to start the Timer
      *
-     * @return
+     * @return the return value
      */
     public Timer start() {
         startMs = System.currentTimeMillis();
@@ -58,7 +56,7 @@ public final class Timer {
     /**
      * Method to stop the Timer
      *
-     * @return
+     * @return the return value
      */
     public Timer stop() {
         stopMs = System.currentTimeMillis();
@@ -66,10 +64,11 @@ public final class Timer {
     }
 
     /**
-     * Method to get the Timer duration
-     * @return
+     * Method to get the Timer's elapsed time
+     *
+     * @return the return value
      */
-    public Duration duration() {
-        return Duration.ofMillis(stopMs - startMs);
+    public long elapsedTime() {
+        return stopMs - startMs;
     }
 }

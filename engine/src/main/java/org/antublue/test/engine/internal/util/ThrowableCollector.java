@@ -37,7 +37,7 @@ public class ThrowableCollector {
     /**
      * Method to collect a Throwable Exceptions
      *
-     * @param throwable
+     * @param throwable throwable
      */
     public void add(Throwable throwable) {
         throwableList.add(throwable);
@@ -46,7 +46,7 @@ public class ThrowableCollector {
     /**
      * Method to add a ThrowableCollector's Throwable Exceptions to this ThrowableCollector
      *
-     * @param throwableCollector
+     * @param throwableCollector throwableCollector
      */
     public void addAll(ThrowableCollector throwableCollector) {
         throwableList.addAll(throwableCollector.getList());
@@ -55,7 +55,7 @@ public class ThrowableCollector {
     /**
      * Method to get the number of Throwable Exception collected
      *
-     * @return
+     * @return the return value
      */
     public int size() {
         return throwableList.size();
@@ -64,7 +64,7 @@ public class ThrowableCollector {
     /**
      * Method to return whether the ThrowableCollector has any Throwable Exceptions
      *
-     * @return
+     * @return the return value
      */
     public boolean isEmpty() {
         return throwableList.isEmpty();
@@ -73,7 +73,7 @@ public class ThrowableCollector {
     /**
      * Method to get the first Throwable Exception
      *
-     * @return
+     * @return the return value
      */
     public Optional<Throwable> getFirst() {
         if (throwableList.isEmpty()) {
@@ -86,7 +86,7 @@ public class ThrowableCollector {
     /**
      * Method to get the List of Throwable Exceptions
      *
-     * @return
+     * @return the return value
      */
     public List<Throwable> getList() {
         return throwableList;

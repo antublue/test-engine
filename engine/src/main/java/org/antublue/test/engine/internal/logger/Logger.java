@@ -63,7 +63,8 @@ public class Logger {
     /**
      * Constructor
      *
-     * @param name
+     * @param name name
+     * @param level level
      */
     public Logger(String name, Level level) {
         this.name = name;
@@ -73,7 +74,7 @@ public class Logger {
     /**
      * Method to return if TRACE logging is enabled
      *
-     * @return
+     * @return the return value
      */
     public boolean isTraceEnabled() {
         return level.get().toInt() >= Level.TRACE.toInt();
@@ -82,7 +83,7 @@ public class Logger {
     /**
      * Method to return if DEBUG logging is enabled
      *
-     * @return
+     * @return the return value
      */
     public boolean isDebugEnabled() {
         return level.get().toInt() >= Level.DEBUG.toInt();
@@ -91,7 +92,7 @@ public class Logger {
     /**
      * Method to return if INFO logging is enabled
      *
-     * @return
+     * @return the return value
      */
     public boolean isInfoEnabled() {
         return level.get().toInt() >= Level.INFO.toInt();
@@ -100,7 +101,7 @@ public class Logger {
     /**
      * Method to return if WARNING logging is enabled
      *
-     * @return
+     * @return the return value
      */
     public boolean isWarnEnabled() {
         return level.get().toInt() >= Level.WARN.toInt();
@@ -109,7 +110,7 @@ public class Logger {
     /**
      * Method to return if ERROR logging is enabled
      *
-     * @return
+     * @return the return value
      */
     public boolean isErrorEnabled() {
         return level.get().toInt() >= Level.ERROR.toInt();
@@ -118,7 +119,7 @@ public class Logger {
     /**
      * Method to log a TRACE message
      *
-     * @param message
+     * @param message message
      */
     public void trace(String message) {
         if (isTraceEnabled()) {
@@ -129,8 +130,8 @@ public class Logger {
     /**
      * Method to log a TRACE message
      *
-     * @param format
-     * @param object
+     * @param format format
+     * @param object object
      */
     public void trace(String format, Object object) {
         if (isTraceEnabled()) {
@@ -142,8 +143,8 @@ public class Logger {
     /**
      * Method to log a TRACE message
      *
-     * @param format
-     * @param objects
+     * @param format format
+     * @param objects objects
      */
     public void trace(String format, Object... objects) {
         if (isTraceEnabled()) {
@@ -155,8 +156,8 @@ public class Logger {
     /**
      * Method to log a TRACE message
      *
-     * @param message
-     * @param throwable
+     * @param message message
+     * @param throwable throwable
      */
     public void trace(String message, Throwable throwable) {
         if (isTraceEnabled()) {
@@ -167,7 +168,7 @@ public class Logger {
     /**
      * Method to log a DEBUG message
      *
-     * @param message
+     * @param message message
      */
     public void debug(String message) {
         if (isDebugEnabled()) {
@@ -178,8 +179,8 @@ public class Logger {
     /**
      * Method to log a DEBUG message
      *
-     * @param format
-     * @param object
+     * @param format format
+     * @param object object
      */
     public void debug(String format, Object object) {
         if (isDebugEnabled()) {
@@ -190,8 +191,8 @@ public class Logger {
     /**
      * Method to log a DEBUG message
      *
-     * @param format
-     * @param objects
+     * @param format format
+     * @param objects objects
      */
     public void debug(String format, Object... objects) {
         if (isDebugEnabled()) {
@@ -203,8 +204,8 @@ public class Logger {
     /**
      * Method to log a DEBUG message
      *
-     * @param message
-     * @param throwable
+     * @param message message
+     * @param throwable throwable
      */
     public void debug(String message, Throwable throwable) {
         if (isDebugEnabled()) {
@@ -215,7 +216,7 @@ public class Logger {
     /**
      * Method to log an INFO message
      *
-     * @param message
+     * @param message message
      */
     public void info(String message) {
         if (isInfoEnabled()) {
@@ -226,8 +227,8 @@ public class Logger {
     /**
      * Method to log an INFO message
      *
-     * @param format
-     * @param object
+     * @param format format
+     * @param object object
      */
     public void info(String format, Object object) {
         if (isInfoEnabled()) {
@@ -238,8 +239,8 @@ public class Logger {
     /**
      * Method to log an INFO message
      *
-     * @param format
-     * @param objects
+     * @param format format
+     * @param objects objects
      */
     public void info(String format, Object... objects) {
         if (isInfoEnabled()) {
@@ -251,8 +252,8 @@ public class Logger {
     /**
      * Method to log an INFO message
      *
-     * @param message
-     * @param throwable
+     * @param message message
+     * @param throwable throwable
      */
     public void info(String message, Throwable throwable) {
         if (isInfoEnabled()) {
@@ -263,7 +264,7 @@ public class Logger {
     /**
      * Method to log a WARN message
      *
-     * @param message
+     * @param message message
      */
     public void warn(String message) {
         if (isWarnEnabled()) {
@@ -274,8 +275,8 @@ public class Logger {
     /**
      * Method to log an WARN message
      *
-     * @param format
-     * @param object
+     * @param format format
+     * @param object object
      */
     public void warn(String format, Object object) {
         if (isWarnEnabled()) {
@@ -286,8 +287,8 @@ public class Logger {
     /**
      * Method to log an WARN message
      *
-     * @param format
-     * @param objects
+     * @param format format
+     * @param objects objects
      */
     public void warn(String format, Object... objects) {
         if (isWarnEnabled()) {
@@ -299,8 +300,8 @@ public class Logger {
     /**
      * Method to log an WARN message
      *
-     * @param message
-     * @param throwable
+     * @param message message
+     * @param throwable throwable
      */
     public void warn(String message, Throwable throwable) {
         if (isWarnEnabled()) {
@@ -311,7 +312,7 @@ public class Logger {
     /**
      * Method to log an ERROR message
      *
-     * @param message
+     * @param message message
      */
     public void error(String message) {
         if (isErrorEnabled()) {
@@ -322,8 +323,8 @@ public class Logger {
     /**
      * Method to log an ERROR message
      *
-     * @param format
-     * @param object
+     * @param format format
+     * @param object object
      */
     public void error(String format, Object object) {
         if (isErrorEnabled()) {
@@ -334,8 +335,8 @@ public class Logger {
     /**
      * Method to log an ERROR message
      *
-     * @param format
-     * @param objects
+     * @param format format
+     * @param objects objects
      */
     public void error(String format, Object... objects) {
         if (isErrorEnabled()) {
@@ -347,8 +348,8 @@ public class Logger {
     /**
      * Method to log an ERROR message
      *
-     * @param message
-     * @param throwable
+     * @param message message
+     * @param throwable throwable
      */
     public void error(String message, Throwable throwable) {
         if (isErrorEnabled()) {
@@ -360,8 +361,8 @@ public class Logger {
      * Method to create a log message
      *
      * @apram level
-     * @param message
-     * @return
+     * @param message message
+     * @return the return value
      */
     private String createMessage(Level level, String message) {
         String dateTime;
@@ -381,9 +382,9 @@ public class Logger {
     /**
      * Method to create a log message
      *
-     * @param message
-     * @param throwable
-     * @return
+     * @param message message
+     * @param throwable throwable
+     * @return the return value
      */
     private String createMessage(String message, Throwable throwable) {
         StringWriter stringWriter = new StringWriter();
@@ -399,8 +400,8 @@ public class Logger {
     /**
      * Method to log to a PrintStream
      *
-     * @param printStream
-     * @param message
+     * @param printStream printStream
+     * @param message message
      */
     private void log(PrintStream printStream, String message) {
         printStream.println(message);
