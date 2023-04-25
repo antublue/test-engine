@@ -115,7 +115,9 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             }
 
             // Build a classloader for subsequent calls
-            ClassLoader classLoader = new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+            ClassLoader classLoader =
+                    new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+
             Thread.currentThread().setContextClassLoader(classLoader);
 
             Optional.ofNullable(properties)
@@ -124,7 +126,8 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                         System.setProperty(entry.getKey(), entry.getValue());
                     }));
 
-            TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener = new TestEngineConsoleTestExecutionListener();
+            TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener =
+                    new TestEngineConsoleTestExecutionListener();
 
             LauncherConfig launcherConfig =
                     LauncherConfig
