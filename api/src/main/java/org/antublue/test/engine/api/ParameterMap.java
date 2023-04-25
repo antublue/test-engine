@@ -31,6 +31,8 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
 
     /**
      * Constructor
+     *
+     * @param name name
      */
     protected ParameterMap(String name) {
         super();
@@ -129,6 +131,7 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
     /**
      * Method to get a value from the map cast to a specific type
      *
+     * @param key key
      * @param clazz clazz
      * @return the return value
      * @param <T> the return type
