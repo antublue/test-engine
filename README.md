@@ -562,7 +562,7 @@ Scan all classpath jars for test classes that contains a method annotated with "
 
 for (each test class in the Collection<Class<?>>) {
 
-  create a thread to test the class (default thread count = machine processor count)
+  create a thread to test the test class (default thread count = machine processor count)
   
   thread {
   
