@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for paramet
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v3.1.1](https://github.com/antublue/test-engine/releases/tag/v3.1.1)
+- General Availability (GA): [Test Engine v3.1.2](https://github.com/antublue/test-engine/releases/tag/v3.1.2)
 
 ## Goals
 
@@ -426,7 +426,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>3.1.1</version>
+  <version>3.1.2</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -445,12 +445,12 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -472,11 +472,11 @@ mvn clean package integration-test
 
 ## Test Engine Summary
 
-When running via Maven in a Linux console, the Test Engine will report a summary
+When running via Maven in a Linux console, the Test Engine will report a summary similar to...
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v3.1.1 Summary
+[INFO] AntuBLUE Test Engine v3.1.2 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes    :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
 [INFO] Test Parameters : 119, PASSED : 119, FAILED : 0, SKIPPED : 0
