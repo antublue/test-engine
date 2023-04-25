@@ -33,8 +33,8 @@ public final class ExtendedEngineDescriptor extends EngineDescriptor {
     /***
      * Constructor
      *
-     * @param uniqueId
-     * @param displayName
+     * @param uniqueId uniqueId
+     * @param displayName displayName
      */
     public ExtendedEngineDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
@@ -43,7 +43,7 @@ public final class ExtendedEngineDescriptor extends EngineDescriptor {
     /**
      * Method to get the TestSource
      *
-     * @return
+     * @return the return value
      */
     @Override
     public Optional<TestSource> getSource() {
@@ -53,7 +53,7 @@ public final class ExtendedEngineDescriptor extends EngineDescriptor {
     /**
      * Method to get the test descriptor Type
      *
-     * @return
+     * @return the return value
      */
     @Override
     public Type getType() {
@@ -63,7 +63,7 @@ public final class ExtendedEngineDescriptor extends EngineDescriptor {
     /**
      * Method to return whether the test descriptor is a test
      *
-     * @return
+     * @return the return value
      */
     @Override
     public boolean isTest() {
@@ -73,7 +73,7 @@ public final class ExtendedEngineDescriptor extends EngineDescriptor {
     /**
      * Method to return whether the test descriptor is a container
      *
-     * @return
+     * @return the return value
      */
     @Override
     public boolean isContainer() {
@@ -83,9 +83,9 @@ public final class ExtendedEngineDescriptor extends EngineDescriptor {
     /**
      * Method to get a List of children cast as a specific class
      *
-     * @param clazz
-     * @return
-     * @param <T>
+     * @param clazz clazz
+     * @return the return value
+     * @param <T> the return type
      */
     public <T> List<T> getChildren(Class<T> clazz) {
         final List<T> list = new ArrayList<>();

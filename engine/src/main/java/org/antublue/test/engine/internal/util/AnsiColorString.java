@@ -33,7 +33,7 @@ public class AnsiColorString {
     /**
      * Reset the content
      *
-     * @return
+     * @return the return value
      */
     public AnsiColorString reset() {
         stringBuilder.setLength(0);
@@ -43,8 +43,8 @@ public class AnsiColorString {
     /**
      * Method to set the current color
      *
-     * @param ansiColor
-     * @return
+     * @param ansiColor ansiColor
+     * @return the return value
      */
     public AnsiColorString color(AnsiColor ansiColor) {
         stringBuilder.append(ansiColor);
@@ -54,8 +54,8 @@ public class AnsiColorString {
     /**
      * Method to append a string
      *
-     * @param string
-     * @return
+     * @param string string
+     * @return the return value
      */
     public AnsiColorString append(String string) {
         stringBuilder.append(string);

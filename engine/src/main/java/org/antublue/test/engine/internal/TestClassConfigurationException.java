@@ -24,7 +24,7 @@ public class TestClassConfigurationException extends RuntimeException {
     /**
      * Constructor
      *
-     * @param message
+     * @param message message
      */
     public TestClassConfigurationException(String message) {
         super(message);
@@ -33,8 +33,8 @@ public class TestClassConfigurationException extends RuntimeException {
     /**
      * Constructor
      *
-     * @param message
-     * @param throwable
+     * @param message message
+     * @param throwable throwable
      */
     public TestClassConfigurationException(String message, Throwable throwable) {
         super(message, throwable);

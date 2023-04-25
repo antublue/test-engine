@@ -31,6 +31,8 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
 
     /**
      * Constructor
+     *
+     * @param name name
      */
     protected ParameterMap(String name) {
         super();
@@ -40,7 +42,7 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
     /**
      * Method to get the ParameterMap name
      *
-     * @return
+     * @return the return value
      */
     public String name() {
         return name;
@@ -50,7 +52,7 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
      * Method to return whether a key exists in the map
      *
      * @param key key whose presence in this map is to be tested
-     * @return
+     * @return the return value
      */
     public boolean containsKey(Object key) {
         validateKey(key);
@@ -60,9 +62,9 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
     /**
      * Method to put a key / value into the map
      *
-     * @param key
-     * @param object
-     * @return
+     * @param key key
+     * @param object object
+     * @return the return value
      */
     public ParameterMap put(String key, Object object) {
         validateKey(key);
@@ -90,7 +92,7 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
      *
      * @param key key with which the specified value is to be associated
      * @param object value to be associated with the specified key
-     * @return
+     * @return the return value
      */
     public Object putIfAbsent(String key, Object object) {
         validateKey(key);
@@ -100,10 +102,10 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
     /**
      * Method to merge a map into this map (Unsupported)
      *
-     * @param key
-     * @param value
-     * @param remappingFunction
-     * @return
+     * @param key key
+     * @param value value
+     * @param remappingFunction remappingFunction
+     * @return the return value
      */
     public Object merge(String key, Object value, BiFunction<Object, Object, Object> remappingFunction) {
         throw new UnsupportedOperationException("Merge is not supported");
@@ -112,9 +114,9 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
     /**
      * Method to get value from the map
      *
-     * @param key
-     * @return
-     * @param <T>
+     * @param key key
+     * @return the return value
+     * @param <T> the return type
      */
     public <T> T get(String key) {
         Objects.requireNonNull(key);
@@ -129,9 +131,10 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
     /**
      * Method to get a value from the map cast to a specific type
      *
-     * @param clazz
-     * @return
-     * @param <T>
+     * @param key key
+     * @param clazz clazz
+     * @return the return value
+     * @param <T> the return type
      */
     public <T> T get(String key, Class<T> clazz) {
         Object value = get(key);
@@ -145,7 +148,7 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
     /**
      * Method to convert the object to a Parameter
      *
-     * @return
+     * @return the return value
      */
     public Parameter parameter() {
         return Parameter.of(this.name, this);
@@ -154,8 +157,8 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
     /**
      * Method to create a ParameterMap
      *
-     * @param name
-     * @return
+     * @param name name
+     * @return the return value
      */
     public static ParameterMap named(String name) {
         if (name == null || name.trim().isEmpty()) {

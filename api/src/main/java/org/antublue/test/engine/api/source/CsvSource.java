@@ -48,10 +48,10 @@ public final class CsvSource {
     /**
      * Method to create a Stream of Parameters from a CSV file
      *
-     * @param file
-     * @param charset
-     * @return
-     * @throws IOException
+     * @param file file
+     * @param charset charset
+     * @return the return value
+     * @throws IOException IOException
      */
     public static Stream<Parameter> of(File file, Charset charset) throws IOException {
         try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
@@ -62,9 +62,9 @@ public final class CsvSource {
     /**
      * Method to create a Stream of Parameters from an InputStream formatted as CSV
      *
-     * @param reader
-     * @return
-     * @throws IOException
+     * @param reader reader
+     * @return the return value
+     * @throws IOException IOException
      */
     public static Stream<Parameter> of(Reader reader) throws IOException {
         CsvParserSettings parserSettings = new CsvParserSettings();
@@ -80,10 +80,10 @@ public final class CsvSource {
     /**
      * Method to create a Stream of Parameters from a Reader formatted as CSV
      *
-     * @param inputStream
-     * @param charset
-     * @return
-     * @throws IOException
+     * @param inputStream inputStream
+     * @param charset charset
+     * @return the return value
+     * @throws IOException IOException
      */
     public static Stream<Parameter> of(InputStream inputStream, Charset charset) throws IOException {
         CsvParserSettings parserSettings = new CsvParserSettings();

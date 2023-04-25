@@ -45,8 +45,8 @@ public class UniqueIdSelectorResolver {
     /**
      * Method to resolve a UniqueIdSelector
      *
-     * @param uniqueIdSelector
-     * @param engineDescriptor
+     * @param uniqueIdSelector uniqueIdSelector
+     * @param engineDescriptor engineDescriptor
      */
     public void resolve(UniqueIdSelector uniqueIdSelector, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolve [%s]", uniqueIdSelector.getUniqueId());

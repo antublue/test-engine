@@ -46,10 +46,10 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
     /**
      * Constructor
      *
-     * @param uniqueId
-     * @param displayName
-     * @param testClass
-     * @param testParameter
+     * @param uniqueId uniqueId
+     * @param displayName displayName
+     * @param testClass testClass
+     * @param testParameter testParameter
      */
     public ParameterTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Parameter testParameter) {
         super(uniqueId, displayName);
@@ -60,7 +60,7 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
     /**
      * Method to get the TestSource
      *
-     * @return
+     * @return the return value
      */
     @Override
     public Optional<TestSource> getSource() {
@@ -69,7 +69,7 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
 
     /**
      * Method to get the test descriptor Type
-     * @return
+     * @return the return value
      */
     @Override
     public Type getType() {
@@ -79,7 +79,7 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
     /**
      * Method to return whether the test descriptor is a test
      *
-     * @return
+     * @return the return value
      */
     @Override
     public boolean isTest() {
@@ -89,7 +89,7 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
     /**
      * Method to return whether the test descriptor is a container
      *
-     * @return
+     * @return the return value
      */
     @Override
     public boolean isContainer() {
@@ -99,7 +99,7 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
     /**
      * Method to get the test class
      *
-     * @return
+     * @return the return value
      */
     public Class<?> getTestClass() {
         return testClass;
@@ -107,7 +107,7 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
 
     /**
      * Method to get the test parameter
-     * @return
+     * @return the return value
      */
     public Parameter getTestParameter() {
         return testParameter;
@@ -116,7 +116,7 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
     /**
      * Method to test the test descriptor
      *
-     * @param testExecutionContext
+     * @param testExecutionContext testExecutionContext
      */
     public void execute(TestExecutionContext testExecutionContext) {
         ThrowableCollector throwableCollector = getThrowableCollector();

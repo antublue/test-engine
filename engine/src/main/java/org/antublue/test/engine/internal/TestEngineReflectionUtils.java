@@ -357,7 +357,7 @@ public final class TestEngineReflectionUtils {
      * Method to get a @TestEngine.ParameterSupplier Method
      *
      * @param clazz class to inspect
-     * @return Method
+     * @return Method the return value
      */
     public static Method getParameterSupplierMethod(Class<?> clazz) {
         synchronized (parameterSupplierMethodCache) {
@@ -462,7 +462,7 @@ public final class TestEngineReflectionUtils {
             Class<? extends Annotation> annotation,
             Class<?> fieldType,
             Set<Field> fieldSet) {
-        LOGGER.trace("resolveFields(%s, %s, %s)", clazz.getName(), annotation.getName(), fieldType);
+        LOGGER.trace("resolveFields(%s, %s, %s)", clazz.getName(), annotation.getName(), fieldType.getName());
 
         Stream.of(clazz.getDeclaredFields())
                 .filter(field -> {
@@ -470,7 +470,7 @@ public final class TestEngineReflectionUtils {
                     return !Modifier.isFinal(modifiers)
                             && !Modifier.isStatic(modifiers)
                             && field.isAnnotationPresent(annotation)
-                            && field.getType() == fieldType;
+                            && fieldType.isAssignableFrom(field.getType());
                 })
                 .forEach(field -> {
                     field.setAccessible(true);

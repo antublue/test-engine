@@ -38,8 +38,8 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     /**
      * Constructor
      *
-     * @param uniqueId
-     * @param displayName
+     * @param uniqueId uniqueId
+     * @param displayName displayName
      */
     protected ExtendedAbstractTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
@@ -49,9 +49,9 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     /**
      * Method to get a List of children cast as a specific Class
      *
-     * @param clazz
-     * @return
-     * @param <T>
+     * @param clazz clazz
+     * @return the return value
+     * @param <T> the return type
      */
     public <T> List<T> getChildren(Class<T> clazz) {
         // Clazz is not used directly, but required to make Stream semantics work
@@ -64,7 +64,7 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     /**
      * Method to get the test descriptors ThrowableCollector
      *
-     * @return
+     * @return the return value
      */
     protected ThrowableCollector getThrowableCollector() {
         return throwableCollector;
@@ -73,8 +73,8 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     /**
      * Method to resolve an Exception to the underlying Exception
      *
-     * @param t
-     * @return
+     * @param t t
+     * @return the return value
      */
     protected static Throwable resolve(Throwable t) {
         if (t instanceof RuntimeException) {
@@ -103,14 +103,14 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     /**
      * Method to test the TestDescriptor
      *
-     * @param testExecutionContext
+     * @param testExecutionContext testExecutionContext
      */
     public abstract void execute(TestExecutionContext testExecutionContext);
 
     /**
      * Method to skip the TestDescriptor's children, then the TestDescriptor (recursively)
      *
-     * @param testExecutionContext
+     * @param testExecutionContext testExecutionContext
      */
     public void skip(TestExecutionContext testExecutionContext) {
         getChildren(ExtendedAbstractTestDescriptor.class).forEach(
@@ -119,6 +119,6 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
         testExecutionContext
                 .getExecutionRequest()
                 .getEngineExecutionListener()
-                .executionSkipped(this, "Parent failures");
+                .executionSkipped(this, "Skipped");
     }
 }

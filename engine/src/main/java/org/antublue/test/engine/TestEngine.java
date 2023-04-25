@@ -47,7 +47,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     /**
      * Method to get the test engine id
      *
-     * @return
+     * @return the return value
      */
     @Override
     public String getId() {
@@ -57,7 +57,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     /**
      * Method to get the test engine group id
      *
-     * @return
+     * @return the return value
      */
     @Override
     public Optional<String> getGroupId() {
@@ -67,7 +67,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     /**
      * Method to get the test engine artifact id
      *
-     * @return
+     * @return the return value
      */
     @Override
     public Optional<String> getArtifactId() {
@@ -77,7 +77,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     /**
      * Method to get the test engine version
      *
-     * @return
+     * @return the return value
      */
     @Override
     public Optional<String> getVersion() {
@@ -87,9 +87,9 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     /**
      * Method to discover test classes
      *
-     * @param engineDiscoveryRequest
-     * @param uniqueId
-     * @return
+     * @param engineDiscoveryRequest engineDiscoveryRequest
+     * @param uniqueId uniqueId
+     * @return the return value
      */
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
@@ -119,7 +119,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     /**
      * Method to execute an ExecutionRequest
      *
-     * @param executionRequest
+     * @param executionRequest executionRequest
      */
     @Override
     public void execute(ExecutionRequest executionRequest) {

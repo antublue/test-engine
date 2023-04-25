@@ -39,8 +39,8 @@ public final class EnumSource {
     /**
      * Method to create a Stream of Parameters from an Enum
      *
-     * @param e
-     * @return
+     * @param e e
+     * @return the return value
      */
     public static Stream<Parameter> of(Class<? extends Enum> e) {
         final List<Parameter> list = new ArrayList<>();

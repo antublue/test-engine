@@ -32,8 +32,8 @@ public class ParameterImpl implements Parameter {
     /**
      * Constructor
      *
-     * @param name
-     * @param value
+     * @param name name
+     * @param value value
      */
     public ParameterImpl(String name, Object value) {
         Objects.requireNonNull(name);
@@ -49,7 +49,7 @@ public class ParameterImpl implements Parameter {
     /**
      * Method to get the parameter name
      *
-     * @return
+     * @return the return value
      */
     @Override
     public String name() {
@@ -58,8 +58,8 @@ public class ParameterImpl implements Parameter {
 
     /**
      * Method to get the parameter value
-     * @return
-     * @param <T>
+     * @return the return value
+     * @param <T> the return type
      */
     @Override
     public <T> T value() {
@@ -69,9 +69,9 @@ public class ParameterImpl implements Parameter {
     /**
      * Method to get the parameter value cast to a specific type
      *
-     * @param clazz
-     * @return
-     * @param <T>
+     * @param clazz clazz
+     * @return the return value
+     * @param <T> the return type
      */
     @Override
     public <T> T value(Class<T> clazz) {

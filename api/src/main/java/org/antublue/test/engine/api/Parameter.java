@@ -28,33 +28,33 @@ public interface Parameter {
     /**
      * Method to get the Parameter name
      *
-     * @return
+     * @return the return value
      */
     String name();
 
     /**
      * Method to get the Parameter value cast as the return type
      *
-     * @return
-     * @param <T>
+     * @return the return value
+     * @param <T> the return type
      */
     <T> T value();
 
     /**
      * Method to get the Parameter value cast to a specific type
      *
-     * @param clazz
-     * @return
-     * @param <T>
+     * @param clazz clazz
+     * @return the return value
+     * @param <T> the return type
      */
     <T> T value(Class<T> clazz);
 
     /**
      * Method to create a Parameter object
      *
-     * @param name
-     * @param value
-     * @return
+     * @param name name
+     * @param value value
+     * @return the return value
      */
     static Parameter of(String name, Object value) {
         Objects.requireNonNull(name);
@@ -69,8 +69,8 @@ public interface Parameter {
     /**
      * Method to create a Parameter containing a boolean
      *
-     * @param b
-     * @return
+     * @param b b
+     * @return the return value
      */
     static Parameter of(boolean b) {
         return of(String.valueOf(b), b);
@@ -79,8 +79,8 @@ public interface Parameter {
     /**
      * Method to create a Parameter containing as byte
      *
-     * @param b
-     * @return
+     * @param b b
+     * @return the return value
      */
     static Parameter of(byte b) {
         return of(String.valueOf(b), b);
@@ -89,8 +89,8 @@ public interface Parameter {
     /**
      * Method to create a Parameter containing as char
      *
-     * @param c
-     * @return
+     * @param c c
+     * @return the return value
      */
     static Parameter of(char c) {
         return of(String.valueOf(c), c);
@@ -99,8 +99,8 @@ public interface Parameter {
     /**
      * Method to create a Parameter containing a short
      *
-     * @param s
-     * @return
+     * @param s s
+     * @return the return value
      */
     static Parameter of(short s) {
         return of(String.valueOf(s), s);
@@ -109,8 +109,8 @@ public interface Parameter {
     /**
      * Method to create a Parameter containing an int
      *
-     * @param i
-     * @return
+     * @param i i
+     * @return the return value
      */
     static Parameter of(int i) {
         return of(String.valueOf(i), i);
@@ -119,8 +119,8 @@ public interface Parameter {
     /**
      * Method to create a Parameter containing a long
      *
-     * @param l
-     * @return
+     * @param l l
+     * @return the return value
      */
     static Parameter of(long l) {
         return of(String.valueOf(l), l);
@@ -129,8 +129,8 @@ public interface Parameter {
     /**
      * Method to create a Parameter containing a float
      *
-     * @param f
-     * @return
+     * @param f f
+     * @return the return value
      */
     static Parameter of(float f) {
         return of(String.valueOf(f), f);
@@ -139,8 +139,8 @@ public interface Parameter {
     /**
      * Method to create a Parameter containing a double
      *
-     * @param d
-     * @return
+     * @param d d
+     * @return the return value
      */
     static Parameter of(double d) {
         return of(String.valueOf(d), d);
@@ -150,7 +150,7 @@ public interface Parameter {
      * Method to create a Parameter containing a String
      *
      * @param value not null
-     * @return
+     * @return the return value
      */
     static Parameter of(String value) {
         if (value == null) {

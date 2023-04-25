@@ -46,9 +46,9 @@ public final class TestDescriptorUtils {
     /**
      * Method to create a ClassTestDescriptor
      *
-     * @param uniqueId
-     * @param clazz
-     * @return
+     * @param uniqueId uniqueId
+     * @param clazz clazz
+     * @return the return value
      */
     public static ClassTestDescriptor createClassTestDescriptor(
             UniqueId uniqueId, Class<?> clazz) {
@@ -61,24 +61,39 @@ public final class TestDescriptorUtils {
     /**
      * Method to create a ParameterTestDescriptor
      *
-     * @param uniqueId
-     * @param clazz
-     * @param parameter
-     * @return
+     * @param uniqueId uniqueId
+     * @param clazz clazz
+     * @param parameter parameter
+     * @return the return value
      */
     public static ParameterTestDescriptor createParameterTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Parameter parameter) {
+        if (TestEngineReflectionUtils.getParameterSupplierMethod(clazz) == null) {
+            throw new TestClassConfigurationException(
+                    String.format(
+                            "Test class [%s] must declare an @TestEngine.ParameterSupplier method",
+                            clazz.getName()));
+        }
+
+        if (TestEngineReflectionUtils.getParameterFields(clazz).isEmpty()
+            && TestEngineReflectionUtils.getParameterMethods(clazz).isEmpty()) {
+            throw new TestClassConfigurationException(
+                    String.format(
+                            "Test class [%s] must declare a @TestEngine.Parameter field or method",
+                            clazz.getName()));
+        }
+
         return new ParameterTestDescriptor(uniqueId, parameter.name(), clazz, parameter);
     }
 
     /**
      * Method to create a MethodTestDescriptor
      *
-     * @param uniqueId
-     * @param clazz
-     * @param parameter
-     * @param method
-     * @return
+     * @param uniqueId uniqueId
+     * @param clazz clazz
+     * @param parameter parameter
+     * @param method method
+     * @return the return value
      */
     public static MethodTestDescriptor createMethodTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Parameter parameter, Method method) {
@@ -92,7 +107,7 @@ public final class TestDescriptorUtils {
 
     /**
      *
-     * @param testDescriptor
+     * @param testDescriptor testDescriptor
      */
     public static void trace(TestDescriptor testDescriptor) {
         if (LOGGER.isTraceEnabled()) {
@@ -107,8 +122,8 @@ public final class TestDescriptorUtils {
     /**
      * Method to log the test descriptor tree hierarchy
      *
-     * @param testDescriptor
-     * @param indent
+     * @param testDescriptor testDescriptor
+     * @param indent indent
      */
     private static void trace(TestDescriptor testDescriptor, int indent) {
         StringBuilder stringBuilder = new StringBuilder();

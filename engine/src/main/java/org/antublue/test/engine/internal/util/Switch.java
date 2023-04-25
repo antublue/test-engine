@@ -35,9 +35,9 @@ public final class Switch {
     /**
      * Method to implement a "switch" based on an Object's class
      *
-     * @param object
-     * @param consumers
-     * @param <T>
+     * @param object object
+     * @param consumers consumers
+     * @param <T> the return type
      */
     public static <T> void switchType(Object object, Consumer... consumers) {
         if (consumers != null) {
@@ -50,10 +50,10 @@ public final class Switch {
     /**
      * Method to implement a switch "case" based on an Object's class
      *
-     * @param clazz
-     * @param consumer
-     * @return
-     * @param <T>
+     * @param clazz clazz
+     * @param consumer consumer
+     * @return the return value
+     * @param <T> the return type
      */
     public static <T> Consumer<T> switchCase(Class<T> clazz, Consumer<T> consumer) {
         if (clazz != null && consumer != null) {

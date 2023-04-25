@@ -36,8 +36,8 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
     /**
      * Constructor
      *
-     * @param engineDiscoveryRequest
-     * @param configurationParameters
+     * @param engineDiscoveryRequest engineDiscoveryRequest
+     * @param configurationParameters configurationParameters
      */
     public TestEngineEngineDiscoveryRequest(EngineDiscoveryRequest engineDiscoveryRequest, ConfigurationParameters configurationParameters) {
         Objects.requireNonNull(engineDiscoveryRequest);

@@ -180,8 +180,8 @@ public class TestEngineDiscoveryRequestResolver {
     /**
      * Method to process an EngineDiscoveryRequest
      *
-     * @param engineDiscoveryRequest
-     * @param engineDescriptor
+     * @param engineDiscoveryRequest engineDiscoveryRequest
+     * @param engineDescriptor engineDescriptor
      */
     public void resolve(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolve(EngineDiscoveryRequest, EngineDescriptor)");
@@ -252,8 +252,8 @@ public class TestEngineDiscoveryRequestResolver {
     /**
      * Method to process PackageNameFilters
      *
-     * @param engineDiscoveryRequest
-     * @param engineDescriptor
+     * @param engineDiscoveryRequest engineDiscoveryRequest
+     * @param engineDescriptor engineDescriptor
      */
     private void processPackageNameFilters(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         LOGGER.trace("processPackageNameFilters");
@@ -296,7 +296,7 @@ public class TestEngineDiscoveryRequestResolver {
     /**
      * Method to process test class predicates
      *
-     * @param engineDescriptor
+     * @param engineDescriptor engineDescriptor
      */
     private void processTestClassPredicates(EngineDescriptor engineDescriptor) {
         LOGGER.trace("processTestClassPredicates");
@@ -343,7 +343,7 @@ public class TestEngineDiscoveryRequestResolver {
     /**
      * Method to process test method predicates
      *
-     * @param engineDescriptor
+     * @param engineDescriptor engineDescriptor
      */
     private void processTestMethodPredicates(EngineDescriptor engineDescriptor) {
         LOGGER.trace("processTestMethodPredicates");
@@ -410,7 +410,7 @@ public class TestEngineDiscoveryRequestResolver {
     /**
      * Method to process test class tag predicates
      *
-     * @param engineDescriptor
+     * @param engineDescriptor engineDescriptor
      */
     private void processTestClassTagPredicates(EngineDescriptor engineDescriptor) {
         LOGGER.trace("processTestClassTagPredicates");
@@ -457,7 +457,7 @@ public class TestEngineDiscoveryRequestResolver {
     /**
      * Method to process test method tag predicates
      *
-     * @param engineDescriptor
+     * @param engineDescriptor engineDescriptor
      */
     private void processTestMethodTagPredicates(EngineDescriptor engineDescriptor) {
         LOGGER.trace("processTestMethodTagPredicates");
