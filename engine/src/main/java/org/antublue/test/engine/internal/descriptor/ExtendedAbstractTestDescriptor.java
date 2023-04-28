@@ -18,11 +18,15 @@ package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.internal.TestExecutionContext;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
+import org.antublue.test.engine.internal.util.ThrowableConsumerException;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -54,7 +58,7 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
      * @param <T> the return type
      */
     public <T> List<T> getChildren(Class<T> clazz) {
-        // Clazz is not used directly, but required to make Stream semantics work
+        // Clazz is required to be able to get the generic type
         return getChildren()
                 .stream()
                 .map((Function<TestDescriptor, T>) testDescriptor -> (T) testDescriptor)
@@ -71,21 +75,44 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     }
 
     /**
-     * Method to resolve an Exception to the underlying Exception
+     * Method to prune a Throwable stacktrace
      *
-     * @param t t
+     * @param throwable throwable
+     * @param markerClassName markerClassName
      * @return the return value
      */
-    protected static Throwable resolve(Throwable t) {
-        if (t instanceof RuntimeException) {
-            t = t.getCause();
+    protected Throwable pruneStackTrace(Throwable throwable, String markerClassName) {
+        if (throwable instanceof InvocationTargetException) {
+            throwable = throwable.getCause();
         }
 
-        if (t instanceof InvocationTargetException) {
-            return t.getCause();
+        if (throwable instanceof ThrowableConsumerException) {
+            throwable = throwable.getCause();
         }
 
-        return t;
+        /*
+         * Check the Throwable cause again, since the invocation may
+         * have been wrapped by a ThrowableConsumerException
+         */
+        if (throwable instanceof InvocationTargetException) {
+            throwable = throwable.getCause();
+        }
+
+        List<StackTraceElement> workingStackTrace = new ArrayList<>();
+        List<StackTraceElement> stackTraceElements = Arrays.asList(throwable.getStackTrace());
+
+        Iterator<StackTraceElement> stackTraceElementIterator = stackTraceElements.iterator();
+        while (stackTraceElementIterator.hasNext()) {
+            StackTraceElement stackTraceElement = stackTraceElementIterator.next();
+            String stackTraceClassName = stackTraceElement.getClassName();
+            workingStackTrace.add(stackTraceElement);
+            if (stackTraceClassName.equals(markerClassName)) {
+                break;
+            }
+        }
+
+        throwable.setStackTrace(workingStackTrace.toArray(new StackTraceElement[0]));
+        return throwable;
     }
 
     /**
