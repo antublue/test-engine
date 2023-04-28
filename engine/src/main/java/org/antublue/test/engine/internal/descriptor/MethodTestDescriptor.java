@@ -166,8 +166,11 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                         }
                     });
         } catch (Throwable t) {
+            t = pruneStackTrace(t, testClassName);
+            System.out.println("-->");
+            t.printStackTrace();
+            System.out.println("<--");
             throwableCollector.add(t);
-            resolve(t).printStackTrace();
         }
 
         if (throwableCollector.isEmpty()) {
@@ -179,8 +182,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     flush();
                 }
             } catch (Throwable t) {
+                t = pruneStackTrace(t, testClassName);
+                t.printStackTrace();
                 throwableCollector.add(t);
-                resolve(t).printStackTrace();
             }
         }
 
@@ -201,8 +205,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                         }
                     });
         } catch (Throwable t) {
+            t = pruneStackTrace(t, testClassName);
+            t.printStackTrace();
             throwableCollector.add(t);
-            resolve(t).printStackTrace();
         }
 
         if (throwableCollector.isEmpty()) {

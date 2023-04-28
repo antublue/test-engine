@@ -165,8 +165,9 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
                         }
                     });
         } catch (Throwable t) {
+            t = pruneStackTrace(t, testClassName);
+            t.printStackTrace();
             throwableCollector.add(t);
-            resolve(t).printStackTrace();
         }
 
         if (throwableCollector.isEmpty()) {
@@ -185,8 +186,9 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
                             }
                         });
             } catch (Throwable t) {
+                t = pruneStackTrace(t, testClassName);
+                t.printStackTrace();
                 throwableCollector.add(t);
-                resolve(t).printStackTrace();
             }
 
             if (!throwableCollector.isEmpty()) {
@@ -222,8 +224,9 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
                         }
                     });
         } catch (Throwable t) {
+            t = pruneStackTrace(t, testClassName);
+            t.printStackTrace();
             throwableCollector.add(t);
-            resolve(t).printStackTrace();
         }
 
         if (throwableCollector.isEmpty()) {

@@ -139,8 +139,9 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         }
                     });
         } catch (Throwable t) {
+            t = pruneStackTrace(t, testClassName);
+            t.printStackTrace();
             throwableCollector.add(t);
-            resolve(t).printStackTrace();
         }
 
         if (throwableCollector.isEmpty()) {
@@ -173,8 +174,9 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         }
                     });
         } catch (Throwable t) {
+            t = pruneStackTrace(t, testClassName);
+            t.printStackTrace();
             throwableCollector.add(t);
-            resolve(t).printStackTrace();
         }
 
         if (throwableCollector.isEmpty()) {
@@ -186,6 +188,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                             throwableCollector
                                     .getFirst()
                                     .orElse(null)));
+
         }
 
         testExecutionContext.setTestInstance(null);
