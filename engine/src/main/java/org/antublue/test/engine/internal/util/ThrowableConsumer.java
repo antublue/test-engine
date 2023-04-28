@@ -26,7 +26,11 @@ public interface ThrowableConsumer<T> extends Consumer<T> {
         try {
             acceptThrowable(t);
         } catch(Throwable tt) {
-            ThrowableUtils.throwUnchecked(tt);
+            if (tt instanceof RuntimeException) {
+                throw (RuntimeException) tt;
+            } else {
+                throw new ThrowableConsumerException(tt);
+            }
         }
     }
 

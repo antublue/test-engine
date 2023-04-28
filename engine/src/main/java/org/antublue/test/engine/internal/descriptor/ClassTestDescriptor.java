@@ -107,6 +107,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param testExecutionContext testExecutionContext
      */
     public void execute(TestExecutionContext testExecutionContext) {
+        boolean executionViaMavenPlugin = "X".equals(System.getProperty("__ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN__"));
+
         ThrowableCollector throwableCollector = getThrowableCollector();
 
         EngineExecutionListener engineExecutionListener =
@@ -139,15 +141,23 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         }
                     });
         } catch (Throwable t) {
+            t = pruneStackTrace(t, testClassName);
+            t.printStackTrace();
             throwableCollector.add(t);
-            resolve(t).printStackTrace();
         }
 
         if (throwableCollector.isEmpty()) {
             getChildren(ParameterTestDescriptor.class)
                     .forEach(parameterTestDescriptor -> {
                         parameterTestDescriptor.execute(testExecutionContext);
-                        throwableCollector.addAll(parameterTestDescriptor.getThrowableCollector());
+                        // Only collect and report a child's Throwable exceptions
+                        // when running via the Test Engine Maven Plugin.
+                        // Using these to indicate an issue for this test descriptor
+                        // results in incorrect test run output
+                        // (invalid test counts, tested marked skipped, etc.)
+                        if (executionViaMavenPlugin) {
+                            throwableCollector.addAll(parameterTestDescriptor.getThrowableCollector());
+                        }
                     });
         } else {
             getChildren(ParameterTestDescriptor.class)
@@ -173,8 +183,9 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         }
                     });
         } catch (Throwable t) {
+            t = pruneStackTrace(t, testClassName);
+            t.printStackTrace();
             throwableCollector.add(t);
-            resolve(t).printStackTrace();
         }
 
         if (throwableCollector.isEmpty()) {
@@ -186,6 +197,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                             throwableCollector
                                     .getFirst()
                                     .orElse(null)));
+
         }
 
         testExecutionContext.setTestInstance(null);

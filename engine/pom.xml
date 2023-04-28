@@ -7,7 +7,7 @@
 
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>3.1.2</version>
+    <version>3.1.3</version>
     <packaging>jar</packaging>
     <name>AntuBLUE Test Engine</name>
 
@@ -243,7 +243,7 @@
         <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine-api</artifactId>
-            <version>3.1.2</version>
+            <version>3.1.3</version>
         </dependency>
         <dependency>
             <groupId>com.univocity</groupId>

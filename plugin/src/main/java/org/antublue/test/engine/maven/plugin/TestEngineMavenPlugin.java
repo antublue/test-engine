@@ -126,6 +126,8 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                         System.setProperty(entry.getKey(), entry.getValue());
                     }));
 
+            System.setProperty("__ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN__", "X");
+
             TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener =
                     new TestEngineConsoleTestExecutionListener();
 

@@ -23,16 +23,15 @@ import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Cast;
+import org.antublue.test.engine.internal.util.NamedThreadFactory;
 import org.junit.platform.engine.ExecutionRequest;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Method to execute an ExecutionRequest
@@ -72,7 +71,7 @@ public class TestEngineExecutor {
                 threadCount, 60L,
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(threadCount * 10),
-                new NamedThreadFactory());
+                new NamedThreadFactory("test-engine-%02d"));
     }
 
     /**
@@ -110,25 +109,4 @@ public class TestEngineExecutor {
         }
     }
 
-    /**
-     * Class to implement a named ThreadFactory
-     */
-    private static class NamedThreadFactory implements ThreadFactory {
-
-        private final AtomicInteger threadId = new AtomicInteger(1);
-
-        /**
-         * Method to create a new Thread
-         *
-         * @param r a runnable to be executed by new thread instance
-         * @return the Thread
-         */
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread thread = new Thread(r);
-            thread.setName(String.format("test-engine-%02d", threadId.getAndIncrement()));
-            thread.setDaemon(true);
-            return thread;
-        }
-    }
 }
