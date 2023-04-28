@@ -526,6 +526,11 @@ IntelliJ doesn't properly display the correct test class display name when a sin
 
 - https://youtrack.jetbrains.com/issue/IDEA-318733/IntelliJ-test-class-display-name-is-incorrect-when-selecting-a-specific-test-class
 
+IntelliJ doesn't properly display `System.out` / `System.err` for running tests when "Track Running Tests" is enabled.
+
+- Various reports on https://youtrack.jetbrains.com
+- The output can be misleading and should not be used as a source of truth
+
 ## Getting Help
 
 GitHub's Discussions is the current mechanism for help / support
