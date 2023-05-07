@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Douglas Hoard
+ * Copyright (C) 2023 Douglas Hoard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package org.antublue.test.engine.maven.plugin;
 
 import org.antublue.test.engine.internal.TestEngineConsoleTestExecutionListener;
+import org.antublue.test.engine.internal.util.AnsiColor;
+import org.antublue.test.engine.internal.util.AnsiColorString;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -36,7 +38,6 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -48,7 +49,7 @@ import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNa
 /**
  * Class to implement a Maven plugin to run the AntuBLUE Test Engine
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "deprecation"})
 @Mojo(name = "test", threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST)
 public class TestEngineMavenPlugin extends AbstractMojo {
 
@@ -73,44 +74,33 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             Set<Path> artifactPaths = new LinkedHashSet<>();
 
             Optional.ofNullable(mavenProject.getCompileClasspathElements())
-                    .map(Collection::stream)
-                    .get()
-                    .forEach(string -> artifactPaths.add(new File(string).toPath()));
-
+                    .ifPresent(
+                            strings -> strings.forEach(string -> artifactPaths.add(new File(string).toPath())));
 
             Optional.ofNullable(mavenProject.getRuntimeClasspathElements())
-                    .map(Collection::stream)
-                    .get()
-                    .forEach(string -> artifactPaths.add(new File(string).toPath()));
+                    .ifPresent(
+                            strings -> strings.forEach(string -> artifactPaths.add(new File(string).toPath())));
 
             Optional.ofNullable(mavenProject.getTestClasspathElements())
-                    .map(Collection::stream)
-                    .get()
-                    .forEach(string -> artifactPaths.add(new File(string).toPath()));
+                    .ifPresent(
+                            strings -> strings.forEach(string -> artifactPaths.add(new File(string).toPath())));
 
             Optional.ofNullable(mavenProject.getArtifact())
-                    .ifPresent(artifact -> artifactPaths.add(artifact.getFile().toPath()));
-
-
-            Optional.ofNullable(mavenProject.getArtifacts())
-                            .map(Collection::stream)
-                            .get()
-                            .forEach(artifact -> artifactPaths.add(artifact.getFile().toPath()));
+                    .ifPresent(
+                            artifact -> artifactPaths.add(artifact.getFile().toPath()));
 
             Optional.ofNullable(mavenProject.getDependencyArtifacts())
-                    .map(Collection::stream)
-                    .get()
-                    .forEach(artifact -> artifactPaths.add(artifact.getFile().toPath()));
+                    .ifPresent(
+                            artifacts -> artifacts.forEach(artifact -> artifactPaths.add(artifact.getFile().toPath())));
 
             Optional.ofNullable(mavenProject.getAttachedArtifacts())
-                    .map(Collection::stream)
-                    .get()
-                    .forEach(artifact -> artifactPaths.add(artifact.getFile().toPath()));
+                    .ifPresent(
+                            artifacts -> artifacts.forEach(artifact -> artifactPaths.add(artifact.getFile().toPath())));
 
             Set<URL> urls = new LinkedHashSet<>();
             for (Path path : artifactPaths) {
                 URL url = path.toUri().toURL();
-                debug("classpath entry URL [%s]", url);
+                info("classpath entry [%s]", url);
                 urls.add(url);
             }
 
@@ -121,12 +111,13 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             Thread.currentThread().setContextClassLoader(classLoader);
 
             Optional.ofNullable(properties)
-                    .ifPresent(map -> map.entrySet().forEach(entry -> {
-                        debug("plugin property [%s] = [%s]", entry.getKey(), entry.getValue());
-                        System.setProperty(entry.getKey(), entry.getValue());
-                    }));
-
-            System.setProperty("__ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN__", "X");
+                    .ifPresent(map ->
+                            map.forEach((key, value) -> {
+                                if (key != null && value != null) {
+                                    info("plugin property [%s] = [%s]", key, value);
+                                    System.setProperty(key, value);
+                                }
+                            }));
 
             TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener =
                     new TestEngineConsoleTestExecutionListener();
@@ -202,5 +193,31 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         if (log.isDebugEnabled()) {
             log.debug(message);
         }
+    }
+
+    /**
+     * Method to log an INFO message
+     *
+     * @param format format
+     * @param objects objects
+     */
+    private void info(String format, Object ... objects) {
+        info(String.format(format, objects));
+    }
+
+    /**
+     * Method to log an INFO message
+     *
+     * @param message message
+     */
+    private void info(String message) {
+        System.out.println(
+                new AnsiColorString()
+                        .append("[")
+                        .color(AnsiColor.BLUE_BOLD)
+                        .append("INFO")
+                        .color(AnsiColor.RESET)
+                        .append("] ")
+                        .append(message));
     }
 }
