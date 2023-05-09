@@ -65,6 +65,12 @@ public class MethodSelectorResolver {
 
         UniqueId engineDescriptorUniqueId = engineDescriptor.getUniqueId();
         Class<?> clazz = methodSelector.getJavaClass();
+        LOGGER.trace("  class [%s]", clazz.getName());
+
+        if (!IS_TEST_CLASS.test(clazz)) {
+            return;
+        }
+
         Method method = methodSelector.getJavaMethod();
         UniqueId classTestDescriptorUniqueId = engineDescriptorUniqueId.append("class", clazz.getName());
 
