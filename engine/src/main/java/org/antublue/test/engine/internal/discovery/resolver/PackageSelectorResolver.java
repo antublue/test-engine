@@ -43,10 +43,11 @@ public class PackageSelectorResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(PackageSelectorResolver.class);
 
     /**
-     * Predicate to determine if a class is a test class (not abstract, has @TestEngine.Test methods)
+     * Predicate to determine if a class is a valid test class
      */
     private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
-        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class) || clazz.isAnnotationPresent(TestEngine.Disabled.class)) {
+        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
+                || clazz.isAnnotationPresent(TestEngine.Disabled.class)) {
             return false;
         }
 

@@ -44,7 +44,7 @@ public class ClasspathRootResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClasspathRootResolver.class);
 
     /**
-     * Predicate to determine if a class is a test class (not abstract, has @TestEngine.Test methods)
+     * Predicate to determine if a class is a valid test class
      */
     private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
         if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
