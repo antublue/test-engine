@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.internal.discovery.resolver;
 
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
@@ -27,7 +28,9 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
+import java.lang.reflect.Modifier;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 /**
  * Class to resolve a ClassSelector
@@ -35,6 +38,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ClassSelectorResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassSelectorResolver.class);
+
+    /**
+     * Predicate to determine if a class is a test class (not abstract, has @TestEngine.Test methods)
+     */
+    private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
+        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
+                || clazz.isAnnotationPresent(TestEngine.Disabled.class)) {
+            return false;
+        }
+
+        return !Modifier.isAbstract(clazz.getModifiers()) && !TestEngineReflectionUtils.getTestMethods(clazz).isEmpty();
+    };
 
     /**
      * Method to resolve a ClassSelector
@@ -48,6 +63,10 @@ public class ClassSelectorResolver {
         UniqueId engineDescriptorUniqueId = engineDescriptor.getUniqueId();
         Class<?> clazz = classSelector.getJavaClass();
         LOGGER.trace("  class [%s]", clazz.getName());
+
+        if (!IS_TEST_CLASS.test(clazz)) {
+            return;
+        }
 
         UniqueId classTestDescriptorUniqueId = engineDescriptorUniqueId.append("class", clazz.getName());
 
