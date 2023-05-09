@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Douglas Hoard
+ * Copyright (C) 2022-2023 The AntuBLUE test-engine project authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Cast;
 import org.antublue.test.engine.internal.util.NamedThreadFactory;
 import org.junit.platform.engine.ExecutionRequest;
+import org.junit.platform.engine.TestExecutionResult;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -86,6 +87,8 @@ public class TestEngineExecutor {
 
         TestDescriptorUtils.trace(extendedEngineDescriptor);
 
+        executionRequest.getEngineExecutionListener().executionStarted(extendedEngineDescriptor);
+
         List<ClassTestDescriptor> classTestDescriptors =
                 extendedEngineDescriptor.getChildren(ClassTestDescriptor.class);
 
@@ -107,6 +110,7 @@ public class TestEngineExecutor {
                 executorService.shutdown();
             }
         }
-    }
 
+        executionRequest.getEngineExecutionListener().executionFinished(extendedEngineDescriptor, TestExecutionResult.successful());
+    }
 }
