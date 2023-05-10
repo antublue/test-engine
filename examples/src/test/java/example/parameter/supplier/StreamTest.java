@@ -1,4 +1,4 @@
-package example;
+package example.parametersupplier;
 
 import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Example test
  */
-public class StreamOfTest {
+public class StreamTest {
 
     private Parameter parameter;
 
