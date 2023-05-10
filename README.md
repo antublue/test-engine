@@ -86,17 +86,17 @@ This test is testing functionality of an Apache Kafka Producer and Consumer agai
 
 ## Common Test Annotations
 
-| Annotation                      | Scope             | Required                               | Static | Example Method                                                                   |
-|---------------------------------|-------------------|----------------------------------------|--------|----------------------------------------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | method            | yes                                    | yes    | <nobr>`public static Stream<Parameter> parameters();`</nobr>                     |
-| `@TestEngine.Parameter`         | field<br/> method | yes <br/><nobr>(either or both)</nobr> | no     | `public Parameter parameter;`<br/> `public void parameter(Parameter parameter);` |
-| `@TestEngine.BeforeClass`       | method            | no                                     | yes    | `public static void beforeClass();`                                              |
-| `@TestEngine.BeforeAll`         | method            | no                                     | no     | `public void beforeAll();`                                                       |
-| `@TestEngine.BeforeEach`        | method            | no                                     | no     | `public void beforeEach();`                                                      |
-| `@TestEngine.Test`              | method            | yes                                    | no     | `public void test();`                                                            |
-| `@TestEngine.AfterEach`         | method            | no                                     | no     | `public void afterEach();`                                                       |
-| `@TestEngine.AfterAll`          | method            | no                                     | no     | `public void afterAll();`                                                        |
-| `@TestEngine.AfterClass`        | method            | no                                     | yes    | `public static void afterClass();`                                               |
+| Annotation                      | Scope             | Required                               | Static | Example Method                                                                                                                  |
+|---------------------------------|-------------------|----------------------------------------|--------|---------------------------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | method            | yes                                    | yes    | <nobr>`public static Stream<Parameter> parameters();`</nobr><br/><nobr>`public static Iterable<Parameter> parameters();`</nobr> |
+| `@TestEngine.Parameter`         | field<br/> method | yes <br/><nobr>(either or both)</nobr> | no     | `public Parameter parameter;`<br/> `public void parameter(Parameter parameter);`                                                |
+| `@TestEngine.BeforeClass`       | method            | no                                     | yes    | `public static void beforeClass();`                                                                                             |
+| `@TestEngine.BeforeAll`         | method            | no                                     | no     | `public void beforeAll();`                                                                                                      |
+| `@TestEngine.BeforeEach`        | method            | no                                     | no     | `public void beforeEach();`                                                                                                     |
+| `@TestEngine.Test`              | method            | yes                                    | no     | `public void test();`                                                                                                           |
+| `@TestEngine.AfterEach`         | method            | no                                     | no     | `public void afterEach();`                                                                                                      |
+| `@TestEngine.AfterAll`          | method            | no                                     | no     | `public void afterAll();`                                                                                                       |
+| `@TestEngine.AfterClass`        | method            | no                                     | yes    | `public static void afterClass();`                                                                                              |
 
 Reference the [Design](https://github.com/antublue/test-engine#design) for the state machine flow
 

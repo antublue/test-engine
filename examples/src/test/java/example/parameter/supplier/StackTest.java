@@ -3,23 +3,24 @@ package example.parameter.supplier;
 import org.antublue.test.engine.api.Parameter;
 import org.antublue.test.engine.api.TestEngine;
 
-import java.util.stream.Stream;
+import java.util.Stack;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Example test
  */
-public class StreamTest {
+public class StackTest {
 
     private Parameter parameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        return Stream.of(
-                Parameter.of(1),
-                Parameter.of(2),
-                Parameter.of(3));
+    public static Stack<Parameter> parameters() {
+        Stack<Parameter> parameters = new Stack<>();
+        parameters.push(Parameter.of(1));
+        parameters.push(Parameter.of(2));
+        parameters.push(Parameter.of(3));
+        return parameters;
     }
 
     @TestEngine.Parameter
