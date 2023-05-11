@@ -254,7 +254,7 @@ String[] values = parameter.value();
 
 ## What is a `ParameterMap` ?
 
-A `ParameterMap` is specialized `Map` object that allows building a map of keys/values and converting it to a `Parameter`
+A `ParameterMap` is specialized `Map` Object that allows building a map of keys/values and converting it to a `Parameter`
 
 - It allows you to add keys/values using a fluent pattern
 
