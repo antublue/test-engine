@@ -36,7 +36,7 @@ public class ParameterImpl implements Parameter {
      * @param value value
      */
     public ParameterImpl(String name, Object value) {
-        Objects.requireNonNull(name);
+        Objects.requireNonNull(name, "name is null");
 
         if (name.trim().isEmpty()) {
             throw new IllegalArgumentException("name is empty");

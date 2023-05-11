@@ -78,7 +78,7 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
      * @param map mappings to be stored in this map
      */
     public void putAll(java.util.Map map) {
-        Objects.requireNonNull(map);
+        Objects.requireNonNull(map, "map is null");
 
         Set<java.util.Map.Entry<Object, Object>> set = map.entrySet();
         for (java.util.Map.Entry<Object, Object> entry : set) {
@@ -119,10 +119,10 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
      * @param <T> the return type
      */
     public <T> T get(String key) {
-        Objects.requireNonNull(key);
+        Objects.requireNonNull(key, "key is null");
 
         if (key.trim().isEmpty()) {
-            throw new IllegalArgumentException("Key is empty");
+            throw new IllegalArgumentException("key is empty");
         }
 
         return (T) super.get(key);
@@ -170,16 +170,16 @@ public class ParameterMap extends LinkedHashMap<String, Object> {
 
     private static String validateKey(Object key) {
         if (key == null) {
-            throw new IllegalArgumentException("Key is null");
+            throw new IllegalArgumentException("key is null");
         }
 
         if (!(key instanceof String)) {
-            throw new IllegalArgumentException("Illegal key type [" + key.getClass().getName() + "] String is required");
+            throw new IllegalArgumentException("unsupported key type [" + key.getClass().getName() + "] String is required");
         }
 
         String stringKey = (String) key;
         if (stringKey.trim().isEmpty()) {
-            throw new IllegalArgumentException("Key is empty");
+            throw new IllegalArgumentException("key is empty");
         }
 
         return stringKey;

@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for paramet
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v3.1.5](https://github.com/antublue/test-engine/releases/tag/v3.1.5)
+- General Availability (GA): [Test Engine v3.2.0](https://github.com/antublue/test-engine/releases/tag/v3.2.0)
 
 ## Goals
 
@@ -86,17 +86,17 @@ This test is testing functionality of an Apache Kafka Producer and Consumer agai
 
 ## Common Test Annotations
 
-| Annotation                      | Scope             | Required                               | Static | Example Method                                                                   |
-|---------------------------------|-------------------|----------------------------------------|--------|----------------------------------------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | method            | yes                                    | yes    | <nobr>`public static Stream<Parameter> parameters();`</nobr>                     |
-| `@TestEngine.Parameter`         | field<br/> method | yes <br/><nobr>(either or both)</nobr> | no     | `public Parameter parameter;`<br/> `public void parameter(Parameter parameter);` |
-| `@TestEngine.BeforeClass`       | method            | no                                     | yes    | `public static void beforeClass();`                                              |
-| `@TestEngine.BeforeAll`         | method            | no                                     | no     | `public void beforeAll();`                                                       |
-| `@TestEngine.BeforeEach`        | method            | no                                     | no     | `public void beforeEach();`                                                      |
-| `@TestEngine.Test`              | method            | yes                                    | no     | `public void test();`                                                            |
-| `@TestEngine.AfterEach`         | method            | no                                     | no     | `public void afterEach();`                                                       |
-| `@TestEngine.AfterAll`          | method            | no                                     | no     | `public void afterAll();`                                                        |
-| `@TestEngine.AfterClass`        | method            | no                                     | yes    | `public static void afterClass();`                                               |
+| Annotation                      | Scope             | Required                               | Static | Example Method                                                                                                                  |
+|---------------------------------|-------------------|----------------------------------------|--------|---------------------------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | method            | yes                                    | yes    | <nobr>`public static Stream<Parameter> parameters();`</nobr><br/><nobr>`public static Iterable<Parameter> parameters();`</nobr> |
+| `@TestEngine.Parameter`         | field<br/> method | yes <br/><nobr>(either or both)</nobr> | no     | `public Parameter parameter;`<br/> `public void parameter(Parameter parameter);`                                                |
+| `@TestEngine.BeforeClass`       | method            | no                                     | yes    | `public static void beforeClass();`                                                                                             |
+| `@TestEngine.BeforeAll`         | method            | no                                     | no     | `public void beforeAll();`                                                                                                      |
+| `@TestEngine.BeforeEach`        | method            | no                                     | no     | `public void beforeEach();`                                                                                                     |
+| `@TestEngine.Test`              | method            | yes                                    | no     | `public void test();`                                                                                                           |
+| `@TestEngine.AfterEach`         | method            | no                                     | no     | `public void afterEach();`                                                                                                      |
+| `@TestEngine.AfterAll`          | method            | no                                     | no     | `public void afterAll();`                                                                                                       |
+| `@TestEngine.AfterClass`        | method            | no                                     | yes    | `public static void afterClass();`                                                                                              |
 
 Reference the [Design](https://github.com/antublue/test-engine#design) for the state machine flow
 
@@ -426,7 +426,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>3.1.5</version>
+  <version>3.2.0</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -445,12 +445,12 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>3.1.5</version>
+    <version>3.2.0</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>3.1.5</version>
+    <version>3.2.0</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -476,7 +476,7 @@ When running via Maven in a Linux console, the Test Engine will report a summary
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v3.1.5 Summary
+[INFO] AntuBLUE Test Engine v3.2.0 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes    :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
 [INFO] Test Parameters : 119, PASSED : 119, FAILED : 0, SKIPPED : 0
@@ -525,10 +525,6 @@ IntelliJ doesn't properly handle all possible test selection scenarios from the 
 IntelliJ doesn't properly display the correct test class display name when a single test class is selected.
 
 - https://youtrack.jetbrains.com/issue/IDEA-318733/IntelliJ-test-class-display-name-is-incorrect-when-selecting-a-specific-test-class
-
-IntelliJ intermittently doesn't display correct test results. (Tests that were executed are sometimes marked as `skipped`.)
-
-https://youtrack.jetbrains.com/issue/IDEA-319262/IntelliJ-test-output-window-intermittently-displays-incorrect-test-results-for-custom-JUnit-5-based-test-engine
 
 IntelliJ doesn't properly display `System.out` / `System.err` for running tests when "Track Running Tests" is enabled.
 
