@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -86,8 +87,19 @@ public final class TestEngineReflectionUtils {
     public static List<Parameter> getParameters(Class<?> clazz) {
         try {
             Method method = getParameterSupplierMethod(clazz);
-            Stream<Parameter> stream = (Stream<Parameter>) method.invoke(null, (Object[]) null);
-            return stream.collect(Collectors.toList());
+            Object object = method.invoke(null, (Object[]) null);
+            if (object instanceof Stream) {
+                return ((Stream<Parameter>) object).collect(Collectors.toList());
+            } else if (object instanceof Iterable) {
+                List<Parameter> parameters = new ArrayList<>();
+                ((Iterable<Parameter>) object).forEach(parameter -> parameters.add(parameter));
+                return parameters;
+            } else {
+                throw new TestClassConfigurationException(
+                        String.format(
+                                "Class [%s] must define one @TestEngine.ParameterSupplier method",
+                                clazz.getName()));
+            }
         } catch (TestClassConfigurationException e) {
             throw e;
         } catch (Throwable t) {
@@ -375,6 +387,26 @@ public final class TestEngineReflectionUtils {
                             Stream.class,
                             (Class<?>[]) null);
 
+            if (methodList.size() == 0) {
+                methodList =
+                        getMethods(
+                                clazz,
+                                TestEngine.ParameterSupplier.class,
+                                Scope.STATIC,
+                                Iterable.class,
+                                (Class<?>[]) null);
+            }
+
+            if (methodList.size() == 0) {
+                methodList =
+                        getMethods(
+                                clazz,
+                                TestEngine.ParameterSupplier.class,
+                                Scope.STATIC,
+                                Collection.class,
+                                (Class<?>[]) null);
+            }
+
             if (methodList.size() != 1) {
                 throw new TestClassConfigurationException(
                         String.format(
@@ -604,7 +636,7 @@ public final class TestEngineReflectionUtils {
                     if (returnType == Void.class) {
                         return method.getReturnType().getName().equals("void");
                     } else {
-                        return method.getReturnType().equals(returnType);
+                        return returnType.isAssignableFrom(method.getReturnType());
                     }
                 })
                 .forEach(method -> {

@@ -56,6 +56,8 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                     .append(TestEngine.VERSION)
                     .toString();
 
+    private static final String SUMMARY_BANNER = BANNER + AnsiColor.WHITE_BRIGHT.apply(" Summary");
+
     private static final String INFO =
             new AnsiColorString()
                     .color(AnsiColor.WHITE_BRIGHT)
@@ -167,9 +169,11 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                                 .getInstance()
                                 .get(testIdentifier.getUniqueIdObject()).ifPresent(TestDescriptorUtils::trace));
 
+        System.out.println(INFO);
         System.out.println(INFO + SEPARATOR);
         System.out.println(INFO + BANNER);
         System.out.println(INFO + SEPARATOR);
+        System.out.println(INFO);
     }
 
     /**
@@ -408,8 +412,9 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     public void testPlanExecutionFinished(TestPlan testPlan) {
         summary.testPlanExecutionFinished(testPlan);
 
+        System.out.println(INFO);
         System.out.println(INFO + SEPARATOR);
-        System.out.println(INFO + BANNER + AnsiColor.WHITE_BRIGHT.apply(" Summary"));
+        System.out.println(INFO + SUMMARY_BANNER);
         System.out.println(INFO + SEPARATOR);
 
         if (summary.getTestClassCount() != 0) {
@@ -539,7 +544,8 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 INFO
                 + AnsiColor.WHITE_BRIGHT.apply(
                         "Total Test Time : "
-                                + HumanReadableTime.toHumanReadable(elapsedTime, false)));
+                                + HumanReadableTime.toHumanReadable(elapsedTime, false)
+                                + " (" + elapsedTime + " ms)"));
 
         System.out.println(INFO + AnsiColor.WHITE_BRIGHT.apply("Finished At     : " + HumanReadableTime.now()));
 

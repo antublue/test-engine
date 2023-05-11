@@ -119,8 +119,6 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
      * @param testExecutionContext testExecutionContext
      */
     public void execute(TestExecutionContext testExecutionContext) {
-        boolean executionViaMavenPlugin = "X".equals(System.getProperty("__ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN__"));
-
         ThrowableCollector throwableCollector = getThrowableCollector();
 
         EngineExecutionListener engineExecutionListener =
@@ -207,14 +205,6 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
             getChildren(MethodTestDescriptor.class)
                     .forEach(methodTestDescriptor -> {
                         methodTestDescriptor.execute(testExecutionContext);
-                        // Only collect and report a child's Throwable exceptions
-                        // when running via the Test Engine Maven Plugin.
-                        // Using these to indicate an issue for this test descriptor
-                        // results in incorrect test run output
-                        // (invalid test counts, tested marked skipped, etc.)
-                        if (executionViaMavenPlugin) {
-                            throwableCollector.addAll(methodTestDescriptor.getThrowableCollector());
-                        }
                     });
         }
 
