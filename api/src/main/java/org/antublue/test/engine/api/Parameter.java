@@ -57,7 +57,7 @@ public interface Parameter {
      * @return the return value
      */
     static Parameter of(String name, Object value) {
-        Objects.requireNonNull(name);
+        Objects.requireNonNull(name, "name is null");
 
         if (name.trim().isEmpty()) {
             throw new IllegalArgumentException("name is empty");
