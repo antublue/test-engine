@@ -208,13 +208,13 @@ https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example
 The `Parameter` interface also has static methods to wrap an Object
 
 
-- `@TestEngine.ParameterSupplier` must return a `Stream<Parameter>`
+- `@TestEngine.ParameterSupplier` must return a `Stream<Parameter>` or `Iterable<Parameter>`
 
 
 - `@TestEngine.Parameter` field is a single `Parameter` object
 
 
-- `@TestEngine.Parameter` methods requires single `Parameter` object as parameter
+- `@TestEngine.Parameter` methods require a single `Parameter` object as a parameter
 
 
 - The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name
@@ -254,7 +254,7 @@ String[] values = parameter.value();
 
 ## What is a `ParameterMap` ?
 
-A `ParameterMap` is `Map` Object that implements the `Parameter` interface
+A `ParameterMap` is specialized `Map` object that allows building a map of keys/values and converting it to a `Parameter`
 
 - It allows you to add keys/values using a fluent pattern
 
@@ -300,6 +300,7 @@ The Test Engine has seven configuration parameters
 | Environment variable | ANTUBLUE_TEST_ENGINE_THREAD_COUNT |
 | System property      | antublue.test.engine.thread.count |
 | Type                 | integer                           |
+| Default              | number of processors              |
 
 <br/>
 
@@ -335,7 +336,6 @@ The Test Engine has seven configuration parameters
 
 <br/>
 
-
 | <nobr>Test class tag include filter</nobr> |                                             |
 |------------------------------------------------|---------------------------------------------|
 | Environment variable                           | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE |
@@ -366,6 +366,7 @@ The Test Engine has seven configuration parameters
 | System property                                 | antublue.test.engine.test.method.tag.exclude |
 | Type                                            | regex string                                 |
 
+<br/>
 Using a combination of the system properties (and/or environment variables) allows for including / excluding individual test classes / test methods
 
 ## Experimental Test Engine Configuration
@@ -465,10 +466,6 @@ Build and test your project...
 ```bash
 mvn clean package integration-test
 ```
-
-**Notes**
-
-- The Test Engine requires core JUnit 5 jars as dependencies
 
 ## Test Engine Summary
 
@@ -571,13 +568,13 @@ for (each test class in the Collection<Class<?>>) {
   
   thread {
   
-    invoke the test class "@TestEngine.ParameterSupplier" method to get a Stream<Parameter>
+    invoke the test class "@TestEngine.ParameterSupplier" method to get a Stream<Parameter> or Iterable<Parameter>
 
     invoke the test class "@TestEngine.BeforeClass" methods 
  
     create a single instance of the test class
     
-    for (each Parameter in the Stream<Parameter>) {
+    for (each Parameter) {
     
       set all test instance "@TestEngine.Parameter" fields to the Parameter object
   
