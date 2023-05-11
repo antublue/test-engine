@@ -526,10 +526,6 @@ IntelliJ doesn't properly display the correct test class display name when a sin
 
 - https://youtrack.jetbrains.com/issue/IDEA-318733/IntelliJ-test-class-display-name-is-incorrect-when-selecting-a-specific-test-class
 
-IntelliJ intermittently doesn't display correct test results. (Tests that were executed are sometimes marked as `skipped`.)
-
-https://youtrack.jetbrains.com/issue/IDEA-319262/IntelliJ-test-output-window-intermittently-displays-incorrect-test-results-for-custom-JUnit-5-based-test-engine
-
 IntelliJ doesn't properly display `System.out` / `System.err` for running tests when "Track Running Tests" is enabled.
 
 - Various reports on https://youtrack.jetbrains.com
