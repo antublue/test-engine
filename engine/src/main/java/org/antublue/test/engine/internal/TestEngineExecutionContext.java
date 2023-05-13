@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Class to implement a TestExecutionContext for multithreaded execution
  */
-public class TestExecutionContext {
+public class TestEngineExecutionContext {
 
     private final ExecutionRequest executionRequest;
     private final CountDownLatch countDownLatch;
@@ -35,7 +35,7 @@ public class TestExecutionContext {
      * @param executionRequest executionRequest
      * @param countDownLatch countDownLatch
      */
-    public TestExecutionContext(ExecutionRequest executionRequest, CountDownLatch countDownLatch) {
+    public TestEngineExecutionContext(ExecutionRequest executionRequest, CountDownLatch countDownLatch) {
         this.executionRequest = executionRequest;
         this.countDownLatch = countDownLatch;
     }

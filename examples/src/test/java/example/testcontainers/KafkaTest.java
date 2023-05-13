@@ -1,6 +1,6 @@
 package example.testcontainers;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -30,44 +30,47 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestEngine.Disabled
 public class KafkaTest {
 
-    private static Network network;
-
-    private Parameter parameter;
-
-    private KafkaContainer kafkaContainer;
-    private String bootstrapServers;
-    private String message;
-
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        return Stream.of(
-                Parameter.of("confluentinc/cp-kafka:7.3.0"),
-                Parameter.of("confluentinc/cp-kafka:7.3.1"),
-                Parameter.of("confluentinc/cp-kafka:7.3.2"),
-                Parameter.of("confluentinc/cp-kafka:7.3.3"));
-    }
+    private KafkaTestState kafkaTestState;
 
     @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        System.out.println(String.format("parameter [%s]", parameter.name()));
-        this.parameter = parameter;
+    private SimpleParameter<String> simpleParameter;
+
+    @TestEngine.ParameterSupplier
+    public static Stream<SimpleParameter<String>> parameters() {
+        return Stream.of(
+                SimpleParameter.of("confluentinc/cp-kafka:7.3.0"),
+                SimpleParameter.of("confluentinc/cp-kafka:7.3.1"),
+                SimpleParameter.of("confluentinc/cp-kafka:7.3.2"),
+                SimpleParameter.of("confluentinc/cp-kafka:7.3.3"));
     }
 
-    @TestEngine.BeforeClass
-    public static void createNetwork() {
+    @TestEngine.Prepare
+    public void prepare() {
+        System.out.println("prepare()");
         System.out.println("createNetwork()");
-        network = Network.newNetwork();
+
+        Network network = Network.newNetwork();
         network.getId();
+
+        kafkaTestState = new KafkaTestState();
+        kafkaTestState.setNetwork(network);
     }
 
     @TestEngine.BeforeAll
-    public void createKafkaServer() {
-        System.out.println("createKafkaServer()");
-        kafkaContainer = new KafkaContainer(DockerImageName.parse(parameter.value(String.class)));
+    public void createKafkaContainer() {
+        System.out.println("createKafkaContainer()");
+
+        Network network = kafkaTestState.getNetwork();
+        String dockerImageName = simpleParameter.value();
+
+        KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse(dockerImageName));
         kafkaContainer.withNetwork(network);
         kafkaContainer.withEmbeddedZookeeper();
         kafkaContainer.start();
-        bootstrapServers = kafkaContainer.getBootstrapServers();
+        kafkaTestState.setKafkaContainer(kafkaContainer);
+
+        String bootstrapServers = kafkaContainer.getBootstrapServers();
+        kafkaTestState.setBootstrapServers(bootstrapServers);
     }
 
     @TestEngine.Test
@@ -78,8 +81,11 @@ public class KafkaTest {
     }
 
     private void produce() throws Throwable {
-        message = randomString(16);
+        String message = randomString(16);
         System.out.println(String.format("produce message [%s]", message));
+        kafkaTestState.setMessage(message);
+
+        String bootstrapServers = kafkaTestState.getBootstrapServers();
 
         Properties properties = new Properties();
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -94,15 +100,17 @@ public class KafkaTest {
             producer.send(producerRecord).get();
         } finally {
             if (producer != null) {
-                producer.flush();
                 producer.close();
             }
         }
     }
 
-    private void consume() throws Throwable {
+    private void consume() {
         String groupId = "test-group-id";
         String topic = "test";
+
+        String message = kafkaTestState.getMessage();
+        String bootstrapServers = kafkaTestState.getBootstrapServers();
 
         Properties properties = new Properties();
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -122,7 +130,7 @@ public class KafkaTest {
 
             ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
             for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
-                System.out.println(String.format("consume message key [%s] value [%s]", consumerRecord.key(), consumerRecord.value()));
+                System.out.println(String.format("consume message [%s]", consumerRecord.value()));
                 assertThat(consumerRecord.value()).isEqualTo(message);
             }
         } finally {
@@ -133,20 +141,16 @@ public class KafkaTest {
     }
 
     @TestEngine.AfterAll
-    public void destroyKafkaServer() {
-        System.out.println("destroyKafkaServer()");
-        if (kafkaContainer != null) {
-            kafkaContainer.stop();
-            kafkaContainer.close();
-        }
+    public void cleanupKafkaContainer() {
+        System.out.println("cleanupKafkaContainer()");
+        kafkaTestState.reset();
     }
 
-    @TestEngine.AfterClass
-    public static void destroyNetwork() {
-        System.out.println("destroyNetwork()");
-        if (network != null) {
-            network.close();
-        }
+    @TestEngine.Conclude
+    public void conclude() {
+        System.out.println("conclude()");
+        System.out.println("cleanupNetwork()");
+        kafkaTestState.dispose();
     }
 
     private static String randomString(int length) {
@@ -155,5 +159,61 @@ public class KafkaTest {
                 .limit(length)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
+    }
+
+    private static class KafkaTestState {
+
+        private Network network;
+        private KafkaContainer kafkaContainer;
+        private String bootstrapServers;
+        private String message;
+
+        public void setNetwork(Network network) {
+            this.network = network;
+        }
+
+        public Network getNetwork() {
+            return network;
+        }
+
+        public void setKafkaContainer(KafkaContainer kafkaContainer) {
+            this.kafkaContainer = kafkaContainer;
+        }
+
+        public KafkaContainer getKafkaContainer() {
+            return kafkaContainer;
+        }
+
+        public void setBootstrapServers(String bootstrapServers) {
+            this.bootstrapServers = bootstrapServers;
+        }
+
+        public String getBootstrapServers() {
+            return bootstrapServers;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void reset() {
+            if (kafkaContainer != null) {
+                kafkaContainer.close();
+                kafkaContainer = null;
+            }
+        }
+
+        public void dispose() {
+            if (network != null) {
+                network.close();;
+                network = null;
+            }
+
+            reset();
+        }
     }
 }

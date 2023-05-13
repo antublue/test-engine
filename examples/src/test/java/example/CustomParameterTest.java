@@ -11,24 +11,19 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@SuppressWarnings("unchecked")
 public class CustomParameterTest {
 
-    private CustomParameter parameter;
+    @TestEngine.Parameter
+    private CustomParameter customParameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
+    public static Stream<CustomParameter> parameters() {
+        Collection<CustomParameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
             collection.add(CustomParameter.of("CustomParameter(" + i + ") = " + value, String.valueOf(value)));
         }
         return collection.stream();
-    }
-
-    @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        this.parameter = (CustomParameter) parameter;
     }
 
     @TestEngine.BeforeAll
@@ -38,12 +33,12 @@ public class CustomParameterTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter.value() + ")");
+        System.out.println("test1(" + customParameter.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameter.value() + ")");
+        System.out.println("test2(" + customParameter.value() + ")");
     }
 
     @TestEngine.AfterAll
@@ -66,14 +61,8 @@ public class CustomParameterTest {
             return name;
         }
 
-        @Override
-        public <T> T value() {
-            return (T) value;
-        }
-
-        @Override
-        public <T> T value(Class<T> clazz) {
-            return clazz.cast(value());
+        public String value() {
+            return value;
         }
 
         public static CustomParameter of(String name, String value) {

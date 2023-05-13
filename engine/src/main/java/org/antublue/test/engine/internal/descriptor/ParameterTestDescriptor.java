@@ -17,8 +17,8 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.internal.TestEngineExecutionContext;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
-import org.antublue.test.engine.internal.TestExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
@@ -29,7 +29,6 @@ import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
@@ -116,54 +115,30 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
     /**
      * Method to test the test descriptor
      *
-     * @param testExecutionContext testExecutionContext
+     * @param testEngineExecutionContext testEngineExecutionContext
      */
-    public void execute(TestExecutionContext testExecutionContext) {
+    public void execute(TestEngineExecutionContext testEngineExecutionContext) {
         ThrowableCollector throwableCollector = getThrowableCollector();
 
         EngineExecutionListener engineExecutionListener =
-                testExecutionContext.getExecutionRequest().getEngineExecutionListener();
+                testEngineExecutionContext.getExecutionRequest().getEngineExecutionListener();
 
         engineExecutionListener.executionStarted(this);
 
-        final Object testInstance = testExecutionContext.getTestInstance();
+        final Object testInstance = testEngineExecutionContext.getTestInstance();
         final Class<?> testClass = testInstance.getClass();
         final String testClassName = testClass.getName();
 
         try {
-            testExecutionContext.setTestInstance(testInstance);
+            testEngineExecutionContext.setTestInstance(testInstance);
 
-            LOGGER.trace("injecting [%s] @TestEngine.Parameter fields ...", testClassName);
+            LOGGER.trace("injecting [%s] @TestEngine.Parameter field ...", testClassName);
 
-            TestEngineReflectionUtils
-                    .getParameterFields(testClass)
-                    .forEach((ThrowableConsumer<Field>) field -> {
-                        LOGGER.trace(
-                                "injecting [%s] @TestEngine.Parameter field [%s] ...",
-                                testClassName,
-                                field.getName());
-                        try {
-                            field.set(testInstance, testParameter);
-                        } finally {
-                            flush();
-                        }
-                    });
-
-            LOGGER.trace("invoking [%s] @TestEngine.Parameter methods ...", testClassName);
-
-            TestEngineReflectionUtils
-                    .getParameterMethods(testClass)
-                    .forEach((ThrowableConsumer<Method>) method -> {
-                        LOGGER.trace(
-                                "invoking [%s] @TestEngine.Parameter method [%s] ...",
-                                testClassName,
-                                method.getName());
-                        try {
-                            method.invoke(testInstance, testParameter);
-                        } finally {
-                            flush();
-                        }
-                    });
+            try {
+                 TestEngineReflectionUtils.getParameterField(testClass).set(testInstance, testParameter);
+            } finally {
+                flush();
+            }
         } catch (Throwable t) {
             t = pruneStackTrace(t, testClassName);
             t.printStackTrace();
@@ -193,19 +168,17 @@ public final class ParameterTestDescriptor extends ExtendedAbstractTestDescripto
 
             if (!throwableCollector.isEmpty()) {
                 getChildren(MethodTestDescriptor.class)
-                        .forEach(methodTestDescriptor -> methodTestDescriptor.skip(testExecutionContext));
+                        .forEach(methodTestDescriptor -> methodTestDescriptor.skip(testEngineExecutionContext));
             }
 
         } else {
             getChildren(MethodTestDescriptor.class)
-                    .forEach(methodTestDescriptor -> methodTestDescriptor.skip(testExecutionContext));
+                    .forEach(methodTestDescriptor -> methodTestDescriptor.skip(testEngineExecutionContext));
         }
 
         if (throwableCollector.isEmpty()) {
             getChildren(MethodTestDescriptor.class)
-                    .forEach(methodTestDescriptor -> {
-                        methodTestDescriptor.execute(testExecutionContext);
-                    });
+                    .forEach(methodTestDescriptor -> methodTestDescriptor.execute(testEngineExecutionContext));
         }
 
         try {

@@ -7,7 +7,7 @@
 
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>3.2.1</version>
+    <version>4.0.0</version>
     <packaging>jar</packaging>
     <name>AntuBLUE Test Engine API</name>
 
@@ -222,7 +222,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>10.9.3</version>
+                        <version>10.11.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>

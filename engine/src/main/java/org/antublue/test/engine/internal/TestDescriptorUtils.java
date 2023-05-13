@@ -75,6 +75,7 @@ public final class TestDescriptorUtils {
                             clazz.getName()));
         }
 
+        /*
         if (TestEngineReflectionUtils.getParameterFields(clazz).isEmpty()
             && TestEngineReflectionUtils.getParameterMethods(clazz).isEmpty()) {
             throw new TestClassConfigurationException(
@@ -82,6 +83,7 @@ public final class TestDescriptorUtils {
                             "Test class [%s] must declare a @TestEngine.Parameter field or method",
                             clazz.getName()));
         }
+        */
 
         return new ParameterTestDescriptor(uniqueId, parameter.name(), clazz, parameter);
     }

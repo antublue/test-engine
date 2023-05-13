@@ -16,8 +16,8 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import org.antublue.test.engine.internal.TestEngineExecutionContext;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
-import org.antublue.test.engine.internal.TestExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
@@ -104,36 +104,39 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
     /**
      * Method to test the test descriptor
      *
-     * @param testExecutionContext testExecutionContext
+     * @param testEngineExecutionContext testEngineExecutionContext
      */
-    public void execute(TestExecutionContext testExecutionContext) {
+    public void execute(TestEngineExecutionContext testEngineExecutionContext) {
         ThrowableCollector throwableCollector = getThrowableCollector();
 
         EngineExecutionListener engineExecutionListener =
-                testExecutionContext.getExecutionRequest().getEngineExecutionListener();
+                testEngineExecutionContext.getExecutionRequest().getEngineExecutionListener();
 
         engineExecutionListener.executionStarted(this);
 
         String testClassName = testClass.getName();
-        Object testInstance;
+        Object testInstance = null;
 
         try {
-            testInstance = testClass.getDeclaredConstructor((Class<?>[]) null).newInstance((Object[]) null);
-            testExecutionContext.setTestInstance(testInstance);
+            LOGGER.trace("creating class [%s]", testClassName);
+            try {
+                testInstance = testClass.getDeclaredConstructor((Class<?>[]) null).newInstance((Object[]) null);
+                testEngineExecutionContext.setTestInstance(testInstance);
+            } finally {
+                flush();
+            }
 
-            LOGGER.trace("invoking [%s] @TestEngine.BeforeClass methods ...", testClassName);
+            final Object finalTestInstance = testInstance;
 
             TestEngineReflectionUtils
-                    .getBeforeClassMethods(testClass)
+                    .getPrepareMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
                         LOGGER.trace(
-                                String.format(
-                                        "invoking [%s] @TestEngine.BeforeClass method [%s] ...",
-                                        testClassName,
-                                        method.getName()));
-
+                                "invoking [%s] @TestEngine.Prepare method [%s] ...",
+                                testClassName,
+                                method.getName());
                         try {
-                            method.invoke(null, (Object[]) null);
+                            method.invoke(finalTestInstance, (Object[]) null);
                         } finally {
                             flush();
                         }
@@ -146,32 +149,30 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         if (throwableCollector.isEmpty()) {
             getChildren(ParameterTestDescriptor.class)
-                    .forEach(parameterTestDescriptor -> {
-                        parameterTestDescriptor.execute(testExecutionContext);
-                    });
+                    .forEach(parameterTestDescriptor -> parameterTestDescriptor.execute(testEngineExecutionContext));
         } else {
             getChildren(ParameterTestDescriptor.class)
-                    .forEach(parameterTestDescriptor -> parameterTestDescriptor.skip(testExecutionContext));
+                    .forEach(parameterTestDescriptor -> parameterTestDescriptor.skip(testEngineExecutionContext));
         }
 
         try {
-            LOGGER.trace("invoking [%s] @TestEngine.AfterClass methods ...", testClassName);
+            if (testInstance != null) {
+                final Object finalTestInstance = testInstance;
 
-            TestEngineReflectionUtils
-                    .getAfterClassMethods(testClass)
-                    .forEach((ThrowableConsumer<Method>) method -> {
-                        LOGGER.trace(
-                                String.format(
-                                        "invoking [%s] @TestEngine.AfterClass method [%s] ...",
-                                        testClassName,
-                                        method.getName()));
-
-                        try {
-                            method.invoke(null, (Object[]) null);
-                        } finally {
-                            flush();
-                        }
-                    });
+                TestEngineReflectionUtils
+                        .getConcludeMethods(testClass)
+                        .forEach((ThrowableConsumer<Method>) method -> {
+                            LOGGER.trace(
+                                    "invoking [%s] @TestEngine.Conclude method [%s] ...",
+                                    testClassName,
+                                    method.getName());
+                            try {
+                                method.invoke(finalTestInstance, (Object[]) null);
+                            } finally {
+                                flush();
+                            }
+                        });
+            }
         } catch (Throwable t) {
             t = pruneStackTrace(t, testClassName);
             t.printStackTrace();
@@ -190,7 +191,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         }
 
-        testExecutionContext.setTestInstance(null);
-        testExecutionContext.getCountDownLatch().countDown();
+        testEngineExecutionContext.setTestInstance(null);
+        testEngineExecutionContext.getCountDownLatch().countDown();
     }
 }

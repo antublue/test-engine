@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import org.antublue.test.engine.internal.TestExecutionContext;
+import org.antublue.test.engine.internal.TestEngineExecutionContext;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.antublue.test.engine.internal.util.ThrowableConsumerException;
 import org.junit.platform.engine.TestDescriptor;
@@ -130,20 +130,20 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     /**
      * Method to test the TestDescriptor
      *
-     * @param testExecutionContext testExecutionContext
+     * @param testEngineExecutionContext testEngineExecutionContext
      */
-    public abstract void execute(TestExecutionContext testExecutionContext);
+    public abstract void execute(TestEngineExecutionContext testEngineExecutionContext);
 
     /**
      * Method to skip the TestDescriptor's children, then the TestDescriptor (recursively)
      *
-     * @param testExecutionContext testExecutionContext
+     * @param testEngineExecutionContext testEngineExecutionContext
      */
-    public void skip(TestExecutionContext testExecutionContext) {
+    public void skip(TestEngineExecutionContext testEngineExecutionContext) {
         getChildren(ExtendedAbstractTestDescriptor.class).forEach(
-                testDescriptor -> testDescriptor.skip(testExecutionContext));
+                testDescriptor -> testDescriptor.skip(testEngineExecutionContext));
 
-        testExecutionContext
+        testEngineExecutionContext
                 .getExecutionRequest()
                 .getEngineExecutionListener()
                 .executionSkipped(this, "Skipped");

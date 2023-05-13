@@ -1,7 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.api.ParameterMap;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -11,26 +10,18 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class ParameterMapTest {
-
-    private ParameterMap parameterMap;
-
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            collection.add(
-                    ParameterMap
-                            .named("Map[" + i + "]")
-                            .put("key", i)
-                            .parameter());
-        }
-        return collection.stream();
-    }
+public class SimpleParameterOfDoubleTest {
 
     @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        parameterMap = parameter.value();
+    private SimpleParameter<Double> simpleParameter;
+
+    @TestEngine.ParameterSupplier
+    public static Stream<SimpleParameter<Double>> parameters() {
+        Collection<SimpleParameter<Double>> collection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            collection.add(SimpleParameter.of(i + 0.1d));
+        }
+        return collection.stream();
     }
 
     @TestEngine.BeforeAll
@@ -40,13 +31,13 @@ public class ParameterMapTest {
 
     @TestEngine.Test
     public void test1() {
-        int value = parameterMap.get("key");
+        double value = simpleParameter.value();
         System.out.println("test1(" + value + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        int value = parameterMap.get("key");
+        double value = simpleParameter.value();
         System.out.println("test2(" + value + ")");
     }
 

@@ -1,6 +1,6 @@
 package example.tag;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -9,25 +9,23 @@ import java.util.stream.Stream;
 
 /**
  * Example test
+ *
+ * All test methods are executed due to the fact that the test engine system
+ * properties / environment variables have to be defined during test discovery
  */
-
 public class TaggedMethodTag1Test {
 
-    private Parameter parameter;
+    @TestEngine.Parameter
+    private SimpleParameter<String> simpleParameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
+    public static Stream<SimpleParameter<String>> parameters() {
+        Collection<SimpleParameter<String>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(Parameter.of(String.valueOf(value)));
+            collection.add(SimpleParameter.of(String.valueOf(value)));
         }
         return collection.stream();
-    }
-
-    @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        this.parameter = parameter;
     }
 
     @TestEngine.BeforeAll
@@ -38,17 +36,17 @@ public class TaggedMethodTag1Test {
     @TestEngine.Test
     @TestEngine.Tag("/tag1/")
     public void test1() {
-        System.out.println("test1(" + parameter.value() + ")");
+        System.out.println("test1(" + simpleParameter.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameter.value() + ")");
+        System.out.println("test2(" + simpleParameter.value() + ")");
     }
 
     @TestEngine.Test
     public void test3() {
-        System.out.println("test3(" + parameter.value() + ")");
+        System.out.println("test3(" + simpleParameter.value() + ")");
     }
 
     @TestEngine.AfterAll
