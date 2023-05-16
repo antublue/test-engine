@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -22,33 +22,32 @@ public class CamelCaseFunctionTest {
 
     private Tuple tuple;
 
+    @TestEngine.Parameter
+    private SimpleParameter<Tuple> simpleParameter;
+
     @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
+    public static Stream<SimpleParameter<Tuple>> parameters() {
+        Collection<SimpleParameter<Tuple>> collection = new ArrayList<>();
 
         Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Parameter.of(tuple.input, tuple));
+        collection.add(new SimpleParameter<Tuple>(tuple.input, tuple));
 
         tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Parameter.of(tuple.input, tuple));
+        collection.add(new SimpleParameter<Tuple>(tuple.input, tuple));
 
         tuple = new Tuple("THIS", "this");
-        collection.add(Parameter.of(tuple.input, tuple));
+        collection.add(new SimpleParameter<Tuple>(tuple.input, tuple));
 
         tuple = new Tuple("tHis", "this");
-        collection.add(Parameter.of(tuple.input, tuple));
+        collection.add(new SimpleParameter<Tuple>(tuple.input, tuple));
 
         return collection.stream();
-    }
-
-    @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        tuple = parameter.value();
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
+        tuple = simpleParameter.value();
     }
 
     @TestEngine.Test

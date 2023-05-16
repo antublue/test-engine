@@ -19,7 +19,7 @@ package org.antublue.test.engine.api.source;
 import com.univocity.parsers.common.processor.RowListProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -53,7 +53,7 @@ public final class CsvSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<Parameter> of(File file, Charset charset) throws IOException {
+    public static Stream<SimpleParameter<String[]>> of(File file, Charset charset) throws IOException {
         try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
             return of(inputStream, charset);
         }
@@ -66,7 +66,7 @@ public final class CsvSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<Parameter> of(Reader reader) throws IOException {
+    public static Stream<SimpleParameter<String[]>> of(Reader reader) throws IOException {
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.setLineSeparatorDetectionEnabled(true);
         RowListProcessor rowListProcessor = new RowListProcessor();
@@ -85,7 +85,7 @@ public final class CsvSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<Parameter> of(InputStream inputStream, Charset charset) throws IOException {
+    public static Stream<SimpleParameter<String[]>> of(InputStream inputStream, Charset charset) throws IOException {
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.setLineSeparatorDetectionEnabled(true);
         RowListProcessor rowListProcessor = new RowListProcessor();
@@ -96,16 +96,16 @@ public final class CsvSource {
         return process(rowListProcessor);
     }
 
-    private static Stream<Parameter> process(RowListProcessor rowListProcessor) {
-        List<Parameter> list = new ArrayList<>();
+    private static Stream<SimpleParameter<String[]>> process(RowListProcessor rowListProcessor) {
+        List<SimpleParameter<String[]>> list = new ArrayList<>();
 
         // Add the header row
-        list.add(Parameter.of("header", rowListProcessor.getHeaders()));
+        list.add(new SimpleParameter<>("header", rowListProcessor.getHeaders()));
 
         AtomicInteger index = new AtomicInteger(1);
         rowListProcessor
                 .getRows()
-                .forEach(strings -> list.add(Parameter.of("row[" + index.getAndIncrement() + "]", strings)));
+                .forEach(strings -> list.add(new SimpleParameter<>("row[" + index.getAndIncrement() + "]", strings)));
 
         return list.stream();
     }

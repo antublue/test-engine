@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -12,16 +12,12 @@ import java.util.stream.Stream;
  */
 public class DisabledMethodTest {
 
-    private Parameter parameter;
+    @TestEngine.Parameter
+    private SimpleParameter<String> simpleParameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
+    public static Stream<SimpleParameter<String>> parameters() {
         return StringParameterSupplier.parameters();
-    }
-
-    @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        this.parameter = parameter;
     }
 
     @TestEngine.BeforeAll
@@ -36,13 +32,13 @@ public class DisabledMethodTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter + ")");
+        System.out.println("test1(" + simpleParameter + ")");
     }
 
     @TestEngine.Disabled
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameter + ")");
+        System.out.println("test2(" + simpleParameter + ")");
     }
 
     @TestEngine.AfterEach
@@ -57,10 +53,10 @@ public class DisabledMethodTest {
 
     private static class StringParameterSupplier {
 
-        public static Stream<Parameter> parameters() {
-            Collection<Parameter> collection = new ArrayList<>();
+        public static Stream<SimpleParameter<String>> parameters() {
+            Collection<SimpleParameter<String>> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(Parameter.of(String.valueOf(i)));
+                collection.add(SimpleParameter.of(String.valueOf(i)));
             }
             return collection.stream();
         }

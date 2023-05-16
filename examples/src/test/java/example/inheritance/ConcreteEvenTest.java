@@ -1,6 +1,6 @@
 package example.inheritance;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.stream.Stream;
@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConcreteEvenTest extends EvenBaseTest {
 
     @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
+    public static Stream<SimpleParameter<Integer>> parameters() {
         return EvenBaseTest.parameters();
     }
 
@@ -21,14 +21,14 @@ public class ConcreteEvenTest extends EvenBaseTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter.value() + ")");
-        assertThat((Integer) parameter.value() % 2).isEven();
+        System.out.println("test1(" + simpleParameter.value() + ")");
+        assertThat((Integer) simpleParameter.value() % 2).isEven();
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameter.value() + ")");
-        assertThat((Integer) parameter.value() % 2).isEven();
+        System.out.println("test2(" + simpleParameter.value() + ")");
+        assertThat((Integer) simpleParameter.value() % 2).isEven();
     }
 
     @TestEngine.AfterEach

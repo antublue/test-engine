@@ -10,7 +10,11 @@ The Test Engine is a JUnit 5 based test engine designed specifically for paramet
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v3.2.0](https://github.com/antublue/test-engine/releases/tag/v3.2.0)
+- General Availability (GA): [Test Engine v4.0.0](https://github.com/antublue/test-engine/releases/tag/v4.0.0)
+
+**Notes**
+
+- v3.x.x tests will have to be migrated to v4.x.x
 
 ## Goals
 
@@ -24,13 +28,10 @@ The Test Engine is not meant to replace JUnit for unit tests.
 
 Currently, JUnit 5 does not support parameterized tests at the test class level (common for parameterized integration testing)
 
-- https://github.com/junit-team/junit5/issues/878
+- https://github.com/junit-team/junit5/issues/878 (Open since 2017-06-09)
 
 
-- The JUnit team is working on the functionality, but it's not clear if it will satisfy the common parameterized integration testing use cases (2023-04-18)
-
-
-- It doesn't provide annotations to run static methods before/after the class **and** instance methods before/after all tests in a test class (2023-04-18)
+- It doesn't provide annotations to run methods before and after all tests and before / after a test parameter (2023-04-18)
 
 
 - It doesn't provide the summary information typically wanted for parameterized integration testing
@@ -39,7 +40,10 @@ Currently, JUnit 5 does not support parameterized tests at the test class level 
 
 Junit 4 does provide test class level parameterization via `@RunWith(Parameterized.class)`
 
-- It doesn't provide annotations to run static methods before/after the class **and** instance methods before/after all tests in a test class
+- It doesn't provide annotations to run methods before and after all tests and before / after a test parameter
+
+
+- It uses a test class constructor approach, limiting you to Java inheritance semantics (superclass before subclass construction)
 
 
 - It doesn't provide the summary information typically wanted for parameterized integration testing
@@ -60,13 +64,13 @@ Parameterized integration testing is most common when you...
 
 A text book example...
 
-1. You have developed a networked based application: ApplicationX
+1. You have developed a networked based application using Docker: ApplicationX
 
 
 2. You want to test that the behavior of the ApplicationX is various runtime environments
 
 
-3. You want to test workflow scenarios
+3. You want to reuse the Docker network for performance reasons
 
 
 The parameters in this scenario are the various runtime environments
@@ -77,26 +81,25 @@ A reference example...
 
 https://github.com/antublue/test-engine/blob/main/examples/src/test/java/example/testcontainers/KafkaTest.java
 
-This test is testing functionality of an Apache Kafka Producer and Consumer against four Apache Kafka servers.
+This test is testing functionality of an Apache Kafka Producer and Consumer against four Confluent Platform server versions
 
-- The test is very basic, with a single test method that declare the logic client logic, but you could test multiple scenarios using ordered test methods
+- The test is very basic, with a single test method that declare the logic client prooduce / consume logic, but you could test multiple scenarios using ordered test methods
 
-
-- This example is really testing Apache Kafka
+- Test state between methods is stored in a `KafkaTestState` object
 
 ## Common Test Annotations
 
-| Annotation                      | Scope             | Required                               | Static | Example Method                                                                                                                  |
-|---------------------------------|-------------------|----------------------------------------|--------|---------------------------------------------------------------------------------------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | method            | yes                                    | yes    | <nobr>`public static Stream<Parameter> parameters();`</nobr><br/><nobr>`public static Iterable<Parameter> parameters();`</nobr> |
-| `@TestEngine.Parameter`         | field<br/> method | yes <br/><nobr>(either or both)</nobr> | no     | `public Parameter parameter;`<br/> `public void parameter(Parameter parameter);`                                                |
-| `@TestEngine.BeforeClass`       | method            | no                                     | yes    | `public static void beforeClass();`                                                                                             |
-| `@TestEngine.BeforeAll`         | method            | no                                     | no     | `public void beforeAll();`                                                                                                      |
-| `@TestEngine.BeforeEach`        | method            | no                                     | no     | `public void beforeEach();`                                                                                                     |
-| `@TestEngine.Test`              | method            | yes                                    | no     | `public void test();`                                                                                                           |
-| `@TestEngine.AfterEach`         | method            | no                                     | no     | `public void afterEach();`                                                                                                      |
-| `@TestEngine.AfterAll`          | method            | no                                     | no     | `public void afterAll();`                                                                                                       |
-| `@TestEngine.AfterClass`        | method            | no                                     | yes    | `public static void afterClass();`                                                                                              |
+| Annotation                      | Static | Type   | Required | Example                                                                                                                                                                                |
+|---------------------------------|--------|--------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.ParameterSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Parameter]> parameters();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Parameter]> parameters();`</nobr> |
+| `@TestEngine.Parameter`         | no     | field  | yes      | `public Parameter parameter;`                                                                                                                                                          |
+| `@TestEngine.Prepare`           | no     | method | no       | `public void prepare();`                                                                                                                                                               | `public void prepare();`                                                         |
+| `@TestEngine.BeforeAll`         | no     | method | no       | `public void beforeAll();`                                                                                                                                                             |
+| `@TestEngine.BeforeEach`        | no     | method | no       | `public void beforeEach();`                                                                                                                                                            |
+| `@TestEngine.Test`              | no     | method | yes      | `public void test();`                                                                                                                                                                  |
+| `@TestEngine.AfterEach`         | no     | method | no       | `public void afterEach();`                                                                                                                                                             |
+| `@TestEngine.AfterAll`          | no     | method | no       | `public void afterAll();`                                                                                                                                                              |
+| `@TestEngine.Conclude`          | no     | method | no       | `public void conclude();`                                                                                                                                                              |
 
 Reference the [Design](https://github.com/antublue/test-engine#design) for the state machine flow
 
@@ -112,7 +115,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
   - Methods are sorted by the annotation value first, then alphabetically by the test method name
     - In scenarios where `@TestEngine.Order` values are duplicated, methods with the same name are sorted alphabetically
     - The test method name can be changed by using the `@TestEngine.DisplayName` annotation
-  - Method order is relative to other methods with the same annotation
+  - Method order is relative to other methods with the same annotation regardless of superclass / subclass location
 
 ## Additional Test Annotations
 
@@ -138,10 +141,10 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 ## Usage Example
 
 ```java
-package org.antublue.test.engine.test.example;
+package example;
 
-import api.org.antublue.test.engine.Parameter;
-import api.org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.api.SimpleParameter;
+import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -150,25 +153,23 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class ParameterTest {
-
-  private Parameter parameter;
-
-  @TestEngine.ParameterSupplier
-  public static Stream<Parameter> parameters() {
-    Collection<Parameter> collection = new ArrayList<>();
-
-    for (int i = 0; i < 10; i++) {
-      int value = i * 3;
-      collection.add(Parameter.of("parameter(" + i + ") = " + value, String.valueOf(value)));
-    }
-
-    return collection.stream();
-  }
+public class ExampleTest {
 
   @TestEngine.Parameter
-  public void parameter(Parameter parameter) {
-    this.parameter = parameter;
+  private SimpleParameter<String> simpleParameter;
+
+  @TestEngine.ParameterSupplier
+  public static Stream<SimpleParameter<String>> parameters() {
+    Collection<SimpleParameter<String>> collection = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+      collection.add(SimpleParameter.of("String " + i));
+    }
+    return collection.stream();
+  }
+  
+  @TestEngine.Prepare
+  public void prepare() {
+      // Create any global class state
   }
 
   @TestEngine.BeforeAll
@@ -178,17 +179,24 @@ public class ParameterTest {
 
   @TestEngine.Test
   public void test1() {
-    System.out.println("test1(" + parameter.value() + ")");
+    String value = simpleParameter.value();
+    System.out.println("test1(" + value + ")");
   }
 
   @TestEngine.Test
   public void test2() {
-    System.out.println("test2(" + parameter.value() + ")");
+    String value = simpleParameter.value();
+    System.out.println("test2(" + value + ")");
   }
 
   @TestEngine.AfterAll
   public void afterAll() {
     System.out.println("afterAll()");
+  }
+  
+  @TestEnging.Conclude
+  public void conclude() {
+    // Clean up any global class state
   }
 }
 ```
@@ -203,21 +211,14 @@ https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example
 
 ## What is a `Parameter`?
 
-`Parameter` is an interface all parameter objects must implement to allow for parameter name and value resolution
+`Parameter` is an interface all parameter objects must implement to provide a name
 
-The `Parameter` interface also has static methods to wrap an Object
+## What is a `SimpleParameter`?
 
-
-- `@TestEngine.ParameterSupplier` must return a `Stream<Parameter>` or `Iterable<Parameter>`
-
-
-- `@TestEngine.Parameter` field is a single `Parameter` object
+- The `SimpleParameter` class is a `Parameter` implementation that allows you to pass an Object as a parameter value
 
 
-- `@TestEngine.Parameter` methods require a single `Parameter` object as a parameter
-
-
-- The `Parameter` interface defines various static methods to wrap basic Java types, using the value as the name
+- The `SimpleParameter` class defines various static methods to wrap native Java types, using the value as the name
   - `boolean`
   - `byte`
   - `char`
@@ -231,48 +232,49 @@ The `Parameter` interface also has static methods to wrap an Object
 Example
 
 ```java
+@TestEngine.Parameter
+public SimpleParameter<String[]> simpleParameter;
+
 @TestEngine.ParameterSupplier
-public static Stream<Parameter> parameters() {
-  Collection<Parameter> collection = new ArrayList<>();
+public static Stream<SimpleParameter<String[]>> parameters() {
+  Collection<SimpleParameter<String[]>> collection = new ArrayList<>();
   
   for (int i = 0; i < 10; i++) {
     collection.add(
-      Parameter.of(
+      new SimpleParameter<(
         "Array [" + i + "]", // name
-          new String[] { String.valueOf(i), String.valueOf(i * 2) })); // value
+        new String[] { String.valueOf(i), String.valueOf(i * 2) })); // value
   }
   
   return collection.stream();
 }
 ```
 
-In this scenario, the value of the `Parameter` is a String[] array
+In this scenario, the value of the `SimpleParameter` is a `String[]`
 
 ```java
 String[] values = parameter.value();
 ```
 
-## What is a `ParameterMap` ?
+## What is a `MapParameteer` ?
 
-A `ParameterMap` is specialized `Map` object that allows building a map of keys/values and converting it to a `Parameter`
+A `MapParameteer` is a `Parameter` implementation that can store key / value Objects 
+
 
 - It allows you to add keys/values using a fluent pattern
 
 
-- It allows you to get a value casted to a specific type
+- It allows you to get a value cast to a specific type
 
 
 ```java
 @TestEngine.ParameterSupplier
-public static Stream<Parameter> parameters() {
-  Collection<Parameter> collection = new ArrayList<>();
+public static Stream<MapParameter> parameters() {
+  Collection<MapParameter> collection = new ArrayList<>();
 
   for (int i = 0; i < 10; i++) {
     collection.add(
-      ParameterMap
-        .named("Map[" + i + "]")
-        .put("key", i)
-        .parameter());
+      new MapParameter("Map[" + i + "]").put("value1", i).put("value2", i * 2);
   }
 
   return collection.stream();
@@ -280,14 +282,13 @@ public static Stream<Parameter> parameters() {
 ```
 
 ```java
-String value = parameterMap.get("key");
+int value1 = mapParameter.get("value1");
+int value2 = mapParameter.get("value2");
 ```
 
-```java
-if (parameterMap.get("key", String.class).length() == 0) {
-    // handle empty string
-}
-```
+**Notes**
+
+- `MapParameter` is provided as a quick convenience `Parameter`, but ideally you should create a custom `Parameter` Object
 
 ## Test Engine Configuration
 
@@ -304,7 +305,7 @@ The Test Engine has seven configuration parameters
 
 <br/>
 
-| <nobr>Test class name include filter</nobr> |                                         |
+| <nobr>Test class name include filter</nobr> |                                          |
 |-------------------------------------------------|-----------------------------------------|
 | Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE |
 | System property                                 | antublue.test.engine.test.class.include |
@@ -427,7 +428,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>3.2.0</version>
+  <version>4.0.0</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -446,12 +447,12 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>3.2.0</version>
+    <version>4.0.0</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>3.2.0</version>
+    <version>4.0.0</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -473,7 +474,7 @@ When running via Maven in a Linux console, the Test Engine will report a summary
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v3.2.0 Summary
+[INFO] AntuBLUE Test Engine v4.0.0 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes    :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
 [INFO] Test Parameters : 119, PASSED : 119, FAILED : 0, SKIPPED : 0
@@ -557,7 +558,7 @@ For changes, you should...
 
 ## Design
 
-The test execution flow...
+Logical test execution flow...
 
 ```
 Scan all classpath jars for test classes that contains a method annotated with "@TestEngine.Test"
@@ -570,16 +571,14 @@ for (each test class in the Collection<Class<?>>) {
   
     invoke the test class "@TestEngine.ParameterSupplier" method to get a Stream<Parameter> or Iterable<Parameter>
 
-    invoke the test class "@TestEngine.BeforeClass" methods 
- 
-    create a single instance of the test class
+    create a single instance of the test class  
+
+    invoke the test instance "@TestEngine.Prepare" methods 
     
     for (each Parameter) {
     
       set all test instance "@TestEngine.Parameter" fields to the Parameter object
-  
-      invoke all test instance "@TestEngine.Parameter" methods with the Parameter object
-      
+       
       invoke all test instance "@TestEngine.BeforeAll" methods
       
       for (each "@TestEngine.Test" method in the test class) {
@@ -594,7 +593,7 @@ for (each test class in the Collection<Class<?>>) {
       invoke all test instance "@TestEngine.AfterAll" methods
     }
     
-    invoke all test class "@TestEngine.AfterClass" methods
+    invoke all test instance "@TestEngine.Conclude" methods
   }
 }
 ```

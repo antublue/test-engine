@@ -27,12 +27,6 @@ import java.lang.annotation.Target;
  * Interface that contains all TestEngine annotations
  */
 public @interface TestEngine {
-    
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD, ElementType.METHOD })
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface Parameter {
-
-    }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
@@ -40,9 +34,15 @@ public @interface TestEngine {
 
     }
 
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Parameter {
+
+    }
+
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
-    @interface BeforeClass {
+    @interface Prepare {
 
     }
 
@@ -79,7 +79,7 @@ public @interface TestEngine {
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
-    @interface AfterClass {
+    @interface Conclude {
 
     }
 

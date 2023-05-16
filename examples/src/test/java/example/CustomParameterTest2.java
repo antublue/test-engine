@@ -14,26 +14,20 @@ import java.util.stream.Stream;
 @SuppressWarnings("unchecked")
 public class CustomParameterTest2 {
 
-    private Long value;
+    @TestEngine.Parameter
+    private CustomParameter customParameter;
 
     @TestEngine.ParameterSupplier
     public static Stream<Parameter> parameters() {
         Collection<Parameter> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            long value = i * 3;
-            collection.add(CustomParameter.of("CustomParameter(" + i + ") = " + value, value));
+            collection.add(
+                    CustomParameter.of(
+                            "CustomParameter(" + i + ")",
+                            "FirstName" + i,
+                            "LastName" + i));
         }
         return collection.stream();
-    }
-
-    @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        value = parameter.value(Long.class);
-    }
-
-    @TestEngine.BeforeClass
-    public static void beforeClass() {
-        System.out.println("beforeClass()");
     }
 
     @TestEngine.BeforeAll
@@ -43,12 +37,12 @@ public class CustomParameterTest2 {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + value + ")");
+        System.out.println("test1(" + customParameter.getFirstName() + " " + customParameter.getLastName() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + value + ")");
+        System.out.println("test1(" + customParameter.getFirstName() + " " + customParameter.getLastName() + ")");
     }
 
     @TestEngine.AfterAll
@@ -56,19 +50,16 @@ public class CustomParameterTest2 {
         System.out.println("afterAll()");
     }
 
-    @TestEngine.AfterClass
-    public static void afterClass() {
-        System.out.println("afterClass()");
-    }
-
     private static class CustomParameter implements Parameter {
 
         private final String name;
-        private final Long value;
+        private final String firstName;
+        private final String lastName;
 
-        private CustomParameter(String name, Long value) {
+        private CustomParameter(String name, String firstName, String lastName) {
             this.name = name;
-            this.value = value;
+            this.firstName = firstName;
+            this.lastName = lastName;
         }
 
         @Override
@@ -76,19 +67,17 @@ public class CustomParameterTest2 {
             return name;
         }
 
-        @Override
-        public <T> T value() {
-            return (T) this;
+        public String getFirstName() {
+            return firstName;
         }
 
-        @Override
-        public <T> T value(Class<T> clazz) {
-            return clazz.cast(value);
+        public String getLastName() {
+            return lastName;
         }
 
-        public static CustomParameter of(String name, Long value) {
+        public static CustomParameter of(String name, String firstName, String lastName) {
             Objects.requireNonNull(name);
-            return new CustomParameter(name, value);
+            return new CustomParameter(name, firstName, lastName);
         }
     }
 }

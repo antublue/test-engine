@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
 /**
  * Example test
  */
-public class ParameterWithMixedObjectTest {
+public class SimpleParameterOfObjectWithMixedObjectsTest {
 
     private Object value;
 
@@ -37,27 +37,26 @@ public class ParameterWithMixedObjectTest {
         }
     };
 
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Set<Parameter> collection = new LinkedHashSet<>();
+    @TestEngine.Parameter
+    public SimpleParameter<Object> simpleParameter;
 
-        collection.add(Parameter.of("BigDecimal", new BigDecimal("1000000000000000000000")));
-        collection.add(Parameter.of("Integer", 1));
-        collection.add(Parameter.of("Map", new HashMap<String, String>()));
-        collection.add(Parameter.of("String", "This is a string"));
-        collection.add(Parameter.of("null", null));
+    @TestEngine.ParameterSupplier
+    public static Stream<SimpleParameter<Object>> parameters() {
+        Set<SimpleParameter<Object>> collection = new LinkedHashSet<>();
+
+        collection.add(new SimpleParameter<>("BigDecimal", new BigDecimal("1000000000000000000000")));
+        collection.add(new SimpleParameter<>("Integer", 1));
+        collection.add(new SimpleParameter<>("Map", new HashMap<String, String>()));
+        collection.add(new SimpleParameter<>("String", "This is a string"));
+        collection.add(new SimpleParameter<>("((null))", null));
 
         return collection.stream();
-    }
-
-    @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        this.value = parameter.value();
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
+        value = simpleParameter.value();
     }
 
     @TestEngine.Test

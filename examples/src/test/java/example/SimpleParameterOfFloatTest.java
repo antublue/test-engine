@@ -1,4 +1,4 @@
-package example.tag;
+package example;
 
 import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
@@ -9,22 +9,17 @@ import java.util.stream.Stream;
 
 /**
  * Example test
- *
- * The test class is executed due to the fact that the test engine system
- * properties / environment variables have to be defined during test discovery
  */
-@TestEngine.Tag("/tag1/")
-public class TaggedClassTag1Test {
+public class SimpleParameterOfFloatTest {
 
     @TestEngine.Parameter
-    private SimpleParameter<String> simpleParameter;
+    private SimpleParameter<Float> simpleParameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<String>> parameters() {
-        Collection<SimpleParameter<String>> collection = new ArrayList<>();
+    public static Stream<SimpleParameter<Float>> parameters() {
+        Collection<SimpleParameter<Float>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            int value = i * 3;
-            collection.add(SimpleParameter.of(String.valueOf(value)));
+            collection.add(SimpleParameter.of(i + 0.1f));
         }
         return collection.stream();
     }
@@ -36,12 +31,14 @@ public class TaggedClassTag1Test {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + simpleParameter.value() + ")");
+        float value = simpleParameter.value();
+        System.out.println("test1(" + value + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + simpleParameter.value() + ")");
+        float value = simpleParameter.value();
+        System.out.println("test2(" + value + ")");
     }
 
     @TestEngine.AfterAll

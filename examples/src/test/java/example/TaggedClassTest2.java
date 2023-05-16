@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -13,21 +13,17 @@ import java.util.stream.Stream;
 @TestEngine.Tag("/tag2/")
 public class TaggedClassTest2 {
 
-    private Parameter parameter;
+    @TestEngine.Parameter
+    private SimpleParameter<String> simpleParameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
+    public static Stream<SimpleParameter<String>> parameters() {
+        Collection<SimpleParameter<String>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(Parameter.of(String.valueOf(value)));
+            collection.add(SimpleParameter.of(String.valueOf(value)));
         }
         return collection.stream();
-    }
-
-    @TestEngine.Parameter
-    public void setParameter(Parameter parameter) {
-        this.parameter = parameter;
     }
 
     @TestEngine.BeforeAll
@@ -37,12 +33,12 @@ public class TaggedClassTest2 {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter.value() + ")");
+        System.out.println("test1(" + simpleParameter.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameter.value() + ")");
+        System.out.println("test2(" + simpleParameter.value() + ")");
     }
 
     @TestEngine.AfterAll

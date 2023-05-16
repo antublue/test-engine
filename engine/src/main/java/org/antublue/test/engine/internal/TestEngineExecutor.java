@@ -98,7 +98,7 @@ public class TestEngineExecutor {
                 .forEach(classTestDescriptor ->
                         executorService.submit(
                                 new ClassTestDescriptorRunnableAdapter(
-                                        classTestDescriptor, new TestExecutionContext(executionRequest, countDownLatch)
+                                        classTestDescriptor, new TestEngineExecutionContext(executionRequest, countDownLatch)
                                 )));
 
         try {

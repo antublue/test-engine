@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -10,22 +10,19 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class ParameterSupplierMethodTest {
-
-    private Parameter parameter;
-
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            collection.add(Parameter.of(String.valueOf(i)));
-        }
-        return collection.stream();
-    }
+public class SimpleParameterOfBooleanTest {
 
     @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        this.parameter = parameter;
+    private SimpleParameter<Boolean> simpleParameter;
+
+    @TestEngine.ParameterSupplier
+    public static Stream<SimpleParameter<Boolean>> parameters() {
+        Collection<SimpleParameter<Boolean>> collection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            boolean value = (i % 2) == 0;
+            collection.add(SimpleParameter.of(value));
+        }
+        return collection.stream();
     }
 
     @TestEngine.BeforeAll
@@ -35,12 +32,14 @@ public class ParameterSupplierMethodTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter + ")");
+        boolean value = simpleParameter.value();
+        System.out.println("test1(" + value + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameter + ")");
+        boolean value = simpleParameter.value();
+        System.out.println("test2(" + value + ")");
     }
 
     @TestEngine.AfterAll

@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.source.LineSource;
 
@@ -17,18 +17,14 @@ public class LineSourceTest2 {
 
     private static final String RESOURCE_NAME = "/sample.txt";
 
-    private Parameter parameter;
+    @TestEngine.Parameter
+    public SimpleParameter<String> simpleParameter;
 
     @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() throws IOException {
+    public static Stream<SimpleParameter<String>> parameters() throws IOException {
         try (InputStream inputStream = LineSourceTest2.class.getResourceAsStream(RESOURCE_NAME)) {
             return LineSource.of(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         }
-    }
-
-    @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        this.parameter = parameter;
     }
 
     @TestEngine.BeforeAll
@@ -38,12 +34,12 @@ public class LineSourceTest2 {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter.value() + ")");
+        System.out.println("test1(" + simpleParameter.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameter.value() + ")");
+        System.out.println("test2(" + simpleParameter.value() + ")");
     }
 
     @TestEngine.AfterAll

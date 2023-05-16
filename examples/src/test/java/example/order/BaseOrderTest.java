@@ -1,49 +1,72 @@
 package example.order;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @TestEngine.BaseClass
 class BaseOrderTest {
 
-    protected static final List<String> ACTUAL_LIST = new ArrayList<>();
+    protected final List<String> EXPECTED_LIST =
+            listOf(
+                    "BaseOrderTest.prepare()",
+                    "ConcreteOrderTest.prepare()",
+                    "BaseOrderTest.beforeAll()",
+                    "ConcreteOrderTest.beforeAll()",
+                    "ConcreteOrderTest.afterAll()",
+                    "BaseOrderTest.afterAll()",
+                    "ConcreteOrderTest.conclude()",
+                    "BaseOrderTest.conclude()");
 
-    protected Parameter parameter;
+    protected final List<String> ACTUAL_LIST = new ArrayList<>();
 
-    @TestEngine.BeforeClass
+    @TestEngine.Parameter
+    protected SimpleParameter<String> simpleParameter;
+
+    @TestEngine.Prepare
     @TestEngine.Order(1)
-    public static void beforeClass2() {
-        System.out.println("baseOrderTest.beforeClass2()");
-        ConcreteOrderTest.ACTUAL_LIST.add("baseOrderTest.beforeClass2");
+    public void prepare() {
+        System.out.println("BaseOrderTest.prepare()");
+        ACTUAL_LIST.add("BaseOrderTest.prepare()");
     }
 
     @TestEngine.BeforeAll
     @TestEngine.Order(1)
-    public void beforeAll2() {
-        System.out.println("baseOrderTest.beforeAll2()");
-        ConcreteOrderTest.ACTUAL_LIST.add("baseOrderTest.beforeAll2");
+    public void beforeAll() {
+        System.out.println("BaseOrderTest.beforeAll()");
+        ACTUAL_LIST.add("BaseOrderTest.beforeAll()");
     }
 
     @TestEngine.Test
     @TestEngine.Order(1)
     public void test2() {
-        System.out.println("baseOrderTest.test2(" + parameter.value() + ")");
+        System.out.println("BaseOrderTest.test2(" + simpleParameter.value() + ")");
     }
 
     @TestEngine.AfterAll
-    @TestEngine.Order(1)
-    public void afterAll2() {
-        System.out.println("baseOrderTest.afterAll2()");
-        ConcreteOrderTest.ACTUAL_LIST.add("baseOrderTest.afterAll2");
+    @TestEngine.Order(2)
+    public void afterAll() {
+        System.out.println("BaseOrderTest.afterAll()");
+        ACTUAL_LIST.add("BaseOrderTest.afterAll()");
     }
 
-    @TestEngine.AfterClass
-    @TestEngine.Order(1)
-    public static void afterClass2() {
-        System.out.println("baseOrderTest.afterClass2()");
-        ConcreteOrderTest.ACTUAL_LIST.add("baseOrderTest.afterClass2");
+    @TestEngine.Conclude
+    @TestEngine.Order(2)
+    public void conclude() {
+        System.out.println("BaseOrderTest.conclude()");
+        ACTUAL_LIST.add("BaseOrderTest.conclude()");
+        assertThat(ACTUAL_LIST).isEqualTo(EXPECTED_LIST);
+    }
+
+    private static List<String> listOf(String ... strings) {
+        List<String> list = new ArrayList<>(strings.length);
+        for (String string : strings) {
+            list.add(string);
+        }
+        return list;
     }
 }
