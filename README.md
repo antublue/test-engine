@@ -256,9 +256,9 @@ In this scenario, the value of the `SimpleParameter` is a `String[]`
 String[] values = parameter.value();
 ```
 
-## What is a `MapParameteer` ?
+## What is a `MapParameter` ?
 
-A `MapParameteer` is a `Parameter` implementation that can store key / value Objects 
+A `MapParameter` is a `Parameter` implementation that can store key / value Objects 
 
 
 - It allows you to add keys/values using a fluent pattern
