@@ -16,35 +16,34 @@
 
 package org.antublue.test.engine.api.source;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
  * Class to create a Stream of Parameters from an Enum
  */
 @SuppressWarnings("unchecked")
-public final class EnumSource {
+public final class EnumSource<T extends Enum> {
 
-    /**
-     * Constructor
-     */
-    private EnumSource() {
-        // DO NOTHING
+    private final Set<T> enumSet = new LinkedHashSet<>();
+
+    public EnumSource(Class<? extends Enum> clazz) {
+        T[] values = (T[]) clazz.getEnumConstants();
+        for (T value : values) {
+            enumSet.add(value);
+        }
     }
 
-    /**
-     * Method to create a Stream of Parameters from an Enum
-     *
-     * @param e e
-     * @return the return value
-     */
-    public static Stream<Parameter> of(Class<? extends Enum> e) {
-        final List<Parameter> list = new ArrayList<>();
-        EnumSet.allOf(e).forEach(o -> list.add(Parameter.of(((Enum<?>) o).name(), o.toString())));
+    public Stream<SimpleParameter<T>> stream() {
+        List<SimpleParameter<T>> list = new ArrayList<>();
+        for (T constant : enumSet) {
+            list.add(new SimpleParameter<>(constant.name(), constant));
+        }
         return list.stream();
     }
 }

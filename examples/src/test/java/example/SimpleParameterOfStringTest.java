@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -10,23 +10,18 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class ParameterTest {
-
-    private Parameter parameter;
-
-    @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            int value = i * 3;
-            collection.add(Parameter.of(String.valueOf(value)));
-        }
-        return collection.stream();
-    }
+public class SimpleParameterOfStringTest {
 
     @TestEngine.Parameter
-    public void setParameter(Parameter parameter) {
-        this.parameter = parameter;
+    private SimpleParameter<String> simpleParameter;
+
+    @TestEngine.ParameterSupplier
+    public static Stream<SimpleParameter<String>> parameters() {
+        Collection<SimpleParameter<String>> collection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            collection.add(SimpleParameter.of("String " + i));
+        }
+        return collection.stream();
     }
 
     @TestEngine.BeforeAll
@@ -36,12 +31,14 @@ public class ParameterTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter.value() + ")");
+        String value = simpleParameter.value();
+        System.out.println("test1(" + value + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameter.value() + ")");
+        String value = simpleParameter.value();
+        System.out.println("test2(" + value + ")");
     }
 
     @TestEngine.AfterAll

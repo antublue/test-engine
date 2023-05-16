@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.api.source;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -53,7 +53,7 @@ public final class LineSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<Parameter> of(File file, Charset charset) throws IOException {
+    public static Stream<SimpleParameter<String>> of(File file, Charset charset) throws IOException {
         try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
             return of(inputStream, charset);
         }
@@ -66,8 +66,8 @@ public final class LineSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<Parameter> of(Reader reader) throws IOException {
-        List<Parameter> list = new ArrayList<>();
+    public static Stream<SimpleParameter<String>> of(Reader reader) throws IOException {
+        List<SimpleParameter<String>> list = new ArrayList<>();
 
         try (BufferedReader bufferedReader = new BufferedReader(reader)) {
             long index = 1;
@@ -77,7 +77,7 @@ public final class LineSource {
                     break;
                 }
 
-                list.add(Parameter.of("line [" + index + "]", line));
+                list.add(new SimpleParameter<>("line [" + index + "]", line));
                 index++;
             }
         }
@@ -93,7 +93,7 @@ public final class LineSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<Parameter> of(InputStream inputStream, Charset charset) throws IOException {
+    public static Stream<SimpleParameter<String>> of(InputStream inputStream, Charset charset) throws IOException {
         try (Reader reader = new InputStreamReader(inputStream, charset)) {
             return of(reader);
         }

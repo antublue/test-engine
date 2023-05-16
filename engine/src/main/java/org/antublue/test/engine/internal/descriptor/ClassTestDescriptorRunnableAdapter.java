@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import org.antublue.test.engine.internal.TestExecutionContext;
+import org.antublue.test.engine.internal.TestEngineExecutionContext;
 
 /**
  * Class to implement a RunnableAdapter to test a ClassTestDescriptor in a Thread
@@ -24,24 +24,24 @@ import org.antublue.test.engine.internal.TestExecutionContext;
 public final class ClassTestDescriptorRunnableAdapter implements Runnable {
 
     private final ClassTestDescriptor classTestDescriptor;
-    private final TestExecutionContext testExecutionContext;
+    private final TestEngineExecutionContext testEngineExecutionContext;
 
     /**
      * Constructor
      *
      * @param classTestDescriptor classTestDescriptor
-     * @param testExecutionContext testExecutionContext
+     * @param testEngineExecutionContext testEngineExecutionContext
      */
     public ClassTestDescriptorRunnableAdapter(
-            ClassTestDescriptor classTestDescriptor, TestExecutionContext testExecutionContext) {
-        this.testExecutionContext = testExecutionContext;
+            ClassTestDescriptor classTestDescriptor, TestEngineExecutionContext testEngineExecutionContext) {
+        this.testEngineExecutionContext = testEngineExecutionContext;
         this.classTestDescriptor = classTestDescriptor;
     }
 
     @Override
     public void run() {
         try {
-            classTestDescriptor.execute(testExecutionContext);
+            classTestDescriptor.execute(testEngineExecutionContext);
         } catch (Throwable t) {
             t.printStackTrace();
         }

@@ -1,12 +1,12 @@
 package example.inheritance;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 
 import java.util.stream.Stream;
 
 public abstract class OddBaseTest extends BaseTest {
 
-    protected static Stream<Parameter> parameters() {
+    protected static Stream<SimpleParameter<Integer>> parameters() {
         return BaseTest
                 .parameters()
                 .filter(parameter -> {

@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -10,35 +10,29 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class ArrayTest {
+public class SimpleParameterOfStringArrayTest {
 
     private String[] values;
 
+    @TestEngine.Parameter
+    public SimpleParameter<String[]> simpleParameter;
+
     @TestEngine.ParameterSupplier
-    public static Stream<Parameter> parameters() {
-        Collection<Parameter> collection = new ArrayList<>();
+    public static Stream<SimpleParameter<String[]>> parameters() {
+        Collection<SimpleParameter<String[]>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             collection.add(
-                    Parameter.of(
+                    new SimpleParameter<>(
                             "Array [" + i + "]",
                             new String[] { String.valueOf(i), String.valueOf(i * 2) }));
         }
         return collection.stream();
     }
 
-    @TestEngine.Parameter
-    public void parameter(Parameter parameter) {
-        values = parameter.value();
-    }
-
-    @TestEngine.BeforeClass
-    public static void beforeClass() {
-        System.out.println("beforeClass()");
-    }
-
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
+        values = simpleParameter.value();
     }
 
     @TestEngine.BeforeEach
@@ -69,10 +63,5 @@ public class ArrayTest {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
-    }
-
-    @TestEngine.AfterClass
-    public static void afterClass() {
-        System.out.println("afterClass()");
     }
 }
