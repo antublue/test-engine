@@ -16,17 +16,17 @@
 
 package org.antublue.test.engine.api;
 
+import java.io.Closeable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Class to implement a Map like object to contain key / values
- * <p>
- * Allows casting of values when using "get(String key)"
+ * DEPRECATED - use new ObjectArgument&lt;KeyValueStore&gt;
  */
 @SuppressWarnings("unchecked")
+@Deprecated
 public final class MapParameter implements Parameter {
 
     private final String name;
@@ -91,8 +91,9 @@ public final class MapParameter implements Parameter {
             throw new IllegalArgumentException("key is null or empty");
         }
 
-        return (T) putIfAbsent(key.trim(), object);
+        return (T) map.putIfAbsent(key.trim(), object);
     }
+
     /**
      * Method to get value from the MapParameter
      *
@@ -159,18 +160,42 @@ public final class MapParameter implements Parameter {
 
         Object value = map.remove(key);
         if (value == null) {
-            return (T) null;
+            return null;
         } else {
             return clazz.cast(value);
         }
     }
 
     /**
-     * Method to clear all MapParameter key / values
+     * Method to clear all MapParameter entries
      */
     public MapParameter clear() {
         map.clear();
         return this;
+    }
+
+    /**
+     * Method to clear all MapParameter entries calling close() on any Closeable or Autocloseable values
+     */
+    public void dispose() {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Closeable) {
+                try {
+                    ((Closeable) value).close();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            } else if (value instanceof AutoCloseable) {
+                try {
+                    ((AutoCloseable) value).close();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        }
+
+        map.clear();
     }
 
     /**
@@ -209,7 +234,13 @@ public final class MapParameter implements Parameter {
         return Objects.hash(name, map);
     }
 
-    public static MapParameter named(String name) {
+    /**
+     * Method to create a MapParameter
+     *
+     * @param name name
+     * @return a MapParameter
+     */
+     public static MapParameter named(String name) {
         return new MapParameter(name);
     }
 }

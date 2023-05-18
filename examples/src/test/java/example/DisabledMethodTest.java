@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.SimpleParameter;
+import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -12,12 +12,12 @@ import java.util.stream.Stream;
  */
 public class DisabledMethodTest {
 
-    @TestEngine.Parameter
-    private SimpleParameter<String> simpleParameter;
+    @TestEngine.Argument
+    protected ObjectArgument<String> objectArgument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<String>> parameters() {
-        return StringParameterSupplier.parameters();
+    @TestEngine.ArgumentSupplier
+    public static Stream<ObjectArgument<String>> arguments() {
+        return StringArgumentSupplier.arguments();
     }
 
     @TestEngine.BeforeAll
@@ -32,13 +32,13 @@ public class DisabledMethodTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + simpleParameter + ")");
+        System.out.println("test1(" + objectArgument + ")");
     }
 
     @TestEngine.Disabled
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + simpleParameter + ")");
+        System.out.println("test2(" + objectArgument + ")");
     }
 
     @TestEngine.AfterEach
@@ -51,12 +51,12 @@ public class DisabledMethodTest {
         System.out.println("afterAll()");
     }
 
-    private static class StringParameterSupplier {
+    private static class StringArgumentSupplier {
 
-        public static Stream<SimpleParameter<String>> parameters() {
-            Collection<SimpleParameter<String>> collection = new ArrayList<>();
+        public static Stream<ObjectArgument<String>> arguments() {
+            Collection<ObjectArgument<String>> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(SimpleParameter.of(String.valueOf(i)));
+                collection.add(ObjectArgument.of(String.valueOf(i)));
             }
             return collection.stream();
         }

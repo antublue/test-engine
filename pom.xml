@@ -7,7 +7,7 @@
 
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-parent</artifactId>
-    <version>4.0.0</version>
+    <version>4.1.0</version>
     <packaging>pom</packaging>
     <name>AntuBLUE Test Engine Parent</name>
 
@@ -19,6 +19,14 @@
                 <version>3.1.1</version>
                 <configuration>
                     <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>

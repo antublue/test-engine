@@ -19,9 +19,9 @@ package org.antublue.test.engine.api;
 import java.util.Objects;
 
 /**
- * Class to implement a SimpleParameter
+ * DEPRECATED - use ObjectArgument
  */
-@SuppressWarnings("unchecked")
+@Deprecated
 public final class SimpleParameter<T> implements Parameter {
 
     private final String name;
@@ -54,6 +54,11 @@ public final class SimpleParameter<T> implements Parameter {
         return name;
     }
 
+    /**
+     * Method to get the SimpleParameter value
+     *
+     * @return the return value
+     */
     public T value() {
         return value;
     }
@@ -114,7 +119,7 @@ public final class SimpleParameter<T> implements Parameter {
      * @param l l
      * @return the return value
      */
-    public static SimpleParameter of(long l) {
+    public static SimpleParameter<Long> of(long l) {
         return new SimpleParameter<>(String.valueOf(l), l);
     }
 

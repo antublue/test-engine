@@ -19,9 +19,9 @@ package org.antublue.test.engine.internal.discovery.resolver;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
+import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -85,41 +85,41 @@ public class PackageSelectorResolver {
 
                     final AtomicInteger index = new AtomicInteger();
                     TestEngineReflectionUtils
-                            .getParameters(clazz)
-                            .forEach(parameter -> {
-                                UniqueId parameterTestDescriptorUniqueId =
+                            .getArguments(clazz)
+                            .forEach(argument -> {
+                                UniqueId argumentTestDescriptorUniqueId =
                                         classTestDescriptorUniqueId
                                                 .append(
-                                                        "parameter",
+                                                        "argument",
                                                         String.valueOf(index.getAndIncrement()));
 
-                                ParameterTestDescriptor testEngineParameterTestDescriptor =
-                                        TestDescriptorUtils.createParameterTestDescriptor(
-                                                parameterTestDescriptorUniqueId,
+                                ArgumentTestDescriptor testEngineArgumentTestDescriptor =
+                                        TestDescriptorUtils.createArgumentTestDescriptor(
+                                                argumentTestDescriptorUniqueId,
                                                 clazz,
-                                                parameter);
+                                                argument);
 
-                                testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
+                                testEngineClassTestDescriptor.addChild(testEngineArgumentTestDescriptor);
 
                                 TestEngineReflectionUtils
                                         .getTestMethods(clazz)
                                         .forEach(method -> {
                                             UniqueId methodTestDescriptorUniqueId =
-                                                    parameterTestDescriptorUniqueId
+                                                    argumentTestDescriptorUniqueId
                                                             .append("method", method.getName());
 
                                             MethodTestDescriptor methodTestDescriptor =
                                                     TestDescriptorUtils.createMethodTestDescriptor(
                                                             methodTestDescriptorUniqueId,
                                                             clazz,
-                                                            parameter,
+                                                            argument,
                                                             method);
 
-                                            testEngineParameterTestDescriptor.addChild(methodTestDescriptor);
+                                            testEngineArgumentTestDescriptor.addChild(methodTestDescriptor);
                                         });
 
-                                testEngineClassTestDescriptor.addChild(testEngineParameterTestDescriptor);
-                                testEngineParameterTestDescriptor.prune();
+                                testEngineClassTestDescriptor.addChild(testEngineArgumentTestDescriptor);
+                                testEngineArgumentTestDescriptor.prune();
                             });
                         testEngineClassTestDescriptor.prune();
                     });

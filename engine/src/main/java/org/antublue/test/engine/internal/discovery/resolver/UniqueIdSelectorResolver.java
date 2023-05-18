@@ -16,13 +16,13 @@
 
 package org.antublue.test.engine.internal.discovery.resolver;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineException;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
+import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Cast;
@@ -59,8 +59,8 @@ public class UniqueIdSelectorResolver {
 
             UniqueId.Segment segment = selectorUniqueId.getLastSegment();
 
-            if ("parameter".equals(segment.getType())) {
-                LOGGER.trace("parameter [%s] selected", segment.getValue());
+            if ("argument".equals(segment.getType())) {
+                LOGGER.trace("argument [%s] selected", segment.getValue());
 
                 UniqueId classTestDescriptorUniqueId = selectorUniqueId.removeLastSegment();
                 UniqueId.Segment classSegment = classTestDescriptorUniqueId.getLastSegment();
@@ -76,18 +76,18 @@ public class UniqueIdSelectorResolver {
                                 .orElseGet(() ->
                                         TestDescriptorUtils.createClassTestDescriptor(classTestDescriptorUniqueId, clazz));
 
-                List<Parameter> parameters = TestEngineReflectionUtils.getParameters(clazz);
-                Parameter parameter = parameters.get(Integer.parseInt(segment.getValue()));
+                List<Argument> arguments = TestEngineReflectionUtils.getArguments(clazz);
+                Argument argument = arguments.get(Integer.parseInt(segment.getValue()));
 
-                ParameterTestDescriptor parameterTestDescriptor =
+                ArgumentTestDescriptor argumentTestDescriptor =
                         classTestDescriptor
                                 .findByUniqueId(selectorUniqueId)
-                                .map((Function<TestDescriptor, ParameterTestDescriptor>) Cast::cast)
+                                .map((Function<TestDescriptor, ArgumentTestDescriptor>) Cast::cast)
                                 .orElseGet(() ->
-                                        TestDescriptorUtils.createParameterTestDescriptor(
+                                        TestDescriptorUtils.createArgumentTestDescriptor(
                                                 selectorUniqueId,
                                                 clazz,
-                                                parameter));
+                                                argument));
 
                 TestEngineReflectionUtils
                         .getTestMethods(clazz)
@@ -99,13 +99,13 @@ public class UniqueIdSelectorResolver {
                                     TestDescriptorUtils.createMethodTestDescriptor(
                                             methodTestDescriptorUniqueId,
                                             clazz,
-                                            parameter,
+                                            argument,
                                             method);
 
-                            parameterTestDescriptor.addChild(methodTestDescriptor);
+                            argumentTestDescriptor.addChild(methodTestDescriptor);
                         });
 
-                classTestDescriptor.addChild(parameterTestDescriptor);
+                classTestDescriptor.addChild(argumentTestDescriptor);
                 engineDescriptor.addChild(classTestDescriptor);
             } else if ("class".equals(segment.getType())) {
                 className = segment.getValue();
@@ -124,24 +124,24 @@ public class UniqueIdSelectorResolver {
 
                 AtomicInteger index = new AtomicInteger();
                 TestEngineReflectionUtils
-                        .getParameters(clazz)
-                        .forEach(parameter -> {
-                            UniqueId parameterTestDescriptorUniqueId =
+                        .getArguments(clazz)
+                        .forEach(argument -> {
+                            UniqueId argumentTestDescriptorUniqueId =
                                     selectorUniqueId.append(
-                                            "parameter",
+                                            "argument",
                                             String.valueOf(index.getAndIncrement()));
 
-                            ParameterTestDescriptor parameterTestDescriptor =
-                                    TestDescriptorUtils.createParameterTestDescriptor(
-                                            parameterTestDescriptorUniqueId,
+                            ArgumentTestDescriptor argumentTestDescriptor =
+                                    TestDescriptorUtils.createArgumentTestDescriptor(
+                                            argumentTestDescriptorUniqueId,
                                             clazz,
-                                            parameter);
+                                            argument);
 
                             TestEngineReflectionUtils
                                     .getTestMethods(clazz)
                                     .forEach(method -> {
                                         UniqueId methodUniqueId =
-                                                parameterTestDescriptorUniqueId.append(
+                                                argumentTestDescriptorUniqueId.append(
                                                         "method",
                                                         method.getName());
 
@@ -149,13 +149,13 @@ public class UniqueIdSelectorResolver {
                                                 TestDescriptorUtils.createMethodTestDescriptor(
                                                         methodUniqueId,
                                                         clazz,
-                                                        parameter,
+                                                        argument,
                                                         method);
 
-                                        parameterTestDescriptor.addChild(methodTestDescriptor);
+                                        argumentTestDescriptor.addChild(methodTestDescriptor);
                                     });
 
-                            classTestDescriptor.addChild(parameterTestDescriptor);
+                            classTestDescriptor.addChild(argumentTestDescriptor);
                         });
 
                 engineDescriptor.addChild(classTestDescriptor);

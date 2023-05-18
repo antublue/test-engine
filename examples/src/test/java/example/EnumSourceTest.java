@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.SimpleParameter;
+import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.source.EnumSource;
 
@@ -13,11 +13,11 @@ import java.util.stream.Stream;
 @SuppressWarnings("unchecked")
 public class EnumSourceTest {
 
-    @TestEngine.Parameter
-    public SimpleParameter<Enum> simpleParameter;
+    @TestEngine.Argument
+    public ObjectArgument<Enum> objectArgument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<Enum>> parameters() throws IOException {
+    @TestEngine.ArgumentSupplier
+    public static Stream<ObjectArgument<Enum>> arguments() throws IOException {
         return new EnumSource(DaysOfTheWeek.class).stream();
     }
 
@@ -28,12 +28,12 @@ public class EnumSourceTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + simpleParameter.name() + ", " + simpleParameter.value() + ")");
+        System.out.println("test1(" + objectArgument.name() + ", " + objectArgument.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + simpleParameter.name() + ", " + simpleParameter.value() + ")");
+        System.out.println("test2(" + objectArgument.name() + ", " + objectArgument.value() + ")");
     }
 
     @TestEngine.AfterAll

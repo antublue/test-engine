@@ -118,6 +118,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                                     System.setProperty(key, value);
                                 }
                             }));
+            info();
 
             TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener =
                     new TestEngineConsoleTestExecutionListener();
@@ -193,6 +194,13 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         if (log.isDebugEnabled()) {
             log.debug(message);
         }
+    }
+
+    /**
+     * Method to log an empty INFO message
+     */
+    private void info() {
+        info("");
     }
 
     /**

@@ -1,6 +1,6 @@
 package example.order;
 
-import org.antublue.test.engine.api.SimpleParameter;
+import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -12,12 +12,12 @@ import java.util.stream.Stream;
  */
 public class ConcreteOrderTest extends BaseOrderTest {
 
-    @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<String>> parameters() {
-        Collection<SimpleParameter<String>> collection = new ArrayList<>();
+    @TestEngine.ArgumentSupplier
+    public static Stream<ObjectArgument<String>> arguments() {
+        Collection<ObjectArgument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 1; i++) {
             int value = i * 3;
-            collection.add(SimpleParameter.of(String.valueOf(value)));
+            collection.add(ObjectArgument.of(String.valueOf(value)));
         }
         return collection.stream();
     }
@@ -38,18 +38,18 @@ public class ConcreteOrderTest extends BaseOrderTest {
 
     @TestEngine.Test
     public void testA() {
-        System.out.println("testA(" + simpleParameter.value() + ")");
+        System.out.println("testA(" + objectArgument.value() + ")");
     }
 
     @TestEngine.Test
     public void testB() {
-        System.out.println("testB(" + simpleParameter.value() + ")");
+        System.out.println("testB(" + objectArgument.value() + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(2)
     public void test3() {
-        System.out.println("test3(" + simpleParameter.value() + ")");
+        System.out.println("test3(" + objectArgument.value() + ")");
     }
 
     @TestEngine.AfterAll

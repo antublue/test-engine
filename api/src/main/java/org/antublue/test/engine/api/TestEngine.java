@@ -30,13 +30,33 @@ public @interface TestEngine {
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
+    @Deprecated
+    /**
+     * DEPRECATED - use ArgumentSupplier
+     */
     @interface ParameterSupplier {
+
+    }
+
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface ArgumentSupplier {
 
     }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
     @Retention(RetentionPolicy.RUNTIME)
+    @Deprecated
+    /**
+     * DEPRECATED - use Argument
+     */
     @interface Parameter {
+
+    }
+
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Argument {
 
     }
 

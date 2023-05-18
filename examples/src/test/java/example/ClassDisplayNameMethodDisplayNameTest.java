@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.SimpleParameter;
+import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.stream.Stream;
@@ -13,15 +13,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestEngine.DisplayName("_Run Second ClassDisplayNameTest because of classname_")
 public class ClassDisplayNameMethodDisplayNameTest {
 
-    @TestEngine.Parameter
-    private SimpleParameter<Integer> simpleParameter;
+    @TestEngine.Argument
+    protected ObjectArgument<Integer> objectArgument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<Integer>> parameters() {
+    @TestEngine.ArgumentSupplier
+    public static Stream<ObjectArgument<Integer>> arguments() {
         return Stream.of(
-                SimpleParameter.of(1),
-                SimpleParameter.of(2),
-                SimpleParameter.of(3));
+                ObjectArgument.of(1),
+                ObjectArgument.of(2),
+                ObjectArgument.of(3));
     }
 
     @TestEngine.BeforeAll
@@ -37,15 +37,15 @@ public class ClassDisplayNameMethodDisplayNameTest {
     @TestEngine.Test
     @TestEngine.DisplayName("Test A")
     public void test1() {
-        System.out.println("test1(" + simpleParameter.value() + ")");
-        assertThat(simpleParameter.value().getClass()).isEqualTo(Integer.class);
+        System.out.println("test1(" + objectArgument.value() + ")");
+        assertThat(objectArgument.value().getClass()).isEqualTo(Integer.class);
     }
 
     @TestEngine.Test
     @TestEngine.DisplayName("Test B")
     public void test2() {
-        System.out.println("test2(" + simpleParameter.value() + ")");
-        assertThat(simpleParameter.value().getClass()).isEqualTo(Integer.class);
+        System.out.println("test2(" + objectArgument.value() + ")");
+        assertThat(objectArgument.value().getClass()).isEqualTo(Integer.class);
     }
 
     @TestEngine.AfterEach

@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.TestEngineExecutionContext;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -40,7 +40,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodTestDescriptor.class);
 
     private final Class<?> testClass;
-    private final Parameter testParameter;
+    private final Argument testArgument;
     private final Method testMethod;
 
     /**
@@ -49,18 +49,18 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param uniqueId uniqueId
      * @param displayName displayName
      * @param testClass testClass
-     * @param testParameter testParameter
+     * @param testArgument testArgument
      * @param testMethod testMethod
      */
     public MethodTestDescriptor(
             UniqueId uniqueId,
             String displayName,
             Class<?> testClass,
-            Parameter testParameter,
+            Argument testArgument,
             Method testMethod) {
         super(uniqueId, displayName);
         this.testClass = testClass;
-        this.testParameter = testParameter;
+        this.testArgument = testArgument;
         this.testMethod = testMethod;
         this.testMethod.setAccessible(true);
     }
@@ -115,12 +115,12 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
     }
 
     /**
-     * Method to get the test parameter
+     * Method to get the test argument
      *
      * @return the return value
      */
-    public Parameter getTestParameter() {
-        return testParameter;
+    public Argument getTestArgument() {
+        return testArgument;
     }
 
     /**

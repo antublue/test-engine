@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.api.source;
 
-import org.antublue.test.engine.api.SimpleParameter;
+import org.antublue.test.engine.api.ObjectArgument;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -39,10 +39,10 @@ public final class EnumSource<T extends Enum> {
         }
     }
 
-    public Stream<SimpleParameter<T>> stream() {
-        List<SimpleParameter<T>> list = new ArrayList<>();
+    public Stream<ObjectArgument<T>> stream() {
+        List<ObjectArgument<T>> list = new ArrayList<>();
         for (T constant : enumSet) {
-            list.add(new SimpleParameter<>(constant.name(), constant));
+            list.add(new ObjectArgument<>(constant.name(), constant));
         }
         return list.stream();
     }

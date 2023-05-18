@@ -17,14 +17,9 @@
 package org.antublue.test.engine.api;
 
 /**
- * Interface required for all Parameter implementations
+ * DEPRECATED - use Argument
  */
-public interface Parameter {
+@Deprecated
+public interface Parameter extends Argument {
 
-    /**
-     * Method to get the Parameter name
-     *
-     * @return the return value
-     */
-    String name();
 }

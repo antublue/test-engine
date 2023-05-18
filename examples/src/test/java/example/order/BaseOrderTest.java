@@ -1,6 +1,6 @@
 package example.order;
 
-import org.antublue.test.engine.api.SimpleParameter;
+import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -24,8 +24,8 @@ class BaseOrderTest {
 
     protected final List<String> ACTUAL_LIST = new ArrayList<>();
 
-    @TestEngine.Parameter
-    protected SimpleParameter<String> simpleParameter;
+    @TestEngine.Argument
+    protected ObjectArgument<String> objectArgument;
 
     @TestEngine.Prepare
     @TestEngine.Order(1)
@@ -44,7 +44,7 @@ class BaseOrderTest {
     @TestEngine.Test
     @TestEngine.Order(1)
     public void test2() {
-        System.out.println("BaseOrderTest.test2(" + simpleParameter.value() + ")");
+        System.out.println("BaseOrderTest.test2(" + objectArgument.value() + ")");
     }
 
     @TestEngine.AfterAll

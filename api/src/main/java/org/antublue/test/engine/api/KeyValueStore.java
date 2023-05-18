@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Class to implement a Map like Context object to contain key / values
+ * Class to implement a KeyStore to contain key / values
  * <p>
  * Allows casting of values when using "get(String key)"
  */
@@ -40,7 +40,7 @@ public final class KeyValueStore {
     }
 
     /**
-     * Method to return whether a key exists in the MapContext
+     * Method to return whether a key exists in the KeyValueStore
      *
      * @param key key
      * @return the return value
@@ -54,7 +54,7 @@ public final class KeyValueStore {
     }
 
     /**
-     * Method to put a key / value into the MapContext
+     * Method to put a key / value into the KeyValueStore
      *
      * @param key key
      * @param object object
@@ -70,7 +70,7 @@ public final class KeyValueStore {
     }
 
     /**
-     * Method to add a key / value if it doesn't exist in this MapContext
+     * Method to add a key / value if it doesn't exist in this KeyValueStore
      *
      * @param key key with which the specified value is to be associated
      * @param object value to be associated with the specified key
@@ -81,10 +81,10 @@ public final class KeyValueStore {
             throw new IllegalArgumentException("key is null or empty");
         }
 
-        return (T) putIfAbsent(key.trim(), object);
+        return (T) map.putIfAbsent(key.trim(), object);
     }
     /**
-     * Method to get value from the MapContext
+     * Method to get value from the KeyValueStore
      *
      * @param key key
      * @return the return value
@@ -99,7 +99,7 @@ public final class KeyValueStore {
     }
 
     /**
-     * Method to get a value from the MapContext cast to a specific type
+     * Method to get a value from the KeyValueStore cast to a specific type
      *
      * @param key key
      * @param clazz clazz
@@ -120,7 +120,7 @@ public final class KeyValueStore {
     }
 
     /**
-     * Method to remove a value for a key from the MapContext
+     * Method to remove a value for a key from the KeyValueStore
      *
      * @param key key
      * @return the return value
@@ -135,7 +135,7 @@ public final class KeyValueStore {
     }
 
     /**
-     * Method to remove a value for a key from the MapContext cast tot a specific type
+     * Method to remove a value for a key from the KeyValueStore cast tot a specific type
      *
      * @param key key
      * @param clazz clazz
@@ -149,14 +149,22 @@ public final class KeyValueStore {
 
         Object value = map.remove(key);
         if (value == null) {
-            return (T) null;
+            return null;
         } else {
             return clazz.cast(value);
         }
     }
 
     /**
-     * Method to remove all MapContext entries calling close on any Closeable or Autocloseable
+     * Method to clear all KeyValueStore entries
+     */
+    public KeyValueStore clear() {
+        map.clear();
+        return this;
+    }
+
+    /**
+     * Method to clear all KeyValueStore entries calling close on any Closeable or Autocloseable
      */
     public void dispose() {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -175,10 +183,12 @@ public final class KeyValueStore {
                 }
             }
         }
+
+        map.clear();
     }
 
     /**
-     * Method to get the MapContext keySet
+     * Method to get the KeyValueStore keySet
      *
      * @return the return value
      */
@@ -187,7 +197,7 @@ public final class KeyValueStore {
     }
 
     /**
-     * Method to get the MapContext entrySet
+     * Method to get the KeyValueStore entrySet
      *
      * @return the return value
      */
@@ -197,7 +207,7 @@ public final class KeyValueStore {
 
     @Override
     public String toString() {
-        return "MapContext{map=[" + map.toString() + "]}";
+        return "KeyValueStore{map=[" + map + "]}";
     }
 
     @Override
@@ -212,5 +222,4 @@ public final class KeyValueStore {
     public int hashCode() {
         return Objects.hash(map);
     }
-
 }

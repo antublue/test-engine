@@ -1,6 +1,6 @@
 package example.tag;
 
-import org.antublue.test.engine.api.SimpleParameter;
+import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.ArrayList;
@@ -16,15 +16,15 @@ import java.util.stream.Stream;
 @TestEngine.Tag("/tag2/")
 public class TaggedClassTag2Test {
 
-    @TestEngine.Parameter
-    private SimpleParameter<String> simpleParameter;
+    @TestEngine.Argument
+    protected ObjectArgument<String> objectArgument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<String>> parameters() {
-        Collection<SimpleParameter<String>> collection = new ArrayList<>();
+    @TestEngine.ArgumentSupplier
+    public static Stream<ObjectArgument<String>> arguments() {
+        Collection<ObjectArgument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(SimpleParameter.of(String.valueOf(value)));
+            collection.add(ObjectArgument.of(String.valueOf(value)));
         }
         return collection.stream();
     }
@@ -36,12 +36,12 @@ public class TaggedClassTag2Test {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + simpleParameter.value() + ")");
+        System.out.println("test1(" + objectArgument.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + simpleParameter.value() + ")");
+        System.out.println("test2(" + objectArgument.value() + ")");
     }
 
     @TestEngine.AfterAll

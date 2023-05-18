@@ -1,6 +1,6 @@
 package example;
 
-import org.antublue.test.engine.api.SimpleParameter;
+import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.source.CsvSource;
 
@@ -21,27 +21,27 @@ public class CsvSourceTest {
     private static final int LAST_NAME = 3;
     private static final int EMAIL_ADDRESS = 9;
 
-    @TestEngine.Parameter
-    public SimpleParameter<String[]> simpleParameter;
+    @TestEngine.Argument
+    public ObjectArgument<String[]> objectArgument;
 
     private String[] columns;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<String[]>> parameters() throws IOException {
-        Stream<SimpleParameter<String[]>> parameters;
+    @TestEngine.ArgumentSupplier
+    public static Stream<ObjectArgument<String[]>> arguments() throws IOException {
+        Stream<ObjectArgument<String[]>> arguments;
 
         try (InputStream inputStream = CsvSourceTest.class.getResourceAsStream(RESOURCE_NAME)) {
-            parameters = CsvSource.of(inputStream, StandardCharsets.UTF_8);
+            arguments = CsvSource.of(inputStream, StandardCharsets.UTF_8);
         }
 
         // Remove the header row
-        return parameters.filter(parameter -> !parameter.name().equals("header"));
+        return arguments.filter(argument -> !argument.name().equals("header"));
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        columns = simpleParameter.value();
+        columns = objectArgument.value();
     }
 
     @TestEngine.Test

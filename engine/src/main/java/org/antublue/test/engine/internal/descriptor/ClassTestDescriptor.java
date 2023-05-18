@@ -148,11 +148,11 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         }
 
         if (throwableCollector.isEmpty()) {
-            getChildren(ParameterTestDescriptor.class)
-                    .forEach(parameterTestDescriptor -> parameterTestDescriptor.execute(testEngineExecutionContext));
+            getChildren(ArgumentTestDescriptor.class)
+                    .forEach(argumentTestDescriptor -> argumentTestDescriptor.execute(testEngineExecutionContext));
         } else {
-            getChildren(ParameterTestDescriptor.class)
-                    .forEach(parameterTestDescriptor -> parameterTestDescriptor.skip(testEngineExecutionContext));
+            getChildren(ArgumentTestDescriptor.class)
+                    .forEach(argumentTestDescriptor -> argumentTestDescriptor.skip(testEngineExecutionContext));
         }
 
         try {

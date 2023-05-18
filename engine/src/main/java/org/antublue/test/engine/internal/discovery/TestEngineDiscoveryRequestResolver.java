@@ -19,9 +19,9 @@ package org.antublue.test.engine.internal.discovery;
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.internal.TestEngineConfiguration;
 import org.antublue.test.engine.internal.TestEngineException;
+import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.discovery.resolver.ClassSelectorResolver;
 import org.antublue.test.engine.internal.discovery.resolver.ClasspathRootResolver;
 import org.antublue.test.engine.internal.discovery.resolver.MethodSelectorResolver;
@@ -266,7 +266,7 @@ public class TestEngineDiscoveryRequestResolver {
                 ClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
                 Set<? extends TestDescriptor> testDescriptors2 = new LinkedHashSet<>(classTestDescriptor.getChildren());
                 for (TestDescriptor testDescriptor2 : testDescriptors2) {
-                    ParameterTestDescriptor parameterTestDescriptor = Cast.cast(testDescriptor2);
+                    ArgumentTestDescriptor argumentTestDescriptor = Cast.cast(testDescriptor2);
                     Set<? extends TestDescriptor> testDescriptors3 = new LinkedHashSet<>(testDescriptor2.getChildren());
                     for (TestDescriptor testDescriptor3 : testDescriptors3) {
                         MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor3);
@@ -276,10 +276,10 @@ public class TestEngineDiscoveryRequestResolver {
                             methodTestDescriptor.removeFromHierarchy();
                         }
                     }
-                    Class<?> clazz = parameterTestDescriptor.getTestClass();
+                    Class<?> clazz = argumentTestDescriptor.getTestClass();
                     String className = clazz.getName();
                     if (packageNameFilter.apply(className).excluded()) {
-                        parameterTestDescriptor.removeFromHierarchy();
+                        argumentTestDescriptor.removeFromHierarchy();
                     }
                 }
                 Class<?> clazz = classTestDescriptor.getTestClass();
@@ -356,7 +356,7 @@ public class TestEngineDiscoveryRequestResolver {
                 if (child instanceof ClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof ParameterTestDescriptor) {
+                        if (grandChild instanceof ArgumentTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
                                 if (greatGrandChild instanceof MethodTestDescriptor) {
@@ -385,7 +385,7 @@ public class TestEngineDiscoveryRequestResolver {
                 if (child instanceof ClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof ParameterTestDescriptor) {
+                        if (grandChild instanceof ArgumentTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
                                 if (greatGrandChild instanceof MethodTestDescriptor) {
@@ -470,7 +470,7 @@ public class TestEngineDiscoveryRequestResolver {
                 if (child instanceof ClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof ParameterTestDescriptor) {
+                        if (grandChild instanceof ArgumentTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
                                 if (greatGrandChild instanceof MethodTestDescriptor) {
@@ -499,7 +499,7 @@ public class TestEngineDiscoveryRequestResolver {
                 if (child instanceof ClassTestDescriptor) {
                     Set<? extends TestDescriptor> grandChildren = child.getChildren();
                     for (TestDescriptor grandChild : grandChildren) {
-                        if (grandChild instanceof ParameterTestDescriptor) {
+                        if (grandChild instanceof ArgumentTestDescriptor) {
                             Set<? extends TestDescriptor> greatGrandChildren = new LinkedHashSet<>(grandChild.getChildren());
                             for (TestDescriptor greatGrandChild : greatGrandChildren) {
                                 if (greatGrandChild instanceof MethodTestDescriptor) {

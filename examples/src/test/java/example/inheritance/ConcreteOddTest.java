@@ -1,6 +1,6 @@
 package example.inheritance;
 
-import org.antublue.test.engine.api.SimpleParameter;
+import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
 
 import java.util.stream.Stream;
@@ -9,9 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConcreteOddTest extends OddBaseTest {
 
-    @TestEngine.ParameterSupplier
-    protected static Stream<SimpleParameter<Integer>> parameters() {
-        return OddBaseTest.parameters();
+    @TestEngine.ArgumentSupplier
+    protected static Stream<ObjectArgument<Integer>> arguments() {
+        return OddBaseTest.arguments();
     }
 
     @TestEngine.BeforeEach
@@ -21,14 +21,14 @@ public class ConcreteOddTest extends OddBaseTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + simpleParameter + ")");
-        assertThat((Integer) simpleParameter.value() % 2).isOdd();
+        System.out.println("test1(" + objectArgument + ")");
+        assertThat((Integer) objectArgument.value() % 2).isOdd();
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + simpleParameter + ")");
-        assertThat((Integer) simpleParameter.value() % 2).isOdd();
+        System.out.println("test2(" + objectArgument + ")");
+        assertThat((Integer) objectArgument.value() % 2).isOdd();
     }
 
     @TestEngine.AfterEach
