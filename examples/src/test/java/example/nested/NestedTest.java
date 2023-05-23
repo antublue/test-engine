@@ -1,11 +1,9 @@
 package example.nested;
 
-import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Example test
@@ -16,7 +14,7 @@ public class NestedTest {
 
         @Override
         protected void setup() {
-            System.out.println("Concrete1.setup(" + simpleParameter.value() + ")");
+            System.out.println("Concrete1.setup(" + integerArgument.value() + ")");
         }
     }
 
@@ -24,24 +22,24 @@ public class NestedTest {
 
         @Override
         protected void setup() {
-            System.out.println("Concrete2.setup(" + simpleParameter.value() + ")");
+            System.out.println("Concrete2.setup(" + integerArgument.value() + ")");
         }
     }
 
     @TestEngine.BaseClass
     public static abstract class BaseTest {
 
-        @TestEngine.Parameter
-        protected SimpleParameter<Integer> simpleParameter;
+        @TestEngine.Argument
+        protected IntegerArgument integerArgument;
 
         protected abstract void setup();
 
-        @TestEngine.ParameterSupplier
-        public static Stream<SimpleParameter<Integer>> parameters() {
+        @TestEngine.ArgumentSupplier
+        public static Stream<IntegerArgument> arguments() {
             return Stream.of(
-                    SimpleParameter.of(1),
-                    SimpleParameter.of(2),
-                    SimpleParameter.of(3));
+                    IntegerArgument.of(1),
+                    IntegerArgument.of(2),
+                    IntegerArgument.of(3));
         }
 
         @TestEngine.BeforeAll
@@ -57,14 +55,12 @@ public class NestedTest {
 
         @TestEngine.Test
         public void test1() {
-            System.out.println("test1(" + simpleParameter.value() + ")");
-            assertThat(simpleParameter.value().getClass()).isEqualTo(Integer.class);
+            System.out.println("test1(" + integerArgument.value() + ")");
         }
 
         @TestEngine.Test
         public void test2() {
-            System.out.println("test2(" + simpleParameter.value() + ")");
-            assertThat(simpleParameter.value().getClass()).isEqualTo(Integer.class);
+            System.out.println("test2(" + integerArgument.value() + ")");
         }
 
         @TestEngine.AfterEach

@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for paramet
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v4.0.0](https://github.com/antublue/test-engine/releases/tag/v4.0.0)
+- General Availability (GA): [Test Engine v4.0.1](https://github.com/antublue/test-engine/releases/tag/v4.0.1)
 
 **Notes**
 
@@ -18,35 +18,35 @@ The Test Engine is a JUnit 5 based test engine designed specifically for paramet
 
 ## Goals
 
-The Test Engine is designed specifically for parameterized integration testing.
+To allow parameterized testing at the test class level, targeting integration testing.
 
 ## Non-Goals
 
-The Test Engine is not meant to replace JUnit for unit tests.
+The Test Engine is not meant to replace JUnit for unit tests. (Though it could be used.)
 
 ## Why not use JUnit 5?
 
-Currently, JUnit 5 does not support parameterized tests at the test class level (common for parameterized integration testing)
+Currently, JUnit 5 does not support parameterized testing at the test class level (common for parameterized integration testing)
 
 - https://github.com/junit-team/junit5/issues/878 (Open since 2017-06-09)
 
 
-- It doesn't provide annotations to run methods before and after all tests and before / after a test parameter (2023-04-18)
+- It doesn't provide annotations to run methods before / after all test methods and before / after each test argument (2023-04-18)
 
 
-- It doesn't provide the summary information typically wanted for parameterized integration testing
+- It doesn't provide the information detailed information during testing or summary information typically wanted for parameterized integration testing
 
 ## Why not use Junit 4?
 
 Junit 4 does provide test class level parameterization via `@RunWith(Parameterized.class)`
 
-- It doesn't provide annotations to run methods before and after all tests and before / after a test parameter
+- It doesn't provide annotations to run methods before / after all test methods and before / after each test argument
 
 
 - It uses a test class constructor approach, limiting you to Java inheritance semantics (superclass before subclass construction)
 
 
-- It doesn't provide the summary information typically wanted for parameterized integration testing
+- It doesn't provide the information detailed information during testing or summary information typically wanted for parameterized integration testing
 
 ## What is parameterized integration testing?
 
@@ -58,22 +58,22 @@ Parameterized integration testing is most common when you...
 2. You want to test workflow oriented scenarios of the application
 
 
-- various environments could involve different operating systems versions and/or different application runtime versions
+3. Various environments could involve different operating systems versions and/or different application runtime versions
 
 ---
 
 A text book example...
 
-1. You have developed a networked based application using Docker: ApplicationX
+1. You have developed a networked based application
 
 
-2. You want to test that the behavior of the ApplicationX is various runtime environments
+2. You want to test the application in various runtime environments
 
 
-3. You want to reuse the Docker network for performance reasons
+3. You want to reuse the Docker network for performance reasons (for all tests in a test class)
 
 
-The parameters in this scenario are the various runtime environments
+The arguments in this scenario are the various runtime environments
 
 ---
 
@@ -83,23 +83,23 @@ https://github.com/antublue/test-engine/blob/main/examples/src/test/java/example
 
 This test is testing functionality of an Apache Kafka Producer and Consumer against four Confluent Platform server versions
 
-- The test is very basic, with a single test method that declare the logic client prooduce / consume logic, but you could test multiple scenarios using ordered test methods
+- The test is very basic, with a single test method that declares the client logic to produce / client logic to consume, but you could test multiple scenarios using ordered test methods
 
 - Test state between methods is stored in a `KafkaTestState` object
 
 ## Common Test Annotations
 
-| Annotation                      | Static | Type   | Required | Example                                                                                                                                                                                |
-|---------------------------------|--------|--------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `@TestEngine.ParameterSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Parameter]> parameters();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Parameter]> parameters();`</nobr> |
-| `@TestEngine.Parameter`         | no     | field  | yes      | `public Parameter parameter;`                                                                                                                                                          |
-| `@TestEngine.Prepare`           | no     | method | no       | `public void prepare();`                                                                                                                                                               | `public void prepare();`                                                         |
-| `@TestEngine.BeforeAll`         | no     | method | no       | `public void beforeAll();`                                                                                                                                                             |
-| `@TestEngine.BeforeEach`        | no     | method | no       | `public void beforeEach();`                                                                                                                                                            |
-| `@TestEngine.Test`              | no     | method | yes      | `public void test();`                                                                                                                                                                  |
-| `@TestEngine.AfterEach`         | no     | method | no       | `public void afterEach();`                                                                                                                                                             |
-| `@TestEngine.AfterAll`          | no     | method | no       | `public void afterAll();`                                                                                                                                                              |
-| `@TestEngine.Conclude`          | no     | method | no       | `public void conclude();`                                                                                                                                                              |
+| Annotation                     | Static | Type   | Required | Example                                                                                                                                                                            |
+|--------------------------------|--------|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.ArgumentSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments();`</nobr> |
+| `@TestEngine.Argument`         | no     | field  | yes      | `public Argument argument;`                                                                                                                                                        |
+| `@TestEngine.Prepare`          | no     | method | no       | `public void prepare();`                                                                                                                                                           | `public void prepare();`                                                         |
+| `@TestEngine.BeforeAll`        | no     | method | no       | `public void beforeAll();`                                                                                                                                                         |
+| `@TestEngine.BeforeEach`       | no     | method | no       | `public void beforeEach();`                                                                                                                                                        |
+| `@TestEngine.Test`             | no     | method | yes      | `public void test();`                                                                                                                                                              |
+| `@TestEngine.AfterEach`        | no     | method | no       | `public void afterEach();`                                                                                                                                                         |
+| `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                          |
+| `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                          |
 
 Reference the [Design](https://github.com/antublue/test-engine#design) for the state machine flow
 
@@ -138,68 +138,10 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 
 - It's recommended to use a tag string format of `/tag1/tag2/tag3/`
 
-## Usage Example
+## Usage Examples
 
-```java
-package example;
+The `examples` projects 
 
-import org.antublue.test.engine.api.SimpleParameter;
-import org.antublue.test.engine.api.TestEngine;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Stream;
-
-/**
- * Example test
- */
-public class ExampleTest {
-
-  @TestEngine.Parameter
-  private SimpleParameter<String> simpleParameter;
-
-  @TestEngine.ParameterSupplier
-  public static Stream<SimpleParameter<String>> parameters() {
-    Collection<SimpleParameter<String>> collection = new ArrayList<>();
-    for (int i = 0; i < 10; i++) {
-      collection.add(SimpleParameter.of("String " + i));
-    }
-    return collection.stream();
-  }
-  
-  @TestEngine.Prepare
-  public void prepare() {
-      // Create any global class state
-  }
-
-  @TestEngine.BeforeAll
-  public void beforeAll() {
-    System.out.println("beforeAll()");
-  }
-
-  @TestEngine.Test
-  public void test1() {
-    String value = simpleParameter.value();
-    System.out.println("test1(" + value + ")");
-  }
-
-  @TestEngine.Test
-  public void test2() {
-    String value = simpleParameter.value();
-    System.out.println("test2(" + value + ")");
-  }
-
-  @TestEngine.AfterAll
-  public void afterAll() {
-    System.out.println("afterAll()");
-  }
-  
-  @TestEnging.Conclude
-  public void conclude() {
-    // Clean up any global class state
-  }
-}
-```
 
 Real integration test example using `testcontainers-java` and Apache Kafka ...
 
@@ -209,86 +151,43 @@ Additional test examples...
 
 https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example
 
-## What is a `Parameter`?
+## What is an `Argument`?
 
-`Parameter` is an interface all parameter objects must implement to provide a name
+`Argument` is an interface all arguments objects must implement to provide a name
 
-## What is a `SimpleParameter`?
+There are standard argument implements for common Java data types
 
-- The `SimpleParameter` class is a `Parameter` implementation that allows you to pass an Object as a parameter value
+- `BooleanArgument`
+- `ByteArgument`
+- `CharArgument`
+- `ShortArgument`
+- `IntegerArgument`
+- `LongArgument`
+- `BigIntegerArgument` 
+- `FloatArgument`
+- `DoubleArgument`
+- `BigDecimalArgument`
+- `StringArgument`
 
+Additionally, there is an `ObjectArgument<T>` that allows passing an arbitrary object as an argument
 
-- The `SimpleParameter` class defines various static methods to wrap native Java types, using the value as the name
-  - `boolean`
-  - `byte`
-  - `char`
-  - `short`
-  - `int`
-  - `long`
-  - `float`
-  - `double`
-  - `String`
+**Notes**
 
-Example
+- It's recommended to use a test specific object that implements `Argument` in instead of `ObjectArgument<T>` whenever possible
 
-```java
-@TestEngine.Parameter
-public SimpleParameter<String[]> simpleParameter;
+## What is a `KeyValueStore` ?
 
-@TestEngine.ParameterSupplier
-public static Stream<SimpleParameter<String[]>> parameters() {
-  Collection<SimpleParameter<String[]>> collection = new ArrayList<>();
-  
-  for (int i = 0; i < 10; i++) {
-    collection.add(
-      new SimpleParameter<(
-        "Array [" + i + "]", // name
-        new String[] { String.valueOf(i), String.valueOf(i * 2) })); // value
-  }
-  
-  return collection.stream();
-}
-```
-
-In this scenario, the value of the `SimpleParameter` is a `String[]`
-
-```java
-String[] values = parameter.value();
-```
-
-## What is a `MapParameter` ?
-
-A `MapParameter` is a `Parameter` implementation that can store key / value Objects 
+A `KeyValueStore` is an object with a `Map` like API that allows you store/retrieve keys/values
 
 
 - It allows you to add keys/values using a fluent pattern
 
 
-- It allows you to get a value cast to a specific type
-
-
-```java
-@TestEngine.ParameterSupplier
-public static Stream<MapParameter> parameters() {
-  Collection<MapParameter> collection = new ArrayList<>();
-
-  for (int i = 0; i < 10; i++) {
-    collection.add(
-      new MapParameter("Map[" + i + "]").put("value1", i).put("value2", i * 2);
-  }
-
-  return collection.stream();
-}
-```
-
-```java
-int value1 = mapParameter.get("value1");
-int value2 = mapParameter.get("value2");
-```
+- `get` method return `<T> T` which performs casting
 
 **Notes**
 
-- `MapParameter` is provided as a quick convenience `Parameter`, but ideally you should create a custom `Parameter` Object
+- It's recommended to use a test specific object to maintain state
 
 ## Test Engine Configuration
 
@@ -428,7 +327,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>4.0.0</version>
+  <version>4.0.1</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -447,12 +346,12 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -474,11 +373,10 @@ When running via Maven in a Linux console, the Test Engine will report a summary
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v4.0.0 Summary
+[INFO] AntuBLUE Test Engine v4.0.1 Summary
 [INFO] ------------------------------------------------------------------------
-[INFO] Test Classes    :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
-[INFO] Test Parameters : 119, PASSED : 119, FAILED : 0, SKIPPED : 0
-[INFO] Test Methods    : 476, PASSED : 476, FAILED : 0, SKIPPED : 0
+[INFO] Test Classes   :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
+[INFO] Test Methods   : 476, PASSED : 476, FAILED : 0, SKIPPED : 0
 [INFO] ------------------------------------------------------------------------
 [INFO] PASSED
 [INFO] ------------------------------------------------------------------------
@@ -492,17 +390,9 @@ Test Classes
 
 - Total number of test classes tested
 
-Test Parameters
-
-- Total number of test parameters tested (all test classes)
-
 Test Methods
 
 - Total number of test methods tested (all parameters / all test classes)
-
-**Notes**
-
-- Test classes can/may different use different test parameters, so you can't necessarily extrapolate the math in reverse
 
 ## Building
 
@@ -558,7 +448,7 @@ For changes, you should...
 
 ## Design
 
-Logical test execution flow...
+Logical test class execution flow...
 
 ```
 Scan all classpath jars for test classes that contains a method annotated with "@TestEngine.Test"
@@ -569,15 +459,15 @@ for (each test class in the Collection<Class<?>>) {
   
   thread {
   
-    invoke the test class "@TestEngine.ParameterSupplier" method to get a Stream<Parameter> or Iterable<Parameter>
+    invoke the test class "@TestEngine.ArgumentSupplier" method to get a Stream<Argument> or Iterable<Argument>
 
     create a single instance of the test class  
 
     invoke the test instance "@TestEngine.Prepare" methods 
     
-    for (each Parameter) {
+    for (each Argument) {
     
-      set all test instance "@TestEngine.Parameter" fields to the Parameter object
+      set the test instance "@TestEngine.Argument" field to the Argument object
        
       invoke all test instance "@TestEngine.BeforeAll" methods
       
@@ -600,6 +490,6 @@ for (each test class in the Collection<Class<?>>) {
 
 **Notes**
 
-- Each parameterized test class will be executed sequentially in a thread, but different test classes are executed in parallel threads
+- Each test class will be executed sequentially in a thread, but different test classes are executed in parallel threads
   - By default, thread count is equal to number of available processors as reported by Java
   - The thread count can be changed via a configuration value

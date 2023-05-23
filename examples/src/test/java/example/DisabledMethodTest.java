@@ -1,7 +1,7 @@
 package example;
 
-import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.StringArgument;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,12 +12,12 @@ import java.util.stream.Stream;
  */
 public class DisabledMethodTest {
 
-    @TestEngine.Parameter
-    private SimpleParameter<String> simpleParameter;
+    @TestEngine.Argument
+    protected StringArgument stringArgument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<String>> parameters() {
-        return StringParameterSupplier.parameters();
+    @TestEngine.ArgumentSupplier
+    public static Stream<StringArgument> arguments() {
+        return StringArgumentSupplier.arguments();
     }
 
     @TestEngine.BeforeAll
@@ -32,13 +32,13 @@ public class DisabledMethodTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + simpleParameter + ")");
+        System.out.println("test1(" + stringArgument + ")");
     }
 
     @TestEngine.Disabled
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + simpleParameter + ")");
+        System.out.println("test2(" + stringArgument + ")");
     }
 
     @TestEngine.AfterEach
@@ -51,12 +51,12 @@ public class DisabledMethodTest {
         System.out.println("afterAll()");
     }
 
-    private static class StringParameterSupplier {
+    private static class StringArgumentSupplier {
 
-        public static Stream<SimpleParameter<String>> parameters() {
-            Collection<SimpleParameter<String>> collection = new ArrayList<>();
+        public static Stream<StringArgument> arguments() {
+            Collection<StringArgument> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(SimpleParameter.of(String.valueOf(i)));
+                collection.add(StringArgument.of(String.valueOf(i)));
             }
             return collection.stream();
         }

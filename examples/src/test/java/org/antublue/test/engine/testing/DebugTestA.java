@@ -1,12 +1,10 @@
 package org.antublue.test.engine.testing;
 
-import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.IntegerArgument;
 import org.opentest4j.AssertionFailedError;
 
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test used for debugging IntelliJ
@@ -14,15 +12,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestEngine.Disabled
 public class DebugTestA {
 
-    @TestEngine.Parameter
-    public SimpleParameter<Integer> simpleParameter;
+    @TestEngine.Argument
+    public IntegerArgument integerArgument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<Integer>> parameters() {
+    @TestEngine.ArgumentSupplier
+    public static Stream<IntegerArgument> arguments() {
         return Stream.of(
-                SimpleParameter.of(1),
-                SimpleParameter.of(2),
-                SimpleParameter.of(3));
+                IntegerArgument.of(1),
+                IntegerArgument.of(2),
+                IntegerArgument.of(3));
     }
 
     @TestEngine.BeforeAll
@@ -37,15 +35,13 @@ public class DebugTestA {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + simpleParameter.value() + ")");
-        assertThat(simpleParameter.value().getClass()).isEqualTo(Integer.class);
+        System.out.println("test1(" + integerArgument.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + simpleParameter.value() + ")");
-        assertThat(simpleParameter.value().getClass()).isEqualTo(Integer.class);
-        if (simpleParameter.value() == 1) {
+        System.out.println("test2(" + integerArgument.value() + ")");
+        if (integerArgument.value() == 1) {
             throw new AssertionFailedError("Forced");
         }
     }
