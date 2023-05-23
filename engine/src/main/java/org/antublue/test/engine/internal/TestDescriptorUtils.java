@@ -75,7 +75,7 @@ public final class TestDescriptorUtils {
                             clazz.getName()));
         }
 
-        if (TestEngineReflectionUtils.getParameterField(clazz) == null) {
+        if (TestEngineReflectionUtils.getArgumentField(clazz) == null) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a @TestEngine.Argument field",

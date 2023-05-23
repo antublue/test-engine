@@ -83,7 +83,7 @@ public final class TestEngineReflectionUtils {
      */
     public static Method getArgumentSupplier(Class<?> clazz) {
         synchronized (argumentSupplierMethodCache) {
-            LOGGER.trace("getParameterSupplierMethod(%s)", clazz.getName());
+            LOGGER.trace("getArgumentSupplier(%s)", clazz.getName());
 
             if (argumentSupplierMethodCache.containsKey(clazz)) {
                 return argumentSupplierMethodCache.get(clazz);
@@ -102,26 +102,6 @@ public final class TestEngineReflectionUtils {
                         getMethods(
                                 clazz,
                                 TestEngine.ArgumentSupplier.class,
-                                Scope.STATIC,
-                                Iterable.class,
-                                (Class<?>[]) null);
-            }
-
-            if (methodList.size() == 0) {
-                methodList =
-                        getMethods(
-                                clazz,
-                                TestEngine.ParameterSupplier.class,
-                                Scope.STATIC,
-                                Stream.class,
-                                (Class<?>[]) null);
-            }
-
-            if (methodList.size() == 0) {
-                methodList =
-                        getMethods(
-                                clazz,
-                                TestEngine.ParameterSupplier.class,
                                 Scope.STATIC,
                                 Iterable.class,
                                 (Class<?>[]) null);
@@ -211,9 +191,9 @@ public final class TestEngineReflectionUtils {
      * @param clazz class to inspect
      * @return Field the Argument field
      */
-    public static Field getParameterField(Class<?> clazz) {
+    public static Field getArgumentField(Class<?> clazz) {
         synchronized (argumentFieldCaches) {
-            LOGGER.trace("getParameterFields(%s)", clazz.getName());
+            LOGGER.trace("getArgumentField(%s)", clazz.getName());
 
             if (argumentFieldCaches.containsKey(clazz)) {
                 return argumentFieldCaches.get(clazz);
@@ -222,12 +202,6 @@ public final class TestEngineReflectionUtils {
             List<Field> argumentFields = getFields(clazz, TestEngine.Argument.class, Argument.class);
 
             LOGGER.trace("@TestEngine.Argument field count [%d]", argumentFields.size());
-
-            if (argumentFields.size() == 0) {
-                argumentFields = getFields(clazz, TestEngine.Parameter.class, Argument.class);
-            }
-
-            LOGGER.trace("@TestEngine.Parameter field count [%d]", argumentFields.size());
 
             if (argumentFields.size() != 1) {
                 throw new TestClassConfigurationException(

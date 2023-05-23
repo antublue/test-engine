@@ -150,7 +150,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
         }
 
         return summary.getTestClassesFailedCount()
-                + summary.getParametersFailedCount()
+                + summary.getArgumentsFailedCount()
                 + summary.getTestsFailedCount() > 0;
     }
 
@@ -420,25 +420,25 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
             long column1Width =
                     getColumnWith(
                             summary.getTestClassCount(),
-                            summary.getParametersFoundCount(),
+                            summary.getArgumentsFoundCount(),
                             summary.getTestsFoundCount());
 
             long column2Width =
                     getColumnWith(
                             summary.getTestClassesSucceededCount(),
-                            summary.getParametersSucceededCount(),
+                            summary.getArgumentsSucceededCount(),
                             summary.getTestsSucceededCount());
 
             long column3Width =
                     getColumnWith(
                             summary.getTestClassesFailedCount(),
-                            summary.getParametersFailedCount(),
+                            summary.getArgumentsFailedCount(),
                             summary.getTestsFailedCount());
 
             long column4Width =
                     getColumnWith(
                             summary.getTestClassesSkippedCount(),
-                            summary.getParametersSkippedCount(),
+                            summary.getArgumentsSkippedCount(),
                             summary.getTestsSkippedCount());
 
             AnsiColorString ansiColorString = new AnsiColorString();
@@ -447,7 +447,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                     .append(INFO)
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append("Test Classes")
-                    .append("    : ")
+                    .append("   : ")
                     .append(pad(summary.getTestClassCount(), column1Width))
                     .append(", ")
                     .color(AnsiColor.GREEN_BOLD_BRIGHT)
@@ -470,38 +470,40 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
 
             System.out.println(ansiColorString);
 
+            /*
             ansiColorString
                     .append(INFO)
                     .color(AnsiColor.WHITE_BRIGHT)
-                    .append("Test Parameters")
+                    .append("Test Arguments")
                     .append(" : ")
-                    .append(pad(summary.getParametersFoundCount(), column1Width))
+                    .append(pad(summary.getArgumentsFoundCount(), column1Width))
                     .append(", ")
                     .color(AnsiColor.GREEN_BOLD_BRIGHT)
                     .append("PASSED")
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
-                    .append(pad(summary.getParametersSucceededCount(), column2Width))
+                    .append(pad(summary.getArgumentsSucceededCount(), column2Width))
                     .append(", ")
                     .color(AnsiColor.RED_BOLD_BRIGHT)
                     .append("FAILED")
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
-                    .append(pad(summary.getParametersFailedCount(), column3Width))
+                    .append(pad(summary.getArgumentsFailedCount(), column3Width))
                     .append(", ")
                     .color(AnsiColor.YELLOW_BOLD_BRIGHT)
                     .append("SKIPPED")
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
-                    .append(pad(summary.getParametersSkippedCount(), column4Width));
+                    .append(pad(summary.getArgumentsSkippedCount(), column4Width));
 
             System.out.println(ansiColorString);
+            */
 
             ansiColorString
                     .append(INFO)
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append("Test Methods")
-                    .append("    : ")
+                    .append("   : ")
                     .append(pad(summary.getTestsFoundCount(), column1Width))
                     .append(", ")
                     .color(AnsiColor.GREEN_BOLD_BRIGHT)
@@ -650,19 +652,19 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
             return testClassesSkipped.get();
         }
 
-        public long getParametersFoundCount() {
+        public long getArgumentsFoundCount() {
             return argumentsFound.get();
         }
 
-        public long getParametersSucceededCount() {
+        public long getArgumentsSucceededCount() {
             return argumentsSuccess.get();
         }
 
-        public long getParametersFailedCount() {
+        public long getArgumentsFailedCount() {
             return argumentsFailed.get();
         }
 
-        public long getParametersSkippedCount() {
+        public long getArgumentsSkippedCount() {
             return argumentsSkipped.get();
         }
 

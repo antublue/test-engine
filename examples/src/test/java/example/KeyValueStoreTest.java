@@ -1,9 +1,8 @@
 package example;
 
-import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.KeyValueStore;
-import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.KeyValueStore;
 
 import java.util.stream.Stream;
 
@@ -20,13 +19,13 @@ public class KeyValueStoreTest {
     private KeyValueStore keyValueStore;
 
     @TestEngine.Argument
-    public ObjectArgument<Integer> objectArgument;
+    public IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument> arguments() {
+    public static Stream<IntegerArgument> arguments() {
         return Stream.of(
-                ObjectArgument.of(1),
-                ObjectArgument.of(2));
+                IntegerArgument.of(1),
+                IntegerArgument.of(2));
     }
 
     @TestEngine.Prepare
@@ -39,35 +38,35 @@ public class KeyValueStoreTest {
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println(String.format("beforeAll() context [%s] argument [%s]", keyValueStore, objectArgument.value()));
+        System.out.println(String.format("beforeAll() context [%s] argument [%s]", keyValueStore, integerArgument.value()));
         System.out.println(String.format(STRING + " = [%s]", keyValueStore.get(STRING, String.class)));
         assertThat(keyValueStore.get(STRING, String.class)).isEqualTo(VALUE);
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println(String.format("beforeEach() context [%s] argument [%s]", keyValueStore, objectArgument.value()));
+        System.out.println(String.format("beforeEach() context [%s] argument [%s]", keyValueStore, integerArgument.value()));
         System.out.println(String.format(STRING + " = [%s]", keyValueStore.get(STRING, String.class)));
         assertThat(keyValueStore.get(STRING, String.class)).isEqualTo(VALUE);
     }
 
     @TestEngine.Test
     public void test() {
-        System.out.println(String.format("test() context [%s] argument [%s]", keyValueStore, objectArgument.value()));
+        System.out.println(String.format("test() context [%s] argument [%s]", keyValueStore, integerArgument.value()));
         System.out.println(String.format(STRING + " = [%s]", keyValueStore.get(STRING, String.class)));
         assertThat(keyValueStore.get(STRING, String.class)).isEqualTo(VALUE);
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
-        System.out.println(String.format("afterEach() context [%s] argument [%s]", keyValueStore, objectArgument.value()));
+        System.out.println(String.format("afterEach() context [%s] argument [%s]", keyValueStore, integerArgument.value()));
         System.out.println(String.format(STRING + " = [%s]", keyValueStore.get(STRING, String.class)));
         assertThat(keyValueStore.get(STRING, String.class)).isEqualTo(VALUE);
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println(String.format("afterAll() context [%s] argument [%s]", keyValueStore, objectArgument.value()));
+        System.out.println(String.format("afterAll() context [%s] argument [%s]", keyValueStore, integerArgument.value()));
         System.out.println(String.format(STRING + " = [%s]", keyValueStore.get(STRING, String.class)));
         assertThat(keyValueStore.get(STRING, String.class)).isEqualTo(VALUE);
     }

@@ -1,7 +1,7 @@
 package example.testcontainers;
 
-import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.StringArgument;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -33,15 +33,15 @@ public class KafkaTest {
     private KafkaTestState kafkaTestState;
 
     @TestEngine.Argument
-    protected ObjectArgument<String> objectArgument;
+    protected StringArgument stringArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<ObjectArgument<String>> arguments() {
+    public static Stream<StringArgument> arguments() {
         return Stream.of(
-                ObjectArgument.of("confluentinc/cp-kafka:7.3.0"),
-                ObjectArgument.of("confluentinc/cp-kafka:7.3.1"),
-                ObjectArgument.of("confluentinc/cp-kafka:7.3.2"),
-                ObjectArgument.of("confluentinc/cp-kafka:7.3.3"));
+                StringArgument.of("confluentinc/cp-kafka:7.3.0"),
+                StringArgument.of("confluentinc/cp-kafka:7.3.1"),
+                StringArgument.of("confluentinc/cp-kafka:7.3.2"),
+                StringArgument.of("confluentinc/cp-kafka:7.3.3"));
     }
 
     @TestEngine.Prepare
@@ -61,7 +61,7 @@ public class KafkaTest {
         System.out.println("createKafkaContainer()");
 
         Network network = kafkaTestState.getNetwork();
-        String dockerImageName = objectArgument.value();
+        String dockerImageName = stringArgument.value();
 
         KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse(dockerImageName));
         kafkaContainer.withNetwork(network);

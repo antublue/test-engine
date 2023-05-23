@@ -1,7 +1,7 @@
 package example;
 
-import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.StringArgument;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,12 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class FilteredArgumentStreamTest {
 
     @TestEngine.Argument
-    protected ObjectArgument<String> objectArgument;
+    protected StringArgument stringArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<ObjectArgument<String>> arguments() {
+    public static Stream<StringArgument> arguments() {
         return ArgumentSupplier
-                .arguments(objectArgument -> !objectArgument.value().contains("b"))
+                .arguments(integerArgument -> !integerArgument.value().contains("b"))
                 .collect(Collectors.toList())
                 .stream();
     }
@@ -34,14 +34,14 @@ public class FilteredArgumentStreamTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + objectArgument.value() + ")");
-        assertThat(objectArgument.value()).isNotEqualTo("b");
+        System.out.println("test1(" + stringArgument.value() + ")");
+        assertThat(stringArgument.value()).isNotEqualTo("b");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + objectArgument.value() + ")");
-        assertThat(objectArgument.value()).isNotEqualTo("b");
+        System.out.println("test2(" + stringArgument.value() + ")");
+        assertThat(stringArgument.value()).isNotEqualTo("b");
     }
 
     @TestEngine.AfterAll
@@ -57,15 +57,15 @@ public class FilteredArgumentStreamTest {
             // DO NOTHING
         }
 
-        public static Stream<ObjectArgument<String>> arguments() {
-            Collection<ObjectArgument<String>> arguments = new ArrayList<>();
+        public static Stream<StringArgument> arguments() {
+            Collection<StringArgument> arguments = new ArrayList<>();
             for (String value : VALUES) {
-                arguments.add(ObjectArgument.of(value));
+                arguments.add(StringArgument.of(value));
             }
             return arguments.stream();
         }
 
-        public static Stream<ObjectArgument<String>> arguments(Predicate<ObjectArgument<String>> predicate) {
+        public static Stream<StringArgument> arguments(Predicate<StringArgument> predicate) {
             return predicate != null ? arguments().filter(predicate) : arguments();
         }
     }

@@ -136,7 +136,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             LOGGER.trace("injecting [%s] @TestEngine.Argument field ...", testClassName);
 
             try {
-                 TestEngineReflectionUtils.getParameterField(testClass).set(testInstance, testArgument);
+                 TestEngineReflectionUtils.getArgumentField(testClass).set(testInstance, testArgument);
             } finally {
                 flush();
             }

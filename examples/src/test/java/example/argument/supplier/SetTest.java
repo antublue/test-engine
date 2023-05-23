@@ -1,12 +1,10 @@
 package example.argument.supplier;
 
-import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Example test
@@ -14,14 +12,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SetTest {
 
     @TestEngine.Argument
-    protected ObjectArgument<Integer> objectArgument;
+    protected IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Set<ObjectArgument<Integer>> arguments() {
-        Set<ObjectArgument<Integer>> arguments = new LinkedHashSet<>();
-        arguments.add(ObjectArgument.of(1));
-        arguments.add(ObjectArgument.of(2));
-        arguments.add(ObjectArgument.of(3));
+    public static Set<IntegerArgument> arguments() {
+        Set<IntegerArgument> arguments = new LinkedHashSet<>();
+        arguments.add(IntegerArgument.of(1));
+        arguments.add(IntegerArgument.of(2));
+        arguments.add(IntegerArgument.of(3));
         return arguments;
     }
 
@@ -37,14 +35,12 @@ public class SetTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + objectArgument.value() + ")");
-        assertThat(objectArgument.value().getClass()).isEqualTo(Integer.class);
+        System.out.println("test1(" + integerArgument.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + objectArgument.value() + ")");
-        assertThat(objectArgument.value().getClass()).isEqualTo(Integer.class);
+        System.out.println("test2(" + integerArgument.value() + ")");
     }
 
     @TestEngine.AfterEach

@@ -1,7 +1,7 @@
 package example;
 
-import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.StringArgument;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,10 +14,10 @@ import java.util.stream.Stream;
 public class DisabledTest {
 
     @TestEngine.Argument
-    private ObjectArgument<String> objectArgument;
+    private StringArgument stringArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<ObjectArgument<String>> arguments() {
+    public static Stream<StringArgument> arguments() {
         return StringArgumentSupplier.arguments();
     }
 
@@ -33,12 +33,12 @@ public class DisabledTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + objectArgument.value() + ")");
+        System.out.println("test1(" + stringArgument.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + objectArgument.value() + ")");
+        System.out.println("test2(" + stringArgument.value() + ")");
     }
 
     @TestEngine.AfterEach
@@ -53,10 +53,10 @@ public class DisabledTest {
 
     private static class StringArgumentSupplier {
 
-        public static Stream<ObjectArgument<String>> arguments() {
-            Collection<ObjectArgument<String>> collection = new ArrayList<>();
+        public static Stream<StringArgument> arguments() {
+            Collection<StringArgument> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(ObjectArgument.of(String.valueOf(i)));
+                collection.add(StringArgument.of(String.valueOf(i)));
             }
             return collection.stream();
         }

@@ -1,12 +1,12 @@
 package example.inheritance;
 
-import org.antublue.test.engine.api.ObjectArgument;
+import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.stream.Stream;
 
 public abstract class EvenBaseTest extends BaseTest {
 
-    protected static Stream<ObjectArgument<Integer>> arguments() {
+    protected static Stream<IntegerArgument> arguments() {
         return BaseTest
                 .arguments()
                 .filter(argument -> {

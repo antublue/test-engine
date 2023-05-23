@@ -1,11 +1,9 @@
 package example.nested;
 
-import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Example test
@@ -16,7 +14,7 @@ public class NestedTest {
 
         @Override
         protected void setup() {
-            System.out.println("Concrete1.setup(" + objectArgument.value() + ")");
+            System.out.println("Concrete1.setup(" + integerArgument.value() + ")");
         }
     }
 
@@ -24,7 +22,7 @@ public class NestedTest {
 
         @Override
         protected void setup() {
-            System.out.println("Concrete2.setup(" + objectArgument.value() + ")");
+            System.out.println("Concrete2.setup(" + integerArgument.value() + ")");
         }
     }
 
@@ -32,16 +30,16 @@ public class NestedTest {
     public static abstract class BaseTest {
 
         @TestEngine.Argument
-        protected ObjectArgument<Integer> objectArgument;
+        protected IntegerArgument integerArgument;
 
         protected abstract void setup();
 
         @TestEngine.ArgumentSupplier
-        public static Stream<ObjectArgument<Integer>> arguments() {
+        public static Stream<IntegerArgument> arguments() {
             return Stream.of(
-                    ObjectArgument.of(1),
-                    ObjectArgument.of(2),
-                    ObjectArgument.of(3));
+                    IntegerArgument.of(1),
+                    IntegerArgument.of(2),
+                    IntegerArgument.of(3));
         }
 
         @TestEngine.BeforeAll
@@ -57,14 +55,12 @@ public class NestedTest {
 
         @TestEngine.Test
         public void test1() {
-            System.out.println("test1(" + objectArgument.value() + ")");
-            assertThat(objectArgument.value().getClass()).isEqualTo(Integer.class);
+            System.out.println("test1(" + integerArgument.value() + ")");
         }
 
         @TestEngine.Test
         public void test2() {
-            System.out.println("test2(" + objectArgument.value() + ")");
-            assertThat(objectArgument.value().getClass()).isEqualTo(Integer.class);
+            System.out.println("test2(" + integerArgument.value() + ")");
         }
 
         @TestEngine.AfterEach

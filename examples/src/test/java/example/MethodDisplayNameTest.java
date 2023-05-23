@@ -1,11 +1,9 @@
 package example;
 
-import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Example test
@@ -13,14 +11,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MethodDisplayNameTest {
 
     @TestEngine.Argument
-    protected ObjectArgument<Integer> objectArgument;
+    protected IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<ObjectArgument<Integer>> arguments() {
+    public static Stream<IntegerArgument> arguments() {
         return Stream.of(
-                ObjectArgument.of(1),
-                ObjectArgument.of(2),
-                ObjectArgument.of(3));
+                IntegerArgument.of(1),
+                IntegerArgument.of(2),
+                IntegerArgument.of(3));
     }
 
     @TestEngine.BeforeAll
@@ -36,15 +34,13 @@ public class MethodDisplayNameTest {
     @TestEngine.Test
     @TestEngine.DisplayName("Test 2")
     public void testA() {
-        System.out.println("testA(" + objectArgument.value() + ")");
-        assertThat(objectArgument.value().getClass()).isEqualTo(Integer.class);
+        System.out.println("testA(" + integerArgument.value() + ")");
     }
 
     @TestEngine.Test
     @TestEngine.DisplayName("Test 1")
     public void testB() {
-        System.out.println("testB(" + objectArgument.value() + ")");
-        assertThat(objectArgument.value().getClass()).isEqualTo(Integer.class);
+        System.out.println("testB(" + integerArgument.value() + ")");
     }
 
     @TestEngine.AfterEach

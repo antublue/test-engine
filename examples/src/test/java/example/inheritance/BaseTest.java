@@ -1,7 +1,7 @@
 package example.inheritance;
 
-import org.antublue.test.engine.api.ObjectArgument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,14 +11,14 @@ import java.util.stream.Stream;
 public class BaseTest {
 
     @TestEngine.Argument
-    protected ObjectArgument<Integer> objectArgument;
+    protected IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
-    protected static Stream<ObjectArgument<Integer>> arguments() {
-        Collection<ObjectArgument<Integer>> collection = new ArrayList<>();
+    protected static Stream<IntegerArgument> arguments() {
+        Collection<IntegerArgument> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            collection.add(new ObjectArgument("Array [" + i + "]", i));
+            collection.add(IntegerArgument.of(i));
         }
 
         return collection.stream();
