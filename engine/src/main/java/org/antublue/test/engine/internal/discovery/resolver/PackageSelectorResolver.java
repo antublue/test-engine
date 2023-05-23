@@ -85,7 +85,7 @@ public class PackageSelectorResolver {
 
                     final AtomicInteger index = new AtomicInteger();
                     TestEngineReflectionUtils
-                            .getArguments(clazz)
+                            .getArgumentsList(clazz)
                             .forEach(argument -> {
                                 UniqueId argumentTestDescriptorUniqueId =
                                         classTestDescriptorUniqueId

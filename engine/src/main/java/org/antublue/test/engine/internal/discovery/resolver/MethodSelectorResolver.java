@@ -94,7 +94,7 @@ public class MethodSelectorResolver {
 
         final AtomicInteger index = new AtomicInteger();
         TestEngineReflectionUtils
-                .getArguments(clazz)
+                .getArgumentsList(clazz)
                 .forEach(argument -> {
                     UniqueId argumentTestDescriptorUniqueId =
                             classTestDescriptorUniqueId.append(

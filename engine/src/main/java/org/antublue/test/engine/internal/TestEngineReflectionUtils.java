@@ -81,9 +81,9 @@ public final class TestEngineReflectionUtils {
      * @param clazz class to inspect
      * @return Method the return value
      */
-    public static Method getArgumentSupplier(Class<?> clazz) {
+    public static Method getArgumentSupplierMethod(Class<?> clazz) {
         synchronized (argumentSupplierMethodCache) {
-            LOGGER.trace("getArgumentSupplier(%s)", clazz.getName());
+            LOGGER.trace("getArgumentSupplierMethod(%s)", clazz.getName());
 
             if (argumentSupplierMethodCache.containsKey(clazz)) {
                 return argumentSupplierMethodCache.get(clazz);
@@ -107,6 +107,8 @@ public final class TestEngineReflectionUtils {
                                 (Class<?>[]) null);
             }
 
+            LOGGER.trace("@TestEngine.ArgumentSupplier method count [%d]", methodList.size());
+
             if (methodList.size() != 1) {
                 throw new TestClassConfigurationException(
                         String.format(
@@ -128,9 +130,11 @@ public final class TestEngineReflectionUtils {
      * @param clazz class to inspect
      * @return list of Arguments
      */
-    public static List<Argument> getArguments(Class<?> clazz) {
+    public static List<Argument> getArgumentsList(Class<?> clazz) {
+        LOGGER.trace("getArgumentsList(%s)", clazz.getName());
+
         try {
-            Method method = getArgumentSupplier(clazz);
+            Method method = getArgumentSupplierMethod(clazz);
             Object object = method.invoke(null, (Object[]) null);
             if (object instanceof Stream) {
                 return ((Stream<Argument>) object).collect(Collectors.toList());
@@ -163,6 +167,8 @@ public final class TestEngineReflectionUtils {
      */
     public static List<Method> getPrepareMethods(Class<?> clazz) {
         synchronized (prepareMethodCache) {
+            LOGGER.trace("getPrepareMethods(%s)", clazz.getName());
+
             if (prepareMethodCache.containsKey(clazz)) {
                 return prepareMethodCache.get(clazz);
             }
@@ -200,7 +206,6 @@ public final class TestEngineReflectionUtils {
             }
 
             List<Field> argumentFields = getFields(clazz, TestEngine.Argument.class, Argument.class);
-
             LOGGER.trace("@TestEngine.Argument field count [%d]", argumentFields.size());
 
             if (argumentFields.size() != 1) {
@@ -224,6 +229,8 @@ public final class TestEngineReflectionUtils {
      */
     public static List<Method> getBeforeAllMethods(Class<?> clazz) {
         synchronized (beforeAllMethodCache) {
+            LOGGER.trace("getBeforeAllMethods(%s)", clazz.getName());
+
             if (beforeAllMethodCache.containsKey(clazz)) {
                 return beforeAllMethodCache.get(clazz);
             }
@@ -254,6 +261,8 @@ public final class TestEngineReflectionUtils {
      */
     public static List<Method> getBeforeEachMethods(Class<?> clazz) {
         synchronized (beforeEachMethodCache) {
+            LOGGER.trace("getBeforeEachMethods(%s)", clazz.getName());
+
             if (beforeEachMethodCache.containsKey(clazz)) {
                 return beforeEachMethodCache.get(clazz);
             }
@@ -321,6 +330,8 @@ public final class TestEngineReflectionUtils {
      */
     public static List<Method> getAfterEachMethods(Class<?> clazz) {
         synchronized (afterEachMethodCache) {
+            LOGGER.trace("getAfterEachMethods(%s)", clazz.getName());
+
             if (afterEachMethodCache.containsKey(clazz)) {
                 return afterEachMethodCache.get(clazz);
             }
@@ -351,6 +362,8 @@ public final class TestEngineReflectionUtils {
      */
     public static List<Method> getAfterAllMethods(Class<?> clazz) {
         synchronized (afterAllMethodCache) {
+            LOGGER.trace("getAfterAllMethods(%s)", clazz.getName());
+
             if (afterAllMethodCache.containsKey(clazz)) {
                 return afterAllMethodCache.get(clazz);
             }
@@ -381,6 +394,8 @@ public final class TestEngineReflectionUtils {
      */
     public static List<Method> getConcludeMethods(Class<?> clazz) {
         synchronized (concludeMethodCache) {
+            LOGGER.trace("getConcludeMethods(%s)", clazz.getName());
+
             if (concludeMethodCache.containsKey(clazz)) {
                 return concludeMethodCache.get(clazz);
             }

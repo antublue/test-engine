@@ -76,7 +76,7 @@ public class UniqueIdSelectorResolver {
                                 .orElseGet(() ->
                                         TestDescriptorUtils.createClassTestDescriptor(classTestDescriptorUniqueId, clazz));
 
-                List<Argument> arguments = TestEngineReflectionUtils.getArguments(clazz);
+                List<Argument> arguments = TestEngineReflectionUtils.getArgumentsList(clazz);
                 Argument argument = arguments.get(Integer.parseInt(segment.getValue()));
 
                 ArgumentTestDescriptor argumentTestDescriptor =
@@ -124,7 +124,7 @@ public class UniqueIdSelectorResolver {
 
                 AtomicInteger index = new AtomicInteger();
                 TestEngineReflectionUtils
-                        .getArguments(clazz)
+                        .getArgumentsList(clazz)
                         .forEach(argument -> {
                             UniqueId argumentTestDescriptorUniqueId =
                                     selectorUniqueId.append(

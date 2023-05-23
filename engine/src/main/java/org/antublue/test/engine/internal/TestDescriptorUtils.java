@@ -68,7 +68,7 @@ public final class TestDescriptorUtils {
      */
     public static ArgumentTestDescriptor createArgumentTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Argument argument) {
-        if (TestEngineReflectionUtils.getArgumentSupplier(clazz) == null) {
+        if (TestEngineReflectionUtils.getArgumentSupplierMethod(clazz) == null) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a static @TestEngine.ArgumentSupplier method",
