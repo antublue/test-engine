@@ -1,8 +1,7 @@
 package example;
 
-import org.antublue.test.engine.api.Parameter;
-import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.StringArgument;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,12 +13,12 @@ import java.util.stream.Stream;
 @TestEngine.Disabled
 public class DisabledTest {
 
-    @TestEngine.Parameter
-    private Parameter parameter;
+    @TestEngine.Argument
+    private StringArgument stringArgument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<String>> parameters() {
-        return StringParameterSupplier.parameters();
+    @TestEngine.ArgumentSupplier
+    public static Stream<StringArgument> arguments() {
+        return StringArgumentSupplier.arguments();
     }
 
     @TestEngine.BeforeAll
@@ -34,12 +33,12 @@ public class DisabledTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + parameter + ")");
+        System.out.println("test1(" + stringArgument.value() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + parameter + ")");
+        System.out.println("test2(" + stringArgument.value() + ")");
     }
 
     @TestEngine.AfterEach
@@ -52,12 +51,12 @@ public class DisabledTest {
         System.out.println("afterAll()");
     }
 
-    private static class StringParameterSupplier {
+    private static class StringArgumentSupplier {
 
-        public static Stream<SimpleParameter<String>> parameters() {
-            Collection<SimpleParameter<String>> collection = new ArrayList<>();
+        public static Stream<StringArgument> arguments() {
+            Collection<StringArgument> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(SimpleParameter.of(String.valueOf(i)));
+                collection.add(StringArgument.of(String.valueOf(i)));
             }
             return collection.stream();
         }

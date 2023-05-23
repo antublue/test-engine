@@ -1,7 +1,7 @@
 package example;
 
-import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.ObjectArgument;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,15 +14,15 @@ public class ArrayTestWithProtectedMethods {
 
     private String[] values;
 
-    @TestEngine.Parameter
-    protected SimpleParameter<String[]> simpleParameter;
+    @TestEngine.Argument
+    protected ObjectArgument<String[]> objectArgument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<String[]>> parameters() {
-        Collection<SimpleParameter<String[]>> collection = new ArrayList<>();
+    @TestEngine.ArgumentSupplier
+    public static Stream<ObjectArgument<String[]>> arguments() {
+        Collection<ObjectArgument<String[]>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             collection.add(
-                    new SimpleParameter<>(
+                    new ObjectArgument<>(
                             "Array [" + i + "]",
                             new String[] { String.valueOf(i), String.valueOf(i * 2) }));
         }
@@ -32,7 +32,7 @@ public class ArrayTestWithProtectedMethods {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        values = simpleParameter.value();
+        values = objectArgument.value();
     }
 
     @TestEngine.BeforeEach

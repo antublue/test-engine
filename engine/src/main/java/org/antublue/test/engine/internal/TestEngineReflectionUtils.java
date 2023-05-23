@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.internal;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -39,15 +39,15 @@ import java.util.stream.Stream;
 /**
  * Class to implement methods to get test class fields / methods, caching the information
  */
-@SuppressWarnings({"unchecked", "PMD.EmptyControlStatement"})
+@SuppressWarnings({"unchecked", "PMD.EmptyControlStatement", "deprecated"})
 public final class TestEngineReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineReflectionUtils.class);
 
     private enum Scope { STATIC, NON_STATIC }
 
-    private static final Map<Class<?>, Method> parameterSupplierMethodCache;
-    private static final Map<Class<?>, Field> parameterFieldCaches;
+    private static final Map<Class<?>, Method> argumentSupplierMethodCache;
+    private static final Map<Class<?>, Field> argumentFieldCaches;
     private static final Map<Class<?>, List<Method>> prepareMethodCache;
     private static final Map<Class<?>, List<Method>> beforeAllMethodCache;
     private static final Map<Class<?>, List<Method>> beforeEachMethodCache;
@@ -57,9 +57,9 @@ public final class TestEngineReflectionUtils {
     private static final Map<Class<?>, List<Method>> concludeMethodCache;
 
     static {
-        parameterSupplierMethodCache = new HashMap<>();
+        argumentSupplierMethodCache = new HashMap<>();
         prepareMethodCache = new HashMap<>();
-        parameterFieldCaches = new HashMap<>();
+        argumentFieldCaches = new HashMap<>();
         beforeAllMethodCache = new HashMap<>();
         beforeEachMethodCache = new HashMap<>();
         testMethodCache = new HashMap<>();
@@ -76,23 +76,23 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a @TestEngine.ParameterSupplier Method
+     * Method to get a @TestEngine.ArgumentSupplier Method
      *
      * @param clazz class to inspect
      * @return Method the return value
      */
-    public static Method getParameterSupplierMethod(Class<?> clazz) {
-        synchronized (parameterSupplierMethodCache) {
-            LOGGER.trace("getParameterSupplierMethod(%s)", clazz.getName());
+    public static Method getArgumentSupplier(Class<?> clazz) {
+        synchronized (argumentSupplierMethodCache) {
+            LOGGER.trace("getArgumentSupplier(%s)", clazz.getName());
 
-            if (parameterSupplierMethodCache.containsKey(clazz)) {
-                return parameterSupplierMethodCache.get(clazz);
+            if (argumentSupplierMethodCache.containsKey(clazz)) {
+                return argumentSupplierMethodCache.get(clazz);
             }
 
             List<Method> methodList =
                     getMethods(
                             clazz,
-                            TestEngine.ParameterSupplier.class,
+                            TestEngine.ArgumentSupplier.class,
                             Scope.STATIC,
                             Stream.class,
                             (Class<?>[]) null);
@@ -101,7 +101,7 @@ public final class TestEngineReflectionUtils {
                 methodList =
                         getMethods(
                                 clazz,
-                                TestEngine.ParameterSupplier.class,
+                                TestEngine.ArgumentSupplier.class,
                                 Scope.STATIC,
                                 Iterable.class,
                                 (Class<?>[]) null);
@@ -110,52 +110,38 @@ public final class TestEngineReflectionUtils {
             if (methodList.size() != 1) {
                 throw new TestClassConfigurationException(
                         String.format(
-                                "Class [%s] must define one @TestEngine.ParameterSupplier method",
+                                "Class [%s] must define one @TestEngine.ArgumentSupplier method",
                                 clazz.getName()));
             }
 
-            /*
-            // TODO
-            methodList.forEach(method -> {
-                Class<?> returnType = method.getReturnType();
-
-                if (Iterable.class.isAssignableFrom(returnType)) {
-
-                } else if (Stream.class.isAssignableFrom(returnType)) {
-
-                } else {
-                    throw new TestClassConfigurationException("TODO");
-                }
-            });
-            */
 
             Method method = methodList.get(0);
-            parameterSupplierMethodCache.put(clazz, method);
+            argumentSupplierMethodCache.put(clazz, method);
 
             return method;
         }
     }
 
     /**
-     * Method to get a List of Parameters for a Class
+     * Method to get a List of Arguments for a Class
      *
      * @param clazz class to inspect
-     * @return list of Parameters
+     * @return list of Arguments
      */
-    public static List<Parameter> getParameters(Class<?> clazz) {
+    public static List<Argument> getArguments(Class<?> clazz) {
         try {
-            Method method = getParameterSupplierMethod(clazz);
+            Method method = getArgumentSupplier(clazz);
             Object object = method.invoke(null, (Object[]) null);
             if (object instanceof Stream) {
-                return ((Stream<Parameter>) object).collect(Collectors.toList());
+                return ((Stream<Argument>) object).collect(Collectors.toList());
             } else if (object instanceof Iterable) {
-                List<Parameter> parameters = new ArrayList<>();
-                ((Iterable<Parameter>) object).forEach(parameters::add);
-                return parameters;
+                List<Argument> argument = new ArrayList<>();
+                ((Iterable<Argument>) object).forEach(argument::add);
+                return argument;
             } else {
                 throw new TestClassConfigurationException(
                         String.format(
-                                "Class [%s] must define one @TestEngine.ParameterSupplier method",
+                                "Class [%s] must define one @TestEngine.ArgumentSupplier method",
                                 clazz.getName()));
             }
         } catch (TestClassConfigurationException e) {
@@ -163,7 +149,7 @@ public final class TestEngineReflectionUtils {
         } catch (Throwable t) {
             throw new TestClassConfigurationException(
                     String.format(
-                            "Can't get Stream<Parameter> from class [%s]",
+                            "Can't get Stream<Argument> or Iterable<Argument> from class [%s]",
                             clazz.getName()),
                     t);
         }
@@ -200,33 +186,33 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a List of @TestEngine.Parameter Fields
+     * Method to get @TestEngine.Argument Field
      *
      * @param clazz class to inspect
-     * @return Field
+     * @return Field the Argument field
      */
-    public static Field getParameterField(Class<?> clazz) {
-        synchronized (parameterFieldCaches) {
-            LOGGER.trace("getParameterFields(%s)", clazz.getName());
+    public static Field getArgumentField(Class<?> clazz) {
+        synchronized (argumentFieldCaches) {
+            LOGGER.trace("getArgumentField(%s)", clazz.getName());
 
-            if (parameterFieldCaches.containsKey(clazz)) {
-                return parameterFieldCaches.get(clazz);
+            if (argumentFieldCaches.containsKey(clazz)) {
+                return argumentFieldCaches.get(clazz);
             }
 
-            List<Field> parameterFields = getFields(clazz, TestEngine.Parameter.class, Parameter.class);
+            List<Field> argumentFields = getFields(clazz, TestEngine.Argument.class, Argument.class);
 
-            LOGGER.trace("@TestEngine.Parameter field count [%d]", parameterFields.size());
+            LOGGER.trace("@TestEngine.Argument field count [%d]", argumentFields.size());
 
-            if (parameterFields.size() != 1) {
+            if (argumentFields.size() != 1) {
                 throw new TestClassConfigurationException(
                         String.format(
-                                "Class [%s] must define one @TestEngine.Parameter field",
+                                "Class [%s] must define one @TestEngine.Argument field",
                                 clazz.getName()));
             }
 
-            parameterFieldCaches.put(clazz, parameterFields.get(0));
+            argumentFieldCaches.put(clazz, argumentFields.get(0));
 
-            return parameterFields.get(0);
+            return argumentFields.get(0);
         }
     }
 

@@ -1,7 +1,7 @@
 package org.antublue.test.engine.testing;
 
-import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.StringArgument;
 import org.opentest4j.AssertionFailedError;
 
 import java.util.stream.Stream;
@@ -14,15 +14,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestEngine.Disabled
 public class DebugTestB {
 
-    @TestEngine.Parameter
-    public SimpleParameter<String> simpleParameter;
+    @TestEngine.Argument
+    public StringArgument stringArgument;
 
-    @TestEngine.ParameterSupplier
-    public static Stream<SimpleParameter<String>> parameters() {
+    @TestEngine.ArgumentSupplier
+    public static Stream<StringArgument> arguments() {
         return Stream.of(
-                SimpleParameter.of("a"),
-                SimpleParameter.of("b"),
-                SimpleParameter.of("c"));
+                StringArgument.of("a"),
+                StringArgument.of("b"),
+                StringArgument.of("c"));
     }
 
     @TestEngine.BeforeAll
@@ -37,15 +37,15 @@ public class DebugTestB {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + simpleParameter.value() + ")");
-        assertThat(simpleParameter.value().getClass()).isEqualTo(String.class);
+        System.out.println("test1(" + stringArgument.value() + ")");
+        assertThat(stringArgument.value().getClass()).isEqualTo(String.class);
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + simpleParameter.value() + ")");
-        assertThat(simpleParameter.value().getClass()).isEqualTo(String.class);
-        if (simpleParameter.value().equals("b")) {
+        System.out.println("test2(" + stringArgument.value() + ")");
+        assertThat(stringArgument.value().getClass()).isEqualTo(String.class);
+        if (stringArgument.value().equals("b")) {
             throw new AssertionFailedError("Forced");
         }
     }

@@ -1,7 +1,7 @@
 package example.inheritance;
 
-import org.antublue.test.engine.api.SimpleParameter;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,15 +10,15 @@ import java.util.stream.Stream;
 @TestEngine.BaseClass
 public class BaseTest {
 
-    @TestEngine.Parameter
-    protected SimpleParameter<Integer> simpleParameter;
+    @TestEngine.Argument
+    protected IntegerArgument integerArgument;
 
-    @TestEngine.ParameterSupplier
-    protected static Stream<SimpleParameter<Integer>> parameters() {
-        Collection<SimpleParameter<Integer>> collection = new ArrayList<>();
+    @TestEngine.ArgumentSupplier
+    protected static Stream<IntegerArgument> arguments() {
+        Collection<IntegerArgument> collection = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            collection.add(new SimpleParameter("Array [" + i + "]", i));
+            collection.add(IntegerArgument.of(i));
         }
 
         return collection.stream();

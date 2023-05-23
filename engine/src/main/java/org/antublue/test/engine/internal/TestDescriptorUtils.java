@@ -16,10 +16,10 @@
 
 package org.antublue.test.engine.internal;
 
-import org.antublue.test.engine.api.Parameter;
+import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.ParameterTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Switch;
@@ -59,33 +59,30 @@ public final class TestDescriptorUtils {
     }
 
     /**
-     * Method to create a ParameterTestDescriptor
+     * Method to create an ArgumentTestDescriptor
      *
      * @param uniqueId uniqueId
      * @param clazz clazz
-     * @param parameter parameter
+     * @param argument argument
      * @return the return value
      */
-    public static ParameterTestDescriptor createParameterTestDescriptor(
-            UniqueId uniqueId, Class<?> clazz, Parameter parameter) {
-        if (TestEngineReflectionUtils.getParameterSupplierMethod(clazz) == null) {
+    public static ArgumentTestDescriptor createArgumentTestDescriptor(
+            UniqueId uniqueId, Class<?> clazz, Argument argument) {
+        if (TestEngineReflectionUtils.getArgumentSupplier(clazz) == null) {
             throw new TestClassConfigurationException(
                     String.format(
-                            "Test class [%s] must declare an @TestEngine.ParameterSupplier method",
+                            "Test class [%s] must declare a static @TestEngine.ArgumentSupplier method",
                             clazz.getName()));
         }
 
-        /*
-        if (TestEngineReflectionUtils.getParameterFields(clazz).isEmpty()
-            && TestEngineReflectionUtils.getParameterMethods(clazz).isEmpty()) {
+        if (TestEngineReflectionUtils.getArgumentField(clazz) == null) {
             throw new TestClassConfigurationException(
                     String.format(
-                            "Test class [%s] must declare a @TestEngine.Parameter field or method",
+                            "Test class [%s] must declare a @TestEngine.Argument field",
                             clazz.getName()));
         }
-        */
 
-        return new ParameterTestDescriptor(uniqueId, parameter.name(), clazz, parameter);
+        return new ArgumentTestDescriptor(uniqueId, argument.name(), clazz, argument);
     }
 
     /**
@@ -93,17 +90,17 @@ public final class TestDescriptorUtils {
      *
      * @param uniqueId uniqueId
      * @param clazz clazz
-     * @param parameter parameter
+     * @param argument argument
      * @param method method
      * @return the return value
      */
     public static MethodTestDescriptor createMethodTestDescriptor(
-            UniqueId uniqueId, Class<?> clazz, Parameter parameter, Method method) {
+            UniqueId uniqueId, Class<?> clazz, Argument argument, Method method) {
         return new MethodTestDescriptor(
                 uniqueId,
                 TestEngineReflectionUtils.getDisplayName(method),
                 clazz,
-                parameter,
+                argument,
                 method);
     }
 
@@ -136,23 +133,23 @@ public final class TestDescriptorUtils {
         Switch.switchType(testDescriptor,
                 Switch.switchCase(
                         MethodTestDescriptor.class,
-                        testMethodTestDescriptor ->
+                        methodTestDescriptor ->
                                 stringBuilder
                                         .append("method -> ")
-                                        .append(testMethodTestDescriptor.getUniqueId())
+                                        .append(methodTestDescriptor.getUniqueId())
                                         .append("()")),
                 Switch.switchCase(
-                        ParameterTestDescriptor.class,
-                        testEngineParameterTestDescriptor ->
+                        ArgumentTestDescriptor.class,
+                        argumentTestDescriptor ->
                                 stringBuilder
-                                        .append("parameter -> ")
-                                        .append(testEngineParameterTestDescriptor.getUniqueId())),
+                                        .append("argument -> ")
+                                        .append(argumentTestDescriptor.getUniqueId())),
                 Switch.switchCase(
                         ClassTestDescriptor.class,
-                        testClassTestDescriptor ->
+                        classTestDescriptor ->
                                 stringBuilder
                                         .append("class -> ")
-                                        .append(testClassTestDescriptor.getUniqueId())),
+                                        .append(classTestDescriptor.getUniqueId())),
                 Switch.switchCase(
                         EngineDescriptor.class,
                         engineDescriptor ->
