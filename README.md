@@ -138,24 +138,22 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 
 - It's recommended to use a tag string format of `/tag1/tag2/tag3/`
 
-## Usage Examples
+## Usage
 
-The `examples` projects 
-
-
-Real integration test example using `testcontainers-java` and Apache Kafka ...
-
-https://github.com/antublue/test-engine/blob/main/examples/src/test/java/example/testcontainers/KafkaTest.java
-
-Additional test examples...
+The `examples` project contains various testing examples and scenarios
 
 https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example
 
+Real integration test example using `testcontainers-java` and Confluent Platform...
+
+https://github.com/antublue/test-engine/blob/main/examples/src/test/java/example/testcontainers/KafkaTest.java
+
+
 ## What is an `Argument`?
 
-`Argument` is an interface all arguments objects must implement to provide a name
+`Argument` is an interface all argument objects must implement to provide a name
 
-There are standard argument implements for common Java data types
+There are standard argument implements for common Java data types:
 
 - `BooleanArgument`
 - `ByteArgument`
@@ -173,7 +171,7 @@ Additionally, there is an `ObjectArgument<T>` that allows passing an arbitrary o
 
 **Notes**
 
-- It's recommended to use a test specific object that implements `Argument` in instead of `ObjectArgument<T>` whenever possible
+- It's recommended to use a test specific argument object instead of `ObjectArgument<T>` whenever possible
 
 ## What is a `KeyValueStore` ?
 
