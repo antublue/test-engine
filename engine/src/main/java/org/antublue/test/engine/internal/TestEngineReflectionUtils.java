@@ -20,6 +20,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.Throwables;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,7 @@ import java.util.stream.Stream;
 /**
  * Class to implement methods to get test class fields / methods, caching the information
  */
-@SuppressWarnings({"unchecked", "PMD.EmptyControlStatement", "deprecated"})
+@SuppressWarnings({"unchecked", "PMD.EmptyControlStatement"})
 public final class TestEngineReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineReflectionUtils.class);
@@ -107,12 +109,15 @@ public final class TestEngineReflectionUtils {
                                 (Class<?>[]) null);
             }
 
-            LOGGER.trace("@TestEngine.ArgumentSupplier method count [%d]", methodList.size());
+            LOGGER.trace(
+                    "class [%s] @TestEngine.ArgumentSupplier method count [%d]",
+                    clazz.getName(),
+                    methodList.size());
 
             if (methodList.size() != 1) {
                 throw new TestClassConfigurationException(
                         String.format(
-                                "Class [%s] must define one @TestEngine.ArgumentSupplier method",
+                                "Test class [%s] must define one @TestEngine.ArgumentSupplier method",
                                 clazz.getName()));
             }
 
@@ -137,15 +142,18 @@ public final class TestEngineReflectionUtils {
             Method method = getArgumentSupplierMethod(clazz);
             Object object = method.invoke(null, (Object[]) null);
             if (object instanceof Stream) {
-                return ((Stream<Argument>) object).collect(Collectors.toList());
+                List<Argument> arguments = ((Stream<Argument>) object).collect(Collectors.toList());
+                LOGGER.trace("class [%s] argument count [%d]", clazz.getName(), arguments.size());
+                return arguments;
             } else if (object instanceof Iterable) {
-                List<Argument> argument = new ArrayList<>();
-                ((Iterable<Argument>) object).forEach(argument::add);
-                return argument;
+                List<Argument> arguments = new ArrayList<>();
+                ((Iterable<Argument>) object).forEach(arguments::add);
+                LOGGER.trace("class [%s] argument count [%d]", clazz.getName(), arguments.size());
+                return arguments;
             } else {
                 throw new TestClassConfigurationException(
                         String.format(
-                                "Class [%s] must define one @TestEngine.ArgumentSupplier method",
+                                "Test class [%s] must define one @TestEngine.ArgumentSupplier method",
                                 clazz.getName()));
             }
         } catch (TestClassConfigurationException e) {
@@ -153,7 +161,7 @@ public final class TestEngineReflectionUtils {
         } catch (Throwable t) {
             throw new TestClassConfigurationException(
                     String.format(
-                            "Can't get Stream<Argument> or Iterable<Argument> from class [%s]",
+                            "Can't get Stream<Argument> or Iterable<Argument> from test class [%s]",
                             clazz.getName()),
                     t);
         }
@@ -181,11 +189,15 @@ public final class TestEngineReflectionUtils {
                             Void.class,
                             (Class<?>[]) null);
 
-            sortByOrderAnnotation(methods);
+            LOGGER.trace("class [%s] @TestEngine.Prepare method count [%d]", clazz.getName(), methods.size());
+
+            if (!methods.isEmpty()) {
+                sortByOrderAnnotation(methods);
+                validateDistinctOrder(clazz, methods);
+            }
+
             methods = Collections.unmodifiableList(methods);
             prepareMethodCache.put(clazz, methods);
-
-            LOGGER.trace("@TestEngine.Prepare method count [%d]", methods.size());
 
             return methods;
         }
@@ -206,12 +218,15 @@ public final class TestEngineReflectionUtils {
             }
 
             List<Field> argumentFields = getFields(clazz, TestEngine.Argument.class, Argument.class);
-            LOGGER.trace("@TestEngine.Argument field count [%d]", argumentFields.size());
+            LOGGER.trace(
+                    "class [%s] @TestEngine.Argument field count [%d]",
+                    clazz.getName(),
+                    argumentFields.size());
 
             if (argumentFields.size() != 1) {
                 throw new TestClassConfigurationException(
                         String.format(
-                                "Class [%s] must define one @TestEngine.Argument field",
+                                "Test class [%s] must define one @TestEngine.Argument field",
                                 clazz.getName()));
             }
 
@@ -243,11 +258,15 @@ public final class TestEngineReflectionUtils {
                             Void.class,
                             (Class<?>[]) null);
 
-            sortByOrderAnnotation(methods);
+            LOGGER.trace("class [%s] @TestEngine.BeforeAll method count [%d]", clazz.getName(), methods.size());
+
+            if (!methods.isEmpty()) {
+                sortByOrderAnnotation(methods);
+                validateDistinctOrder(clazz, methods);
+            }
+
             methods = Collections.unmodifiableList(methods);
             beforeAllMethodCache.put(clazz, methods);
-
-            LOGGER.trace("@TestEngine.BeforeAll method count [%d]", methods.size());
 
             return methods;
         }
@@ -275,11 +294,15 @@ public final class TestEngineReflectionUtils {
                             Void.class,
                             (Class<?>[]) null);
 
-            sortByOrderAnnotation(methods);
+            LOGGER.trace("class [%s] @TestEngine.BeforeEach method count [%d]", clazz.getName(), methods.size());
+
+            if (!methods.isEmpty()) {
+                sortByOrderAnnotation(methods);
+                validateDistinctOrder(clazz, methods);
+            }
+
             methods = Collections.unmodifiableList(methods);
             beforeEachMethodCache.put(clazz, methods);
-
-            LOGGER.trace("@TestEngine.BeforeEach method count [%d]", methods.size());
 
             return methods;
         }
@@ -310,13 +333,15 @@ public final class TestEngineReflectionUtils {
                             .filter(method -> !method.isAnnotationPresent(TestEngine.Disabled.class))
                             .collect(Collectors.toList());
 
-            LOGGER.trace("@TestEngine.Test method count [%d]", methods.size());
+            LOGGER.trace("class [%s] @TestEngine.Test method count [%d]", clazz.getName(), methods.size());
 
-            sortByOrderAnnotation(methods);
-            methods = Collections.unmodifiableList(methods);
+            if (!methods.isEmpty()) {
+                sortByOrderAnnotation(methods);
+                validateDistinctOrder(clazz, methods);
+                methods = Collections.unmodifiableList(methods);
+            }
+
             testMethodCache.put(clazz, methods);
-
-            LOGGER.trace("@TestEngine.Test method count [%d]", methods.size());
 
             return methods;
         }
@@ -344,11 +369,15 @@ public final class TestEngineReflectionUtils {
                             Void.class,
                             (Class<?>[]) null);
 
-            sortByOrderAnnotation(methods);
+            LOGGER.trace("class [%s] @TestEngine.AfterEach method count [%d]", clazz.getName(), methods.size());
+
+            if (!methods.isEmpty()) {
+                sortByOrderAnnotation(methods);
+                validateDistinctOrder(clazz, methods);
+            }
+
             methods = Collections.unmodifiableList(methods);
             afterEachMethodCache.put(clazz, methods);
-
-            LOGGER.trace("@TestEngine.AfterEach method count [%d]", methods.size());
 
             return methods;
         }
@@ -376,11 +405,15 @@ public final class TestEngineReflectionUtils {
                             Void.class,
                             (Class<?>[]) null);
 
-            sortByOrderAnnotation(methods);
+            LOGGER.trace("class [%s] @TestEngine.AfterAll method count [%d]", clazz.getName(), methods.size());
+
+            if (!methods.isEmpty()) {
+                sortByOrderAnnotation(methods);
+                validateDistinctOrder(clazz, methods);
+            }
+
             methods = Collections.unmodifiableList(methods);
             afterAllMethodCache.put(clazz, methods);
-
-            LOGGER.trace("@TestEngine.AfterAll method count [%d]", methods.size());
 
             return methods;
         }
@@ -408,11 +441,15 @@ public final class TestEngineReflectionUtils {
                             Void.class,
                             (Class<?>[]) null);
 
-            sortByOrderAnnotation(methods);
+            LOGGER.trace("class [%s] @TestEngine.Conclude method count [%d]", clazz.getName(), methods.size());
+
+            if (!methods.isEmpty()) {
+                sortByOrderAnnotation(methods);
+                validateDistinctOrder(clazz, methods);
+            }
+
             methods = Collections.unmodifiableList(methods);
             concludeMethodCache.put(clazz, methods);
-
-            LOGGER.trace("@TestEngine.Conclude method count [%d]", methods.size());
 
             return methods;
         }
@@ -434,6 +471,8 @@ public final class TestEngineReflectionUtils {
             }
         }
 
+        LOGGER.trace("method [%s] display name [%s]", method.getName(), displayName);
+
         return displayName;
     }
 
@@ -452,6 +491,8 @@ public final class TestEngineReflectionUtils {
                 displayName = value.trim();
             }
         }
+
+        LOGGER.trace("class [%s] display name [%s]", clazz.getName(), displayName);
 
         return displayName;
     }
@@ -474,6 +515,8 @@ public final class TestEngineReflectionUtils {
         resolveFields(clazz, annotation, fieldType, fieldSet);
         List<Field> fields = new ArrayList<>(fieldSet);
         fields.sort(Comparator.comparing(Field::getName));
+
+        LOGGER.trace("class [%s] argument field count [%d]", clazz.getName(), fieldSet.size());
 
         return fields;
     }
@@ -569,78 +612,88 @@ public final class TestEngineReflectionUtils {
             Class<?> returnType,
             Class<?>[] parameterTypes,
             Map<String, Method> methodMap) {
-        StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder
-                .append(
-                        String.format(
-                                "resolveMethods(%s, %s, %s, %s",
-                                clazz.getName(),
-                                annotation.getName(),
-                                scope,
-                                returnType.getName()));
+        if (LOGGER.isTraceEnabled()) {
+            StringBuilder stringBuilder = new StringBuilder();
 
-        if (parameterTypes != null) {
-            for (Class<?> parameterTypeClass : parameterTypes) {
-                stringBuilder.append(", ").append(parameterTypeClass.getName());
+            stringBuilder
+                    .append(
+                            String.format(
+                                    "resolveMethods(%s, %s, %s, %s",
+                                    clazz.getName(),
+                                    annotation.getName(),
+                                    scope,
+                                    returnType.getName()));
+
+            if (parameterTypes != null) {
+                for (Class<?> parameterTypeClass : parameterTypes) {
+                    stringBuilder.append(", ").append(parameterTypeClass.getName());
+                }
             }
+
+            stringBuilder.append(")");
+            LOGGER.trace(stringBuilder.toString());
         }
 
-        stringBuilder.append(")");
-        LOGGER.trace(stringBuilder.toString());
-
-        Stream.of(clazz.getDeclaredMethods())
-                .filter(method -> method.isAnnotationPresent(annotation))
-                .filter(method -> {
-                    int modifiers = method.getModifiers();
-                    return Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers);
-                })
-                .filter(method -> {
-                    int modifiers = method.getModifiers();
-                    if (scope == Scope.STATIC && !Modifier.isStatic(modifiers)) {
-                        throw new TestClassConfigurationException(
-                                String.format(
-                                        "%s method [%s] must be declared static",
-                                        getAnnotationDisplayName(annotation),
-                                        method.getName()));
-                    }
-                    else if (scope != Scope.STATIC && Modifier.isStatic(modifiers)) {
-                        throw new TestClassConfigurationException(
-                                String.format(
-                                        "%s method [%s] must be not be declared static",
-                                        getAnnotationDisplayName(annotation),
-                                        method.getName()));
-                    } else {
-                        return true;
-                    }
-                })
-                .filter(method -> {
-                    if (parameterTypes == null) {
-                        return method.getParameterTypes().length == 0;
-                    }
-                    if (parameterTypes.length != method.getParameterCount()) {
-                        return false;
-                    }
-                    Class<?>[] methodParameterTypes = method.getParameterTypes();
-                    for (int i = 0; i < parameterTypes.length; i++) {
-                        if (!parameterTypes[i].isAssignableFrom(methodParameterTypes[i])) {
+        try {
+            Stream.of(clazz.getDeclaredMethods())
+                    .filter(method -> method.isAnnotationPresent(annotation))
+                    .filter(method -> {
+                        int modifiers = method.getModifiers();
+                        return Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers);
+                    })
+                    .filter(method -> {
+                        int modifiers = method.getModifiers();
+                        if (scope == Scope.STATIC && !Modifier.isStatic(modifiers)) {
+                            throw new TestClassConfigurationException(
+                                    String.format(
+                                            "%s method [%s] must be declared static",
+                                            getAnnotationDisplayName(annotation),
+                                            method.getName()));
+                        } else if (scope != Scope.STATIC && Modifier.isStatic(modifiers)) {
+                            throw new TestClassConfigurationException(
+                                    String.format(
+                                            "%s method [%s] must be not be declared static",
+                                            getAnnotationDisplayName(annotation),
+                                            method.getName()));
+                        } else {
+                            return true;
+                        }
+                    })
+                    .filter(method -> {
+                        if (parameterTypes == null) {
+                            return method.getParameterTypes().length == 0;
+                        }
+                        if (parameterTypes.length != method.getParameterCount()) {
                             return false;
                         }
-                    }
-                    return true;
-                })
-                .filter(method -> {
-                    if (returnType == Void.class) {
-                        return method.getReturnType().getName().equals("void");
-                    } else {
-                        return returnType.isAssignableFrom(method.getReturnType());
-                    }
-                })
-                .forEach(method -> {
-                    if (methodMap.putIfAbsent(method.getName(), method) == null) {
-                        method.setAccessible(true);
-                    }
-                });
+                        Class<?>[] methodParameterTypes = method.getParameterTypes();
+                        for (int i = 0; i < parameterTypes.length; i++) {
+                            if (!parameterTypes[i].isAssignableFrom(methodParameterTypes[i])) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .filter(method -> {
+                        if (returnType == Void.class) {
+                            return method.getReturnType().getName().equals("void");
+                        } else {
+                            return returnType.isAssignableFrom(method.getReturnType());
+                        }
+                    })
+                    .forEach(method -> {
+                        if (methodMap.putIfAbsent(method.getName(), method) == null) {
+                            method.setAccessible(true);
+                        }
+                    });
+        } catch (Throwable t) {
+            if (t instanceof NoClassDefFoundError) {
+                // DO NOTHING
+            } else {
+                Throwables.throwIfUnchecked(t);
+            }
+        }
 
         Class<?> declaringClass = clazz.getSuperclass();
         if (declaringClass != null && !declaringClass.equals(Object.class)) {
@@ -675,6 +728,25 @@ public final class TestEngineReflectionUtils {
                 String o1DisplayName = getDisplayName(o1);
                 String o2DisplayName = getDisplayName(o2);
                 return o1DisplayName.compareTo(o2DisplayName);
+            }
+        });
+    }
+
+    private static void validateDistinctOrder(Class<?> clazz, List<Method> methods) {
+        Set<Integer> integers = new HashSet<>();
+
+        methods.forEach(method -> {
+            if (method.isAnnotationPresent(TestEngine.Order.class)) {
+                int value = method.getAnnotation(TestEngine.Order.class).value();
+                if (integers.contains(value)) {
+                    throw new TestClassConfigurationException(
+                            String.format(
+                                    "Test class [%s] (or superclass) contains a duplicate @TestEngine.Order(%d) annotation",
+                                    clazz.getName(),
+                                    value));
+                } else {
+                    integers.add(value);
+                }
             }
         });
     }

@@ -18,7 +18,6 @@ package org.antublue.test.engine.internal.discovery;
 
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.internal.TestEngineConfiguration;
-import org.antublue.test.engine.internal.TestEngineException;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
@@ -40,7 +39,6 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
 import org.junit.platform.engine.discovery.MethodSelector;
-import org.junit.platform.engine.discovery.PackageNameFilter;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
@@ -48,7 +46,6 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -186,111 +183,58 @@ public class TestEngineDiscoveryRequestResolver {
     public void resolve(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolve(EngineDiscoveryRequest, EngineDescriptor)");
 
-        try {
-            // Resolve selectors
+        // Resolve selectors
 
-            engineDiscoveryRequest
-                    .getSelectorsByType(ClasspathRootSelector.class)
-                    .stream()
-                    .sorted(Comparator.comparing(o -> o.getClasspathRoot()))
-                    .collect(Collectors.toList())
-                    .forEach(classpathRootSelector ->
-                            classpathRootResolver.resolve(classpathRootSelector, engineDescriptor));
+        engineDiscoveryRequest
+                .getSelectorsByType(ClasspathRootSelector.class)
+                .stream()
+                .sorted(Comparator.comparing(o -> o.getClasspathRoot()))
+                .collect(Collectors.toList())
+                .forEach(classpathRootSelector ->
+                        classpathRootResolver.resolve(
+                                engineDiscoveryRequest, engineDescriptor, classpathRootSelector));
 
-            engineDiscoveryRequest
-                    .getSelectorsByType(PackageSelector.class)
-                    .stream()
-                    .sorted(Comparator.comparing(o -> o.getPackageName()))
-                    .collect(Collectors.toList())
-                    .forEach(packageSelector -> packageSelectorResolver.resolve(packageSelector, engineDescriptor));
+        engineDiscoveryRequest
+                .getSelectorsByType(PackageSelector.class)
+                .stream()
+                .sorted(Comparator.comparing(o -> o.getPackageName()))
+                .collect(Collectors.toList())
+                .forEach(packageSelector ->
+                        packageSelectorResolver.resolve(engineDiscoveryRequest, engineDescriptor, packageSelector));
 
-            engineDiscoveryRequest
-                    .getSelectorsByType(ClassSelector.class)
-                    .stream()
-                    .sorted(Comparator.comparing(o -> o.getJavaClass().getName()))
-                    .collect(Collectors.toList())
-                    .forEach(classSelector -> classSelectorResolver.resolve(classSelector, engineDescriptor));
+        engineDiscoveryRequest
+                .getSelectorsByType(ClassSelector.class)
+                .stream()
+                .sorted(Comparator.comparing(o -> o.getJavaClass().getName()))
+                .collect(Collectors.toList())
+                .forEach(classSelector -> classSelectorResolver.resolve(classSelector, engineDescriptor));
 
-            engineDiscoveryRequest
-                    .getSelectorsByType(MethodSelector.class)
-                    .stream()
-                    .sorted(Comparator.comparing(o -> o.getJavaMethod().getName()))
-                    .collect(Collectors.toList())
-                    .forEach(methodSelector -> methodSelectorResolver.resolve(methodSelector, engineDescriptor));
+        engineDiscoveryRequest
+                .getSelectorsByType(MethodSelector.class)
+                .stream()
+                .sorted(Comparator.comparing(o -> o.getJavaMethod().getName()))
+                .collect(Collectors.toList())
+                .forEach(methodSelector -> methodSelectorResolver.resolve(methodSelector, engineDescriptor));
 
-            engineDiscoveryRequest
-                    .getSelectorsByType(UniqueIdSelector.class)
-                    .stream()
-                    .sorted(Comparator.comparing(o -> o.getUniqueId().toString()))
-                    .collect(Collectors.toList())
-                    .forEach(uniqueIdSelector -> uniqueIdSelectorResolver.resolve(uniqueIdSelector, engineDescriptor));
+        engineDiscoveryRequest
+                .getSelectorsByType(UniqueIdSelector.class)
+                .stream()
+                .sorted(Comparator.comparing(o -> o.getUniqueId().toString()))
+                .collect(Collectors.toList())
+                .forEach(uniqueIdSelector -> uniqueIdSelectorResolver.resolve(uniqueIdSelector, engineDescriptor));
 
-            /**
-             * TODO refactor code to use a visitor pattern to apply
-             *      the predicate filters or possibly do it during the resolution phase
-             */
+        /**
+         * TODO refactor code to use a visitor pattern to apply
+         *      the predicate filters or possibly do it during the resolution phase
+         */
 
-            // Filter based on package names
-            processPackageNameFilters(engineDiscoveryRequest, engineDescriptor);
+        // Filter test classes based on class/method predicate
+        processTestClassPredicates(engineDescriptor);
+        processTestMethodPredicates(engineDescriptor);
 
-            // Filter test classes based on class/method predicate
-            processTestClassPredicates(engineDescriptor);
-            processTestMethodPredicates(engineDescriptor);
-
-            // Filter test classes based on class/method tag predicates
-            processTestClassTagPredicates(engineDescriptor);
-            processTestMethodTagPredicates(engineDescriptor);
-        } catch (TestEngineException e) {
-            throw e;
-        } catch (RuntimeException e) {
-            throw new TestEngineException("Exception processing engine discovery request", e);
-        } catch (Throwable t) {
-            throw new TestEngineException("Exception processing engine discovery request", t);
-        }
-    }
-
-    /**
-     * Method to process PackageNameFilters
-     *
-     * @param engineDiscoveryRequest engineDiscoveryRequest
-     * @param engineDescriptor engineDescriptor
-     */
-    private void processPackageNameFilters(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
-        LOGGER.trace("processPackageNameFilters");
-
-        List<? extends PackageNameFilter> packageNameFilters = engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
-        LOGGER.trace("packageNameFilters size [%d]", packageNameFilters.size());
-        for (PackageNameFilter packageNameFilter : packageNameFilters) {
-            Set<? extends TestDescriptor> testDescriptors = new LinkedHashSet<>(engineDescriptor.getChildren());
-            for (TestDescriptor testDescriptor : testDescriptors) {
-                ClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
-                Set<? extends TestDescriptor> testDescriptors2 = new LinkedHashSet<>(classTestDescriptor.getChildren());
-                for (TestDescriptor testDescriptor2 : testDescriptors2) {
-                    ArgumentTestDescriptor argumentTestDescriptor = Cast.cast(testDescriptor2);
-                    Set<? extends TestDescriptor> testDescriptors3 = new LinkedHashSet<>(testDescriptor2.getChildren());
-                    for (TestDescriptor testDescriptor3 : testDescriptors3) {
-                        MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor3);
-                        Class<?> clazz = methodTestDescriptor.getTestClass();
-                        String className = clazz.getName();
-                        if (packageNameFilter.apply(className).excluded()) {
-                            methodTestDescriptor.removeFromHierarchy();
-                        }
-                    }
-                    Class<?> clazz = argumentTestDescriptor.getTestClass();
-                    String className = clazz.getName();
-                    if (packageNameFilter.apply(className).excluded()) {
-                        argumentTestDescriptor.removeFromHierarchy();
-                    }
-                }
-                Class<?> clazz = classTestDescriptor.getTestClass();
-                String className = clazz.getName();
-                if (packageNameFilter.apply(className).excluded()) {
-                    classTestDescriptor.removeFromHierarchy();
-                }
-            }
-        }
-
-        engineDescriptor.prune();
+        // Filter test classes based on class/method tag predicates
+        processTestClassTagPredicates(engineDescriptor);
+        processTestMethodTagPredicates(engineDescriptor);
     }
 
     /**

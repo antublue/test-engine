@@ -52,6 +52,8 @@ public final class TestDescriptorUtils {
      */
     public static ClassTestDescriptor createClassTestDescriptor(
             UniqueId uniqueId, Class<?> clazz) {
+        validateTestClass(clazz);
+
         return new ClassTestDescriptor(
                 uniqueId,
                 TestEngineReflectionUtils.getDisplayName(clazz),
@@ -68,19 +70,7 @@ public final class TestDescriptorUtils {
      */
     public static ArgumentTestDescriptor createArgumentTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Argument argument) {
-        if (TestEngineReflectionUtils.getArgumentSupplierMethod(clazz) == null) {
-            throw new TestClassConfigurationException(
-                    String.format(
-                            "Test class [%s] must declare a static @TestEngine.ArgumentSupplier method",
-                            clazz.getName()));
-        }
-
-        if (TestEngineReflectionUtils.getArgumentField(clazz) == null) {
-            throw new TestClassConfigurationException(
-                    String.format(
-                            "Test class [%s] must declare a @TestEngine.Argument field",
-                            clazz.getName()));
-        }
+        validateTestClass(clazz);
 
         return new ArgumentTestDescriptor(uniqueId, argument.name(), clazz, argument);
     }
@@ -96,6 +86,8 @@ public final class TestDescriptorUtils {
      */
     public static MethodTestDescriptor createMethodTestDescriptor(
             UniqueId uniqueId, Class<?> clazz, Argument argument, Method method) {
+        validateTestClass(clazz);
+
         return new MethodTestDescriptor(
                 uniqueId,
                 TestEngineReflectionUtils.getDisplayName(method),
@@ -162,5 +154,40 @@ public final class TestDescriptorUtils {
         testDescriptor
                 .getChildren()
                 .forEach(t -> trace(t, indent + 2));
+    }
+
+    private static void validateTestClass(Class<?> clazz) {
+        // Validate we have a @TestEngine.ArgumentSupplier method
+        if (TestEngineReflectionUtils.getArgumentSupplierMethod(clazz) == null) {
+            throw new TestClassConfigurationException(
+                    String.format(
+                            "Test class [%s] must declare a static @TestEngine.ArgumentSupplier method",
+                            clazz.getName()));
+        }
+
+        // Validate we have a @TestEngine.Argument field
+        if (TestEngineReflectionUtils.getArgumentField(clazz) == null) {
+            throw new TestClassConfigurationException(
+                    String.format(
+                            "Test class [%s] must declare a @TestEngine.Argument field",
+                            clazz.getName()));
+        }
+
+        // Validate we have a @TestEngine.Test method
+        if (TestEngineReflectionUtils.getTestMethods(clazz).size() < 1) {
+            throw new TestClassConfigurationException(
+                    String.format(
+                            "Test class [%s] must declare a @TestEngine.Test method",
+                            clazz.getName()));
+        }
+
+        // Get other method optional annotated methods
+        // which will check for duplicate @TestEngine.Order vlues
+        TestEngineReflectionUtils.getPrepareMethods(clazz);
+        TestEngineReflectionUtils.getBeforeAllMethods(clazz);
+        TestEngineReflectionUtils.getBeforeEachMethods(clazz);
+        TestEngineReflectionUtils.getAfterEachMethods(clazz);
+        TestEngineReflectionUtils.getAfterAllMethods(clazz);
+        TestEngineReflectionUtils.getConcludeMethods(clazz);
     }
 }

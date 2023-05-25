@@ -16,8 +16,10 @@
 
 package org.antublue.test.engine;
 
+import org.antublue.test.engine.internal.TestClassConfigurationException;
 import org.antublue.test.engine.internal.TestEngineConfiguration;
 import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
+import org.antublue.test.engine.internal.TestEngineException;
 import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
 import org.antublue.test.engine.internal.TestEngineTestDescriptorStore;
@@ -43,6 +45,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static final String GROUP_ID = "org.antublue";
     public static final String ARTIFACT_ID = "test-engine";
     public static final String VERSION = TestEngineInformation.getVersion();
+    public static final String ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN = "__ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN__";
 
     /**
      * Method to get the test engine id
@@ -95,22 +98,35 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public TestDescriptor discover(EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
         LOGGER.trace("discover(EngineDiscoveryRequest, UniqueId)");
 
-        // Wrap the discovery request
-        TestEngineEngineDiscoveryRequest testEngineDiscoveryRequest =
-                new TestEngineEngineDiscoveryRequest(
-                        engineDiscoveryRequest,
-                        TestEngineConfiguration.getInstance());
-
         // Create an EngineDescriptor as the target
-        ExtendedEngineDescriptor extendedEngineDescriptor =
-                new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
+        ExtendedEngineDescriptor extendedEngineDescriptor = null;
 
-        // Create a TestEngineDiscoverySelectorResolver and
-        // resolve selectors, adding them to the engine descriptor
-        new TestEngineDiscoveryRequestResolver().resolve(testEngineDiscoveryRequest, extendedEngineDescriptor);
+        try {
+            // Create an EngineDescriptor as the target
+            extendedEngineDescriptor =
+                    new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
 
-        // Store the test descriptors
-        TestEngineTestDescriptorStore.getInstance().store(extendedEngineDescriptor);
+            // Wrap the discovery request
+            TestEngineEngineDiscoveryRequest testEngineDiscoveryRequest =
+                    new TestEngineEngineDiscoveryRequest(
+                            engineDiscoveryRequest,
+                            TestEngineConfiguration.getInstance());
+
+
+            // Create a TestEngineDiscoverySelectorResolver and
+            // resolve selectors, adding them to the engine descriptor
+            new TestEngineDiscoveryRequestResolver().resolve(testEngineDiscoveryRequest, extendedEngineDescriptor);
+
+            // Store the test descriptors
+            TestEngineTestDescriptorStore.getInstance().store(extendedEngineDescriptor);
+        } catch (TestClassConfigurationException | TestEngineException t) {
+            if ("true".equals(System.getProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN))) {
+                throw t;
+            }
+
+            System.err.println(t.getMessage());
+            System.exit(1);
+        }
 
         // Return the engine descriptor with all child test descriptors
         return extendedEngineDescriptor;

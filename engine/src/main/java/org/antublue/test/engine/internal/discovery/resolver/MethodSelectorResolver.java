@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.discovery.resolver;
 
-import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
@@ -29,9 +28,7 @@ import org.junit.platform.engine.discovery.MethodSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 
 /**
  * Class to resolve a MethodSelector
@@ -40,26 +37,6 @@ import java.util.function.Predicate;
 public class MethodSelectorResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodSelectorResolver.class);
-
-    /**
-     * Predicate to determine if a class is a valid test class
-     */
-    private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
-        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
-                || clazz.isAnnotationPresent(TestEngine.Disabled.class)) {
-            return false;
-        }
-
-        int modifiers = clazz.getModifiers();
-        return !Modifier.isAbstract(modifiers) && !TestEngineReflectionUtils.getTestMethods(clazz).isEmpty();
-    };
-
-    private static final Predicate<Method> IS_TEST_METHOD = new Predicate<Method>() {
-        @Override
-        public boolean test(Method method) {
-            return TestEngineReflectionUtils.getTestMethods(method.getDeclaringClass()).contains(method);
-        }
-    };
 
     /**
      * Method to resolve a MethodSelector
@@ -74,14 +51,14 @@ public class MethodSelectorResolver {
         Class<?> clazz = methodSelector.getJavaClass();
         LOGGER.trace("  class [%s]", clazz.getName());
 
-        if (!IS_TEST_CLASS.test(clazz)) {
+        if (!IsTestClassPredicate.INSTANCE.test(clazz)) {
             return;
         }
 
         Method method = methodSelector.getJavaMethod();
         LOGGER.trace("  class [%s]", clazz.getName());
 
-        if (!IS_TEST_METHOD.test(method)) {
+        if (!IsTestMethodPredicate.INSTANCE.test(method)) {
             return;
         }
 

@@ -88,9 +88,9 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
      * Constructor
      */
     public TestEngineConsoleTestExecutionListener() {
-        this.summary = new Summary();
+        summary = new Summary();
 
-        this.detailedOutput =
+        detailedOutput =
                 TestEngineConfiguration.getInstance()
                         .get(TestEngineConstants.CONSOLE_OUTPUT)
                         .map(value -> {
@@ -102,7 +102,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         })
                         .orElse(true);
 
-        this.logTestMessages =
+        logTestMessages =
                 TestEngineConfiguration.getInstance()
                         .get(TestEngineConstants.LOG_TEST_MESSAGES)
                         .map(value -> {
@@ -114,7 +114,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         })
                         .orElse(true);
 
-        this.logPassMessages =
+        logPassMessages =
                 TestEngineConfiguration.getInstance()
                         .get(TestEngineConstants.LOG_PASS_MESSAGES)
                         .map(value -> {
@@ -126,7 +126,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         })
                         .orElse(true);
 
-        this.logSkipMessages =
+        logSkipMessages =
                 TestEngineConfiguration.getInstance()
                         .get(TestEngineConstants.LOG_SKIP_MESSAGES)
                         .map(value -> {

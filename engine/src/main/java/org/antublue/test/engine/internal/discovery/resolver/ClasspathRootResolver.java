@@ -24,17 +24,20 @@ import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.Throwables;
 import org.junit.platform.commons.util.ReflectionUtils;
+import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.discovery.ClassNameFilter;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
+import org.junit.platform.engine.discovery.PackageNameFilter;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Modifier;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 
 /**
  * Class to resolve a ClasspathRootSelector
@@ -44,83 +47,98 @@ public class ClasspathRootResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClasspathRootResolver.class);
 
     /**
-     * Predicate to determine if a class is a valid test class
-     */
-    private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
-        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
-                || clazz.isAnnotationPresent(TestEngine.Disabled.class)) {
-            return false;
-        }
-
-        return !Modifier.isAbstract(clazz.getModifiers()) && !TestEngineReflectionUtils.getTestMethods(clazz).isEmpty();
-    };
-
-    /**
      * Method to resolve a ClasspathRootSelector
      *
-     * @param classpathRootSelector classpathRootSelector
+     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param engineDescriptor engineDescriptor
+     * @param classpathRootSelector classpathRootSelector
      */
-    public void resolve(ClasspathRootSelector classpathRootSelector, EngineDescriptor engineDescriptor) {
+    public void resolve(
+            EngineDiscoveryRequest engineDiscoveryRequest,
+            EngineDescriptor engineDescriptor,
+            ClasspathRootSelector classpathRootSelector) {
         LOGGER.trace("resolve [%s]", classpathRootSelector);
 
         final UniqueId engineDescriptorUniqueId = engineDescriptor.getUniqueId();
         URI uri = classpathRootSelector.getClasspathRoot();
         LOGGER.trace("uri [%s]", uri);
 
-        new ArrayList<>(ReflectionUtils.findAllClassesInClasspathRoot(uri, IS_TEST_CLASS, name -> true))
-                .stream()
-                .sorted(Comparator.comparing(TestEngineReflectionUtils::getDisplayName))
-                .forEach(clazz -> {
-                    LOGGER.trace("  class [%s]", clazz.getName());
+        List<ClassNameFilter> classNameFilters =
+                engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class);
 
-                    final UniqueId classTestDescriptorUniqueId =
-                            engineDescriptorUniqueId.append("class", clazz.getName());
+        LOGGER.trace("classNameFilters count [%d]", classNameFilters.size());
 
-                    ClassTestDescriptor classTestDescriptor =
-                            TestDescriptorUtils.createClassTestDescriptor(
-                                    classTestDescriptorUniqueId,
-                                    clazz);
+        List<PackageNameFilter> packageNameFilters =
+                engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
 
-                    engineDescriptor.addChild(classTestDescriptor);
+        LOGGER.trace("packageNameFilters count [%d]", packageNameFilters.size());
 
-                    AtomicInteger index = new AtomicInteger();
-                    TestEngineReflectionUtils
-                            .getArgumentsList(clazz)
-                            .forEach(argument -> {
-                                UniqueId argumentTestDescriptorUniqueId =
-                                        classTestDescriptorUniqueId.append(
-                                                "argument",
-                                                String.valueOf(index.getAndIncrement()));
+        try {
+            ReflectionUtils
+                    .findAllClassesInClasspathRoot(uri, classFilter -> true, classNameFilter -> true)
+                    .stream()
+                    .filter(new PackageNameFiltersPredicate(packageNameFilters))
+                    .filter(new ClassNameFiltersPredicate(classNameFilters))
+                    .filter(clazz -> !TestEngineReflectionUtils.getTestMethods(clazz).isEmpty())
+                    .filter(clazz ->
+                            !(Modifier.isAbstract(clazz.getModifiers())
+                                    || clazz.isAnnotationPresent(TestEngine.BaseClass.class)
+                                    || clazz.isAnnotationPresent(TestEngine.Disabled.class)
+                                    || TestEngineReflectionUtils.getTestMethods(clazz).isEmpty()))
+                    .sorted(Comparator.comparing(TestEngineReflectionUtils::getDisplayName))
+                    .forEach(clazz -> {
+                        LOGGER.trace("  class [%s]", clazz.getName());
 
-                                ArgumentTestDescriptor argumentTestDescriptor =
-                                        TestDescriptorUtils.createArgumentTestDescriptor(
-                                                argumentTestDescriptorUniqueId,
-                                                clazz,
-                                                argument);
+                        final UniqueId classTestDescriptorUniqueId =
+                                engineDescriptorUniqueId.append("class", clazz.getName());
 
-                                classTestDescriptor.addChild(argumentTestDescriptor);
+                        ClassTestDescriptor classTestDescriptor =
+                                TestDescriptorUtils.createClassTestDescriptor(
+                                        classTestDescriptorUniqueId,
+                                        clazz);
 
-                                TestEngineReflectionUtils
-                                        .getTestMethods(clazz)
-                                        .forEach(method -> {
-                                            UniqueId methodTestDescriptorUniqueId =
-                                                    argumentTestDescriptorUniqueId.append("method", method.getName());
+                        engineDescriptor.addChild(classTestDescriptor);
 
-                                            MethodTestDescriptor methodTestDescriptor =
-                                                    TestDescriptorUtils.createMethodTestDescriptor(
-                                                            methodTestDescriptorUniqueId,
-                                                            clazz,
-                                                            argument,
-                                                            method);
+                        AtomicInteger index = new AtomicInteger();
+                        TestEngineReflectionUtils
+                                .getArgumentsList(clazz)
+                                .forEach(argument -> {
+                                    UniqueId argumentTestDescriptorUniqueId =
+                                            classTestDescriptorUniqueId.append(
+                                                    "argument",
+                                                    String.valueOf(index.getAndIncrement()));
 
-                                            argumentTestDescriptor.addChild(methodTestDescriptor);
-                                        });
+                                    ArgumentTestDescriptor argumentTestDescriptor =
+                                            TestDescriptorUtils.createArgumentTestDescriptor(
+                                                    argumentTestDescriptorUniqueId,
+                                                    clazz,
+                                                    argument);
 
-                                argumentTestDescriptor.prune();
-                            });
+                                    classTestDescriptor.addChild(argumentTestDescriptor);
 
-                    classTestDescriptor.prune();
-                });
+                                    TestEngineReflectionUtils
+                                            .getTestMethods(clazz)
+                                            .forEach(method -> {
+                                                UniqueId methodTestDescriptorUniqueId =
+                                                        argumentTestDescriptorUniqueId.append("method", method.getName());
+
+                                                MethodTestDescriptor methodTestDescriptor =
+                                                        TestDescriptorUtils.createMethodTestDescriptor(
+                                                                methodTestDescriptorUniqueId,
+                                                                clazz,
+                                                                argument,
+                                                                method);
+
+                                                argumentTestDescriptor.addChild(methodTestDescriptor);
+                                            });
+
+                                    argumentTestDescriptor.prune();
+                                });
+
+                        classTestDescriptor.prune();
+                    });
+        } catch (Throwable t) {
+            Throwables.throwIfUnchecked(t);
+        }
     }
 }

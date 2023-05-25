@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.discovery.resolver;
 
-import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
@@ -25,15 +24,17 @@ import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
+import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.discovery.ClassNameFilter;
+import org.junit.platform.engine.discovery.PackageNameFilter;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 
 /**
  * Class to resolve a PackageSelector
@@ -43,32 +44,32 @@ public class PackageSelectorResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(PackageSelectorResolver.class);
 
     /**
-     * Predicate to determine if a class is a valid test class
-     */
-    private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
-        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
-                || clazz.isAnnotationPresent(TestEngine.Disabled.class)) {
-            return false;
-        }
-
-        int modifiers = clazz.getModifiers();
-        return !Modifier.isAbstract(modifiers) && !TestEngineReflectionUtils.getTestMethods(clazz).isEmpty();
-    };
-
-    /**
      * Method to resolve a PackageSelector
      *
-     * @param packageSelector packageSelector
+     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param engineDescriptor engineDescriptor
+     * @param packageSelector packageSelector
      */
-    public void resolve(PackageSelector packageSelector, EngineDescriptor engineDescriptor) {
+    public void resolve(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor, PackageSelector packageSelector) {
         LOGGER.trace("resolve [%s]", packageSelector.getPackageName());
 
         final UniqueId engineDescriptorUniqueId = engineDescriptor.getUniqueId();
         String packageName = packageSelector.getPackageName();
 
-        new ArrayList<>(ReflectionSupport.findAllClassesInPackage(packageName, IS_TEST_CLASS, name -> true))
+        List<ClassNameFilter> classNameFilters =
+                engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class);
+
+        LOGGER.trace("classNameFilters count [%d]", classNameFilters.size());
+
+        List<PackageNameFilter> packageNameFilters =
+                engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
+
+        LOGGER.trace("packageNameFilters count [%d]", packageNameFilters.size());
+
+        new ArrayList<>(ReflectionSupport.findAllClassesInPackage(packageName, classFilter -> true, classNameFilter -> true))
                 .stream()
+                //.filter(new PackageNameFiltersPredicate(packageNameFilters))
+                //.filter(new ClassNameFiltersPredicate(classNameFilters))
                 .sorted(Comparator.comparing(Class::getName))
                 .forEach(clazz -> {
                     LOGGER.trace("  class [%s]", clazz.getName());
