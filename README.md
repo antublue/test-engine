@@ -119,13 +119,13 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 
 ## Additional Test Annotations
 
-| Annotation                  | Scope            | Required | Usage                                                                              |
-|-----------------------------|------------------|----------|------------------------------------------------------------------------------------|
-| `@TestEngine.Disabled`      | class<br/>method | no       | Marks a test class or method disabled                                              |
-| `@TestEngine.BaseClass`     | class            | no       | Marks a test class as being a base test class (skips direct execution)             |
-| `@TestEngine.Order(<int>)`  | method           | no       | Provides a way to order methods relative to other methods with the same annotation |
-| `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                  | 
-| `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name           |
+| Annotation                  | Scope            | Required | Usage                                                                                                       |
+|-----------------------------|------------------|----------|-------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.Disabled`      | class<br/>method | no       | Marks a test class or method disabled                                                                       |
+| `@TestEngine.BaseClass`     | class            | no       | Marks a test class as being a base test class (skips direct execution)                                      |
+| `@TestEngine.Order(<int>)`  | class<br/>method | no       | Provides a way to order class execution order or methods relative to other methods with the same annotation |
+| `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                                           | 
+| `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name                                    |
 
 
 **Notes**
