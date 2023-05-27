@@ -55,7 +55,6 @@ import java.util.stream.Collectors;
  * The current paradigm is to build a complete test descriptor tree,
  * then remove filter (remove) test descriptor
  */
-@SuppressWarnings("unchecked")
 public class TestEngineDiscoveryRequestResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineDiscoveryRequestResolver.class);
@@ -188,7 +187,7 @@ public class TestEngineDiscoveryRequestResolver {
         engineDiscoveryRequest
                 .getSelectorsByType(ClasspathRootSelector.class)
                 .stream()
-                .sorted(Comparator.comparing(o -> o.getClasspathRoot()))
+                .sorted(Comparator.comparing(ClasspathRootSelector::getClasspathRoot))
                 .collect(Collectors.toList())
                 .forEach(classpathRootSelector ->
                         classpathRootResolver.resolve(
@@ -197,7 +196,7 @@ public class TestEngineDiscoveryRequestResolver {
         engineDiscoveryRequest
                 .getSelectorsByType(PackageSelector.class)
                 .stream()
-                .sorted(Comparator.comparing(o -> o.getPackageName()))
+                .sorted(Comparator.comparing(PackageSelector::getPackageName))
                 .collect(Collectors.toList())
                 .forEach(packageSelector ->
                         packageSelectorResolver.resolve(engineDiscoveryRequest, engineDescriptor, packageSelector));
@@ -223,7 +222,7 @@ public class TestEngineDiscoveryRequestResolver {
                 .collect(Collectors.toList())
                 .forEach(uniqueIdSelector -> uniqueIdSelectorResolver.resolve(uniqueIdSelector, engineDescriptor));
 
-        /**
+        /*
          * TODO refactor code to use a visitor pattern to apply
          *      the predicate filters or possibly do it during the resolution phase
          */

@@ -21,11 +21,14 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Throwables;
+import org.junit.platform.commons.support.ReflectionSupport;
+import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -75,6 +78,41 @@ public final class TestEngineReflectionUtils {
      */
     private TestEngineReflectionUtils() {
         // DO NOTHING
+    }
+
+    /**
+     * Method to find all classes for a URI
+     *
+     * @param uri uri
+     * @return the return value
+     */
+    public static List<Class<?>> findAllClasses(URI uri) {
+        List<Class<?>> classes =
+                ReflectionUtils
+                        .findAllClassesInClasspathRoot(uri, classFilter -> true, classNameFilter -> true);
+
+        classes = new ArrayList<>(classes);
+        sortClasses(classes);
+        validateDistinctOrder(classes);
+
+        return classes;
+    }
+
+    /**
+     * Method to find all classes with a package name
+     *
+     * @param packageName packageName
+     * @return the return value
+     */
+    public static List<Class<?>> findAllClasses(String packageName) {
+        List<Class<?>> classes =
+                ReflectionSupport.findAllClassesInPackage(packageName, classFilter -> true, classNameFilter -> true);
+
+        classes = new ArrayList<>(classes);
+        sortClasses(classes);
+        validateDistinctOrder(classes);
+
+        return classes;
     }
 
     /**
@@ -192,7 +230,7 @@ public final class TestEngineReflectionUtils {
             LOGGER.trace("class [%s] @TestEngine.Prepare method count [%d]", clazz.getName(), methods.size());
 
             if (!methods.isEmpty()) {
-                sortByOrderAnnotation(methods);
+                sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
             }
 
@@ -261,7 +299,7 @@ public final class TestEngineReflectionUtils {
             LOGGER.trace("class [%s] @TestEngine.BeforeAll method count [%d]", clazz.getName(), methods.size());
 
             if (!methods.isEmpty()) {
-                sortByOrderAnnotation(methods);
+                sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
             }
 
@@ -297,7 +335,7 @@ public final class TestEngineReflectionUtils {
             LOGGER.trace("class [%s] @TestEngine.BeforeEach method count [%d]", clazz.getName(), methods.size());
 
             if (!methods.isEmpty()) {
-                sortByOrderAnnotation(methods);
+                sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
             }
 
@@ -336,7 +374,7 @@ public final class TestEngineReflectionUtils {
             LOGGER.trace("class [%s] @TestEngine.Test method count [%d]", clazz.getName(), methods.size());
 
             if (!methods.isEmpty()) {
-                sortByOrderAnnotation(methods);
+                sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
                 methods = Collections.unmodifiableList(methods);
             }
@@ -372,7 +410,7 @@ public final class TestEngineReflectionUtils {
             LOGGER.trace("class [%s] @TestEngine.AfterEach method count [%d]", clazz.getName(), methods.size());
 
             if (!methods.isEmpty()) {
-                sortByOrderAnnotation(methods);
+                sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
             }
 
@@ -408,7 +446,7 @@ public final class TestEngineReflectionUtils {
             LOGGER.trace("class [%s] @TestEngine.AfterAll method count [%d]", clazz.getName(), methods.size());
 
             if (!methods.isEmpty()) {
-                sortByOrderAnnotation(methods);
+                sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
             }
 
@@ -444,7 +482,7 @@ public final class TestEngineReflectionUtils {
             LOGGER.trace("class [%s] @TestEngine.Conclude method count [%d]", clazz.getName(), methods.size());
 
             if (!methods.isEmpty()) {
-                sortByOrderAnnotation(methods);
+                sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
             }
 
@@ -702,11 +740,66 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
+     * Method to sort a List of classes first by @TestEngine.Order annotation, then by display name / class name
+     *
+     * @param classes list of Classes to sort
+     */
+    private static void sortClasses(List<Class<?>> classes) {
+        classes.sort((o1, o2) -> {
+            boolean o1AnnotationPresent = o1.isAnnotationPresent(TestEngine.Order.class);
+            boolean o2AnnotationPresent = o2.isAnnotationPresent(TestEngine.Order.class);
+            if (o1AnnotationPresent) {
+                if (o2AnnotationPresent) {
+                    // Sort based on @TestEngine.Order value
+                    int o1Order = o1.getAnnotation(TestEngine.Order.class).value();
+                    int o2Order = o2.getAnnotation(TestEngine.Order.class).value();
+                    return Integer.compare(o1Order, o2Order);
+                } else {
+                    return -1;
+                }
+            } else if (o2AnnotationPresent) {
+                return 1;
+            } else {
+                // Order by display name which is either
+                // the name declared by @TestEngine.DisplayName
+                // or the real method name
+                String o1DisplayName = getDisplayName(o1);
+                String o2DisplayName = getDisplayName(o2);
+                return o1DisplayName.compareTo(o2DisplayName);
+            }
+        });
+    }
+
+    /**
+     * Method to validate @TestEngine.Order is unique on classes
+     *
+     * @param classes classes
+     */
+    private static void validateDistinctOrder(List<Class<?>> classes) {
+        Set<Integer> integers = new HashSet<>();
+
+        classes.forEach(clazz -> {
+            if (clazz.isAnnotationPresent(TestEngine.Order.class)) {
+                int value = clazz.getAnnotation(TestEngine.Order.class).value();
+                if (integers.contains(value)) {
+                    throw new TestClassConfigurationException(
+                            String.format(
+                                    "Test class [%s] (or superclass) contains a duplicate @TestEngine.Order(%d) class annotation",
+                                    clazz.getName(),
+                                    value));
+                } else {
+                    integers.add(value);
+                }
+            }
+        });
+    }
+
+    /**
      * Method to sort a List of methods first by @TestEngine.Order annotation, then alphabetically
      *
      * @param methods list of Methods to sort
      */
-    private static void sortByOrderAnnotation(List<Method> methods) {
+    private static void sortMethods(List<Method> methods) {
         methods.sort((o1, o2) -> {
             boolean o1AnnotationPresent = o1.isAnnotationPresent(TestEngine.Order.class);
             boolean o2AnnotationPresent = o2.isAnnotationPresent(TestEngine.Order.class);
@@ -732,6 +825,12 @@ public final class TestEngineReflectionUtils {
         });
     }
 
+    /**
+     * Method to validate @TestEngine.Order is unique on methods with the same annotation
+     *
+     * @param clazz clazz
+     * @param methods methods
+     */
     private static void validateDistinctOrder(Class<?> clazz, List<Method> methods) {
         Set<Integer> integers = new HashSet<>();
 
@@ -741,7 +840,7 @@ public final class TestEngineReflectionUtils {
                 if (integers.contains(value)) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] (or superclass) contains a duplicate @TestEngine.Order(%d) annotation",
+                                    "Test class [%s] (or superclass) contains a duplicate @TestEngine.Order(%d) method annotation",
                                     clazz.getName(),
                                     value));
                 } else {

@@ -25,7 +25,6 @@ import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Throwables;
-import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassNameFilter;
@@ -35,7 +34,6 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Modifier;
 import java.net.URI;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -74,8 +72,8 @@ public class ClasspathRootResolver {
         LOGGER.trace("packageNameFilters count [%d]", packageNameFilters.size());
 
         try {
-            ReflectionUtils
-                    .findAllClassesInClasspathRoot(uri, classFilter -> true, classNameFilter -> true)
+            TestEngineReflectionUtils
+                    .findAllClasses(uri)
                     .stream()
                     .filter(new PackageNameFiltersPredicate(packageNameFilters))
                     .filter(new ClassNameFiltersPredicate(classNameFilters))
@@ -85,7 +83,6 @@ public class ClasspathRootResolver {
                                     || clazz.isAnnotationPresent(TestEngine.BaseClass.class)
                                     || clazz.isAnnotationPresent(TestEngine.Disabled.class)
                                     || TestEngineReflectionUtils.getTestMethods(clazz).isEmpty()))
-                    .sorted(Comparator.comparing(TestEngineReflectionUtils::getDisplayName))
                     .forEach(clazz -> {
                         LOGGER.trace("  class [%s]", clazz.getName());
 

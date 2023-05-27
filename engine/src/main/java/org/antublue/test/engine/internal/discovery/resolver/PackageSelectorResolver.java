@@ -23,7 +23,6 @@ import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassNameFilter;
@@ -31,8 +30,6 @@ import org.junit.platform.engine.discovery.PackageNameFilter;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -66,11 +63,11 @@ public class PackageSelectorResolver {
 
         LOGGER.trace("packageNameFilters count [%d]", packageNameFilters.size());
 
-        new ArrayList<>(ReflectionSupport.findAllClassesInPackage(packageName, classFilter -> true, classNameFilter -> true))
+        TestEngineReflectionUtils
+                .findAllClasses(packageName)
                 .stream()
-                //.filter(new PackageNameFiltersPredicate(packageNameFilters))
-                //.filter(new ClassNameFiltersPredicate(classNameFilters))
-                .sorted(Comparator.comparing(Class::getName))
+                .filter(new PackageNameFiltersPredicate(packageNameFilters))
+                .filter(new ClassNameFiltersPredicate(classNameFilters))
                 .forEach(clazz -> {
                     LOGGER.trace("  class [%s]", clazz.getName());
 
