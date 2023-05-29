@@ -9,6 +9,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestEngine.BaseClass
+@TestEngine.Order(3)
 class BaseOrderTest {
 
     protected final List<String> EXPECTED_LIST =

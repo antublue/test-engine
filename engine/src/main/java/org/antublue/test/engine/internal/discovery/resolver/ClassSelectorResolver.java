@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.internal.discovery.resolver;
 
+import org.antublue.test.engine.internal.TestClassConfigurationException;
 import org.antublue.test.engine.internal.TestDescriptorUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
@@ -27,6 +28,8 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -35,6 +38,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ClassSelectorResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassSelectorResolver.class);
+
+    private final Map<Integer, Class<?>> orderToClassMap;
+
+    public ClassSelectorResolver() {
+        orderToClassMap = new LinkedHashMap<>();
+    }
 
     /**
      * Method to resolve a ClassSelector
@@ -51,6 +60,21 @@ public class ClassSelectorResolver {
 
         if (!IsTestClassPredicate.INSTANCE.test(clazz)) {
             return;
+        }
+
+        Integer order = TestEngineReflectionUtils.getClassOrder(clazz);
+        if (order != null) {
+            if (orderToClassMap.containsKey(order)) {
+                Class<?> existingClass = orderToClassMap.get(order);
+                throw new TestClassConfigurationException(
+                        String.format(
+                                "Test class [%s] (or superclass) and test class [%s] (or superclass) contain duplicate @TestEngine.Order(%d) class annotation",
+                                existingClass.getName(),
+                                clazz.getName(),
+                                order));
+            } else {
+                orderToClassMap.put(order, clazz);
+            }
         }
 
         UniqueId classTestDescriptorUniqueId = engineDescriptorUniqueId.append("class", clazz.getName());

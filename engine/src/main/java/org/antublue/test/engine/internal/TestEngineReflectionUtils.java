@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -535,6 +536,16 @@ public final class TestEngineReflectionUtils {
         return displayName;
     }
 
+    public static Integer getClassOrder(Class<?> clazz) {
+        if (!clazz.isAnnotationPresent(TestEngine.BaseClass.class)
+                && !Modifier.isAbstract(clazz.getModifiers())
+                && clazz.isAnnotationPresent(TestEngine.Order.class)) {
+            return clazz.getAnnotation(TestEngine.Order.class).value();
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Method to get a List of all fields from a Class and super Classes
      *
@@ -776,19 +787,24 @@ public final class TestEngineReflectionUtils {
      * @param classes classes
      */
     private static void validateDistinctOrder(List<Class<?>> classes) {
-        Set<Integer> integers = new HashSet<>();
+        Map<Integer, Class<?>> orderToClassMap = new LinkedHashMap<>();
 
         classes.forEach(clazz -> {
-            if (clazz.isAnnotationPresent(TestEngine.Order.class)) {
-                int value = clazz.getAnnotation(TestEngine.Order.class).value();
-                if (integers.contains(value)) {
+            if (!clazz.isAnnotationPresent(TestEngine.BaseClass.class)
+                    && !Modifier.isAbstract(clazz.getModifiers())
+                    && clazz.isAnnotationPresent(TestEngine.Order.class)) {
+                int order = clazz.getAnnotation(TestEngine.Order.class).value();
+                LOGGER.trace("clazz [%s] order [%d]", clazz.getName(), order);
+                if (orderToClassMap.containsKey(order)) {
+                    Class<?> existingClass = orderToClassMap.get(order);
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] (or superclass) contains a duplicate @TestEngine.Order(%d) class annotation",
+                                    "Test class [%s] (or superclass) and test class [%s] (or superclass) contain duplicate @TestEngine.Order(%d) class annotation",
+                                    existingClass.getName(),
                                     clazz.getName(),
-                                    value));
+                                    order));
                 } else {
-                    integers.add(value);
+                    orderToClassMap.put(order, clazz);
                 }
             }
         });
