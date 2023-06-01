@@ -26,6 +26,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.junit.platform.commons.JUnitException;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
@@ -44,6 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN;
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
 /**
@@ -70,6 +72,8 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      * @throws MojoExecutionException execution exception
      */
     public void execute() throws MojoExecutionException {
+        System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN, "true");
+
         try {
             Set<Path> artifactPaths = new LinkedHashSet<>();
 
@@ -106,7 +110,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
             // Build a classloader for subsequent calls
             ClassLoader classLoader =
-                    new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+                    new URLClassLoader(urls.toArray(new URL[urls.size()]), Thread.currentThread().getContextClassLoader());
 
             Thread.currentThread().setContextClassLoader(classLoader);
 
@@ -118,6 +122,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                                     System.setProperty(key, value);
                                 }
                             }));
+
             info();
 
             TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener =
@@ -146,6 +151,14 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             }
         } catch (SuppressedStackTraceMojoExecutionException e) {
             throw e;
+        } catch (JUnitException e) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(e.getCause().getMessage());
+            stringBuilder.append(System.lineSeparator());
+
+            throw new SuppressedStackTraceMojoExecutionException(stringBuilder.toString());
         } catch (Throwable t) {
             t.printStackTrace();
             throw new MojoExecutionException("General AntuBLUE Test Engine Maven Plugin Exception", t);

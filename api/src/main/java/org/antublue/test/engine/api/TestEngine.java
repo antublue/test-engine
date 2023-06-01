@@ -83,7 +83,7 @@ public @interface TestEngine {
 
     }
 
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Order {
         int value();

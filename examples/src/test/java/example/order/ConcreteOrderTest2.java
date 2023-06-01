@@ -10,8 +10,8 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@TestEngine.Order(3)
-public class ConcreteOrderTest extends BaseOrderTest {
+@TestEngine.Order(4)
+public class ConcreteOrderTest2 extends BaseOrderTest {
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
