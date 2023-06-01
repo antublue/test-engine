@@ -20,6 +20,7 @@ import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptorRunnableAdapter;
 import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
+import org.antublue.test.engine.internal.descriptor.TestDescriptorUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Cast;

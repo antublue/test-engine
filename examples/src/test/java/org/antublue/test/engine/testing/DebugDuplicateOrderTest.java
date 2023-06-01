@@ -1,52 +1,46 @@
-package example;
+package org.antublue.test.engine.testing;
 
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 /**
  * Example test
  */
-@TestEngine.DisplayName("_A_ClassDisplayNameMethodDisplayNameTest")
-public class ClassDisplayNameMethodDisplayNameTest {
+public class DebugDuplicateOrderTest {
 
     @TestEngine.Argument
     protected IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<IntegerArgument> arguments() {
-        return Stream.of(
-                IntegerArgument.of(1),
-                IntegerArgument.of(2),
-                IntegerArgument.of(3));
+        Collection<IntegerArgument> collection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            collection.add(IntegerArgument.of(i));
+        }
+        return collection.stream();
     }
 
     @TestEngine.BeforeAll
+    @TestEngine.Order(0)
     public void beforeAll() {
         System.out.println("beforeAll()");
     }
 
-    @TestEngine.BeforeEach
-    public void beforeEach() {
-        System.out.println("beforeEach()");
-    }
-
     @TestEngine.Test
-    @TestEngine.DisplayName("Test A")
+    @TestEngine.Order(0)
     public void test1() {
         System.out.println("test1(" + integerArgument.value() + ")");
     }
 
     @TestEngine.Test
-    @TestEngine.DisplayName("Test B")
+    @TestEngine.Order(1)
+    // Switch to @TestEngine.Order(0) to test duplicate @TestEngine.Order detection
     public void test2() {
         System.out.println("test2(" + integerArgument.value() + ")");
-    }
-
-    @TestEngine.AfterEach
-    public void afterEach() {
-        System.out.println("afterEach()");
     }
 
     @TestEngine.AfterAll

@@ -63,7 +63,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      */
     @Override
     public Optional<TestSource> getSource() {
-        return Optional.of(MethodSource.from(TestEngineReflectionUtils.getArgumentSupplier(testClass)));
+        return Optional.of(MethodSource.from(TestEngineReflectionUtils.getArgumentSupplierMethod(testClass)));
     }
 
     /**

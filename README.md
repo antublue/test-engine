@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for paramet
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v4.0.1](https://github.com/antublue/test-engine/releases/tag/v4.0.1)
+- General Availability (GA): [Test Engine v4.1.0](https://github.com/antublue/test-engine/releases/tag/v4.1.0)
 
 **Notes**
 
@@ -108,24 +108,23 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - `public` and `protected` methods are supported for `@TestEngine.X` annotations
 
 
-- By default, methods are executed in alphabetical order based on a method name, regardless of where they are declared (class or superclasses)
+- By default, methods are executed in alphabetical order based on class/method name, regardless of where they are declared (class or superclasses)
 
 
-- `@TestEngine.Order` can be used to control test method order
-  - Methods are sorted by the annotation value first, then alphabetically by the test method name
-    - In scenarios where `@TestEngine.Order` values are duplicated, methods with the same name are sorted alphabetically
-    - The test method name can be changed by using the `@TestEngine.DisplayName` annotation
+- `@TestEngine.Order` can be used to control test class / test method order of execution
+  - Classes/methods are sorted by the order annotation value first, then alphabetically by the class name/method name
+  - The test method name can be changed by using the `@TestEngine.DisplayName` annotation
   - Method order is relative to other methods with the same annotation regardless of superclass / subclass location
 
 ## Additional Test Annotations
 
-| Annotation                  | Scope            | Required | Usage                                                                              |
-|-----------------------------|------------------|----------|------------------------------------------------------------------------------------|
-| `@TestEngine.Disabled`      | class<br/>method | no       | Marks a test class or method disabled                                              |
-| `@TestEngine.BaseClass`     | class            | no       | Marks a test class as being a base test class (skips direct execution)             |
-| `@TestEngine.Order(<int>)`  | method           | no       | Provides a way to order methods relative to other methods with the same annotation |
-| `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                  | 
-| `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name           |
+| Annotation                  | Scope            | Required | Usage                                                                                                                              |
+|-----------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.Disabled`      | class<br/>method | no       | Marks a test class or method disabled                                                                                              |
+| `@TestEngine.BaseClass`     | class            | no       | Marks a test class as being a base test class (skips direct execution)                                                             |
+| `@TestEngine.Order(<int>)`  | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
+| `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
+| `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
 
 
 **Notes**
@@ -136,7 +135,10 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - `@TestEngine.Order(<int>)` is inheritance agnostic (test class and super classes are treated equally)
 
 
-- It's recommended to use a tag string format of `/tag1/tag2/tag3/`
+- `@TestEngine.Order(<int>)` is ignored for abstract and `@TestEngine.BaseClass` annotated classes
+
+
+- For `@TestEngine.Tag(<string>)` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`
 
 ## Usage
 
@@ -325,7 +327,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>4.0.1</version>
+  <version>4.1.0</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -344,12 +346,12 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.0</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>4.0.1</version>
+    <version>4.1.0</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -366,12 +368,12 @@ mvn clean package integration-test
 ```
 
 ## Test Engine Summary
-
+rf
 When running via Maven in a Linux console, the Test Engine will report a summary similar to...
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v4.0.1 Summary
+[INFO] AntuBLUE Test Engine v4.1.0 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes   :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
 [INFO] Test Methods   : 476, PASSED : 476, FAILED : 0, SKIPPED : 0
