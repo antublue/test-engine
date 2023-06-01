@@ -69,9 +69,9 @@ public final class TestEngineTestDescriptorStore {
     }
 
     /**
-     * Method to recursively store TestDescriptors
+     * Method to recursively store a TestDescriptor
      *
-     * @param testDescriptor the test descriptoro
+     * @param testDescriptor the test descriptor
      */
     private void recursivelyStore(TestDescriptor testDescriptor) {
         testDescriptorMap.put(testDescriptor.getUniqueId(), testDescriptor);
