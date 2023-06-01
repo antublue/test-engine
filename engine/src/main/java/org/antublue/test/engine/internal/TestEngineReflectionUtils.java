@@ -358,7 +358,7 @@ public final class TestEngineReflectionUtils {
             LOGGER.trace("getTestMethods(%s)", clazz.getName());
 
             if (testMethodCache.containsKey(clazz)) {
-                return testMethodCache.get(clazz);
+                return new ArrayList<>(testMethodCache.get(clazz));
             }
 
             List<Method> methods =
@@ -382,7 +382,7 @@ public final class TestEngineReflectionUtils {
 
             testMethodCache.put(clazz, methods);
 
-            return methods;
+            return new ArrayList<>(methods);
         }
     }
 
@@ -755,7 +755,7 @@ public final class TestEngineReflectionUtils {
      *
      * @param classes list of Classes to sort
      */
-    private static void sortClasses(List<Class<?>> classes) {
+    public static void sortClasses(List<Class<?>> classes) {
         classes.sort((o1, o2) -> {
             boolean o1AnnotationPresent = o1.isAnnotationPresent(TestEngine.Order.class);
             boolean o2AnnotationPresent = o2.isAnnotationPresent(TestEngine.Order.class);
@@ -815,7 +815,7 @@ public final class TestEngineReflectionUtils {
      *
      * @param methods list of Methods to sort
      */
-    private static void sortMethods(List<Method> methods) {
+    public static void sortMethods(List<Method> methods) {
         methods.sort((o1, o2) -> {
             boolean o1AnnotationPresent = o1.isAnnotationPresent(TestEngine.Order.class);
             boolean o2AnnotationPresent = o2.isAnnotationPresent(TestEngine.Order.class);

@@ -14,42 +14,40 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.predicate;
-
-import java.lang.reflect.Method;
+package org.antublue.test.engine.internal.discovery.predicate;
 
 /**
- * Class to implement a test method predicate
+ * Class to implement a Predicate that matches a classname
  */
-public final class TestMethodPredicate extends RegexPredicate<Method> {
+public final class TestClassPredicate extends RegexPredicate<Class<?>> {
 
     /**
      * Constructor
      *
      * @param regex regex
      */
-    private TestMethodPredicate(String regex) {
+    private TestClassPredicate(String regex) {
         super(regex);
     }
 
     /**
      * Method to test the Predicate
      *
-     * @param method the input argument
-     * @return whether to accept the Method
+     * @param clazz the input argument
+     * @return whether to accept the Class
      */
     @Override
-    public boolean test(Method method) {
-        return matcher.reset(method.getName()).find();
+    public boolean test(Class<?> clazz) {
+        return matcher.reset(clazz.getName()).find();
     }
 
     /**
-     * Method to create an instance of a TestMethodPredicate
+     * Method to create an instance of a TestClassPredicate
      *
      * @param regex regex
      * @return the return value
      */
-    public static TestMethodPredicate of(String regex) {
-        return new TestMethodPredicate(regex);
+    public static TestClassPredicate of(String regex) {
+        return new TestClassPredicate(regex);
     }
 }

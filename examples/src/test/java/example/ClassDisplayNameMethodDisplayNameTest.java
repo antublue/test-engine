@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@TestEngine.DisplayName("_Run Second ClassDisplayNameTest because of classname_")
+@TestEngine.DisplayName("_A_ClassDisplayNameMethodDisplayNameTest")
 public class ClassDisplayNameMethodDisplayNameTest {
 
     @TestEngine.Argument

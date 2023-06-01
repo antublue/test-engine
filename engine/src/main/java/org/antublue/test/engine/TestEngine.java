@@ -24,7 +24,6 @@ import org.antublue.test.engine.internal.TestEngineExecutor;
 import org.antublue.test.engine.internal.TestEngineInformation;
 import org.antublue.test.engine.internal.TestEngineTestDescriptorStore;
 import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
-import org.antublue.test.engine.internal.discovery.TestEngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -102,22 +101,20 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         ExtendedEngineDescriptor extendedEngineDescriptor = null;
 
         try {
-            // Create an EngineDescriptor as the target
-            extendedEngineDescriptor =
-                    new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
+            // Create an ExtendedEngineDescriptor as the target
+            extendedEngineDescriptor = new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
 
-            // Wrap the discovery request
+            // Create a TestEngineEngineDiscoveryRequest to resolve test classes
             TestEngineEngineDiscoveryRequest testEngineDiscoveryRequest =
                     new TestEngineEngineDiscoveryRequest(
                             engineDiscoveryRequest,
-                            TestEngineConfiguration.getInstance());
+                            TestEngineConfiguration.getInstance(),
+                            extendedEngineDescriptor);
 
+            // Resolve test classes
+            testEngineDiscoveryRequest.resolve();
 
-            // Create a TestEngineDiscoverySelectorResolver and
-            // resolve selectors, adding them to the engine descriptor
-            new TestEngineDiscoveryRequestResolver().resolve(testEngineDiscoveryRequest, extendedEngineDescriptor);
-
-            // Store the test descriptors
+            // Store the test descriptors for use in the test execution listener
             TestEngineTestDescriptorStore.getInstance().store(extendedEngineDescriptor);
         } catch (TestClassConfigurationException | TestEngineException t) {
             if ("true".equals(System.getProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN))) {
@@ -128,7 +125,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             System.exit(1);
         }
 
-        // Return the engine descriptor with all child test descriptors
+        // Return the EngineDescriptor with all child TestDescriptor
         return extendedEngineDescriptor;
     }
 
@@ -139,8 +136,9 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      */
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        LOGGER.trace("execute(ExecutionRequest)");
+        LOGGER.trace("execute()");
 
+        // Execute the ExecutionRequest
         new TestEngineExecutor().execute(executionRequest);
     }
 }
