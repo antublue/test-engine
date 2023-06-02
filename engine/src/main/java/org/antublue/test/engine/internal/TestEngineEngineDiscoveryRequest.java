@@ -353,9 +353,9 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
 
             if (includeTestClassPredicate != null) {
                 if (includeTestClassPredicate.test(clazz)) {
-                    LOGGER.trace("  accept [%s]", clazz.getName());
+                    LOGGER.trace("includeTestClassPredicate class [%s] included", clazz.getName());
                 } else {
-                    LOGGER.trace("  filter  [%s]", clazz.getName());
+                    LOGGER.trace("includeTestClassPredicate class [%s] excluded", clazz.getName());
                     classMethodMapEntryIterator.remove();
                     continue;
                 }
@@ -363,19 +363,19 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
 
             if (excludeTestClassPredicate != null) {
                 if (excludeTestClassPredicate.test(clazz)) {
-                    LOGGER.trace("  filter  [%s]", clazz.getName());
+                    LOGGER.trace("excludeTestClassPredicate class [%s] excluded", clazz.getName());
                     classMethodMapEntryIterator.remove();
                     continue;
                 } else {
-                    LOGGER.trace("  accept [%s]", clazz.getName());
+                    LOGGER.trace("excludeTestClassPredicate class [%s] included", clazz.getName());
                 }
             }
 
             if (includeTestClassTagPredicate != null) {
                 if (includeTestClassTagPredicate.test(clazz)) {
-                    LOGGER.trace("  accept [%s]", clazz.getName());
+                    LOGGER.trace("includeTestClassTagPredicate class [%s] included", clazz.getName());
                 } else {
-                    LOGGER.trace("  filter  [%s]", clazz.getName());
+                    LOGGER.trace("includeTestClassTagPredicate class [%s] excluded", clazz.getName());
                     classMethodMapEntryIterator.remove();
                     continue;
                 }
@@ -383,11 +383,11 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
 
             if (excludeTestClassTagPredicate != null) {
                 if (excludeTestClassTagPredicate.test(clazz)) {
-                    LOGGER.trace("  filter  [%s]", clazz.getName());
+                    LOGGER.trace("excludeTestClassTagPredicate class [%s] excluded", clazz.getName());
                     classMethodMapEntryIterator.remove();
                     continue;
                 } else {
-                    LOGGER.trace("  accept [%s]", clazz.getName());
+                    LOGGER.trace("excludeTestClassTagPredicate class [%s] included", clazz.getName());
                 }
             }
 
@@ -397,9 +397,9 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
 
                 if (includeTestMethodPredicate != null) {
                     if (includeTestMethodPredicate.test(method)) {
-                        LOGGER.trace("  accept [%s]", method.getName());
+                        LOGGER.trace("includeTestMethodPredicate class [%s] included", method.getName());
                     } else {
-                        LOGGER.trace("  filter [%s]", method.getName());
+                        LOGGER.trace("includeTestMethodPredicate class [%s] excluded", method.getName());
                         methodIterator.remove();
                         continue;
                     }
@@ -407,19 +407,19 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
 
                 if (excludeTestMethodPredicate != null) {
                     if (excludeTestMethodPredicate.test(method)) {
-                        LOGGER.trace("  filter [%s]", method.getName());
+                        LOGGER.trace("excludeTestMethodPredicate class [%s] excluded", method.getName());
                         methodIterator.remove();
                         continue;
                     } else {
-                        LOGGER.trace("  accept [%s]", method.getName());
+                        LOGGER.trace("excludeTestMethodPredicate class [%s] included", method.getName());
                     }
                 }
 
                 if (includeTestMethodTagPredicate != null) {
                     if (includeTestMethodTagPredicate.test(method)) {
-                        LOGGER.trace("  accept [%s]", method.getName());
+                        LOGGER.trace("includeTestMethodTagPredicate class [%s] included", method.getName());
                     } else {
-                        LOGGER.trace("  filter [%s]", method.getName());
+                        LOGGER.trace("includeTestMethodTagPredicate class [%s] excluded", method.getName());
                         methodIterator.remove();
                         continue;
                     }
@@ -427,18 +427,21 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
 
                 if (excludeTestMethodTagPredicate != null) {
                     if (excludeTestMethodTagPredicate.test(method)) {
-                        LOGGER.trace("  filter [%s]", method.getName());
+                        LOGGER.trace("excludeTestMethodTagPredicate class [%s] excluded", method.getName());
                         methodIterator.remove();
                     } else {
-                        LOGGER.trace("  accept [%s]", method.getName());
+                        LOGGER.trace("excludeTestMethodTagPredicate class [%s] included", method.getName());
                     }
                 }
             }
 
             if (methods.isEmpty()) {
+                LOGGER.trace("class [%s] has no test methods, ignoring", clazz.getName());
                 classMethodMapEntryIterator.remove();
                 continue;
             }
+
+            LOGGER.trace("building test descriptor tree for class [%s]", clazz.getName());
 
             UniqueId classTestDescritporUniqueId =
                     engineDescriptor.getUniqueId().append("class", clazz.getName());
@@ -478,6 +481,6 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
         }
 
         // Log the TestDescriptor tree is trace is enabled
-        TestDescriptorUtils.trace(engineDescriptor);
+        TestDescriptorUtils.logTestDescriptorTree(engineDescriptor);
     }
 }

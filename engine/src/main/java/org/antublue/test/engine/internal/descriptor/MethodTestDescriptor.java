@@ -150,13 +150,13 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         final String testClassName = testClass.getName();
 
         try {
-            LOGGER.trace("invoking [%s] @TestEngine.BeforeEach methods ...", testClassName);
+            LOGGER.trace("invoking [%s] @TestEngine.BeforeEach methods", testClassName);
 
             TestEngineReflectionUtils
                     .getBeforeEachMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.BeforeEach method [%s] ...",
+                                "invoking [%s] @TestEngine.BeforeEach method [%s]",
                                 testClassName,
                                 method.getName());
                         try {
@@ -175,7 +175,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         if (throwableCollector.isEmpty()) {
             try {
-                LOGGER.trace("invoking [%s] @TestEngine.Test method [%s] ...", testClassName, testMethod.getName());
+                LOGGER.trace("invoking [%s] @TestEngine.Test method [%s]", testClassName, testMethod.getName());
                 try {
                     testMethod.invoke(testInstance, (Object[]) null);
                 } finally {
@@ -189,13 +189,13 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         }
 
         try {
-            LOGGER.trace("invoking [%s] @TestEngine.AfterEach methods ...", testClassName);
+            LOGGER.trace("invoking [%s] @TestEngine.AfterEach methods", testClassName);
 
             TestEngineReflectionUtils
                     .getAfterEachMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.AfterEach method [%s] ...",
+                                "invoking [%s] @TestEngine.AfterEach method [%s]",
                                 testClassName,
                                 method.getName());
                         try {

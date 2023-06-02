@@ -168,7 +168,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 .forEach(testIdentifier ->
                         TestEngineTestDescriptorStore
                                 .getInstance()
-                                .get(testIdentifier.getUniqueIdObject()).ifPresent(TestDescriptorUtils::trace));
+                                .get(testIdentifier.getUniqueIdObject()).ifPresent(TestDescriptorUtils::logTestDescriptorTree));
 
         System.out.println(INFO + SEPARATOR);
         System.out.println(INFO + BANNER);

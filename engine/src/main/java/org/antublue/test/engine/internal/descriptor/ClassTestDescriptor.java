@@ -132,7 +132,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                     .getPrepareMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.Prepare method [%s] ...",
+                                "invoking [%s] @TestEngine.Prepare method [%s]",
                                 testClassName,
                                 method.getName());
                         try {
@@ -163,7 +163,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         .getConcludeMethods(testClass)
                         .forEach((ThrowableConsumer<Method>) method -> {
                             LOGGER.trace(
-                                    "invoking [%s] @TestEngine.Conclude method [%s] ...",
+                                    "invoking [%s] @TestEngine.Conclude method [%s]",
                                     testClassName,
                                     method.getName());
                             try {

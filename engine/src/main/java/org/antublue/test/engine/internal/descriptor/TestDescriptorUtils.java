@@ -99,12 +99,12 @@ public final class TestDescriptorUtils {
      *
      * @param testDescriptor testDescriptor
      */
-    public static void trace(TestDescriptor testDescriptor) {
+    public static void logTestDescriptorTree(TestDescriptor testDescriptor) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("--------------------");
             LOGGER.trace("Test descriptor tree");
             LOGGER.trace("--------------------");
-            trace(testDescriptor, 0);
+            logTestDescriptorTree(testDescriptor, 0);
             LOGGER.trace("------------------------");
         }
     }
@@ -115,7 +115,7 @@ public final class TestDescriptorUtils {
      * @param testDescriptor testDescriptor
      * @param indent indent
      */
-    private static void trace(TestDescriptor testDescriptor, int indent) {
+    private static void logTestDescriptorTree(TestDescriptor testDescriptor, int indent) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < indent; i++) {
             stringBuilder.append(" ");
@@ -152,7 +152,7 @@ public final class TestDescriptorUtils {
 
         testDescriptor
                 .getChildren()
-                .forEach(t -> trace(t, indent + 2));
+                .forEach(t -> logTestDescriptorTree(t, indent + 2));
     }
 
     private static void validateTestClass(Class<?> clazz) {
