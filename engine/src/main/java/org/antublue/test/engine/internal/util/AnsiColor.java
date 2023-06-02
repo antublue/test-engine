@@ -96,7 +96,12 @@ public class AnsiColor {
 
     static {
         if (System.console() != null || "true".equals(System.getenv("__ANTUBLUE_TEST_ENGINE_HAS_CONSOLE__"))) {
-            ANSI_COLOR_SUPPORTED = true;
+            String noColor = System.getenv("NO_COLOR");
+            if ("1".equals(noColor)) {
+                ANSI_COLOR_SUPPORTED = false;
+            } else {
+                ANSI_COLOR_SUPPORTED = true;
+            }
         } else {
             ANSI_COLOR_SUPPORTED = false;
         }
