@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.util;
 
+import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE;
+
 // Based on https://www.w3schools.blog/ansi-colors-java
 public class AnsiColor {
 
@@ -95,14 +97,17 @@ public class AnsiColor {
     private static boolean ANSI_COLOR_SUPPORTED;
 
     static {
-        if (System.console() != null || "true".equals(System.getenv("__ANTUBLUE_TEST_ENGINE_HAS_CONSOLE__"))) {
-            String noColor = System.getenv("NO_COLOR");
-            if ("1".equals(noColor)) {
-                ANSI_COLOR_SUPPORTED = false;
-            } else {
-                ANSI_COLOR_SUPPORTED = true;
-            }
+        if (System.console() != null) {
+            ANSI_COLOR_SUPPORTED = false;
         } else {
+            ANSI_COLOR_SUPPORTED = true;
+        }
+
+        if ("1".equals(System.getenv("NO_COLOR"))) {
+            ANSI_COLOR_SUPPORTED = false;
+        }
+
+        if ("true".equals(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE)) {
             ANSI_COLOR_SUPPORTED = false;
         }
     }
