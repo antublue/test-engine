@@ -19,6 +19,7 @@ package org.antublue.test.engine.maven.plugin;
 import org.antublue.test.engine.internal.TestEngineConsoleTestExecutionListener;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorString;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -45,6 +46,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE;
 import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN;
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
@@ -57,6 +59,9 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
     private static final String GROUP_ID = "org.antublue";
     private static final String ARTIFACT_ID = "test-engine-maven-plugin";
+
+    @Parameter(defaultValue = "${session}", required = true, readonly = true)
+    private MavenSession mavenSession;
 
     @Parameter(property ="project", required = true, readonly = true)
     protected MavenProject mavenProject;
@@ -73,6 +78,10 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      */
     public void execute() throws MojoExecutionException {
         System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN, "true");
+
+        if (!mavenSession.getRequest().isInteractiveMode()) {
+            System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE, "true");
+        }
 
         try {
             Set<Path> artifactPaths = new LinkedHashSet<>();

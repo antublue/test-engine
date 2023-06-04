@@ -45,6 +45,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static final String ARTIFACT_ID = "test-engine";
     public static final String VERSION = TestEngineInformation.getVersion();
     public static final String ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN = "__ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN__";
+    public static final String ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE = "__ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE__";
 
     /**
      * Method to get the test engine id
