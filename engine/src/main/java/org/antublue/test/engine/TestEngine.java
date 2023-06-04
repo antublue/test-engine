@@ -95,7 +95,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      */
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
-        LOGGER.trace("discover(EngineDiscoveryRequest, UniqueId)");
+        LOGGER.trace("discover()");
 
         // Create an EngineDescriptor as the target
         ExtendedEngineDescriptor extendedEngineDescriptor = null;

@@ -117,6 +117,16 @@ public class Logger {
     }
 
     /**
+     * Method to return if a specific Level is enabled
+     *
+     * @param level level
+     * @return the return value
+     */
+    public boolean isEnabled(Level level) {
+        return this.level.get().toInt() >= level.toInt();
+    }
+
+    /**
      * Method to log a TRACE message
      *
      * @param message message

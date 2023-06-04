@@ -133,7 +133,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         try {
             testEngineExecutionContext.setTestInstance(testInstance);
 
-            LOGGER.trace("injecting [%s] @TestEngine.Argument field ...", testClassName);
+            LOGGER.trace("injecting class [%s] @TestEngine.Argument field", testClassName);
 
             try {
                  TestEngineReflectionUtils.getArgumentField(testClass).set(testInstance, testArgument);
@@ -152,7 +152,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                         .getBeforeAllMethods(testClass)
                         .forEach((ThrowableConsumer<Method>) method -> {
                             LOGGER.trace(
-                                    "invoking [%s] @TestEngine.BeforeAll method [%s] ...",
+                                    "invoking [%s] @TestEngine.BeforeAll method [%s]",
                                     testClassName,
                                     method.getName());
                             try {
@@ -187,7 +187,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     .getAfterAllMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.AfterAll method [%s] ...",
+                                "invoking [%s] @TestEngine.AfterAll method [%s]",
                                 testClassName,
                                 method.getName());
                         try {
