@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Class to implement methods to get test class fields / methods, caching the information
+ * Class to implement methods to get test class fields / methods, caching the results
  */
 @SuppressWarnings({"unchecked", "PMD.EmptyControlStatement"})
 public final class TestEngineReflectionUtils {
@@ -536,16 +536,6 @@ public final class TestEngineReflectionUtils {
         return displayName;
     }
 
-    public static Integer getClassOrder(Class<?> clazz) {
-        if (!clazz.isAnnotationPresent(TestEngine.BaseClass.class)
-                && !Modifier.isAbstract(clazz.getModifiers())
-                && clazz.isAnnotationPresent(TestEngine.Order.class)) {
-            return clazz.getAnnotation(TestEngine.Order.class).value();
-        } else {
-            return null;
-        }
-    }
-
     /**
      * Method to get a List of all fields from a Class and super Classes
      *
@@ -773,7 +763,7 @@ public final class TestEngineReflectionUtils {
             } else {
                 // Order by display name which is either
                 // the name declared by @TestEngine.DisplayName
-                // or the real method name
+                // or the real class name
                 String o1DisplayName = getDisplayName(o1);
                 String o2DisplayName = getDisplayName(o2);
                 return o1DisplayName.compareTo(o2DisplayName);
