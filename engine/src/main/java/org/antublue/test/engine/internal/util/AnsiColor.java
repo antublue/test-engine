@@ -21,6 +21,11 @@ import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_BAT
 // Based on https://www.w3schools.blog/ansi-colors-java
 public class AnsiColor {
 
+    private static final String NO_COLOR = "NO_COLOR";
+    private static final String EMPTY_STRING = "";
+    private static final String ONE = "1";
+    private static final String TRUE = "true";
+
     // Reset
     public static final AnsiColor RESET = new AnsiColor("\033[0m");  // Text Reset
 
@@ -98,29 +103,29 @@ public class AnsiColor {
 
     static {
         if (System.console() != null) {
-            ANSI_COLOR_SUPPORTED = false;
-        } else {
             ANSI_COLOR_SUPPORTED = true;
-        }
-
-        if ("1".equals(System.getenv("NO_COLOR"))) {
+        } else {
             ANSI_COLOR_SUPPORTED = false;
         }
 
-        if ("true".equals(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE)) {
+        if (ONE.equals(System.getenv(NO_COLOR))) {
+            ANSI_COLOR_SUPPORTED = false;
+        }
+
+        if (TRUE.equals(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE)) {
             ANSI_COLOR_SUPPORTED = false;
         }
     }
 
-    private final String escapeString;
+    private final String ansiColorCodeSequence;
 
     /**
      * Constructor
      *
-     * @param escapeString escapeString
+     * @param ansiColorCodeSequence ansiColorCodeSequence
      */
-    public AnsiColor(String escapeString) {
-        this.escapeString = escapeString;
+    private AnsiColor(String ansiColorCodeSequence) {
+        this.ansiColorCodeSequence = ansiColorCodeSequence;
     }
 
     /**
@@ -131,9 +136,9 @@ public class AnsiColor {
      */
     public String apply(Object object) {
         if (ANSI_COLOR_SUPPORTED) {
-            return escapeString + object + AnsiColor.RESET;
+            return ansiColorCodeSequence + object + AnsiColor.RESET;
         } else {
-            return "" + object;
+            return String.valueOf(object);
         }
     }
 
@@ -144,11 +149,11 @@ public class AnsiColor {
      */
     @Override
     public String toString() {
-        if (!ANSI_COLOR_SUPPORTED) {
-            return "";
+        if (ANSI_COLOR_SUPPORTED) {
+            return ansiColorCodeSequence;
+        } else {
+            return EMPTY_STRING;
         }
-
-        return escapeString;
     }
 
     /**
