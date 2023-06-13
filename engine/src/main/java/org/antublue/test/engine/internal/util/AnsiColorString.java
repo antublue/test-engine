@@ -47,7 +47,10 @@ public class AnsiColorString {
      * @return the return value
      */
     public AnsiColorString color(AnsiColor ansiColor) {
-        stringBuilder.append(ansiColor);
+        if (ansiColor != null) {
+            stringBuilder.append(ansiColor);
+        }
+
         return this;
     }
 
