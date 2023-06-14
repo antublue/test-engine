@@ -112,4 +112,11 @@ public @interface TestEngine {
     @interface DisplayName {
         String value();
     }
+
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface ResourceLock {
+        String value();
+        ResourceLockMode mode() default ResourceLockMode.READ_WRITE;
+    }
 }

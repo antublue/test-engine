@@ -85,6 +85,7 @@ This test is testing functionality of an Apache Kafka Producer and Consumer agai
 
 - The test is very basic, with a single test method that declares the client logic to produce / client logic to consume, but you could test multiple scenarios using ordered test methods
 
+
 - Test state between methods is stored in a `KafkaTestState` object
 
 ## Common Test Annotations
@@ -125,7 +126,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 | `@TestEngine.Order(<int>)`  | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
 | `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
 | `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
-
+| `@TestEngine.ResourceLock`  | class<br/>method | no       | Provides a way to synchronize execution of test classes and/or test methods                                                        |
 
 **Notes**
 
@@ -140,13 +141,17 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 
 - For `@TestEngine.Tag(<string>)` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`
 
+
+- `@TestEngine.ResourceLock` requires a String value for the lock name, and an optional mode (`ResourceLockMode`)
+  - The default mode is `READ_WRITE`
+
 ## Usage
 
-The `examples` project contains various testing examples and scenarios
+The `examples` project contains various testing examples and scenarios...
 
 https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example
 
-Real integration test example using `testcontainers-java` and Confluent Platform...
+Real integration test example using `testcontainers-java` and Confluent Platform Docker images...
 
 https://github.com/antublue/test-engine/blob/main/examples/src/test/java/example/testcontainers/KafkaTest.java
 
