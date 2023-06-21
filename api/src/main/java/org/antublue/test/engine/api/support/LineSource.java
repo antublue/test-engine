@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Class to create a Stream of Parameters where each Parameter value is a line,
+ * Class to create a Stream of Arguments where each Argument value is a line,
  * <br>
  * Skips lines that start with a "#", but accepts empty lines
  */
@@ -46,7 +46,7 @@ public final class LineSource {
     }
 
     /**
-     * Method to get a Stream of Parameters from a File
+     * Method to get a Stream of Arguments from a File
      *
      * @param file file
      * @param charset charset
@@ -60,7 +60,7 @@ public final class LineSource {
     }
 
     /**
-     * Method to get a Stream of Parameters from a Reader
+     * Method to get a Stream of Arguments from a Reader
      *
      * @param reader reader
      * @return the return value
@@ -86,7 +86,7 @@ public final class LineSource {
     }
 
     /**
-     * Method to get a Stream of Parameters from an InputStream
+     * Method to get a Stream of Arguments from an InputStream
      *
      * @param inputStream inputStream
      * @param charset charset
