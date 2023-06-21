@@ -16,8 +16,6 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import org.antublue.test.engine.api.ResourceLockMode;
-import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.TestEngineExecutionContext;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -32,7 +30,6 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Class to implement a class test descriptor
@@ -114,35 +111,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         ThrowableCollector throwableCollector = getThrowableCollector();
 
         String testClassName = testClass.getName();
-        String lockName = null;
-        ReentrantReadWriteLock reentrantReadWriteLock = null;
-        ResourceLockMode resourceLockMode = null;
         Object testInstance = null;
-
-        if (testClass.isAnnotationPresent(TestEngine.ResourceLock.class)) {
-            lockName = testClass.getAnnotation(TestEngine.ResourceLock.class).value();
-            if (lockName != null && !lockName.trim().isEmpty()) {
-                lockName = lockName.trim();
-                reentrantReadWriteLock = LockManager.getLock(lockName);
-                resourceLockMode = testClass.getAnnotation(TestEngine.ResourceLock.class).mode();
-                switch (resourceLockMode) {
-                    case READ_WRITE: {
-                        reentrantReadWriteLock.writeLock().lock();
-                        break;
-                    }
-                    case READ: {
-                        reentrantReadWriteLock.readLock().lock();
-                        break;
-                    }
-                }
-
-                LOGGER.trace(
-                        "class [%s] resource lock [%s] [%s] locked",
-                        testClassName,
-                        lockName,
-                        resourceLockMode);
-            }
-        }
 
         EngineExecutionListener engineExecutionListener =
                 testEngineExecutionContext.getExecutionRequest().getEngineExecutionListener();
@@ -221,29 +190,6 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                                     .getFirst()
                                     .orElse(null)));
 
-        }
-
-        if (reentrantReadWriteLock != null) {
-            try {
-                switch (resourceLockMode) {
-                    case READ_WRITE: {
-                        reentrantReadWriteLock.writeLock().unlock();
-                        break;
-                    }
-                    case READ: {
-                        reentrantReadWriteLock.readLock().unlock();
-                        break;
-                    }
-                }
-
-                LOGGER.trace(
-                        "class [%s] resource lock [%s] [%s] unlocked",
-                        testClassName,
-                        lockName,
-                        resourceLockMode);
-            } catch (Throwable t) {
-                // DO NOTHING
-            }
         }
 
         testEngineExecutionContext.setTestInstance(null);

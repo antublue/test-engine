@@ -126,7 +126,6 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 | `@TestEngine.Order(<int>)`  | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
 | `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
 | `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
-| `@TestEngine.ResourceLock`  | class<br/>method | no       | Provides a way to synchronize execution of test classes and/or test methods                                                        |
 
 **Notes**
 
@@ -141,9 +140,31 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 
 - For `@TestEngine.Tag(<string>)` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`
 
+## Synchronization
 
-- `@TestEngine.ResourceLock` requires a String value for the lock name, and an optional mode (`ResourceLockMode`)
-  - The default mode is `READ_WRITE`
+The Test Engine runs multiple test classes in parallel (arguments within a test class are run sequentially)
+
+The Test Engine API includes a `Store` object to allow sharing of resources between tests.
+
+https://github.com/antublue/test-engine/tree/main/api/src/main/java/org/antublue/test/engine/api/support/Store.java
+
+For synchronization, a Store can contain a ReentrantReadWriteLock for synchronization.
+
+Class locking example code:
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/ClassLockingTestBase.java
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/ClassLockingTest1.java
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/ClassLockingTest2.java
+
+Method locking example code:
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/MethodLockingTestBase.java
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/MethodLockingTest1.java
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/MethodLockingTest2.java
 
 ## Usage
 

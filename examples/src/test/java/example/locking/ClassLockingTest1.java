@@ -1,15 +1,13 @@
-package org.antublue.test.engine.testing;
+package example.locking;
 
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.stream.Stream;
 
-import static org.antublue.test.engine.api.ResourceLockMode.READ_WRITE;
 import static org.assertj.core.api.Fail.fail;
 
-@TestEngine.ResourceLock(value="LOCK_2", mode=READ_WRITE)
-public class LockingTest1 extends LockingTestBaseClass {
+public class ClassLockingTest1 extends ClassLockingTestBase {
 
     @TestEngine.Argument
     public IntegerArgument integerArgument;
@@ -20,6 +18,13 @@ public class LockingTest1 extends LockingTestBaseClass {
                 IntegerArgument.of(1),
                 IntegerArgument.of(2),
                 IntegerArgument.of(3));
+    }
+
+    @TestEngine.Prepare
+    public void prepare() {
+        lock();
+        System.out.println(getClass().getName() + " LOCKED");
+        System.out.println(getClass().getName() + " prepare()");
     }
 
     @TestEngine.BeforeAll
@@ -33,7 +38,6 @@ public class LockingTest1 extends LockingTestBaseClass {
     }
 
     @TestEngine.Test
-    @TestEngine.ResourceLock(value="LOCK_METHOD", mode=READ_WRITE)
     public void test1() throws InterruptedException {
         count++;
         if (count != 1) {
@@ -61,5 +65,12 @@ public class LockingTest1 extends LockingTestBaseClass {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
+    }
+
+    @TestEngine.Conclude
+    public void conclude() {
+        System.out.println(getClass().getName() + " conclude()");
+        System.out.println(getClass().getName() + " UNLOCKED");
+        unlock();
     }
 }
