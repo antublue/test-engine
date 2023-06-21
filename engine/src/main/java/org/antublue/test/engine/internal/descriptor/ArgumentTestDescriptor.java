@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
- * Class to implement an extended argument test descriptor
+ * Class to implement an argument test descriptor
  */
 public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor {
 
