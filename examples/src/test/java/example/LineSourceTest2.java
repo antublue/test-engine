@@ -2,7 +2,7 @@ package example;
 
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
-import org.antublue.test.engine.api.support.LineSource;
+import org.antublue.test.engine.api.source.LineSource;
 
 import java.io.IOException;
 import java.io.InputStream;
