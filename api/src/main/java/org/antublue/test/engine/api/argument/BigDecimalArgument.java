@@ -73,7 +73,7 @@ public class BigDecimalArgument implements Argument {
     }
 
     /**
-     * Method to create a BigDecimal
+     * Method to create a BigDecimalArgument
      *
      * @param value not null
      * @return the return value

@@ -1,15 +1,13 @@
-package org.antublue.test.engine.testing;
+package example.locking;
 
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.stream.Stream;
 
-import static org.antublue.test.engine.api.ResourceLockMode.READ_WRITE;
 import static org.assertj.core.api.Fail.fail;
 
-@TestEngine.ResourceLock(value="LOCK_1", mode=READ_WRITE)
-public class LockingTest2 extends LockingTestBaseClass {
+public class MethodLockingTest2 extends MethodLockingTestBase {
 
     @TestEngine.Argument
     public IntegerArgument integerArgument;
@@ -20,6 +18,11 @@ public class LockingTest2 extends LockingTestBaseClass {
                 IntegerArgument.of(1),
                 IntegerArgument.of(2),
                 IntegerArgument.of(3));
+    }
+
+    @TestEngine.Prepare
+    public void prepare() {
+        System.out.println("prepare()");
     }
 
     @TestEngine.BeforeAll
@@ -33,18 +36,23 @@ public class LockingTest2 extends LockingTestBaseClass {
     }
 
     @TestEngine.Test
-    @TestEngine.ResourceLock(value="LOCK_METHOD", mode=READ_WRITE)
     public void test1() throws InterruptedException {
-        count++;
-        if (count != 1) {
-            fail("expected count = 1");
-        }
+        try {
+            lock();
 
-        System.out.println(getClass().getName() + " test1(" + integerArgument.value() + ")");
+            count++;
+            if (count != 1) {
+                fail("expected count = 1");
+            }
 
-        count--;
-        if (count != 0) {
-            fail("expected count = 0");
+            System.out.println(getClass().getName() + " test1(" + integerArgument.value() + ")");
+
+            count--;
+            if (count != 0) {
+                fail("expected count = 0");
+            }
+        } finally {
+            unlock();
         }
     }
 
@@ -61,5 +69,10 @@ public class LockingTest2 extends LockingTestBaseClass {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
+    }
+
+    @TestEngine.Conclude
+    public void conclude() {
+        System.out.println("conclude()");
     }
 }

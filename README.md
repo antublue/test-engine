@@ -10,7 +10,7 @@ The Test Engine is a JUnit 5 based test engine designed specifically for paramet
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v4.2.0](https://github.com/antublue/test-engine/releases/tag/v4.2.0)
+- General Availability (GA): [Test Engine v4.2.1](https://github.com/antublue/test-engine/releases/tag/v4.2.1)
 
 **Notes**
 
@@ -126,7 +126,6 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 | `@TestEngine.Order(<int>)`  | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
 | `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
 | `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
-| `@TestEngine.ResourceLock`  | class<br/>method | no       | Provides a way to synchronize execution of test classes and/or test methods                                                        |
 
 **Notes**
 
@@ -141,26 +140,11 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 
 - For `@TestEngine.Tag(<string>)` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`
 
-
-- `@TestEngine.ResourceLock` requires a String value for the lock name, and an optional mode (`ResourceLockMode`)
-  - The default mode is `READ_WRITE`
-
-## Usage
-
-The `examples` project contains various testing examples and scenarios...
-
-https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example
-
-Real integration test example using `testcontainers-java` and Confluent Platform Docker images...
-
-https://github.com/antublue/test-engine/blob/main/examples/src/test/java/example/testcontainers/KafkaTest.java
-
-
 ## What is an `Argument`?
 
 `Argument` is an interface all argument objects must implement to provide a name
 
-There are standard argument implements for common Java data types:
+There are standard argument implementations for common Java data types:
 
 - `BooleanArgument`
 - `ByteArgument`
@@ -174,25 +158,51 @@ There are standard argument implements for common Java data types:
 - `BigDecimalArgument`
 - `StringArgument`
 
-Additionally, there is an `ObjectArgument<T>` that allows passing an arbitrary object as an argument
+Additionally, there is an `ObjectArgument<T>` argument implementation that allows passing an arbitrary object as an argument
 
 **Notes**
 
-- It's recommended to use a test specific argument object instead of `ObjectArgument<T>` whenever possible
+- It's recommended to implement a test specific `Argument` object instead of using `ObjectArgument<T>` whenever possible
 
-## What is a `KeyValueStore` ?
+## What is a `Store` ?
 
-A `KeyValueStore` is an object with a `Map` like API that allows you store/retrieve keys/values
+A `Store` is a singleton object that allow sharing of named resources between tests
 
+https://github.com/antublue/test-engine/tree/main/api/src/main/java/org/antublue/test/engine/api/Store.java
 
-- It allows you to add keys/values using a fluent pattern
+A common usage is shared resource synchronization
 
+### Shared resource synchronization
 
-- `get` method return `<T> T` which performs casting
+The Test Engine runs multiple test classes in parallel (arguments within a test class are run sequentially)
 
-**Notes**
+For synchronization, a `Store` can contain a `Lock` object for synchronization
 
-- It's recommended to use a test specific object to maintain state
+Class locking example code:
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/ClassLockingTestBase.java
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/ClassLockingTest1.java
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/ClassLockingTest2.java
+
+Method locking example code:
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/MethodLockingTestBase.java
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/MethodLockingTest1.java
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example/locking/MethodLockingTest2.java
+
+## Usage
+
+The `examples` project contains various testing examples and scenarios...
+
+https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example
+
+Real integration test example using `testcontainers-java` and Confluent Platform Docker images...
+
+https://github.com/antublue/test-engine/blob/main/examples/src/test/java/example/testcontainers/KafkaTest.java
 
 ## Test Engine Configuration
 
@@ -332,7 +342,7 @@ Add the Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>4.2.0</version>
+  <version>4.2.1</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -351,12 +361,12 @@ Add the Test Engine jars (and dependencies)...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>4.2.0</version>
+    <version>4.2.1</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>4.2.0</version>
+    <version>4.2.1</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -378,7 +388,7 @@ When running via Maven in a Linux console, the Test Engine will report a summary
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v4.2.0 Summary
+[INFO] AntuBLUE Test Engine v4.2.1 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes   :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
 [INFO] Test Methods   : 476, PASSED : 476, FAILED : 0, SKIPPED : 0

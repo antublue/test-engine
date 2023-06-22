@@ -28,6 +28,7 @@ import java.util.Set;
  * Allows casting of values when using "get(String key)"
  */
 @SuppressWarnings("unchecked")
+@Deprecated
 public final class KeyValueStore {
 
     private final Map<String, Object> map;

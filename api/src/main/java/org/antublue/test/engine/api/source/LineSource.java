@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.api.source;
 
 import org.antublue.test.engine.api.argument.StringArgument;
 
@@ -35,10 +35,7 @@ import java.util.stream.Stream;
  * Class to create a Stream of Arguments where each Argument value is a line,
  * <br>
  * Skips lines that start with a "#", but accepts empty lines
- * <br>
- * DEPRECATED - Use org.antublue.test.engine.api.source.LineSource
  */
-@Deprecated
 public final class LineSource {
 
     /**
