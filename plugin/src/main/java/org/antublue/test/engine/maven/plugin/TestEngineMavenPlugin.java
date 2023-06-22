@@ -59,6 +59,22 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
     private static final String GROUP_ID = "org.antublue";
     private static final String ARTIFACT_ID = "test-engine-maven-plugin";
+    private static final String VERSION = TestEngineMavenPluginInformation.getVersion();
+
+    private static final String BANNER =
+            new AnsiColorString()
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append("Antu")
+                    .color(AnsiColor.BLUE_BOLD_BRIGHT)
+                    .append("BLUE")
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append(" Test Engine Maven Plugin ")
+                    .append(VERSION)
+                    .toString();
+
+    private static final String SEPARATOR =
+            AnsiColor.WHITE_BRIGHT.apply(
+                    "------------------------------------------------------------------------");
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
@@ -82,6 +98,10 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         if (!mavenSession.getRequest().isInteractiveMode()) {
             System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE, "true");
         }
+
+        info(SEPARATOR);
+        info(BANNER);
+        info(SEPARATOR);
 
         try {
             Set<Path> artifactPaths = new LinkedHashSet<>();
@@ -119,7 +139,9 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
             // Build a classloader for subsequent calls
             ClassLoader classLoader =
-                    new URLClassLoader(urls.toArray(new URL[urls.size()]), Thread.currentThread().getContextClassLoader());
+                    new URLClassLoader(
+                            urls.toArray(new URL[urls.size()]),
+                            Thread.currentThread().getContextClassLoader());
 
             Thread.currentThread().setContextClassLoader(classLoader);
 
@@ -131,8 +153,6 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                                     System.setProperty(key, value);
                                 }
                             }));
-
-            info();
 
             TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener =
                     new TestEngineConsoleTestExecutionListener();
@@ -161,11 +181,12 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         } catch (SuppressedStackTraceMojoExecutionException e) {
             throw e;
         } catch (JUnitException e) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(System.lineSeparator());
-            stringBuilder.append(System.lineSeparator());
-            stringBuilder.append(e.getCause().getMessage());
-            stringBuilder.append(System.lineSeparator());
+            StringBuilder stringBuilder =
+                    new StringBuilder()
+                            .append(System.lineSeparator())
+                            .append(System.lineSeparator())
+                            .append(e.getCause().getMessage())
+                            .append(System.lineSeparator());
 
             throw new SuppressedStackTraceMojoExecutionException(stringBuilder.toString());
         } catch (Throwable t) {
