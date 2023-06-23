@@ -78,17 +78,15 @@ public class Store {
             throw new IllegalArgumentException("name is empty");
         }
 
-        T t;
-
         synchronized (objectCache) {
-            t = (T) objectCache.get(name);
+            T t = (T) objectCache.get(name);
             if (t == null) {
                 t = function.apply(name);
                 objectCache.put(name, t);
             }
-        }
 
-        return t;
+            return t;
+        }
     }
 
     /**
