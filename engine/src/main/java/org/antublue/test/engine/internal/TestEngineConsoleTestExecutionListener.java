@@ -78,12 +78,12 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
             AnsiColor.WHITE_BRIGHT.apply(
                     "------------------------------------------------------------------------");
 
+
+    private final Summary summary;
     private final boolean detailedOutput;
     private final boolean logTestMessages;
     private final boolean logPassMessages;
     private final boolean logSkipMessages;
-
-    private final Summary summary;
 
     /**
      * Constructor
