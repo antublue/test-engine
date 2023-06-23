@@ -52,27 +52,15 @@ public final class TestEngineReflectionUtils {
 
     private enum Scope { STATIC, NON_STATIC }
 
-    private static final Map<Class<?>, Method> argumentSupplierMethodCache;
-    private static final Map<Class<?>, Field> argumentFieldCaches;
-    private static final Map<Class<?>, List<Method>> prepareMethodCache;
-    private static final Map<Class<?>, List<Method>> beforeAllMethodCache;
-    private static final Map<Class<?>, List<Method>> beforeEachMethodCache;
-    private static final Map<Class<?>, List<Method>> testMethodCache;
-    private static final Map<Class<?>, List<Method>> afterEachMethodCache;
-    private static final Map<Class<?>, List<Method>> afterAllMethodCache;
-    private static final Map<Class<?>, List<Method>> concludeMethodCache;
-
-    static {
-        argumentSupplierMethodCache = new HashMap<>();
-        prepareMethodCache = new HashMap<>();
-        argumentFieldCaches = new HashMap<>();
-        beforeAllMethodCache = new HashMap<>();
-        beforeEachMethodCache = new HashMap<>();
-        testMethodCache = new HashMap<>();
-        afterEachMethodCache = new HashMap<>();
-        afterAllMethodCache = new HashMap<>();
-        concludeMethodCache = new HashMap<>();
-    }
+    private static final Map<Class<?>, Method> ARGUMENT_SUPPLIER_METHOD_CACHE = new HashMap<>();
+    private static final Map<Class<?>, Field> ARGUMENT_FIELD_CACHE = new HashMap<>();
+    private static final Map<Class<?>, List<Method>> PREPARE_METHOD_CACHE = new HashMap<>();
+    private static final Map<Class<?>, List<Method>> BEFORE_ALL_METHOD_CACHE = new HashMap<>();
+    private static final Map<Class<?>, List<Method>> BEFORE_EACH_METHOD_CACHE = new HashMap<>();
+    private static final Map<Class<?>, List<Method>> TEST_METHOD_CACHE = new HashMap<>();
+    private static final Map<Class<?>, List<Method>> AFTER_EACH_METHOD_CACHE = new HashMap<>();
+    private static final Map<Class<?>, List<Method>> AFTER_ALL_METHOD_CACHE = new HashMap<>();
+    private static final Map<Class<?>, List<Method>> CONCLUDE_METHOD_CACHE = new HashMap<>();
 
     /**
      * Constructor
@@ -123,11 +111,11 @@ public final class TestEngineReflectionUtils {
      * @return Method the return value
      */
     public static Method getArgumentSupplierMethod(Class<?> clazz) {
-        synchronized (argumentSupplierMethodCache) {
+        synchronized (ARGUMENT_SUPPLIER_METHOD_CACHE) {
             LOGGER.trace("getArgumentSupplierMethod(%s)", clazz.getName());
 
-            if (argumentSupplierMethodCache.containsKey(clazz)) {
-                return argumentSupplierMethodCache.get(clazz);
+            if (ARGUMENT_SUPPLIER_METHOD_CACHE.containsKey(clazz)) {
+                return ARGUMENT_SUPPLIER_METHOD_CACHE.get(clazz);
             }
 
             List<Method> methodList =
@@ -162,7 +150,7 @@ public final class TestEngineReflectionUtils {
 
 
             Method method = methodList.get(0);
-            argumentSupplierMethodCache.put(clazz, method);
+            ARGUMENT_SUPPLIER_METHOD_CACHE.put(clazz, method);
 
             return method;
         }
@@ -213,11 +201,11 @@ public final class TestEngineReflectionUtils {
      * @return list of Methods
      */
     public static List<Method> getPrepareMethods(Class<?> clazz) {
-        synchronized (prepareMethodCache) {
+        synchronized (PREPARE_METHOD_CACHE) {
             LOGGER.trace("getPrepareMethods(%s)", clazz.getName());
 
-            if (prepareMethodCache.containsKey(clazz)) {
-                return prepareMethodCache.get(clazz);
+            if (PREPARE_METHOD_CACHE.containsKey(clazz)) {
+                return PREPARE_METHOD_CACHE.get(clazz);
             }
 
             List<Method> methods =
@@ -236,7 +224,7 @@ public final class TestEngineReflectionUtils {
             }
 
             methods = Collections.unmodifiableList(methods);
-            prepareMethodCache.put(clazz, methods);
+            PREPARE_METHOD_CACHE.put(clazz, methods);
 
             return methods;
         }
@@ -249,11 +237,11 @@ public final class TestEngineReflectionUtils {
      * @return Field the Argument field
      */
     public static Field getArgumentField(Class<?> clazz) {
-        synchronized (argumentFieldCaches) {
+        synchronized (ARGUMENT_FIELD_CACHE) {
             LOGGER.trace("getArgumentField(%s)", clazz.getName());
 
-            if (argumentFieldCaches.containsKey(clazz)) {
-                return argumentFieldCaches.get(clazz);
+            if (ARGUMENT_FIELD_CACHE.containsKey(clazz)) {
+                return ARGUMENT_FIELD_CACHE.get(clazz);
             }
 
             List<Field> argumentFields = getFields(clazz, TestEngine.Argument.class, Argument.class);
@@ -269,7 +257,7 @@ public final class TestEngineReflectionUtils {
                                 clazz.getName()));
             }
 
-            argumentFieldCaches.put(clazz, argumentFields.get(0));
+            ARGUMENT_FIELD_CACHE.put(clazz, argumentFields.get(0));
 
             return argumentFields.get(0);
         }
@@ -282,11 +270,11 @@ public final class TestEngineReflectionUtils {
      * @return list of Methods
      */
     public static List<Method> getBeforeAllMethods(Class<?> clazz) {
-        synchronized (beforeAllMethodCache) {
+        synchronized (BEFORE_ALL_METHOD_CACHE) {
             LOGGER.trace("getBeforeAllMethods(%s)", clazz.getName());
 
-            if (beforeAllMethodCache.containsKey(clazz)) {
-                return beforeAllMethodCache.get(clazz);
+            if (BEFORE_ALL_METHOD_CACHE.containsKey(clazz)) {
+                return BEFORE_ALL_METHOD_CACHE.get(clazz);
             }
 
             List<Method> methods =
@@ -305,7 +293,7 @@ public final class TestEngineReflectionUtils {
             }
 
             methods = Collections.unmodifiableList(methods);
-            beforeAllMethodCache.put(clazz, methods);
+            BEFORE_ALL_METHOD_CACHE.put(clazz, methods);
 
             return methods;
         }
@@ -318,11 +306,11 @@ public final class TestEngineReflectionUtils {
      * @return list of Methods
      */
     public static List<Method> getBeforeEachMethods(Class<?> clazz) {
-        synchronized (beforeEachMethodCache) {
+        synchronized (BEFORE_EACH_METHOD_CACHE) {
             LOGGER.trace("getBeforeEachMethods(%s)", clazz.getName());
 
-            if (beforeEachMethodCache.containsKey(clazz)) {
-                return beforeEachMethodCache.get(clazz);
+            if (BEFORE_EACH_METHOD_CACHE.containsKey(clazz)) {
+                return BEFORE_EACH_METHOD_CACHE.get(clazz);
             }
 
             List<Method> methods =
@@ -341,7 +329,7 @@ public final class TestEngineReflectionUtils {
             }
 
             methods = Collections.unmodifiableList(methods);
-            beforeEachMethodCache.put(clazz, methods);
+            BEFORE_EACH_METHOD_CACHE.put(clazz, methods);
 
             return methods;
         }
@@ -354,11 +342,11 @@ public final class TestEngineReflectionUtils {
      * @return list of Methods
      */
     public static List<Method> getTestMethods(Class<?> clazz) {
-        synchronized (testMethodCache) {
+        synchronized (TEST_METHOD_CACHE) {
             LOGGER.trace("getTestMethods(%s)", clazz.getName());
 
-            if (testMethodCache.containsKey(clazz)) {
-                return new ArrayList<>(testMethodCache.get(clazz));
+            if (TEST_METHOD_CACHE.containsKey(clazz)) {
+                return new ArrayList<>(TEST_METHOD_CACHE.get(clazz));
             }
 
             List<Method> methods =
@@ -380,7 +368,7 @@ public final class TestEngineReflectionUtils {
                 methods = Collections.unmodifiableList(methods);
             }
 
-            testMethodCache.put(clazz, methods);
+            TEST_METHOD_CACHE.put(clazz, methods);
 
             return new ArrayList<>(methods);
         }
@@ -393,11 +381,11 @@ public final class TestEngineReflectionUtils {
      * @return list of Methods
      */
     public static List<Method> getAfterEachMethods(Class<?> clazz) {
-        synchronized (afterEachMethodCache) {
+        synchronized (AFTER_EACH_METHOD_CACHE) {
             LOGGER.trace("getAfterEachMethods(%s)", clazz.getName());
 
-            if (afterEachMethodCache.containsKey(clazz)) {
-                return afterEachMethodCache.get(clazz);
+            if (AFTER_EACH_METHOD_CACHE.containsKey(clazz)) {
+                return AFTER_EACH_METHOD_CACHE.get(clazz);
             }
 
             List<Method> methods =
@@ -416,7 +404,7 @@ public final class TestEngineReflectionUtils {
             }
 
             methods = Collections.unmodifiableList(methods);
-            afterEachMethodCache.put(clazz, methods);
+            AFTER_EACH_METHOD_CACHE.put(clazz, methods);
 
             return methods;
         }
@@ -429,11 +417,11 @@ public final class TestEngineReflectionUtils {
      * @return list of Methods
      */
     public static List<Method> getAfterAllMethods(Class<?> clazz) {
-        synchronized (afterAllMethodCache) {
+        synchronized (AFTER_ALL_METHOD_CACHE) {
             LOGGER.trace("getAfterAllMethods(%s)", clazz.getName());
 
-            if (afterAllMethodCache.containsKey(clazz)) {
-                return afterAllMethodCache.get(clazz);
+            if (AFTER_ALL_METHOD_CACHE.containsKey(clazz)) {
+                return AFTER_ALL_METHOD_CACHE.get(clazz);
             }
 
             List<Method> methods =
@@ -452,7 +440,7 @@ public final class TestEngineReflectionUtils {
             }
 
             methods = Collections.unmodifiableList(methods);
-            afterAllMethodCache.put(clazz, methods);
+            AFTER_ALL_METHOD_CACHE.put(clazz, methods);
 
             return methods;
         }
@@ -465,11 +453,11 @@ public final class TestEngineReflectionUtils {
      * @return Method the return value
      */
     public static List<Method> getConcludeMethods(Class<?> clazz) {
-        synchronized (concludeMethodCache) {
+        synchronized (CONCLUDE_METHOD_CACHE) {
             LOGGER.trace("getConcludeMethods(%s)", clazz.getName());
 
-            if (concludeMethodCache.containsKey(clazz)) {
-                return concludeMethodCache.get(clazz);
+            if (CONCLUDE_METHOD_CACHE.containsKey(clazz)) {
+                return CONCLUDE_METHOD_CACHE.get(clazz);
             }
 
             List<Method> methods =
@@ -488,7 +476,7 @@ public final class TestEngineReflectionUtils {
             }
 
             methods = Collections.unmodifiableList(methods);
-            concludeMethodCache.put(clazz, methods);
+            CONCLUDE_METHOD_CACHE.put(clazz, methods);
 
             return methods;
         }
