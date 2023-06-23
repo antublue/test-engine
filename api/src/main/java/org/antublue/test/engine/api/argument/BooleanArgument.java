@@ -88,7 +88,7 @@ public class BooleanArgument implements Argument {
     /**
      * Method to create a BooleanArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static BooleanArgument of(boolean value) {

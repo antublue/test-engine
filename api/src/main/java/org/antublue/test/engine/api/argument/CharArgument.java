@@ -88,7 +88,7 @@ public class CharArgument implements Argument {
     /**
      * Method to create a CharArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static CharArgument of(char value) {

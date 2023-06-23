@@ -83,7 +83,7 @@ public class ShortArgument implements Argument {
     /**
      * Method to create a ShortArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static ShortArgument of(short value) {

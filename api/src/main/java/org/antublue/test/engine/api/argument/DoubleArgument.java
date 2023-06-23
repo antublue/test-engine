@@ -88,7 +88,7 @@ public class DoubleArgument implements Argument {
     /**
      * Method to create a DoubleArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static DoubleArgument of(double value) {

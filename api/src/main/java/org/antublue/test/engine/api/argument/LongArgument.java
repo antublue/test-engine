@@ -88,7 +88,7 @@ public class LongArgument implements Argument {
     /**
      * Method to create a LongArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static LongArgument of(long value) {

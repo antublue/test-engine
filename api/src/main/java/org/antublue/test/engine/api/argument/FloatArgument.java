@@ -88,7 +88,7 @@ public class FloatArgument implements Argument {
     /**
      * Method to create a FloatArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static FloatArgument of(float value) {

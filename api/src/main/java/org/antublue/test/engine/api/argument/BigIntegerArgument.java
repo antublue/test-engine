@@ -89,7 +89,7 @@ public class BigIntegerArgument implements Argument {
     /**
      * Method to create a BigIntegerArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static BigIntegerArgument of(BigInteger value) {

@@ -88,7 +88,7 @@ public class ByteArgument implements Argument {
     /**
      * Method to create a ByteArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static ByteArgument of(byte value) {

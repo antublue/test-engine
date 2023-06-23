@@ -89,7 +89,7 @@ public class BigDecimalArgument implements Argument {
     /**
      * Method to create a BigDecimalArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static BigDecimalArgument of(BigDecimal value) {

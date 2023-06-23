@@ -88,7 +88,7 @@ public class StringArgument implements Argument {
     /**
      * Method to create a StringArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static StringArgument of(String value) {
