@@ -195,7 +195,7 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a List of @TestEngine.Prepare Methods sorted alphabetically
+     * Method to get a List of @TestEngine.Prepare Methods
      *
      * @param clazz class to inspect
      * @return list of Methods
@@ -264,7 +264,7 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a List of @TestEngine.BeforeAll Methods sorted alphabetically
+     * Method to get a List of @TestEngine.BeforeAll Methods
      *
      * @param clazz class to inspect
      * @return list of Methods
@@ -300,7 +300,7 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a List of @TestEngine.BeforeEach Methods sorted alphabetically
+     * Method to get a List of @TestEngine.BeforeEach Methods
      *
      * @param clazz class to inspect
      * @return list of Methods
@@ -336,7 +336,7 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a List of @TestEngine.Test Methods sorted alphabetically
+     * Method to get a List of @TestEngine.Test Methods
      *
      * @param clazz class to inspect
      * @return list of Methods
@@ -375,7 +375,7 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a List of @TestEngine.AfterEach Methods sorted alphabetically
+     * Method to get a List of @TestEngine.AfterEach Methods
      *
      * @param clazz class to inspect
      * @return list of Methods
@@ -411,7 +411,7 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a List of @TestEngine.AfterAll Methods sorted alphabetically
+     * Method to get a List of @TestEngine.AfterAll Methods
      *
      * @param clazz class to inspect
      * @return list of Methods
