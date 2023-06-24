@@ -69,7 +69,8 @@ public class TestEngineExecutor {
 
         executorService = new ThreadPoolExecutor(
                 threadCount,
-                threadCount, 60L,
+                threadCount,
+                60L,
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(threadCount * 10),
                 new NamedThreadFactory("test-engine-%02d"));
