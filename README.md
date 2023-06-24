@@ -22,7 +22,7 @@ To allow parameterized testing at the test class level, targeting integration te
 
 ## Non-Goals
 
-The Test Engine is not meant to replace JUnit for unit tests
+The Test Engine is not meant to replace JUnit 5 for unit tests, but can be used.
 
 ## Why not use JUnit 5?
 
@@ -203,6 +203,16 @@ https://github.com/antublue/test-engine/tree/main/examples/src/test/java/example
 Real integration test example using `testcontainers-java` and Confluent Platform Docker images...
 
 https://github.com/antublue/test-engine/blob/main/examples/src/test/java/example/testcontainers/KafkaTest.java
+
+### I want to use the Test Engine in place of JUnit 5
+
+You can use the Test Engine in place of Junit 5 in scenarios where you don't really have parameterized test classes
+
+- It's not a "drop in" replacement
+
+Example:
+
+https://github.com/antublue/test-engine/blob/main/examples/src/test/java/example/Junit5ReplacementExampleTest.java
 
 ## Test Engine Configuration
 
