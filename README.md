@@ -43,7 +43,7 @@ Junit 4 does provide test class level parameterization via `@RunWith(Parameteriz
 - It doesn't provide annotations to run methods before / after all test methods and before / after each test argument.
 
 
-- It uses a test class constructor approach, limiting you to Java inheritance semantics. (superclass before subclass construction)
+- It uses a test class constructor approach, limiting you to Java inheritance semantics. (superclass before subclass construction.)
 
 
 - It doesn't provide the information detailed information during testing or summary information typically wanted for parameterized integration testing.
