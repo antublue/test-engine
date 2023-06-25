@@ -93,15 +93,26 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      * @throws MojoExecutionException execution exception
      */
     public void execute() throws MojoExecutionException {
+        debug(SEPARATOR);
+        debug(BANNER);
+        debug(SEPARATOR);
+
         System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN, "true");
+        debug("system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN + "] = [%s]", "true");
 
         if (!mavenSession.getRequest().isInteractiveMode()) {
             System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE, "true");
+            debug("system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE + "] = [%s]", "true");
         }
 
-        info(SEPARATOR);
-        info(BANNER);
-        info(SEPARATOR);
+        Optional.ofNullable(properties)
+                .ifPresent(map ->
+                        map.forEach((key, value) -> {
+                            if (key != null && value != null) {
+                                System.setProperty(key, value);
+                                debug("system property [%s] = [%s]", key, value);
+                            }
+                        }));
 
         try {
             Set<Path> artifactPaths = new LinkedHashSet<>();
@@ -133,8 +144,8 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             Set<URL> urls = new LinkedHashSet<>();
             for (Path path : artifactPaths) {
                 URL url = path.toUri().toURL();
-                info("classpath entry [%s]", url);
                 urls.add(url);
+                debug("classpath entry [%s]", url);
             }
 
             // Build a classloader for subsequent calls
@@ -144,15 +155,6 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             Thread.currentThread().getContextClassLoader());
 
             Thread.currentThread().setContextClassLoader(classLoader);
-
-            Optional.ofNullable(properties)
-                    .ifPresent(map ->
-                            map.forEach((key, value) -> {
-                                if (key != null && value != null) {
-                                    info("plugin property [%s] = [%s]", key, value);
-                                    System.setProperty(key, value);
-                                }
-                            }));
 
             TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener =
                     new TestEngineConsoleTestExecutionListener();
