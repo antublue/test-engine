@@ -16,12 +16,23 @@
 
 package org.antublue.test.engine.api;
 
+/**
+ * Class to fail a test
+ */
 public class Fail {
 
+    /**
+     * Constructor
+     */
     private Fail() {
         // DO NOTHING
     }
 
+    /**
+     * Method to fail a test by generating a FailError
+     *
+     * @param message
+     */
     public static void fail(String message) {
         throw new FailError(message);
     }
