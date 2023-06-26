@@ -190,6 +190,12 @@ Method locking example code:
 - [MethodLockingTest1.java](/examples/src/test/java/example/locking/MethodLockingTest1.java)
 - [MethodLockingTest2.java](/examples/src/test/java/example/locking/MethodLockingTest2.java)
 
+Multiple methods locking example code:
+
+- [MultipleMethodsLockingTestBase.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTestBase.java)
+- [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest1.java)
+- [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest2.java)
+
 ## Usage
 
 The `examples` project contains various testing examples and scenarios...
