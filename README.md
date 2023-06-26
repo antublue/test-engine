@@ -1,4 +1,4 @@
-[![Build](https://github.com/antublue/test-engine/blob/actions/workflows/build.yml/badge.svg)](https://github.com/antublue/test-engine/blob/actions/workflows/build.yml)
+[![Build](https://github.com/antublue/test-engine/actions/workflows/build.yml/badge.svg)](https://github.com/antublue/test-engine/actions/workflows/build.yml)
 
 <br/>
 
