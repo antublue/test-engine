@@ -39,6 +39,7 @@ public class MethodLockingTest1 extends MethodLockingTestBase {
     public void test1() throws InterruptedException {
         try {
             lock();
+            System.out.println(getClass().getName() + " test1()");
 
             count++;
             if (count != 1) {

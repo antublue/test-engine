@@ -23,7 +23,6 @@ public class ClassLockingTest1 extends ClassLockingTestBase {
     @TestEngine.Prepare
     public void prepare() {
         lock();
-        System.out.println(getClass().getName() + " LOCKED");
         System.out.println(getClass().getName() + " prepare()");
     }
 
@@ -70,7 +69,6 @@ public class ClassLockingTest1 extends ClassLockingTestBase {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println(getClass().getName() + " conclude()");
-        System.out.println(getClass().getName() + " UNLOCKED");
         unlock();
     }
 }
