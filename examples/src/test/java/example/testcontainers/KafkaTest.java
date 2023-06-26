@@ -65,7 +65,13 @@ public class KafkaTest {
 
         KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse(dockerImageName));
         kafkaContainer.withNetwork(network);
-        kafkaContainer.withEmbeddedZookeeper();
+
+        if (stringArgument.equals("confluentinc/cp-kafka:7.4.0")) {
+            kafkaContainer.withKraft();
+        } else {
+            kafkaContainer.withEmbeddedZookeeper();
+        }
+
         kafkaContainer.start();
         kafkaTestState.setKafkaContainer(kafkaContainer);
 
