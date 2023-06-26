@@ -479,8 +479,7 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
                 }
             }
         }
-
-        // Log the TestDescriptor tree is trace is enabled
+        
         TestDescriptorUtils.logTestDescriptorTree(engineDescriptor);
     }
 }

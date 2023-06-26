@@ -181,7 +181,7 @@ public final class TestDescriptorUtils {
         }
 
         // Get other method optional annotated methods
-        // which will check for duplicate @TestEngine.Order vlues
+        // which will check for duplicate @TestEngine.Order values
         TestEngineReflectionUtils.getPrepareMethods(clazz);
         TestEngineReflectionUtils.getBeforeAllMethods(clazz);
         TestEngineReflectionUtils.getBeforeEachMethods(clazz);

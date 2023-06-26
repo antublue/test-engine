@@ -25,10 +25,10 @@ import java.util.function.Function;
  */
 public class Store {
 
-    private static final Map<String, Object> objectCache;
+    private static final Map<String, Object> OBJECT_MAP;
 
     static {
-        objectCache = new HashMap<>();
+        OBJECT_MAP = new HashMap<>();
     }
 
     /**
@@ -55,8 +55,8 @@ public class Store {
             throw new IllegalArgumentException("name is empty");
         }
 
-        synchronized (objectCache) {
-            return (T) objectCache.get(name);
+        synchronized (OBJECT_MAP) {
+            return (T) OBJECT_MAP.get(name);
         }
     }
 
@@ -78,17 +78,15 @@ public class Store {
             throw new IllegalArgumentException("name is empty");
         }
 
-        T t;
-
-        synchronized (objectCache) {
-            t = (T) objectCache.get(name);
+        synchronized (OBJECT_MAP) {
+            T t = (T) OBJECT_MAP.get(name);
             if (t == null) {
                 t = function.apply(name);
-                objectCache.put(name, t);
+                OBJECT_MAP.put(name, t);
             }
-        }
 
-        return t;
+            return t;
+        }
     }
 
     /**
@@ -108,8 +106,8 @@ public class Store {
             throw new IllegalArgumentException("name is empty");
         }
 
-        synchronized (objectCache) {
-            return (T) objectCache.remove(name);
+        synchronized (OBJECT_MAP) {
+            return (T) OBJECT_MAP.remove(name);
         }
     }
 }

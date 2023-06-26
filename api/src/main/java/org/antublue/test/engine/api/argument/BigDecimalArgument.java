@@ -19,6 +19,7 @@ package org.antublue.test.engine.api.argument;
 import org.antublue.test.engine.api.Argument;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * Class to implement a BigDecimalArgument
@@ -72,10 +73,23 @@ public class BigDecimalArgument implements Argument {
         return String.valueOf(value);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BigDecimalArgument that = (BigDecimalArgument) o;
+        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, value);
+    }
+
     /**
      * Method to create a BigDecimalArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static BigDecimalArgument of(BigDecimal value) {
