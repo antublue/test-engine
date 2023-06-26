@@ -28,9 +28,10 @@ import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestExecutionResult;
 
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -72,8 +73,9 @@ public class TestEngineExecutor {
                 threadCount,
                 60L,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(threadCount * 10),
-                new NamedThreadFactory("test-engine-%02d"));
+                new ArrayBlockingQueue<>(threadCount * 10),
+                new NamedThreadFactory("test-engine-%02d"),
+                new BlockingRejectedExecutionHandler());
     }
 
     /**
@@ -111,5 +113,20 @@ public class TestEngineExecutor {
         }
 
         executionRequest.getEngineExecutionListener().executionFinished(extendedEngineDescriptor, TestExecutionResult.successful());
+    }
+
+    /**
+     * Class to handle a submit rejection, adding the Runnable using blocking semantics
+     */
+    private static class BlockingRejectedExecutionHandler implements RejectedExecutionHandler {
+
+        @Override
+        public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
+            try {
+                executor.getQueue().put(runnable);
+            } catch (InterruptedException e) {
+                LOGGER.error("Runnable discarded!!!");
+            }
+        }
     }
 }
