@@ -2,9 +2,10 @@ package org.antublue.test.engine.testing;
 
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
-import org.opentest4j.AssertionFailedError;
 
 import java.util.stream.Stream;
+
+import static org.antublue.test.engine.api.Fail.fail;
 
 /**
  * Test used for debugging IntelliJ
@@ -42,7 +43,7 @@ public class DebugTestA {
     public void test2() {
         System.out.println("test2(" + integerArgument.value() + ")");
         if (integerArgument.value() == 1) {
-            throw new AssertionFailedError("Forced");
+            fail("Forced");
         }
     }
 

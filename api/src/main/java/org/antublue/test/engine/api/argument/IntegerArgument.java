@@ -18,6 +18,8 @@ package org.antublue.test.engine.api.argument;
 
 import org.antublue.test.engine.api.Argument;
 
+import java.util.Objects;
+
 /**
  * Class to implement a BooleanArgument
  */
@@ -70,10 +72,23 @@ public class IntegerArgument implements Argument {
         return String.valueOf(value);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IntegerArgument that = (IntegerArgument) o;
+        return value == that.value && Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, value);
+    }
+
     /**
      * Method to create a IntegerArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static IntegerArgument of(int value) {

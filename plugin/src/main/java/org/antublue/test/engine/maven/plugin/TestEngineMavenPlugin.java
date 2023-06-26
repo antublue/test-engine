@@ -59,6 +59,22 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
     private static final String GROUP_ID = "org.antublue";
     private static final String ARTIFACT_ID = "test-engine-maven-plugin";
+    private static final String VERSION = TestEngineMavenPluginInformation.getVersion();
+
+    private static final String BANNER =
+            new AnsiColorString()
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append("Antu")
+                    .color(AnsiColor.BLUE_BOLD_BRIGHT)
+                    .append("BLUE")
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append(" Test Engine Maven Plugin ")
+                    .append(VERSION)
+                    .toString();
+
+    private static final String SEPARATOR =
+            AnsiColor.WHITE_BRIGHT.apply(
+                    "------------------------------------------------------------------------");
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
@@ -77,11 +93,26 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      * @throws MojoExecutionException execution exception
      */
     public void execute() throws MojoExecutionException {
+        debug(SEPARATOR);
+        debug(BANNER);
+        debug(SEPARATOR);
+
         System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN, "true");
+        debug("system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN + "] = [%s]", "true");
 
         if (!mavenSession.getRequest().isInteractiveMode()) {
             System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE, "true");
+            debug("system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE + "] = [%s]", "true");
         }
+
+        Optional.ofNullable(properties)
+                .ifPresent(map ->
+                        map.forEach((key, value) -> {
+                            if (key != null && value != null) {
+                                System.setProperty(key, value);
+                                debug("system property [%s] = [%s]", key, value);
+                            }
+                        }));
 
         try {
             Set<Path> artifactPaths = new LinkedHashSet<>();
@@ -113,26 +144,17 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             Set<URL> urls = new LinkedHashSet<>();
             for (Path path : artifactPaths) {
                 URL url = path.toUri().toURL();
-                info("classpath entry [%s]", url);
                 urls.add(url);
+                debug("classpath entry [%s]", url);
             }
 
             // Build a classloader for subsequent calls
             ClassLoader classLoader =
-                    new URLClassLoader(urls.toArray(new URL[urls.size()]), Thread.currentThread().getContextClassLoader());
+                    new URLClassLoader(
+                            urls.toArray(new URL[urls.size()]),
+                            Thread.currentThread().getContextClassLoader());
 
             Thread.currentThread().setContextClassLoader(classLoader);
-
-            Optional.ofNullable(properties)
-                    .ifPresent(map ->
-                            map.forEach((key, value) -> {
-                                if (key != null && value != null) {
-                                    info("plugin property [%s] = [%s]", key, value);
-                                    System.setProperty(key, value);
-                                }
-                            }));
-
-            info();
 
             TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener =
                     new TestEngineConsoleTestExecutionListener();
@@ -161,11 +183,12 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         } catch (SuppressedStackTraceMojoExecutionException e) {
             throw e;
         } catch (JUnitException e) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(System.lineSeparator());
-            stringBuilder.append(System.lineSeparator());
-            stringBuilder.append(e.getCause().getMessage());
-            stringBuilder.append(System.lineSeparator());
+            StringBuilder stringBuilder =
+                    new StringBuilder()
+                            .append(System.lineSeparator())
+                            .append(System.lineSeparator())
+                            .append(e.getCause().getMessage())
+                            .append(System.lineSeparator());
 
             throw new SuppressedStackTraceMojoExecutionException(stringBuilder.toString());
         } catch (Throwable t) {

@@ -18,6 +18,8 @@ package org.antublue.test.engine.api.argument;
 
 import org.antublue.test.engine.api.Argument;
 
+import java.util.Objects;
+
 /**
  * Class to implement a FloatArgument
  */
@@ -70,10 +72,23 @@ public class FloatArgument implements Argument {
         return String.valueOf(value);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FloatArgument that = (FloatArgument) o;
+        return Float.compare(that.value, value) == 0 && Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, value);
+    }
+
     /**
      * Method to create a FloatArgument
      *
-     * @param value not null
+     * @param value value
      * @return the return value
      */
     public static FloatArgument of(float value) {
