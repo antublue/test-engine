@@ -41,13 +41,13 @@ public class KafkaTest {
                 StringArgument.of("confluentinc/cp-kafka:7.3.0"),
                 StringArgument.of("confluentinc/cp-kafka:7.3.1"),
                 StringArgument.of("confluentinc/cp-kafka:7.3.2"),
-                StringArgument.of("confluentinc/cp-kafka:7.3.3"));
+                StringArgument.of("confluentinc/cp-kafka:7.3.3"),
+                StringArgument.of("confluentinc/cp-kafka:7.4.0"));
     }
 
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        System.out.println("createNetwork()");
 
         Network network = Network.newNetwork();
         network.getId();
@@ -57,15 +57,21 @@ public class KafkaTest {
     }
 
     @TestEngine.BeforeAll
-    public void createKafkaContainer() {
-        System.out.println("createKafkaContainer()");
+    public void beforeAll() {
+        System.out.println("beforeAll()");
 
         Network network = kafkaTestState.getNetwork();
         String dockerImageName = stringArgument.value();
 
         KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse(dockerImageName));
         kafkaContainer.withNetwork(network);
-        kafkaContainer.withEmbeddedZookeeper();
+
+        if (stringArgument.equals("confluentinc/cp-kafka:7.4.0")) {
+            kafkaContainer.withKraft();
+        } else {
+            kafkaContainer.withEmbeddedZookeeper();
+        }
+
         kafkaContainer.start();
         kafkaTestState.setKafkaContainer(kafkaContainer);
 
@@ -141,15 +147,14 @@ public class KafkaTest {
     }
 
     @TestEngine.AfterAll
-    public void cleanupKafkaContainer() {
-        System.out.println("cleanupKafkaContainer()");
+    public void afterAll() {
+        System.out.println("afterAll()");
         kafkaTestState.reset();
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        System.out.println("cleanupNetwork()");
         kafkaTestState.dispose();
     }
 

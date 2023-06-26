@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class ClassLockingTest2 extends ClassLockingTestBase {
+public class MultipleMethodsLockingTest2 extends MultipleMethodsLockingTestBase {
 
     @TestEngine.Argument
     public IntegerArgument integerArgument;
@@ -22,13 +22,13 @@ public class ClassLockingTest2 extends ClassLockingTestBase {
 
     @TestEngine.Prepare
     public void prepare() {
-        lock();
-        System.out.println(getClass().getName() + " prepare()");
+        System.out.println("prepare()");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll()");
+        lock();
+        System.out.println(getClass().getName() + " beforeAll()");
     }
 
     @TestEngine.BeforeEach
@@ -53,7 +53,17 @@ public class ClassLockingTest2 extends ClassLockingTestBase {
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument.value() + ")");
+        count++;
+        if (count != 1) {
+            fail("expected count = 1");
+        }
+
+        System.out.println(getClass().getName() + " test1(" + integerArgument.value() + ")");
+
+        count--;
+        if (count != 0) {
+            fail("expected count = 0");
+        }
     }
 
     @TestEngine.AfterEach
@@ -63,12 +73,12 @@ public class ClassLockingTest2 extends ClassLockingTestBase {
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll()");
+        System.out.println(getClass().getName() + " afterAll()");
+        unlock();
     }
 
     @TestEngine.Conclude
     public void conclude() {
-        System.out.println(getClass().getName() + " conclude()");
-        unlock();
+        System.out.println("conclude()");
     }
 }
