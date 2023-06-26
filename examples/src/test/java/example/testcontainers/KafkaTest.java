@@ -47,7 +47,6 @@ public class KafkaTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        System.out.println("createNetwork()");
 
         Network network = Network.newNetwork();
         network.getId();
@@ -57,8 +56,8 @@ public class KafkaTest {
     }
 
     @TestEngine.BeforeAll
-    public void createKafkaContainer() {
-        System.out.println("createKafkaContainer()");
+    public void beforeAll() {
+        System.out.println("beforeAll()");
 
         Network network = kafkaTestState.getNetwork();
         String dockerImageName = stringArgument.value();
@@ -141,15 +140,14 @@ public class KafkaTest {
     }
 
     @TestEngine.AfterAll
-    public void cleanupKafkaContainer() {
-        System.out.println("cleanupKafkaContainer()");
+    public void afterAll() {
+        System.out.println("afterAll()");
         kafkaTestState.reset();
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        System.out.println("cleanupNetwork()");
         kafkaTestState.dispose();
     }
 
