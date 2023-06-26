@@ -41,7 +41,8 @@ public class KafkaTest {
                 StringArgument.of("confluentinc/cp-kafka:7.3.0"),
                 StringArgument.of("confluentinc/cp-kafka:7.3.1"),
                 StringArgument.of("confluentinc/cp-kafka:7.3.2"),
-                StringArgument.of("confluentinc/cp-kafka:7.3.3"));
+                StringArgument.of("confluentinc/cp-kafka:7.3.3"),
+                StringArgument.of("confluentinc/cp-kafka:7.4.0"));
     }
 
     @TestEngine.Prepare
