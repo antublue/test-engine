@@ -324,7 +324,7 @@ The Test Engine as two experimental configuration parameters.
 - If all test methods are excluded, then the test class will be excluded.
 
 
-- If no test classes are found, an error exit code of -2 is returned.
+- If no test classes are found, an exit code of `-2` is returned.
 
 
 - Experimental configuration values are subject to change at any time.
