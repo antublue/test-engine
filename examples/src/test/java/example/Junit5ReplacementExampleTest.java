@@ -10,9 +10,11 @@ import java.util.stream.Stream;
  */
 public class Junit5ReplacementExampleTest {
 
+    // The stringArgument is required by the test engine, but is not actually used in test methods
     @TestEngine.Argument
     protected StringArgument stringArgument;
 
+    // The stringArgument provides a node in the hierarchy, but is not actually used in test methods
     @TestEngine.ArgumentSupplier
     protected static Stream<StringArgument> arguments() {
         return Stream.of(StringArgument.of("tests"));
