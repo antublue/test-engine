@@ -6,7 +6,7 @@
 
 # Test Engine
 
-The Test Engine is a JUnit 5 based test engine designed specifically for parameterized integration testing by allowing parameterization at the test class level.
+The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically for parameterized integration testing by allowing parameterization at the test class level.
 
 ## Latest Releases
 
@@ -34,11 +34,16 @@ Currently, JUnit 5 does not support parameterized testing at the test class leve
 - It doesn't provide annotations to run methods before / after all test methods and before / after each test argument. (2023-04-18)
 
 
-- It doesn't provide the information detailed information during testing or summary information typically wanted for parameterized integration testing.
+- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
 
-## Why not use Junit 4?
+## Why not use JUnit 4?
 
-Junit 4 does provide test class level parameterization via `@RunWith(Parameterized.class)`.
+JUnit 4 does provide test class level parameterization via `@RunWith(Parameterized.class)`.
+
+- JUnit 4 is maintained, but no new functionality is being added.
+  - The latest release was on February 13, 2021.
+  - https://stackoverflow.com/questions/72325172/when-is-junit4-going-to-be-deprecated
+
 
 - It doesn't provide annotations to run methods before / after all test methods and before / after each test argument.
 
@@ -46,7 +51,7 @@ Junit 4 does provide test class level parameterization via `@RunWith(Parameteriz
 - It uses a test class constructor approach, limiting you to Java inheritance semantics. (superclass before subclass construction.)
 
 
-- It doesn't provide the information detailed information during testing or summary information typically wanted for parameterized integration testing.
+- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
 
 ## What is parameterized integration testing?
 
