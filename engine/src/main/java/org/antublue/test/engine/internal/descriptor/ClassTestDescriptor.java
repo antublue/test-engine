@@ -17,6 +17,7 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.internal.TestEngineExecutionContext;
+import org.antublue.test.engine.internal.TestEngineLockUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -132,6 +133,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
             TestEngineReflectionUtils
                     .getPrepareMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
+                        TestEngineLockUtils.processLock(method);
+
                         LOGGER.trace(
                                 "invoking [%s] @TestEngine.Prepare method [%s]",
                                 testClassName,
@@ -139,6 +142,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         try {
                             method.invoke(finalTestInstance, (Object[]) null);
                         } finally {
+                            TestEngineLockUtils.processUnlock(method);
                             flush();
                         }
                     });
@@ -163,6 +167,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 TestEngineReflectionUtils
                         .getConcludeMethods(testClass)
                         .forEach((ThrowableConsumer<Method>) method -> {
+                            TestEngineLockUtils.processLock(method);
+
                             LOGGER.trace(
                                     "invoking [%s] @TestEngine.Conclude method [%s]",
                                     testClassName,
@@ -170,6 +176,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                             try {
                                 method.invoke(finalTestInstance, (Object[]) null);
                             } finally {
+                                TestEngineLockUtils.processUnlock(method);
                                 flush();
                             }
                         });

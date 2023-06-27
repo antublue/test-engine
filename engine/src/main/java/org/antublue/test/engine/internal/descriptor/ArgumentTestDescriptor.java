@@ -18,6 +18,7 @@ package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.TestEngineExecutionContext;
+import org.antublue.test.engine.internal.TestEngineLockUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -151,6 +152,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 TestEngineReflectionUtils
                         .getBeforeAllMethods(testClass)
                         .forEach((ThrowableConsumer<Method>) method -> {
+                            TestEngineLockUtils.processLock(method);
+
                             LOGGER.trace(
                                     "invoking [%s] @TestEngine.BeforeAll method [%s]",
                                     testClassName,
@@ -158,6 +161,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                             try {
                                 method.invoke(testInstance, (Object[]) null);
                             } finally {
+                                TestEngineLockUtils.processUnlock(method);
                                 flush();
                             }
                         });
@@ -186,6 +190,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             TestEngineReflectionUtils
                     .getAfterAllMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
+                        TestEngineLockUtils.processLock(method);
+
                         LOGGER.trace(
                                 "invoking [%s] @TestEngine.AfterAll method [%s]",
                                 testClassName,
@@ -193,6 +199,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                         try {
                             method.invoke(testInstance, (Object[]) null);
                         } finally {
+                            TestEngineLockUtils.processUnlock(method);
                             flush();
                         }
                     });

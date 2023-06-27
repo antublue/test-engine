@@ -36,18 +36,18 @@ public class TaggedMethodTag1And2Test {
     @TestEngine.Test
     @TestEngine.Tag("/tag1/")
     public void test1() {
-        System.out.println("test1(" + stringArgument.value() + ")");
+        System.out.println("test1(" + stringArgument  + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Tag("/tag2/")
     public void test2() {
-        System.out.println("test2(" + stringArgument.value() + ")");
+        System.out.println("test2(" + stringArgument  + ")");
     }
 
     @TestEngine.Test
     public void test3() {
-        System.out.println("test3(" + stringArgument.value() + ")");
+        System.out.println("test3(" + stringArgument  + ")");
     }
 
     @TestEngine.AfterAll

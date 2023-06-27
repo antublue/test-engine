@@ -128,6 +128,8 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 | `@TestEngine.Order(<int>)`  | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
 | `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
 | `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
+| `@TestEngine.Lock`          | method           | no       | Acquires a named `ReentrantLock` before execution                                                                                  |
+| `@TestEngine.UnLock`        | method           | no       | Acquires a named `ReentrantLock` before execution                                                                                  |
 
 **Notes**
 
@@ -176,9 +178,30 @@ A common usage is shared resource synchronization.
 
 ### Shared resource synchronization
 
-The test engine runs multiple test classes in parallel (arguments within a test class are run sequentially.)
+The test engine runs multiple test classes in parallel (arguments within a test class are tested sequentially.)
 
-For synchronization, a `Store` can contain a `Lock` object for synchronization.
+**Solution 1**
+
+Use `@TestEngine.Lock` and `@TestEngine.Unlock` annotations.
+
+Annotated class locking example code:
+
+- [AnnotatedClassLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedClassLockingTest1.java)
+- [AnnotatedClassLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedClassLockingTest2.java)
+
+Annotated method locking example code:
+
+- [AnnotatedMethodLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedMethodLockingTest1.java)
+- [AnnotatedMethodLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedMethodLockingTest2.java)
+
+Annotated multiple methods locking example code:
+
+- [AnnotatedMultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedMultipleMethodsLockingTest1.java)
+- [AnnotatedMultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedMultipleMethodsLockingTest2.java)
+
+**Solution 2**
+
+Use a `Store` along with a `ReentrantLock`.
 
 Class locking example code:
 

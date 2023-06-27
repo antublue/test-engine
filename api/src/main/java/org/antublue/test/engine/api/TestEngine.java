@@ -112,4 +112,16 @@ public @interface TestEngine {
     @interface DisplayName {
         String value();
     }
+
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Lock {
+        String value();
+    }
+
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Unlock {
+        String value();
+    }
 }

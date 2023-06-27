@@ -56,7 +56,7 @@ public class MethodLockingTest2 {
                 fail("expected count = 1");
             }
 
-            System.out.println(getClass().getName() + " test1(" + integerArgument.value() + ")");
+            System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
             count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
             if (count != 0) {
@@ -69,7 +69,7 @@ public class MethodLockingTest2 {
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument.value() + ")");
+        System.out.println("test2(" + integerArgument + ")");
     }
 
     @TestEngine.AfterEach

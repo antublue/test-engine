@@ -54,7 +54,7 @@ public class ClassLockingTest1 {
             fail("expected count = 1");
         }
 
-        System.out.println(getClass().getName() + " test1(" + integerArgument.value() + ")");
+        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
         count = Store.getOrCreate("COUNTER", name -> new AtomicInteger()).decrementAndGet();
         if (count != 0) {
@@ -64,7 +64,7 @@ public class ClassLockingTest1 {
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument.value() + ")");
+        System.out.println("test2(" + integerArgument + ")");
     }
 
     @TestEngine.AfterEach

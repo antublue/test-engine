@@ -45,7 +45,7 @@ class BaseOrderTest {
     @TestEngine.Test
     @TestEngine.Order(1)
     public void test2() {
-        System.out.println("BaseOrderTest.test2(" + stringArgument.value() + ")");
+        System.out.println("BaseOrderTest.test2(" + stringArgument  + ")");
     }
 
     @TestEngine.AfterAll

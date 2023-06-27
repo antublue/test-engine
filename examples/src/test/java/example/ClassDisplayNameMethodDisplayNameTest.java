@@ -35,13 +35,13 @@ public class ClassDisplayNameMethodDisplayNameTest {
     @TestEngine.Test
     @TestEngine.DisplayName("Test A")
     public void test1() {
-        System.out.println("test1(" + integerArgument.value() + ")");
+        System.out.println("test1(" + integerArgument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.DisplayName("Test B")
     public void test2() {
-        System.out.println("test2(" + integerArgument.value() + ")");
+        System.out.println("test2(" + integerArgument + ")");
     }
 
     @TestEngine.AfterEach
