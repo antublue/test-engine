@@ -20,6 +20,8 @@ public class Junit5ReplacementExampleTest {
         return Stream.of(StringArgument.of("tests"));
     }
 
+    // For a single Argument, a @TestEngine.Prepare method is equivalent to a @TestEngine.BeforeAll method
+
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
@@ -49,4 +51,6 @@ public class Junit5ReplacementExampleTest {
     public void afterAll() {
         System.out.println("afterAll()");
     }
+
+    // For a single Argument, a @TestEngine.Conclude method is equivalent to a @TestEngine.AfterAll method
 }
