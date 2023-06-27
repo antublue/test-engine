@@ -16,7 +16,7 @@ public class MultipleMethodsLockingTest2 {
     public static final String COUNTER_NAME = "multiple.methods.counter";
 
     static {
-        Store.getOrCreate(COUNTER_NAME, namw -> new AtomicInteger());
+        Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger());
     }
 
     @TestEngine.Argument
