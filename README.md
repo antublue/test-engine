@@ -115,7 +115,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - `@TestEngine.Order` can be used to control test class order / test method order of execution.
   - Classes/methods are sorted by the order annotation value first, then alphabetically by the class name/method name.
   - The test method name can be changed by using the `@TestEngine.DisplayName` annotation.
-  - Method order is relative to other methods with the same annotation regardless of superclass / subclass location.
+  - Method order is relative to other methods in a test class with the same annotation regardless of superclass / subclass location.
 
   
  - **Class execution order can't be guaranteed unless the test engine is configured for a single thread.** 
