@@ -10,7 +10,7 @@ The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically fo
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v4.2.4](https://github.com/antublue/test-engine/blob/releases/tag/v4.2.4)
+- General Availability (GA): [Test Engine v4.3.0](https://github.com/antublue/test-engine/blob/releases/tag/v4.3.0)
 
 **Notes**
 
@@ -376,7 +376,7 @@ Add the AntuBLUE Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>4.2.4</version>
+  <version>4.3.0</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -395,12 +395,12 @@ Add the AntuBLUE Test Engine jars...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>4.2.4</version>
+    <version>4.3.0</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>4.2.4</version>
+    <version>4.3.0</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -422,7 +422,7 @@ When running via Maven in a Linux console, the test engine will report a summary
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v4.2.4 Summary
+[INFO] AntuBLUE Test Engine v4.3.0 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes   :  58, PASSED :  58, FAILED : 0, SKIPPED : 0
 [INFO] Test Methods   : 777, PASSED : 777, FAILED : 0, SKIPPED : 0
