@@ -160,7 +160,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                         TestEngineLockUtils.processLock(method);
 
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.BeforeEach method [%s]",
+                                "invoking [%s] @TestEngine.BeforeEach methods [%s]",
                                 testClassName,
                                 method.getName());
                         try {
@@ -204,7 +204,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                         TestEngineLockUtils.processLock(method);
 
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.AfterEach method [%s]",
+                                "invoking [%s] @TestEngine.AfterEach methods [%s]",
                                 testClassName,
                                 method.getName());
                         try {
