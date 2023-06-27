@@ -22,7 +22,7 @@ To allow parameterized testing at the test class level, targeting integration te
 
 ## Non-Goals
 
-The Test Engine is not meant to replace JUnit 5 for unit tests, but can be used.
+The test engine is not meant to replace JUnit 5 for unit tests, but can be used.
 
 ## Why not use JUnit 5?
 
@@ -112,11 +112,14 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - By default, methods are executed in alphabetical order based on class/method name, regardless of where they are declared (class or superclasses.)
 
 
-- `@TestEngine.Order` can be used to control test class / test method order of execution.
+- `@TestEngine.Order` can be used to control test class order / test method order of execution.
   - Classes/methods are sorted by the order annotation value first, then alphabetically by the class name/method name.
   - The test method name can be changed by using the `@TestEngine.DisplayName` annotation.
   - Method order is relative to other methods with the same annotation regardless of superclass / subclass location.
 
+  
+ - **Class execution order can't be guaranteed unless the test engine is configured for a single thread.** 
+ 
 ## Additional Test Annotations
 
 | Annotation                  | Scope            | Required | Usage                                                                                                                              |
@@ -174,7 +177,7 @@ A common usage is shared resource synchronization.
 
 ### Shared resource synchronization
 
-The Test Engine runs multiple test classes in parallel (arguments within a test class are run sequentially.)
+The test engine runs multiple test classes in parallel (arguments within a test class are run sequentially.)
 
 For synchronization, a `Store` can contain a `Lock` object for synchronization.
 
@@ -203,9 +206,9 @@ Integration test example using `testcontainers-java` and Confluent Platform Dock
 
 - [KafkaTest.java](/examples/src/test/java/example/testcontainers/KafkaTest.java)
 
-### I want to use the Test Engine in place of JUnit 5
+### I want to use the test engine in place of JUnit 5
 
-You can use the Test Engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
+You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
 
 - It's not a "drop in" replacement.
 
@@ -215,7 +218,7 @@ Example:
 
 ## Test Engine Configuration
 
-The Test Engine has seven configuration parameters.
+The test engine has seven configuration parameters.
 <br/>
 <br/>
 
@@ -295,7 +298,7 @@ Using a combination of the system properties (and/or environment variables) allo
 
 ## Experimental Test Engine Configuration
 
-The Test Engine as two experimental configuration parameters.
+The test engine as two experimental configuration parameters.
 
 
 | <nobr>Output console TEST messages</nobr> |                                                     |
@@ -345,7 +348,7 @@ Disable the Maven Surefire plugin...
 </plugin>
 ```
 
-Add the Test Engine Maven Plugin...
+Add the AntuBLUE Test Engine Maven Plugin...
 
 ```xml
 <plugin>
@@ -363,7 +366,7 @@ Add the Test Engine Maven Plugin...
 </plugin>
 ```
 
-Add the Test Engine jars...
+Add the AntuBLUE Test Engine jars...
 
 ```xml
 <dependencies>
@@ -393,7 +396,7 @@ mvn clean package integration-test
 
 ## Test Engine Summary
 
-When running via Maven in a Linux console, the Test Engine will report a summary similar to...
+When running via Maven in a Linux console, the test engine will report a summary similar to...
 
 ```bash
 [INFO] ------------------------------------------------------------------------
@@ -451,7 +454,7 @@ GitHub's Discussions is the current mechanism for help / support.
 
 ## Contributing
 
-Contributions to the Test Engine are both welcomed and appreciated.
+Contributions to the test engine are both welcomed and appreciated.
 
 The project uses a simplified GitFlow branching strategy.
 
