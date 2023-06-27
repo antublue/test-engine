@@ -180,19 +180,16 @@ For synchronization, a `Store` can contain a `Lock` object for synchronization.
 
 Class locking example code:
 
-- [ClassLockingTestBase.java](/examples/src/test/java/example/locking/ClassLockingTestBase.java)
 - [ClassLockingTest1.java](/examples/src/test/java/example/locking/ClassLockingTest1.java)
 - [ClassLockingTest2.java](/examples/src/test/java/example/locking/ClassLockingTest2.java)
 
 Method locking example code:
 
-- [MethodLockingTestBase.java](/examples/src/test/java/example/locking/MethodLockingTestBase.java)
 - [MethodLockingTest1.java](/examples/src/test/java/example/locking/MethodLockingTest1.java)
 - [MethodLockingTest2.java](/examples/src/test/java/example/locking/MethodLockingTest2.java)
 
 Multiple methods locking example code:
 
-- [MultipleMethodsLockingTestBase.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTestBase.java)
 - [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest1.java)
 - [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest2.java)
 
