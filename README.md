@@ -399,13 +399,13 @@ When running via Maven in a Linux console, the Test Engine will report a summary
 [INFO] ------------------------------------------------------------------------
 [INFO] AntuBLUE Test Engine v4.2.4 Summary
 [INFO] ------------------------------------------------------------------------
-[INFO] Test Classes   :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
-[INFO] Test Methods   : 476, PASSED : 476, FAILED : 0, SKIPPED : 0
+[INFO] Test Classes   :  58, PASSED :  58, FAILED : 0, SKIPPED : 0
+[INFO] Test Methods   : 777, PASSED : 777, FAILED : 0, SKIPPED : 0
 [INFO] ------------------------------------------------------------------------
 [INFO] PASSED
 [INFO] ------------------------------------------------------------------------
-[INFO] Total Test Time : 1 minute, 24 seconds, 608 ms
-[INFO] Finished At     : 2023-04-19T14:36:05.124
+[INFO] Total Test Time : 34 ms (34 ms)
+[INFO] Finished At     : 2023-06-26T22:35:46.691
 [INFO] ------------------------------------------------------------------------
 
 ```
