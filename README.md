@@ -60,22 +60,7 @@ Parameterized integration testing is most common when you...
 
 3. Various environments could involve different operating systems versions and/or different application runtime versions.
 
----
-
-A text book example...
-
-1. You have developed a networked based application.
-
-
-2. You want to test the application in various runtime environments.
-
-
-3. You want to reuse the Docker network for performance reasons (for all tests in a test class.)
-
-
-The arguments in this scenario are the various runtime environments.
-
----
+### Real World Example
 
 Usage in a project...
 
@@ -83,7 +68,10 @@ The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses t
 
 - Prometheus JMX Exporter [integration_test_suite](https://github.com/prometheus/jmx_exporter/tree/main/integration_test_suite)
 
-A reference example...
+
+- Integration tests using [testcontainers-java](https://github.com/testcontainers/testcontainers-java) and [Docker](https://www.docker.com/)
+
+### Reference Example
 
 - [KafkaTest.java](/examples/src/test/java/example/testcontainers/KafkaTest.java)
 
