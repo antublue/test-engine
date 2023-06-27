@@ -6,7 +6,6 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
