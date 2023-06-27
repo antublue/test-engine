@@ -77,6 +77,12 @@ The arguments in this scenario are the various runtime environments.
 
 ---
 
+Usage in a project...
+
+The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses the AntuBLUE Test Engine for integration testing.
+
+- Prometheus JMX Exporter [integration_test_suite](https://github.com/prometheus/jmx_exporter/tree/main/integration_test_suite)
+
 A reference example...
 
 - [KafkaTest.java](/examples/src/test/java/example/testcontainers/KafkaTest.java)
