@@ -35,14 +35,14 @@ public class MethodOrderAndDisplayNameTest {
     @TestEngine.Order(1)
     @TestEngine.DisplayName("Test 2")
     public void testA() {
-        System.out.println("testA(" + integerArgument.value() + ")");
+        System.out.println("testA(" + integerArgument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(2)
     @TestEngine.DisplayName("Test 1")
     public void testB() {
-        System.out.println("testB(" + integerArgument.value() + ")");
+        System.out.println("testB(" + integerArgument + ")");
     }
 
     @TestEngine.AfterEach

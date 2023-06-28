@@ -39,18 +39,18 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
 
     @TestEngine.Test
     public void testA() {
-        System.out.println("testA(" + stringArgument.value() + ")");
+        System.out.println("testA(" + stringArgument  + ")");
     }
 
     @TestEngine.Test
     public void testB() {
-        System.out.println("testB(" + stringArgument.value() + ")");
+        System.out.println("testB(" + stringArgument  + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(2)
     public void test3() {
-        System.out.println("test3(" + stringArgument.value() + ")");
+        System.out.println("test3(" + stringArgument  + ")");
     }
 
     @TestEngine.AfterAll

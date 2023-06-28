@@ -6,11 +6,11 @@
 
 # Test Engine
 
-The Test Engine is a JUnit 5 based test engine designed specifically for parameterized integration testing by allowing parameterization at the test class level.
+The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically for parameterized integration testing by allowing parameterization at the test class level.
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v4.2.3](https://github.com/antublue/test-engine/blob/releases/tag/v4.2.3)
+- General Availability (GA): [Test Engine v4.3.0](https://github.com/antublue/test-engine/blob/releases/tag/v4.3.0)
 
 **Notes**
 
@@ -22,7 +22,7 @@ To allow parameterized testing at the test class level, targeting integration te
 
 ## Non-Goals
 
-The Test Engine is not meant to replace JUnit 5 for unit tests, but can be used.
+The test engine is not meant to replace JUnit 5 for unit tests, but can be used.
 
 ## Why not use JUnit 5?
 
@@ -34,11 +34,16 @@ Currently, JUnit 5 does not support parameterized testing at the test class leve
 - It doesn't provide annotations to run methods before / after all test methods and before / after each test argument. (2023-04-18)
 
 
-- It doesn't provide the information detailed information during testing or summary information typically wanted for parameterized integration testing.
+- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
 
-## Why not use Junit 4?
+## Why not use JUnit 4?
 
-Junit 4 does provide test class level parameterization via `@RunWith(Parameterized.class)`.
+JUnit 4 does provide test class level parameterization via `@RunWith(Parameterized.class)`.
+
+- JUnit 4 is maintained, but no new functionality is being added.
+  - The latest release was on February 13, 2021.
+  - https://stackoverflow.com/questions/72325172/when-is-junit4-going-to-be-deprecated
+
 
 - It doesn't provide annotations to run methods before / after all test methods and before / after each test argument.
 
@@ -46,7 +51,7 @@ Junit 4 does provide test class level parameterization via `@RunWith(Parameteriz
 - It uses a test class constructor approach, limiting you to Java inheritance semantics. (superclass before subclass construction.)
 
 
-- It doesn't provide the information detailed information during testing or summary information typically wanted for parameterized integration testing.
+- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
 
 ## What is parameterized integration testing?
 
@@ -60,24 +65,18 @@ Parameterized integration testing is most common when you...
 
 3. Various environments could involve different operating systems versions and/or different application runtime versions.
 
----
+### Real World Example
 
-A text book example...
+Usage in a project...
 
-1. You have developed a networked based application.
+The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses the AntuBLUE Test Engine for integration testing.
 
-
-2. You want to test the application in various runtime environments.
-
-
-3. You want to reuse the Docker network for performance reasons (for all tests in a test class.)
+- Prometheus JMX Exporter [integration_test_suite](https://github.com/prometheus/jmx_exporter/tree/main/integration_test_suite)
 
 
-The arguments in this scenario are the various runtime environments.
+- Integration tests using [testcontainers-java](https://github.com/testcontainers/testcontainers-java) and [Docker](https://www.docker.com/)
 
----
-
-A reference example...
+### Reference Example
 
 - [KafkaTest.java](/examples/src/test/java/example/testcontainers/KafkaTest.java)
 
@@ -112,11 +111,14 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 - By default, methods are executed in alphabetical order based on class/method name, regardless of where they are declared (class or superclasses.)
 
 
-- `@TestEngine.Order` can be used to control test class / test method order of execution.
+- `@TestEngine.Order` can be used to control test class order / test method order of execution.
   - Classes/methods are sorted by the order annotation value first, then alphabetically by the class name/method name.
   - The test method name can be changed by using the `@TestEngine.DisplayName` annotation.
-  - Method order is relative to other methods with the same annotation regardless of superclass / subclass location.
+  - Method order is relative to other methods in a test class with the same annotation regardless of superclass / subclass location.
 
+  
+ - **Class execution order can't be guaranteed unless the test engine is configured for a single thread.** 
+ 
 ## Additional Test Annotations
 
 | Annotation                  | Scope            | Required | Usage                                                                                                                              |
@@ -126,6 +128,8 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 | `@TestEngine.Order(<int>)`  | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
 | `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
 | `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
+| `@TestEngine.Lock`          | method           | no       | Acquires a named `ReentrantLock` before execution                                                                                  |
+| `@TestEngine.UnLock`        | method           | no       | Acquires a named `ReentrantLock` before execution                                                                                  |
 
 **Notes**
 
@@ -174,25 +178,49 @@ A common usage is shared resource synchronization.
 
 ### Shared resource synchronization
 
-The Test Engine runs multiple test classes in parallel (arguments within a test class are run sequentially.)
+The test engine runs multiple test classes in parallel (arguments within a test class are tested sequentially.)
 
-For synchronization, a `Store` can contain a `Lock` object for synchronization.
+**Solution 1**
+
+Use `@TestEngine.Lock` and `@TestEngine.Unlock` annotations.
+
+- Less flexible
+- `@TestEngine.Lock` acquires a lock before method execution.
+- `@TestEngine.Unlock` releases a lock after method execution.
+
+Annotated class locking example code:
+
+- [AnnotatedClassLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedClassLockingTest1.java)
+- [AnnotatedClassLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedClassLockingTest2.java)
+
+Annotated method locking example code:
+
+- [AnnotatedMethodLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedMethodLockingTest1.java)
+- [AnnotatedMethodLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedMethodLockingTest2.java)
+
+Annotated multiple methods locking example code:
+
+- [AnnotatedMultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedMultipleMethodsLockingTest1.java)
+- [AnnotatedMultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedMultipleMethodsLockingTest2.java)
+
+**Solution 2**
+
+Use a `Store` along with a `ReentrantLock`.
+
+- More flexible
 
 Class locking example code:
 
-- [ClassLockingTestBase.java](/examples/src/test/java/example/locking/ClassLockingTestBase.java)
 - [ClassLockingTest1.java](/examples/src/test/java/example/locking/ClassLockingTest1.java)
 - [ClassLockingTest2.java](/examples/src/test/java/example/locking/ClassLockingTest2.java)
 
 Method locking example code:
 
-- [MethodLockingTestBase.java](/examples/src/test/java/example/locking/MethodLockingTestBase.java)
 - [MethodLockingTest1.java](/examples/src/test/java/example/locking/MethodLockingTest1.java)
 - [MethodLockingTest2.java](/examples/src/test/java/example/locking/MethodLockingTest2.java)
 
 Multiple methods locking example code:
 
-- [MultipleMethodsLockingTestBase.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTestBase.java)
 - [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest1.java)
 - [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest2.java)
 
@@ -206,9 +234,9 @@ Integration test example using `testcontainers-java` and Confluent Platform Dock
 
 - [KafkaTest.java](/examples/src/test/java/example/testcontainers/KafkaTest.java)
 
-### I want to use the Test Engine in place of JUnit 5
+### I want to use the test engine in place of JUnit 5
 
-You can use the Test Engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
+You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
 
 - It's not a "drop in" replacement.
 
@@ -218,7 +246,7 @@ Example:
 
 ## Test Engine Configuration
 
-The Test Engine has seven configuration parameters.
+The test engine has seven configuration parameters.
 <br/>
 <br/>
 
@@ -298,7 +326,7 @@ Using a combination of the system properties (and/or environment variables) allo
 
 ## Experimental Test Engine Configuration
 
-The Test Engine as two experimental configuration parameters.
+The test engine as two experimental configuration parameters.
 
 
 | <nobr>Output console TEST messages</nobr> |                                                     |
@@ -327,7 +355,7 @@ The Test Engine as two experimental configuration parameters.
 - If all test methods are excluded, then the test class will be excluded.
 
 
-- If no test classes are found, an error exit code of -2 is returned.
+- If no test classes are found, an exit code of `-2` is returned.
 
 
 - Experimental configuration values are subject to change at any time.
@@ -348,13 +376,13 @@ Disable the Maven Surefire plugin...
 </plugin>
 ```
 
-Add the Test Engine Maven Plugin...
+Add the AntuBLUE Test Engine Maven Plugin...
 
 ```xml
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>4.2.3</version>
+  <version>4.3.0</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -366,19 +394,19 @@ Add the Test Engine Maven Plugin...
 </plugin>
 ```
 
-Add the Test Engine jars...
+Add the AntuBLUE Test Engine jars...
 
 ```xml
 <dependencies>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>4.2.3</version>
+    <version>4.3.0</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>4.2.3</version>
+    <version>4.3.0</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -396,19 +424,19 @@ mvn clean package integration-test
 
 ## Test Engine Summary
 
-When running via Maven in a Linux console, the Test Engine will report a summary similar to...
+When running via Maven in a Linux console, the test engine will report a summary similar to...
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v4.2.3 Summary
+[INFO] AntuBLUE Test Engine v4.3.0 Summary
 [INFO] ------------------------------------------------------------------------
-[INFO] Test Classes   :  17, PASSED :  17, FAILED : 0, SKIPPED : 0
-[INFO] Test Methods   : 476, PASSED : 476, FAILED : 0, SKIPPED : 0
+[INFO] Test Classes   :  58, PASSED :  58, FAILED : 0, SKIPPED : 0
+[INFO] Test Methods   : 777, PASSED : 777, FAILED : 0, SKIPPED : 0
 [INFO] ------------------------------------------------------------------------
 [INFO] PASSED
 [INFO] ------------------------------------------------------------------------
-[INFO] Total Test Time : 1 minute, 24 seconds, 608 ms
-[INFO] Finished At     : 2023-04-19T14:36:05.124
+[INFO] Total Test Time : 34 ms (34 ms)
+[INFO] Finished At     : 2023-06-26T22:35:46.691
 [INFO] ------------------------------------------------------------------------
 
 ```
@@ -454,7 +482,7 @@ GitHub's Discussions is the current mechanism for help / support.
 
 ## Contributing
 
-Contributions to the Test Engine are both welcomed and appreciated.
+Contributions to the test engine are both welcomed and appreciated.
 
 The project uses a simplified GitFlow branching strategy.
 

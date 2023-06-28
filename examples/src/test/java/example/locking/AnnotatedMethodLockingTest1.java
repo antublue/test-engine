@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class MethodLockingTest1 {
+public class AnnotatedMethodLockingTest1 {
 
     public static final String LOCK_NAME = "method.lock";
     public static final String COUNTER_NAME = "method.counter";
@@ -46,24 +46,21 @@ public class MethodLockingTest1 {
     }
 
     @TestEngine.Test
+    @TestEngine.Lock(value=LOCK_NAME)
+    @TestEngine.Unlock(value=LOCK_NAME)
     public void test1() throws InterruptedException {
-        try {
-            Store.getOrCreate(LOCK_NAME, name -> new ReentrantLock(true)).lock();
-            System.out.println(getClass().getName() + " test1()");
+        System.out.println(getClass().getName() + " test1()");
 
-            int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
-            if (count != 1) {
-                fail("expected count = 1");
-            }
+        int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+        if (count != 1) {
+            fail("expected count = 1");
+        }
 
-            System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
+        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-            count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
-            if (count != 0) {
-                fail("expected count = 0");
-            }
-        } finally {
-            Store.get(LOCK_NAME, ReentrantLock.class).unlock();
+        count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
+        if (count != 0) {
+            fail("expected count = 0");
         }
     }
 

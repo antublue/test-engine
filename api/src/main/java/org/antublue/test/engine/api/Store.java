@@ -61,6 +61,33 @@ public class Store {
     }
 
     /**
+     * Method to get a named Object cast to a specific type
+     *
+     * @param name name
+     * @param clazz clazz
+     * @return the return value
+     * @param <T>
+     */
+    public static <T> T get(String name, Class<T> clazz) {
+        if (name == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+
+        name = name.trim();
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("name is empty");
+        }
+
+        if (clazz == null) {
+            throw new IllegalArgumentException("clazz is null");
+        }
+
+        synchronized (OBJECT_MAP) {
+            return clazz.cast(OBJECT_MAP.get(name));
+        }
+    }
+
+    /**
      * Method to get a named Object executing the supplied Function to create the Object if it doesn't exist
      *
      * @param name name

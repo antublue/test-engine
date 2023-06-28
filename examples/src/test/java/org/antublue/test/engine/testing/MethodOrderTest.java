@@ -33,13 +33,13 @@ public class MethodOrderTest {
     @TestEngine.Test
     @TestEngine.Order(0)
     public void test1() {
-        System.out.println("test1(" + stringArgument.value() + ")");
+        System.out.println("test1(" + stringArgument  + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(1)
     public void test2() {
-        System.out.println("test2(" + stringArgument.value() + ")");
+        System.out.println("test2(" + stringArgument  + ")");
     }
 
     @TestEngine.AfterEach

@@ -35,12 +35,12 @@ public class SetTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + integerArgument.value() + ")");
+        System.out.println("test1(" + integerArgument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument.value() + ")");
+        System.out.println("test2(" + integerArgument + ")");
     }
 
     @TestEngine.AfterEach

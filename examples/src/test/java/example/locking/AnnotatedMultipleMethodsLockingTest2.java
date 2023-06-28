@@ -10,10 +10,10 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class MethodLockingTest1 {
+public class AnnotatedMultipleMethodsLockingTest2 {
 
-    public static final String LOCK_NAME = "method.lock";
-    public static final String COUNTER_NAME = "method.counter";
+    public static final String LOCK_NAME = "multiple.methods.lock";
+    public static final String COUNTER_NAME = "multiple.methods.counter";
 
     static {
         Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger());
@@ -36,8 +36,9 @@ public class MethodLockingTest1 {
     }
 
     @TestEngine.BeforeAll
+    @TestEngine.Lock(value=LOCK_NAME)
     public void beforeAll() {
-        System.out.println("beforeAll()");
+        System.out.println(getClass().getName() + " beforeAll()");
     }
 
     @TestEngine.BeforeEach
@@ -47,29 +48,32 @@ public class MethodLockingTest1 {
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
-        try {
-            Store.getOrCreate(LOCK_NAME, name -> new ReentrantLock(true)).lock();
-            System.out.println(getClass().getName() + " test1()");
+        int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+        if (count != 1) {
+            fail("expected count = 1");
+        }
 
-            int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
-            if (count != 1) {
-                fail("expected count = 1");
-            }
+        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-            System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
-
-            count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
-            if (count != 0) {
-                fail("expected count = 0");
-            }
-        } finally {
-            Store.get(LOCK_NAME, ReentrantLock.class).unlock();
+        count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
+        if (count != 0) {
+            fail("expected count = 0");
         }
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument + ")");
+        int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+        if (count != 1) {
+            fail("expected count = 1");
+        }
+
+        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
+
+        count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
+        if (count != 0) {
+            fail("expected count = 0");
+        }
     }
 
     @TestEngine.AfterEach
@@ -78,8 +82,9 @@ public class MethodLockingTest1 {
     }
 
     @TestEngine.AfterAll
+    @TestEngine.Unlock(value=LOCK_NAME)
     public void afterAll() {
-        System.out.println("afterAll()");
+        System.out.println(getClass().getName() + " afterAll()");
     }
 
     @TestEngine.Conclude

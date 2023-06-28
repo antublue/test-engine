@@ -10,13 +10,17 @@ import java.util.stream.Stream;
  */
 public class Junit5ReplacementExampleTest {
 
+    // The stringArgument is required by the test engine, but is not actually used in test methods
     @TestEngine.Argument
     protected StringArgument stringArgument;
 
+    // The stringArgument provides a node in the hierarchy, but is not actually used in test methods
     @TestEngine.ArgumentSupplier
     protected static Stream<StringArgument> arguments() {
         return Stream.of(StringArgument.of("tests"));
     }
+
+    // For a single Argument, a @TestEngine.Prepare method is equivalent to a @TestEngine.BeforeAll method
 
     @TestEngine.BeforeAll
     public void beforeAll() {
@@ -47,4 +51,6 @@ public class Junit5ReplacementExampleTest {
     public void afterAll() {
         System.out.println("afterAll()");
     }
+
+    // For a single Argument, a @TestEngine.Conclude method is equivalent to a @TestEngine.AfterAll method
 }
