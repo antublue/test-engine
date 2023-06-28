@@ -184,6 +184,10 @@ The test engine runs multiple test classes in parallel (arguments within a test 
 
 Use `@TestEngine.Lock` and `@TestEngine.Unlock` annotations.
 
+- Less flexible
+- `@TestEngine.Lock` acquires a lock before method execution.
+- `@TestEngine.Unlock` releases a lock after method execution.
+
 Annotated class locking example code:
 
 - [AnnotatedClassLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedClassLockingTest1.java)
@@ -202,6 +206,8 @@ Annotated multiple methods locking example code:
 **Solution 2**
 
 Use a `Store` along with a `ReentrantLock`.
+
+- More flexible
 
 Class locking example code:
 
