@@ -16,7 +16,7 @@ public class ClassLockingTest1 {
     public static final String COUNTER_NAME = "class.counter";
 
     static {
-        Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger());
+        Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger());
     }
 
     @TestEngine.Argument
@@ -32,7 +32,7 @@ public class ClassLockingTest1 {
 
     @TestEngine.Prepare
     public void prepare() {
-        Store.getOrCreate(LOCK_NAME, name -> new ReentrantLock(true)).lock();
+        Store.getOrElse(LOCK_NAME, name -> new ReentrantLock(true)).lock();
         System.out.println(getClass().getName() + " prepare()");
     }
 
@@ -48,7 +48,7 @@ public class ClassLockingTest1 {
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
-        int count = Store.getOrCreate("COUNTER", name -> new AtomicInteger()).incrementAndGet();
+        int count = Store.getOrElse("COUNTER", name -> new AtomicInteger()).incrementAndGet();
 
         if (count != 1) {
             fail("expected count = 1");
@@ -56,7 +56,7 @@ public class ClassLockingTest1 {
 
         System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-        count = Store.getOrCreate("COUNTER", name -> new AtomicInteger()).decrementAndGet();
+        count = Store.getOrElse("COUNTER", name -> new AtomicInteger()).decrementAndGet();
         if (count != 0) {
             fail("expected count = 0");
         }

@@ -5,7 +5,6 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
@@ -16,7 +15,7 @@ public class AnnotatedMultipleMethodsLockingTest2 {
     public static final String COUNTER_NAME = "multiple.methods.counter";
 
     static {
-        Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger());
+        Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger());
     }
 
     @TestEngine.Argument
@@ -48,14 +47,14 @@ public class AnnotatedMultipleMethodsLockingTest2 {
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
-        int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+        int count = Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");
         }
 
         System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-        count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
+        count = Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
         if (count != 0) {
             fail("expected count = 0");
         }
@@ -63,14 +62,14 @@ public class AnnotatedMultipleMethodsLockingTest2 {
 
     @TestEngine.Test
     public void test2() {
-        int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+        int count = Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");
         }
 
         System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-        count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
+        count = Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
         if (count != 0) {
             fail("expected count = 0");
         }

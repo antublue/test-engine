@@ -16,7 +16,7 @@ public class MultipleMethodsLockingTest2 {
     public static final String COUNTER_NAME = "multiple.methods.counter";
 
     static {
-        Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger());
+        Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger());
     }
 
     @TestEngine.Argument
@@ -37,7 +37,7 @@ public class MultipleMethodsLockingTest2 {
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        Store.getOrCreate(LOCK_NAME, name -> new ReentrantLock(true)).lock();
+        Store.getOrElse(LOCK_NAME, name -> new ReentrantLock(true)).lock();
         System.out.println(getClass().getName() + " beforeAll()");
     }
 
@@ -48,14 +48,14 @@ public class MultipleMethodsLockingTest2 {
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
-        int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+        int count = Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");
         }
 
         System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-        count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
+        count = Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
         if (count != 0) {
             fail("expected count = 0");
         }
@@ -63,14 +63,14 @@ public class MultipleMethodsLockingTest2 {
 
     @TestEngine.Test
     public void test2() {
-        int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+        int count = Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");
         }
 
         System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-        count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
+        count = Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
         if (count != 0) {
             fail("expected count = 0");
         }

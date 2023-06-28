@@ -24,41 +24,57 @@ import org.antublue.test.engine.internal.logger.LoggerFactory;
 import java.lang.reflect.Method;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Class to process @TestEngine.Lock and @TestEngine.Unlock annotations
+ */
 public class TestEngineLockUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineLockUtils.class);
 
+    /**
+     * Constructor
+     */
     private TestEngineLockUtils() {
         // DO NOTHING
     }
 
     /**
-     * Method to process a TestEngine.Lock annotation for a Method
+     * Method to process a @TestEngine.Lock annotation for a Method if it exists
      *
      * @param method
      */
     public static void processLock(Method method) {
-        if (method.isAnnotationPresent(TestEngine.Lock.class)) {
-            String value = method.getAnnotation(TestEngine.Lock.class).value();
-            if (value != null && !value.trim().isEmpty()) {
-                Store.getOrCreate(value, name -> new ReentrantLock(true)).lock();
-                LOGGER.trace(String.format("Lock name = [%s] locked", value));
+        TestEngine.Lock annotation = method.getAnnotation(TestEngine.Lock.class);
+        if (annotation != null) {
+            String name = annotation.value();
+            if (name != null && !name.trim().isEmpty()) {
+                name = name.trim();
+                Store.getOrElse(name, n -> new ReentrantLock(true)).lock();
+                LOGGER.trace(
+                        String.format(
+                                "Lock class [%s] name [%s] locked",
+                                method.getDeclaringClass().getName(), name));
             }
         }
     }
 
     /**
-     * Method to process a TestEngine.Unlock annotation for a Method
+     * Method to process a @TestEngine.Unlock annotation for a Method if it exists
      *
      * @param method
      */
     public static void processUnlock(Method method) {
-        if (method.isAnnotationPresent(TestEngine.Unlock.class)) {
-            String value = method.getAnnotation(TestEngine.Unlock.class).value();
-            if (value != null && !value.trim().isEmpty()) {
-                ReentrantLock reentrantLock = Store.get(value);
+        TestEngine.Unlock annotation = method.getAnnotation(TestEngine.Unlock.class);
+        if (annotation != null) {
+            String name = annotation.value();
+            if (name != null && !name.trim().isEmpty()) {
+                name = name.trim();
+                ReentrantLock reentrantLock = Store.get(name);
                 if (reentrantLock != null) {
-                    LOGGER.trace(String.format("Lock name = [%s] unlocked", value));
+                    LOGGER.trace(
+                            String.format(
+                                    "Lock class [%s] name [%s] unlocked",
+                                    method.getDeclaringClass().getName(), name));
                     reentrantLock.unlock();
                 } else {
                     throw new TestClassConfigurationException(

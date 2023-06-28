@@ -16,19 +16,21 @@
 
 package org.antublue.test.engine.api;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
- * Class to implement a Store that allows for sharing objects between tests
+ * Class to implement a Store that allows for sharing Objects between tests
  */
 public class Store {
 
     private static final Map<String, Object> OBJECT_MAP;
 
     static {
-        OBJECT_MAP = new HashMap<>();
+        OBJECT_MAP = new LinkedHashMap<>();
     }
 
     /**
@@ -36,6 +38,33 @@ public class Store {
      */
     private Store() {
         // DO NOTHING
+    }
+
+    /**
+     * Method to put a named Object into the store
+     * <p>
+     * null values are accepted
+     *
+     * @param name
+     * @param value
+     * @return
+     * @param <T>
+     */
+    public static <T> T put(String name, T value) {
+        if (name == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+
+        name = name.trim();
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("name is empty");
+        }
+
+        synchronized (OBJECT_MAP) {
+            OBJECT_MAP.put(name, value);
+        }
+
+        return value;
     }
 
     /**
@@ -88,14 +117,29 @@ public class Store {
     }
 
     /**
-     * Method to get a named Object executing the supplied Function to create the Object if it doesn't exist
+     * Method to get a named Object, executing the supplied Function to create the Object if it doesn't exist
+     * <p>
+     * DEPRECATED - use getOrElse
      *
      * @param name name
      * @param function function
      * @return the return value
      * @param <T>
      */
+    @Deprecated
     public static <T> T getOrCreate(String name, Function<String, ? extends T> function) {
+        return getOrElse(name, function);
+    }
+
+    /**
+     * Method to get a named Object, executing the supplied Function if the named Object doesn't exist
+     *
+     * @param name name
+     * @param function function
+     * @return the return value
+     * @param <T>
+     */
+    public static <T> T getOrElse(String name, Function<String, ? extends T> function) {
         if (name == null) {
             throw new IllegalArgumentException("name is null");
         }
@@ -105,11 +149,17 @@ public class Store {
             throw new IllegalArgumentException("name is empty");
         }
 
+        if (function == null) {
+            throw new IllegalArgumentException("function is null");
+        }
+
         synchronized (OBJECT_MAP) {
             T t = (T) OBJECT_MAP.get(name);
             if (t == null) {
                 t = function.apply(name);
-                OBJECT_MAP.put(name, t);
+                if (t != null) {
+                    OBJECT_MAP.put(name, t);
+                }
             }
 
             return t;
@@ -118,6 +168,8 @@ public class Store {
 
     /**
      * Method to remove a named Object
+     * <p>
+     * Be cautious using remove when sharing an Object between classes
      *
      * @param name name
      * @return the return value
@@ -135,6 +187,12 @@ public class Store {
 
         synchronized (OBJECT_MAP) {
             return (T) OBJECT_MAP.remove(name);
+        }
+    }
+
+    public static Set<String> keySet() {
+        synchronized (OBJECT_MAP) {
+            return new LinkedHashSet<>(OBJECT_MAP.keySet());
         }
     }
 }
