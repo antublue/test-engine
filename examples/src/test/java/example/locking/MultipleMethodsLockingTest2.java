@@ -1,13 +1,23 @@
 package example.locking;
 
+import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class MultipleMethodsLockingTest2 extends MultipleMethodsLockingTestBase {
+public class MultipleMethodsLockingTest2 {
+
+    public static final String LOCK_NAME = "multiple.methods.lock";
+    public static final String COUNTER_NAME = "multiple.methods.counter";
+
+    static {
+        Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger());
+    }
 
     @TestEngine.Argument
     public IntegerArgument integerArgument;
@@ -27,7 +37,7 @@ public class MultipleMethodsLockingTest2 extends MultipleMethodsLockingTestBase 
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        lock();
+        Store.getOrCreate(LOCK_NAME, name -> new ReentrantLock(true)).lock();
         System.out.println(getClass().getName() + " beforeAll()");
     }
 
@@ -38,14 +48,14 @@ public class MultipleMethodsLockingTest2 extends MultipleMethodsLockingTestBase 
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
-        count++;
+        int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");
         }
 
-        System.out.println(getClass().getName() + " test1(" + integerArgument.value() + ")");
+        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-        count--;
+        count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
         if (count != 0) {
             fail("expected count = 0");
         }
@@ -53,14 +63,14 @@ public class MultipleMethodsLockingTest2 extends MultipleMethodsLockingTestBase 
 
     @TestEngine.Test
     public void test2() {
-        count++;
+        int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");
         }
 
-        System.out.println(getClass().getName() + " test1(" + integerArgument.value() + ")");
+        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-        count--;
+        count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
         if (count != 0) {
             fail("expected count = 0");
         }
@@ -74,7 +84,7 @@ public class MultipleMethodsLockingTest2 extends MultipleMethodsLockingTestBase 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println(getClass().getName() + " afterAll()");
-        unlock();
+        Store.get(LOCK_NAME, ReentrantLock.class).unlock();
     }
 
     @TestEngine.Conclude

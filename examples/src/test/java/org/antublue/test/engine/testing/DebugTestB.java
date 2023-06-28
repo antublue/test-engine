@@ -37,13 +37,13 @@ public class DebugTestB {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument.value() + ")");
+        System.out.println("test1(" + stringArgument  + ")");
         assertThat(stringArgument.value().getClass()).isEqualTo(String.class);
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument.value() + ")");
+        System.out.println("test2(" + stringArgument  + ")");
         assertThat(stringArgument.value().getClass()).isEqualTo(String.class);
         if (stringArgument.value().equals("b")) {
             fail("Forced");

@@ -18,6 +18,7 @@ package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.TestEngineExecutionContext;
+import org.antublue.test.engine.internal.TestEngineLockUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -156,13 +157,16 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             TestEngineReflectionUtils
                     .getBeforeEachMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
+                        TestEngineLockUtils.processLock(method);
+
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.BeforeEach method [%s]",
+                                "invoking [%s] @TestEngine.BeforeEach methods [%s]",
                                 testClassName,
                                 method.getName());
                         try {
                             method.invoke(testInstance, (Object[]) null);
                         } finally {
+                            TestEngineLockUtils.processUnlock(method);
                             flush();
                         }
                     });
@@ -178,8 +182,10 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             try {
                 LOGGER.trace("invoking [%s] @TestEngine.Test method [%s]", testClassName, testMethod.getName());
                 try {
+                    TestEngineLockUtils.processLock(testMethod);
                     testMethod.invoke(testInstance, (Object[]) null);
                 } finally {
+                    TestEngineLockUtils.processUnlock(testMethod);
                     flush();
                 }
             } catch (Throwable t) {
@@ -195,13 +201,16 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             TestEngineReflectionUtils
                     .getAfterEachMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
+                        TestEngineLockUtils.processLock(method);
+
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.AfterEach method [%s]",
+                                "invoking [%s] @TestEngine.AfterEach methods [%s]",
                                 testClassName,
                                 method.getName());
                         try {
                             method.invoke(testInstance, (Object[]) null);
                         } finally {
+                            TestEngineLockUtils.processUnlock(method);
                             flush();
                         }
                     });

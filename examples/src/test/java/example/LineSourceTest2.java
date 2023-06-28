@@ -34,12 +34,12 @@ public class LineSourceTest2 {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument.value() + ")");
+        System.out.println("test1(" + stringArgument  + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument.value() + ")");
+        System.out.println("test2(" + stringArgument  + ")");
     }
 
     @TestEngine.AfterAll
