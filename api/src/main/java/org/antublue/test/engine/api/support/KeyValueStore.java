@@ -25,7 +25,9 @@ import java.util.Set;
 /**
  * Class to implement a KeyStore to contain key / values
  * <p>
- * Allows casting of values when using "get(String key)"
+ * Allows casting of values when using get(String key)
+ * <p>
+ * DEPRECATE - use Store
  */
 @SuppressWarnings("unchecked")
 @Deprecated
