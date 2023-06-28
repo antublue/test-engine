@@ -10,7 +10,7 @@ The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically fo
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v4.3.0](https://github.com/antublue/test-engine/blob/releases/tag/v4.3.0)
+- General Availability (GA): [Test Engine v4.3.0](https://github.com/antublue/test-engine/releases/tag/v4.3.0)
 
 ### Versions prior to v4.2.3 suffer from [#32](https://github.com/antublue/test-engine/issues/32) and should not be used.
 
