@@ -188,6 +188,7 @@ The test engine provides two solutions for synchronization.
 
 Use `@TestEngine.Lock` and `@TestEngine.Unlock` annotations.
 
+- Annotation driven (less code)
 - Less flexible
 - `@TestEngine.Lock` acquires a lock before method execution.
 - `@TestEngine.Unlock` releases a lock after method execution.
@@ -211,6 +212,7 @@ Annotated multiple methods locking example code:
 
 Use a `Store` along with a `ReentrantLock`.
 
+- Code driven (more code)
 - More flexible
 
 Class locking example code:
