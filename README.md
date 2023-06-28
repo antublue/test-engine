@@ -176,9 +176,11 @@ A `Store` is a singleton object that allow sharing of named resources between te
 
 A common usage is shared resource synchronization.
 
-### Shared resource synchronization
+## How to lock shared resources?
 
-The test engine runs multiple test classes in parallel (arguments within a test class are tested sequentially.)
+The test engine runs multiple test classes in parallel (arguments within a test class are tested sequentially.) For some test scenarios, shared resources may need to be used.
+
+The test engine provides two solutions for synchronization.
 
 **Solution 1**
 
