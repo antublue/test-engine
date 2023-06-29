@@ -4,7 +4,9 @@ import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
@@ -15,7 +17,7 @@ public class AnnotatedClassLockingTest1 {
     public static final String COUNTER_NAME = "class.counter";
 
     static {
-        Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger());
+        Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger());
     }
 
     @TestEngine.Argument
@@ -47,7 +49,7 @@ public class AnnotatedClassLockingTest1 {
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
-        int count = Store.getOrElse("COUNTER", name -> new AtomicInteger()).incrementAndGet();
+        int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
 
         if (count != 1) {
             fail("expected count = 1");
@@ -55,9 +57,8 @@ public class AnnotatedClassLockingTest1 {
 
         System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-        count = Store.getOrElse("COUNTER", name -> new AtomicInteger()).decrementAndGet();
-        if (count != 0) {
-            fail("expected count = 0");
+        if (Store.get(COUNTER_NAME, AtomicInteger.class).decrementAndGet() != 0) {
+                fail("expected count = 0");
         }
     }
 

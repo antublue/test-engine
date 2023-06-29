@@ -41,7 +41,7 @@ public class Store {
     }
 
     /**
-     * Method to put a named Object into the store
+     * Method to put a named Object into the Store, returning the previous value is one exists
      * <p>
      * null values are accepted
      *
@@ -51,20 +51,11 @@ public class Store {
      * @param <T>
      */
     public static <T> T put(String name, T value) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
+        name = validate(name);
 
         synchronized (OBJECT_MAP) {
-            OBJECT_MAP.put(name, value);
+            return (T) OBJECT_MAP.put(name, value);
         }
-
-        return value;
     }
 
     /**
@@ -75,14 +66,7 @@ public class Store {
      * @param <T>
      */
     public static <T> T get(String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
+        name = validate(name);
 
         synchronized (OBJECT_MAP) {
             return (T) OBJECT_MAP.get(name);
@@ -98,14 +82,7 @@ public class Store {
      * @param <T>
      */
     public static <T> T get(String name, Class<T> clazz) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
+        name = validate(name);
 
         if (clazz == null) {
             throw new IllegalArgumentException("clazz is null");
@@ -119,7 +96,7 @@ public class Store {
     /**
      * Method to get a named Object, executing the supplied Function to create the Object if it doesn't exist
      * <p>
-     * DEPRECATED - use getOrElse
+     * DEPRECATED - use computeIfAbsent
      *
      * @param name name
      * @param function function
@@ -128,7 +105,21 @@ public class Store {
      */
     @Deprecated
     public static <T> T getOrCreate(String name, Function<String, ? extends T> function) {
-        return getOrElse(name, function);
+        return computeIfAbsent(name, function);
+    }
+
+    /**
+     * Method to get a named Object, executing the supplied Function if the named Object doesn't exist
+     * <p>
+     * DEPRECATED - use computeIfAbsent
+     *
+     * @param name name
+     * @param function function
+     * @return the return value
+     * @param <T>
+     */
+    public static <T> T getOrElse(String name, Function<String, ? extends T> function) {
+        return computeIfAbsent(name, function);
     }
 
     /**
@@ -139,35 +130,20 @@ public class Store {
      * @return the return value
      * @param <T>
      */
-    public static <T> T getOrElse(String name, Function<String, ? extends T> function) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
+    public static <T> T computeIfAbsent(String name, Function<String, T> function) {
+        name = validate(name);
 
         if (function == null) {
             throw new IllegalArgumentException("function is null");
         }
 
         synchronized (OBJECT_MAP) {
-            T t = (T) OBJECT_MAP.get(name);
-            if (t == null) {
-                t = function.apply(name);
-                if (t != null) {
-                    OBJECT_MAP.put(name, t);
-                }
-            }
-
-            return t;
+            return (T) OBJECT_MAP.computeIfAbsent(name, function);
         }
     }
 
     /**
-     * Method to remove a named Object
+     * Method to remove a named Object, returning the value is one exists
      * <p>
      * Be cautious using remove when sharing an Object between classes
      *
@@ -176,6 +152,33 @@ public class Store {
      * @param <T>
      */
     public static <T> T remove(String name) {
+        name = validate(name);
+
+        synchronized (OBJECT_MAP) {
+            return (T) OBJECT_MAP.remove(name);
+        }
+    }
+
+    /**
+     * Method to get a keySet of Store keys
+     * <p>
+     * The keySet will be a copy
+     *
+     * @return the return value
+     */
+    public static Set<String> keySet() {
+        synchronized (OBJECT_MAP) {
+            return new LinkedHashSet<>(OBJECT_MAP.keySet());
+        }
+    }
+
+    /**
+     * Method to valide a name is not null and not empty, returning the name trimmed
+     *
+     * @param name name
+     * @return the return value
+     */
+    private static String validate(String name) {
         if (name == null) {
             throw new IllegalArgumentException("name is null");
         }
@@ -185,14 +188,6 @@ public class Store {
             throw new IllegalArgumentException("name is empty");
         }
 
-        synchronized (OBJECT_MAP) {
-            return (T) OBJECT_MAP.remove(name);
-        }
-    }
-
-    public static Set<String> keySet() {
-        synchronized (OBJECT_MAP) {
-            return new LinkedHashSet<>(OBJECT_MAP.keySet());
-        }
+        return name;
     }
 }

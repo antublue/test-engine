@@ -4,6 +4,7 @@ import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
@@ -16,7 +17,7 @@ public class MethodLockingTest1 {
     public static final String COUNTER_NAME = "method.counter";
 
     static {
-        Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger());
+        Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger());
     }
 
     @TestEngine.Argument
@@ -48,18 +49,17 @@ public class MethodLockingTest1 {
     @TestEngine.Test
     public void test1() throws InterruptedException {
         try {
-            Store.getOrElse(LOCK_NAME, name -> new ReentrantLock(true)).lock();
+            Store.computeIfAbsent(LOCK_NAME, name -> new ReentrantLock(true)).lock();
             System.out.println(getClass().getName() + " test1()");
 
-            int count = Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+            int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
             if (count != 1) {
                 fail("expected count = 1");
             }
 
             System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-            count = Store.getOrElse(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
-            if (count != 0) {
+            if (Store.get(COUNTER_NAME, AtomicInteger.class).decrementAndGet() != 0) {
                 fail("expected count = 0");
             }
         } finally {
