@@ -17,10 +17,7 @@
 package org.antublue.test.engine.internal.discovery.predicate;
 
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.internal.TestEngineException;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -45,19 +42,13 @@ public final class TestMethodTagPredicate extends RegexPredicate<Method> {
      */
     @Override
     public boolean test(Method method) {
-        if (!method.isAnnotationPresent(TestEngine.Tag.class)) {
+        TestEngine.Tag annotation = method.getAnnotation(TestEngine.Tag.class);
+        if (annotation == null) {
             return false;
         }
 
-        try {
-            Annotation annotation = method.getAnnotation(TestEngine.Tag.class);
-            Class<? extends Annotation> type = annotation.annotationType();
-            Method valueMethod = type.getDeclaredMethod("value", (Class<?>[]) null);
-            String tag = valueMethod.invoke(annotation, (Object[]) null).toString();
-            return matcher.reset(tag).find();
-        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            throw new TestEngineException(String.format("Invalid @TestEngine.Tag configuration", e));
-        }
+        String value = annotation.value();
+        return matcher.reset(value).find();
     }
 
     /**
