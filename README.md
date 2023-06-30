@@ -212,7 +212,7 @@ Annotated multiple methods locking example code:
 
 Use a `Store` along with a `ReentrantLock`.
 
-- Code driven (more code)
+- Via code (more code)
 - More flexible
 
 Class locking example code:
