@@ -16,7 +16,7 @@ public class MethodLockingTest2 {
     public static final String COUNTER_NAME = "method.counter";
 
     static {
-        Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger());
+        Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger());
     }
 
     @TestEngine.Argument
@@ -48,18 +48,17 @@ public class MethodLockingTest2 {
     @TestEngine.Test
     public void test1() throws InterruptedException {
         try {
-            Store.getOrCreate(LOCK_NAME, name -> new ReentrantLock(true)).lock();
+            Store.computeIfAbsent(LOCK_NAME, name -> new ReentrantLock(true)).lock();
             System.out.println(getClass().getName() + " test1()");
 
-            int count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+            int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
             if (count != 1) {
                 fail("expected count = 1");
             }
 
             System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-            count = Store.getOrCreate(COUNTER_NAME, name -> new AtomicInteger()).decrementAndGet();
-            if (count != 0) {
+            if (Store.get(COUNTER_NAME, AtomicInteger.class).decrementAndGet() != 0) {
                 fail("expected count = 0");
             }
         } finally {

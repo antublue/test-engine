@@ -491,8 +491,9 @@ public final class TestEngineReflectionUtils {
     public static String getDisplayName(Method method) {
         String displayName = method.getName();
 
-        if (method.isAnnotationPresent(TestEngine.DisplayName.class)) {
-            String value = method.getAnnotation(TestEngine.DisplayName.class).value();
+        TestEngine.DisplayName annotation = method.getAnnotation(TestEngine.DisplayName.class);
+        if (annotation != null) {
+            String value = annotation.value();
             if (value != null && !value.trim().isEmpty()) {
                 displayName = value.trim();
             }
@@ -512,8 +513,9 @@ public final class TestEngineReflectionUtils {
     public static String getDisplayName(Class<?> clazz) {
         String displayName = clazz.getName();
 
-        if (clazz.isAnnotationPresent(TestEngine.DisplayName.class)) {
-            String value = clazz.getAnnotation(TestEngine.DisplayName.class).value();
+        TestEngine.DisplayName annotation = clazz.getAnnotation(TestEngine.DisplayName.class);
+        if (annotation != null) {
+            String value = annotation.value();
             if (value != null && !value.trim().isEmpty()) {
                 displayName = value.trim();
             }
@@ -795,18 +797,18 @@ public final class TestEngineReflectionUtils {
      */
     public static void sortMethods(List<Method> methods) {
         methods.sort((o1, o2) -> {
-            boolean o1AnnotationPresent = o1.isAnnotationPresent(TestEngine.Order.class);
-            boolean o2AnnotationPresent = o2.isAnnotationPresent(TestEngine.Order.class);
-            if (o1AnnotationPresent) {
-                if (o2AnnotationPresent) {
+            TestEngine.Order o1Annotation = o1.getAnnotation(TestEngine.Order.class);
+            TestEngine.Order o2Annotation = o2.getAnnotation(TestEngine.Order.class);
+            if (o1Annotation != null) {
+                if (o2Annotation != null) {
                     // Sort based on @TestEngine.Order value
-                    int o1Order = o1.getAnnotation(TestEngine.Order.class).value();
-                    int o2Order = o2.getAnnotation(TestEngine.Order.class).value();
+                    int o1Order = o1Annotation.value();
+                    int o2Order = o2Annotation.value();
                     return Integer.compare(o1Order, o2Order);
                 } else {
                     return -1;
                 }
-            } else if (o2AnnotationPresent) {
+            } else if (o2Annotation != null) {
                 return 1;
             } else {
                 // Order by display name which is either
@@ -829,8 +831,9 @@ public final class TestEngineReflectionUtils {
         Set<Integer> integers = new HashSet<>();
 
         methods.forEach(method -> {
-            if (method.isAnnotationPresent(TestEngine.Order.class)) {
-                int value = method.getAnnotation(TestEngine.Order.class).value();
+            TestEngine.Order annotation = method.getAnnotation(TestEngine.Order.class);
+            if (annotation != null) {
+                int value = annotation.value();
                 if (integers.contains(value)) {
                     throw new TestClassConfigurationException(
                             String.format(
