@@ -25,7 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 /**
- * Class to implement a Store that allows for sharing Objects between tests
+ * Class to implement a Store that allows for sharing named Objects between tests
  */
 @SuppressWarnings("unchecked")
 public class Store {
