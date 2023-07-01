@@ -115,7 +115,7 @@ The `examples` project contains various testing examples and scenarios.
 
 - [examples](/examples/src/test/java/example)
 
-Integration test example using `testcontainers-java` and Confluent Platform Docker images.
+Integration test example using [Test Containers](https://testcontainers.com/) and [Confluent](https://www.confluent.io/) Platform Docker images.
 
 - [KafkaTest.java](/examples/src/test/java/example/testcontainers/KafkaTest.java)
 
