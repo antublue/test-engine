@@ -105,7 +105,7 @@ Additionally, there is an `ObjectArgument<T>` argument implementation that allow
 
 ### What is a `Store` ?
 
-A `Store` is a thread-safe convenience object that allow sharing of named resources between tests.
+A `Store` is a thread-safe convenience object that allow sharing of Objects between tests.
 
 - [Store.java](/api/src/main/java/org/antublue/test/engine/api/Store.java)
 
