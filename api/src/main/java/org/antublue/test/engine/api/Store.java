@@ -52,7 +52,7 @@ public class Store {
     }
 
     /**
-     * Method to put a named Object into the Store, returning the previous value is one exists
+     * Method to put a named Object into the Store
      * <p>
      * null values are accepted
      *
