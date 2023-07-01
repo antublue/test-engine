@@ -57,8 +57,10 @@ public class TestEngineLockUtils {
                 LOCK_MAP.computeIfAbsent(name, n -> new ReentrantLock(true)).lock();
                 LOGGER.trace(
                         String.format(
-                                "Lock acquired class [%s] name",
-                                method.getDeclaringClass().getName(), name));
+                                "Lock [%s] acquired for class [%s] method [%s]",
+                                name,
+                                method.getDeclaringClass().getName(),
+                                method.getName()));
             }
         }
     }
@@ -77,16 +79,19 @@ public class TestEngineLockUtils {
                 name = name.trim();
                 ReentrantLock reentrantLock = LOCK_MAP.get(name);
                 if (reentrantLock != null) {
-                    LOGGER.info(
+                    LOGGER.trace(
                             String.format(
-                                    "Lock release class [%s] name [%s]",
-                                    method.getDeclaringClass().getName(), name));
+                                    "Lock [%s] released for class [%s] method [%s]",
+                                    name,
+                                    method.getDeclaringClass().getName(),
+                                    method.getName()));
                     reentrantLock.unlock();
                 } else {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "@TestEngine.Unlock with out @TestEngine.Lock, class [%s]",
-                                    method.getDeclaringClass().getName()));
+                                    "@TestEngine.Unlock without @TestEngine.Lock, class [%s] method [%s]",
+                                    method.getDeclaringClass().getName(),
+                                    method.getName()));
                 }
             }
         }
