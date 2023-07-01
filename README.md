@@ -176,13 +176,9 @@ Additionally, there is an `ObjectArgument<T>` argument implementation that allow
 
 ## What is a `Store` ?
 
-A `Store` is a static Object that allow sharing of named resources between tests.
+A `Store` is a thread-safe convenience object that allow sharing of named resources between tests.
 
 - [Store.java](/api/src/main/java/org/antublue/test/engine/api/Store.java)
-
-A common usage is shared resource synchronization.
-
-For complex usage of `Store`, you can use the `Store.getLock()`.
 
 ## How to lock shared resources?
 
@@ -251,6 +247,7 @@ Integration test example using `testcontainers-java` and Confluent Platform Dock
 You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
 
 - It's not a "drop in" replacement.
+- Reference the [Design](https://github.com/antublue/test-engine#design) for the state machine flow.
 
 Example:
 
