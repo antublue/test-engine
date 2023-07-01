@@ -10,13 +10,17 @@ The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically fo
 
 ## Latest Releases
 
-- General Availability (GA): [Test Engine v4.3.1](https://github.com/antublue/test-engine/releases/tag/v4.3.1)
+- General Availability (GA): [Test Engine v5.0.0](https://github.com/antublue/test-engine/releases/tag/v5.0.0)
 
 ### Versions prior to v4.2.3 suffer from [#32](https://github.com/antublue/test-engine/issues/32) and should not be used.
 
 **Notes**
 
-- v3.x.x tests will have to be migrated to v4.x.x
+- v4.x.x tests may require migration to v5.x.x if using `Store` or any previously deprecated classes
+  - v4.x.x deprecated classes were removed
+
+
+- v3.x.x tests will have to be migrated to v5.x.x
 
 ## Goals
 
@@ -172,11 +176,13 @@ Additionally, there is an `ObjectArgument<T>` argument implementation that allow
 
 ## What is a `Store` ?
 
-A `Store` is a singleton object that allow sharing of named resources between tests.
+A `Store` is a static Object that allow sharing of named resources between tests.
 
 - [Store.java](/api/src/main/java/org/antublue/test/engine/api/Store.java)
 
 A common usage is shared resource synchronization.
+
+For complex usage of `Store`, you can use the `Store.getLock()`.
 
 ## How to lock shared resources?
 
@@ -388,7 +394,7 @@ Add the AntuBLUE Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>4.3.1</version>
+  <version>5.0.0</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -407,12 +413,12 @@ Add the AntuBLUE Test Engine jars...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>4.3.1</version>
+    <version>5.0.0</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>4.3.1</version>
+    <version>5.0.0</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -434,7 +440,7 @@ When running via Maven in a Linux console, the test engine will report a summary
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v4.3.1 Summary
+[INFO] AntuBLUE Test Engine v5.0.0 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes   :  58, PASSED :  58, FAILED : 0, SKIPPED : 0
 [INFO] Test Methods   : 777, PASSED : 777, FAILED : 0, SKIPPED : 0
