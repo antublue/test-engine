@@ -171,7 +171,7 @@ public class Store {
     }
 
     /**
-     * Method to valide a name is not null and not empty, returning the name trimmed
+     * Method to validate a name is not null and not empty, returning the name trimmed
      *
      * @param name name
      * @return the return value
