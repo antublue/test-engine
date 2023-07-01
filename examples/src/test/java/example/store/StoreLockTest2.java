@@ -1,4 +1,4 @@
-package example.locking;
+package example.store;
 
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
@@ -9,10 +9,10 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class AnnotatedClassLockingTest2 {
+public class StoreLockTest2 {
 
-    public static final String LOCK_NAME = "class.lock";
-    public static final String COUNTER_NAME = "class.counter";
+    public static final String LOCK_NAME = "store.lock";
+    public static final String COUNTER_NAME = "store.counter";
 
     static {
         Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger());
@@ -30,9 +30,8 @@ public class AnnotatedClassLockingTest2 {
     }
 
     @TestEngine.Prepare
-    @TestEngine.Lock(value=LOCK_NAME)
     public void prepare() {
-        System.out.println("prepare()");
+        System.out.println(getClass().getName() + " prepare()");
     }
 
     @TestEngine.BeforeAll
@@ -47,22 +46,26 @@ public class AnnotatedClassLockingTest2 {
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
-        System.out.println("test1()");
+        try {
+            Store.getLock().lock();
 
-        int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+            System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
 
-        if (count != 1) {
-            fail("expected count = 1");
-        }
+            Store.put(COUNTER_NAME, 2);
 
-        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
-            fail("expected count = 0");
+            if (Store.get(COUNTER_NAME, Integer.class).get() != 2) {
+                fail("expected count = 2");
+            }
+
+            Store.remove(COUNTER_NAME);
+        } finally {
+            Store.getLock().unlock();
         }
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2()");
+        System.out.println("test2(" + integerArgument + ")");
     }
 
     @TestEngine.AfterEach
@@ -76,8 +79,7 @@ public class AnnotatedClassLockingTest2 {
     }
 
     @TestEngine.Conclude
-    @TestEngine.Unlock(value=LOCK_NAME)
-    public void conclude() throws InterruptedException {
-        System.out.println("conclude()");
+    public void conclude() {
+        System.out.println(getClass().getName() + " conclude()");
     }
 }

@@ -49,26 +49,24 @@ public class MethodLockingTest1 {
     public void test1() throws InterruptedException {
         try {
             Store.computeIfAbsent(LOCK_NAME, name -> new ReentrantLock(true)).lock();
-            System.out.println(getClass().getName() + " test1()");
+            System.out.println("test1()");
 
             int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
             if (count != 1) {
                 fail("expected count = 1");
             }
 
-            System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
-
-            if (Store.get(COUNTER_NAME, AtomicInteger.class).decrementAndGet() != 0) {
+            if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
                 fail("expected count = 0");
             }
         } finally {
-            Store.get(LOCK_NAME, ReentrantLock.class).unlock();
+            Store.get(LOCK_NAME, ReentrantLock.class).ifPresent(reentrantLock -> reentrantLock.unlock());
         }
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument + ")");
+        System.out.println("test2()");
     }
 
     @TestEngine.AfterEach

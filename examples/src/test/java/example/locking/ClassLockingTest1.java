@@ -6,6 +6,7 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
@@ -33,7 +34,7 @@ public class ClassLockingTest1 {
     @TestEngine.Prepare
     public void prepare() {
         Store.computeIfAbsent(LOCK_NAME, name -> new ReentrantLock(true)).lock();
-        System.out.println(getClass().getName() + " prepare()");
+        System.out.println("prepare()");
     }
 
     @TestEngine.BeforeAll
@@ -48,22 +49,22 @@ public class ClassLockingTest1 {
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
+        System.out.println("test1()");
+
         int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
 
         if (count != 1) {
             fail("expected count = 1");
         }
 
-        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
-
-        if (Store.get(COUNTER_NAME, AtomicInteger.class).decrementAndGet() != 0) {
+        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
             fail("expected count = 0");
         }
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument + ")");
+        System.out.println("test2()");
     }
 
     @TestEngine.AfterEach
@@ -78,7 +79,7 @@ public class ClassLockingTest1 {
 
     @TestEngine.Conclude
     public void conclude() {
-        System.out.println(getClass().getName() + " conclude()");
-        Store.get(LOCK_NAME, ReentrantLock.class).unlock();
+        System.out.println("conclude()");
+        Store.get(LOCK_NAME, ReentrantLock.class).ifPresent(reentrantLock -> reentrantLock.unlock());
     }
 }

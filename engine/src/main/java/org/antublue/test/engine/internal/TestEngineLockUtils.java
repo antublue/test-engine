@@ -22,6 +22,7 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -49,7 +50,7 @@ public class TestEngineLockUtils {
             String name = annotation.value();
             if (name != null && !name.trim().isEmpty()) {
                 name = name.trim();
-                Store.getOrElse(name, n -> new ReentrantLock(true)).lock();
+                Store.computeIfAbsent(name, n -> new ReentrantLock(true)).lock();
                 LOGGER.trace(
                         String.format(
                                 "Lock class [%s] name [%s] locked",
@@ -69,13 +70,13 @@ public class TestEngineLockUtils {
             String name = annotation.value();
             if (name != null && !name.trim().isEmpty()) {
                 name = name.trim();
-                ReentrantLock reentrantLock = Store.get(name);
-                if (reentrantLock != null) {
+                Optional<ReentrantLock> reentrantLockOptional = Store.get(name, ReentrantLock.class);
+                if (reentrantLockOptional.isPresent()) {
                     LOGGER.trace(
                             String.format(
                                     "Lock class [%s] name [%s] unlocked",
                                     method.getDeclaringClass().getName(), name));
-                    reentrantLock.unlock();
+                    reentrantLockOptional.get().unlock();
                 } else {
                     throw new TestClassConfigurationException(
                             String.format(

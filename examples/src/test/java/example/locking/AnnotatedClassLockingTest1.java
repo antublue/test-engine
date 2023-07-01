@@ -32,7 +32,7 @@ public class AnnotatedClassLockingTest1 {
     @TestEngine.Prepare
     @TestEngine.Lock(value=LOCK_NAME)
     public void prepare() {
-        System.out.println(getClass().getName() + " prepare()");
+        System.out.println("prepare()");
     }
 
     @TestEngine.BeforeAll
@@ -47,22 +47,22 @@ public class AnnotatedClassLockingTest1 {
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
+        System.out.println("test1()");
+
         int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
 
         if (count != 1) {
             fail("expected count = 1");
         }
 
-        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
-
-        if (Store.get(COUNTER_NAME, AtomicInteger.class).decrementAndGet() != 0) {
+        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
                 fail("expected count = 0");
         }
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument + ")");
+        System.out.println("test2()");
     }
 
     @TestEngine.AfterEach
@@ -78,6 +78,6 @@ public class AnnotatedClassLockingTest1 {
     @TestEngine.Conclude
     @TestEngine.Unlock(value=LOCK_NAME)
     public void conclude() throws InterruptedException {
-        System.out.println(getClass().getName() + " conclude()");
+        System.out.println("conclude()");
     }
 }

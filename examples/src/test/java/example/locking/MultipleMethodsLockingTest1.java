@@ -38,7 +38,7 @@ public class MultipleMethodsLockingTest1 {
     @TestEngine.BeforeAll
     public void beforeAll() {
         Store.computeIfAbsent(LOCK_NAME, name -> new ReentrantLock(true)).lock();
-        System.out.println(getClass().getName() + " beforeAll()");
+        System.out.println("beforeAll()");
     }
 
     @TestEngine.BeforeEach
@@ -48,28 +48,28 @@ public class MultipleMethodsLockingTest1 {
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
+        System.out.println("test1()");
+
         int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");
         }
 
-        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
-
-        if (Store.get(COUNTER_NAME, AtomicInteger.class).decrementAndGet() != 0) {
+        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
             fail("expected count = 0");
         }
     }
 
     @TestEngine.Test
     public void test2() {
+        System.out.println("test2()");
+
         int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");
         }
 
-        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
-
-        if (Store.get(COUNTER_NAME, AtomicInteger.class).decrementAndGet() != 0) {
+        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
             fail("expected count = 0");
         }
     }
@@ -81,8 +81,8 @@ public class MultipleMethodsLockingTest1 {
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println(getClass().getName() + " afterAll()");
-        Store.get(LOCK_NAME, ReentrantLock.class).unlock();
+        System.out.println("afterAll()");
+        Store.get(LOCK_NAME, ReentrantLock.class).ifPresent(reentrantLock -> reentrantLock.unlock());
     }
 
     @TestEngine.Conclude

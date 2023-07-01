@@ -37,7 +37,7 @@ public class AnnotatedMultipleMethodsLockingTest2 {
     @TestEngine.BeforeAll
     @TestEngine.Lock(value=LOCK_NAME)
     public void beforeAll() {
-        System.out.println(getClass().getName() + " beforeAll()");
+        System.out.println(" beforeAll()");
     }
 
     @TestEngine.BeforeEach
@@ -47,28 +47,28 @@ public class AnnotatedMultipleMethodsLockingTest2 {
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
+        System.out.println("test1()");
+
         int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");
         }
 
-        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
-
-        if (Store.get(COUNTER_NAME, AtomicInteger.class).decrementAndGet() != 0) {
+        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
             fail("expected count = 0");
         }
     }
 
     @TestEngine.Test
     public void test2() {
+        System.out.println("test2()");
+
         int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");
         }
 
-        System.out.println(getClass().getName() + " test1(" + integerArgument + ")");
-
-        if (Store.get(COUNTER_NAME, AtomicInteger.class).decrementAndGet() != 0) {
+        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
             fail("expected count = 0");
         }
     }
@@ -81,7 +81,7 @@ public class AnnotatedMultipleMethodsLockingTest2 {
     @TestEngine.AfterAll
     @TestEngine.Unlock(value=LOCK_NAME)
     public void afterAll() {
-        System.out.println(getClass().getName() + " afterAll()");
+        System.out.println(" afterAll()");
     }
 
     @TestEngine.Conclude
