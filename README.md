@@ -505,7 +505,7 @@ The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses t
 
 - [KafkaTest.java](/examples/src/test/java/example/testcontainers/KafkaTest.java)
 
-This test is testing functionality of an Apache Kafka Producer and Consumer against four [Confluent](https://www.confluent.io/) Platform server versions.
+This test is testing functionality of an Apache Kafka producer and consumer against four [Confluent](https://www.confluent.io/) Platform server versions.
 
 - The test is very basic, with a single test method that declares the client logic to produce / client logic to consume, but you could test multiple scenarios using ordered test methods.
 
