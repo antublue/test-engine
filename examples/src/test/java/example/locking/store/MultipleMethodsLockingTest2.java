@@ -1,4 +1,4 @@
-package example.locking;
+package example.locking.store;
 
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class MultipleMethodsLockingTest1 {
+public class MultipleMethodsLockingTest2 {
 
     public static final String LOCK_NAME = "multiple.methods.lock";
     public static final String COUNTER_NAME = "multiple.methods.counter";

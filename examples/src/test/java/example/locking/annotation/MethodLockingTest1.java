@@ -1,19 +1,18 @@
-package example.locking;
+package example.locking.annotation;
 
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
 public class MethodLockingTest1 {
 
-    public static final String LOCK_NAME = "method.lock";
-    public static final String COUNTER_NAME = "method.counter";
+    public static final String LOCK_NAME = "annotated.method.lock";
+    public static final String COUNTER_NAME = "annotated.method.counter";
 
     static {
         Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger());
@@ -46,21 +45,20 @@ public class MethodLockingTest1 {
     }
 
     @TestEngine.Test
+    @TestEngine.Lock(value=LOCK_NAME)
+    @TestEngine.Unlock(value=LOCK_NAME)
     public void test1() throws InterruptedException {
-        try {
-            Store.computeIfAbsent(LOCK_NAME, name -> new ReentrantLock(true)).lock();
-            System.out.println("test1()");
+        System.out.println("test1()");
 
-            int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
-            if (count != 1) {
-                fail("expected count = 1");
-            }
+        int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+        if (count != 1) {
+            fail("expected count = 1");
+        }
 
-            if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
-                fail("expected count = 0");
-            }
-        } finally {
-            Store.get(LOCK_NAME, ReentrantLock.class).ifPresent(reentrantLock -> reentrantLock.unlock());
+        System.out.println("test1("+ integerArgument + ")");
+
+        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
+            fail("expected count = 0");
         }
     }
 

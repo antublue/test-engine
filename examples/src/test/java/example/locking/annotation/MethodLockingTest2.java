@@ -1,4 +1,4 @@
-package example.locking;
+package example.locking.annotation;
 
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
@@ -9,10 +9,10 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class AnnotatedMethodLockingTest1 {
+public class MethodLockingTest2 {
 
-    public static final String LOCK_NAME = "method.lock";
-    public static final String COUNTER_NAME = "method.counter";
+    public static final String LOCK_NAME = "annotated.method.lock";
+    public static final String COUNTER_NAME = "annotated.method.counter";
 
     static {
         Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger());
@@ -55,7 +55,7 @@ public class AnnotatedMethodLockingTest1 {
             fail("expected count = 1");
         }
 
-        System.out.println(" test1(" + integerArgument + ")");
+        System.out.println("test1("+ integerArgument + ")");
 
         if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
             fail("expected count = 0");

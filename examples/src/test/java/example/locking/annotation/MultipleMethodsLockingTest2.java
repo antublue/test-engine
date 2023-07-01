@@ -1,4 +1,4 @@
-package example.locking;
+package example.locking.annotation;
 
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
@@ -9,10 +9,10 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class AnnotatedClassLockingTest2 {
+public class MultipleMethodsLockingTest2 {
 
-    public static final String LOCK_NAME = "class.lock";
-    public static final String COUNTER_NAME = "class.counter";
+    public static final String LOCK_NAME = "annotated.multiple.methods.lock";
+    public static final String COUNTER_NAME = "annotated.multiple.methods.counter";
 
     static {
         Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger());
@@ -30,12 +30,12 @@ public class AnnotatedClassLockingTest2 {
     }
 
     @TestEngine.Prepare
-    @TestEngine.Lock(value=LOCK_NAME)
     public void prepare() {
         System.out.println("prepare()");
     }
 
     @TestEngine.BeforeAll
+    @TestEngine.Lock(value=LOCK_NAME)
     public void beforeAll() {
         System.out.println("beforeAll()");
     }
@@ -50,7 +50,6 @@ public class AnnotatedClassLockingTest2 {
         System.out.println("test1()");
 
         int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
-
         if (count != 1) {
             fail("expected count = 1");
         }
@@ -63,6 +62,15 @@ public class AnnotatedClassLockingTest2 {
     @TestEngine.Test
     public void test2() {
         System.out.println("test2()");
+
+        int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+        if (count != 1) {
+            fail("expected count = 1");
+        }
+
+        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
+            fail("expected count = 0");
+        }
     }
 
     @TestEngine.AfterEach
@@ -71,13 +79,13 @@ public class AnnotatedClassLockingTest2 {
     }
 
     @TestEngine.AfterAll
+    @TestEngine.Unlock(value=LOCK_NAME)
     public void afterAll() {
         System.out.println("afterAll()");
     }
 
     @TestEngine.Conclude
-    @TestEngine.Unlock(value=LOCK_NAME)
-    public void conclude() throws InterruptedException {
+    public void conclude() {
         System.out.println("conclude()");
     }
 }

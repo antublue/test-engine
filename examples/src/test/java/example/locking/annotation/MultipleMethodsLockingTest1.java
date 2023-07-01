@@ -1,19 +1,18 @@
-package example.locking;
+package example.locking.annotation;
 
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class MultipleMethodsLockingTest2 {
+public class MultipleMethodsLockingTest1 {
 
-    public static final String LOCK_NAME = "multiple.methods.lock";
-    public static final String COUNTER_NAME = "multiple.methods.counter";
+    public static final String LOCK_NAME = "annotated.multiple.methods.lock";
+    public static final String COUNTER_NAME = "annotated.multiple.methods.counter";
 
     static {
         Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger());
@@ -36,8 +35,8 @@ public class MultipleMethodsLockingTest2 {
     }
 
     @TestEngine.BeforeAll
+    @TestEngine.Lock(value=LOCK_NAME)
     public void beforeAll() {
-        Store.computeIfAbsent(LOCK_NAME, name -> new ReentrantLock(true)).lock();
         System.out.println("beforeAll()");
     }
 
@@ -80,9 +79,9 @@ public class MultipleMethodsLockingTest2 {
     }
 
     @TestEngine.AfterAll
+    @TestEngine.Unlock(value=LOCK_NAME)
     public void afterAll() {
         System.out.println("afterAll()");
-        Store.get(LOCK_NAME, ReentrantLock.class).ifPresent(reentrantLock -> reentrantLock.unlock());
     }
 
     @TestEngine.Conclude

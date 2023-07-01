@@ -1,20 +1,18 @@
-package example.locking;
+package example.locking.annotation;
 
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class ClassLockingTest1 {
+public class ClassLockingTest2 {
 
-    public static final String LOCK_NAME = "class.lock";
-    public static final String COUNTER_NAME = "class.counter";
+    public static final String LOCK_NAME = "annotated.class.lock";
+    public static final String COUNTER_NAME = "annotated.class.counter";
 
     static {
         Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger());
@@ -32,8 +30,8 @@ public class ClassLockingTest1 {
     }
 
     @TestEngine.Prepare
+    @TestEngine.Lock(value=LOCK_NAME)
     public void prepare() {
-        Store.computeIfAbsent(LOCK_NAME, name -> new ReentrantLock(true)).lock();
         System.out.println("prepare()");
     }
 
@@ -78,8 +76,8 @@ public class ClassLockingTest1 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    @TestEngine.Unlock(value=LOCK_NAME)
+    public void conclude() throws InterruptedException {
         System.out.println("conclude()");
-        Store.get(LOCK_NAME, ReentrantLock.class).ifPresent(reentrantLock -> reentrantLock.unlock());
     }
 }

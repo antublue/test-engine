@@ -1,18 +1,19 @@
-package example.locking;
+package example.locking.store;
 
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class AnnotatedMultipleMethodsLockingTest1 {
+public class MethodLockingTest2 {
 
-    public static final String LOCK_NAME = "multiple.methods.lock";
-    public static final String COUNTER_NAME = "multiple.methods.counter";
+    public static final String LOCK_NAME = "method.lock";
+    public static final String COUNTER_NAME = "method.counter";
 
     static {
         Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger());
@@ -35,9 +36,8 @@ public class AnnotatedMultipleMethodsLockingTest1 {
     }
 
     @TestEngine.BeforeAll
-    @TestEngine.Lock(value=LOCK_NAME)
     public void beforeAll() {
-        System.out.println(" beforeAll()");
+        System.out.println("beforeAll()");
     }
 
     @TestEngine.BeforeEach
@@ -47,30 +47,26 @@ public class AnnotatedMultipleMethodsLockingTest1 {
 
     @TestEngine.Test
     public void test1() throws InterruptedException {
-        System.out.println("test1()");
+        try {
+            Store.computeIfAbsent(LOCK_NAME, name -> new ReentrantLock(true)).lock();
+            System.out.println("test1()");
 
-        int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
-        if (count != 1) {
-            fail("expected count = 1");
-        }
+            int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
+            if (count != 1) {
+                fail("expected count = 1");
+            }
 
-        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
-            fail("expected count = 0");
+            if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
+                fail("expected count = 0");
+            }
+        } finally {
+            Store.get(LOCK_NAME, ReentrantLock.class).ifPresent(reentrantLock -> reentrantLock.unlock());
         }
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2()");
-
-        int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
-        if (count != 1) {
-            fail("expected count = 1");
-        }
-
-        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
-            fail("expected count = 0");
-        }
     }
 
     @TestEngine.AfterEach
@@ -79,9 +75,8 @@ public class AnnotatedMultipleMethodsLockingTest1 {
     }
 
     @TestEngine.AfterAll
-    @TestEngine.Unlock(value=LOCK_NAME)
     public void afterAll() {
-        System.out.println(" afterAll()");
+        System.out.println("afterAll()");
     }
 
     @TestEngine.Conclude

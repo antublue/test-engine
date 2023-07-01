@@ -190,31 +190,31 @@ The test engine runs multiple test classes in parallel (arguments within a test 
 
 The test engine provides two solutions for synchronization.
 
-**Solution 1**
+**Annotated Locking**
 
 Use `@TestEngine.Lock` and `@TestEngine.Unlock` annotations.
 
 - Annotation driven (less code)
 - Less flexible
-- `@TestEngine.Lock` acquires a lock before method execution.
-- `@TestEngine.Unlock` releases a lock after method execution.
+- `@TestEngine.Lock` acquires a `Reentrant` lock before method execution.
+- `@TestEngine.Unlock` releases a `Reentrant` lock after method execution.
 
 Annotated class locking example code:
 
-- [AnnotatedClassLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedClassLockingTest1.java)
-- [AnnotatedClassLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedClassLockingTest2.java)
+- [ClassLockingTest1.java](/examples/src/test/java/example/locking/annotation/ClassLockingTest1.java)
+- [ClassLockingTest2.java](/examples/src/test/java/example/locking/annotation/ClassLockingTest2.java)
 
 Annotated method locking example code:
 
-- [AnnotatedMethodLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedMethodLockingTest1.java)
-- [AnnotatedMethodLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedMethodLockingTest2.java)
+- [MethodLockingTest1.java](/examples/src/test/java/example/locking/annotation/MethodLockingTest1.java)
+- [MethodLockingTest2.java](/examples/src/test/java/example/locking/annotation/MethodLockingTest2.java)
 
 Annotated multiple methods locking example code:
 
-- [AnnotatedMultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedMultipleMethodsLockingTest1.java)
-- [AnnotatedMultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedMultipleMethodsLockingTest2.java)
+- [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/annotation/MultipleMethodsLockingTest1.java)
+- [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/annotation/MultipleMethodsLockingTest2.java)
 
-**Solution 2**
+**Declared Locking**
 
 Use a `Store` along with a `ReentrantLock`.
 
@@ -223,18 +223,18 @@ Use a `Store` along with a `ReentrantLock`.
 
 Class locking example code:
 
-- [ClassLockingTest1.java](/examples/src/test/java/example/locking/ClassLockingTest1.java)
-- [ClassLockingTest2.java](/examples/src/test/java/example/locking/ClassLockingTest2.java)
+- [ClassLockingTest1.java](/examples/src/test/java/example/locking/store/ClassLockingTest1.java)
+- [ClassLockingTest2.java](/examples/src/test/java/example/locking/store/ClassLockingTest2.java)
 
 Method locking example code:
 
-- [MethodLockingTest1.java](/examples/src/test/java/example/locking/MethodLockingTest1.java)
-- [MethodLockingTest2.java](/examples/src/test/java/example/locking/MethodLockingTest2.java)
+- [MethodLockingTest1.java](/examples/src/test/java/example/locking/store/MethodLockingTest1.java)
+- [MethodLockingTest2.java](/examples/src/test/java/example/locking/store/MethodLockingTest2.java)
 
 Multiple methods locking example code:
 
-- [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest1.java)
-- [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest2.java)
+- [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/store/MultipleMethodsLockingTest1.java)
+- [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/store/MultipleMethodsLockingTest2.java)
 
 ## Usage
 
