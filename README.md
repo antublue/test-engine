@@ -115,20 +115,11 @@ The `examples` project contains various testing examples and scenarios.
 
 - [examples](/examples/src/test/java/example)
 
-Integration test example using [Test Containers](https://testcontainers.com/) and [Confluent](https://www.confluent.io/) Platform Docker images.
+### Usage in a project
 
-- [KafkaTest.java](/examples/src/test/java/example/testcontainers/KafkaTest.java)
+The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses the AntuBLUE Test Engine for integration testing.
 
-### I want to use the test engine in place of JUnit 5
-
-You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
-
-- It's not a "drop in" replacement.
-- Reference the [Design](https://github.com/antublue/test-engine#design) for the state machine flow.
-
-Example:
-
-- [Junit5ReplacementExampleTest.java](/examples/src/test/java/example/Junit5ReplacementExampleTest.java)
+- Prometheus JMX Exporter [integration_test_suite](https://github.com/prometheus/jmx_exporter/tree/main/integration_test_suite)
 
 ## Configuration
 
@@ -345,7 +336,7 @@ You need Java 8 or greater to build.
 ```shell
 git clone https://github.com/antublue/test-engine
 cd test-engine
-./build.sh
+./mvnw clean verify
 ```
 
 ## Known issues
@@ -490,28 +481,6 @@ Parameterized integration testing is most common when you...
 
 3. Various environments could involve different operating systems versions and/or different application runtime versions.
 
-### Real World Example
-
-Usage in a project...
-
-The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses the AntuBLUE Test Engine for integration testing.
-
-- Prometheus JMX Exporter [integration_test_suite](https://github.com/prometheus/jmx_exporter/tree/main/integration_test_suite)
-
-
-- Integration tests using [testcontainers-java](https://github.com/testcontainers/testcontainers-java) and [Docker](https://www.docker.com/)
-
-### Reference Example
-
-- [KafkaTest.java](/examples/src/test/java/example/testcontainers/KafkaTest.java)
-
-This test is testing functionality of an Apache Kafka producer and consumer against four [Confluent](https://www.confluent.io/) Platform server versions.
-
-- The test is very basic, with a single test method that declares the client logic to produce / client logic to consume, but you could test multiple scenarios using ordered test methods.
-
-
-- Test state between methods is stored in a `KafkaTestState` object.
-
 ### How to lock shared resources?
 
 The test engine runs multiple test classes in parallel (arguments within a test class are tested sequentially.) For some test scenarios, shared resources may need to be used.
@@ -563,3 +532,14 @@ Multiple methods locking example code:
 
 - [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/store/MultipleMethodsLockingTest1.java)
 - [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/store/MultipleMethodsLockingTest2.java)
+
+### I want to use the test engine in place of JUnit 5
+
+You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
+
+- It's not a "drop in" replacement.
+- Reference the [Design](https://github.com/antublue/test-engine#design) for the state machine flow.
+
+Example:
+
+- [Junit5ReplacementExampleTest.java](/examples/src/test/java/example/Junit5ReplacementExampleTest.java)
