@@ -16,7 +16,7 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -26,9 +26,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Example using testcontainers-java and Apache Kafka
+ * <p>
+ * Disabled by default since users may not have Docker installed
  */
 @TestEngine.Disabled
 public class KafkaTest {
+
+    private static final String TOPIC = "test";
+    private static final String GROUP_ID = "test-group-id";
+    private static final String EARLIEST = "earliest";
 
     private KafkaTestState kafkaTestState;
 
@@ -88,6 +94,7 @@ public class KafkaTest {
 
     private void produce() throws Throwable {
         String message = randomString(16);
+
         System.out.println(String.format("produce message [%s]", message));
         kafkaTestState.setMessage(message);
 
@@ -102,7 +109,7 @@ public class KafkaTest {
 
         try {
             producer = new KafkaProducer<>(properties);
-            ProducerRecord<String, String> producerRecord = new ProducerRecord<>("test", message);
+            ProducerRecord<String, String> producerRecord = new ProducerRecord<>(TOPIC, message);
             producer.send(producerRecord).get();
         } finally {
             if (producer != null) {
@@ -112,9 +119,6 @@ public class KafkaTest {
     }
 
     private void consume() {
-        String groupId = "test-group-id";
-        String topic = "test";
-
         String message = kafkaTestState.getMessage();
         String bootstrapServers = kafkaTestState.getBootstrapServers();
 
@@ -122,14 +126,13 @@ public class KafkaTest {
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
+        properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST);
 
         KafkaConsumer<String, String> consumer = null;
 
         try {
-            List<String> topicList = new ArrayList<>();
-            topicList.add(topic);
+            List<String> topicList = Collections.singletonList(TOPIC);
 
             consumer = new KafkaConsumer<>(properties);
             consumer.subscribe(topicList);
@@ -149,13 +152,13 @@ public class KafkaTest {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
-        kafkaTestState.reset();
+        kafkaTestState.close();
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        kafkaTestState.dispose();
+        kafkaTestState.close();
     }
 
     private static String randomString(int length) {
@@ -205,7 +208,7 @@ public class KafkaTest {
             return message;
         }
 
-        public void reset() {
+        public void close() {
             if (kafkaContainer != null) {
                 kafkaContainer.close();
                 kafkaContainer = null;
@@ -213,12 +216,12 @@ public class KafkaTest {
         }
 
         public void dispose() {
+            close();
+
             if (network != null) {
                 network.close();;
                 network = null;
             }
-
-            reset();
         }
     }
 }

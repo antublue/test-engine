@@ -37,8 +37,16 @@ public class Fail {
         throw new FailError(message);
     }
 
+    /**
+     * Class to implement a FailError
+     */
     private static class FailError extends AssertionError {
 
+        /**
+         * Constructor
+         *
+         * @param message
+         */
         public FailError(String message) {
             super(message);
         }

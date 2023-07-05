@@ -16,9 +16,10 @@ The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically fo
 
 **Notes**
 
-- v4.x.x tests **may** require code changes to migrate to v5.x.x
-  - `Store` has been refactored
-  - v4.x.x deprecated classes were removed
+- `v4.x.x` tests, if using `Store`, will need to be migrated to the `v5.x.x` version of `Store`
+
+
+- `v4.x.x` deprecated classes were removed
 
 ## API
 
@@ -483,55 +484,24 @@ Parameterized integration testing is most common when you...
 
 ### How to lock shared resources?
 
-The test engine runs multiple test classes in parallel (arguments within a test class are tested sequentially.) For some test scenarios, shared resources may need to be used.
+The test engine runs multiple test classes in parallel (arguments within a test class are tested sequentially.)
 
-The test engine provides two solutions for synchronization.
+For some test scenarios, shared resources may need to be used.
 
-**Annotated Locking**
+The test engine provides the `@TestEngine.Lock` and `@TestEngine.Unlock` annotations for resource locking.
 
-Use `@TestEngine.Lock` and `@TestEngine.Unlock` annotations.
-
-- Annotation driven (less code)
-- Less flexible
-- `@TestEngine.Lock` acquires a `Reentrant` lock before method execution.
-- `@TestEngine.Unlock` releases a `Reentrant` lock after method execution.
-
-Annotated class locking example code:
+Examples:
 
 - [ClassLockingTest1.java](/examples/src/test/java/example/locking/annotation/ClassLockingTest1.java)
 - [ClassLockingTest2.java](/examples/src/test/java/example/locking/annotation/ClassLockingTest2.java)
-
-Annotated method locking example code:
-
 - [MethodLockingTest1.java](/examples/src/test/java/example/locking/annotation/MethodLockingTest1.java)
 - [MethodLockingTest2.java](/examples/src/test/java/example/locking/annotation/MethodLockingTest2.java)
-
-Annotated multiple methods locking example code:
-
 - [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/annotation/MultipleMethodsLockingTest1.java)
 - [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/annotation/MultipleMethodsLockingTest2.java)
 
-**Declared Locking**
+**Notes**
 
-Use a `Store` along with a `ReentrantLock`.
-
-- Via code (more code)
-- More flexible
-
-Class locking example code:
-
-- [ClassLockingTest1.java](/examples/src/test/java/example/locking/store/ClassLockingTest1.java)
-- [ClassLockingTest2.java](/examples/src/test/java/example/locking/store/ClassLockingTest2.java)
-
-Method locking example code:
-
-- [MethodLockingTest1.java](/examples/src/test/java/example/locking/store/MethodLockingTest1.java)
-- [MethodLockingTest2.java](/examples/src/test/java/example/locking/store/MethodLockingTest2.java)
-
-Multiple methods locking example code:
-
-- [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/store/MultipleMethodsLockingTest1.java)
-- [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/store/MultipleMethodsLockingTest2.java)
+- Locks are reentrant
 
 ### I want to use the test engine in place of JUnit 5
 

@@ -1,4 +1,4 @@
-package example.locking.annotation;
+package example.locking;
 
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
@@ -9,13 +9,13 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Fail.fail;
 
-public class ClassLockingTest1 {
+public class MethodLockingTest1 {
 
-    public static final String LOCK_NAME = "annotated.class.lock";
-    public static final String COUNTER_NAME = "annotated.class.counter";
+    public static final String LOCK_NAME = "annotated.method.lock";
+    public static final String COUNTER_NAME = "annotated.method.counter";
 
     static {
-        Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger());
+        Store.putIfAbsent(COUNTER_NAME, s -> new AtomicInteger());
     }
 
     @TestEngine.Argument
@@ -30,7 +30,6 @@ public class ClassLockingTest1 {
     }
 
     @TestEngine.Prepare
-    @TestEngine.Lock(value=LOCK_NAME)
     public void prepare() {
         System.out.println("prepare()");
     }
@@ -46,17 +45,20 @@ public class ClassLockingTest1 {
     }
 
     @TestEngine.Test
+    @TestEngine.Lock(value=LOCK_NAME)
+    @TestEngine.Unlock(value=LOCK_NAME)
     public void test1() throws InterruptedException {
         System.out.println("test1()");
 
-        int count = Store.computeIfAbsent(COUNTER_NAME, name -> new AtomicInteger()).incrementAndGet();
-
+        AtomicInteger atomicInteger = Store.get(COUNTER_NAME, AtomicInteger.class).get();
+        int count = atomicInteger.incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");
         }
 
-        if (Store.get(COUNTER_NAME, AtomicInteger.class).get().decrementAndGet() != 0) {
-                fail("expected count = 0");
+        count = atomicInteger.decrementAndGet();
+        if (count != 0) {
+            fail("expected count = 0");
         }
     }
 
@@ -76,8 +78,7 @@ public class ClassLockingTest1 {
     }
 
     @TestEngine.Conclude
-    @TestEngine.Unlock(value=LOCK_NAME)
-    public void conclude() throws InterruptedException {
+    public void conclude() {
         System.out.println("conclude()");
     }
 }
