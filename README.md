@@ -14,7 +14,7 @@ The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically fo
 
 ### Versions prior to v4.2.3
 
-Versions prior to `v4.2.3` should not be used due to a critical bug and should not be used ...
+Versions prior to `v4.2.3` should not be used due to a critical bug ...
 
 - [#32](https://github.com/antublue/test-engine/issues/32) Tests may be skipped on a slow machine or scenarios where there are a large number of test classes
 
