@@ -5,8 +5,6 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.stream.Stream;
 
-import static org.antublue.test.engine.api.Fail.fail;
-
 /**
  * Test used for debugging IntelliJ
  */
@@ -43,7 +41,7 @@ public class DebugTestA {
     public void test2() {
         System.out.println("test2(" + integerArgument.value() + ")");
         if (integerArgument.value() == 1) {
-            fail("Forced");
+            throw new AssertionError("FORCED");
         }
     }
 

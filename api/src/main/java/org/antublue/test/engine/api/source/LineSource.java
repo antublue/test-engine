@@ -32,9 +32,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Class to create a Stream of Arguments where each Argument value is a line,
- * <br>
- * Skips lines that start with a "#", but accepts empty lines
+ * Class to create a Stream of Arguments where each Argument value is a line of a Stream
  */
 public final class LineSource {
 

@@ -8,88 +8,29 @@
 
 The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically for parameterized integration testing by allowing parameterization at the test class level.
 
-## Latest Releases
+## Latest Release
 
-- General Availability (GA): [Test Engine v4.3.1](https://github.com/antublue/test-engine/releases/tag/v4.3.1)
+- [Test Engine v5.0.0](https://github.com/antublue/test-engine/releases/tag/v5.0.0)
 
-### Versions prior to v4.2.3 suffer from [#32](https://github.com/antublue/test-engine/issues/32) and should not be used.
+### Versions prior to v4.2.3
+
+Versions prior to `v4.2.3` should not be used due to a critical bug ...
+
+- [#32](https://github.com/antublue/test-engine/issues/32) Tests may be skipped on a slow machine or scenarios where there are a large number of test classes
 
 **Notes**
 
-- v3.x.x tests will have to be migrated to v4.x.x
-
-## Goals
-
-To allow parameterized testing at the test class level, targeting integration testing.
-
-## Non-Goals
-
-The test engine is not meant to replace JUnit 5 for unit tests, but can be used.
-
-## Why not use JUnit 5?
-
-Currently, JUnit 5 does not support parameterized testing at the test class level (common for parameterized integration testing.)
-
-- https://github.com/junit-team/junit5/issues/878 (Open since 2017-06-09)
+- `v4.x.x` tests, if using `Store`, will need to be changed to use the `v5.x.x` version of `Store`
 
 
-- It doesn't provide annotations to run methods before / after all test methods and before / after each test argument. (2023-04-18)
+- `v4.x.x` tests, if using `Fail`, will need to be changed to throw an `AssertionError` or other `RuntimeException`.
 
 
-- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
+- `v4.x.x` deprecated classes were removed
 
-## Why not use JUnit 4?
+## API
 
-JUnit 4 does provide test class level parameterization via `@RunWith(Parameterized.class)`.
-
-- JUnit 4 is maintained, but no new functionality is being added.
-  - The latest release was on February 13, 2021.
-  - https://stackoverflow.com/questions/72325172/when-is-junit4-going-to-be-deprecated
-
-
-- It doesn't provide annotations to run methods before / after all test methods and before / after each test argument.
-
-
-- It uses a test class constructor approach, limiting you to Java inheritance semantics. (superclass before subclass construction.)
-
-
-- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
-
-## What is parameterized integration testing?
-
-Parameterized integration testing is most common when you...
-
-1. Want to perform integration testing of the application in various environments.
-
-
-2. You want to test workflow oriented scenarios of the application.
-
-
-3. Various environments could involve different operating systems versions and/or different application runtime versions.
-
-### Real World Example
-
-Usage in a project...
-
-The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses the AntuBLUE Test Engine for integration testing.
-
-- Prometheus JMX Exporter [integration_test_suite](https://github.com/prometheus/jmx_exporter/tree/main/integration_test_suite)
-
-
-- Integration tests using [testcontainers-java](https://github.com/testcontainers/testcontainers-java) and [Docker](https://www.docker.com/)
-
-### Reference Example
-
-- [KafkaTest.java](/examples/src/test/java/example/testcontainers/KafkaTest.java)
-
-This test is testing functionality of an Apache Kafka Producer and Consumer against four Confluent Platform server versions.
-
-- The test is very basic, with a single test method that declares the client logic to produce / client logic to consume, but you could test multiple scenarios using ordered test methods.
-
-
-- Test state between methods is stored in a `KafkaTestState` object.
-
-## Common Test Annotations
+### Test Annotations
 
 | Annotation                     | Static | Type   | Required | Example                                                                                                                                                                            |
 |--------------------------------|--------|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -103,7 +44,7 @@ This test is testing functionality of an Apache Kafka Producer and Consumer agai
 | `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                          |
 | `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                          |
 
-Reference the [Design](https://github.com/antublue/test-engine#design) for the state machine flow.
+Reference the [Design](https://github.com/antublue/test-engine#design) for the test engine execution flow.
 
 **Notes**
 
@@ -118,10 +59,10 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
   - The test method name can be changed by using the `@TestEngine.DisplayName` annotation.
   - Method order is relative to other methods in a test class with the same annotation regardless of superclass / subclass location.
 
-  
- - **Class execution order can't be guaranteed unless the test engine is configured for a single thread.** 
- 
-## Additional Test Annotations
+
+- **Class execution order can't be guaranteed unless the test engine is configured for a single thread.**
+
+### Additional Test Annotations
 
 | Annotation                  | Scope            | Required | Usage                                                                                                                              |
 |-----------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
@@ -130,8 +71,8 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 | `@TestEngine.Order(<int>)`  | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
 | `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
 | `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
-| `@TestEngine.Lock`          | method           | no       | Acquires a named `ReentrantLock` before execution                                                                                  |
-| `@TestEngine.UnLock`        | method           | no       | Acquires a named `ReentrantLock` before execution                                                                                  |
+| `@TestEngine.Lock`          | method           | no       | Provides a way to acquire a named `ReentrantLock` and lock it before method execution                                              |
+| `@TestEngine.UnLock`        | method           | no       | Provides a way to acquire a named `ReentrantLock` and unlock it after method execution                                             |
 
 **Notes**
 
@@ -146,7 +87,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the s
 
 - For `@TestEngine.Tag(<string>)` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`.
 
-## What is an `Argument`?
+### What is an `Argument`?
 
 `Argument` is an interface all argument objects must implement to provide a name.
 
@@ -158,7 +99,7 @@ There are standard argument implementations for common Java data types:
 - `ShortArgument`
 - `IntegerArgument`
 - `LongArgument`
-- `BigIntegerArgument` 
+- `BigIntegerArgument`
 - `FloatArgument`
 - `DoubleArgument`
 - `BigDecimalArgument`
@@ -170,87 +111,88 @@ Additionally, there is an `ObjectArgument<T>` argument implementation that allow
 
 - It's recommended to implement a test specific `Argument` object instead of using `ObjectArgument<T>` whenever possible.
 
-## What is a `Store` ?
+### What is a `Store` ?
 
-A `Store` is a singleton object that allow sharing of named resources between tests.
+A `Store` is a thread-safe convenience object that allow sharing of Objects between tests.
 
 - [Store.java](/api/src/main/java/org/antublue/test/engine/api/Store.java)
 
-A common usage is shared resource synchronization.
+## Code Examples
 
-## How to lock shared resources?
-
-The test engine runs multiple test classes in parallel (arguments within a test class are tested sequentially.) For some test scenarios, shared resources may need to be used.
-
-The test engine provides two solutions for synchronization.
-
-**Solution 1**
-
-Use `@TestEngine.Lock` and `@TestEngine.Unlock` annotations.
-
-- Annotation driven (less code)
-- Less flexible
-- `@TestEngine.Lock` acquires a lock before method execution.
-- `@TestEngine.Unlock` releases a lock after method execution.
-
-Annotated class locking example code:
-
-- [AnnotatedClassLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedClassLockingTest1.java)
-- [AnnotatedClassLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedClassLockingTest2.java)
-
-Annotated method locking example code:
-
-- [AnnotatedMethodLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedMethodLockingTest1.java)
-- [AnnotatedMethodLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedMethodLockingTest2.java)
-
-Annotated multiple methods locking example code:
-
-- [AnnotatedMultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/AnnotatedMultipleMethodsLockingTest1.java)
-- [AnnotatedMultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/AnnotatedMultipleMethodsLockingTest2.java)
-
-**Solution 2**
-
-Use a `Store` along with a `ReentrantLock`.
-
-- Via code (more code)
-- More flexible
-
-Class locking example code:
-
-- [ClassLockingTest1.java](/examples/src/test/java/example/locking/ClassLockingTest1.java)
-- [ClassLockingTest2.java](/examples/src/test/java/example/locking/ClassLockingTest2.java)
-
-Method locking example code:
-
-- [MethodLockingTest1.java](/examples/src/test/java/example/locking/MethodLockingTest1.java)
-- [MethodLockingTest2.java](/examples/src/test/java/example/locking/MethodLockingTest2.java)
-
-Multiple methods locking example code:
-
-- [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest1.java)
-- [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest2.java)
-
-## Usage
-
-The `examples` project contains various testing examples and scenarios...
+The `examples` project contains various testing examples and scenarios.
 
 - [examples](/examples/src/test/java/example)
 
-Integration test example using `testcontainers-java` and Confluent Platform Docker images...
+### Usage in a project
 
-- [KafkaTest.java](/examples/src/test/java/example/testcontainers/KafkaTest.java)
+The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses the AntuBLUE Test Engine for integration testing.
 
-### I want to use the test engine in place of JUnit 5
+- Prometheus JMX Exporter [integration_test_suite](https://github.com/prometheus/jmx_exporter/tree/main/integration_test_suite)
 
-You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
+## Configuration
 
-- It's not a "drop in" replacement.
+### Maven Configuration
 
-Example:
+Disable the Maven Surefire plugin...
 
-- [Junit5ReplacementExampleTest.java](/examples/src/test/java/example/Junit5ReplacementExampleTest.java)
+```xml
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-surefire-plugin</artifactId>
+  <version>3.1.0</version>
+  <configuration>
+    <skipTests>true</skipTests>
+  </configuration>
+</plugin>
+```
 
-## Test Engine Configuration
+Add the AntuBLUE Test Engine Maven Plugin...
+
+```xml
+<plugin>
+  <groupId>org.antublue</groupId>
+  <artifactId>test-engine-maven-plugin</artifactId>
+  <version>5.0.0</version>
+  <executions>
+    <execution>
+      <phase>integration-test</phase>
+      <goals>
+        <goal>test</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+```
+
+Add the AntuBLUE Test Engine jars...
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>org.antublue</groupId>
+    <artifactId>test-engine-api</artifactId>
+    <version>5.0.0</version>
+  </dependency>
+  <dependency>
+    <groupId>org.antublue</groupId>
+    <artifactId>test-engine</artifactId>
+    <version>5.0.0</version>
+    <scope>test</scope>
+  </dependency>
+</dependencies>
+```
+
+**Notes**
+
+- The `test-engine-api`, `test-engine`, and `test-engine-maven-plugin` versions must match.
+
+Build and test your project...
+
+```bash
+mvn clean package integration-test
+```
+
+### Test Engine Configuration
 
 The test engine has seven configuration parameters.
 <br/>
@@ -330,7 +272,7 @@ The test engine has seven configuration parameters.
 <br/>
 Using a combination of the system properties (and/or environment variables) allows for including / excluding individual test classes / test methods.
 
-## Experimental Test Engine Configuration
+### Experimental Test Engine Configuration
 
 The test engine as two experimental configuration parameters.
 
@@ -366,83 +308,23 @@ The test engine as two experimental configuration parameters.
 
 - Experimental configuration values are subject to change at any time.
 
-
-## Maven Configuration
-
-Disable the Maven Surefire plugin...
-
-```xml
-<plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-surefire-plugin</artifactId>
-  <version>3.1.0</version>
-  <configuration>
-    <skipTests>true</skipTests>
-  </configuration>
-</plugin>
-```
-
-Add the AntuBLUE Test Engine Maven Plugin...
-
-```xml
-<plugin>
-  <groupId>org.antublue</groupId>
-  <artifactId>test-engine-maven-plugin</artifactId>
-  <version>4.3.1</version>
-  <executions>
-    <execution>
-      <phase>integration-test</phase>
-      <goals>
-        <goal>test</goal>
-      </goals>
-    </execution>
-  </executions>
-</plugin>
-```
-
-Add the AntuBLUE Test Engine jars...
-
-```xml
-<dependencies>
-  <dependency>
-    <groupId>org.antublue</groupId>
-    <artifactId>test-engine-api</artifactId>
-    <version>4.3.1</version>
-  </dependency>
-  <dependency>
-    <groupId>org.antublue</groupId>
-    <artifactId>test-engine</artifactId>
-    <version>4.3.1</version>
-    <scope>test</scope>
-  </dependency>
-</dependencies>
-```
-
-**Notes**
-
-- The `test-engine-api`, `test-engine`, and `test-engine-maven-plugin` versions must match.
-
-Build and test your project...
-
-```bash
-mvn clean package integration-test
-```
-
 ## Test Engine Summary
 
-When running via Maven in a Linux console, the test engine will report a summary similar to...
+When running via Maven in a Linux console, the test engine will report a summary.
+
+Example
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v4.3.1 Summary
+[INFO] AntuBLUE Test Engine v5.0.0 Summary
 [INFO] ------------------------------------------------------------------------
-[INFO] Test Classes   :  58, PASSED :  58, FAILED : 0, SKIPPED : 0
-[INFO] Test Methods   : 777, PASSED : 777, FAILED : 0, SKIPPED : 0
+[INFO] Test Classes   :  64, PASSED :  64, FAILED : 0, SKIPPED : 0
+[INFO] Test Methods   : 803, PASSED : 803, FAILED : 0, SKIPPED : 0
 [INFO] ------------------------------------------------------------------------
 [INFO] PASSED
 [INFO] ------------------------------------------------------------------------
-[INFO] Total Test Time : 34 ms (34 ms)
-[INFO] Finished At     : 2023-06-26T22:35:46.691
+[INFO] Total Test Time : 41 ms (41 ms)
+[INFO] Finished At     : 2023-07-01T10:06:53.169
 [INFO] ------------------------------------------------------------------------
 
 ```
@@ -462,7 +344,7 @@ You need Java 8 or greater to build.
 ```shell
 git clone https://github.com/antublue/test-engine
 cd test-engine
-./build.sh
+./mvnw clean verify
 ```
 
 ## Known issues
@@ -507,9 +389,18 @@ For changes, you should...
 - Google checkstyle formatted code is required.
 - Snapshots are not used.
 
+
 ## Design
 
-Logical test class execution flow...
+### Goals
+
+To allow parameterized testing at the test class level, targeting integration testing.
+
+### Non-Goals
+
+The test engine is not meant to replace JUnit 5 for unit tests, but can be used.
+
+### Logical Flow
 
 ```
 Scan all classpath jars for test classes that contains a method annotated with "@TestEngine.Test"
@@ -554,3 +445,78 @@ for (each test class in the Collection<Class<?>>) {
 - Each test class will be executed sequentially in a thread, but different test classes are executed in parallel threads.
   - By default, thread count is equal to number of available processors as reported by Java.
   - The thread count can be changed via a configuration value.
+
+## FAQ
+
+### Why not use JUnit 5?
+
+Currently, JUnit 5 does not support parameterized testing at the test class level (common for parameterized integration testing.)
+
+- https://github.com/junit-team/junit5/issues/878 (Open since 2017-06-09)
+
+
+- It doesn't provide annotations to run methods before / after all test methods and before / after each test argument. (2023-04-18)
+
+
+- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
+
+### Why not use JUnit 4?
+
+JUnit 4 does provide test class level parameterization via `@RunWith(Parameterized.class)`.
+
+- JUnit 4 is maintained, but no new functionality is being added.
+  - The latest release was on February 13, 2021.
+  - https://stackoverflow.com/questions/72325172/when-is-junit4-going-to-be-deprecated
+
+
+- It doesn't provide annotations to run methods before / after all test methods and before / after each test argument.
+
+
+- It uses a test class constructor approach, limiting you to Java inheritance semantics. (superclass before subclass construction.)
+
+
+- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
+
+### What is parameterized integration testing?
+
+Parameterized integration testing is most common when you...
+
+1. Want to perform integration testing of the application in various environments.
+
+
+2. You want to test workflow oriented scenarios of the application.
+
+
+3. Various environments could involve different operating systems versions and/or different application runtime versions.
+
+### How to lock shared resources?
+
+The test engine runs multiple test classes in parallel (arguments within a test class are tested sequentially.)
+
+For some test scenarios, shared resources may need to be used.
+
+The test engine provides the `@TestEngine.Lock` and `@TestEngine.Unlock` annotations for resource locking.
+
+Examples:
+
+- [ClassLockingTest1.java](/examples/src/test/java/example/locking/annotation/ClassLockingTest1.java)
+- [ClassLockingTest2.java](/examples/src/test/java/example/locking/annotation/ClassLockingTest2.java)
+- [MethodLockingTest1.java](/examples/src/test/java/example/locking/annotation/MethodLockingTest1.java)
+- [MethodLockingTest2.java](/examples/src/test/java/example/locking/annotation/MethodLockingTest2.java)
+- [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/annotation/MultipleMethodsLockingTest1.java)
+- [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/annotation/MultipleMethodsLockingTest2.java)
+
+**Notes**
+
+- Locks are reentrant
+
+### I want to use the test engine in place of JUnit 5
+
+You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
+
+- It's not a "drop in" replacement.
+- Reference the [Design](https://github.com/antublue/test-engine#design) for the state machine flow.
+
+Example:
+
+- [Junit5ReplacementExampleTest.java](/examples/src/test/java/example/Junit5ReplacementExampleTest.java)
