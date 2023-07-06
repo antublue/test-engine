@@ -12,11 +12,18 @@ The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically fo
 
 - [Test Engine v5.0.0](https://github.com/antublue/test-engine/releases/tag/v5.0.0)
 
-### Versions prior to v4.2.3 suffer from [#32](https://github.com/antublue/test-engine/issues/32) and should not be used.
+### Versions prior to v4.2.3
+
+Versions prior to `v4.2.3` should not be used due to a critical bug and should not be used ...
+
+- [#32](https://github.com/antublue/test-engine/issues/32) Tests may be skipped on a slow machine or scenarios where there are a large number of test classes
 
 **Notes**
 
-- `v4.x.x` tests, if using `Store`, will need to be migrated to the `v5.x.x` version of `Store`
+- `v4.x.x` tests, if using `Store`, will need to be changed to use the `v5.x.x` version of `Store`
+
+
+- `v4.x.x` tests, if using `Fail`, will need to be changed to throw an `AssertionError` or other `RuntimeException`.
 
 
 - `v4.x.x` deprecated classes were removed
