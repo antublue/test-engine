@@ -17,21 +17,23 @@
 package org.antublue.test.engine.api;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 /**
- * Class to implement a Store that allows for sharing Objects between tests
+ * Class to implement a singleton Store
+ * <p>
+ * Store methods are atomic and thread-safe. Complex usage should lock the Store using either lock() / unlock() or use the Lock returned from getLock().
+ * <p>
+ * Locking of Objects in the Store is the responsibility of the caller.
  */
 public class Store {
 
-    private static final Map<String, Object> OBJECT_MAP;
-
-    static {
-        OBJECT_MAP = new LinkedHashMap<>();
-    }
+    private final static Lock LOCK = new ReentrantLock(true);
+    private final static Map<String, Object> MAP = new LinkedHashMap<>();
 
     /**
      * Constructor
@@ -41,153 +43,95 @@ public class Store {
     }
 
     /**
-     * Method to put a named Object into the Store, returning the previous value is one exists
-     * <p>
-     * null values are accepted
+     * Method to lock the Store, returning the Lock
      *
-     * @param name
-     * @param value
-     * @return
-     * @param <T>
+     * @return the Lock
      */
-    public static <T> T put(String name, T value) {
-        name = validate(name);
+    public static Lock lock() {
+        LOCK.lock();
+        return LOCK;
+    }
 
-        synchronized (OBJECT_MAP) {
-            return (T) OBJECT_MAP.put(name, value);
+    /**
+     * Method to unlock the Store, returning the Lock
+     *
+     * @return the Lock
+     */
+    public static Lock unlock() {
+        LOCK.unlock();
+        return LOCK;
+    }
+
+    /**
+     * Method to get the Store's Lock
+     *
+     * @return the Lock
+     */
+    public static Lock getLock() {
+        return LOCK;
+    }
+
+    /**
+     * Method to put an Object into the Store
+     *
+     * @param key key
+     * @param object object
+     * @return an Optional containing the existing Object, or an empty Optional if an Object didn't exist
+     */
+    public static Optional<Object> put(String key, Object object) {
+        try {
+            lock();
+            return Optional.ofNullable(MAP.put(key, object));
+        } finally {
+            unlock();
         }
     }
 
     /**
-     * Method to get a named Object
+     * Method to put an Object into the store if it's not present
      *
-     * @param name name
-     * @return the return value
-     * @param <T>
+     * @param key key
+     * @param function function
+     * @return an Optional containing the existing Object, or an empty Optional if an Object didn't exist
      */
-    public static <T> T get(String name) {
-        name = validate(name);
-
-        synchronized (OBJECT_MAP) {
-            return (T) OBJECT_MAP.get(name);
+    public static Optional<Object> putIfAbsent(String key, Function<String, Object> function) {
+        try {
+            lock();
+            return Optional.ofNullable(MAP.computeIfAbsent(key, function));
+        } finally {
+            unlock();
         }
     }
 
     /**
-     * Method to get a named Object cast to a specific type
+     * Method to get an Object from the Store
      *
-     * @param name name
+     * @param key key
+     * @return an Optional that contains the Object
+     */
+    public static Optional<Object> get(String key) {
+        try {
+            lock();
+            return Optional.ofNullable(MAP.get(key));
+        } finally {
+            unlock();
+        }
+    }
+
+    /**
+     * Method to get an Object from the Store
+     *
+     * @param key key
      * @param clazz clazz
-     * @return the return value
+     * @return an Optional that contains the Object
      * @param <T>
      */
-    public static <T> T get(String name, Class<T> clazz) {
-        name = validate(name);
-
-        if (clazz == null) {
-            throw new IllegalArgumentException("clazz is null");
+    public static <T> Optional<T> get(String key, Class<T> clazz) {
+        try {
+            lock();
+            return Optional.ofNullable(clazz.cast(MAP.get(key)));
+        } finally {
+            unlock();
         }
-
-        synchronized (OBJECT_MAP) {
-            return clazz.cast(OBJECT_MAP.get(name));
-        }
-    }
-
-    /**
-     * Method to get a named Object, executing the supplied Function to create the Object if it doesn't exist
-     * <p>
-     * DEPRECATED - use computeIfAbsent
-     *
-     * @param name name
-     * @param function function
-     * @return the return value
-     * @param <T>
-     */
-    @Deprecated
-    public static <T> T getOrCreate(String name, Function<String, ? extends T> function) {
-        return computeIfAbsent(name, function);
-    }
-
-    /**
-     * Method to get a named Object, executing the supplied Function if the named Object doesn't exist
-     * <p>
-     * DEPRECATED - use computeIfAbsent
-     *
-     * @param name name
-     * @param function function
-     * @return the return value
-     * @param <T>
-     */
-    public static <T> T getOrElse(String name, Function<String, ? extends T> function) {
-        return computeIfAbsent(name, function);
-    }
-
-    /**
-     * Method to get a named Object, executing the supplied Function if the named Object doesn't exist
-     *
-     * @param name name
-     * @param function function
-     * @return the return value
-     * @param <T>
-     */
-    public static <T> T computeIfAbsent(String name, Function<String, T> function) {
-        name = validate(name);
-
-        if (function == null) {
-            throw new IllegalArgumentException("function is null");
-        }
-
-        synchronized (OBJECT_MAP) {
-            return (T) OBJECT_MAP.computeIfAbsent(name, function);
-        }
-    }
-
-    /**
-     * Method to remove a named Object, returning the value is one exists
-     * <p>
-     * Be cautious using remove when sharing an Object between classes
-     *
-     * @param name name
-     * @return the return value
-     * @param <T>
-     */
-    public static <T> T remove(String name) {
-        name = validate(name);
-
-        synchronized (OBJECT_MAP) {
-            return (T) OBJECT_MAP.remove(name);
-        }
-    }
-
-    /**
-     * Method to get a keySet of Store keys
-     * <p>
-     * The keySet will be a copy
-     *
-     * @return the return value
-     */
-    public static Set<String> keySet() {
-        synchronized (OBJECT_MAP) {
-            return new LinkedHashSet<>(OBJECT_MAP.keySet());
-        }
-    }
-
-    /**
-     * Method to valide a name is not null and not empty, returning the name trimmed
-     *
-     * @param name name
-     * @return the return value
-     */
-    private static String validate(String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
-
-        return name;
     }
 }

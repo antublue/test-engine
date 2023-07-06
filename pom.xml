@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-parent</artifactId>
-    <version>4.3.1</version>
+    <version>5.0.0</version>
     <packaging>pom</packaging>
     <name>AntuBLUE Test Engine Parent</name>
 

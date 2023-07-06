@@ -5,7 +5,6 @@ import org.antublue.test.engine.api.argument.StringArgument;
 
 import java.util.stream.Stream;
 
-import static org.antublue.test.engine.api.Fail.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -46,7 +45,7 @@ public class DebugTestB {
         System.out.println("test2(" + stringArgument  + ")");
         assertThat(stringArgument.value().getClass()).isEqualTo(String.class);
         if (stringArgument.value().equals("b")) {
-            fail("Forced");
+            throw new AssertionError("FORCED");
         }
     }
 
