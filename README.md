@@ -71,8 +71,8 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 | `@TestEngine.Order(<int>)`  | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
 | `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
 | `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
-| `@TestEngine.Lock`          | method           | no       | Provides a way to acquire a named `ReentrantLock` and lock it before execution                                                     |
-| `@TestEngine.UnLock`        | method           | no       | Provides a way to acquire a named `ReentrantLock` and unlock it after execution                                                    |
+| `@TestEngine.Lock`          | method           | no       | Provides a way to acquire a named `ReentrantLock` and lock it before method execution                                              |
+| `@TestEngine.UnLock`        | method           | no       | Provides a way to acquire a named `ReentrantLock` and unlock it after method execution                                             |
 
 **Notes**
 
