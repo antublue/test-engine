@@ -22,7 +22,7 @@ Test Engine versions prior to `v4.2.3` should not be used due to a critical bug 
 
 **Documentation is specific to a release.**
 
-For the current branch, reference [DOCUMENTATION.md](DOCUMENTATION.md)
+For the current branch, reference [DOCUMENTATION.md](DOCUMENTATION.md).
 
 For a release, reference the `release-<VERSION>` branch for documentation for the release you are using.
 
