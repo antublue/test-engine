@@ -23,6 +23,7 @@ Test Engine versions prior to `v4.2.3` should not be used due to a critical bug 
 Documentation is specific to a release.
 
 - [v5.0.0](documentation/v5.0.0/README.md)
+- [v4.3.1](documentation/v4.3.1/README.md)
 
 # Building
 
