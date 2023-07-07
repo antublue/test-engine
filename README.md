@@ -30,6 +30,14 @@ For a release, reference the `release-<VERSION>` branch for documentation for th
 - [v4.3.1](https://github.com/antublue/test-engine/tree/release-4.3.1)
 - [v4.3.0](https://github.com/antublue/test-engine/tree/release-4.3.0)
 
+# Getting Help
+
+GitHub's Discussions is the current mechanism for help / support.
+
+# FAQ
+
+- [Fequently Asked Questions](FAQ.md)
+
 # Building
 
 Java 8 or greater is required to build the project. The project targets Java 8 as a baseline.
@@ -61,7 +69,3 @@ For changes, you should...
 - Build and test your changes
 - Open a pull request, tagging `@antublue` for review
 - A [Developer Certificate of Origin](DCO.md) (DCO) is required for all contributions
-
-# Getting Help
-
-GitHub's Discussions is the current mechanism for help / support.
