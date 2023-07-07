@@ -8,10 +8,6 @@
 
 The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically for parameterized integration testing by allowing parameterization at the test class level.
 
-## Release Documentation
-
-Please reference the release branch for documentation.
-
 ### Versions prior to v4.2.3
 
 Versions prior to `v4.2.3` should not be used due to a critical bug ...
