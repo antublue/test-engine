@@ -52,7 +52,7 @@ cd test-engine
 
 Contributions to the Test Engine are both welcomed and appreciated.
 
-The project uses a [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) branching strategy.
+The project uses a [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) branching strategy, with release branches.
 
 - The [main](/) branch contains the latest unreleased code
 - Release branches `release-<VERSION>` contains a release's code and documentation
