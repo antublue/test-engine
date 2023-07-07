@@ -54,7 +54,7 @@ For changes, you should...
 - Make changes on your branch
 - Build and test your changes
 - Open a pull request, tagging `@antublue` for review
-- [Developer Certificate of Origin](https://github.com/apps/dco) is required for all contributions
+- [Developer Certificate of Origin](https://github.com/apps/dco) (DCO) is required for all contributions
 
 # Getting Help
 
