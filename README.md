@@ -20,9 +20,9 @@ Test Engine versions prior to `v4.2.3` should not be used due to a critical bug 
 
 # Documentation
 
-Documentation is specific to a release.
+**Documentation is specific to a release.**
 
-Please reference the correct `release-<version>` branch.
+**Please reference the `release-<VERSION>` branch for documentation for the release you are using.**
 
 - [v5.0.0](https://github.com/antublue/test-engine/tree/release-5.0.0)
 - [v4.3.1](https://github.com/antublue/test-engine/tree/release-4.3.1)
@@ -44,6 +44,7 @@ Contributions to the Test Engine are both welcomed and appreciated.
 The project uses a [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) branching strategy.
 
 - The [main](/) branch contains the latest unreleased code
+- Release branches `release-<VERSION>` contains a release's code and documentation
 - Google checkstyle format is required
 - PMD is used for static analysis
 - Expand all Java imports
