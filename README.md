@@ -8,10 +8,6 @@
 
 The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically for parameterized integration testing by allowing parameterization at the test class level.
 
-## Latest Release
-
-- [Test Engine v5.0.0](https://github.com/antublue/test-engine/releases/tag/v5.0.0)
-
 ### Versions prior to v4.2.3
 
 Versions prior to `v4.2.3` should not be used due to a critical bug ...
@@ -152,7 +148,7 @@ Add the AntuBLUE Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>5.0.0</version>
+  <version>5.0.1</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -171,12 +167,12 @@ Add the AntuBLUE Test Engine jars...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>5.0.0</version>
+    <version>5.0.1</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>5.0.0</version>
+    <version>5.0.1</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -316,7 +312,7 @@ Example
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine v5.0.0 Summary
+[INFO] AntuBLUE Test Engine 5.0.1 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes   :  64, PASSED :  64, FAILED : 0, SKIPPED : 0
 [INFO] Test Methods   : 803, PASSED : 803, FAILED : 0, SKIPPED : 0
@@ -336,6 +332,10 @@ Test Classes
 Test Methods
 
 - Total number of test methods tested (all parameters / all test classes.)
+
+## Getting Help
+
+GitHub's Discussions is the current mechanism for help / support.
 
 ## Building
 
@@ -364,31 +364,26 @@ IntelliJ doesn't properly display `System.out` / `System.err` for running tests.
 
 - The output can be misleading and should not be used as a source of truth.
 
-## Getting Help
-
-GitHub's Discussions is the current mechanism for help / support.
-
 ## Contributing
 
-Contributions to the test engine are both welcomed and appreciated.
+Contributions to the Test Engine are both welcomed and appreciated.
 
-The project uses a simplified GitFlow branching strategy.
+The project uses a [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) branching strategy.
 
-- `main` is the latest release.
-- `development-<NEXT RELEASE>` is the next release.
+- The [main](/) branch contains the latest unreleased code
+- Google checkstyle format is required
+- PMD is used for static analysis
+- Expand all Java imports
+- Tags are used for releases
 
 For changes, you should...
 
-- Fork the repository.
-- Create a branch based on `development-<NEXT RELEASE>`.
-- Make changes on your branch.
-- Open a PR against the source repository branch `development-<NEXT RELEASE>`.
-
-**Notes**
-
-- Google checkstyle formatted code is required.
-- Snapshots are not used.
-
+- Fork the repository
+- Create a branch for your work
+- Make changes on your branch
+- Build and test your changes
+- Open a pull request, tagging `@antublue` for review
+- A [Developer Certificate of Origin](DCO.md) (DCO) is required for all contributions
 
 ## Design
 
