@@ -42,8 +42,9 @@ Contributions to the Test Engine are both welcomed and appreciated.
 The project uses a [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) branching strategy.
 
 - The [main](/) branch contains the latest unreleased code
-
-
+- Google checkstyle format is required
+- PMD is used for static analysis
+- Expand all Java imports
 - Tags are used for releases
 
 For changes, you should...
@@ -51,6 +52,7 @@ For changes, you should...
 - Fork the repository
 - Create a branch for your work
 - Make changes on your branch
+- Build and test your changes
 - Open a pull request, tagging `@antublue` for review
 
 # Getting Help
