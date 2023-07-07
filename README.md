@@ -42,7 +42,6 @@ Contributions to the Test Engine are both welcomed and appreciated.
 The project uses a [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) branching strategy.
 
 - The [main](/) branch contains the latest unreleased code
-- [DCO](https://github.com/apps/dco) is required for all contributions
 - Google checkstyle format is required
 - PMD is used for static analysis
 - Expand all Java imports
@@ -55,6 +54,7 @@ For changes, you should...
 - Make changes on your branch
 - Build and test your changes
 - Open a pull request, tagging `@antublue` for review
+- [Developer Certificate of Origin](https://github.com/apps/dco) is required for all contributions
 
 # Getting Help
 
