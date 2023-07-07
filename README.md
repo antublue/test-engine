@@ -24,8 +24,8 @@ Documentation is specific to a release.
 
 Please reference the correct `release-<version>` branch.
 
-- [v5.0.0](tree/release-5.0.0)
-- [v4.3.1](tree/release-4.3.1)
+- [v5.0.0](https://github.com/antublue/test-engine/tree/release-5.0.0)
+- [v4.3.1](https://github.com/antublue/test-engine/tree/release-4.3.1)
 
 # Building
 
