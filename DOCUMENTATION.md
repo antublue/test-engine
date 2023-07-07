@@ -333,20 +333,6 @@ Test Methods
 
 - Total number of test methods tested (all parameters / all test classes.)
 
-## Getting Help
-
-GitHub's Discussions is the current mechanism for help / support.
-
-## Building
-
-You need Java 8 or greater to build.
-
-```shell
-git clone https://github.com/antublue/test-engine
-cd test-engine
-./mvnw clean verify
-```
-
 ## Known issues
 
 IntelliJ doesn't properly handle all possible test selection scenarios from the Test Run window.
@@ -363,27 +349,6 @@ IntelliJ doesn't properly display `System.out` / `System.err` for running tests.
 
 
 - The output can be misleading and should not be used as a source of truth.
-
-## Contributing
-
-Contributions to the Test Engine are both welcomed and appreciated.
-
-The project uses a [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) branching strategy.
-
-- The [main](/) branch contains the latest unreleased code
-- Google checkstyle format is required
-- PMD is used for static analysis
-- Expand all Java imports
-- Tags are used for releases
-
-For changes, you should...
-
-- Fork the repository
-- Create a branch for your work
-- Make changes on your branch
-- Build and test your changes
-- Open a pull request, tagging `@antublue` for review
-- A [Developer Certificate of Origin](DCO.md) (DCO) is required for all contributions
 
 ## Design
 
