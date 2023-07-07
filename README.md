@@ -2,7 +2,7 @@
 
 <br/>
 
-![AntuBLUE logo](documentation/assets/logo.png)
+![AntuBLUE logo](assets/logo.png)
 
 # Test Engine
 
