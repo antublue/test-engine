@@ -111,6 +111,7 @@
             <groupId>org.antublue</groupId>
             <artifactId>test-engine-api</artifactId>
             <version>5.0.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
