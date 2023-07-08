@@ -183,11 +183,17 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         } catch (SuppressedStackTraceMojoExecutionException e) {
             throw e;
         } catch (JUnitException e) {
+            String message = e.getMessage();
+
+            if (e.getCause() != null) {
+                message = e.getCause().getMessage();
+            }
+
             StringBuilder stringBuilder =
                     new StringBuilder()
                             .append(System.lineSeparator())
                             .append(System.lineSeparator())
-                            .append(e.getCause().getMessage())
+                            .append(message)
                             .append(System.lineSeparator());
 
             throw new SuppressedStackTraceMojoExecutionException(stringBuilder.toString());

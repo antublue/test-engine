@@ -172,6 +172,16 @@
                         <configuration>
                             <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                             <finalName>${project.artifactId}-${project.version}</finalName>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.apiguardian:apiguardian-api</exclude>
+                                    <exclude>org.junit.jupiter:junit-jupiter-api</exclude>
+                                    <exclude>org.junit.platform:junit-platform-commons</exclude>
+                                    <exclude>org.junit.platform:junit-platform-engine</exclude>
+                                    <exclude>org.junit.platform:junit-platform-launcher</exclude>
+                                    <exclude>org.opentest4j:opentest4j</exclude>
+                                </excludes>
+                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
@@ -233,11 +243,13 @@
             <artifactId>test-engine-api</artifactId>
             <version>5.0.1</version>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.9.3</version>
         </dependency>
+        -->
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
