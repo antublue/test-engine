@@ -36,7 +36,7 @@ GitHub's Discussions is the current mechanism for help / support.
 
 # FAQ
 
-- [Fequently Asked Questions](FAQ.md)
+- [Frequently Asked Questions](FAQ.md)
 
 # Building
 
