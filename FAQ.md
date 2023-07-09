@@ -67,7 +67,7 @@ Examples:
 You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
 
 - It's not a "drop in" replacement.
-- Reference the [Design](https://github.com/antublue/test-engine#design) for the state machine flow.
+- Reference the [Design](/DOCUMENTATION.md#design) for the state machine flow.
 
 Example:
 
