@@ -15,7 +15,7 @@ public class ClassLockingTest1 {
     public static final String COUNTER_NAME = "annotated.class.counter";
 
     static {
-        Store.putIfAbsent(COUNTER_NAME, s -> new AtomicInteger());
+        Store.putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
     @TestEngine.Argument
