@@ -3,11 +3,10 @@ package org.antublue.test.engine.testing;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
-import org.junit.jupiter.api.Assertions;
 
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test for HumanReadableTime
@@ -43,7 +42,7 @@ public class HumanReadableTimeTest {
         String actualHumanReadableTime = HumanReadableTime.toHumanReadable(milliseconds);
 
         if (!actualHumanReadableTime.equals(expectedHumanReadableTime)) {
-            Assertions.fail(
+            fail(
                     String.format(
                             "testHumanReadableTime() milliseconds [%d] expected [%s] actual [%s]",
                             milliseconds,

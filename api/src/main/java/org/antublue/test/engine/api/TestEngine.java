@@ -113,15 +113,22 @@ public @interface TestEngine {
         String value();
     }
 
+    enum LockMode {
+        READ_WRITE,
+        READ;
+    }
+
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Lock {
         String value();
+        LockMode mode() default LockMode.READ_WRITE;
     }
 
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Unlock {
         String value();
+        LockMode mode() default LockMode.READ_WRITE;
     }
 }
