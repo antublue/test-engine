@@ -83,6 +83,10 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 - For `@TestEngine.Tag(<string>)` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`.
 
+
+- By default, `@TestEngine.Lock` and `@TestEngine.Unlock` use a `ReentrantReadWriteLock`, locking the write lock.
+  - You can add `mode=TestEngine.LockMode.READ` to use a read lock.
+
 ### What is an `Argument`?
 
 `Argument` is an interface all argument objects must implement to provide a name.
