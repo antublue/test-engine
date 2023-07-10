@@ -15,7 +15,7 @@ public class MultipleMethodsLockingTest1 {
     public static final String COUNTER_NAME = "annotated.multiple.methods.counter";
 
     static {
-        Store.putIfAbsent(COUNTER_NAME, s -> new AtomicInteger());
+        Store.putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
     @TestEngine.Argument
