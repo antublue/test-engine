@@ -62,6 +62,10 @@ Examples:
 
 - Locks are reentrant
 
+
+- By default, `@TestEngine.Lock` and `@TestEngine.Unlock` use a `ReentrantReadWriteLock`, locking the write lock.
+  - You can add `mode=TestEngine.LockMode.READ` to use a read lock.
+
 ### I want to use the test engine in place of JUnit 5
 
 You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
