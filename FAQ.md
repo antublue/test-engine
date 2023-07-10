@@ -1,6 +1,9 @@
 ## FAQ
 
+---
+
 ### Why not use JUnit 5?
+
 
 Currently, JUnit 5 does not support parameterized testing at the test class level (common for parameterized integration testing.)
 
@@ -11,6 +14,8 @@ Currently, JUnit 5 does not support parameterized testing at the test class leve
 
 
 - It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
+
+---
 
 ### Why not use JUnit 4?
 
@@ -29,6 +34,8 @@ JUnit 4 does provide test class level parameterization via `@RunWith(Parameteriz
 
 - It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
 
+---
+
 ### What is parameterized integration testing?
 
 Parameterized integration testing is most common when you...
@@ -40,6 +47,8 @@ Parameterized integration testing is most common when you...
 
 
 3. Various environments could involve different operating systems versions and/or different application runtime versions.
+
+---
 
 ### How to lock shared resources?
 
@@ -68,13 +77,17 @@ Examples:
 - By default, `@TestEngine.Lock` and `@TestEngine.Unlock` use a `ReentrantReadWriteLock`, locking the write lock.
   - You can add `mode=TestEngine.LockMode.READ` to use a read lock.
 
+---
+
 ### Why does `Store` use a `ReentrantLock`?
 
 Using a `ReentrantReadWriteLock` allows for finer grain access patterns, but relies on the end user to not call any `Store` methods that may change state.
 
 Using a `ReentrantLock` prevents the scenario.
 
-### I want to use the test engine in place of JUnit 5
+---
+
+### I want to use the Test Engine in place of JUnit 5
 
 You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
 
