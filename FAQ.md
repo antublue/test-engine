@@ -81,7 +81,7 @@ Examples:
 
 ### Why does `Store` use a `ReentrantLock`?
 
-Using a `ReentrantReadWriteLock` allows for finer grain access patterns, but relies on the end user to not call any `Store` methods that may change state.
+Using a `ReentrantReadWriteLock` allows for finer grain access patterns, but relies on the end user to not call any `Store` methods that may change values.
 
 Using a `ReentrantLock` prevents the scenario.
 
