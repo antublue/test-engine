@@ -24,7 +24,7 @@ Test Engine versions prior to `v4.2.3` should not be used due to a critical bug 
 
 For the current branch, reference the [Manual](MANUAL.md).
 
-For a release, reference the `release-<VERSION>` branch for documentation for the release you are using.
+For a specific release, reference the `release-<VERSION>` branch for relevant documentation.
 
 - [v5.0.0](https://github.com/antublue/test-engine/tree/release-5.0.0)
 - [v4.3.1](https://github.com/antublue/test-engine/tree/release-4.3.1)
