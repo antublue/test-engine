@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Class to process @TestEngine.Lock and @TestEngine.Unlock annotations
@@ -33,7 +34,7 @@ public class TestEngineLockUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineLockUtils.class);
 
-    private static final Map<String, ReentrantLock> LOCK_MAP = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<String, ReentrantReadWriteLock> LOCK_MAP = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * Constructor
@@ -52,13 +53,19 @@ public class TestEngineLockUtils {
         if (annotation != null) {
             LOGGER.trace("processLock(%s, %s)", method.getDeclaringClass().getName(), method.getName());
             String name = annotation.value();
+            TestEngine.LockMode mode = annotation.mode();
             if (name != null && !name.trim().isEmpty()) {
                 name = name.trim();
-                LOCK_MAP.computeIfAbsent(name, n -> new ReentrantLock(true)).lock();
+                if (mode == TestEngine.LockMode.READ_WRITE) {
+                    LOCK_MAP.computeIfAbsent(name, n -> new ReentrantReadWriteLock(true)).writeLock().lock();
+                } else {
+                    LOCK_MAP.computeIfAbsent(name, n -> new ReentrantReadWriteLock(true)).readLock().lock();
+                }
                 LOGGER.trace(
                         String.format(
-                                "Lock [%s] acquired for class [%s] method [%s]",
+                                "Lock [%s] [%s] acquired for class [%s] method [%s]",
                                 name,
+                                mode,
                                 method.getDeclaringClass().getName(),
                                 method.getName()));
             }
@@ -75,17 +82,23 @@ public class TestEngineLockUtils {
         if (annotation != null) {
             LOGGER.trace("processUnlock(%s, %s)", method.getDeclaringClass().getName(), method.getName());
             String name = annotation.value();
+            TestEngine.LockMode mode = annotation.mode();
             if (name != null && !name.trim().isEmpty()) {
                 name = name.trim();
-                ReentrantLock reentrantLock = LOCK_MAP.get(name);
-                if (reentrantLock != null) {
+                ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
+                if (reentrantReadWriteLock != null) {
                     LOGGER.trace(
                             String.format(
-                                    "Lock [%s] released for class [%s] method [%s]",
+                                    "Lock [%s] mode [%s] released for class [%s] method [%s]",
                                     name,
+                                    mode,
                                     method.getDeclaringClass().getName(),
                                     method.getName()));
-                    reentrantLock.unlock();
+                    if (mode == TestEngine.LockMode.READ_WRITE) {
+                        reentrantReadWriteLock.writeLock().unlock();
+                    } else {
+                        reentrantReadWriteLock.readLock().unlock();
+                    }
                 } else {
                     throw new TestClassConfigurationException(
                             String.format(
