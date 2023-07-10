@@ -26,9 +26,9 @@ import java.util.function.Function;
 /**
  * Class to implement a singleton Store
  * <p>
- * Store methods are atomic and thread-safe. Complex usage should lock the Store using either lock() / unlock() or use the Lock returned from getLock().
+ * Store methods are atomic and thread-safe. Complex usage should lock the Store using either lock() / unlock() or use the Lock returned from getLock()
  * <p>
- * Locking of Objects in the Store is the responsibility of the caller.
+ * Locking of Objects in the Store is the responsibility of the calling code
  */
 public class Store {
 
@@ -43,7 +43,7 @@ public class Store {
     }
 
     /**
-     * Method to lock the Store, returning the Lock
+     * Method to lock the Store, returning the Store's Lock
      *
      * @return the Lock
      */
@@ -53,9 +53,9 @@ public class Store {
     }
 
     /**
-     * Method to unlock the Store, returning the Lock
+     * Method to unlock the Store, returning the Store's Lock
      *
-     * @return the Lock
+     * @return the Store Lock
      */
     public static Lock unlock() {
         LOCK.unlock();
@@ -65,20 +65,22 @@ public class Store {
     /**
      * Method to get the Store's Lock
      *
-     * @return the Lock
+     * @return the Store Lock
      */
     public static Lock getLock() {
         return LOCK;
     }
 
     /**
-     * Method to put an Object into the Store
+     * Method to put an Object into the Store. Accepts a null Object.
      *
      * @param key key
      * @param object object
-     * @return an Optional containing the existing Object, or an empty Optional if an Object didn't exist
+     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
      */
     public static Optional<Object> put(String key, Object object) {
+        key = validateKey(key);
+
         try {
             lock();
             return Optional.ofNullable(MAP.put(key, object));
@@ -88,13 +90,16 @@ public class Store {
     }
 
     /**
-     * Method to put an Object into the store if it's not present
+     * Method to put an Object into the store. If an Object doesn't exist, execute the Function to create an Object and store it
      *
      * @param key key
      * @param function function
-     * @return an Optional containing the existing Object, or an empty Optional if an Object didn't exist
+     * @return an Optional containing the existing Object, or an Optional containing the Object returned by the Function
      */
     public static Optional<Object> putIfAbsent(String key, Function<String, Object> function) {
+        key = validateKey(key);
+        validateObject(function, "function is null");
+
         try {
             lock();
             return Optional.ofNullable(MAP.computeIfAbsent(key, function));
@@ -107,9 +112,11 @@ public class Store {
      * Method to get an Object from the Store
      *
      * @param key key
-     * @return an Optional that contains the Object
+     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
      */
     public static Optional<Object> get(String key) {
+        key = validateKey(key);
+
         try {
             lock();
             return Optional.ofNullable(MAP.get(key));
@@ -119,19 +126,53 @@ public class Store {
     }
 
     /**
-     * Method to get an Object from the Store
+     * Method to get an Object from the Store cast to a specific type
      *
      * @param key key
      * @param clazz clazz
-     * @return an Optional that contains the Object
+     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
      * @param <T>
      */
     public static <T> Optional<T> get(String key, Class<T> clazz) {
+        key = validateKey(key);
+        validateObject(clazz, "class is null");
+
         try {
             lock();
             return Optional.ofNullable(clazz.cast(MAP.get(key)));
         } finally {
             unlock();
+        }
+    }
+
+    /**
+     * Method to validate a key is not null and not blank
+     *
+     * @param key key
+     * @return the key trimmed
+     */
+    private static String validateKey(String key) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
+        }
+
+        key = key.trim();
+        if (key.isEmpty()) {
+            throw new IllegalArgumentException("key is empty");
+        }
+
+        return key;
+    }
+
+    /**
+     * Method to validate an Object is not null
+     *
+     * @param object object
+     * @param message message
+     */
+    private static void validateObject(Object object, String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
         }
     }
 }
