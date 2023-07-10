@@ -2,6 +2,7 @@ package org.antublue.test.engine.testing;
 
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.stream.Stream;
 
@@ -41,7 +42,7 @@ public class DebugTestA {
     public void test2() {
         System.out.println("test2(" + integerArgument.value() + ")");
         if (integerArgument.value() == 1) {
-            throw new AssertionError("FORCED");
+            Assertions.fail("FORCED");
         }
     }
 
