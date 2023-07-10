@@ -57,6 +57,8 @@ Examples:
 - [MethodLockingTest2.java](/examples/src/test/java/example/locking/MethodLockingTest2.java)
 - [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest1.java)
 - [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest2.java)
+- [LockModeTest1.java](/examples/src/test/java/example/locking/LockModeTest1.java)
+- [LockModeTest2.java](/examples/src/test/java/example/locking/LockModeTest2.java)
 
 **Notes**
 
