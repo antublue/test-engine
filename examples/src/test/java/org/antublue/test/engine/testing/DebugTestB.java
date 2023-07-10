@@ -2,6 +2,7 @@ package org.antublue.test.engine.testing;
 
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.stream.Stream;
 
@@ -45,7 +46,7 @@ public class DebugTestB {
         System.out.println("test2(" + stringArgument  + ")");
         assertThat(stringArgument.value().getClass()).isEqualTo(String.class);
         if (stringArgument.value().equals("b")) {
-            throw new AssertionError("FORCED");
+            Assertions.fail("FORCED");
         }
     }
 
