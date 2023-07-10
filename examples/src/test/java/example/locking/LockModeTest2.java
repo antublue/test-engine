@@ -46,7 +46,7 @@ public class LockModeTest2 {
     @TestEngine.Test
     @TestEngine.Lock(value=LOCK_NAME,mode=TestEngine.LockMode.READ_WRITE)
     @TestEngine.Unlock(value=LOCK_NAME,mode=TestEngine.LockMode.READ_WRITE)
-    public void test1() throws InterruptedException {
+    public void test1() {
         System.out.println("test1()");
 
         int count = Store.get(COUNTER_NAME, Integer.class).get();
@@ -74,7 +74,7 @@ public class LockModeTest2 {
     @TestEngine.Test
     @TestEngine.Lock(value=LOCK_NAME,mode=TestEngine.LockMode.READ)
     @TestEngine.Unlock(value=LOCK_NAME,mode=TestEngine.LockMode.READ)
-    public void test2() throws InterruptedException {
+    public void test2() {
         System.out.println("test2()");
         int count = Store.get(COUNTER_NAME, Integer.class).get();
         if (count != 0) {

@@ -47,7 +47,7 @@ public class MethodLockingTest2 {
     @TestEngine.Test
     @TestEngine.Lock(value=LOCK_NAME)
     @TestEngine.Unlock(value=LOCK_NAME)
-    public void test1() throws InterruptedException {
+    public void test1() {
         System.out.println("test1()");
 
         AtomicInteger atomicInteger = Store.get(COUNTER_NAME, AtomicInteger.class).get();

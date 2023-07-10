@@ -46,7 +46,7 @@ public class ClassLockingTest1 {
     }
 
     @TestEngine.Test
-    public void test1() throws InterruptedException {
+    public void test1() {
         System.out.println("test1()");
 
         AtomicInteger atomicInteger = Store.get(COUNTER_NAME, AtomicInteger.class).get();
@@ -78,7 +78,7 @@ public class ClassLockingTest1 {
 
     @TestEngine.Conclude
     @TestEngine.Unlock(value=LOCK_NAME)
-    public void conclude() throws InterruptedException {
+    public void conclude() {
         System.out.println("conclude()");
     }
 }
