@@ -46,7 +46,7 @@ public class MultipleMethodsLockingTest1 {
     }
 
     @TestEngine.Test
-    public void test1() throws InterruptedException {
+    public void test1() {
         System.out.println("test1()");
 
         AtomicInteger atomicInteger = Store.get(COUNTER_NAME, AtomicInteger.class).get();
