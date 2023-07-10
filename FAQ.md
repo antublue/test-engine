@@ -56,18 +56,23 @@ The test engine runs multiple test classes in parallel (arguments within a test 
 
 For some test scenarios, shared resources may need to be used.
 
-The test engine provides the `@TestEngine.Lock` and `@TestEngine.Unlock` annotations for resource locking.
+The test engine provides the `@TestEngine.Lock`, `@TestEngine.Unlock`, `@TestEngine.ResourceLock` annotations for resource locking.
 
 Examples:
 
 - [ClassLockingTest1.java](/examples/src/test/java/example/locking/ClassLockingTest1.java)
 - [ClassLockingTest2.java](/examples/src/test/java/example/locking/ClassLockingTest2.java)
+- [LockModeTest1.java](/examples/src/test/java/example/locking/LockModeTest1.java)
+- [LockModeTest2.java](/examples/src/test/java/example/locking/LockModeTest2.java)
+- [MethodLockingMultipleLocksTest1.java](/examples/src/test/java/example/locking/MethodLockingMultipleLocksTest1.java)
+- [MethodLockingMultipleLocksTest2.java](/examples/src/test/java/example/locking/MethodLockingMultipleLocksTest2.java) 
 - [MethodLockingTest1.java](/examples/src/test/java/example/locking/MethodLockingTest1.java)
 - [MethodLockingTest2.java](/examples/src/test/java/example/locking/MethodLockingTest2.java)
 - [MultipleMethodsLockingTest1.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest1.java)
 - [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest2.java)
-- [LockModeTest1.java](/examples/src/test/java/example/locking/LockModeTest1.java)
-- [LockModeTest2.java](/examples/src/test/java/example/locking/LockModeTest2.java)
+- [ResourceLockMethodLockingTest1.java](/examples/src/test/java/example/locking/ResourceLockMethodLockingTest1.java)
+- [ResourceLockMethodLockingTest2.java](/examples/src/test/java/example/locking/ResourceLockMethodLockingTest2.java)
+
 
 **Notes**
 
