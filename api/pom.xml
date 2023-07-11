@@ -215,7 +215,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <configLocation>checkstyle/google_checks.xml</configLocation>
+                    <configLocation>../checkstyle/google_checks.xml</configLocation>
                 </configuration>
                 <executions>
                     <execution>
