@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 
 /**
- * Class to process @TestEngine.Lock and @TestEngine.Unlock annotations
+ * Class to process @TestEngine.Lock, @TestEngine.Unlock, @TestEngine.ResourceLock annotations
  */
 public class TestEngineLockUtils {
 
@@ -47,7 +47,7 @@ public class TestEngineLockUtils {
     }
 
     /**
-     * Method to process a @TestEngine.Lock annotation for a Method if it exists
+     * Method to perform locking on a Method, if annotated
      *
      * @param method
      */
@@ -55,22 +55,29 @@ public class TestEngineLockUtils {
         Annotation[] annotations = method.getAnnotations();
         for (Annotation annotation : annotations) {
             if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.class)) {
-                TestEngine.Lock lockAnnotation = TestEngine.Lock.class.cast(annotation);
-                processLock(method, lockAnnotation.value(), lockAnnotation.mode());
+                TestEngine.Lock lockAnnotation = (TestEngine.Lock) annotation;
+                lock(method, lockAnnotation.value(), lockAnnotation.mode());
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.List.class)) {
-                TestEngine.Lock.List lockListAnnotation = TestEngine.Lock.List.class.cast(annotation);
-                Stream.of(lockListAnnotation.value()).forEach(lock -> processLock(method, lock.value(), lock.mode()));
+                TestEngine.Lock.List lockListAnnotation = (TestEngine.Lock.List) annotation;
+                Stream.of(lockListAnnotation.value()).forEach(lock -> lock(method, lock.value(), lock.mode()));
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.class)) {
-                TestEngine.ResourceLock lockAnnotation = TestEngine.ResourceLock.class.cast(annotation);
-                processLock(method, lockAnnotation.value(), lockAnnotation.mode());
+                TestEngine.ResourceLock lockAnnotation = (TestEngine.ResourceLock) annotation;
+                lock(method, lockAnnotation.value(), lockAnnotation.mode());
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.List.class)) {
-                TestEngine.ResourceLock.List lockListAnnotation = TestEngine.ResourceLock.List.class.cast(annotation);
-                Stream.of(lockListAnnotation.value()).forEach(lock -> processLock(method, lock.value(), lock.mode()));
+                TestEngine.ResourceLock.List lockListAnnotation = (TestEngine.ResourceLock.List) annotation;
+                Stream.of(lockListAnnotation.value()).forEach(lock -> lock(method, lock.value(), lock.mode()));
             }
         }
     }
 
-    private static void processLock(Method method, String name, TestEngine.LockMode mode) {
+    /**
+     * Method to perform locking
+     *
+     * @param method method
+     * @param name name
+     * @param mode mode
+     */
+    private static void lock(Method method, String name, TestEngine.LockMode mode) {
         if (name != null && !name.trim().isEmpty()) {
             name = name.trim();
             if (mode == TestEngine.LockMode.READ_WRITE) {
@@ -81,7 +88,7 @@ public class TestEngineLockUtils {
 
             LOGGER.trace(
                     String.format(
-                            "Lock [%s] mode [%s] acquired for class [%s] method [%s]",
+                            "Locking [%s] mode [%s] for class [%s] method [%s]",
                             name,
                             mode,
                             method.getDeclaringClass().getName(),
@@ -90,7 +97,7 @@ public class TestEngineLockUtils {
     }
 
     /**
-     * Method to process a @TestEngine.Unlock annotation for a Method if it exists
+     * Method to perform unlocking on a Method, if annotated
      *
      * @param method
      */
@@ -98,31 +105,38 @@ public class TestEngineLockUtils {
         Annotation[] annotations = method.getAnnotations();
         for (Annotation annotation : annotations) {
             if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.class)) {
-                TestEngine.Lock lockAnnotation = TestEngine.Lock.class.cast(annotation);
-                processUnlock(method, lockAnnotation.value(), lockAnnotation.mode());
+                TestEngine.Lock lockAnnotation = (TestEngine.Lock) annotation;
+                unlock(method, lockAnnotation.value(), lockAnnotation.mode());
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.List.class)) {
-                TestEngine.Lock.List lockListAnnotation = TestEngine.Lock.List.class.cast(annotation);
-                Stream.of(lockListAnnotation.value()).forEach(lock -> processUnlock(method, lock.value(), lock.mode()));
+                TestEngine.Lock.List lockListAnnotation = (TestEngine.Lock.List) annotation;
+                Stream.of(lockListAnnotation.value()).forEach(lock -> unlock(method, lock.value(), lock.mode()));
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.class)) {
-                TestEngine.ResourceLock lockAnnotation = TestEngine.ResourceLock.class.cast(annotation);
-                processUnlock(method, lockAnnotation.value(), lockAnnotation.mode());
+                TestEngine.ResourceLock lockAnnotation = (TestEngine.ResourceLock) annotation;
+                unlock(method, lockAnnotation.value(), lockAnnotation.mode());
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.List.class)) {
-                TestEngine.ResourceLock.List lockListAnnotation = TestEngine.ResourceLock.List.class.cast(annotation);
+                TestEngine.ResourceLock.List lockListAnnotation = (TestEngine.ResourceLock.List) annotation;
                 List<TestEngine.ResourceLock> list = Arrays.asList(lockListAnnotation.value());
                 Collections.reverse(list);
-                list.stream().forEach(lock -> processUnlock(method, lock.value(), lock.mode()));
+                list.stream().forEach(lock -> unlock(method, lock.value(), lock.mode()));
             }
         }
     }
 
-    private static void processUnlock(Method method, String name, TestEngine.LockMode mode) {
+    /**
+     * Method to perform unlocking
+     *
+     * @param method method
+     * @param name name
+     * @param mode mode
+     */
+    private static void unlock(Method method, String name, TestEngine.LockMode mode) {
         if (name != null && !name.trim().isEmpty()) {
             name = name.trim();
             ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
             if (reentrantReadWriteLock != null) {
                 LOGGER.trace(
                         String.format(
-                                "Unlock [%s] mode [%s] released for class [%s] method [%s]",
+                                "Unlocking [%s] mode [%s] for class [%s] method [%s]",
                                 name,
                                 mode,
                                 method.getDeclaringClass().getName(),
