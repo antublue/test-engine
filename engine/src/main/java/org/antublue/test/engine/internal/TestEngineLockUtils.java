@@ -20,11 +20,15 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Stream;
 
 /**
  * Class to process @TestEngine.Lock and @TestEngine.Unlock annotations
@@ -48,26 +52,40 @@ public class TestEngineLockUtils {
      * @param method
      */
     public static void processLock(Method method) {
-        TestEngine.Lock annotation = method.getAnnotation(TestEngine.Lock.class);
-        if (annotation != null) {
-            LOGGER.trace("processLock(%s, %s)", method.getDeclaringClass().getName(), method.getName());
-            String name = annotation.value();
-            TestEngine.LockMode mode = annotation.mode();
-            if (name != null && !name.trim().isEmpty()) {
-                name = name.trim();
-                if (mode == TestEngine.LockMode.READ_WRITE) {
-                    LOCK_MAP.computeIfAbsent(name, n -> new ReentrantReadWriteLock(true)).writeLock().lock();
-                } else {
-                    LOCK_MAP.computeIfAbsent(name, n -> new ReentrantReadWriteLock(true)).readLock().lock();
-                }
-                LOGGER.trace(
-                        String.format(
-                                "Lock [%s] [%s] acquired for class [%s] method [%s]",
-                                name,
-                                mode,
-                                method.getDeclaringClass().getName(),
-                                method.getName()));
+        Annotation[] annotations = method.getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.class)) {
+                TestEngine.Lock lockAnnotation = TestEngine.Lock.class.cast(annotation);
+                processLock(method, lockAnnotation.value(), lockAnnotation.mode());
+            } else if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.List.class)) {
+                TestEngine.Lock.List lockListAnnotation = TestEngine.Lock.List.class.cast(annotation);
+                Stream.of(lockListAnnotation.value()).forEach(lock -> processLock(method, lock.value(), lock.mode()));
+            } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.class)) {
+                TestEngine.ResourceLock lockAnnotation = TestEngine.ResourceLock.class.cast(annotation);
+                processLock(method, lockAnnotation.value(), lockAnnotation.mode());
+            } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.List.class)) {
+                TestEngine.ResourceLock.List lockListAnnotation = TestEngine.ResourceLock.List.class.cast(annotation);
+                Stream.of(lockListAnnotation.value()).forEach(lock -> processLock(method, lock.value(), lock.mode()));
             }
+        }
+    }
+
+    private static void processLock(Method method, String name, TestEngine.LockMode mode) {
+        if (name != null && !name.trim().isEmpty()) {
+            name = name.trim();
+            if (mode == TestEngine.LockMode.READ_WRITE) {
+                LOCK_MAP.computeIfAbsent(name, n -> new ReentrantReadWriteLock(true)).writeLock().lock();
+            } else {
+                LOCK_MAP.computeIfAbsent(name, n -> new ReentrantReadWriteLock(true)).readLock().lock();
+            }
+
+            LOGGER.trace(
+                    String.format(
+                            "Lock [%s] mode [%s] acquired for class [%s] method [%s]",
+                            name,
+                            mode,
+                            method.getDeclaringClass().getName(),
+                            method.getName()));
         }
     }
 
@@ -77,34 +95,49 @@ public class TestEngineLockUtils {
      * @param method
      */
     public static void processUnlock(Method method) {
-        TestEngine.Unlock annotation = method.getAnnotation(TestEngine.Unlock.class);
-        if (annotation != null) {
-            LOGGER.trace("processUnlock(%s, %s)", method.getDeclaringClass().getName(), method.getName());
-            String name = annotation.value();
-            TestEngine.LockMode mode = annotation.mode();
-            if (name != null && !name.trim().isEmpty()) {
-                name = name.trim();
-                ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
-                if (reentrantReadWriteLock != null) {
-                    LOGGER.trace(
-                            String.format(
-                                    "Lock [%s] mode [%s] released for class [%s] method [%s]",
-                                    name,
-                                    mode,
-                                    method.getDeclaringClass().getName(),
-                                    method.getName()));
-                    if (mode == TestEngine.LockMode.READ_WRITE) {
-                        reentrantReadWriteLock.writeLock().unlock();
-                    } else {
-                        reentrantReadWriteLock.readLock().unlock();
-                    }
+        Annotation[] annotations = method.getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.class)) {
+                TestEngine.Lock lockAnnotation = TestEngine.Lock.class.cast(annotation);
+                processUnlock(method, lockAnnotation.value(), lockAnnotation.mode());
+            } else if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.List.class)) {
+                TestEngine.Lock.List lockListAnnotation = TestEngine.Lock.List.class.cast(annotation);
+                Stream.of(lockListAnnotation.value()).forEach(lock -> processUnlock(method, lock.value(), lock.mode()));
+            } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.class)) {
+                TestEngine.ResourceLock lockAnnotation = TestEngine.ResourceLock.class.cast(annotation);
+                processUnlock(method, lockAnnotation.value(), lockAnnotation.mode());
+            } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.List.class)) {
+                TestEngine.ResourceLock.List lockListAnnotation = TestEngine.ResourceLock.List.class.cast(annotation);
+                List<TestEngine.ResourceLock> list = Arrays.asList(lockListAnnotation.value());
+                Collections.reverse(list);
+                list.stream().forEach(lock -> processUnlock(method, lock.value(), lock.mode()));
+            }
+        }
+    }
+
+    private static void processUnlock(Method method, String name, TestEngine.LockMode mode) {
+        if (name != null && !name.trim().isEmpty()) {
+            name = name.trim();
+            ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
+            if (reentrantReadWriteLock != null) {
+                LOGGER.trace(
+                        String.format(
+                                "Unlock [%s] mode [%s] released for class [%s] method [%s]",
+                                name,
+                                mode,
+                                method.getDeclaringClass().getName(),
+                                method.getName()));
+                if (mode == TestEngine.LockMode.READ_WRITE) {
+                    reentrantReadWriteLock.writeLock().unlock();
                 } else {
-                    throw new TestClassConfigurationException(
-                            String.format(
-                                    "@TestEngine.Unlock without @TestEngine.Lock, class [%s] method [%s]",
-                                    method.getDeclaringClass().getName(),
-                                    method.getName()));
+                    reentrantReadWriteLock.readLock().unlock();
                 }
+            } else {
+                throw new TestClassConfigurationException(
+                        String.format(
+                                "@TestEngine.Unlock without @TestEngine.Lock, class [%s] method [%s]",
+                                method.getDeclaringClass().getName(),
+                                method.getName()));
             }
         }
     }

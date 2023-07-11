@@ -67,8 +67,9 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 | `@TestEngine.Order(<int>)`  | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
 | `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
 | `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
-| `@TestEngine.Lock`          | method           | no       | Provides a way to acquire a named `ReentrantLock` and lock it before method execution                                              |
-| `@TestEngine.UnLock`        | method           | no       | Provides a way to acquire a named `ReentrantLock` and unlock it after method execution                                             |
+| `@TestEngine.Lock`          | method           | no       | Provides a way to acquire a named lock, and lock it before method execution                                                        |
+| `@TestEngine.Unlock`        | method           | no       | Provides a way to acquire a named lock, and unlock it after method execution                                                       |
+| `@TestEngine.ResourceLock`  | method           | no       | Provides a way to acquire a named lock, locking it before method execution and unlocking it after method execution                 |
 
 **Notes**
 
@@ -84,8 +85,11 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - For `@TestEngine.Tag(<string>)` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`.
 
 
-- By default, `@TestEngine.Lock` and `@TestEngine.Unlock` use a `ReentrantReadWriteLock`, locking the write lock.
+- By default, `@TestEngine.Lock`, `@TestEngine.Unlock`, and `@TestEngine.ResourceLock` use a `ReentrantReadWriteLock`, locking the write lock.
   - You can add `mode=TestEngine.LockMode.READ` to use a read lock.
+
+
+- `@TestEngine.Lock`, `@TestEngine.Unlock`, and `@TestEngine.ResourceLock` are all repeatable.
 
 ### What is an `Argument`?
 
