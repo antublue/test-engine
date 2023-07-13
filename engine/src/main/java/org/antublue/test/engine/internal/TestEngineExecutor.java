@@ -122,10 +122,12 @@ public class TestEngineExecutor {
 
         @Override
         public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
-            try {
-                executor.getQueue().put(runnable);
-            } catch (InterruptedException e) {
-                LOGGER.error("Runnable discarded!!!");
+            if (!executor.isShutdown()) {
+                try {
+                    executor.getQueue().put(runnable);
+                } catch (InterruptedException e) {
+                    LOGGER.error("Runnable discarded!!!");
+                }
             }
         }
     }
