@@ -76,14 +76,13 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
     private final EngineDiscoveryRequest engineDiscoveryRequest;
     private final EngineDescriptor engineDescriptor;
 
+    /**
+     * Class to implement a Predicate to determine if a Class is a test class
+     */
     private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
         if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
-                || clazz.isAnnotationPresent(TestEngine.Disabled.class)) {
-            LOGGER.trace("class [%s] excluded", clazz.getName());
-            return false;
-        }
-
-        if (Modifier.isAbstract(clazz.getModifiers())
+                || clazz.isAnnotationPresent(TestEngine.Disabled.class)
+                || Modifier.isAbstract(clazz.getModifiers())
                 || TestEngineReflectionUtils.getTestMethods(clazz).isEmpty()) {
             LOGGER.trace("class [%s] excluded", clazz.getName());
             return false;
@@ -93,8 +92,13 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
         return true;
     };
 
+    /**
+     * Class to implement a Predicate to determine if a Method is a test method
+     */
     private static final Predicate<Method> IS_TEST_METHOD = method -> {
-        boolean result = TestEngineReflectionUtils.getTestMethods(method.getDeclaringClass()).contains(method);
+        boolean result =
+                !method.isAnnotationPresent(TestEngine.Disabled.class)
+                && TestEngineReflectionUtils.getTestMethods(method.getDeclaringClass()).contains(method);
         LOGGER.trace("class [%s] = [%b]", method.getDeclaringClass().getName(), result);
         return result;
     };
