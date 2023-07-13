@@ -24,16 +24,30 @@ import org.junit.platform.engine.discovery.ClassNameFilter;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**
+ * Class to implement a Predicate to filter a Class based on a List of ClassNameFilters
+ */
 public class ClassNameFiltersPredicate implements Predicate<Class<?>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassNameFiltersPredicate.class);
 
     private final List<ClassNameFilter> classNameFilters;
 
+    /**
+     * Constructor
+     *
+     * @param classNameFilters classNameFilters
+     */
     public ClassNameFiltersPredicate(List<ClassNameFilter> classNameFilters) {
         this.classNameFilters = classNameFilters;
     }
 
+    /**
+     * Method to test a Class
+     *
+     * @param clazz the input argument
+     * @return the return value
+     */
     @Override
     public boolean test(Class<?> clazz) {
         if (classNameFilters == null || classNameFilters.isEmpty()) {
