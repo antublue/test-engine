@@ -18,6 +18,9 @@ package org.antublue.test.engine.internal.util;
 
 import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE;
 
+/**
+ * Class to implement ANSI colors
+ */
 // Based on https://www.w3schools.blog/ansi-colors-java
 public class AnsiColor {
 
