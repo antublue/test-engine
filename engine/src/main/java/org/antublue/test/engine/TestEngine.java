@@ -126,7 +126,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             System.exit(1);
         }
 
-        // Return the EngineDescriptor with all child TestDescriptor
+        // Return the EngineDescriptor with all child TestDescriptors
         return extendedEngineDescriptor;
     }
 
