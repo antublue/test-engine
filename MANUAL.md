@@ -156,7 +156,7 @@ Add the AntuBLUE Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>5.0.1</version>
+  <version>5.1.0</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -175,12 +175,12 @@ Add the AntuBLUE Test Engine jars...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>5.0.1</version>
+    <version>5.1.0</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>5.0.1</version>
+    <version>5.1.0</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -320,10 +320,10 @@ Example
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine 5.0.1 Summary
+[INFO] AntuBLUE Test Engine 5.1.0 Summary
 [INFO] ------------------------------------------------------------------------
-[INFO] Test Classes   :  64, PASSED :  64, FAILED : 0, SKIPPED : 0
-[INFO] Test Methods   : 803, PASSED : 803, FAILED : 0, SKIPPED : 0
+[INFO] Test Classes :  62, PASSED :  62, FAILED : 0, SKIPPED : 0
+[INFO] Test Methods : 791, PASSED : 791, FAILED : 0, SKIPPED : 0
 [INFO] ------------------------------------------------------------------------
 [INFO] PASSED
 [INFO] ------------------------------------------------------------------------

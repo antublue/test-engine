@@ -26,7 +26,6 @@ import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestDescriptorUtils;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorString;
-import org.antublue.test.engine.internal.util.Cast;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.antublue.test.engine.internal.util.Switch;
 import org.junit.platform.engine.TestDescriptor;
@@ -198,7 +197,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                     // DO NOTHING
                 }),
                 Switch.switchCase(ClassTestDescriptor.class, consumer -> {
-                    ClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
+                    ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
                     Class<?> testClass = classTestDescriptor.getTestClass();
                     if (logTestMessages) {
                         stringBuilder
@@ -209,7 +208,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(ArgumentTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
-                        ArgumentTestDescriptor argumentTestDescriptor = Cast.cast(testDescriptor);
+                        ArgumentTestDescriptor argumentTestDescriptor = (ArgumentTestDescriptor) testDescriptor;
                         Class<?> testClass = argumentTestDescriptor.getTestClass();
                         Argument testArgument = argumentTestDescriptor.getTestArgument();
                         String testArgumentName = testArgument.name();
@@ -223,7 +222,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(MethodTestDescriptor.class, consumer -> {
                     if (logTestMessages) {
-                        MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
+                        MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
                         Class<?> testClass = methodTestDescriptor.getTestClass();
                         Method testMethod = methodTestDescriptor.getTestMethod();
                         Argument testArgument = methodTestDescriptor.getTestArgument();
@@ -265,7 +264,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(ClassTestDescriptor.class, consumer -> {
                     if (logSkipMessages) {
-                        ClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
+                        ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
                         Class<?> testClass = classTestDescriptor.getTestClass();
                         stringBuilder
                                 .append(SKIP)
@@ -275,7 +274,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(ArgumentTestDescriptor.class, consumer -> {
                     if (logSkipMessages) {
-                        ArgumentTestDescriptor argumentTestDescriptor = Cast.cast(testDescriptor);
+                        ArgumentTestDescriptor argumentTestDescriptor = (ArgumentTestDescriptor) testDescriptor;
                         Class<?> testClass = argumentTestDescriptor.getTestClass();
                         Argument testArgument = argumentTestDescriptor.getTestArgument();
                         String testArgumentName = testArgument.name();
@@ -289,7 +288,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(MethodTestDescriptor.class, consumer -> {
                     if (logSkipMessages) {
-                        MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
+                        MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
                         Class<?> testClass = methodTestDescriptor.getTestClass();
                         Method testMethod = methodTestDescriptor.getTestMethod();
                         Argument testArgument = methodTestDescriptor.getTestArgument();
@@ -336,7 +335,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(ClassTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        ClassTestDescriptor classTestDescriptor = Cast.cast(testDescriptor);
+                        ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
                         Class<?> testClass = classTestDescriptor.getTestClass();
                         stringBuilder
                                 .append("%s | ")
@@ -345,7 +344,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(ArgumentTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        ArgumentTestDescriptor argumentTestDescriptor = Cast.cast(testDescriptor);
+                        ArgumentTestDescriptor argumentTestDescriptor = (ArgumentTestDescriptor) testDescriptor;
                         Class<?> testClass = argumentTestDescriptor.getTestClass();
                         Argument testArgument = argumentTestDescriptor.getTestArgument();
                         String testArgumentName = testArgument.name();
@@ -358,7 +357,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                 }),
                 Switch.switchCase(MethodTestDescriptor.class, consumer -> {
                     if (logPassMessages) {
-                        MethodTestDescriptor methodTestDescriptor = Cast.cast(testDescriptor);
+                        MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
                         Class<?> testClass = methodTestDescriptor.getTestClass();
                         Method testMethod = methodTestDescriptor.getTestMethod();
                         Argument testArgument = methodTestDescriptor.getTestArgument();
