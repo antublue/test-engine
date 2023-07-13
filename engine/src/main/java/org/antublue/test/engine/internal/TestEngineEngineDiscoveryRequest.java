@@ -227,6 +227,9 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
         return engineDiscoveryRequest.getDiscoveryListener();
     }
 
+    /**
+     * Method to resolve selectors
+     */
     public void resolve() {
         LOGGER.trace("resolve()");
 
