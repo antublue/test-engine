@@ -30,52 +30,32 @@ then
   exit 1
 fi
 
-RELEASE="${1}"
+VERSION="${1}"
 CURRENT_DIRECTORY=${PWD}
 CURRENT_DIRECTORY=${CURRENT_DIRECTORY:-/}
 
-git checkout -b "release-${RELEASE}"
-check_exit_code "Git checkout [${RELEASE}] failed"
+git checkout -b "release-${VERSION}"
+check_exit_code "Git checkout [${VERSION}] failed"
 
-mvn versions:set -DnewVersion="${RELEASE}"
-check_exit_code "Maven update [parent] versions failed"
+mvn versions:set -DnewVersion="${VERSION}" -DprocessAllModules
+check_exit_code "Maven update versions [${VERSION}] failed"
 rm -Rf `find . -name "*versionsBackup"`
-
-cd ${CURRENT_DIRECTORY}/api
-mvn versions:set -DnewVersion="${RELEASE}"
-check_exit_code "Maven update [api] versions failed"
-rm -Rf `find . -name *versionsBackup`
-
-cd ${CURRENT_DIRECTORY}/engine
-mvn versions:set -DnewVersion="${RELEASE}"
-check_exit_code "Maven update [engine] versions failed"
-rm -Rf `find . -name *versionsBackup`
-
-cd ${CURRENT_DIRECTORY}/plugin
-mvn versions:set -DnewVersion="${RELEASE}"
-check_exit_code "Maven update [plugin] versions failed"
-rm -Rf `find . -name *versionsBackup`
-
-cd ${CURRENT_DIRECTORY}/examples
-mvn versions:set -DnewVersion="${RELEASE}"
-check_exit_code "Maven update [examples] versions"
-rm -Rf `find . -name *versionsBackup`
 
 cd ${CURRENT_DIRECTORY}
 ./mvnw clean verify
-check_exit_code "Maven build failed"
+check_exit_code "Maven build [${VERSION}] failed"
 
 git add -u
 check_exit_code "Git add failed"
 
-git commit -m "${RELEASE}"
+git commit -m "${VERSION}"
 check_exit_code "Git commit failed"
 
 ./mvnw -s ~/.m2/antublue.settings.xml -P release clean deploy
-check_exit_code "Maven deploy [${RELEASE}] failed"
+check_exit_code "Maven deploy [${VERSION}] failed"
 
-git tag "${RELEASE}"
-check_exit_code "Git tag [${RELEASE}] failed"
+git tag "${VERSION}"
+check_exit_code "Git tag [${VERSION}] failed"
 
 git checkout main
 check_exit_code "Git checkout [main] failed"
