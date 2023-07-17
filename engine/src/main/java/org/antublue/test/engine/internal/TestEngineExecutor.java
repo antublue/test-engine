@@ -18,7 +18,6 @@ package org.antublue.test.engine.internal;
 
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.ClassTestDescriptorRunnableAdapter;
 import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -98,8 +97,9 @@ public class TestEngineExecutor {
         classTestDescriptors
                 .forEach(classTestDescriptor ->
                         executorService.submit(
-                                new ClassTestDescriptorRunnableAdapter(
-                                        classTestDescriptor, new TestEngineExecutionContext(executionRequest, countDownLatch)
+                                new ClassTestDescriptorRunnable(
+                                        classTestDescriptor,
+                                        new TestEngineExecutionContext(executionRequest, countDownLatch)
                                 )));
 
         try {
@@ -112,7 +112,41 @@ public class TestEngineExecutor {
             }
         }
 
-        executionRequest.getEngineExecutionListener().executionFinished(extendedEngineDescriptor, TestExecutionResult.successful());
+        executionRequest
+                .getEngineExecutionListener()
+                .executionFinished(
+                        extendedEngineDescriptor,
+                        TestExecutionResult.successful());
+    }
+
+    /**
+     * Class to implement a RunnableAdapter to test a ClassTestDescriptor in a Thread
+     */
+    private static final class ClassTestDescriptorRunnable implements Runnable {
+
+        private final ClassTestDescriptor classTestDescriptor;
+        private final TestEngineExecutionContext testEngineExecutionContext;
+
+        /**
+         * Constructor
+         *
+         * @param classTestDescriptor classTestDescriptor
+         * @param testEngineExecutionContext testEngineExecutionContext
+         */
+        public ClassTestDescriptorRunnable(
+                ClassTestDescriptor classTestDescriptor, TestEngineExecutionContext testEngineExecutionContext) {
+            this.testEngineExecutionContext = testEngineExecutionContext;
+            this.classTestDescriptor = classTestDescriptor;
+        }
+
+        @Override
+        public void run() {
+            try {
+                classTestDescriptor.execute(testEngineExecutionContext);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
     }
 
     /**
