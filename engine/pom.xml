@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>5.1.0</version>
+    <version>5.1.0-RC2</version>
     <packaging>jar</packaging>
     <name>AntuBLUE Test Engine</name>
 
@@ -241,7 +241,7 @@
         <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine-api</artifactId>
-            <version>5.1.0</version>
+            <version>5.1.0-RC2</version>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
