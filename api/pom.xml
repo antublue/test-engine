@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>5.1.0</version>
+    <version>5.1.0-RC3</version>
     <packaging>jar</packaging>
     <name>AntuBLUE Test Engine API</name>
 
