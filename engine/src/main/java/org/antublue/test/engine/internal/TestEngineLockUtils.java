@@ -52,6 +52,13 @@ public class TestEngineLockUtils {
      * @param method
      */
     public static void processLock(Method method) {
+        if (!method.isAnnotationPresent(TestEngine.Lock.class)
+            && !method.isAnnotationPresent(TestEngine.Lock.List.class)
+            && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
+            && !method.isAnnotationPresent(TestEngine.ResourceLock.List.class)) {
+            return;
+        }
+
         Annotation[] annotations = method.getAnnotations();
         for (Annotation annotation : annotations) {
             if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.class)) {
@@ -102,20 +109,27 @@ public class TestEngineLockUtils {
      * @param method
      */
     public static void processUnlock(Method method) {
+        if (!method.isAnnotationPresent(TestEngine.Unlock.class)
+                && !method.isAnnotationPresent(TestEngine.Unlock.List.class)
+                && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
+                && !method.isAnnotationPresent(TestEngine.ResourceLock.List.class)) {
+            return;
+        }
+
         Annotation[] annotations = method.getAnnotations();
         for (Annotation annotation : annotations) {
-            if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.class)) {
-                TestEngine.Lock lockAnnotation = (TestEngine.Lock) annotation;
-                unlock(method, lockAnnotation.value(), lockAnnotation.mode());
-            } else if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.List.class)) {
-                TestEngine.Lock.List lockListAnnotation = (TestEngine.Lock.List) annotation;
-                Stream.of(lockListAnnotation.value()).forEach(lock -> unlock(method, lock.value(), lock.mode()));
+            if (annotation.annotationType().isAssignableFrom(TestEngine.Unlock.class)) {
+                TestEngine.Unlock unlockAnnotation = (TestEngine.Unlock) annotation;
+                unlock(method, unlockAnnotation.value(), unlockAnnotation.mode());
+            } else if (annotation.annotationType().isAssignableFrom(TestEngine.Unlock.List.class)) {
+                TestEngine.Unlock.List unlockListAnnotation = (TestEngine.Unlock.List) annotation;
+                Stream.of(unlockListAnnotation.value()).forEach(lock -> unlock(method, lock.value(), lock.mode()));
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.class)) {
-                TestEngine.ResourceLock lockAnnotation = (TestEngine.ResourceLock) annotation;
-                unlock(method, lockAnnotation.value(), lockAnnotation.mode());
+                TestEngine.ResourceLock unlockAnnotation = (TestEngine.ResourceLock) annotation;
+                unlock(method, unlockAnnotation.value(), unlockAnnotation.mode());
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.List.class)) {
-                TestEngine.ResourceLock.List lockListAnnotation = (TestEngine.ResourceLock.List) annotation;
-                List<TestEngine.ResourceLock> list = Arrays.asList(lockListAnnotation.value());
+                TestEngine.ResourceLock.List unlockListAnnotation = (TestEngine.ResourceLock.List) annotation;
+                List<TestEngine.ResourceLock> list = Arrays.asList(unlockListAnnotation.value());
                 Collections.reverse(list);
                 list.stream().forEach(lock -> unlock(method, lock.value(), lock.mode()));
             }
