@@ -36,6 +36,7 @@ import java.util.Optional;
 /**
  * Class to implement an argument test descriptor
  */
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentTestDescriptor.class);
@@ -207,6 +208,14 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             t = pruneStackTrace(t, testClassName);
             t.printStackTrace();
             throwableCollector.add(t);
+        }
+
+        try {
+            TestEngineReflectionUtils.getArgumentField(testClass).set(testInstance, null);
+        } catch (Throwable t) {
+            // DO NOTHING
+        } finally {
+            flush();
         }
 
         if (throwableCollector.isEmpty()) {
