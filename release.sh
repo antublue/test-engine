@@ -54,6 +54,9 @@ check_exit_code "Git commit failed"
 ./mvnw -s ~/.m2/antublue.settings.xml -P release clean deploy
 check_exit_code "Maven deploy [${VERSION}] failed"
 
+git push --set-upstream origin release-"${VERSION}"
+check_exit_code "Git push [${VERSION}] failed"
+
 git tag "${VERSION}"
 check_exit_code "Git tag [${VERSION}] failed"
 
