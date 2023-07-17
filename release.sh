@@ -57,6 +57,9 @@ check_exit_code "Maven deploy [${VERSION}] failed"
 git tag "${VERSION}"
 check_exit_code "Git tag [${VERSION}] failed"
 
+git push origin "${VERSION}"
+check_exit_code "Git tag [${VERSION}] push failed"
+
 git checkout main
 check_exit_code "Git checkout [main] failed"
 
