@@ -49,7 +49,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param displayName displayName
      * @param testClass testClass
      */
-    public ClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
+    ClassTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass) {
         super(uniqueId, displayName);
         this.testClass = testClass;
     }

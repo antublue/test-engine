@@ -52,7 +52,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param testClass testClass
      * @param testArgument testArgument
      */
-    public ArgumentTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Argument testArgument) {
+    ArgumentTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Argument testArgument) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testArgument = testArgument;
