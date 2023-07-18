@@ -210,8 +210,6 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             TestEngineReflectionUtils.getArgumentField(testClass).set(testInstance, null);
         } catch (Throwable t) {
             // DO NOTHING
-        } finally {
-            flush();
         }
 
         if (throwableCollector.isEmpty()) {
