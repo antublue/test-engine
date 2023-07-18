@@ -19,7 +19,7 @@ public class SimpleExampleTest {
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(StringArgument.of("String argument " + i));
+            collection.add(StringArgument.of("StringArgument " + i));
         }
         return collection.stream();
     }
