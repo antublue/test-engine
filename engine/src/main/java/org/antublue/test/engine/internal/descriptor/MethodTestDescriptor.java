@@ -54,7 +54,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param testArgument testArgument
      * @param testMethod testMethod
      */
-    public MethodTestDescriptor(
+    MethodTestDescriptor(
             UniqueId uniqueId,
             String displayName,
             Class<?> testClass,
