@@ -152,15 +152,12 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         engineExecutionListener.executionStarted(this);
 
         try {
-            LOGGER.trace("invoking [%s] @TestEngine.BeforeEach methods", testClassName);
-
             TestEngineReflectionUtils
                     .getBeforeEachMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
                         TestEngineLockUtils.processLock(method);
-
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.BeforeEach methods [%s]",
+                                "invoking test instance [%s] @TestEngine.BeforeEach method [%s]",
                                 testClassName,
                                 method.getName());
                         try {
@@ -180,7 +177,10 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         if (throwableCollector.isEmpty()) {
             try {
-                LOGGER.trace("invoking [%s] @TestEngine.Test method [%s]", testClassName, testMethod.getName());
+                LOGGER.trace(
+                        "invoking test instance [%s] @TestEngine.Test method [%s]",
+                        testClassName,
+                        testMethod.getName());
                 try {
                     TestEngineLockUtils.processLock(testMethod);
                     testMethod.invoke(testInstance, (Object[]) null);
@@ -196,15 +196,12 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         }
 
         try {
-            LOGGER.trace("invoking [%s] @TestEngine.AfterEach methods", testClassName);
-
             TestEngineReflectionUtils
                     .getAfterEachMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
                         TestEngineLockUtils.processLock(method);
-
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.AfterEach methods [%s]",
+                                "invoking test instance [%s] @TestEngine.AfterEach method [%s]",
                                 testClassName,
                                 method.getName());
                         try {
