@@ -123,6 +123,10 @@ A `Store` is a thread-safe convenience object that allow sharing of Objects betw
 
 ## Code Examples
 
+Very simple example.
+
+- [SimpleTestExample.java](/examples/src/test/java/example/SimpleExampleTest.java)
+
 The `examples` project contains various testing examples and scenarios.
 
 - [examples](/examples/src/test/java/example)
