@@ -160,10 +160,10 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                                 testClassName,
                                 method.getName());
                         try {
-                            TestEngineLockUtils.processLock(method);
+                            TestEngineLockUtils.processLocks(method);
                             method.invoke(testInstance, (Object[]) null);
                         } finally {
-                            TestEngineLockUtils.processUnlock(method);
+                            TestEngineLockUtils.processUnlocks(method);
                             flush();
                         }
                     });
@@ -182,10 +182,10 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                         testClassName,
                         testMethod.getName());
                 try {
-                    TestEngineLockUtils.processLock(testMethod);
+                    TestEngineLockUtils.processLocks(testMethod);
                     testMethod.invoke(testInstance, (Object[]) null);
                 } finally {
-                    TestEngineLockUtils.processUnlock(testMethod);
+                    TestEngineLockUtils.processUnlocks(testMethod);
                     flush();
                 }
             } catch (Throwable t) {
@@ -204,10 +204,10 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                                 testClassName,
                                 method.getName());
                         try {
-                            TestEngineLockUtils.processLock(method);
+                            TestEngineLockUtils.processLocks(method);
                             method.invoke(testInstance, (Object[]) null);
                         } finally {
-                            TestEngineLockUtils.processUnlock(method);
+                            TestEngineLockUtils.processUnlocks(method);
                             flush();
                         }
                     });
