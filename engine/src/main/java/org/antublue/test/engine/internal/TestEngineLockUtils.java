@@ -51,7 +51,7 @@ public class TestEngineLockUtils {
      *
      * @param method
      */
-    public static void processLock(Method method) {
+    public static void processLocks(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Lock.class)
             && !method.isAnnotationPresent(TestEngine.Lock.List.class)
             && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
@@ -108,7 +108,7 @@ public class TestEngineLockUtils {
      *
      * @param method
      */
-    public static void processUnlock(Method method) {
+    public static void processUnlocks(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Unlock.class)
                 && !method.isAnnotationPresent(TestEngine.Unlock.List.class)
                 && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
