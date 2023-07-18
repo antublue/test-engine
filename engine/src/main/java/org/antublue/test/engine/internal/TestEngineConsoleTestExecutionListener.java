@@ -501,9 +501,9 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
         System.out.println(INFO + SEPARATOR);
 
         if (hasFailures()) {
-            System.out.println(INFO + AnsiColor.RED_BOLD_BRIGHT.apply("FAILED"));
+            System.out.println(INFO + FAIL);
         } else {
-            System.out.println(INFO + AnsiColor.GREEN_BOLD_BRIGHT.apply("PASSED"));
+            System.out.println(INFO + PASS);
         }
 
         long elapsedTime = summary.getTimeFinished() - summary.getTimeStarted();
