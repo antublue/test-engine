@@ -155,12 +155,12 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             TestEngineReflectionUtils
                     .getBeforeEachMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
-                        TestEngineLockUtils.processLock(method);
                         LOGGER.trace(
                                 "invoking test instance [%s] @TestEngine.BeforeEach method [%s]",
                                 testClassName,
                                 method.getName());
                         try {
+                            TestEngineLockUtils.processLock(method);
                             method.invoke(testInstance, (Object[]) null);
                         } finally {
                             TestEngineLockUtils.processUnlock(method);
@@ -199,12 +199,12 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             TestEngineReflectionUtils
                     .getAfterEachMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
-                        TestEngineLockUtils.processLock(method);
                         LOGGER.trace(
                                 "invoking test instance [%s] @TestEngine.AfterEach method [%s]",
                                 testClassName,
                                 method.getName());
                         try {
+                            TestEngineLockUtils.processLock(method);
                             method.invoke(testInstance, (Object[]) null);
                         } finally {
                             TestEngineLockUtils.processUnlock(method);
