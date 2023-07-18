@@ -120,7 +120,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         engineExecutionListener.executionStarted(this);
 
         try {
-            LOGGER.trace("creating class [%s]", testClassName);
+            LOGGER.trace("instantiating test class [%s]", testClassName);
             try {
                 testInstance = testClass.getDeclaredConstructor((Class<?>[]) null).newInstance((Object[]) null);
                 testEngineExecutionContext.setTestInstance(testInstance);
@@ -134,9 +134,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                     .getPrepareMethods(testClass)
                     .forEach((ThrowableConsumer<Method>) method -> {
                         TestEngineLockUtils.processLock(method);
-
                         LOGGER.trace(
-                                "invoking [%s] @TestEngine.Prepare methods [%s]",
+                                "invoking test instance [%s] @TestEngine.Prepare method [%s]",
                                 testClassName,
                                 method.getName());
                         try {
@@ -168,9 +167,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         .getConcludeMethods(testClass)
                         .forEach((ThrowableConsumer<Method>) method -> {
                             TestEngineLockUtils.processLock(method);
-
                             LOGGER.trace(
-                                    "invoking [%s] @TestEngine.Conclude methods [%s]",
+                                    "invoking test instance [%s] @TestEngine.Conclude method [%s]",
                                     testClassName,
                                     method.getName());
                             try {
