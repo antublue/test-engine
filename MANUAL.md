@@ -60,7 +60,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 ### Additional Test Annotations
 
-| Annotation                  | Scope            | Required | Usage                                                                                                                              |
+| Annotation                  | Scope            | Required | Usage                                                                                                                               |
 |-----------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
 | `@TestEngine.Disabled`      | class<br/>method | no       | Marks a test class or method disabled                                                                                              |
 | `@TestEngine.BaseClass`     | class            | no       | Marks a test class as being a base test class (skips direct execution)                                                             |
@@ -70,6 +70,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 | `@TestEngine.Lock`          | method           | no       | Provides a way to acquire a named lock, and lock it before method execution                                                        |
 | `@TestEngine.Unlock`        | method           | no       | Provides a way to acquire a named lock, and unlock it after method execution                                                       |
 | `@TestEngine.ResourceLock`  | method           | no       | Provides a way to acquire a named lock, locking it before method execution and unlocking it after method execution                 |
+| `@TestEngine.AutoClose`     | field            | no       | Provides a way to close `AutoCloseable` field                                                                                      |
 
 **Notes**
 
@@ -90,6 +91,11 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 
 - `@TestEngine.Lock`, `@TestEngine.Unlock`, and `@TestEngine.ResourceLock` are all repeatable.
+
+
+- `@TestEngine.AutoClose` fields are processed after `@TestEngine.AfterEach`, `@TestEngine.AfterAll`, and `@TestEngine.Conclude` methods depending on scope.
+  - Scope must be `@TestEngine.AfterEach`, `@TestEngine.AfterAll`, or `@TestEngine.Conclude`.
+  - The annotation has an optional value `method` (Object method name) to call a method of an that Object doesn't implement `AutoCloseable`.
 
 ### What is an `Argument`?
 

@@ -54,6 +54,7 @@ public final class TestEngineReflectionUtils {
 
     private static final Map<Class<?>, Method> ARGUMENT_SUPPLIER_METHOD_CACHE = new HashMap<>();
     private static final Map<Class<?>, Field> ARGUMENT_FIELD_CACHE = new HashMap<>();
+    private static final Map<Class<?>, List<Field>> AUTO_CLOSE_FIELD_CACHE = new HashMap<>();
     private static final Map<Class<?>, List<Method>> PREPARE_METHOD_CACHE = new HashMap<>();
     private static final Map<Class<?>, List<Method>> BEFORE_ALL_METHOD_CACHE = new HashMap<>();
     private static final Map<Class<?>, List<Method>> BEFORE_EACH_METHOD_CACHE = new HashMap<>();
@@ -260,6 +261,32 @@ public final class TestEngineReflectionUtils {
             ARGUMENT_FIELD_CACHE.put(clazz, argumentFields.get(0));
 
             return argumentFields.get(0);
+        }
+    }
+
+    /**
+     * Method to get a List of @TestEngine.AutoClose Fields
+     *
+     * @param clazz class to inspect
+     * @return List of Fields
+     */
+    public static List<Field> getAutoCloseFields(Class<?> clazz) {
+        synchronized (AUTO_CLOSE_FIELD_CACHE) {
+            LOGGER.trace("getAutoCloseFields(%s)", clazz.getName());
+
+            if (AUTO_CLOSE_FIELD_CACHE.containsKey(clazz)) {
+                return AUTO_CLOSE_FIELD_CACHE.get(clazz);
+            }
+
+            List<Field> autoCloseFields = getFields(clazz, TestEngine.AutoClose.class, Object.class);
+            LOGGER.trace(
+                    "class [%s] @TestEngine.AutoClose field count [%d]",
+                    clazz.getName(),
+                    autoCloseFields.size());
+
+            AUTO_CLOSE_FIELD_CACHE.put(clazz, autoCloseFields);
+
+            return autoCloseFields;
         }
     }
 
