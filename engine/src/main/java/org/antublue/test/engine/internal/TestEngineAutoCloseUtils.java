@@ -82,9 +82,10 @@ public class TestEngineAutoCloseUtils {
                     ((AutoCloseable) o).close();
                 }
             } catch (Throwable t) {
-                throw new TestEngineException(
+                throw new RuntimeException(
                         String.format(
-                                "Exception closing @TestEngine.AutoClose field [%s] scope [%s]",
+                                "Exception closing @TestEngine.AutoClose class [%s] field [%s] scope [%s]",
+                                object.getClass(),
                                 field.getName(),
                                 scope),
                         t);
@@ -99,9 +100,10 @@ public class TestEngineAutoCloseUtils {
                     method.invoke(o, (Object[]) null);
                 }
             } catch (Throwable t) {
-                throw new TestEngineException(
+                throw new RuntimeException(
                         String.format(
-                                "Exception closing @TestEngine.AutoClose field [%s] scope [%s]",
+                                "Exception closing @TestEngine.AutoClose class [%s] field [%s] scope [%s]",
+                                object.getClass().getName(),
                                 field.getName(),
                                 scope),
                         t);

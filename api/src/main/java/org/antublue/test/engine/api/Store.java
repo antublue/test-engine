@@ -188,7 +188,12 @@ public class Store {
                 try {
                     ((AutoCloseable) o).close();
                 } catch (Throwable t) {
-                    // DO NOTHING
+                    throw new RuntimeException(
+                            String.format(
+                                    "Exception closing Object for key [%s] object [%s]",
+                                    key,
+                                    o.getClass().getName()),
+                            t);
                 }
             }
         });
