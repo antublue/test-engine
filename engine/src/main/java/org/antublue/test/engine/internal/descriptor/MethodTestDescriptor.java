@@ -160,10 +160,10 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                                 testClassName,
                                 method.getName());
                         try {
-                            TestEngineLockUtils.processLocks(method);
+                            TestEngineLockUtils.processLockAnnotations(method);
                             method.invoke(testInstance, (Object[]) null);
                         } finally {
-                            TestEngineLockUtils.processUnlocks(method);
+                            TestEngineLockUtils.processUnlockAnnotations(method);
                             flush();
                         }
                     });
@@ -182,10 +182,10 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                         testClassName,
                         testMethod.getName());
                 try {
-                    TestEngineLockUtils.processLocks(testMethod);
+                    TestEngineLockUtils.processLockAnnotations(testMethod);
                     testMethod.invoke(testInstance, (Object[]) null);
                 } finally {
-                    TestEngineLockUtils.processUnlocks(testMethod);
+                    TestEngineLockUtils.processUnlockAnnotations(testMethod);
                     flush();
                 }
             } catch (Throwable t) {
@@ -204,10 +204,10 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                                 testClassName,
                                 method.getName());
                         try {
-                            TestEngineLockUtils.processLocks(method);
+                            TestEngineLockUtils.processLockAnnotations(method);
                             method.invoke(testInstance, (Object[]) null);
                         } finally {
-                            TestEngineLockUtils.processUnlocks(method);
+                            TestEngineLockUtils.processUnlockAnnotations(method);
                             flush();
                         }
                     });

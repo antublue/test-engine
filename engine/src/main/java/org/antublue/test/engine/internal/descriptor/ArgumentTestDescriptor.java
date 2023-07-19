@@ -156,10 +156,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                                     testClassName,
                                     method.getName());
                             try {
-                                TestEngineLockUtils.processLocks(method);
+                                TestEngineLockUtils.processLockAnnotations(method);
                                 method.invoke(testInstance, (Object[]) null);
                             } finally {
-                                TestEngineLockUtils.processUnlocks(method);
+                                TestEngineLockUtils.processUnlockAnnotations(method);
                                 flush();
                             }
                         });
@@ -193,10 +193,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                                 testClassName,
                                 method.getName());
                         try {
-                            TestEngineLockUtils.processLocks(method);
+                            TestEngineLockUtils.processLockAnnotations(method);
                             method.invoke(testInstance, (Object[]) null);
                         } finally {
-                            TestEngineLockUtils.processUnlocks(method);
+                            TestEngineLockUtils.processUnlockAnnotations(method);
                             flush();
                         }
                     });
