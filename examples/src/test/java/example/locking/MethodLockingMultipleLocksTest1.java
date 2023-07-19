@@ -11,9 +11,10 @@ import static org.assertj.core.api.Fail.fail;
 
 public class MethodLockingMultipleLocksTest1 {
 
-    public static final String LOCK_NAME_1 = "multiple.locking.method.lock.1";
-    public static final String LOCK_NAME_2 = "multiple.locking.method.lock.2";
-    public static final String COUNTER_NAME = "annotated.method.counter";
+    public static final String PREFIX = "MethodLockingMultipleLocksTest";
+    public static final String LOCK_NAME_1 = PREFIX + ".lock1";
+    public static final String LOCK_NAME_2 = PREFIX + ".lock2";
+    public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
         Store.putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());

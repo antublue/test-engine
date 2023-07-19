@@ -10,8 +10,9 @@ import static org.assertj.core.api.Fail.fail;
 
 public class LockModeTest2 {
 
-    public static final String LOCK_NAME = "lockmode.method.lock";
-    public static final String COUNTER_NAME = "lockmode.method.counter";
+    public static final String PREFIX = "LockModeTest";
+    public static final String LOCK_NAME = PREFIX + ".lock";
+    public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
         Store.putIfAbsent(COUNTER_NAME, k -> 0);

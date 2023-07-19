@@ -11,8 +11,9 @@ import static org.assertj.core.api.Fail.fail;
 
 public class MethodLockingTest2 {
 
-    public static final String LOCK_NAME = "annotated.method.lock";
-    public static final String COUNTER_NAME = "annotated.method.counter";
+    public static final String PREFIX = "MethodLockingTest";
+    public static final String LOCK_NAME = PREFIX + ".lock";
+    public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
         Store.putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
