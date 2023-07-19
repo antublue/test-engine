@@ -17,6 +17,7 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.internal.TestEngineAutoCloseUtils;
 import org.antublue.test.engine.internal.TestEngineExecutionContext;
 import org.antublue.test.engine.internal.TestEngineLockUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
@@ -200,6 +201,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                             flush();
                         }
                     });
+
+            TestEngineAutoCloseUtils.processAutoCloseAnnotatedFields(testInstance, "@TestEngine.AfterAll");
         } catch (Throwable t) {
             t = pruneStackTrace(t, testClassName);
             t.printStackTrace();
