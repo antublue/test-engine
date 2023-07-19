@@ -1,8 +1,9 @@
-package example;
+package example.autoclose;
 
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -10,7 +11,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class AutoCloseExampleTest1 {
+public class AutoCloseExampleTest2 {
 
     @TestEngine.Argument
     protected StringArgument stringArgument;
@@ -36,19 +37,19 @@ public class AutoCloseExampleTest1 {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare(" + stringArgument  + ")");
-        concludeAutoCloseable = new TestAutoCloseable("concludeAutoCloseable");
+        concludeAutoCloseable = new TestCloseable("concludeCloseable");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + stringArgument  + ")");
-        afterAllAutoClosable = new TestAutoCloseable("afterAllAutoCloseable");
+        afterAllAutoClosable = new TestCloseable("afterAllCloseable");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + stringArgument  + ")");
-        afterEachAutoClosable = new TestAutoCloseable("afterEachAutoCloseable");
+        afterEachAutoClosable = new TestCloseable("afterEachCloseable");
     }
 
     @TestEngine.Test
@@ -76,11 +77,11 @@ public class AutoCloseExampleTest1 {
         System.out.println("conclude(" + stringArgument  + ")");
     }
 
-    private static class TestAutoCloseable implements AutoCloseable {
+    private static class TestCloseable implements Closeable {
 
         private final String name;
 
-        public TestAutoCloseable(String name) {
+        public TestCloseable(String name) {
             this.name = name;
         }
 
