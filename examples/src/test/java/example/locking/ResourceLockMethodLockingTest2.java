@@ -11,9 +11,10 @@ import static org.assertj.core.api.Fail.fail;
 
 public class ResourceLockMethodLockingTest2 {
 
-    public static final String LOCK_NAME_1 = "resource.lock.method.lock.1";
-    public static final String LOCK_NAME_2 = "resource.lock.method.lock.2";
-    public static final String COUNTER_NAME = "resource.lock.method.counter";
+    public static final String PREFIX = "ResourceLockMethodLockingTest";
+    public static final String LOCK_NAME_1 = PREFIX + ".lock1";
+    public static final String LOCK_NAME_2 = PREFIX + ".lock2";
+    public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
         Store.putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
