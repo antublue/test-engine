@@ -1,4 +1,4 @@
-package example;
+package example.autoclose;
 
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-public class AutoCloseExampleTest3 {
+public class AutoCloseExampleTest1 {
 
     @TestEngine.Argument
     protected StringArgument stringArgument;
@@ -24,31 +24,31 @@ public class AutoCloseExampleTest3 {
         return collection.stream();
     }
 
-    @TestEngine.AutoClose(scope="@TestEngine.AfterEach",method="destroy")
-    private TestObject afterEachTestObject;
+    @TestEngine.AutoClose(scope="@TestEngine.AfterEach")
+    private AutoCloseable afterEachAutoClosable;
 
-    @TestEngine.AutoClose(scope="@TestEngine.AfterAll",method="destroy")
-    private TestObject afterAllTestObject;
+    @TestEngine.AutoClose(scope="@TestEngine.AfterAll")
+    private AutoCloseable afterAllAutoClosable;
 
-    @TestEngine.AutoClose(scope="@TestEngine.Conclude",method="destroy")
-    private TestObject concludeTestObject;
+    @TestEngine.AutoClose(scope="@TestEngine.Conclude")
+    private AutoCloseable concludeAutoCloseable;
 
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare(" + stringArgument  + ")");
-        concludeTestObject = new TestObject("concludeTestObject");
+        concludeAutoCloseable = new TestAutoCloseable("concludeAutoCloseable");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + stringArgument  + ")");
-        afterAllTestObject = new TestObject("afterAllTestObject");
+        afterAllAutoClosable = new TestAutoCloseable("afterAllAutoCloseable");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + stringArgument  + ")");
-        afterEachTestObject = new TestObject("afterEachTestObject");
+        afterEachAutoClosable = new TestAutoCloseable("afterEachAutoCloseable");
     }
 
     @TestEngine.Test
@@ -76,16 +76,16 @@ public class AutoCloseExampleTest3 {
         System.out.println("conclude(" + stringArgument  + ")");
     }
 
-    private static class TestObject {
+    private static class TestAutoCloseable implements AutoCloseable {
 
         private final String name;
 
-        public TestObject(String name) {
+        public TestAutoCloseable(String name) {
             this.name = name;
         }
 
-        public void destroy() {
-            System.out.println(name + ".destroy()");
+        public void close() {
+            System.out.println(name + ".close()");
         }
     }
 }
