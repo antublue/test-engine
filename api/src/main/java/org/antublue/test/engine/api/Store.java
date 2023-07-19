@@ -30,6 +30,7 @@ import java.util.function.Function;
  * <p>
  * Locking of Objects in the Store is the responsibility of the calling code
  */
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public class Store {
 
     private final static Lock LOCK = new ReentrantLock(true);
@@ -143,6 +144,54 @@ public class Store {
         } finally {
             unlock();
         }
+    }
+
+    /**
+     * Method to remove an Object from the Store, closing the Object if it implements AutoClosable
+     *
+     * @param key key
+     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
+     */
+    public static Optional<Object> remove(String key) {
+        try {
+            lock();
+            return Optional.ofNullable(MAP.remove(key));
+        } finally {
+            unlock();
+        }
+    }
+
+    /**
+     *
+     * @param key key
+     * @param clazz clazz
+     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
+     * @param <T>
+     */
+    public static <T> Optional<T> remove(String key, Class<T> clazz) {
+        try {
+            lock();
+            return Optional.ofNullable(clazz.cast(MAP.remove(key)));
+        } finally {
+            unlock();
+        }
+    }
+
+    /**
+     * Method to remove an Object from the Store, closing it if it's an instance of AutoCloseable
+     *
+     * @param key
+     */
+    public static void removeAndClose(String key) {
+        remove(key).ifPresent(o -> {
+            if (o instanceof AutoCloseable) {
+                try {
+                    ((AutoCloseable) o).close();
+                } catch (Throwable t) {
+                    // DO NOTHING
+                }
+            }
+        });
     }
 
     /**
