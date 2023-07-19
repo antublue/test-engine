@@ -51,7 +51,7 @@ public class TestEngineLockUtils {
      *
      * @param method
      */
-    public static void processLocks(Method method) {
+    public static void processLockAnnotations(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Lock.class)
             && !method.isAnnotationPresent(TestEngine.Lock.List.class)
             && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
@@ -87,6 +87,15 @@ public class TestEngineLockUtils {
     private static void lock(Method method, String name, TestEngine.LockMode mode) {
         if (name != null && !name.trim().isEmpty()) {
             name = name.trim();
+
+            LOGGER.trace(
+                    String.format(
+                            "Acquiring lock [%s] mode [%s] class [%s] method [%s]",
+                            name,
+                            mode,
+                            method.getDeclaringClass().getName(),
+                            method.getName()));
+            
             if (mode == TestEngine.LockMode.READ_WRITE) {
                 LOCK_MAP.computeIfAbsent(name, n -> new ReentrantReadWriteLock(true)).writeLock().lock();
             } else {
@@ -95,7 +104,7 @@ public class TestEngineLockUtils {
 
             LOGGER.trace(
                     String.format(
-                            "Locking [%s] mode [%s] for class [%s] method [%s]",
+                            "Acquired lock [%s] mode [%s] class [%s] method [%s]",
                             name,
                             mode,
                             method.getDeclaringClass().getName(),
@@ -108,7 +117,7 @@ public class TestEngineLockUtils {
      *
      * @param method
      */
-    public static void processUnlocks(Method method) {
+    public static void processUnlockAnnotations(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Unlock.class)
                 && !method.isAnnotationPresent(TestEngine.Unlock.List.class)
                 && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
@@ -148,22 +157,35 @@ public class TestEngineLockUtils {
             name = name.trim();
             ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
             if (reentrantReadWriteLock != null) {
+                
                 LOGGER.trace(
                         String.format(
-                                "Unlocking [%s] mode [%s] for class [%s] method [%s]",
+                                "Releasing lock [%s] mode [%s] class [%s] method [%s]",
                                 name,
                                 mode,
                                 method.getDeclaringClass().getName(),
                                 method.getName()));
+                
                 if (mode == TestEngine.LockMode.READ_WRITE) {
                     reentrantReadWriteLock.writeLock().unlock();
                 } else {
                     reentrantReadWriteLock.readLock().unlock();
                 }
+
+                LOGGER.trace(
+                        String.format(
+                                "Released lock [%s] mode [%s] class [%s] method [%s]",
+                                name,
+                                mode,
+                                method.getDeclaringClass().getName(),
+                                method.getName()));
+                
             } else {
                 throw new TestClassConfigurationException(
                         String.format(
-                                "@TestEngine.Unlock without @TestEngine.Lock, class [%s] method [%s]",
+                                "@TestEngine.Unlock without @TestEngine.Lock, name [%s] mode [%s] class [%s] method [%s]",
+                                name,
+                                mode,
                                 method.getDeclaringClass().getName(),
                                 method.getName()));
             }
