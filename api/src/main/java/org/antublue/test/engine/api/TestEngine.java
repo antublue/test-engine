@@ -114,6 +114,12 @@ public @interface TestEngine {
         String value();
     }
 
+    @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface AutoClose {
+        String value();
+    }
+
     enum LockMode {
         READ_WRITE,
         READ;
