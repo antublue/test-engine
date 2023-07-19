@@ -21,6 +21,7 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class TestEngineAutoCloseUtils {
@@ -49,9 +50,16 @@ public class TestEngineAutoCloseUtils {
                         field -> {
                             LOGGER.trace("closing field [%s]", field.getName());
                             TestEngine.AutoClose annotation = field.getAnnotation(TestEngine.AutoClose.class);
-                            String value = annotation.value();
-                            if (scope.equals(value)) {
-                                close(object, field);
+                            String annotationScope = annotation.scope();
+                            String annotationMethodName = annotation.method();
+                            if (scope.equals(annotationScope)) {
+                                close(object, annotationScope, annotationMethodName, field);
+                            } else {
+                                LOGGER.trace(
+                                        "skipping field [%s] annotation scope [%s] doesn't match scope [%s]",
+                                        field.getName(),
+                                        annotationScope,
+                                        scope);
                             }
                         });
     }
@@ -60,18 +68,44 @@ public class TestEngineAutoCloseUtils {
      * Method to close an @TestEngine.AutoClose annotated field
      *
      * @param object object
+     * @param scope scope
+     * @param methodName methodName
      * @param field field
      */
-    private static void close(Object object, Field field) {
-        LOGGER.trace("close(%s, %s)", object.getClass().getName(), field.getName());
+    private static void close(Object object, String scope, String methodName, Field field) {
+        LOGGER.trace("close(%s, %s, %s)", object.getClass().getName(), methodName, field.getName());
 
-        try {
-            Object o = field.get(object);
-            if (o instanceof AutoCloseable) {
-                ((AutoCloseable) o).close();
+        if (methodName.trim().isEmpty()) {
+            try {
+                Object o = field.get(object);
+                if (o instanceof AutoCloseable) {
+                    ((AutoCloseable) o).close();
+                }
+            } catch (Throwable t) {
+                throw new TestEngineException(
+                        String.format(
+                                "Exception closing @TestEngine.AutoClose field [%s] scope [%s]",
+                                field.getName(),
+                                scope),
+                        t);
             }
-        } catch (Throwable t) {
-            // TODO - should we throw an exception?
+        } else {
+            try {
+                methodName = methodName.trim();
+                Object o = field.get(object);
+                if (o != null) {
+                    Method method = o.getClass().getMethod(methodName, (Class<?>[]) null);
+                    method.setAccessible(true);
+                    method.invoke(o, (Object[]) null);
+                }
+            } catch (Throwable t) {
+                throw new TestEngineException(
+                        String.format(
+                                "Exception closing @TestEngine.AutoClose field [%s] scope [%s]",
+                                field.getName(),
+                                scope),
+                        t);
+            }
         }
     }
 }

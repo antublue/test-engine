@@ -94,7 +94,8 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 
 - `@TestEngine.AutoClose` fields are processed after `@TestEngine.AfterEach`, `@TestEngine.AfterAll`, and `@TestEngine.Conclude` methods depending on scope.
-  - Scope may be `@TestEngine.AfterEach`, `@TestEngine.AfterAll`, or `@TestEngine.Conclude`
+  - Scope must be `@TestEngine.AfterEach`, `@TestEngine.AfterAll`, or `@TestEngine.Conclude`.
+  - The annotation has an optional value `method` (Object method name) to call a method of an that Object doesn't implement `AutoCloseable`.
 
 ### What is an `Argument`?
 

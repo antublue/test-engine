@@ -278,7 +278,7 @@ public final class TestEngineReflectionUtils {
                 return AUTO_CLOSE_FIELD_CACHE.get(clazz);
             }
 
-            List<Field> autoCloseFields = getFields(clazz, TestEngine.AutoClose.class, AutoCloseable.class);
+            List<Field> autoCloseFields = getFields(clazz, TestEngine.AutoClose.class, Object.class);
             LOGGER.trace(
                     "class [%s] @TestEngine.AutoClose field count [%d]",
                     clazz.getName(),

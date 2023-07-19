@@ -117,7 +117,8 @@ public @interface TestEngine {
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface AutoClose {
-        String value();
+        String scope();
+        String method() default "";
     }
 
     enum LockMode {

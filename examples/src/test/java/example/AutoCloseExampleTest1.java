@@ -24,13 +24,13 @@ public class AutoCloseExampleTest1 {
         return collection.stream();
     }
 
-    @TestEngine.AutoClose(value="@TestEngine.AfterEach")
+    @TestEngine.AutoClose(scope="@TestEngine.AfterEach")
     private AutoCloseable afterEachAutoClosable;
 
-    @TestEngine.AutoClose(value="@TestEngine.AfterAll")
+    @TestEngine.AutoClose(scope="@TestEngine.AfterAll")
     private AutoCloseable afterAllAutoClosable;
 
-    @TestEngine.AutoClose(value="@TestEngine.Conclude")
+    @TestEngine.AutoClose(scope="@TestEngine.Conclude")
     private AutoCloseable concludeAutoCloseable;
 
     @TestEngine.Prepare
