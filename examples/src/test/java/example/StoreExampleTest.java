@@ -35,6 +35,7 @@ public class StoreExampleTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare(" + stringArgument  + ")");
+        
         Store.put(AUTO_CLOSEABLE, new TestAutoCloseable());
         Store.put(CLOSEABLE, new TestCloseable());
     }

@@ -48,7 +48,7 @@ public class ThrowableCollector {
      *
      * @param throwableCollector throwableCollector
      */
-    public void addAll(ThrowableCollector throwableCollector) {
+    public void merge(ThrowableCollector throwableCollector) {
         throwableList.addAll(throwableCollector.getList());
     }
 

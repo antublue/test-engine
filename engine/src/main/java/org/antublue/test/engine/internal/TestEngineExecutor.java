@@ -22,6 +22,7 @@ import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.NamedThreadFactory;
+import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestExecutionResult;
 
@@ -41,6 +42,8 @@ public class TestEngineExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineExecutor.class);
 
     private final ExecutorService executorService;
+    private EngineExecutionListener engineExecutionListener;
+    private CountDownLatch countDownLatch;
 
     /**
      * Constructor
@@ -84,23 +87,24 @@ public class TestEngineExecutor {
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute()");
 
+        this.engineExecutionListener = executionRequest.getEngineExecutionListener();
+
         ExtendedEngineDescriptor extendedEngineDescriptor =
                 (ExtendedEngineDescriptor) executionRequest.getRootTestDescriptor();
 
-        executionRequest.getEngineExecutionListener().executionStarted(extendedEngineDescriptor);
+        engineExecutionListener.executionStarted(extendedEngineDescriptor);
 
         List<ClassTestDescriptor> classTestDescriptors =
                 extendedEngineDescriptor.getChildren(ClassTestDescriptor.class);
 
-        CountDownLatch countDownLatch = new CountDownLatch(classTestDescriptors.size());
+        countDownLatch = new CountDownLatch(classTestDescriptors.size());
 
         classTestDescriptors
                 .forEach(classTestDescriptor ->
-                        executorService.submit(
-                                new ClassTestDescriptorRunnable(
-                                        classTestDescriptor,
-                                        new TestEngineExecutionContext(executionRequest, countDownLatch)
-                                )));
+                        executorService.submit(() -> {
+                            classTestDescriptor.execute(
+                                    new TestEngineExecutorContext(executionRequest, countDownLatch));
+                        }));
 
         try {
             countDownLatch.await();
@@ -112,41 +116,7 @@ public class TestEngineExecutor {
             }
         }
 
-        executionRequest
-                .getEngineExecutionListener()
-                .executionFinished(
-                        extendedEngineDescriptor,
-                        TestExecutionResult.successful());
-    }
-
-    /**
-     * Class to implement a RunnableAdapter to test a ClassTestDescriptor in a Thread
-     */
-    private static final class ClassTestDescriptorRunnable implements Runnable {
-
-        private final ClassTestDescriptor classTestDescriptor;
-        private final TestEngineExecutionContext testEngineExecutionContext;
-
-        /**
-         * Constructor
-         *
-         * @param classTestDescriptor classTestDescriptor
-         * @param testEngineExecutionContext testEngineExecutionContext
-         */
-        public ClassTestDescriptorRunnable(
-                ClassTestDescriptor classTestDescriptor, TestEngineExecutionContext testEngineExecutionContext) {
-            this.testEngineExecutionContext = testEngineExecutionContext;
-            this.classTestDescriptor = classTestDescriptor;
-        }
-
-        @Override
-        public void run() {
-            try {
-                classTestDescriptor.execute(testEngineExecutionContext);
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-        }
+        engineExecutionListener.executionFinished(extendedEngineDescriptor, TestExecutionResult.successful());
     }
 
     /**
