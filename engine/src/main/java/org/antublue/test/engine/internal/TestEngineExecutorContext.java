@@ -16,18 +16,21 @@
 
 package org.antublue.test.engine.internal;
 
+import org.antublue.test.engine.internal.util.ThrowableCollector;
+import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Class to implement a TestExecutionContext for multithreaded execution
+ * Class to implement an execution context
  */
-public class TestEngineExecutionContext {
+public class TestEngineExecutorContext {
 
     private final ExecutionRequest executionRequest;
     private final CountDownLatch countDownLatch;
-    private Object testInstance;
+    private final EngineExecutionListener engineExecutionListener;
+    private final ThrowableCollector throwableCollector;
 
     /**
      * Constructor
@@ -35,44 +38,44 @@ public class TestEngineExecutionContext {
      * @param executionRequest executionRequest
      * @param countDownLatch countDownLatch
      */
-    public TestEngineExecutionContext(ExecutionRequest executionRequest, CountDownLatch countDownLatch) {
+    public TestEngineExecutorContext(ExecutionRequest executionRequest, CountDownLatch countDownLatch) {
         this.executionRequest = executionRequest;
         this.countDownLatch = countDownLatch;
+        this.engineExecutionListener = executionRequest.getEngineExecutionListener();
+        this.throwableCollector = new ThrowableCollector();
     }
 
     /**
      * Method to get the ExecutionRequest
      *
-     * @return the return value
+     * @return the ExecutionRequest
      */
     public ExecutionRequest getExecutionRequest() {
         return executionRequest;
     }
 
     /**
-     * Method to get the CountDownLatch
+     * Method to get the EngineExecutionListener
      *
-     * @return the return value
+     * @return the EngineExecutionListener
      */
-    public CountDownLatch getCountDownLatch() {
-        return countDownLatch;
+    public EngineExecutionListener getEngineExecutionListener() {
+        return engineExecutionListener;
     }
 
     /**
-     * Method to set the test instance Object
+     * Method to get the ThrowableCollector
      *
-     * @param testInstance testInstance
+     * @return the ThrowableCollector
      */
-    public void setTestInstance(Object testInstance) {
-        this.testInstance = testInstance;
+    public ThrowableCollector getThrowableCollector() {
+        return throwableCollector;
     }
 
     /**
-     * Method to get the test instance Object
-     *
-     * @return the return value
+     * Method to mark the execution context complete
      */
-    public Object getTestInstance() {
-        return testInstance;
+    public void complete() {
+        this.countDownLatch.countDown();
     }
 }
