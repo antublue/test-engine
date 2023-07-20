@@ -59,6 +59,7 @@ import java.util.function.Predicate;
 /**
  * Class to implement a TestEngineEngineDiscoveryRequest
  */
+@SuppressWarnings("PMD.NPathComplexity")
 public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineEngineDiscoveryRequest.class);

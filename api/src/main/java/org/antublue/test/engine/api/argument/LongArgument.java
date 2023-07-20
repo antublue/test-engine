@@ -16,14 +16,12 @@
 
 package org.antublue.test.engine.api.argument;
 
-import org.antublue.test.engine.api.Argument;
-
 import java.util.Objects;
 
 /**
  * Class to implement a LongArgument
  */
-public class LongArgument implements Argument {
+public class LongArgument extends AbstractArgument {
 
     private final String name;
     private final long value;
@@ -35,16 +33,7 @@ public class LongArgument implements Argument {
      * @param value value
      */
     public LongArgument(String name, long value) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
-
-        this.name = name;
+        this.name = validateName(name);
         this.value = value;
     }
 

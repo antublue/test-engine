@@ -103,17 +103,17 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 There are standard argument implementations for common Java data types:
 
-- `BooleanArgument`
-- `ByteArgument`
-- `CharArgument`
-- `ShortArgument`
-- `IntegerArgument`
-- `LongArgument`
-- `BigIntegerArgument`
-- `FloatArgument`
-- `DoubleArgument`
-- `BigDecimalArgument`
-- `StringArgument`
+-  `BooleanArgument`
+-  `ByteArgument`
+-  `CharArgument`
+-  `ShortArgument`
+-  `IntegerArgument`
+-  `LongArgument`
+-  `BigIntegerArgument`
+-  `FloatArgument`
+-  `DoubleArgument`
+-  `BigDecimalArgument`
+-  `StringArgument`
 
 Additionally, there is an `ObjectArgument<T>` argument implementation that allows passing an arbitrary object as an argument.
 
@@ -422,4 +422,4 @@ for (each test class in the Collection<Class<?>>) {
 
 - Each test class will be executed sequentially in a thread, but different test classes are executed in parallel threads.
   - By default, thread count is equal to number of available processors as reported by Java.
-  - The thread count can be changed via a configuration value.
+- The thread count can be changed via a configuration value.

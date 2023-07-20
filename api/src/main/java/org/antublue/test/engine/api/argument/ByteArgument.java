@@ -16,14 +16,12 @@
 
 package org.antublue.test.engine.api.argument;
 
-import org.antublue.test.engine.api.Argument;
-
 import java.util.Objects;
 
 /**
  * Class to implement a ByteArgument
  */
-public class ByteArgument implements Argument {
+public class ByteArgument extends AbstractArgument {
 
     private final String name;
     private final byte value;
@@ -35,16 +33,7 @@ public class ByteArgument implements Argument {
      * @param value value
      */
     public ByteArgument(String name, byte value) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
-
-        this.name = name;
+        this.name = validateName(name);
         this.value = value;
     }
 

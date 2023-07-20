@@ -16,15 +16,13 @@
 
 package org.antublue.test.engine.api.argument;
 
-import org.antublue.test.engine.api.Argument;
-
 import java.math.BigInteger;
 import java.util.Objects;
 
 /**
  * Class to implement a BigIntegerArgument
  */
-public class BigIntegerArgument implements Argument {
+public class BigIntegerArgument extends AbstractArgument {
 
     private final String name;
     private final BigInteger value;
@@ -36,16 +34,7 @@ public class BigIntegerArgument implements Argument {
      * @param value value
      */
     public BigIntegerArgument(String name, BigInteger value) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
-
-        this.name = name;
+        this.name = validateName(name);
         this.value = value;
     }
 

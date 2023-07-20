@@ -708,6 +708,10 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         testClassesSkipped.incrementAndGet();
                         break;
                     }
+                    default: {
+                        // DO NOTHING
+                        break;
+                    }
                 }
 
                 return;
@@ -728,6 +732,10 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         argumentsSkipped.incrementAndGet();
                         break;
                     }
+                    default: {
+                        // DO NOTHING
+                        break;
+                    }
                 }
             }
 
@@ -744,6 +752,10 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                     }
                     case ABORTED: {
                         methodsSkipped.incrementAndGet();
+                        break;
+                    }
+                    default: {
+                        // DO NOTHING
                         break;
                     }
                 }

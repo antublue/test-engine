@@ -16,14 +16,12 @@
 
 package org.antublue.test.engine.api.argument;
 
-import org.antublue.test.engine.api.Argument;
-
 import java.util.Objects;
 
 /**
  * Class to implement a DoubleArgument
  */
-public class DoubleArgument implements Argument {
+public class DoubleArgument extends AbstractArgument {
 
     private final String name;
     private final double value;
@@ -35,16 +33,7 @@ public class DoubleArgument implements Argument {
      * @param value value
      */
     public DoubleArgument(String name, double value) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
-
-        this.name = name;
+        this.name = validateName(name);
         this.value = value;
     }
 

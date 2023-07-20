@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 /**
  * Class to implement methods to get test class fields / methods, caching the results
  */
-@SuppressWarnings({"unchecked", "PMD.EmptyControlStatement"})
+@SuppressWarnings({ "unchecked", "PMD.NPathComplexity", "PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock" })
 public final class TestEngineReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineReflectionUtils.class);
@@ -787,16 +787,16 @@ public final class TestEngineReflectionUtils {
                             method.setAccessible(true);
                         }
                     });
+        } catch (NoClassDefFoundError e) {
+            // DO NOTHING
+        } catch (TestEngineException e) {
+            throw e;
         } catch (Throwable t) {
-            if (t instanceof TestEngineException) {
-                throw t;
-            } else if (!(t instanceof NoClassDefFoundError)) {
-                throw new TestEngineException(
-                        String.format(
-                                "Exception resolving methods class [%s]",
-                                clazz.getName()),
-                        t);
-            }
+            throw new TestEngineException(
+                    String.format(
+                            "Exception resolving methods class [%s]",
+                            clazz.getName()),
+                    t);
         }
 
         Class<?> declaringClass = clazz.getSuperclass();

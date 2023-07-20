@@ -16,14 +16,12 @@
 
 package org.antublue.test.engine.api.argument;
 
-import org.antublue.test.engine.api.Argument;
-
 import java.util.Objects;
 
 /**
  * Class to implement a ShortArgument
  */
-public class ShortArgument implements Argument {
+public class ShortArgument extends AbstractArgument {
 
     private final String name;
     private final short value;
@@ -35,16 +33,7 @@ public class ShortArgument implements Argument {
      * @param value value
      */
     public ShortArgument(String name, short value) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
-
-        this.name = name;
+        this.name = validateName(name);
         this.value = value;
     }
 
