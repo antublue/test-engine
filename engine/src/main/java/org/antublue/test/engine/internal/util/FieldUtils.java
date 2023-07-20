@@ -19,6 +19,7 @@ package org.antublue.test.engine.internal.util;
 import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class FieldUtils {
 
     /**

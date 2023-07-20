@@ -4,7 +4,6 @@
 
 ### Why not use JUnit 5?
 
-
 Currently, JUnit 5 does not support parameterized testing at the test class level (common for parameterized integration testing.)
 
 - https://github.com/junit-team/junit5/issues/878 (Open since 2017-06-09)
@@ -22,8 +21,8 @@ Currently, JUnit 5 does not support parameterized testing at the test class leve
 JUnit 4 does provide test class level parameterization via `@RunWith(Parameterized.class)`.
 
 - JUnit 4 is maintained, but no new functionality is being added.
-    - The latest release was on February 13, 2021.
-    - https://stackoverflow.com/questions/72325172/when-is-junit4-going-to-be-deprecated
+  - The latest release was on February 13, 2021.
+  - https://stackoverflow.com/questions/72325172/when-is-junit4-going-to-be-deprecated
 
 
 - It doesn't provide annotations to run methods before / after all test methods and before / after each test argument.
@@ -40,13 +39,13 @@ JUnit 4 does provide test class level parameterization via `@RunWith(Parameteriz
 
 Parameterized integration testing is most common when you...
 
-1. Want to perform integration testing of the application in various environments.
+ 1. Want to perform integration testing of the application in various environments.
 
 
-2. You want to test workflow oriented scenarios of the application.
+ 2. You want to test workflow oriented scenarios of the application.
 
 
-3. Various environments could involve different operating systems versions and/or different application runtime versions.
+ 3. Various environments could involve different operating systems versions and/or different application runtime versions.
 
 ---
 
@@ -72,7 +71,6 @@ Examples:
 - [MultipleMethodsLockingTest2.java](/examples/src/test/java/example/locking/MultipleMethodsLockingTest2.java)
 - [ResourceLockMethodLockingTest1.java](/examples/src/test/java/example/locking/ResourceLockMethodLockingTest1.java)
 - [ResourceLockMethodLockingTest2.java](/examples/src/test/java/example/locking/ResourceLockMethodLockingTest2.java)
-
 
 **Notes**
 

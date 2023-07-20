@@ -21,6 +21,8 @@ package org.antublue.test.engine;
  */
 public final class TestEngineConstants {
 
+    public static final String TRUE = "true";
+
     public static final String PREFIX = "antublue.test.engine";
     public static final String EXPERIMENTAL = ".experimental";
     
@@ -30,6 +32,7 @@ public final class TestEngineConstants {
     public static final String LOG_PASS_MESSAGES = PREFIX + EXPERIMENTAL + ".log.pass.messages";
     public static final String LOG_SKIP_MESSAGES = PREFIX + EXPERIMENTAL + ".log.skip.messages";
 
+    public static final String TEST_CLASS_SHUFFLE = PREFIX + ".test.class.shuffle";
     public static final String TEST_CLASS_INCLUDE = PREFIX + ".test.class.include";
     public static final String TEST_CLASS_EXCLUDE = PREFIX + ".test.class.exclude";
     public static final String TEST_METHOD_INCLUDE = PREFIX + ".test.method.include";

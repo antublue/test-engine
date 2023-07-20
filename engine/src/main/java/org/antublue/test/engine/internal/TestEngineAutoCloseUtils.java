@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
-@SuppressWarnings("PMD.EmptyCatchBlock")
+@SuppressWarnings({ "PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock" })
 public class TestEngineAutoCloseUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineAutoCloseUtils.class);
@@ -96,27 +96,31 @@ public class TestEngineAutoCloseUtils {
                             t));
             }
         } else {
+            Throwable throwable = null;
+
             try {
-                methodName = methodName.trim();
                 Object o = field.get(object);
                 if (o != null) {
-                    Method method = o.getClass().getMethod(methodName, (Class<?>[]) null);
+                    Method method = o.getClass().getMethod(methodName.trim(), (Class<?>[]) null);
                     method.setAccessible(true);
                     method.invoke(o, (Object[]) null);
                 }
+            } catch (InvocationTargetException e) {
+                throwable = e.getCause();
             } catch (Throwable t) {
-                if (t instanceof InvocationTargetException) {
-                    t = t.getCause();
-                }
+                throwable = t;
+            }
 
+            if (throwable != null) {
                 throwableConsumer.accept(
                         new TestEngineException(
                                 String.format(
-                                        "Exception closing @TestEngine.AutoClose class [%s] field [%s] scope [%s]",
+                                        "Exception closing @TestEngine.AutoClose class [%s] field [%s] method [%s] scope [%s]",
                                         object.getClass(),
                                         field.getName(),
+                                        methodName.trim(),
                                         scope),
-                                t));
+                                throwable));
             }
         }
     }

@@ -219,7 +219,7 @@ public class KafkaTest {
             close();
 
             if (network != null) {
-                network.close();;
+                network.close();
                 network = null;
             }
         }

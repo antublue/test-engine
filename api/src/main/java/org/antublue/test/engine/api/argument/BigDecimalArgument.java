@@ -16,15 +16,13 @@
 
 package org.antublue.test.engine.api.argument;
 
-import org.antublue.test.engine.api.Argument;
-
 import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
  * Class to implement a BigDecimalArgument
  */
-public class BigDecimalArgument implements Argument {
+public class BigDecimalArgument extends AbstractArgument {
 
     private final String name;
     private final BigDecimal value;
@@ -36,16 +34,7 @@ public class BigDecimalArgument implements Argument {
      * @param value value
      */
     public BigDecimalArgument(String name, BigDecimal value) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
-
-        this.name = name;
+        this.name = validateName(name);
         this.value = value;
     }
 

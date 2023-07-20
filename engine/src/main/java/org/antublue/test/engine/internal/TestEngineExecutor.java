@@ -26,6 +26,8 @@ import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestExecutionResult;
 
+import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -42,8 +44,6 @@ public class TestEngineExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineExecutor.class);
 
     private final ExecutorService executorService;
-    private EngineExecutionListener engineExecutionListener;
-    private CountDownLatch countDownLatch;
 
     /**
      * Constructor
@@ -87,7 +87,7 @@ public class TestEngineExecutor {
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute()");
 
-        this.engineExecutionListener = executionRequest.getEngineExecutionListener();
+        EngineExecutionListener engineExecutionListener = executionRequest.getEngineExecutionListener();
 
         ExtendedEngineDescriptor extendedEngineDescriptor =
                 (ExtendedEngineDescriptor) executionRequest.getRootTestDescriptor();
@@ -97,7 +97,15 @@ public class TestEngineExecutor {
         List<ClassTestDescriptor> classTestDescriptors =
                 extendedEngineDescriptor.getChildren(ClassTestDescriptor.class);
 
-        countDownLatch = new CountDownLatch(classTestDescriptors.size());
+        TestEngineConfiguration.getInstance()
+                .get(TestEngineConstants.TEST_CLASS_SHUFFLE)
+                .ifPresent(value -> {
+                    if (value.equalsIgnoreCase(TestEngineConstants.TRUE)) {
+                        Collections.shuffle(classTestDescriptors, new SecureRandom());
+                    }
+                });
+
+        CountDownLatch countDownLatch = new CountDownLatch(classTestDescriptors.size());
 
         classTestDescriptors
                 .forEach(classTestDescriptor ->

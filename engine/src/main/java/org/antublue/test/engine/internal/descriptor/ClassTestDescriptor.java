@@ -38,7 +38,7 @@ import java.util.Optional;
 /**
  * Class to implement a class test descriptor
  */
-@SuppressWarnings("PMD.EmptyCatchBlock")
+@SuppressWarnings({ "PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock" })
 public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassTestDescriptor.class);

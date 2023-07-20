@@ -38,7 +38,7 @@ import java.util.Optional;
 /**
  * Class to implement a method descriptor
  */
-@SuppressWarnings("PMD.EmptyCatchBlock")
+@SuppressWarnings({ "PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock" })
 public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodTestDescriptor.class);
@@ -66,7 +66,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         this.testClass = testClass;
         this.testArgument = testArgument;
         this.testMethod = testMethod;
-        this.testMethod.setAccessible(true);
+        testMethod.setAccessible(true);
     }
 
     /**

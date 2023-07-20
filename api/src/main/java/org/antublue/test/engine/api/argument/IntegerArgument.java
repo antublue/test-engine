@@ -16,14 +16,12 @@
 
 package org.antublue.test.engine.api.argument;
 
-import org.antublue.test.engine.api.Argument;
-
 import java.util.Objects;
 
 /**
  * Class to implement a BooleanArgument
  */
-public class IntegerArgument implements Argument {
+public class IntegerArgument extends AbstractArgument {
 
     private final String name;
     private final int value;
@@ -35,16 +33,7 @@ public class IntegerArgument implements Argument {
      * @param value value
      */
     public IntegerArgument(String name, int value) {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-
-        name = name.trim();
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
-
-        this.name = name;
+        this.name = validateName(name);
         this.value = value;
     }
 

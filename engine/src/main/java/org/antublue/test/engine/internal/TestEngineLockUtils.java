@@ -154,14 +154,13 @@ public class TestEngineLockUtils {
      */
     private static void unlock(Method method, String name, TestEngine.LockMode mode) {
         if (name != null && !name.trim().isEmpty()) {
-            name = name.trim();
             ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
             if (reentrantReadWriteLock != null) {
                 
                 LOGGER.trace(
                         String.format(
                                 "Releasing lock [%s] mode [%s] class [%s] method [%s]",
-                                name,
+                                name.trim(),
                                 mode,
                                 method.getDeclaringClass().getName(),
                                 method.getName()));
@@ -175,7 +174,7 @@ public class TestEngineLockUtils {
                 LOGGER.trace(
                         String.format(
                                 "Released lock [%s] mode [%s] class [%s] method [%s]",
-                                name,
+                                name.trim(),
                                 mode,
                                 method.getDeclaringClass().getName(),
                                 method.getName()));
@@ -184,7 +183,7 @@ public class TestEngineLockUtils {
                 throw new TestClassConfigurationException(
                         String.format(
                                 "@TestEngine.Unlock without @TestEngine.Lock, name [%s] mode [%s] class [%s] method [%s]",
-                                name,
+                                name.trim(),
                                 mode,
                                 method.getDeclaringClass().getName(),
                                 method.getName()));

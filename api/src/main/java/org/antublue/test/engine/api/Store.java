@@ -135,12 +135,12 @@ public class Store {
      * @param <T>
      */
     public static <T> Optional<T> get(String key, Class<T> clazz) {
-        key = validateKey(key);
+        String validateKey = validateKey(key);
         validateObject(clazz, "class is null");
 
         try {
             lock();
-            return Optional.ofNullable(clazz.cast(MAP.get(key)));
+            return Optional.ofNullable(clazz.cast(MAP.get(validateKey)));
         } finally {
             unlock();
         }
@@ -210,12 +210,11 @@ public class Store {
             throw new IllegalArgumentException("key is null");
         }
 
-        key = key.trim();
-        if (key.isEmpty()) {
+        if (key.trim().isEmpty()) {
             throw new IllegalArgumentException("key is empty");
         }
 
-        return key;
+        return key.trim();
     }
 
     /**
