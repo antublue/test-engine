@@ -38,6 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,6 +55,7 @@ public final class TestEngineReflectionUtils {
 
     private static final Map<Class<?>, Method> ARGUMENT_SUPPLIER_METHOD_CACHE = new HashMap<>();
     private static final Map<Class<?>, Field> ARGUMENT_FIELD_CACHE = new HashMap<>();
+    private static final Map<Class<?>, Optional<Method>> EXCEPTION_HANDLER_METHOD_CACHE = new HashMap<>();
     private static final Map<Class<?>, List<Field>> AUTO_CLOSE_FIELD_CACHE = new HashMap<>();
     private static final Map<Class<?>, List<Method>> PREPARE_METHOD_CACHE = new HashMap<>();
     private static final Map<Class<?>, List<Method>> BEFORE_ALL_METHOD_CACHE = new HashMap<>();
@@ -194,6 +196,50 @@ public final class TestEngineReflectionUtils {
                     t);
         }
     }
+
+    /*
+    public static Optional<Method> getExceptionHandlerMethod(Class<?> clazz) {
+        synchronized (EXCEPTION_HANDLER_METHOD_CACHE) {
+            LOGGER.trace("getExceptionHandlerMethod(%s)", clazz.getName());
+
+            if (EXCEPTION_HANDLER_METHOD_CACHE.containsKey(clazz)) {
+                return EXCEPTION_HANDLER_METHOD_CACHE.get(clazz);
+            }
+
+            List<Method> methodList =
+                    getMethods(
+                            clazz,
+                            TestEngine.ExceptionHandler.class,
+                            Scope.NON_STATIC,
+                            Void.class,
+                            (Class<?>[]) null);
+
+            LOGGER.trace(
+                    "class [%s] @TestEngine.ExceptionHandler method count [%d]",
+                    clazz.getName(),
+                    methodList.size());
+
+            if (methodList.size() > 1) {
+                throw new TestClassConfigurationException(
+                        String.format(
+                                "Test class [%s] must define one @TestEngine.ExceptionHandler method",
+                                clazz.getName()));
+            }
+
+            Optional<Method> optionalMethod;
+
+            if (methodList.size() == 1) {
+                optionalMethod = Optional.of(methodList.get(0));
+            } else {
+                optionalMethod = Optional.empty();
+            }
+
+            EXCEPTION_HANDLER_METHOD_CACHE.put(clazz, optionalMethod);
+
+            return optionalMethod;
+        }
+    }
+    */
 
     /**
      * Method to get a List of @TestEngine.Prepare Methods

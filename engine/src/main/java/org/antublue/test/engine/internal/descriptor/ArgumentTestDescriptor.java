@@ -18,20 +18,23 @@ package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.TestEngineAutoCloseUtils;
-import org.antublue.test.engine.internal.TestEngineExecutionContext;
+import org.antublue.test.engine.internal.TestEngineExecutorContext;
 import org.antublue.test.engine.internal.TestEngineLockUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.FieldUtils;
+import org.antublue.test.engine.internal.util.MethodUtils;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
-import org.antublue.test.engine.internal.util.ThrowableConsumer;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -118,102 +121,101 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
     /**
      * Method to test the test descriptor
-     *
-     * @param testEngineExecutionContext testEngineExecutionContext
      */
-    public void execute(TestEngineExecutionContext testEngineExecutionContext) {
-        ThrowableCollector throwableCollector = getThrowableCollector();
+    public void execute(TestEngineExecutorContext testEngineExecutorContext) {
+        LOGGER.trace(
+                "execute uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(),
+                testClass.getName(),
+                testArgument.name());
 
-        EngineExecutionListener engineExecutionListener =
-                testEngineExecutionContext.getExecutionRequest().getEngineExecutionListener();
-
+        EngineExecutionListener engineExecutionListener = testEngineExecutorContext.getEngineExecutionListener();
         engineExecutionListener.executionStarted(this);
 
-        final Object testInstance = testEngineExecutionContext.getTestInstance();
-        final Class<?> testClass = testInstance.getClass();
-        final String testClassName = testClass.getName();
+        ThrowableCollector throwableCollector = testEngineExecutorContext.getThrowableCollector();
 
-        try {
-            testEngineExecutionContext.setTestInstance(testInstance);
-            try {
-                LOGGER.trace("injecting test instance [%s] @TestEngine.Argument field", testClassName);
-                TestEngineReflectionUtils.getArgumentField(testClass).set(testInstance, testArgument);
-            } finally {
-                flush();
-            }
-        } catch (Throwable t) {
-            t = pruneStackTrace(t, testClassName);
-            t.printStackTrace();
-            throwableCollector.add(t);
-        }
+        Field field = TestEngineReflectionUtils.getArgumentField(testClass);
+        FieldUtils.setField(testInstance, field, testArgument, throwable -> {
+            throwableCollector.add(throwable);
+            throwable.printStackTrace();
+        });
 
         if (throwableCollector.isEmpty()) {
-            try {
-                TestEngineReflectionUtils
-                        .getBeforeAllMethods(testClass)
-                        .forEach((ThrowableConsumer<Method>) method -> {
-                            LOGGER.trace(
-                                    "invoking test instance [%s] @TestEngine.BeforeAll method [%s]",
-                                    testClassName,
-                                    method.getName());
-                            try {
-                                TestEngineLockUtils.processLockAnnotations(method);
-                                method.invoke(testInstance, (Object[]) null);
-                            } finally {
-                                TestEngineLockUtils.processUnlockAnnotations(method);
-                                flush();
-                            }
+            List<Method> methods = TestEngineReflectionUtils.getBeforeAllMethods(testClass);
+            for (Method method : methods) {
+                LOGGER.trace(
+                        "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
+                        getUniqueId(),
+                        testClass.getName(),
+                        method.getName());
+
+                TestEngineLockUtils.processLockAnnotations(method);
+
+                MethodUtils.invoke(
+                        testInstance,
+                        method,
+                        throwable -> {
+                            throwableCollector.add(throwable);
+                            throwable.printStackTrace();
                         });
-            } catch (Throwable t) {
-                t = pruneStackTrace(t, testClassName);
-                t.printStackTrace();
-                throwableCollector.add(t);
-            }
 
-            if (!throwableCollector.isEmpty()) {
-                getChildren(MethodTestDescriptor.class)
-                        .forEach(methodTestDescriptor -> methodTestDescriptor.skip(testEngineExecutionContext));
-            }
+                TestEngineLockUtils.processUnlockAnnotations(method);
 
-        } else {
-            getChildren(MethodTestDescriptor.class)
-                    .forEach(methodTestDescriptor -> methodTestDescriptor.skip(testEngineExecutionContext));
+                if (!throwableCollector.isEmpty()) {
+                    break;
+                }
+            }
         }
+
+        List<MethodTestDescriptor> methodTestDescriptors = getChildren(MethodTestDescriptor.class);
 
         if (throwableCollector.isEmpty()) {
-            getChildren(MethodTestDescriptor.class)
-                    .forEach(methodTestDescriptor -> methodTestDescriptor.execute(testEngineExecutionContext));
+           methodTestDescriptors
+                   .forEach(methodTestDescriptor -> {
+                        methodTestDescriptor.setTestInstance(testInstance);
+                        methodTestDescriptor.execute(testEngineExecutorContext);
+                    });
+        } else {
+            methodTestDescriptors
+                    .forEach(methodTestDescriptor -> {
+                        LOGGER.trace(
+                                "skip uniqueId [%s] testClass [%s] testMethod [%s]",
+                                methodTestDescriptor.getUniqueId(),
+                                testClass.getName(),
+                                methodTestDescriptor.getTestMethod().getName());
+
+                        methodTestDescriptor.skip(testEngineExecutorContext);
+                    });
         }
 
-        try {
-            TestEngineReflectionUtils
-                    .getAfterAllMethods(testClass)
-                    .forEach((ThrowableConsumer<Method>) method -> {
-                        LOGGER.trace(
-                                "invoking test instance [%s] @TestEngine.AfterAll method [%s]",
-                                testClassName,
-                                method.getName());
-                        try {
-                            TestEngineLockUtils.processLockAnnotations(method);
-                            method.invoke(testInstance, (Object[]) null);
-                        } finally {
-                            TestEngineLockUtils.processUnlockAnnotations(method);
-                            flush();
-                        }
+        List<Method> methods = TestEngineReflectionUtils.getAfterAllMethods(testClass);
+        for (Method method : methods) {
+            LOGGER.trace(
+                    "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
+                    getUniqueId(),
+                    testClass.getName(),
+                    method.getName());
+
+            TestEngineLockUtils.processLockAnnotations(method);
+
+            MethodUtils.invoke(
+                    testInstance,
+                    method,
+                    throwable -> {
+                        throwableCollector.add(throwable);
+                        throwable.printStackTrace();
                     });
 
-            TestEngineAutoCloseUtils.processAutoCloseAnnotatedFields(testInstance, "@TestEngine.AfterAll");
-        } catch (Throwable t) {
-            t = pruneStackTrace(t, testClassName);
-            t.printStackTrace();
-            throwableCollector.add(t);
+            TestEngineLockUtils.processUnlockAnnotations(method);
+
+            if (!throwableCollector.isEmpty()) {
+                break;
+            }
         }
 
-        try {
-            TestEngineReflectionUtils.getArgumentField(testClass).set(testInstance, null);
-        } catch (Throwable t) {
-            // DO NOTHING
-        }
+        TestEngineAutoCloseUtils.processAutoCloseAnnotatedFields(testInstance, "@TestEngine.AfterAll");
+
+        FieldUtils.setField(testInstance, field, null, throwable -> {});
 
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());

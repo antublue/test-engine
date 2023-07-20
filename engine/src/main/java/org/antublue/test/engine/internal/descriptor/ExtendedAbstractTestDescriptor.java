@@ -16,17 +16,11 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import org.antublue.test.engine.internal.TestEngineExecutionContext;
-import org.antublue.test.engine.internal.util.ThrowableCollector;
-import org.antublue.test.engine.internal.util.ThrowableConsumerException;
+import org.antublue.test.engine.internal.TestEngineExecutorContext;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -37,7 +31,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
 
-    private final ThrowableCollector throwableCollector;
+    protected Object testInstance;
 
     /**
      * Constructor
@@ -47,7 +41,6 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
      */
     protected ExtendedAbstractTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
-        throwableCollector = new ThrowableCollector();
     }
 
     /**
@@ -66,12 +59,33 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     }
 
     /**
-     * Method to get the test descriptors ThrowableCollector
+     * Method to set the test instance
      *
-     * @return the return value
+     * @param testInstance testInstance
      */
-    protected ThrowableCollector getThrowableCollector() {
-        return throwableCollector;
+    public void setTestInstance(Object testInstance) {
+        this.testInstance = testInstance;
+    }
+
+    /**
+     * Method to execute the TestDescriptor
+     *
+     * @param testEngineExecutorContext testEngineExecutorContext
+     */
+    public abstract void execute(TestEngineExecutorContext testEngineExecutorContext);
+
+    /**
+     * Method to skip the TestDescriptor's children, then the TestDescriptor (recursively)
+     *
+     * @param testEngineExecutorContext testEngineExecutorContext
+     */
+    public void skip(TestEngineExecutorContext testEngineExecutorContext) {
+        getChildren(ExtendedAbstractTestDescriptor.class)
+                .forEach(testDescriptor -> {
+                    testDescriptor.skip(testEngineExecutorContext);
+                });
+
+        testEngineExecutorContext.getEngineExecutionListener().executionSkipped(this, "Skipped");
     }
 
     /**
@@ -81,6 +95,7 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
      * @param markerClassName markerClassName
      * @return the return value
      */
+    /*
     protected Throwable pruneStackTrace(Throwable throwable, String markerClassName) {
         if (throwable instanceof InvocationTargetException) {
             throwable = throwable.getCause();
@@ -94,6 +109,7 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
          * Check the Throwable cause again, since the invocation may
          * have been wrapped by a ThrowableConsumerException
          */
+    /*
         if (throwable instanceof InvocationTargetException) {
             throwable = throwable.getCause();
         }
@@ -114,10 +130,12 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
         throwable.setStackTrace(workingStackTrace.toArray(new StackTraceElement[0]));
         return throwable;
     }
+    */
 
     /**
      * Method to flush System.out and System.err PrintStreams
      */
+    /*
     public void flush() {
         synchronized (System.out) {
             synchronized (System.err) {
@@ -126,26 +144,5 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
             }
         }
     }
-
-    /**
-     * Method to test the TestDescriptor
-     *
-     * @param testEngineExecutionContext testEngineExecutionContext
-     */
-    public abstract void execute(TestEngineExecutionContext testEngineExecutionContext);
-
-    /**
-     * Method to skip the TestDescriptor's children, then the TestDescriptor (recursively)
-     *
-     * @param testEngineExecutionContext testEngineExecutionContext
-     */
-    public void skip(TestEngineExecutionContext testEngineExecutionContext) {
-        getChildren(ExtendedAbstractTestDescriptor.class).forEach(
-                testDescriptor -> testDescriptor.skip(testEngineExecutionContext));
-
-        testEngineExecutionContext
-                .getExecutionRequest()
-                .getEngineExecutionListener()
-                .executionSkipped(this, "Skipped");
-    }
+    */
 }

@@ -17,13 +17,14 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.internal.TestEngineAutoCloseUtils;
-import org.antublue.test.engine.internal.TestEngineExecutionContext;
+import org.antublue.test.engine.internal.TestEngineExecutorContext;
 import org.antublue.test.engine.internal.TestEngineLockUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.MethodUtils;
+import org.antublue.test.engine.internal.util.ObjectUtils;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
-import org.antublue.test.engine.internal.util.ThrowableConsumer;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -31,6 +32,7 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -106,87 +108,94 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     /**
      * Method to test the test descriptor
-     *
-     * @param testEngineExecutionContext testEngineExecutionContext
      */
-    public void execute(TestEngineExecutionContext testEngineExecutionContext) {
-        ThrowableCollector throwableCollector = getThrowableCollector();
+    public void execute(TestEngineExecutorContext testEngineExecutorContext) {
+        LOGGER.trace("execute uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
-        String testClassName = testClass.getName();
-        Object testInstance = null;
-
-        EngineExecutionListener engineExecutionListener =
-                testEngineExecutionContext.getExecutionRequest().getEngineExecutionListener();
-
+        EngineExecutionListener engineExecutionListener = testEngineExecutorContext.getEngineExecutionListener();
         engineExecutionListener.executionStarted(this);
 
-        try {
-            LOGGER.trace("instantiating test class [%s]", testClassName);
-            try {
-                testInstance = testClass.getDeclaredConstructor((Class<?>[]) null).newInstance((Object[]) null);
-                testEngineExecutionContext.setTestInstance(testInstance);
-            } finally {
-                flush();
-            }
+        ThrowableCollector throwableCollector = testEngineExecutorContext.getThrowableCollector();
 
-            final Object finalTestInstance = testInstance;
-
-            TestEngineReflectionUtils
-                    .getPrepareMethods(testClass)
-                    .forEach((ThrowableConsumer<Method>) method -> {
-                        LOGGER.trace(
-                                "invoking test instance [%s] @TestEngine.Prepare method [%s]",
-                                testClassName,
-                                method.getName());
-                        try {
-                            TestEngineLockUtils.processLockAnnotations(method);
-                            method.invoke(finalTestInstance, (Object[]) null);
-                        } finally {
-                            TestEngineLockUtils.processUnlockAnnotations(method);
-                            flush();
-                        }
-                    });
-        } catch (Throwable t) {
-            t = pruneStackTrace(t, testClassName);
-            t.printStackTrace();
-            throwableCollector.add(t);
-        }
+        ObjectUtils.instantiate(testClass, o -> testInstance = o, throwable -> throwableCollector.add(throwable));
 
         if (throwableCollector.isEmpty()) {
-            getChildren(ArgumentTestDescriptor.class)
-                    .forEach(argumentTestDescriptor -> argumentTestDescriptor.execute(testEngineExecutionContext));
-        } else {
-            getChildren(ArgumentTestDescriptor.class)
-                    .forEach(argumentTestDescriptor -> argumentTestDescriptor.skip(testEngineExecutionContext));
-        }
+            List<Method> methods = TestEngineReflectionUtils.getPrepareMethods(testClass);
+            for (Method method : methods) {
+                LOGGER.trace(
+                        "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
+                        getUniqueId(),
+                        testClass.getName(),
+                        method.getName());
 
-        try {
-            if (testInstance != null) {
-                final Object finalTestInstance = testInstance;
+                TestEngineLockUtils.processLockAnnotations(method);
 
-                TestEngineReflectionUtils
-                        .getConcludeMethods(testClass)
-                        .forEach((ThrowableConsumer<Method>) method -> {
-                            LOGGER.trace(
-                                    "invoking test instance [%s] @TestEngine.Conclude method [%s]",
-                                    testClassName,
-                                    method.getName());
-                            try {
-                                TestEngineLockUtils.processLockAnnotations(method);
-                                method.invoke(finalTestInstance, (Object[]) null);
-                            } finally {
-                                TestEngineLockUtils.processUnlockAnnotations(method);
-                                flush();
-                            }
+                MethodUtils.invoke(
+                        testInstance,
+                        method,
+                        throwable -> {
+                            throwableCollector.add(throwable);
+                            throwable.printStackTrace();
                         });
 
-                TestEngineAutoCloseUtils.processAutoCloseAnnotatedFields(testInstance, "@TestEngine.Conclude");
+                TestEngineLockUtils.processUnlockAnnotations(method);
+
+                if (!throwableCollector.isEmpty()) {
+                    break;
+                }
             }
-        } catch (Throwable t) {
-            t = pruneStackTrace(t, testClassName);
-            t.printStackTrace();
-            throwableCollector.add(t);
         }
+
+        List<ArgumentTestDescriptor> argumentTestDescriptors = getChildren(ArgumentTestDescriptor.class);
+
+        if (throwableCollector.isEmpty()) {
+            argumentTestDescriptors
+                    .forEach(argumentTestDescriptor -> {
+                        argumentTestDescriptor.setTestInstance(testInstance);
+                        argumentTestDescriptor.execute(testEngineExecutorContext);
+                    } );
+        } else {
+            argumentTestDescriptors
+                    .forEach(argumentTestDescriptor -> {
+                        LOGGER.trace(
+                                "skip uniqueId [%s] testClass [%s] testArgument [%s]",
+                                argumentTestDescriptor.getUniqueId(),
+                                testClass.getName(),
+                                argumentTestDescriptor.getTestArgument().name());
+
+                        argumentTestDescriptor.skip(testEngineExecutorContext);
+                    });
+        }
+
+        if (testInstance != null) {
+            List<Method> methods = TestEngineReflectionUtils.getConcludeMethods(testClass);
+            for (Method method : methods) {
+                LOGGER.trace(
+                        "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
+                        getUniqueId(),
+                        testClass.getName(),
+                        method.getName());
+
+                TestEngineLockUtils.processLockAnnotations(method);
+
+                MethodUtils.invoke(
+                        testInstance,
+                        method,
+                        throwable -> {
+                            throwableCollector.add(throwable);
+                            throwable.printStackTrace();
+                        });
+
+                TestEngineLockUtils.processUnlockAnnotations(method);
+
+                if (!throwableCollector.isEmpty()) {
+                    break;
+                }
+            }
+
+            TestEngineAutoCloseUtils.processAutoCloseAnnotatedFields(testInstance, "@TestEngine.Conclude");
+        }
+
 
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
@@ -200,7 +209,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         }
 
-        testEngineExecutionContext.setTestInstance(null);
-        testEngineExecutionContext.getCountDownLatch().countDown();
+        testInstance = null;
+        testEngineExecutorContext.complete();
     }
 }
