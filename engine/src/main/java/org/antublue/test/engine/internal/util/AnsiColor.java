@@ -115,7 +115,7 @@ public class AnsiColor {
             ANSI_COLOR_SUPPORTED = false;
         }
 
-        if (TRUE.equals(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE)) {
+        if (TRUE.equals(System.getenv(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE))) {
             ANSI_COLOR_SUPPORTED = false;
         }
     }

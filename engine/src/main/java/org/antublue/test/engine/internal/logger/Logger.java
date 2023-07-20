@@ -21,9 +21,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -43,19 +41,6 @@ public class Logger {
     private static final int DEBUG = 400;
     private static final int TRACE = 500;
     private static final int ALL = Integer.MAX_VALUE;
-
-    private static final Map<String, Integer> LOG_LEVEL_MAP;
-
-    static {
-        LOG_LEVEL_MAP = new HashMap<>();
-        LOG_LEVEL_MAP.put("OFF", OFF);
-        LOG_LEVEL_MAP.put("ERROR", ERROR);
-        LOG_LEVEL_MAP.put("WARNING", WARNING);
-        LOG_LEVEL_MAP.put("INFO", INFO);
-        LOG_LEVEL_MAP.put("DEBUG", DEBUG);
-        LOG_LEVEL_MAP.put("TRACE", TRACE);
-        LOG_LEVEL_MAP.put("ALL", ALL);
-    }
 
     private final String name;
     private final AtomicReference<Level> level;

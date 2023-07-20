@@ -17,7 +17,6 @@
 package org.antublue.test.engine.internal.util;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.function.Consumer;
 
 public class FieldUtils {
@@ -46,9 +45,6 @@ public class FieldUtils {
             field.setAccessible(true);
             field.set(object, value);
         } catch (Throwable t) {
-            if (t instanceof InvocationTargetException) {
-                t = t.getCause();
-            }
             t.printStackTrace();
             throwableConsumer.accept(t);
         }

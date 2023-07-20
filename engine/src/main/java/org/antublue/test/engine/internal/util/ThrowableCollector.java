@@ -44,15 +44,6 @@ public class ThrowableCollector {
     }
 
     /**
-     * Method to add a ThrowableCollector's Throwable Exceptions to this ThrowableCollector
-     *
-     * @param throwableCollector throwableCollector
-     */
-    public void merge(ThrowableCollector throwableCollector) {
-        throwableList.addAll(throwableCollector.getList());
-    }
-
-    /**
      * Method to get the number of Throwable Exception collected
      *
      * @return the return value
@@ -62,12 +53,21 @@ public class ThrowableCollector {
     }
 
     /**
-     * Method to return whether the ThrowableCollector has any Throwable Exceptions
+     * Method to return whether the ThrowableCollector is empty
      *
      * @return the return value
      */
     public boolean isEmpty() {
         return throwableList.isEmpty();
+    }
+
+    /**
+     * Method to return whether the ThrowableCollector is not empty
+     *
+     * @return the return value
+     */
+    public boolean isNotEmpty() {
+        return !throwableList.isEmpty();
     }
 
     /**

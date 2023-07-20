@@ -140,7 +140,7 @@ public class TestEngineLockUtils {
                 TestEngine.ResourceLock.List unlockListAnnotation = (TestEngine.ResourceLock.List) annotation;
                 List<TestEngine.ResourceLock> list = Arrays.asList(unlockListAnnotation.value());
                 Collections.reverse(list);
-                list.stream().forEach(lock -> unlock(method, lock.value(), lock.mode()));
+                list.forEach(lock -> unlock(method, lock.value(), lock.mode()));
             }
         }
     }

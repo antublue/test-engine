@@ -47,7 +47,7 @@ public final class ExtendedEngineDescriptor extends EngineDescriptor {
      */
     @Override
     public Optional<TestSource> getSource() {
-        return Optional.ofNullable(null);
+        return Optional.empty();
     }
 
     /**

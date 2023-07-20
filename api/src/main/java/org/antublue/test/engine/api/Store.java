@@ -188,7 +188,7 @@ public class Store {
                 try {
                     ((AutoCloseable) o).close();
                 } catch (Throwable t) {
-                    throw new RuntimeException(
+                    throw new StoreException(
                             String.format(
                                     "Exception closing Object for key [%s] object [%s]",
                                     key,

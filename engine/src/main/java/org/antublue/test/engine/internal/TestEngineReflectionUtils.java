@@ -20,7 +20,6 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.Throwables;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.ReflectionUtils;
 
@@ -38,7 +37,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,7 +53,7 @@ public final class TestEngineReflectionUtils {
 
     private static final Map<Class<?>, Method> ARGUMENT_SUPPLIER_METHOD_CACHE = new HashMap<>();
     private static final Map<Class<?>, Field> ARGUMENT_FIELD_CACHE = new HashMap<>();
-    private static final Map<Class<?>, Optional<Method>> EXCEPTION_HANDLER_METHOD_CACHE = new HashMap<>();
+    //private static final Map<Class<?>, Optional<Method>> EXCEPTION_HANDLER_METHOD_CACHE = new HashMap<>();
     private static final Map<Class<?>, List<Field>> AUTO_CLOSE_FIELD_CACHE = new HashMap<>();
     private static final Map<Class<?>, List<Method>> PREPARE_METHOD_CACHE = new HashMap<>();
     private static final Map<Class<?>, List<Method>> BEFORE_ALL_METHOD_CACHE = new HashMap<>();
@@ -790,10 +788,14 @@ public final class TestEngineReflectionUtils {
                         }
                     });
         } catch (Throwable t) {
-            if (t instanceof NoClassDefFoundError) {
-                // DO NOTHING
-            } else {
-                Throwables.throwIfUnchecked(t);
+            if (t instanceof TestEngineException) {
+                throw t;
+            } else if (!(t instanceof NoClassDefFoundError)) {
+                throw new TestEngineException(
+                        String.format(
+                                "Exception resolving methods class [%s]",
+                                clazz.getName()),
+                        t);
             }
         }
 
