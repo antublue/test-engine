@@ -221,6 +221,15 @@ The test engine has seven configuration parameters.
 
 <br/>
 
+| <nobr>Test class shuffle</nobr>                |                                          |
+|------------------------------------------------|------------------------------------------|
+| Environment variable                           | ANTUBLUE_TEST_ENGINE_TEST_CLASS_SHUFFLE  |
+| System property                                | antublue.test.engine.test.class.shuffle  |
+| Type                                           | string (`true`, else considered `false`) |
+
+
+<br/>
+
 | <nobr>Test class name include filter</nobr> |                                          |
 |-------------------------------------------------|-----------------------------------------|
 | Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE |

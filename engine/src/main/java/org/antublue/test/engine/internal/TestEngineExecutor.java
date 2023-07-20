@@ -26,6 +26,8 @@ import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestExecutionResult;
 
+import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -96,6 +98,14 @@ public class TestEngineExecutor {
 
         List<ClassTestDescriptor> classTestDescriptors =
                 extendedEngineDescriptor.getChildren(ClassTestDescriptor.class);
+
+        TestEngineConfiguration.getInstance()
+                .get(TestEngineConstants.TEST_CLASS_SHUFFLE)
+                .ifPresent(value -> {
+                    if (value.equalsIgnoreCase(TestEngineConstants.TRUE)) {
+                        Collections.shuffle(classTestDescriptors, new SecureRandom());
+                    }
+                });
 
         countDownLatch = new CountDownLatch(classTestDescriptors.size());
 
