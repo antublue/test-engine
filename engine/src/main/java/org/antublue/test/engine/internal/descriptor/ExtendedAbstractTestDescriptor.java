@@ -80,69 +80,10 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
      * @param testEngineExecutorContext testEngineExecutorContext
      */
     public void skip(TestEngineExecutorContext testEngineExecutorContext) {
-        getChildren(ExtendedAbstractTestDescriptor.class)
-                .forEach(testDescriptor -> {
-                    testDescriptor.skip(testEngineExecutorContext);
-                });
+        for (ExtendedAbstractTestDescriptor testDescriptor : getChildren(ExtendedAbstractTestDescriptor.class)) {
+            testDescriptor.skip(testEngineExecutorContext);
+        }
 
         testEngineExecutorContext.getEngineExecutionListener().executionSkipped(this, "Skipped");
     }
-
-    /**
-     * Method to prune a Throwable stacktrace
-     *
-     * @param throwable throwable
-     * @param markerClassName markerClassName
-     * @return the return value
-     */
-    /*
-    protected Throwable pruneStackTrace(Throwable throwable, String markerClassName) {
-        if (throwable instanceof InvocationTargetException) {
-            throwable = throwable.getCause();
-        }
-
-        if (throwable instanceof ThrowableConsumerException) {
-            throwable = throwable.getCause();
-        }
-
-        /*
-         * Check the Throwable cause again, since the invocation may
-         * have been wrapped by a ThrowableConsumerException
-         */
-    /*
-        if (throwable instanceof InvocationTargetException) {
-            throwable = throwable.getCause();
-        }
-
-        List<StackTraceElement> workingStackTrace = new ArrayList<>();
-        List<StackTraceElement> stackTraceElements = Arrays.asList(throwable.getStackTrace());
-
-        Iterator<StackTraceElement> stackTraceElementIterator = stackTraceElements.iterator();
-        while (stackTraceElementIterator.hasNext()) {
-            StackTraceElement stackTraceElement = stackTraceElementIterator.next();
-            String stackTraceClassName = stackTraceElement.getClassName();
-            workingStackTrace.add(stackTraceElement);
-            if (stackTraceClassName.equals(markerClassName)) {
-                break;
-            }
-        }
-
-        throwable.setStackTrace(workingStackTrace.toArray(new StackTraceElement[0]));
-        return throwable;
-    }
-    */
-
-    /**
-     * Method to flush System.out and System.err PrintStreams
-     */
-    /*
-    public void flush() {
-        synchronized (System.out) {
-            synchronized (System.err) {
-                System.out.flush();
-                System.err.flush();
-            }
-        }
-    }
-    */
 }

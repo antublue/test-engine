@@ -139,6 +139,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
     /**
      * Method to test the test descriptor
      */
+    @Override
     public void execute(TestEngineExecutorContext testEngineExecutorContext) {
         LOGGER.trace(
                 "execute uniqueId [%s] testClass [%s] testArgument [%s] testMethod [%s]",
@@ -172,7 +173,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
             TestEngineLockUtils.processUnlockAnnotations(method);
 
-            if (!throwableCollector.isEmpty()) {
+            if (throwableCollector.isNotEmpty()) {
                 break;
             }
         }
@@ -216,13 +217,16 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     });
 
             TestEngineLockUtils.processUnlockAnnotations(method);
-
-            if (!throwableCollector.isEmpty()) {
-                break;
-            }
         }
 
-        TestEngineAutoCloseUtils.processAutoCloseAnnotatedFields(testInstance, "@TestEngine.AfterEach");
+        TestEngineAutoCloseUtils
+                .processAutoCloseAnnotatedFields(
+                        testInstance,
+                        "@TestEngine.AfterEach",
+                        throwable -> {
+                            throwableCollector.add(throwable);
+                            throwable.printStackTrace();
+                        });
 
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());

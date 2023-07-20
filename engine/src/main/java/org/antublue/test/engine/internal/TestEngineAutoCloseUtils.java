@@ -21,7 +21,9 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.function.Consumer;
 
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class TestEngineAutoCloseUtils {
@@ -41,7 +43,8 @@ public class TestEngineAutoCloseUtils {
      * @param object object
      * @param scope scope
      */
-    public static void processAutoCloseAnnotatedFields(Object object, String scope) {
+    public static void processAutoCloseAnnotatedFields(
+            Object object, String scope, Consumer<Throwable> throwableConsumer) {
         LOGGER.trace("processAutoCloseFields(%s, %s)", object.getClass().getName(), scope);
 
         TestEngineReflectionUtils
@@ -53,7 +56,7 @@ public class TestEngineAutoCloseUtils {
                             String annotationScope = annotation.scope();
                             String annotationMethodName = annotation.method();
                             if (scope.equals(annotationScope)) {
-                                close(object, annotationScope, annotationMethodName, field);
+                                close(object, annotationScope, annotationMethodName, field, throwableConsumer);
                             } else {
                                 LOGGER.trace(
                                         "skipping field [%s] annotation scope [%s] doesn't match scope [%s]",
@@ -72,7 +75,8 @@ public class TestEngineAutoCloseUtils {
      * @param methodName methodName
      * @param field field
      */
-    private static void close(Object object, String scope, String methodName, Field field) {
+    private static void close(
+            Object object, String scope, String methodName, Field field, Consumer<Throwable> throwableConsumer) {
         LOGGER.trace("close(%s, %s, %s)", object.getClass().getName(), methodName, field.getName());
 
         if (methodName.trim().isEmpty()) {
@@ -82,13 +86,14 @@ public class TestEngineAutoCloseUtils {
                     ((AutoCloseable) o).close();
                 }
             } catch (Throwable t) {
-                throw new RuntimeException(
-                        String.format(
-                                "Exception closing @TestEngine.AutoClose class [%s] field [%s] scope [%s]",
-                                object.getClass(),
-                                field.getName(),
-                                scope),
-                        t);
+                throwableConsumer.accept(
+                        new TestEngineException(
+                            String.format(
+                                    "Exception closing @TestEngine.AutoClose class [%s] field [%s] scope [%s]",
+                                    object.getClass(),
+                                    field.getName(),
+                                    scope),
+                            t));
             }
         } else {
             try {
@@ -100,13 +105,18 @@ public class TestEngineAutoCloseUtils {
                     method.invoke(o, (Object[]) null);
                 }
             } catch (Throwable t) {
-                throw new RuntimeException(
-                        String.format(
-                                "Exception closing @TestEngine.AutoClose class [%s] field [%s] scope [%s]",
-                                object.getClass().getName(),
-                                field.getName(),
-                                scope),
-                        t);
+                if (t instanceof InvocationTargetException) {
+                    t = t.getCause();
+                }
+
+                throwableConsumer.accept(
+                        new TestEngineException(
+                                String.format(
+                                        "Exception closing @TestEngine.AutoClose class [%s] field [%s] scope [%s]",
+                                        object.getClass(),
+                                        field.getName(),
+                                        scope),
+                                t));
             }
         }
     }

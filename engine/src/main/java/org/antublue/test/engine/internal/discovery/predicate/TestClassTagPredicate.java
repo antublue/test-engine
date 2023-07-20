@@ -56,7 +56,11 @@ public final class TestClassTagPredicate extends RegexPredicate<Class<?>> {
             String tag = valueMethod.invoke(annotation, (Object[]) null).toString();
             return matcher.reset(tag).find();
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            throw new TestEngineException(String.format("Invalid @TestEngine.Tag configuration", e));
+            throw new TestEngineException(
+                    String.format(
+                            "Invalid @TestEngine.Tag configuration class [%s]",
+                            clazz.getName()),
+                    e);
         }
     }
 

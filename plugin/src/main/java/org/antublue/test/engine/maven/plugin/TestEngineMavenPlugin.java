@@ -80,10 +80,10 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     private MavenSession mavenSession;
 
     @Parameter(property ="project", required = true, readonly = true)
-    protected MavenProject mavenProject;
+    private MavenProject mavenProject;
 
     @Parameter(property = "properties")
-    protected Map<String, String> properties;
+    private Map<String, String> properties;
 
     private Log log;
 

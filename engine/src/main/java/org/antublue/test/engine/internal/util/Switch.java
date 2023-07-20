@@ -37,9 +37,8 @@ public final class Switch {
      *
      * @param object object
      * @param consumers consumers
-     * @param <T> the return type
      */
-    public static <T> void switchType(Object object, Consumer... consumers) {
+    public static void switchType(Object object, Consumer... consumers) {
         if (consumers != null) {
             for (Consumer consumer : consumers) {
                 consumer.accept(object);
@@ -57,7 +56,12 @@ public final class Switch {
      */
     public static <T> Consumer<T> switchCase(Class<T> clazz, Consumer<T> consumer) {
         if (clazz != null && consumer != null) {
-            return object -> Optional.ofNullable(object).filter(clazz::isInstance).map(clazz::cast).ifPresent(consumer);
+            return object ->
+                    Optional
+                            .ofNullable(object)
+                            .filter(clazz::isInstance)
+                            .map(clazz::cast)
+                            .ifPresent(consumer);
         } else {
             return null;
         }

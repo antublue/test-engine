@@ -109,6 +109,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
     /**
      * Method to test the test descriptor
      */
+    @Override
     public void execute(TestEngineExecutorContext testEngineExecutorContext) {
         LOGGER.trace("execute uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
@@ -117,7 +118,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         ThrowableCollector throwableCollector = testEngineExecutorContext.getThrowableCollector();
 
-        ObjectUtils.instantiate(testClass, o -> testInstance = o, throwable -> throwableCollector.add(throwable));
+        ObjectUtils.instantiate(testClass, o -> testInstance = o, throwableCollector::add);
 
         if (throwableCollector.isEmpty()) {
             List<Method> methods = TestEngineReflectionUtils.getPrepareMethods(testClass);
@@ -140,7 +141,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
                 TestEngineLockUtils.processUnlockAnnotations(method);
 
-                if (!throwableCollector.isEmpty()) {
+                if (throwableCollector.isNotEmpty()) {
                     break;
                 }
             }
@@ -187,15 +188,17 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         });
 
                 TestEngineLockUtils.processUnlockAnnotations(method);
-
-                if (!throwableCollector.isEmpty()) {
-                    break;
-                }
             }
 
-            TestEngineAutoCloseUtils.processAutoCloseAnnotatedFields(testInstance, "@TestEngine.Conclude");
+            TestEngineAutoCloseUtils
+                    .processAutoCloseAnnotatedFields(
+                            testInstance,
+                            "@TestEngine.Conclude",
+                            throwable -> {
+                                throwableCollector.add(throwable);
+                                throwable.printStackTrace();
+                            });
         }
-
 
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());

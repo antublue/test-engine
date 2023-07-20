@@ -101,10 +101,9 @@ public class TestEngineExecutor {
 
         classTestDescriptors
                 .forEach(classTestDescriptor ->
-                        executorService.submit(() -> {
-                            classTestDescriptor.execute(
-                                    new TestEngineExecutorContext(executionRequest, countDownLatch));
-                        }));
+                        executorService.submit(
+                                () -> classTestDescriptor
+                                        .execute(new TestEngineExecutorContext(executionRequest, countDownLatch))));
 
         try {
             countDownLatch.await();

@@ -57,7 +57,7 @@ public final class TestEngineConfiguration implements ConfigurationParameters {
 
     @Override
     public Optional<Boolean> getBoolean(String key) {
-        return Optional.ofNullable(Boolean.parseBoolean(resolve(key)));
+        return Optional.of(Boolean.parseBoolean(resolve(key)));
     }
 
     @Override

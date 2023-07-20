@@ -17,11 +17,16 @@
 #
 
 function check_exit_code () {
-  if [ ! $? -eq 0 ];
+  if [ ! $? ];
   then
     echo "${1}"
     exit 1
   fi
+}
+
+function emit_error () {
+  echo "${1}"
+  exit 1;
 }
 
 if [ "$#" -ne 1 ];
@@ -39,9 +44,9 @@ check_exit_code "Git checkout [${VERSION}] failed"
 
 mvn versions:set -DnewVersion="${VERSION}" -DprocessAllModules
 check_exit_code "Maven update versions [${VERSION}] failed"
-rm -Rf `find . -name "*versionsBackup"`
+rm -Rf "$(find . -name "*versionsBackup")"
 
-cd ${CURRENT_DIRECTORY}
+cd "${CURRENT_DIRECTORY}" || emit_error "Failed to change directory [${CURRENT_DIRECTORY}]"
 ./mvnw clean verify
 check_exit_code "Maven build [${VERSION}] failed"
 
