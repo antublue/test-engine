@@ -86,26 +86,26 @@ public class TestEngineLockUtils {
      */
     private static void lock(Method method, String name, TestEngine.LockMode mode) {
         if (name != null && !name.trim().isEmpty()) {
-            name = name.trim();
+            String trimmedName = name.trim();
 
             LOGGER.trace(
                     String.format(
                             "Acquiring lock [%s] mode [%s] class [%s] method [%s]",
-                            name,
+                            trimmedName,
                             mode,
                             method.getDeclaringClass().getName(),
                             method.getName()));
             
             if (mode == TestEngine.LockMode.READ_WRITE) {
-                LOCK_MAP.computeIfAbsent(name, n -> new ReentrantReadWriteLock(true)).writeLock().lock();
+                LOCK_MAP.computeIfAbsent(trimmedName, n -> new ReentrantReadWriteLock(true)).writeLock().lock();
             } else {
-                LOCK_MAP.computeIfAbsent(name, n -> new ReentrantReadWriteLock(true)).readLock().lock();
+                LOCK_MAP.computeIfAbsent(trimmedName, n -> new ReentrantReadWriteLock(true)).readLock().lock();
             }
 
             LOGGER.trace(
                     String.format(
                             "Acquired lock [%s] mode [%s] class [%s] method [%s]",
-                            name,
+                            trimmedName,
                             mode,
                             method.getDeclaringClass().getName(),
                             method.getName()));
