@@ -1,7 +1,7 @@
 package example.testcontainers;
 
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -15,6 +15,7 @@ import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.Closeable;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
@@ -36,69 +37,54 @@ public class KafkaTest {
     private static final String GROUP_ID = "test-group-id";
     private static final String EARLIEST = "earliest";
 
-    private KafkaTestState kafkaTestState;
+    private String message;
+
+    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude")
+    private Network network;
 
     @TestEngine.Argument
-    protected StringArgument stringArgument;
+    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll")
+    protected KafkaTestContainer kafkaTestContainer;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
+    public static Stream<KafkaTestContainer> arguments() {
         return Stream.of(
-                StringArgument.of("confluentinc/cp-kafka:7.3.0"),
-                StringArgument.of("confluentinc/cp-kafka:7.3.1"),
-                StringArgument.of("confluentinc/cp-kafka:7.3.2"),
-                StringArgument.of("confluentinc/cp-kafka:7.3.3"),
-                StringArgument.of("confluentinc/cp-kafka:7.4.0"));
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.0.9"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.1.8"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.2.6"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.3.4"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.4.1"));
     }
 
     @TestEngine.Prepare
-    public void prepare() {
-        System.out.println("prepare()");
+    public void createNetwork() {
+        info("creating network ...");
 
-        Network network = Network.newNetwork();
-        network.getId();
+        network = Network.newNetwork();
+        String id = network.getId();
 
-        kafkaTestState = new KafkaTestState();
-        kafkaTestState.setNetwork(network);
+        info("network [%s] created", id);
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll() {
-        System.out.println("beforeAll()");
+    public void startTestContainer() {
+        info("starting test container ...");
 
-        Network network = kafkaTestState.getNetwork();
-        String dockerImageName = stringArgument.value();
+        kafkaTestContainer.start(network);
 
-        KafkaContainer kafkaContainer = new KafkaContainer(DockerImageName.parse(dockerImageName));
-        kafkaContainer.withNetwork(network);
-
-        if (stringArgument.equals("confluentinc/cp-kafka:7.4.0")) {
-            kafkaContainer.withKraft();
-        } else {
-            kafkaContainer.withEmbeddedZookeeper();
-        }
-
-        kafkaContainer.start();
-        kafkaTestState.setKafkaContainer(kafkaContainer);
-
-        String bootstrapServers = kafkaContainer.getBootstrapServers();
-        kafkaTestState.setBootstrapServers(bootstrapServers);
+        info("test container started");
     }
 
     @TestEngine.Test
-    public void produceConsumeTest() throws Throwable {
-        System.out.println("produceConsumeTest()");
-        produce();
-        consume();
-    }
+    @TestEngine.Order(order = 1)
+    public void testProduce() throws Throwable {
+        info("testing produce ...");
 
-    private void produce() throws Throwable {
-        String message = randomString(16);
+        message = randomString(16);
 
-        System.out.println(String.format("produce message [%s]", message));
-        kafkaTestState.setMessage(message);
+        String bootstrapServers = kafkaTestContainer.getBootstrapServers();
 
-        String bootstrapServers = kafkaTestState.getBootstrapServers();
+        info("producing message [%s] to [%s] ...", message, bootstrapServers);
 
         Properties properties = new Properties();
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -116,11 +102,18 @@ public class KafkaTest {
                 producer.close();
             }
         }
+
+        System.out.println(String.format("message [%s] produced", message));
     }
 
-    private void consume() {
-        String message = kafkaTestState.getMessage();
-        String bootstrapServers = kafkaTestState.getBootstrapServers();
+    @TestEngine.Test
+    @TestEngine.Order(order = 2)
+    public void testConsume() {
+        info("testing consume ...");
+
+        String bootstrapServers = kafkaTestContainer.getBootstrapServers();
+
+        info("consuming message from [%s] ...", bootstrapServers);
 
         Properties properties = new Properties();
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -139,7 +132,7 @@ public class KafkaTest {
 
             ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
             for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
-                System.out.println(String.format("consume message [%s]", consumerRecord.value()));
+                info("consumed message [%s] from [%s]", consumerRecord.value(), bootstrapServers);
                 assertThat(consumerRecord.value()).isEqualTo(message);
             }
         } finally {
@@ -149,18 +142,94 @@ public class KafkaTest {
         }
     }
 
-    @TestEngine.AfterAll
-    public void afterAll() {
-        System.out.println("afterAll()");
-        kafkaTestState.close();
+    /**
+     * Class to implement a KafkaTestContainer
+     */
+    private static class KafkaTestContainer implements Argument, Closeable {
+
+        private final String dockerImageName;
+        private KafkaContainer kafkaContainer;
+
+        /**
+         * Constructor
+         *
+         * @param dockerImageName the name
+         */
+        public KafkaTestContainer(String dockerImageName) {
+            this.dockerImageName = dockerImageName;
+        }
+
+        /**
+         * Method to get the name
+         *
+         * @return the name
+         */
+        public String name() {
+            return dockerImageName;
+        }
+
+        /**
+         * Method to start the KafkaTestContainer using a specific network
+         *
+         * @param network the network
+         */
+        public void start(Network network) {
+            info("test container [%s] starting ...", dockerImageName);
+
+            kafkaContainer = new KafkaContainer(DockerImageName.parse(dockerImageName));
+            kafkaContainer.withNetwork(network);
+
+            if (dockerImageName.startsWith("confluentinc/cp-kafka:7.4")) {
+                kafkaContainer.withKraft();
+            } else {
+                kafkaContainer.withEmbeddedZookeeper();
+            }
+
+            kafkaContainer.start();
+
+            info("test container [%s] started", dockerImageName);
+        }
+
+        /**
+         * Method to get the Kafka bootstrap servers
+         *
+         * @return the Kafka bootstrap servers
+         */
+        public String getBootstrapServers() {
+            return kafkaContainer.getBootstrapServers();
+        }
+
+        /**
+         * Method to close (shutdown) the KafkaTestContainer
+         */
+        public void close() {
+            info("test container [%s] stopping ..", dockerImageName);
+
+            if (kafkaContainer != null) {
+                kafkaContainer.stop();
+                kafkaContainer = null;
+            }
+
+            info("test container [%s] stopped", dockerImageName);
+        }
+
+        /**
+         * Method to create a KafkaTestContainer
+         *
+         * @param dockerImageName the name
+         * @return a KafkaTestContainer
+         */
+        public static KafkaTestContainer of(String dockerImageName) {
+            return new KafkaTestContainer(dockerImageName);
+        }
     }
 
-    @TestEngine.Conclude
-    public void conclude() {
-        System.out.println("conclude()");
-        kafkaTestState.close();
-    }
-
+    /**
+     * Method to create a random string
+     *
+     * @param length length
+     * @return a random String
+     */
     private static String randomString(int length) {
         return new Random()
                 .ints(97, 123 + 1)
@@ -169,59 +238,11 @@ public class KafkaTest {
                 .toString();
     }
 
-    private static class KafkaTestState {
+    private static void info(Object object) {
+        System.out.println(object);
+    }
 
-        private Network network;
-        private KafkaContainer kafkaContainer;
-        private String bootstrapServers;
-        private String message;
-
-        public void setNetwork(Network network) {
-            this.network = network;
-        }
-
-        public Network getNetwork() {
-            return network;
-        }
-
-        public void setKafkaContainer(KafkaContainer kafkaContainer) {
-            this.kafkaContainer = kafkaContainer;
-        }
-
-        public KafkaContainer getKafkaContainer() {
-            return kafkaContainer;
-        }
-
-        public void setBootstrapServers(String bootstrapServers) {
-            this.bootstrapServers = bootstrapServers;
-        }
-
-        public String getBootstrapServers() {
-            return bootstrapServers;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void close() {
-            if (kafkaContainer != null) {
-                kafkaContainer.close();
-                kafkaContainer = null;
-            }
-        }
-
-        public void dispose() {
-            close();
-
-            if (network != null) {
-                network.close();
-                network = null;
-            }
-        }
+    private static void info(String format, Object ... objects) {
+        info(String.format(format, objects));
     }
 }

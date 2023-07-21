@@ -47,8 +47,8 @@ public class ResourceLockMethodLockingTest1 {
     }
 
     @TestEngine.Test
-    @TestEngine.ResourceLock(value=LOCK_NAME_1)
-    @TestEngine.ResourceLock(value=LOCK_NAME_2)
+    @TestEngine.ResourceLock(name = LOCK_NAME_1)
+    @TestEngine.ResourceLock(name = LOCK_NAME_2)
     public void test1() {
         System.out.println("test1()");
 

@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@TestEngine.Order(0)
+@TestEngine.Order(order = 0)
 public class ClassOrderTest {
 
     @TestEngine.Argument

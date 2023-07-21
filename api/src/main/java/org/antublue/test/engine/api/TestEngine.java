@@ -29,36 +29,54 @@ import java.lang.annotation.Target;
  */
 public @interface TestEngine {
 
+    /**
+     * ArgumentSupplier annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface ArgumentSupplier {
 
     }
 
+    /**
+     * Argument annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Argument {
 
     }
 
+    /**
+     * Prepare annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Prepare {
 
     }
 
+    /**
+     * BeforeAll annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface BeforeAll {
 
     }
 
+    /**
+     * BeforeEach annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface BeforeEach {
 
     }
 
+    /**
+     * Test annotation
+     */
     @Testable
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
@@ -66,105 +84,245 @@ public @interface TestEngine {
 
     }
 
+    /**
+     * AfterEach annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface AfterEach {
 
     }
 
+    /**
+     * AfterAll annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface AfterAll {
 
     }
 
+    /**
+     * Conclude annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Conclude {
 
     }
 
+    /**
+     * Order annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Order {
-        int value();
+
+        /**
+         * Order value
+         *
+         * @return the order value
+         */
+        int order();
     }
 
+    /**
+     * Disabled annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Disabled {
 
     }
 
+    /**
+     * BaseClass annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE })
     @Retention(RetentionPolicy.RUNTIME)
     @interface BaseClass {
 
     }
 
+    /**
+     * Tag annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface Tag {
-        String value();
+
+        /**
+         * Tag value
+         *
+         * @return the tag value
+         */
+        String tag();
     }
 
+    /**
+     * DisplayName annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface DisplayName {
-        String value();
+
+        /**
+         * DisplayName value
+         *
+         * @return the display name value
+         */
+        String name();
     }
 
+    /**
+     * AutoClose annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
     @Retention(RetentionPolicy.RUNTIME)
     @interface AutoClose {
-        String scope();
+
+        /**
+         * Lifecycle value
+         *
+         * @return the lifecycle value
+         */
+        String lifecycle();
+
+        /**
+         * Method value
+         *
+         * @return the method name
+         */
         String method() default "";
     }
 
-    enum LockMode {
-        READ_WRITE,
-        READ;
-    }
-
+    /**
+     * Lock annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @Repeatable(ResourceLock.List.class)
     @interface ResourceLock {
-        String value();
+
+        /**
+         * Name value
+         *
+         * @return the lock name value
+         */
+        String name();
+
+        /**
+         * Mode value
+         *
+         * @return the lock mode value
+         */
         LockMode mode() default LockMode.READ_WRITE;
 
+        /**
+         * Lock.List annotation
+         */
         @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
         @Retention(RetentionPolicy.RUNTIME)
         @interface List {
+
+            /**
+             * List values
+             *
+             * @return the list values
+             */
             ResourceLock[] value();
         }
     }
 
+    /**
+     * Lock annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @Repeatable(TestEngine.Lock.List.class)
     @interface Lock {
-        String value();
+
+        /**
+         * Name value
+         *
+         * @return the lock name value
+         */
+        String name();
+
+        /**
+         * Mode value
+         *
+         * @return the lock mode value
+         */
         LockMode mode() default LockMode.READ_WRITE;
 
+        /**
+         * Lock.List annotation
+         */
         @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
         @Retention(RetentionPolicy.RUNTIME)
         @interface List {
+
+            /**
+             * List values
+             *
+             * @return the list values
+             */
             TestEngine.Lock[] value();
         }
     }
 
+    /**
+     * Unlock annotation
+     */
     @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @Repeatable(Unlock.List.class)
     @interface Unlock {
-        String value();
+
+        /**
+         * Name value
+         *
+         * @return the lock name value
+         */
+        String name();
+
+        /**
+         * Mode value
+         *
+         * @return the lock mode value
+         */
         LockMode mode() default LockMode.READ_WRITE;
 
+        /**
+         * Unlock.List annotation
+         */
         @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
         @Retention(RetentionPolicy.RUNTIME)
         @interface List {
+
+            /**
+             * List values
+             *
+             * @return the list values
+             */
             Unlock[] value();
         }
+    }
+
+    /**
+     * Lock modes
+     */
+    enum LockMode {
+
+        /**
+         * Read write mode
+         */
+        READ_WRITE,
+
+        /**
+         * Read mode
+         */
+        READ;
     }
 }

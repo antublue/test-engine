@@ -31,7 +31,7 @@ public class ClassLockingTest2 {
     }
 
     @TestEngine.Prepare
-    @TestEngine.Lock(value=LOCK_NAME)
+    @TestEngine.Lock(name = LOCK_NAME)
     public void prepare() {
         System.out.println("prepare()");
     }
@@ -78,7 +78,7 @@ public class ClassLockingTest2 {
     }
 
     @TestEngine.Conclude
-    @TestEngine.Unlock(value=LOCK_NAME)
+    @TestEngine.Unlock(name = LOCK_NAME)
     public void conclude() {
         System.out.println("conclude()");
     }

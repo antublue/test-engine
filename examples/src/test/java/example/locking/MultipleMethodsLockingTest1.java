@@ -36,7 +36,7 @@ public class MultipleMethodsLockingTest1 {
     }
 
     @TestEngine.BeforeAll
-    @TestEngine.Lock(value=LOCK_NAME)
+    @TestEngine.Lock(name = LOCK_NAME)
     public void beforeAll() {
         System.out.println("beforeAll()");
     }
@@ -84,7 +84,7 @@ public class MultipleMethodsLockingTest1 {
     }
 
     @TestEngine.AfterAll
-    @TestEngine.Unlock(value=LOCK_NAME)
+    @TestEngine.Unlock(name = LOCK_NAME)
     public void afterAll() {
         System.out.println("afterAll()");
     }

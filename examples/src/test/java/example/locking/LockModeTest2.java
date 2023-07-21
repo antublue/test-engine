@@ -45,8 +45,8 @@ public class LockModeTest2 {
     }
 
     @TestEngine.Test
-    @TestEngine.Lock(value=LOCK_NAME,mode=TestEngine.LockMode.READ_WRITE)
-    @TestEngine.Unlock(value=LOCK_NAME,mode=TestEngine.LockMode.READ_WRITE)
+    @TestEngine.Lock(name = LOCK_NAME, mode = TestEngine.LockMode.READ_WRITE)
+    @TestEngine.Unlock(name = LOCK_NAME, mode = TestEngine.LockMode.READ_WRITE)
     public void test1() {
         System.out.println("test1()");
 
@@ -73,8 +73,8 @@ public class LockModeTest2 {
     }
 
     @TestEngine.Test
-    @TestEngine.Lock(value=LOCK_NAME,mode=TestEngine.LockMode.READ)
-    @TestEngine.Unlock(value=LOCK_NAME,mode=TestEngine.LockMode.READ)
+    @TestEngine.Lock(name = LOCK_NAME, mode = TestEngine.LockMode.READ)
+    @TestEngine.Unlock(name = LOCK_NAME, mode = TestEngine.LockMode.READ)
     public void test2() {
         System.out.println("test2()");
         int count = Store.get(COUNTER_NAME, Integer.class).get();

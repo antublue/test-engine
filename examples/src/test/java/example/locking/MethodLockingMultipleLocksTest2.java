@@ -47,10 +47,10 @@ public class MethodLockingMultipleLocksTest2 {
     }
 
     @TestEngine.Test
-    @TestEngine.Lock(value=LOCK_NAME_1)
-    @TestEngine.Lock(value=LOCK_NAME_2)
-    @TestEngine.Unlock(value=LOCK_NAME_2)
-    @TestEngine.Unlock(value=LOCK_NAME_1)
+    @TestEngine.Lock(name = LOCK_NAME_1)
+    @TestEngine.Lock(name = LOCK_NAME_2)
+    @TestEngine.Unlock(name = LOCK_NAME_2)
+    @TestEngine.Unlock(name = LOCK_NAME_1)
     public void test1() {
         System.out.println("test1()");
 

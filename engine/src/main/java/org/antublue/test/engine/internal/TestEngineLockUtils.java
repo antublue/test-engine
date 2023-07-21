@@ -49,7 +49,7 @@ public class TestEngineLockUtils {
     /**
      * Method to perform locking on a Method, if annotated
      *
-     * @param method
+     * @param method method
      */
     public static void processLockAnnotations(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Lock.class)
@@ -63,16 +63,16 @@ public class TestEngineLockUtils {
         for (Annotation annotation : annotations) {
             if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.class)) {
                 TestEngine.Lock lockAnnotation = (TestEngine.Lock) annotation;
-                lock(method, lockAnnotation.value(), lockAnnotation.mode());
+                lock(method, lockAnnotation.name(), lockAnnotation.mode());
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.List.class)) {
                 TestEngine.Lock.List lockListAnnotation = (TestEngine.Lock.List) annotation;
-                Stream.of(lockListAnnotation.value()).forEach(lock -> lock(method, lock.value(), lock.mode()));
+                Stream.of(lockListAnnotation.value()).forEach(lock -> lock(method, lock.name(), lock.mode()));
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.class)) {
                 TestEngine.ResourceLock lockAnnotation = (TestEngine.ResourceLock) annotation;
-                lock(method, lockAnnotation.value(), lockAnnotation.mode());
+                lock(method, lockAnnotation.name(), lockAnnotation.mode());
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.List.class)) {
                 TestEngine.ResourceLock.List lockListAnnotation = (TestEngine.ResourceLock.List) annotation;
-                Stream.of(lockListAnnotation.value()).forEach(lock -> lock(method, lock.value(), lock.mode()));
+                Stream.of(lockListAnnotation.value()).forEach(lock -> lock(method, lock.name(), lock.mode()));
             }
         }
     }
@@ -115,7 +115,7 @@ public class TestEngineLockUtils {
     /**
      * Method to perform unlocking on a Method, if annotated
      *
-     * @param method
+     * @param method method
      */
     public static void processUnlockAnnotations(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Unlock.class)
@@ -129,18 +129,18 @@ public class TestEngineLockUtils {
         for (Annotation annotation : annotations) {
             if (annotation.annotationType().isAssignableFrom(TestEngine.Unlock.class)) {
                 TestEngine.Unlock unlockAnnotation = (TestEngine.Unlock) annotation;
-                unlock(method, unlockAnnotation.value(), unlockAnnotation.mode());
+                unlock(method, unlockAnnotation.name(), unlockAnnotation.mode());
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.Unlock.List.class)) {
                 TestEngine.Unlock.List unlockListAnnotation = (TestEngine.Unlock.List) annotation;
-                Stream.of(unlockListAnnotation.value()).forEach(lock -> unlock(method, lock.value(), lock.mode()));
+                Stream.of(unlockListAnnotation.value()).forEach(lock -> unlock(method, lock.name(), lock.mode()));
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.class)) {
                 TestEngine.ResourceLock unlockAnnotation = (TestEngine.ResourceLock) annotation;
-                unlock(method, unlockAnnotation.value(), unlockAnnotation.mode());
+                unlock(method, unlockAnnotation.name(), unlockAnnotation.mode());
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.List.class)) {
                 TestEngine.ResourceLock.List unlockListAnnotation = (TestEngine.ResourceLock.List) annotation;
                 List<TestEngine.ResourceLock> list = Arrays.asList(unlockListAnnotation.value());
                 Collections.reverse(list);
-                list.forEach(lock -> unlock(method, lock.value(), lock.mode()));
+                list.forEach(lock -> unlock(method, lock.name(), lock.mode()));
             }
         }
     }

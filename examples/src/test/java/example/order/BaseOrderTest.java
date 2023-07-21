@@ -9,7 +9,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestEngine.BaseClass
-@TestEngine.Order(3)
+@TestEngine.Order(order = 3)
 class BaseOrderTest {
 
     protected final List<String> EXPECTED_LIST =
@@ -29,34 +29,34 @@ class BaseOrderTest {
     protected StringArgument stringArgument;
 
     @TestEngine.Prepare
-    @TestEngine.Order(1)
+    @TestEngine.Order(order = 1)
     public void prepare() {
         System.out.println("BaseOrderTest.prepare()");
         ACTUAL_LIST.add("BaseOrderTest.prepare()");
     }
 
     @TestEngine.BeforeAll
-    @TestEngine.Order(1)
+    @TestEngine.Order(order = 1)
     public void beforeAll() {
         System.out.println("BaseOrderTest.beforeAll()");
         ACTUAL_LIST.add("BaseOrderTest.beforeAll()");
     }
 
     @TestEngine.Test
-    @TestEngine.Order(1)
+    @TestEngine.Order(order = 1)
     public void test2() {
         System.out.println("BaseOrderTest.test2(" + stringArgument  + ")");
     }
 
     @TestEngine.AfterAll
-    @TestEngine.Order(2)
+    @TestEngine.Order(order = 2)
     public void afterAll() {
         System.out.println("BaseOrderTest.afterAll()");
         ACTUAL_LIST.add("BaseOrderTest.afterAll()");
     }
 
     @TestEngine.Conclude
-    @TestEngine.Order(2)
+    @TestEngine.Order(order = 2)
     public void conclude() {
         System.out.println("BaseOrderTest.conclude()");
         ACTUAL_LIST.add("BaseOrderTest.conclude()");

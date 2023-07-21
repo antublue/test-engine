@@ -34,7 +34,7 @@ public class TaggedMethodTag1Test {
     }
 
     @TestEngine.Test
-    @TestEngine.Tag("/tag1/")
+    @TestEngine.Tag(tag="/tag1/")
     public void test1() {
         System.out.println("test1(" + stringArgument  + ")");
     }

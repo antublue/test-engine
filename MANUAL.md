@@ -56,7 +56,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
   - Method order is relative to other methods in a test class with the same annotation regardless of superclass / subclass location.
 
 
-- **Class execution order can't be guaranteed unless the test engine is configured for a single thread.**
+- **Class execution order can't be guaranteed unless the test engine is configured to use a single thread.**
 
 ### Additional Test Annotations
 

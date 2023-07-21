@@ -12,11 +12,19 @@ The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically fo
 
 The Test Engine is published to Maven Central.
 
+Release information can be found in GitHub Releases
+
+- [Releases](https://github.com/antublue/test-engine/releases)
+
+**Test classes may **require** migration between major releases.**
+
+- [Migration](/MIGRATION.md)
+
 **Notes**
 
 Test Engine versions prior to `v4.2.3` should not be used due to a critical bug ...
 
-- [#32](https://github.com/antublue/test-engine/issues/32) Tests may be skipped on a slow machine or scenarios where there are a large number of test classes
+- [#32](https://github.com/antublue/test-engine/issues/32) Tests may be skipped on a slow machine or scenarios where there are a large number of test classes.
 
 # Documentation
 
@@ -26,11 +34,7 @@ For the current branch, reference the [Manual](MANUAL.md).
 
 For a specific release, reference the `release-<VERSION>` branch for relevant documentation.
 
-- [v5.0.0](https://github.com/antublue/test-engine/tree/release-5.0.0)
-- [v4.3.1](https://github.com/antublue/test-engine/tree/release-4.3.1)
-- [v4.3.0](https://github.com/antublue/test-engine/tree/release-4.3.0)
-
-# Getting Help
+# Support
 
 GitHub's Discussions is the current mechanism for help / support.
 

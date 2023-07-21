@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@TestEngine.DisplayName("_Z_ClassDisplayNameTest")
+@TestEngine.DisplayName(name = "_Z_ClassDisplayNameTest")
 public class ClassDisplayNameTest {
 
     @TestEngine.Argument

@@ -47,7 +47,7 @@ public final class TestMethodTagPredicate extends RegexPredicate<Method> {
             return false;
         }
 
-        String value = annotation.value();
+        String value = annotation.tag();
         return matcher.reset(value).find();
     }
 

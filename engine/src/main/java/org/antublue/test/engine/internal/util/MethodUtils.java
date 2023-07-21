@@ -19,6 +19,9 @@ package org.antublue.test.engine.internal.util;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
+/**
+ * Class to implement Method utilities
+ */
 public class MethodUtils {
 
     /**

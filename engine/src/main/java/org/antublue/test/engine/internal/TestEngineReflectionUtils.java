@@ -564,9 +564,9 @@ public final class TestEngineReflectionUtils {
 
         TestEngine.DisplayName annotation = method.getAnnotation(TestEngine.DisplayName.class);
         if (annotation != null) {
-            String value = annotation.value();
-            if (value != null && !value.trim().isEmpty()) {
-                displayName = value.trim();
+            String name = annotation.name();
+            if (name != null && !name.trim().isEmpty()) {
+                displayName = name.trim();
             }
         }
 
@@ -586,9 +586,9 @@ public final class TestEngineReflectionUtils {
 
         TestEngine.DisplayName annotation = clazz.getAnnotation(TestEngine.DisplayName.class);
         if (annotation != null) {
-            String value = annotation.value();
-            if (value != null && !value.trim().isEmpty()) {
-                displayName = value.trim();
+            String name = annotation.name();
+            if (name != null && !name.trim().isEmpty()) {
+                displayName = name.trim();
             }
         }
 
@@ -817,8 +817,8 @@ public final class TestEngineReflectionUtils {
             if (o1AnnotationPresent) {
                 if (o2AnnotationPresent) {
                     // Sort based on @TestEngine.Order value
-                    int o1Order = o1.getAnnotation(TestEngine.Order.class).value();
-                    int o2Order = o2.getAnnotation(TestEngine.Order.class).value();
+                    int o1Order = o1.getAnnotation(TestEngine.Order.class).order();
+                    int o2Order = o2.getAnnotation(TestEngine.Order.class).order();
                     return Integer.compare(o1Order, o2Order);
                 } else {
                     return -1;
@@ -848,7 +848,7 @@ public final class TestEngineReflectionUtils {
             if (!clazz.isAnnotationPresent(TestEngine.BaseClass.class)
                     && !Modifier.isAbstract(clazz.getModifiers())
                     && clazz.isAnnotationPresent(TestEngine.Order.class)) {
-                int order = clazz.getAnnotation(TestEngine.Order.class).value();
+                int order = clazz.getAnnotation(TestEngine.Order.class).order();
                 LOGGER.trace("clazz [%s] order [%d]", clazz.getName(), order);
                 if (orderToClassMap.containsKey(order)) {
                     Class<?> existingClass = orderToClassMap.get(order);
@@ -878,8 +878,8 @@ public final class TestEngineReflectionUtils {
             if (o1Annotation != null) {
                 if (o2Annotation != null) {
                     // Sort based on @TestEngine.Order value
-                    int o1Order = o1Annotation.value();
-                    int o2Order = o2Annotation.value();
+                    int o1Order = o1Annotation.order();
+                    int o2Order = o2Annotation.order();
                     return Integer.compare(o1Order, o2Order);
                 } else {
                     return -1;
@@ -909,7 +909,7 @@ public final class TestEngineReflectionUtils {
         methods.forEach(method -> {
             TestEngine.Order annotation = method.getAnnotation(TestEngine.Order.class);
             if (annotation != null) {
-                int value = annotation.value();
+                int value = annotation.order();
                 if (integers.contains(value)) {
                     throw new TestClassConfigurationException(
                             String.format(

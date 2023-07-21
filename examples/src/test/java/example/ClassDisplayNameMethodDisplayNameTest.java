@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@TestEngine.DisplayName("_A_ClassDisplayNameMethodDisplayNameTest")
+@TestEngine.DisplayName(name = "_A_ClassDisplayNameMethodDisplayNameTest")
 public class ClassDisplayNameMethodDisplayNameTest {
 
     @TestEngine.Argument
@@ -33,13 +33,13 @@ public class ClassDisplayNameMethodDisplayNameTest {
     }
 
     @TestEngine.Test
-    @TestEngine.DisplayName("Test A")
+    @TestEngine.DisplayName(name = "Test A")
     public void test1() {
         System.out.println("test1(" + integerArgument + ")");
     }
 
     @TestEngine.Test
-    @TestEngine.DisplayName("Test B")
+    @TestEngine.DisplayName(name = "Test B")
     public void test2() {
         System.out.println("test2(" + integerArgument + ")");
     }
