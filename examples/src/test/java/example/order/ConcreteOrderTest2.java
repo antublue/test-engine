@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@TestEngine.Order(4)
+@TestEngine.Order(order = 4)
 public class ConcreteOrderTest2 extends BaseOrderTest {
 
     @TestEngine.ArgumentSupplier
@@ -24,14 +24,14 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
     }
 
     @TestEngine.Prepare
-    @TestEngine.Order(2)
+    @TestEngine.Order(order = 2)
     public void prepare2() {
         System.out.println("ConcreteOrderTest.prepare()");
         ACTUAL_LIST.add("ConcreteOrderTest.prepare()");
     }
 
     @TestEngine.BeforeAll
-    @TestEngine.Order(2)
+    @TestEngine.Order(order = 2)
     public void beforeAll2() {
         System.out.println("ConcreteOrderTest.beforeAll()");
         ACTUAL_LIST.add("ConcreteOrderTest.beforeAll()");
@@ -48,20 +48,20 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
     }
 
     @TestEngine.Test
-    @TestEngine.Order(2)
+    @TestEngine.Order(order = 2)
     public void test3() {
         System.out.println("test3(" + stringArgument  + ")");
     }
 
     @TestEngine.AfterAll
-    @TestEngine.Order(1)
+    @TestEngine.Order(order = 1)
     public void afterAll2() {
         System.out.println("ConcreteOrderTest.afterAll()");
         ACTUAL_LIST.add("ConcreteOrderTest.afterAll()");
     }
 
     @TestEngine.Conclude
-    @TestEngine.Order(1)
+    @TestEngine.Order(order = 1)
     public void conclude() {
         System.out.println("ConcreteOrderTest.conclude()");
         ACTUAL_LIST.add("ConcreteOrderTest.conclude()");

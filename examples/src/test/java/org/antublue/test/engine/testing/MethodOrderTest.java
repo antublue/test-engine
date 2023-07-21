@@ -54,7 +54,7 @@ public class MethodOrderTest {
     }
 
     @TestEngine.Prepare
-    @TestEngine.Order(0)
+    @TestEngine.Order(order = 0)
     public void prepare2() {
         System.out.println("prepare2()");
         ACTUAL_ORDER.add("prepare2()");
@@ -73,14 +73,14 @@ public class MethodOrderTest {
     }
 
     @TestEngine.Test
-    @TestEngine.Order(1)
+    @TestEngine.Order(order = 1)
     public void test1() {
         System.out.println("test1(" + stringArgument  + ")");
         ACTUAL_ORDER.add(stringArgument + ".test1()");
     }
 
     @TestEngine.Test
-    @TestEngine.Order(0)
+    @TestEngine.Order(order = 0)
     public void test2() {
         System.out.println("test2(" + stringArgument  + ")");
         ACTUAL_ORDER.add(stringArgument + ".test2()");
@@ -99,7 +99,7 @@ public class MethodOrderTest {
     }
 
     @TestEngine.AfterAll
-    @TestEngine.Order(0)
+    @TestEngine.Order(order = 0)
     public void afterAll2() {
         System.out.println("afterAll2()");
         ACTUAL_ORDER.add(stringArgument + ".afterAll2()");

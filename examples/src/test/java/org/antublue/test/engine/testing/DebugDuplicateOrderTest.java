@@ -25,19 +25,19 @@ public class DebugDuplicateOrderTest {
     }
 
     @TestEngine.BeforeAll
-    @TestEngine.Order(0)
+    @TestEngine.Order(order = 0)
     public void beforeAll() {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.Test
-    @TestEngine.Order(0)
+    @TestEngine.Order(order = 0)
     public void test1() {
         System.out.println("test1(" + integerArgument.value() + ")");
     }
 
     @TestEngine.Test
-    @TestEngine.Order(1)
+    @TestEngine.Order(order = 1)
     // Switch to @TestEngine.Order(0) to test duplicate @TestEngine.Order detection
     public void test2() {
         System.out.println("test2(" + integerArgument.value() + ")");

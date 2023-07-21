@@ -25,6 +25,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
+/**
+ * Class to process @TestEngine.AutoClose annotations
+ */
 @SuppressWarnings({ "PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock" })
 public class TestEngineAutoCloseUtils {
 
@@ -41,11 +44,12 @@ public class TestEngineAutoCloseUtils {
      * Method to process @TestEngine.AutoClose annotated fields for a specific scope
      *
      * @param object object
-     * @param scope scope
+     * @param lifecycle lifecycle
+     * @param throwableConsumer throwableConsumer
      */
     public static void processAutoCloseAnnotatedFields(
-            Object object, String scope, Consumer<Throwable> throwableConsumer) {
-        LOGGER.trace("processAutoCloseFields(%s, %s)", object.getClass().getName(), scope);
+            Object object, String lifecycle, Consumer<Throwable> throwableConsumer) {
+        LOGGER.trace("processAutoCloseFields(%s, %s)", object.getClass().getName(), lifecycle);
 
         TestEngineReflectionUtils
                 .getAutoCloseFields(object.getClass())
@@ -53,16 +57,16 @@ public class TestEngineAutoCloseUtils {
                         field -> {
                             LOGGER.trace("closing field [%s]", field.getName());
                             TestEngine.AutoClose annotation = field.getAnnotation(TestEngine.AutoClose.class);
-                            String annotationScope = annotation.scope();
+                            String annotationLifecycle = annotation.lifecycle();
                             String annotationMethodName = annotation.method();
-                            if (scope.equals(annotationScope)) {
-                                close(object, annotationScope, annotationMethodName, field, throwableConsumer);
+                            if (lifecycle.equals(annotationLifecycle)) {
+                                close(object, annotationLifecycle, annotationMethodName, field, throwableConsumer);
                             } else {
                                 LOGGER.trace(
                                         "skipping field [%s] annotation scope [%s] doesn't match scope [%s]",
                                         field.getName(),
-                                        annotationScope,
-                                        scope);
+                                        annotationLifecycle,
+                                        lifecycle);
                             }
                         });
     }
@@ -71,12 +75,13 @@ public class TestEngineAutoCloseUtils {
      * Method to close an @TestEngine.AutoClose annotated field
      *
      * @param object object
-     * @param scope scope
+     * @param lifecycle lifecycle
      * @param methodName methodName
      * @param field field
+     * @param throwableConsumer throwableConsumer
      */
     private static void close(
-            Object object, String scope, String methodName, Field field, Consumer<Throwable> throwableConsumer) {
+            Object object, String lifecycle, String methodName, Field field, Consumer<Throwable> throwableConsumer) {
         LOGGER.trace("close(%s, %s, %s)", object.getClass().getName(), methodName, field.getName());
 
         if (methodName.trim().isEmpty()) {
@@ -92,7 +97,7 @@ public class TestEngineAutoCloseUtils {
                                     "Exception closing @TestEngine.AutoClose class [%s] field [%s] scope [%s]",
                                     object.getClass(),
                                     field.getName(),
-                                    scope),
+                                    lifecycle),
                             t));
             }
         } else {
@@ -119,7 +124,7 @@ public class TestEngineAutoCloseUtils {
                                         object.getClass(),
                                         field.getName(),
                                         methodName.trim(),
-                                        scope),
+                                        lifecycle),
                                 throwable));
             }
         }

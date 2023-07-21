@@ -24,13 +24,13 @@ public class AutoCloseExampleTest3 {
         return collection.stream();
     }
 
-    @TestEngine.AutoClose(scope="@TestEngine.AfterEach",method="destroy")
+    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterEach", method = "destroy")
     private TestObject afterEachTestObject;
 
-    @TestEngine.AutoClose(scope="@TestEngine.AfterAll",method="destroy")
+    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll", method = "destroy")
     private TestObject afterAllTestObject;
 
-    @TestEngine.AutoClose(scope="@TestEngine.Conclude",method="destroy")
+    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude", method = "destroy")
     private TestObject concludeTestObject;
 
     @TestEngine.Prepare

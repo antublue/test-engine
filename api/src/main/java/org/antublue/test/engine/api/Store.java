@@ -133,7 +133,7 @@ public class Store {
      * @param key key
      * @param clazz clazz
      * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
-     * @param <T>
+     * @param <T> the return type
      */
     public static <T> Optional<T> get(String key, Class<T> clazz) {
         String validKey = validateKey(key);
@@ -167,7 +167,7 @@ public class Store {
      * @param key key
      * @param clazz clazz
      * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
-     * @param <T>
+     * @param <T> the return type
      */
     public static <T> Optional<T> remove(String key, Class<T> clazz) {
         try {
@@ -181,9 +181,10 @@ public class Store {
     /**
      * Method to remove an Object from the Store, closing it if it's an instance of AutoCloseable
      *
-     * @param key
+     * @param key key
+     * @throws StoreException exception if the AutoCloseable throws an Exception
      */
-    public static void removeAndClose(String key) {
+    public static void removeAndClose(String key) throws StoreException {
         remove(key).ifPresent(o -> {
             if (o instanceof AutoCloseable) {
                 try {

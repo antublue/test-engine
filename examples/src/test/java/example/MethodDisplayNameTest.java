@@ -32,13 +32,13 @@ public class MethodDisplayNameTest {
     }
 
     @TestEngine.Test
-    @TestEngine.DisplayName("Test 2")
+    @TestEngine.DisplayName(name = "Test 2")
     public void testA() {
         System.out.println("testA(" + integerArgument + ")");
     }
 
     @TestEngine.Test
-    @TestEngine.DisplayName("Test 1")
+    @TestEngine.DisplayName(name = "Test 1")
     public void testB() {
         System.out.println("testB(" + integerArgument + ")");
     }

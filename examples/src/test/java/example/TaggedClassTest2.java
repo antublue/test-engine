@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 /**
  * Example test
  */
-@TestEngine.Tag("/tag2/")
+@TestEngine.Tag(tag="/tag2/")
 public class TaggedClassTest2 {
 
     @TestEngine.Argument

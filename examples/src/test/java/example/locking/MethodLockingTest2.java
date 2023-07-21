@@ -46,8 +46,8 @@ public class MethodLockingTest2 {
     }
 
     @TestEngine.Test
-    @TestEngine.Lock(value=LOCK_NAME)
-    @TestEngine.Unlock(value=LOCK_NAME)
+    @TestEngine.Lock(name = LOCK_NAME)
+    @TestEngine.Unlock(name = LOCK_NAME)
     public void test1() {
         System.out.println("test1()");
 

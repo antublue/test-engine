@@ -31,6 +31,9 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
 
+    /**
+     * Test instance
+     */
     protected Object testInstance;
 
     /**

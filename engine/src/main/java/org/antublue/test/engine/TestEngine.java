@@ -40,11 +40,34 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
+    /**
+     * Configuration constant
+     */
     public static final String ENGINE_ID = "antublue-test-engine";
+
+    /**
+     * Configuration constant
+     */
     public static final String GROUP_ID = "org.antublue";
+
+    /**
+     * Configuration constant
+     */
     public static final String ARTIFACT_ID = "test-engine";
+
+    /**
+     * Configuration constant
+     */
     public static final String VERSION = TestEngineInformation.getVersion();
+
+    /**
+     * Configuration constant
+     */
     public static final String ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN = "__ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN__";
+
+    /**
+     * Configuration constant
+     */
     public static final String ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE = "__ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE__";
 
     /**

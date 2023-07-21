@@ -21,7 +21,7 @@ Currently, JUnit 5 does not support parameterized testing at the test class leve
 JUnit 4 does provide test class level parameterization via `@RunWith(Parameterized.class)`.
 
 - JUnit 4 is maintained, but no new functionality is being added.
-  - The latest release was on February 13, 2021.
+c  - The latest release was on February 13, 2021.
   - https://stackoverflow.com/questions/72325172/when-is-junit4-going-to-be-deprecated
 
 
