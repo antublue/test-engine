@@ -854,7 +854,8 @@ public final class TestEngineReflectionUtils {
                     Class<?> existingClass = orderToClassMap.get(order);
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] (or superclass) and test class [%s] (or superclass) contain duplicate @TestEngine.Order(%d) class annotation",
+                                    "Test class [%s] (or superclass) and test class [%s] (or superclass)"
+                                    + " contain duplicate @TestEngine.Order(%d) class annotation",
                                     existingClass.getName(),
                                     clazz.getName(),
                                     order));

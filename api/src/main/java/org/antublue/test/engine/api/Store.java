@@ -26,7 +26,8 @@ import java.util.function.Function;
 /**
  * Class to implement a singleton Store
  * <p>
- * Store methods are atomic and thread-safe. Complex usage should lock the Store using either lock() / unlock() or use the Lock returned from getLock()
+ * Store methods are atomic and thread-safe. Complex usage should lock the Store
+ * using either lock() / unlock() or use the Lock returned from getLock()
  * <p>
  * Locking of Objects in the Store is the responsibility of the calling code
  */
@@ -80,11 +81,11 @@ public class Store {
      * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
      */
     public static Optional<Object> put(String key, Object object) {
-        key = validateKey(key);
+        String validKey = validateKey(key);
 
         try {
             lock();
-            return Optional.ofNullable(MAP.put(key, object));
+            return Optional.ofNullable(MAP.put(validKey, object));
         } finally {
             unlock();
         }
@@ -98,12 +99,12 @@ public class Store {
      * @return an Optional containing the existing Object, or an Optional containing the Object returned by the Function
      */
     public static Optional<Object> putIfAbsent(String key, Function<String, Object> function) {
-        key = validateKey(key);
+        String validKey = validateKey(key);
         validateObject(function, "function is null");
 
         try {
             lock();
-            return Optional.ofNullable(MAP.computeIfAbsent(key, function));
+            return Optional.ofNullable(MAP.computeIfAbsent(validKey, function));
         } finally {
             unlock();
         }
@@ -116,11 +117,11 @@ public class Store {
      * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
      */
     public static Optional<Object> get(String key) {
-        key = validateKey(key);
+        String validKey = validateKey(key);
 
         try {
             lock();
-            return Optional.ofNullable(MAP.get(key));
+            return Optional.ofNullable(MAP.get(validKey));
         } finally {
             unlock();
         }
@@ -135,12 +136,12 @@ public class Store {
      * @param <T>
      */
     public static <T> Optional<T> get(String key, Class<T> clazz) {
-        String validateKey = validateKey(key);
+        String validKey = validateKey(key);
         validateObject(clazz, "class is null");
 
         try {
             lock();
-            return Optional.ofNullable(clazz.cast(MAP.get(validateKey)));
+            return Optional.ofNullable(clazz.cast(MAP.get(validKey)));
         } finally {
             unlock();
         }
