@@ -57,9 +57,9 @@ import java.util.function.Predicate;
  * Class to implement a TestEngineTestResolver
  */
 @SuppressWarnings("PMD.NPathComplexity")
-public class TestResolver {
+public class Resolver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestResolver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Resolver.class);
 
     private TestClassPredicate includeTestClassPredicate;
     private TestClassPredicate excludeTestClassPredicate;
@@ -69,6 +69,7 @@ public class TestResolver {
     private TestClassTagPredicate excludeTestClassTagPredicate;
     private TestMethodTagPredicate includeTestMethodTagPredicate;
     private TestMethodTagPredicate excludeTestMethodTagPredicate;
+    private Map<Class<?>, Set<Method>> classMethodSetMap;
 
     private ConfigurationParameters configurationParameters;
     private EngineDiscoveryRequest engineDiscoveryRequest;
@@ -104,10 +105,17 @@ public class TestResolver {
     /**
      * Constructor
      */
-    public TestResolver() {
+    public Resolver() {
         // DO NOTHING
     }
 
+    /**
+     * Method to resolve test classes / test methods
+     *
+     * @param engineDiscoveryRequest engineDiscoveryRequest
+     * @param configurationParameters configurationParameters
+     * @param engineDescriptor engineDescriptor
+     */
     public void resolve(
             EngineDiscoveryRequest engineDiscoveryRequest,
             ConfigurationParameters configurationParameters,
@@ -118,12 +126,15 @@ public class TestResolver {
 
         configure();
         resolve();
+        filter();
     }
 
     /**
      * Method to configure the resolver
      */
     private void configure() {
+        LOGGER.trace("configure()");
+
         includeTestClassPredicate =
                 configurationParameters
                         .get(Constants.TEST_CLASS_INCLUDE)
@@ -221,7 +232,7 @@ public class TestResolver {
 
         PackageNameFiltersPredicate packageNameFiltersPredicate = new PackageNameFiltersPredicate(packageNameFilters);
 
-        final Map<Class<?>, Set<Method>> classMethodSetMap = new LinkedHashMap<>();
+        classMethodSetMap = new LinkedHashMap<>();
 
         // Resolve selectors
 
@@ -323,6 +334,13 @@ public class TestResolver {
                         }
                     }
                 });
+    }
+
+    /**
+     * Method to filter selectors
+     */
+    private void filter() {
+        LOGGER.trace("filter()");
 
         /*
          * Filter...

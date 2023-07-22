@@ -22,7 +22,7 @@ import org.antublue.test.engine.internal.TestEngineException;
 import org.antublue.test.engine.internal.Executor;
 import org.antublue.test.engine.internal.Information;
 import org.antublue.test.engine.internal.TestDescriptorStore;
-import org.antublue.test.engine.internal.TestResolver;
+import org.antublue.test.engine.internal.Resolver;
 import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -127,8 +127,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             EngineDescriptor engineDescriptor = new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
 
-            TestResolver testResolver = new TestResolver();
-            testResolver.resolve(engineDiscoveryRequest, configurationParameters, engineDescriptor);
+            new Resolver().resolve(engineDiscoveryRequest, configurationParameters, engineDescriptor);
 
             // Store the test descriptors for use in the test execution listener
             TestDescriptorStore.getInstance().store(engineDescriptor);
