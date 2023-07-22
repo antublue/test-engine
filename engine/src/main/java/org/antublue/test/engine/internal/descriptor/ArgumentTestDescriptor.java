@@ -133,7 +133,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         EngineExecutionListener engineExecutionListener = testEngineExecutorContext.getEngineExecutionListener();
         engineExecutionListener.executionStarted(this);
 
-        ThrowableCollector throwableCollector = testEngineExecutorContext.getThrowableCollector();
+        ThrowableCollector throwableCollector = new ThrowableCollector();
 
         Field field = TestEngineReflectionUtils.getArgumentField(testClass);
         FieldUtils.setField(testInstance, field, testArgument, throwable -> {

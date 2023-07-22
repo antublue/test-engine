@@ -151,7 +151,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         EngineExecutionListener engineExecutionListener = testEngineExecutorContext.getEngineExecutionListener();
         engineExecutionListener.executionStarted(this);
 
-        ThrowableCollector throwableCollector = testEngineExecutorContext.getThrowableCollector();
+        ThrowableCollector throwableCollector = new ThrowableCollector();
 
         List<Method> methods = TestEngineReflectionUtils.getBeforeEachMethods(testClass);
         for (Method method : methods) {
