@@ -105,3 +105,67 @@ public class Test {
   }
 }
 ```
+
+## @TestEngine.Lock
+
+`5.x.x` code:
+
+```java
+public class Test {
+
+  // ... code omitted ...
+
+  @TestEngine.Test
+  @TestEngine.Lock("lock-name")
+  public void test() {
+    // ... code omitted ...
+  }
+}
+```
+
+`6.x.x` code:
+
+```java
+public class Test {
+
+  // ... code omitted ...
+  
+  @TestEngine.Test
+  @TestEngine.Lock(name = "lock-name")
+  public void test() {
+    // ... code omitted ...
+  }
+}
+```
+
+## @TestEngine.Unlock
+
+`5.x.x` code:
+
+```java
+public class Test {
+
+  // ... code omitted ...
+
+  @TestEngine.Test
+  @TestEngine.Unlock("lock-name")
+  public void test() {
+    // ... code omitted ...
+  }
+}
+```
+
+`6.x.x` code:
+
+```java
+public class Test {
+
+  // ... code omitted ...
+  
+  @TestEngine.Test
+  @TestEngine.Unlock(name = "lock-name")
+  public void test() {
+    // ... code omitted ...
+  }
+}
+```
