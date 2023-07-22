@@ -60,30 +60,30 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 ### Additional Test Annotations
 
-| Annotation                  | Scope            | Required | Usage                                                                                                                               |
-|-----------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
-| `@TestEngine.Disabled`      | class<br/>method | no       | Marks a test class or method disabled                                                                                              |
-| `@TestEngine.BaseClass`     | class            | no       | Marks a test class as being a base test class (skips direct execution)                                                             |
-| `@TestEngine.Order(<int>)`  | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
-| `@TestEngine.Tag(<string>)` | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
-| `@TestEngine.DisplayName`   | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
-| `@TestEngine.Lock`          | method           | no       | Provides a way to acquire a named lock, and lock it before method execution                                                        |
-| `@TestEngine.Unlock`        | method           | no       | Provides a way to acquire a named lock, and unlock it after method execution                                                       |
-| `@TestEngine.ResourceLock`  | method           | no       | Provides a way to acquire a named lock, locking it before method execution and unlocking it after method execution                 |
-| `@TestEngine.AutoClose`     | field            | no       | Provides a way to close `AutoCloseable` field                                                                                      |
+| Annotation                                    | Scope            | Required | Usage                                                                                                                               |
+|-----------------------------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.Disabled`                        | class<br/>method | no       | Marks a test class or method disabled                                                                                              |
+| `@TestEngine.BaseClass`                       | class            | no       | Marks a test class as being a base test class (skips direct execution)                                                             |
+| `@TestEngine.Order(order = <int>)`            | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
+| `@TestEngine.Tag(tag = <string>)`             | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
+| `@TestEngine.DisplayName(name = <string>)`    | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
+| `@TestEngine.Lock(name = <string>)`           | method           | no       | Provides a way to acquire a named lock, and lock it before method execution                                                        |
+| `@TestEngine.Unlock(name = <string>)`         | method           | no       | Provides a way to acquire a named lock, and unlock it after method execution                                                       |
+| `@TestEngine.ResourceLock(name = <string>)`   | method           | no       | Provides a way to acquire a named lock, locking it before method execution and unlocking it after method execution                 |
+| `@TestEngine.AutoClose(lifecycle = <string>)` | field            | no       | Provides a way to close `AutoCloseable` field                                                                                      |
 
 **Notes**
 
 - Abstract test classes are not executed.
 
 
-- `@TestEngine.Order(<int>)` is inheritance agnostic (test class and super classes are treated equally.)
+- `@TestEngine.Order(order = <int>)` is inheritance agnostic (test class and super classes are treated equally.)
 
 
-- `@TestEngine.Order(<int>)` is ignored for abstract and `@TestEngine.BaseClass` annotated classes.
+- `@TestEngine.Order(order = <int>)` is ignored for abstract and `@TestEngine.BaseClass` annotated classes.
 
 
-- For `@TestEngine.Tag(<string>)` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`.
+- For `@TestEngine.Tag(tag = <string>)` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`.
 
 
 - By default, `@TestEngine.Lock`, `@TestEngine.Unlock`, and `@TestEngine.ResourceLock` use a `ReentrantReadWriteLock`, locking the write lock.
@@ -93,9 +93,9 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - `@TestEngine.Lock`, `@TestEngine.Unlock`, and `@TestEngine.ResourceLock` are all repeatable.
 
 
-- `@TestEngine.AutoClose` fields are processed after `@TestEngine.AfterEach`, `@TestEngine.AfterAll`, and `@TestEngine.Conclude` methods depending on scope.
-  - Scope must be `@TestEngine.AfterEach`, `@TestEngine.AfterAll`, or `@TestEngine.Conclude`.
-  - The annotation has an optional value `method` (Object method name) to call a method of an that Object doesn't implement `AutoCloseable`.
+- `@TestEngine.AutoClose` fields are processed after `@TestEngine.AfterEach`, `@TestEngine.AfterAll`, and `@TestEngine.Conclude` methods depending on lifecycle.
+  - Lifecycle must be `@TestEngine.AfterEach`, `@TestEngine.AfterAll`, or `@TestEngine.Conclude`.
+  - The annotation has an optional value `method` (Object method name) to call a method of an Object that doesn't implement `AutoCloseable`.
 
 ### What is an `Argument`?
 
@@ -166,7 +166,7 @@ Add the AntuBLUE Test Engine Maven Plugin...
 <plugin>
   <groupId>org.antublue</groupId>
   <artifactId>test-engine-maven-plugin</artifactId>
-  <version>5.1.0</version>
+  <version>TEST-ENGINE-VERSION</version>
   <executions>
     <execution>
       <phase>integration-test</phase>
@@ -185,12 +185,12 @@ Add the AntuBLUE Test Engine jars...
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-api</artifactId>
-    <version>5.1.0</version>
+    <version>TEST-ENGINE-VERSION</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
     <artifactId>test-engine</artifactId>
-    <version>5.1.0</version>
+    <version>TEST-ENGINE-VERSION</version>
     <scope>test</scope>
   </dependency>
 </dependencies>
@@ -330,7 +330,7 @@ Example
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine 5.1.0 Summary
+[INFO] AntuBLUE Test Engine 6.0.0 Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes :  62, PASSED :  62, FAILED : 0, SKIPPED : 0
 [INFO] Test Methods : 791, PASSED : 791, FAILED : 0, SKIPPED : 0
