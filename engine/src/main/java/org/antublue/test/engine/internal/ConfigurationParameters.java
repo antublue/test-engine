@@ -25,14 +25,7 @@ import java.util.function.Function;
  * Class to implement TestEngineConfiguration
  */
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
-
-    /**
-     * Constructor
-     */
-    public ConfigurationParameters() {
-        // DO NOTHING
-    }
-
+    
     @Override
     public Optional<String> get(String key) {
         return Optional.ofNullable(resolve(key));

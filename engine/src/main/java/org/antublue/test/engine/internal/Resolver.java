@@ -103,13 +103,6 @@ public class Resolver {
     };
 
     /**
-     * Constructor
-     */
-    public Resolver() {
-        // DO NOTHING
-    }
-
-    /**
      * Method to resolve test classes / test methods
      *
      * @param engineDiscoveryRequest engineDiscoveryRequest

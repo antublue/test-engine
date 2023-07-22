@@ -47,13 +47,6 @@ public class Executor {
     private ExecutorService executorService;
 
     /**
-     * Constructor
-     */
-    public Executor() {
-
-    }
-
-    /**
      * Method to execute the ExecutionRequest
      *
      * @param executionRequest the execution request
