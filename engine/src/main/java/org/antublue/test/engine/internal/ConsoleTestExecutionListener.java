@@ -87,6 +87,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
 
     /**
      * Constructor
+     *
+     * @param configurationParameters configurationParameters
      */
     public ConsoleTestExecutionListener(ConfigurationParameters configurationParameters) {
         summary = new Summary();
