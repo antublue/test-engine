@@ -53,7 +53,7 @@ check_exit_code "Git checkout [${VERSION}] failed"
 
 mvn versions:set -DnewVersion="${VERSION}" -DprocessAllModules
 check_exit_code "Maven update versions [${VERSION}] failed"
-rm -Rf "$(find . -name "*versionsBackup")"
+rm -Rf $(find . -name "*versionsBackup")
 
 cd "${CURRENT_DIRECTORY}" || emit_error "Failed to change directory [${CURRENT_DIRECTORY}]"
 ./mvnw clean verify
