@@ -16,10 +16,10 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import org.antublue.test.engine.internal.TestEngineAutoCloseUtils;
-import org.antublue.test.engine.internal.TestEngineExecutorContext;
-import org.antublue.test.engine.internal.TestEngineLockUtils;
-import org.antublue.test.engine.internal.TestEngineReflectionUtils;
+import org.antublue.test.engine.internal.AutoCloseAnnotationUtils;
+import org.antublue.test.engine.internal.ExecutorContext;
+import org.antublue.test.engine.internal.LockAnnotationUtils;
+import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.MethodUtils;
@@ -110,10 +110,10 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * Method to test the test descriptor
      */
     @Override
-    public void execute(TestEngineExecutorContext testEngineExecutorContext) {
+    public void execute(ExecutorContext executorContext) {
         LOGGER.trace("execute uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
-        EngineExecutionListener engineExecutionListener = testEngineExecutorContext.getEngineExecutionListener();
+        EngineExecutionListener engineExecutionListener = executorContext.getEngineExecutionListener();
         engineExecutionListener.executionStarted(this);
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
@@ -121,7 +121,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         ObjectUtils.instantiate(testClass, o -> testInstance = o, throwableCollector::add);
 
         if (throwableCollector.isEmpty()) {
-            List<Method> methods = TestEngineReflectionUtils.getPrepareMethods(testClass);
+            List<Method> methods = ReflectionUtils.getPrepareMethods(testClass);
             for (Method method : methods) {
                 LOGGER.trace(
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
@@ -129,7 +129,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         testClass.getName(),
                         method.getName());
 
-                TestEngineLockUtils.processLockAnnotations(method);
+                LockAnnotationUtils.processLockAnnotations(method);
 
                 MethodUtils.invoke(
                         testInstance,
@@ -139,7 +139,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                             throwable.printStackTrace();
                         });
 
-                TestEngineLockUtils.processUnlockAnnotations(method);
+                LockAnnotationUtils.processUnlockAnnotations(method);
 
                 if (throwableCollector.isNotEmpty()) {
                     break;
@@ -153,7 +153,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
             argumentTestDescriptors
                     .forEach(argumentTestDescriptor -> {
                         argumentTestDescriptor.setTestInstance(testInstance);
-                        argumentTestDescriptor.execute(testEngineExecutorContext);
+                        argumentTestDescriptor.execute(executorContext);
                     } );
         } else {
             argumentTestDescriptors
@@ -164,12 +164,12 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                                 testClass.getName(),
                                 argumentTestDescriptor.getTestArgument().name());
 
-                        argumentTestDescriptor.skip(testEngineExecutorContext);
+                        argumentTestDescriptor.skip(executorContext);
                     });
         }
 
         if (testInstance != null) {
-            List<Method> methods = TestEngineReflectionUtils.getConcludeMethods(testClass);
+            List<Method> methods = ReflectionUtils.getConcludeMethods(testClass);
             for (Method method : methods) {
                 LOGGER.trace(
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
@@ -177,7 +177,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         testClass.getName(),
                         method.getName());
 
-                TestEngineLockUtils.processLockAnnotations(method);
+                LockAnnotationUtils.processLockAnnotations(method);
 
                 MethodUtils.invoke(
                         testInstance,
@@ -187,10 +187,10 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                             throwable.printStackTrace();
                         });
 
-                TestEngineLockUtils.processUnlockAnnotations(method);
+                LockAnnotationUtils.processUnlockAnnotations(method);
             }
 
-            TestEngineAutoCloseUtils
+            AutoCloseAnnotationUtils
                     .processAutoCloseAnnotatedFields(
                             testInstance,
                             "@TestEngine.Conclude",
@@ -213,6 +213,6 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         }
 
         testInstance = null;
-        testEngineExecutorContext.complete();
+        executorContext.complete();
     }
 }

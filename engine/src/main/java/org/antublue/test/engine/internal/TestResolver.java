@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.internal;
 
-import org.antublue.test.engine.TestEngineConstants;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
@@ -32,9 +32,6 @@ import org.antublue.test.engine.internal.discovery.resolver.PackageNameFiltersPr
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.ConfigurationParameters;
-import org.junit.platform.engine.DiscoveryFilter;
-import org.junit.platform.engine.DiscoverySelector;
-import org.junit.platform.engine.EngineDiscoveryListener;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassNameFilter;
@@ -57,25 +54,25 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * Class to implement a TestEngineEngineDiscoveryRequest
+ * Class to implement a TestEngineTestResolver
  */
 @SuppressWarnings("PMD.NPathComplexity")
-public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest {
+public class TestResolver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineEngineDiscoveryRequest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestResolver.class);
 
-    private final TestClassPredicate includeTestClassPredicate;
-    private final TestClassPredicate excludeTestClassPredicate;
-    private final TestMethodPredicate includeTestMethodPredicate;
-    private final TestMethodPredicate excludeTestMethodPredicate;
-    private final TestClassTagPredicate includeTestClassTagPredicate;
-    private final TestClassTagPredicate excludeTestClassTagPredicate;
-    private final TestMethodTagPredicate includeTestMethodTagPredicate;
-    private final TestMethodTagPredicate excludeTestMethodTagPredicate;
+    private TestClassPredicate includeTestClassPredicate;
+    private TestClassPredicate excludeTestClassPredicate;
+    private TestMethodPredicate includeTestMethodPredicate;
+    private TestMethodPredicate excludeTestMethodPredicate;
+    private TestClassTagPredicate includeTestClassTagPredicate;
+    private TestClassTagPredicate excludeTestClassTagPredicate;
+    private TestMethodTagPredicate includeTestMethodTagPredicate;
+    private TestMethodTagPredicate excludeTestMethodTagPredicate;
 
-    private final ConfigurationParameters configurationParameters;
-    private final EngineDiscoveryRequest engineDiscoveryRequest;
-    private final EngineDescriptor engineDescriptor;
+    private ConfigurationParameters configurationParameters;
+    private EngineDiscoveryRequest engineDiscoveryRequest;
+    private EngineDescriptor engineDescriptor;
 
     /**
      * Class to implement a Predicate to determine if a Class is a test class
@@ -84,7 +81,7 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
         if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
                 || clazz.isAnnotationPresent(TestEngine.Disabled.class)
                 || Modifier.isAbstract(clazz.getModifiers())
-                || TestEngineReflectionUtils.getTestMethods(clazz).isEmpty()) {
+                || ReflectionUtils.getTestMethods(clazz).isEmpty()) {
             LOGGER.trace("class [%s] excluded", clazz.getName());
             return false;
         }
@@ -99,19 +96,19 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
     private static final Predicate<Method> IS_TEST_METHOD = method -> {
         boolean result =
                 !method.isAnnotationPresent(TestEngine.Disabled.class)
-                && TestEngineReflectionUtils.getTestMethods(method.getDeclaringClass()).contains(method);
+                && ReflectionUtils.getTestMethods(method.getDeclaringClass()).contains(method);
         LOGGER.trace("class [%s] = [%b]", method.getDeclaringClass().getName(), result);
         return result;
     };
 
     /**
      * Constructor
-     *
-     * @param configurationParameters configurationParameters
-     * @param engineDiscoveryRequest engineDiscoveryRequest
-     * @param engineDescriptor engineDescriptor
      */
-    public TestEngineEngineDiscoveryRequest(
+    public TestResolver() {
+        // DO NOTHING
+    }
+
+    public void resolve(
             EngineDiscoveryRequest engineDiscoveryRequest,
             ConfigurationParameters configurationParameters,
             EngineDescriptor engineDescriptor) {
@@ -119,127 +116,107 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
         this.configurationParameters = configurationParameters;
         this.engineDescriptor = engineDescriptor;
 
+        configure();
+        resolve();
+    }
+
+    /**
+     * Method to configure the resolver
+     */
+    private void configure() {
         includeTestClassPredicate =
-                TestEngineConfiguration
-                        .getInstance()
-                        .get(TestEngineConstants.TEST_CLASS_INCLUDE)
+                configurationParameters
+                        .get(Constants.TEST_CLASS_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_INCLUDE, value);
+                            LOGGER.trace("%s [%s]", Constants.TEST_CLASS_INCLUDE, value);
                             return value;
                         })
                         .map(TestClassPredicate::of)
                         .orElse(null);
 
         excludeTestClassPredicate =
-                TestEngineConfiguration
-                        .getInstance()
-                        .get(TestEngineConstants.TEST_CLASS_EXCLUDE)
+                configurationParameters
+                        .get(Constants.TEST_CLASS_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_EXCLUDE, value);
+                            LOGGER.trace("%s [%s]", Constants.TEST_CLASS_EXCLUDE, value);
                             return value;
                         })
                         .map(TestClassPredicate::of)
                         .orElse(null);
 
         includeTestMethodPredicate =
-                TestEngineConfiguration
-                        .getInstance()
-                        .get(TestEngineConstants.TEST_METHOD_INCLUDE)
+                configurationParameters
+                        .get(Constants.TEST_METHOD_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_INCLUDE, value);
+                            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_INCLUDE, value);
                             return value;
                         })
                         .map(TestMethodPredicate::of)
                         .orElse(null);
 
         excludeTestMethodPredicate =
-                TestEngineConfiguration
-                        .getInstance()
-                        .get(TestEngineConstants.TEST_METHOD_EXCLUDE)
+                configurationParameters
+                        .get(Constants.TEST_METHOD_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_EXCLUDE, value);
+                            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_EXCLUDE, value);
                             return value;
                         })
                         .map(TestMethodPredicate::of)
                         .orElse(null);
 
         includeTestClassTagPredicate =
-                TestEngineConfiguration
-                        .getInstance()
-                        .get(TestEngineConstants.TEST_CLASS_TAG_INCLUDE)
+                configurationParameters
+                        .get(Constants.TEST_CLASS_TAG_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_TAG_INCLUDE, value);
+                            LOGGER.trace("%s [%s]", Constants.TEST_CLASS_TAG_INCLUDE, value);
                             return value;
                         })
                         .map(TestClassTagPredicate::of)
                         .orElse(null);
 
         excludeTestClassTagPredicate =
-                TestEngineConfiguration
-                        .getInstance()
-                        .get(TestEngineConstants.TEST_CLASS_TAG_EXCLUDE)
+                configurationParameters
+                        .get(Constants.TEST_CLASS_TAG_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_CLASS_TAG_EXCLUDE, value);
+                            LOGGER.trace("%s [%s]", Constants.TEST_CLASS_TAG_EXCLUDE, value);
                             return value;
                         })
                         .map(TestClassTagPredicate::of)
                         .orElse(null);
 
         includeTestMethodTagPredicate =
-                TestEngineConfiguration
-                        .getInstance()
-                        .get(TestEngineConstants.TEST_METHOD_TAG_INCLUDE)
+                configurationParameters
+                        .get(Constants.TEST_METHOD_TAG_INCLUDE)
                         .map(value -> {
-                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_TAG_INCLUDE, value);
+                            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_TAG_INCLUDE, value);
                             return value;
                         })
                         .map(TestMethodTagPredicate::of)
                         .orElse(null);
 
         excludeTestMethodTagPredicate =
-                TestEngineConfiguration
-                        .getInstance()
-                        .get(TestEngineConstants.TEST_METHOD_TAG_EXCLUDE)
+                configurationParameters
+                        .get(Constants.TEST_METHOD_TAG_EXCLUDE)
                         .map(value -> {
-                            LOGGER.trace("%s [%s]", TestEngineConstants.TEST_METHOD_TAG_EXCLUDE, value);
+                            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_TAG_EXCLUDE, value);
                             return value;
                         })
                         .map(TestMethodTagPredicate::of)
                         .orElse(null);
     }
 
-    @Override
-    public <T extends DiscoverySelector> List<T> getSelectorsByType(Class<T> clazz) {
-        return engineDiscoveryRequest.getSelectorsByType(clazz);
-    }
-
-    @Override
-    public <T extends DiscoveryFilter<?>> List<T> getFiltersByType(Class<T> clazz) {
-        return engineDiscoveryRequest.getFiltersByType(clazz);
-    }
-
-    @Override
-    public ConfigurationParameters getConfigurationParameters() {
-        return configurationParameters;
-    }
-
-    @Override
-    public EngineDiscoveryListener getDiscoveryListener() {
-        return engineDiscoveryRequest.getDiscoveryListener();
-    }
-
     /**
      * Method to resolve selectors
      */
-    public void resolve() {
+    private void resolve() {
         LOGGER.trace("resolve()");
 
-        List<ClassNameFilter> classNameFilters = getFiltersByType(ClassNameFilter.class);
+        List<ClassNameFilter> classNameFilters = engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class);
         LOGGER.trace("classNameFilters count [%d]", classNameFilters.size());
 
         ClassNameFiltersPredicate classNameFiltersPredicate = new ClassNameFiltersPredicate(classNameFilters);
 
-        List<PackageNameFilter> packageNameFilters = getFiltersByType(PackageNameFilter.class);
+        List<PackageNameFilter> packageNameFilters = engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
         LOGGER.trace("packageNameFilters count [%d]", packageNameFilters.size());
 
         PackageNameFiltersPredicate packageNameFiltersPredicate = new PackageNameFiltersPredicate(packageNameFilters);
@@ -248,10 +225,11 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
 
         // Resolve selectors
 
-        getSelectorsByType(ClasspathRootSelector.class)
+        engineDiscoveryRequest
+                .getSelectorsByType(ClasspathRootSelector.class)
                 .forEach(classpathRootSelector -> {
                     LOGGER.trace("ClasspathRootSelector.class");
-                    TestEngineReflectionUtils
+                    ReflectionUtils
                             .findAllClasses(classpathRootSelector.getClasspathRoot())
                             .forEach(clazz -> {
                                 if (IS_TEST_CLASS.test(clazz)
@@ -259,15 +237,16 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
                                         && classNameFiltersPredicate.test(clazz)) {
                                     classMethodSetMap.put(
                                             clazz,
-                                            new LinkedHashSet<>(TestEngineReflectionUtils.getTestMethods(clazz)));
+                                            new LinkedHashSet<>(ReflectionUtils.getTestMethods(clazz)));
                                 }
                             });
                 });
 
-        getSelectorsByType(PackageSelector.class)
+        engineDiscoveryRequest
+                .getSelectorsByType(PackageSelector.class)
                 .forEach(packageSelector -> {
                     LOGGER.trace("PackageSelector.class");
-                    TestEngineReflectionUtils
+                    ReflectionUtils
                             .findAllClasses(packageSelector.getPackageName())
                             .forEach(clazz -> {
                                 if (IS_TEST_CLASS.test(clazz)
@@ -275,12 +254,13 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
                                         && classNameFiltersPredicate.test(clazz)) {
                                     classMethodSetMap.put(
                                             clazz,
-                                            new LinkedHashSet<>(TestEngineReflectionUtils.getTestMethods(clazz)));
+                                            new LinkedHashSet<>(ReflectionUtils.getTestMethods(clazz)));
                                 }
                             });
                 });
 
-       getSelectorsByType(ClassSelector.class)
+        engineDiscoveryRequest
+                .getSelectorsByType(ClassSelector.class)
                 .forEach(classSelector -> {
                     LOGGER.trace("ClassSelector.class");
                     Class<?> clazz = classSelector.getJavaClass();
@@ -289,11 +269,12 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
                             && classNameFiltersPredicate.test(clazz)) {
                         classMethodSetMap.put(
                                 clazz,
-                                new LinkedHashSet<>(TestEngineReflectionUtils.getTestMethods(clazz)));
+                                new LinkedHashSet<>(ReflectionUtils.getTestMethods(clazz)));
                     }
                 });
 
-       getSelectorsByType(MethodSelector.class)
+        engineDiscoveryRequest
+                .getSelectorsByType(MethodSelector.class)
                 .forEach(methodSelector -> {
                     LOGGER.trace("MethodSelector.class");
                     Class<?> clazz = methodSelector.getJavaClass();
@@ -306,7 +287,8 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
                     }
                 });
 
-        getSelectorsByType(UniqueIdSelector.class)
+        engineDiscoveryRequest
+                .getSelectorsByType(UniqueIdSelector.class)
                 .forEach(uniqueIdSelector -> {
                     LOGGER.trace("UniqueIdSelector.class");
                     UniqueId.Segment segment = uniqueIdSelector.getUniqueId().getLastSegment();
@@ -318,7 +300,7 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
                                     && packageNameFiltersPredicate.test(clazz)
                                     && classNameFiltersPredicate.test(clazz)) {
                                 Set<Method> methods = classMethodSetMap.getOrDefault(clazz, new LinkedHashSet<>());
-                                methods.addAll(TestEngineReflectionUtils.getTestMethods(clazz));
+                                methods.addAll(ReflectionUtils.getTestMethods(clazz));
                                 classMethodSetMap.put(clazz, methods);
                             }
                         } catch (ClassNotFoundException e) {
@@ -333,7 +315,7 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
                                     && packageNameFiltersPredicate.test(clazz)
                                     && classNameFiltersPredicate.test(clazz)) {
                                 Set<Method> methods = classMethodSetMap.getOrDefault(clazz, new LinkedHashSet<>());
-                                methods.addAll(TestEngineReflectionUtils.getTestMethods(clazz));
+                                methods.addAll(ReflectionUtils.getTestMethods(clazz));
                                 classMethodSetMap.put(clazz, methods);
                             }
                         } catch (ClassNotFoundException e) {
@@ -459,7 +441,7 @@ public class TestEngineEngineDiscoveryRequest implements EngineDiscoveryRequest 
 
             engineDescriptor.addChild(classTestDescriptor);
 
-            List<Argument> arguments = TestEngineReflectionUtils.getArgumentsList(clazz);
+            List<Argument> arguments = ReflectionUtils.getArgumentsList(clazz);
             for (Argument argument : arguments) {
                 UniqueId argumentUniqueId =
                         classTestDescritporUniqueId.append("argument", argument.name());

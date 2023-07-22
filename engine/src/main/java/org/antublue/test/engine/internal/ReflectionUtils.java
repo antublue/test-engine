@@ -21,7 +21,6 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
-import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -45,9 +44,9 @@ import java.util.stream.Stream;
  * Class to implement methods to get test class fields / methods, caching the results
  */
 @SuppressWarnings({ "unchecked", "PMD.NPathComplexity", "PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock" })
-public final class TestEngineReflectionUtils {
+public final class ReflectionUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineReflectionUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
 
     private enum Scope { STATIC, NON_STATIC }
 
@@ -66,7 +65,7 @@ public final class TestEngineReflectionUtils {
     /**
      * Constructor
      */
-    private TestEngineReflectionUtils() {
+    private ReflectionUtils() {
         // DO NOTHING
     }
 
@@ -78,7 +77,7 @@ public final class TestEngineReflectionUtils {
      */
     public static List<Class<?>> findAllClasses(URI uri) {
         List<Class<?>> classes =
-                ReflectionUtils
+                org.junit.platform.commons.util.ReflectionUtils
                         .findAllClassesInClasspathRoot(uri, classFilter -> true, classNameFilter -> true);
 
         classes = new ArrayList<>(classes);

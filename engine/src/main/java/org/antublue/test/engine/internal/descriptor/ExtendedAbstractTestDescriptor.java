@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import org.antublue.test.engine.internal.TestEngineExecutorContext;
+import org.antublue.test.engine.internal.ExecutorContext;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
@@ -73,20 +73,20 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     /**
      * Method to execute the TestDescriptor
      *
-     * @param testEngineExecutorContext testEngineExecutorContext
+     * @param executorContext testEngineExecutorContext
      */
-    public abstract void execute(TestEngineExecutorContext testEngineExecutorContext);
+    public abstract void execute(ExecutorContext executorContext);
 
     /**
      * Method to skip the TestDescriptor's children, then the TestDescriptor (recursively)
      *
-     * @param testEngineExecutorContext testEngineExecutorContext
+     * @param executorContext testEngineExecutorContext
      */
-    public void skip(TestEngineExecutorContext testEngineExecutorContext) {
+    public void skip(ExecutorContext executorContext) {
         for (ExtendedAbstractTestDescriptor testDescriptor : getChildren(ExtendedAbstractTestDescriptor.class)) {
-            testDescriptor.skip(testEngineExecutorContext);
+            testDescriptor.skip(executorContext);
         }
 
-        testEngineExecutorContext.getEngineExecutionListener().executionSkipped(this, "Skipped");
+        executorContext.getEngineExecutionListener().executionSkipped(this, "Skipped");
     }
 }

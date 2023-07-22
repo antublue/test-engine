@@ -16,7 +16,8 @@
 
 package org.antublue.test.engine.maven.plugin;
 
-import org.antublue.test.engine.internal.TestEngineConsoleTestExecutionListener;
+import org.antublue.test.engine.internal.ConfigurationParameters;
+import org.antublue.test.engine.internal.ConsoleTestExecutionListener;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorString;
 import org.apache.maven.execution.MavenSession;
@@ -59,7 +60,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
     private static final String GROUP_ID = "org.antublue";
     private static final String ARTIFACT_ID = "test-engine-maven-plugin";
-    private static final String VERSION = TestEngineMavenPluginInformation.getVersion();
+    private static final String VERSION = Information.getVersion();
 
     private static final String BANNER =
             new AnsiColorString()
@@ -156,8 +157,10 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
             Thread.currentThread().setContextClassLoader(classLoader);
 
-            TestEngineConsoleTestExecutionListener testEngineConsoleTestExecutionListener =
-                    new TestEngineConsoleTestExecutionListener();
+            org.junit.platform.engine.ConfigurationParameters configurationParameters = new ConfigurationParameters();
+
+            ConsoleTestExecutionListener consoleTestExecutionListener =
+                    new ConsoleTestExecutionListener(configurationParameters);
 
             LauncherConfig launcherConfig =
                     LauncherConfig
@@ -173,14 +176,14 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
             try (LauncherSession launcherSession = LauncherFactory.openSession(launcherConfig)) {
                 Launcher launcher = launcherSession.getLauncher();
-                launcher.registerTestExecutionListeners(testEngineConsoleTestExecutionListener);
+                launcher.registerTestExecutionListeners(consoleTestExecutionListener);
                 launcher.execute(launcherDiscoveryRequest);
             }
 
-            if (testEngineConsoleTestExecutionListener.hasFailures()) {
-                throw new SuppressedStackTraceMojoExecutionException("Test failures");
+            if (consoleTestExecutionListener.hasFailures()) {
+                throw new SuppressedStackTraceException("Test failures");
             }
-        } catch (SuppressedStackTraceMojoExecutionException e) {
+        } catch (SuppressedStackTraceException e) {
             throw e;
         } catch (JUnitException e) {
             String message = e.getMessage();
@@ -196,7 +199,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             .append(message)
                             .append(System.lineSeparator());
 
-            throw new SuppressedStackTraceMojoExecutionException(stringBuilder.toString());
+            throw new SuppressedStackTraceException(stringBuilder.toString());
         } catch (Throwable t) {
             t.printStackTrace();
             throw new MojoExecutionException("General AntuBLUE Test Engine Maven Plugin Exception", t);

@@ -17,12 +17,12 @@
 package org.antublue.test.engine;
 
 import org.antublue.test.engine.internal.TestClassConfigurationException;
-import org.antublue.test.engine.internal.TestEngineConfiguration;
-import org.antublue.test.engine.internal.TestEngineEngineDiscoveryRequest;
+import org.antublue.test.engine.internal.ConfigurationParameters;
 import org.antublue.test.engine.internal.TestEngineException;
-import org.antublue.test.engine.internal.TestEngineExecutor;
-import org.antublue.test.engine.internal.TestEngineInformation;
-import org.antublue.test.engine.internal.TestEngineTestDescriptorStore;
+import org.antublue.test.engine.internal.Executor;
+import org.antublue.test.engine.internal.Information;
+import org.antublue.test.engine.internal.TestDescriptorStore;
+import org.antublue.test.engine.internal.TestResolver;
 import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -30,6 +30,7 @@ import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.util.Optional;
 
@@ -58,7 +59,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     /**
      * Configuration constant
      */
-    public static final String VERSION = TestEngineInformation.getVersion();
+    public static final String VERSION = Information.getVersion();
 
     /**
      * Configuration constant
@@ -121,25 +122,18 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public TestDescriptor discover(EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
         LOGGER.trace("discover()");
 
-        // Create an EngineDescriptor as the target
-        ExtendedEngineDescriptor extendedEngineDescriptor = null;
-
         try {
-            // Create an ExtendedEngineDescriptor as the target
-            extendedEngineDescriptor = new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
+            org.junit.platform.engine.ConfigurationParameters configurationParameters = new ConfigurationParameters();
 
-            // Create a TestEngineEngineDiscoveryRequest to resolve test classes
-            TestEngineEngineDiscoveryRequest testEngineDiscoveryRequest =
-                    new TestEngineEngineDiscoveryRequest(
-                            engineDiscoveryRequest,
-                            TestEngineConfiguration.getInstance(),
-                            extendedEngineDescriptor);
+            EngineDescriptor engineDescriptor = new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
 
-            // Resolve test classes
-            testEngineDiscoveryRequest.resolve();
+            TestResolver testResolver = new TestResolver();
+            testResolver.resolve(engineDiscoveryRequest, configurationParameters, engineDescriptor);
 
             // Store the test descriptors for use in the test execution listener
-            TestEngineTestDescriptorStore.getInstance().store(extendedEngineDescriptor);
+            TestDescriptorStore.getInstance().store(engineDescriptor);
+
+            return engineDescriptor;
         } catch (TestClassConfigurationException | TestEngineException t) {
             if ("true".equals(System.getProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN))) {
                 throw t;
@@ -147,10 +141,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             System.err.println(t.getMessage());
             System.exit(1);
+        } catch (Throwable t) {
+            throw new TestEngineException("General exception", t);
         }
 
-        // Return the EngineDescriptor with all the child TestDescriptors
-        return extendedEngineDescriptor;
+        return null;
     }
 
     /**
@@ -163,6 +158,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("execute()");
 
         // Execute the ExecutionRequest
-        new TestEngineExecutor().execute(executionRequest);
+        new Executor().execute(executionRequest);
     }
 }
