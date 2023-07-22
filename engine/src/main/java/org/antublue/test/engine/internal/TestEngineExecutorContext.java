@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal;
 
-import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 
@@ -30,7 +29,6 @@ public class TestEngineExecutorContext {
     private final ExecutionRequest executionRequest;
     private final CountDownLatch countDownLatch;
     private final EngineExecutionListener engineExecutionListener;
-    private final ThrowableCollector throwableCollector;
 
     /**
      * Constructor
@@ -42,7 +40,6 @@ public class TestEngineExecutorContext {
         this.executionRequest = executionRequest;
         this.countDownLatch = countDownLatch;
         this.engineExecutionListener = executionRequest.getEngineExecutionListener();
-        this.throwableCollector = new ThrowableCollector();
     }
 
     /**
@@ -61,15 +58,6 @@ public class TestEngineExecutorContext {
      */
     public EngineExecutionListener getEngineExecutionListener() {
         return engineExecutionListener;
-    }
-
-    /**
-     * Method to get the ThrowableCollector
-     *
-     * @return the ThrowableCollector
-     */
-    public ThrowableCollector getThrowableCollector() {
-        return throwableCollector;
     }
 
     /**

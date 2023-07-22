@@ -116,7 +116,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         EngineExecutionListener engineExecutionListener = testEngineExecutorContext.getEngineExecutionListener();
         engineExecutionListener.executionStarted(this);
 
-        ThrowableCollector throwableCollector = testEngineExecutorContext.getThrowableCollector();
+        ThrowableCollector throwableCollector = new ThrowableCollector();
 
         ObjectUtils.instantiate(testClass, o -> testInstance = o, throwableCollector::add);
 
