@@ -16,11 +16,7 @@
 
 package org.antublue.test.engine.internal;
 
-import org.junit.platform.engine.ConfigurationParameters;
-
-import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -28,26 +24,13 @@ import java.util.function.Function;
 /**
  * Class to implement TestEngineConfiguration
  */
-public final class TestEngineConfiguration implements ConfigurationParameters {
-
-    private static final TestEngineConfiguration INSTANCE = new TestEngineConfiguration();
-
-    private final Map<String, String> map;
-
-    /**
-     * Method to get a singleton instance of TestEngineConfiguration
-     *
-     * @return the return value
-     */
-    public static TestEngineConfiguration getInstance() {
-        return INSTANCE;
-    }
+public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
     /**
      * Constructor
      */
-    private TestEngineConfiguration() {
-        map = new LinkedHashMap<>();
+    public ConfigurationParameters() {
+        // DO NOTHING
     }
 
     @Override
@@ -85,13 +68,8 @@ public final class TestEngineConfiguration implements ConfigurationParameters {
      * @return the return value
      */
     private String resolve(String key) {
-        String value = map.get(key);
-        if (value != null && !value.trim().isEmpty()) {
-            return value.trim();
-        }
-
         // Convert the system property to an environment variable and get the value
-        value = System.getenv(key.toUpperCase(Locale.ENGLISH).replace('.', '_'));
+        String value = System.getenv(key.toUpperCase(Locale.ENGLISH).replace('.', '_'));
         if (value != null && !value.trim().isEmpty()) {
             return value.trim();
         }

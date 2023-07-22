@@ -29,14 +29,14 @@ import java.util.function.Consumer;
  * Class to process @TestEngine.AutoClose annotations
  */
 @SuppressWarnings({ "PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock" })
-public class TestEngineAutoCloseUtils {
+public class AutoCloseAnnotationUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineAutoCloseUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutoCloseAnnotationUtils.class);
 
     /**
      * Constructor
      */
-    private TestEngineAutoCloseUtils() {
+    private AutoCloseAnnotationUtils() {
         // DO NOTHING
     }
 
@@ -51,7 +51,7 @@ public class TestEngineAutoCloseUtils {
             Object object, String lifecycle, Consumer<Throwable> throwableConsumer) {
         LOGGER.trace("processAutoCloseFields(%s, %s)", object.getClass().getName(), lifecycle);
 
-        TestEngineReflectionUtils
+        ReflectionUtils
                 .getAutoCloseFields(object.getClass())
                 .forEach(
                         field -> {

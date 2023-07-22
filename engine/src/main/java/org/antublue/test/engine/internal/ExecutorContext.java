@@ -24,7 +24,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Class to implement an execution context
  */
-public class TestEngineExecutorContext {
+public class ExecutorContext {
 
     private final ExecutionRequest executionRequest;
     private final CountDownLatch countDownLatch;
@@ -36,7 +36,7 @@ public class TestEngineExecutorContext {
      * @param executionRequest executionRequest
      * @param countDownLatch countDownLatch
      */
-    public TestEngineExecutorContext(ExecutionRequest executionRequest, CountDownLatch countDownLatch) {
+    public ExecutorContext(ExecutionRequest executionRequest, CountDownLatch countDownLatch) {
         this.executionRequest = executionRequest;
         this.countDownLatch = countDownLatch;
         this.engineExecutionListener = executionRequest.getEngineExecutionListener();

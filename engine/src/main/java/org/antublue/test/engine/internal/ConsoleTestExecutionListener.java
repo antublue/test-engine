@@ -17,7 +17,7 @@
 package org.antublue.test.engine.internal;
 
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.TestEngineConstants;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
@@ -28,6 +28,7 @@ import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorString;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.antublue.test.engine.internal.util.Switch;
+import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.launcher.TestExecutionListener;
@@ -43,7 +44,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Class to collect test information and output a test execution summary
  */
-public class TestEngineConsoleTestExecutionListener implements TestExecutionListener {
+public class ConsoleTestExecutionListener implements TestExecutionListener {
 
     private static final String BANNER =
             new AnsiColorString()
@@ -87,12 +88,12 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     /**
      * Constructor
      */
-    public TestEngineConsoleTestExecutionListener() {
+    public ConsoleTestExecutionListener(ConfigurationParameters configurationParameters) {
         summary = new Summary();
 
         detailedOutput =
-                TestEngineConfiguration.getInstance()
-                        .get(TestEngineConstants.CONSOLE_OUTPUT)
+                configurationParameters
+                        .get(Constants.CONSOLE_OUTPUT)
                         .map(value -> {
                             try {
                                 return Boolean.parseBoolean(value);
@@ -103,8 +104,8 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         .orElse(true);
 
         logTestMessages =
-                TestEngineConfiguration.getInstance()
-                        .get(TestEngineConstants.LOG_TEST_MESSAGES)
+                configurationParameters
+                        .get(Constants.LOG_TEST_MESSAGES)
                         .map(value -> {
                             try {
                                 return Boolean.parseBoolean(value);
@@ -115,8 +116,8 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         .orElse(true);
 
         logPassMessages =
-                TestEngineConfiguration.getInstance()
-                        .get(TestEngineConstants.LOG_PASS_MESSAGES)
+                configurationParameters
+                        .get(Constants.LOG_PASS_MESSAGES)
                         .map(value -> {
                             try {
                                 return Boolean.parseBoolean(value);
@@ -127,8 +128,8 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
                         .orElse(true);
 
         logSkipMessages =
-                TestEngineConfiguration.getInstance()
-                        .get(TestEngineConstants.LOG_SKIP_MESSAGES)
+                configurationParameters
+                        .get(Constants.LOG_SKIP_MESSAGES)
                         .map(value -> {
                             try {
                                 return Boolean.parseBoolean(value);
@@ -165,7 +166,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
 
         testPlan.getRoots()
                 .forEach(testIdentifier ->
-                        TestEngineTestDescriptorStore
+                        TestDescriptorStore
                                 .getInstance()
                                 .get(testIdentifier.getUniqueIdObject()).ifPresent(TestDescriptorUtils::logTestDescriptorTree));
 
@@ -182,7 +183,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     @Override
     public void executionStarted(TestIdentifier testIdentifier) {
         TestDescriptor testDescriptor =
-                TestEngineTestDescriptorStore
+                TestDescriptorStore
                         .getInstance()
                         .get(testIdentifier.getUniqueIdObject())
                         .orElse(null);
@@ -248,7 +249,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     @Override
     public void executionSkipped(TestIdentifier testIdentifier, String reason) {
         TestDescriptor testDescriptor =
-                TestEngineTestDescriptorStore
+                TestDescriptorStore
                         .getInstance()
                         .get(testIdentifier.getUniqueIdObject())
                         .orElse(null);
@@ -319,7 +320,7 @@ public class TestEngineConsoleTestExecutionListener implements TestExecutionList
     @Override
     public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
         TestDescriptor testDescriptor =
-                TestEngineTestDescriptorStore
+                TestDescriptorStore
                         .getInstance()
                         .get(testIdentifier.getUniqueIdObject())
                         .orElse(null);

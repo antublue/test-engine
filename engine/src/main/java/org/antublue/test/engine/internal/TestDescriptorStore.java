@@ -27,9 +27,9 @@ import java.util.Optional;
 /**
  * Class to store TestDescriptors based on UniqueId
  */
-public final class TestEngineTestDescriptorStore {
+public final class TestDescriptorStore {
 
-    private static final TestEngineTestDescriptorStore INSTANCE = new TestEngineTestDescriptorStore();
+    private static final TestDescriptorStore INSTANCE = new TestDescriptorStore();
 
     private final Map<UniqueId, TestDescriptor> testDescriptorMap;
 
@@ -38,14 +38,14 @@ public final class TestEngineTestDescriptorStore {
      *
      * @return the singleton instance of a TestEngineTestDescriptorStore
      */
-    public static TestEngineTestDescriptorStore getInstance() {
+    public static TestDescriptorStore getInstance() {
         return INSTANCE;
     }
 
     /**
      * Constructor
      */
-    private TestEngineTestDescriptorStore() {
+    private TestDescriptorStore() {
         testDescriptorMap = new LinkedHashMap<>();
     }
 

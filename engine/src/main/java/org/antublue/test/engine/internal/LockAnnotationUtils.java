@@ -33,16 +33,16 @@ import java.util.stream.Stream;
 /**
  * Class to process @TestEngine.Lock, @TestEngine.Unlock, @TestEngine.ResourceLock annotations
  */
-public class TestEngineLockUtils {
+public class LockAnnotationUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineLockUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LockAnnotationUtils.class);
 
     private static final Map<String, ReentrantReadWriteLock> LOCK_MAP = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * Constructor
      */
-    private TestEngineLockUtils() {
+    private LockAnnotationUtils() {
         // DO NOTHING
     }
 

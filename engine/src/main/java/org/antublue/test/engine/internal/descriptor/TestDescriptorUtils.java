@@ -18,7 +18,7 @@ package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.TestClassConfigurationException;
-import org.antublue.test.engine.internal.TestEngineReflectionUtils;
+import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Switch;
@@ -55,7 +55,7 @@ public final class TestDescriptorUtils {
 
         return new ClassTestDescriptor(
                 uniqueId,
-                TestEngineReflectionUtils.getDisplayName(clazz),
+                ReflectionUtils.getDisplayName(clazz),
                 clazz);
     }
 
@@ -89,7 +89,7 @@ public final class TestDescriptorUtils {
 
         return new MethodTestDescriptor(
                 uniqueId,
-                TestEngineReflectionUtils.getDisplayName(method),
+                ReflectionUtils.getDisplayName(method),
                 clazz,
                 argument,
                 method);
@@ -157,7 +157,7 @@ public final class TestDescriptorUtils {
 
     private static void validateTestClass(Class<?> clazz) {
         // Validate we have a @TestEngine.ArgumentSupplier method
-        if (TestEngineReflectionUtils.getArgumentSupplierMethod(clazz) == null) {
+        if (ReflectionUtils.getArgumentSupplierMethod(clazz) == null) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a static @TestEngine.ArgumentSupplier method",
@@ -165,7 +165,7 @@ public final class TestDescriptorUtils {
         }
 
         // Validate we have a @TestEngine.Argument field
-        if (TestEngineReflectionUtils.getArgumentField(clazz) == null) {
+        if (ReflectionUtils.getArgumentField(clazz) == null) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a @TestEngine.Argument field",
@@ -173,7 +173,7 @@ public final class TestDescriptorUtils {
         }
 
         // Validate we have a @TestEngine.Test method
-        if (TestEngineReflectionUtils.getTestMethods(clazz).size() < 1) {
+        if (ReflectionUtils.getTestMethods(clazz).size() < 1) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a @TestEngine.Test method",
@@ -182,11 +182,11 @@ public final class TestDescriptorUtils {
 
         // Get other method optional annotated methods
         // which will check for duplicate @TestEngine.Order values
-        TestEngineReflectionUtils.getPrepareMethods(clazz);
-        TestEngineReflectionUtils.getBeforeAllMethods(clazz);
-        TestEngineReflectionUtils.getBeforeEachMethods(clazz);
-        TestEngineReflectionUtils.getAfterEachMethods(clazz);
-        TestEngineReflectionUtils.getAfterAllMethods(clazz);
-        TestEngineReflectionUtils.getConcludeMethods(clazz);
+        ReflectionUtils.getPrepareMethods(clazz);
+        ReflectionUtils.getBeforeAllMethods(clazz);
+        ReflectionUtils.getBeforeEachMethods(clazz);
+        ReflectionUtils.getAfterEachMethods(clazz);
+        ReflectionUtils.getAfterAllMethods(clazz);
+        ReflectionUtils.getConcludeMethods(clazz);
     }
 }

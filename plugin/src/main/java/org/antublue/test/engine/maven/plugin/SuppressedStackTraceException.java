@@ -23,14 +23,14 @@ import java.io.PrintStream;
 /**
  * Class to implement a MojoExecutionException that doesn't print a stack trace
  */
-public class SuppressedStackTraceMojoExecutionException extends MojoExecutionException {
+public class SuppressedStackTraceException extends MojoExecutionException {
 
     /**
      * Constructor
      *
      * @param message message
      */
-    public SuppressedStackTraceMojoExecutionException(String message) {
+    public SuppressedStackTraceException(String message) {
         super(message);
     }
 

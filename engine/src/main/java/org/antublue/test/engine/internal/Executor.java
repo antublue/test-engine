@@ -16,12 +16,13 @@
 
 package org.antublue.test.engine.internal;
 
-import org.antublue.test.engine.TestEngineConstants;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.NamedThreadFactory;
+import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestExecutionResult;
@@ -39,19 +40,32 @@ import java.util.concurrent.TimeUnit;
 /**
  * Method to execute an ExecutionRequest
  */
-public class TestEngineExecutor {
+public class Executor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Executor.class);
 
-    private final ExecutorService executorService;
+    private ExecutorService executorService;
 
     /**
      * Constructor
      */
-    public TestEngineExecutor() {
+    public Executor() {
+
+    }
+
+    /**
+     * Method to execute the ExecutionRequest
+     *
+     * @param executionRequest the execution request
+     */
+    public void execute(ExecutionRequest executionRequest) {
+        LOGGER.trace("execute()");
+
+        ConfigurationParameters configurationParameters = executionRequest.getConfigurationParameters();
+
         int threadCount =
-                TestEngineConfiguration.getInstance()
-                        .get(TestEngineConstants.THREAD_COUNT)
+                configurationParameters
+                        .get(Constants.THREAD_COUNT)
                         .map(value -> {
                             int intValue;
                             try {
@@ -67,25 +81,17 @@ public class TestEngineExecutor {
                         })
                         .orElse(Runtime.getRuntime().availableProcessors());
 
-        LOGGER.trace("[%s] = [%d]", TestEngineConstants.THREAD_COUNT, threadCount);
+        LOGGER.trace("[%s] = [%d]", Constants.THREAD_COUNT, threadCount);
 
-        executorService = new ThreadPoolExecutor(
-                threadCount,
-                threadCount,
-                60L,
-                TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(threadCount * 10),
-                new NamedThreadFactory("test-engine-%02d"),
-                new BlockingRejectedExecutionHandler());
-    }
-
-    /**
-     * Method to execute the ExecutionRequest
-     *
-     * @param executionRequest the execution request
-     */
-    public void execute(ExecutionRequest executionRequest) {
-        LOGGER.trace("execute()");
+        executorService =
+                new ThreadPoolExecutor(
+                        threadCount,
+                        threadCount,
+                        60L,
+                        TimeUnit.SECONDS,
+                        new ArrayBlockingQueue<>(threadCount * 10),
+                        new NamedThreadFactory("test-engine-%02d"),
+                        new BlockingRejectedExecutionHandler());
 
         EngineExecutionListener engineExecutionListener = executionRequest.getEngineExecutionListener();
 
@@ -97,10 +103,10 @@ public class TestEngineExecutor {
         List<ClassTestDescriptor> classTestDescriptors =
                 extendedEngineDescriptor.getChildren(ClassTestDescriptor.class);
 
-        TestEngineConfiguration.getInstance()
-                .get(TestEngineConstants.TEST_CLASS_SHUFFLE)
+        configurationParameters
+                .get(Constants.TEST_CLASS_SHUFFLE)
                 .ifPresent(value -> {
-                    if (value.equalsIgnoreCase(TestEngineConstants.TRUE)) {
+                    if (value.equalsIgnoreCase(Constants.TRUE)) {
                         Collections.shuffle(classTestDescriptors, new SecureRandom());
                     }
                 });
@@ -111,7 +117,7 @@ public class TestEngineExecutor {
                 .forEach(classTestDescriptor ->
                         executorService.submit(
                                 () -> classTestDescriptor
-                                        .execute(new TestEngineExecutorContext(executionRequest, countDownLatch))));
+                                        .execute(new ExecutorContext(executionRequest, countDownLatch))));
 
         try {
             countDownLatch.await();
