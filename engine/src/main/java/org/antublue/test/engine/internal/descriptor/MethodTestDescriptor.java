@@ -23,7 +23,6 @@ import org.antublue.test.engine.internal.LockAnnotationUtils;
 import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.MethodUtils;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestExecutionResult;
@@ -163,7 +162,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
             LockAnnotationUtils.processLockAnnotations(method);
 
-            MethodUtils.invoke(
+            ReflectionUtils.invoke(
                     testInstance,
                     method,
                     throwable -> {
@@ -187,7 +186,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
             LockAnnotationUtils.processLockAnnotations(testMethod);
 
-            MethodUtils.invoke(
+            ReflectionUtils.invoke(
                     testInstance,
                     testMethod,
                     throwable -> {
@@ -208,7 +207,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
             LockAnnotationUtils.processLockAnnotations(method);
 
-            MethodUtils.invoke(
+            ReflectionUtils.invoke(
                     testInstance,
                     method,
                     throwable -> {

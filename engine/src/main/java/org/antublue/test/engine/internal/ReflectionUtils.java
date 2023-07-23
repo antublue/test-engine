@@ -20,6 +20,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.Precondition;
 import org.junit.platform.commons.support.ReflectionSupport;
 
 import java.lang.annotation.Annotation;
@@ -37,6 +38,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -594,6 +596,93 @@ public final class ReflectionUtils {
         LOGGER.trace("class [%s] display name [%s]", clazz.getName(), displayName);
 
         return displayName;
+    }
+
+    /**
+     * Method to instantiate an Object
+     *
+     * @param clazz clazz
+     * @param objectConsumer objectConsumer
+     * @param throwableConsumer throwableConsumer
+     */
+    public static void instantiate(
+            Class<?> clazz,
+            Consumer<Object> objectConsumer,
+            Consumer<Throwable> throwableConsumer) {
+        Precondition.notNull(clazz, "clazz is null");
+        Precondition.notNull(objectConsumer, "objectConsumer is null");
+        Precondition.notNull(throwableConsumer, "throwableConsumer is null");
+
+        try {
+            Object object = clazz.getDeclaredConstructor((Class<?>[]) null).newInstance((Object[]) null);
+            objectConsumer.accept(object);
+        } catch (Throwable t) {
+            throwableConsumer.accept(t.getCause());
+        }
+    }
+
+    /**
+     * Method to set a Field
+     *
+     * @param object object
+     * @param field field
+     * @param value value
+     * @param throwableConsumer throwableConsumer
+     */
+    public static void setField(Object object, Field field, Object value, Consumer<Throwable> throwableConsumer) {
+        Precondition.notNull(object, "object is null");
+        Precondition.notNull(field, "field is null");
+        Precondition.notNull(throwableConsumer, "throwableConsumer is null");
+
+        try {
+            field.setAccessible(true);
+            field.set(object, value);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throwableConsumer.accept(t);
+        }
+    }
+
+    /**
+     * Method to invoke a method
+     *
+     * @param object object
+     * @param method method
+     * @param throwableConsumer throwableConsumer
+     */
+    public static void invoke(
+            Object object,
+            Method method,
+            Consumer<Throwable> throwableConsumer) {
+        Precondition.notNull(object, "object is null");
+        Precondition.notNull(method, "method is null");
+        Precondition.notNull(throwableConsumer, "throwableConsumer is null");
+
+        invoke(object, method, null, throwableConsumer);
+    }
+
+    /**
+     * Method to invoke a method
+     *
+     * @param object object
+     * @param method method
+     * @param arguments arguments
+     * @param throwableConsumer throwableConsumer
+     */
+    public static void invoke(
+            Object object,
+            Method method,
+            Object[] arguments,
+            Consumer<Throwable> throwableConsumer) {
+        Precondition.notNull(object, "object is null");
+        Precondition.notNull(method, "method is null");
+        Precondition.notNull(throwableConsumer, "throwableConsumer is null");
+
+        try {
+            method.invoke(object, arguments);
+        } catch (Throwable t) {
+            throwableConsumer.accept(t.getCause());
+        }
     }
 
     /**
