@@ -83,7 +83,7 @@ public class Resolver {
                 || clazz.isAnnotationPresent(TestEngine.Disabled.class)
                 || Modifier.isAbstract(clazz.getModifiers())
                 || ReflectionUtils.getTestMethods(clazz).isEmpty()) {
-            LOGGER.trace("class [%s] excluded", clazz.getName());
+            LOGGER.trace("is test class [%s] excluded", clazz.getName());
             return false;
         }
 
@@ -98,7 +98,7 @@ public class Resolver {
         boolean result =
                 !method.isAnnotationPresent(TestEngine.Disabled.class)
                 && ReflectionUtils.getTestMethods(method.getDeclaringClass()).contains(method);
-        LOGGER.trace("class [%s] = [%b]", method.getDeclaringClass().getName(), result);
+        LOGGER.trace("is test method [%s] = [%b]", method.getDeclaringClass().getName(), result);
         return result;
     };
 
