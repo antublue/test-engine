@@ -23,7 +23,7 @@ import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.MethodUtils;
-import org.antublue.test.engine.internal.util.ObjectUtils;
+import org.antublue.test.engine.internal.util.ClassUtils;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestExecutionResult;
@@ -118,7 +118,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
-        ObjectUtils.instantiate(testClass, o -> testInstance = o, throwableCollector::add);
+        ClassUtils.instantiate(testClass, o -> testInstance = o, throwableCollector::add);
 
         if (throwableCollector.isEmpty()) {
             List<Method> methods = ReflectionUtils.getPrepareMethods(testClass);

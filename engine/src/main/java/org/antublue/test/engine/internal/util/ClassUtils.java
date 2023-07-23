@@ -19,14 +19,14 @@ package org.antublue.test.engine.internal.util;
 import java.util.function.Consumer;
 
 /**
- * Class to implement Object utilities
+ * Class to implement Class utilities
  */
-public class ObjectUtils {
+public class ClassUtils {
 
     /**
      * Constructor
      */
-    private ObjectUtils() {
+    private ClassUtils() {
         // DO NOTHING
     }
 
