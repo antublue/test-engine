@@ -136,6 +136,13 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
         Field field = ReflectionUtils.getArgumentField(testClass);
+
+        LOGGER.trace(
+                "set field testClass [%s] field [%s] testArgument [%s]",
+                testClass.getName(),
+                field.getName(),
+                testArgument.name());
+
         FieldUtils.setField(testInstance, field, testArgument, throwable -> {
             throwableCollector.add(throwable);
             throwable.printStackTrace();
@@ -218,6 +225,11 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                             throwableCollector.add(throwable);
                             throwable.printStackTrace();
                         });
+
+        LOGGER.trace(
+                "set field testClass [%s] field [%s] testArgument[null]",
+                testClass.getName(),
+                field.getName());
 
         FieldUtils.setField(testInstance, field, null, throwable -> {});
 
