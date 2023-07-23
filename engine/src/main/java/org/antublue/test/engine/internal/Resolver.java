@@ -334,18 +334,7 @@ public class Resolver {
      */
     private void filter() {
         LOGGER.trace("filter()");
-
-        /*
-         * Filter...
-         *
-         * include/exclude classes
-         * include/exclude methods
-         * include/exclude class tags
-         * include/exclude method tags
-         *
-         * ... and build the TestDescriptor tree
-         */
-
+        
         Iterator<Map.Entry<Class<?>, Set<Method>>> classMethodMapEntryIterator = classMethodSetMap.entrySet().iterator();
         while (classMethodMapEntryIterator.hasNext()) {
             Map.Entry<Class<?>, Set<Method>> entry = classMethodMapEntryIterator.next();
