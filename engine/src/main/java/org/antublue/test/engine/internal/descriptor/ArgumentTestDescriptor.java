@@ -23,8 +23,6 @@ import org.antublue.test.engine.internal.LockAnnotationUtils;
 import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.FieldUtils;
-import org.antublue.test.engine.internal.util.MethodUtils;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestExecutionResult;
@@ -143,7 +141,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 field.getName(),
                 testArgument.name());
 
-        FieldUtils.setField(testInstance, field, testArgument, throwable -> {
+        ReflectionUtils.setField(testInstance, field, testArgument, throwable -> {
             throwableCollector.add(throwable);
             throwable.printStackTrace();
         });
@@ -159,7 +157,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
                 LockAnnotationUtils.processLockAnnotations(method);
 
-                MethodUtils.invoke(
+                ReflectionUtils.invoke(
                         testInstance,
                         method,
                         throwable -> {
@@ -206,7 +204,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
             LockAnnotationUtils.processLockAnnotations(method);
 
-            MethodUtils.invoke(
+            ReflectionUtils.invoke(
                     testInstance,
                     method,
                     throwable -> {
@@ -231,7 +229,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 testClass.getName(),
                 field.getName());
 
-        FieldUtils.setField(testInstance, field, null, throwable -> {});
+        ReflectionUtils.setField(testInstance, field, null, throwable -> {});
 
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
