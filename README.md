@@ -22,7 +22,7 @@ Release information can be found in GitHub Releases
 
 **Notes**
 
-Test Engine versions prior to `v4.2.3` should not be used due to a critical bug ...
+Test Engine versions prior to `4.2.3` should not be used due to a critical bug ...
 
 - [#32](https://github.com/antublue/test-engine/issues/32) Tests may be skipped on a slow machine or scenarios where there are a large number of test classes.
 
@@ -30,13 +30,17 @@ Test Engine versions prior to `v4.2.3` should not be used due to a critical bug 
 
 **Documentation is specific to a release.**
 
-For the current branch, reference the [Manual](MANUAL.md).
+For the current branch, reference the manual
+
+- [Manual](MANUAL.md)
 
 For a specific release, reference the `release-<VERSION>` branch for relevant documentation.
 
 # Support
 
 GitHub's Discussions is the current mechanism for help / support.
+
+- [Discussions](https://github.com/antublue/test-engine/discussions)
 
 # FAQ
 
