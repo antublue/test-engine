@@ -22,7 +22,7 @@ import org.junit.platform.engine.ExecutionRequest;
 
 import java.util.concurrent.CountDownLatch;
 
-/** Class to implement an execution context */
+/** Class to implement an executor context */
 public class ExecutorContext {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorContext.class);
