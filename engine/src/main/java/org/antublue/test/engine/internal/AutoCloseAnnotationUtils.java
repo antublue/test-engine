@@ -84,7 +84,7 @@ public class AutoCloseAnnotationUtils {
             Object object, String lifecycle, String methodName, Field field, Consumer<Throwable> throwableConsumer) {
         LOGGER.trace("close(%s, %s, %s)", object.getClass().getName(), methodName, field.getName());
 
-        if (methodName.trim().isEmpty()) {
+        if (methodName == null || methodName.trim().isEmpty()) {
             try {
                 Object o = field.get(object);
                 if (o instanceof AutoCloseable) {
