@@ -39,6 +39,7 @@ public class NestedTest {
         @TestEngine.BeforeAll
         public void beforeAll() {
             System.out.println("beforeAll()");
+
             setup();
         }
 

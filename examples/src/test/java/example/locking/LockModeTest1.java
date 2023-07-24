@@ -73,6 +73,7 @@ public class LockModeTest1 {
     @TestEngine.Unlock(name = LOCK_NAME, mode = TestEngine.LockMode.READ)
     public void test2() {
         System.out.println("test2()");
+
         int count = Store.singleton().get(COUNTER_NAME, Integer.class).get();
         if (count != 0) {
             fail("expected count = 0");

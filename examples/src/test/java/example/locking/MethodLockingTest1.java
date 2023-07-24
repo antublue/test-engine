@@ -47,7 +47,9 @@ public class MethodLockingTest1 {
     public void test1() {
         System.out.println("test1()");
 
-        AtomicInteger atomicInteger = Store.singleton().get(COUNTER_NAME, AtomicInteger.class).get();
+        AtomicInteger atomicInteger =
+                Store.singleton().get(COUNTER_NAME, AtomicInteger.class).get();
+
         int count = atomicInteger.incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");

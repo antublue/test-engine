@@ -15,11 +15,9 @@ public class BaseTest {
     @TestEngine.ArgumentSupplier
     protected static Stream<IntegerArgument> arguments() {
         Collection<IntegerArgument> collection = new ArrayList<>();
-
         for (int i = 0; i < 10; i++) {
             collection.add(IntegerArgument.of(i));
         }
-
         return collection.stream();
     }
 

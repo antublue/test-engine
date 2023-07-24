@@ -20,26 +20,30 @@ public class CamelCaseFunctionTest {
 
     private static Function<String, String> FUNCTION = new CamelCaseFunction();
 
-    private Tuple tuple;
+    private InputOutputArgument inputOutputArgument;
 
-    @TestEngine.Argument protected ObjectArgument<Tuple> objectArgument;
+    @TestEngine.Argument protected ObjectArgument<InputOutputArgument> objectArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<ObjectArgument<Tuple>> arguments() {
-        Collection<ObjectArgument<Tuple>> collection = new ArrayList<>();
+    public static Stream<ObjectArgument<InputOutputArgument>> arguments() {
+        Collection<ObjectArgument<InputOutputArgument>> collection = new ArrayList<>();
 
-        Tuple tuple =
-                new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
-        collection.add(new ObjectArgument<>(tuple.input, tuple));
+        InputOutputArgument inputOutputArgument =
+                new InputOutputArgument(
+                        "THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
 
-        tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
-        collection.add(new ObjectArgument<>(tuple.input, tuple));
+        collection.add(new ObjectArgument<>(inputOutputArgument.input, inputOutputArgument));
 
-        tuple = new Tuple("THIS", "this");
-        collection.add(new ObjectArgument<>(tuple.input, tuple));
+        inputOutputArgument =
+                new InputOutputArgument(
+                        "THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
+        collection.add(new ObjectArgument<>(inputOutputArgument.input, inputOutputArgument));
 
-        tuple = new Tuple("tHis", "this");
-        collection.add(new ObjectArgument<>(tuple.input, tuple));
+        inputOutputArgument = new InputOutputArgument("THIS", "this");
+        collection.add(new ObjectArgument<>(inputOutputArgument.input, inputOutputArgument));
+
+        inputOutputArgument = new InputOutputArgument("tHis", "this");
+        collection.add(new ObjectArgument<>(inputOutputArgument.input, inputOutputArgument));
 
         return collection.stream();
     }
@@ -47,21 +51,23 @@ public class CamelCaseFunctionTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        tuple = objectArgument.value();
+        inputOutputArgument = objectArgument.value();
     }
 
     @TestEngine.Test
     public void test() {
-        String actual = FUNCTION.apply(tuple.input);
+        String actual = FUNCTION.apply(inputOutputArgument.input);
+
         System.out.println(
                 "test() input ["
-                        + tuple.input
+                        + inputOutputArgument.input
                         + "] expected ["
-                        + tuple.expected
+                        + inputOutputArgument.expected
                         + "] actual ["
                         + actual
                         + "]");
-        assertThat(actual).isEqualTo(tuple.expected);
+
+        assertThat(actual).isEqualTo(inputOutputArgument.expected);
     }
 
     // Based on https://www.baeldung.com/java-string-to-camel-case
@@ -95,12 +101,12 @@ public class CamelCaseFunctionTest {
         }
     }
 
-    private static class Tuple {
+    private static class InputOutputArgument {
 
         public String input;
         public String expected;
 
-        public Tuple(String input, String expected) {
+        public InputOutputArgument(String input, String expected) {
             this.input = input;
             this.expected = expected;
         }
