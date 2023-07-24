@@ -16,14 +16,10 @@
 
 package org.antublue.test.engine.internal.util;
 
-/**
- * Class to check preconditions
- */
+/** Class to check preconditions */
 public final class Precondition {
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     private Precondition() {
         // DO NOTHING
     }

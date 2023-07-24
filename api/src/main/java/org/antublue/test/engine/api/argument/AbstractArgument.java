@@ -18,9 +18,7 @@ package org.antublue.test.engine.api.argument;
 
 import org.antublue.test.engine.api.Argument;
 
-/**
- * Abstract class for common arguments
- */
+/** Abstract class for common arguments */
 public abstract class AbstractArgument implements Argument {
 
     /**

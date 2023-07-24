@@ -8,13 +8,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class BigDecimalArgumentTest {
 
-    @TestEngine.Argument
-    protected BigDecimalArgument bigDecimalArgument;
+    @TestEngine.Argument protected BigDecimalArgument bigDecimalArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<BigDecimalArgument> arguments() {

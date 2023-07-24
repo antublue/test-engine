@@ -1,12 +1,12 @@
 package example.order;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TestEngine.BaseClass
 @TestEngine.Order(order = 3)
@@ -25,8 +25,7 @@ class BaseOrderTest {
 
     protected final List<String> ACTUAL_LIST = new ArrayList<>();
 
-    @TestEngine.Argument
-    protected StringArgument stringArgument;
+    @TestEngine.Argument protected StringArgument stringArgument;
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 1)
@@ -45,7 +44,7 @@ class BaseOrderTest {
     @TestEngine.Test
     @TestEngine.Order(order = 1)
     public void test2() {
-        System.out.println("BaseOrderTest.test2(" + stringArgument  + ")");
+        System.out.println("BaseOrderTest.test2(" + stringArgument + ")");
     }
 
     @TestEngine.AfterAll
@@ -66,7 +65,7 @@ class BaseOrderTest {
         assertThat(ACTUAL_LIST).isEqualTo(EXPECTED_LIST);
     }
 
-    private static List<String> listOf(String ... strings) {
+    private static List<String> listOf(String... strings) {
         List<String> list = new ArrayList<>(strings.length);
         for (String string : strings) {
             list.add(string);

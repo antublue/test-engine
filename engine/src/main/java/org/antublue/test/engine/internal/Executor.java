@@ -37,9 +37,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Method to execute an ExecutionRequest
- */
+/** Method to execute an ExecutionRequest */
 public class Executor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Executor.class);
@@ -54,24 +52,30 @@ public class Executor {
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute()");
 
-        ConfigurationParameters configurationParameters = executionRequest.getConfigurationParameters();
+        ConfigurationParameters configurationParameters =
+                executionRequest.getConfigurationParameters();
 
         int threadCount =
                 configurationParameters
                         .get(Constants.THREAD_COUNT)
-                        .map(value -> {
-                            int intValue;
-                            try {
-                                intValue = Integer.parseInt(value);
-                                if (intValue >= 1) {
-                                    return intValue;
-                                } else {
-                                    throw new TestEngineException(String.format("Invalid thread count [%d]", intValue));
-                                }
-                            } catch (NumberFormatException e) {
-                                throw new TestEngineException(String.format("Invalid thread count [%s]", value), e);
-                            }
-                        })
+                        .map(
+                                value -> {
+                                    int intValue;
+                                    try {
+                                        intValue = Integer.parseInt(value);
+                                        if (intValue >= 1) {
+                                            return intValue;
+                                        } else {
+                                            throw new TestEngineException(
+                                                    String.format(
+                                                            "Invalid thread count [%d]", intValue));
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        throw new TestEngineException(
+                                                String.format("Invalid thread count [%s]", value),
+                                                e);
+                                    }
+                                })
                         .orElse(Runtime.getRuntime().availableProcessors());
 
         LOGGER.trace("[%s] = [%d]", Constants.THREAD_COUNT, threadCount);
@@ -86,7 +90,8 @@ public class Executor {
                         new NamedThreadFactory("test-engine-%02d"),
                         new BlockingRejectedExecutionHandler());
 
-        EngineExecutionListener engineExecutionListener = executionRequest.getEngineExecutionListener();
+        EngineExecutionListener engineExecutionListener =
+                executionRequest.getEngineExecutionListener();
 
         ExtendedEngineDescriptor extendedEngineDescriptor =
                 (ExtendedEngineDescriptor) executionRequest.getRootTestDescriptor();
@@ -98,19 +103,22 @@ public class Executor {
 
         configurationParameters
                 .get(Constants.TEST_CLASS_SHUFFLE)
-                .ifPresent(value -> {
-                    if (value.equalsIgnoreCase(Constants.TRUE)) {
-                        Collections.shuffle(classTestDescriptors, new SecureRandom());
-                    }
-                });
+                .ifPresent(
+                        value -> {
+                            if (value.equalsIgnoreCase(Constants.TRUE)) {
+                                Collections.shuffle(classTestDescriptors, new SecureRandom());
+                            }
+                        });
 
         CountDownLatch countDownLatch = new CountDownLatch(classTestDescriptors.size());
 
-        classTestDescriptors
-                .forEach(classTestDescriptor ->
+        classTestDescriptors.forEach(
+                classTestDescriptor ->
                         executorService.submit(
-                                () -> classTestDescriptor
-                                        .execute(new ExecutorContext(executionRequest, countDownLatch))));
+                                () ->
+                                        classTestDescriptor.execute(
+                                                new ExecutorContext(
+                                                        executionRequest, countDownLatch))));
 
         try {
             countDownLatch.await();
@@ -122,12 +130,11 @@ public class Executor {
             }
         }
 
-        engineExecutionListener.executionFinished(extendedEngineDescriptor, TestExecutionResult.successful());
+        engineExecutionListener.executionFinished(
+                extendedEngineDescriptor, TestExecutionResult.successful());
     }
 
-    /**
-     * Class to handle a submit rejection, adding the Runnable using blocking semantics
-     */
+    /** Class to handle a submit rejection, adding the Runnable using blocking semantics */
     private static class BlockingRejectedExecutionHandler implements RejectedExecutionHandler {
 
         @Override

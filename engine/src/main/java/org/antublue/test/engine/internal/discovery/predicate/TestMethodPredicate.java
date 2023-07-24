@@ -18,9 +18,7 @@ package org.antublue.test.engine.internal.discovery.predicate;
 
 import java.lang.reflect.Method;
 
-/**
- * Class to implement a test method predicate
- */
+/** Class to implement a test method predicate */
 public final class TestMethodPredicate extends RegexPredicate<Method> {
 
     /**

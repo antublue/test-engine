@@ -7,13 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class BooleanArgumentTest {
 
-    @TestEngine.Argument
-    protected BooleanArgument booleanArgument;
+    @TestEngine.Argument protected BooleanArgument booleanArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<BooleanArgument> arguments() {

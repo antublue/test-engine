@@ -18,9 +18,7 @@ package org.antublue.test.engine.api.argument;
 
 import java.util.Objects;
 
-/**
- * Class to implement a FloatArgument
- */
+/** Class to implement a FloatArgument */
 public class FloatArgument extends AbstractArgument {
 
     private final String name;

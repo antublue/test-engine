@@ -25,21 +25,19 @@ import java.util.function.Function;
 
 /**
  * Class to implement a singleton Store
- * <p>
- * Store methods are atomic and thread-safe. Complex usage should lock the Store
- * using either lock() / unlock() or use the Lock returned from getLock()
- * <p>
- * Locking of Objects in the Store is the responsibility of the calling code
+ *
+ * <p>Store methods are atomic and thread-safe. Complex usage should lock the Store using either
+ * lock() / unlock() or use the Lock returned from getLock()
+ *
+ * <p>Locking of Objects in the Store is the responsibility of the calling code
  */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Store {
 
-    private final static Lock LOCK = new ReentrantLock(true);
-    private final static Map<String, Object> MAP = new LinkedHashMap<>();
+    private static final Lock LOCK = new ReentrantLock(true);
+    private static final Map<String, Object> MAP = new LinkedHashMap<>();
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     private Store() {
         // DO NOTHING
     }
@@ -78,7 +76,8 @@ public class Store {
      *
      * @param key key
      * @param object object
-     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
+     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't
+     *     exist
      */
     public static Optional<Object> put(String key, Object object) {
         String validKey = validateKey(key);
@@ -92,11 +91,13 @@ public class Store {
     }
 
     /**
-     * Method to put an Object into the store. If an Object doesn't exist, execute the Function to create an Object and store it
+     * Method to put an Object into the store. If an Object doesn't exist, execute the Function to
+     * create an Object and store it
      *
      * @param key key
      * @param function function
-     * @return an Optional containing the existing Object, or an Optional containing the Object returned by the Function
+     * @return an Optional containing the existing Object, or an Optional containing the Object
+     *     returned by the Function
      */
     public static Optional<Object> putIfAbsent(String key, Function<String, Object> function) {
         String validKey = validateKey(key);
@@ -114,7 +115,8 @@ public class Store {
      * Method to get an Object from the Store
      *
      * @param key key
-     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
+     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't
+     *     exist
      */
     public static Optional<Object> get(String key) {
         String validKey = validateKey(key);
@@ -132,7 +134,8 @@ public class Store {
      *
      * @param key key
      * @param clazz clazz
-     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
+     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't
+     *     exist
      * @param <T> the return type
      */
     public static <T> Optional<T> get(String key, Class<T> clazz) {
@@ -151,7 +154,8 @@ public class Store {
      * Method to remove an Object from the Store, closing the Object if it implements AutoClosable
      *
      * @param key key
-     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
+     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't
+     *     exist
      */
     public static Optional<Object> remove(String key) {
         try {
@@ -163,10 +167,10 @@ public class Store {
     }
 
     /**
-     *
      * @param key key
      * @param clazz clazz
-     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't exist
+     * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't
+     *     exist
      * @param <T> the return type
      */
     public static <T> Optional<T> remove(String key, Class<T> clazz) {
@@ -185,20 +189,22 @@ public class Store {
      * @throws StoreException exception if the AutoCloseable throws an Exception
      */
     public static void removeAndClose(String key) throws StoreException {
-        remove(key).ifPresent(o -> {
-            if (o instanceof AutoCloseable) {
-                try {
-                    ((AutoCloseable) o).close();
-                } catch (Throwable t) {
-                    throw new StoreException(
-                            String.format(
-                                    "Exception closing Object for key [%s] object [%s]",
-                                    key,
-                                    o.getClass().getName()),
-                            t);
-                }
-            }
-        });
+        remove(key)
+                .ifPresent(
+                        o -> {
+                            if (o instanceof AutoCloseable) {
+                                try {
+                                    ((AutoCloseable) o).close();
+                                } catch (Throwable t) {
+                                    throw new StoreException(
+                                            String.format(
+                                                    "Exception closing Object for key [%s] object"
+                                                            + " [%s]",
+                                                    key, o.getClass().getName()),
+                                            t);
+                                }
+                            }
+                        });
     }
 
     /**

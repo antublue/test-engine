@@ -8,13 +8,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class BigIntegerArgumentTest {
 
-    @TestEngine.Argument
-    protected BigIntegerArgument bigIntegerArgument;
+    @TestEngine.Argument protected BigIntegerArgument bigIntegerArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<BigIntegerArgument> arguments() {

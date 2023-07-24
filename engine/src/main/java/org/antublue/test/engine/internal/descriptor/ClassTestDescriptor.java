@@ -33,10 +33,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Class to implement a class test descriptor
- */
-@SuppressWarnings({ "PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock" })
+/** Class to implement a class test descriptor */
+@SuppressWarnings({"PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock"})
 public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassTestDescriptor.class);
@@ -106,17 +104,13 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         return testClass;
     }
 
-    /**
-     * Method to execute the test descriptor
-     */
+    /** Method to execute the test descriptor */
     @Override
     public void execute(ExecutorContext executorContext) {
         LOGGER.trace("execute uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
         EngineExecutionListener engineExecutionListener =
-                executorContext
-                        .getExecutionRequest()
-                        .getEngineExecutionListener();
+                executorContext.getExecutionRequest().getEngineExecutionListener();
 
         engineExecutionListener.executionStarted(this);
 
@@ -137,16 +131,11 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
             for (Method method : methods) {
                 LOGGER.trace(
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
-                        getUniqueId(),
-                        testClass.getName(),
-                        method.getName());
+                        getUniqueId(), testClass.getName(), method.getName());
 
                 LockAnnotationUtils.processLockAnnotations(method);
 
-                ReflectionUtils.invoke(
-                        testInstance,
-                        method,
-                        throwableCollector);
+                ReflectionUtils.invoke(testInstance, method, throwableCollector);
 
                 LockAnnotationUtils.processUnlockAnnotations(method);
 
@@ -156,14 +145,15 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
             }
         }
 
-        List<ArgumentTestDescriptor> argumentTestDescriptors = getChildren(ArgumentTestDescriptor.class);
+        List<ArgumentTestDescriptor> argumentTestDescriptors =
+                getChildren(ArgumentTestDescriptor.class);
 
         if (throwableCollector.isEmpty()) {
-            argumentTestDescriptors
-                    .forEach(argumentTestDescriptor -> argumentTestDescriptor.execute(executorContext));
+            argumentTestDescriptors.forEach(
+                    argumentTestDescriptor -> argumentTestDescriptor.execute(executorContext));
         } else {
-            argumentTestDescriptors
-                    .forEach(argumentTestDescriptor -> {
+            argumentTestDescriptors.forEach(
+                    argumentTestDescriptor -> {
                         LOGGER.trace(
                                 "skip uniqueId [%s] testClass [%s] testArgument [%s]",
                                 argumentTestDescriptor.getUniqueId(),
@@ -179,37 +169,24 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
             for (Method method : methods) {
                 LOGGER.trace(
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
-                        getUniqueId(),
-                        testClass.getName(),
-                        method.getName());
+                        getUniqueId(), testClass.getName(), method.getName());
 
                 LockAnnotationUtils.processLockAnnotations(method);
 
-                ReflectionUtils.invoke(
-                        testInstance,
-                        method,
-                        throwableCollector);
+                ReflectionUtils.invoke(testInstance, method, throwableCollector);
 
                 LockAnnotationUtils.processUnlockAnnotations(method);
             }
 
-            AutoCloseAnnotationUtils
-                    .processAutoCloseAnnotatedFields(
-                            testInstance,
-                            "@TestEngine.Conclude",
-                            throwableCollector);
+            AutoCloseAnnotationUtils.processAutoCloseAnnotatedFields(
+                    testInstance, "@TestEngine.Conclude", throwableCollector);
         }
 
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
         } else {
             engineExecutionListener.executionFinished(
-                    this,
-                    TestExecutionResult.failed(
-                            throwableCollector
-                                    .getFirst()
-                                    .orElse(null)));
-
+                    this, TestExecutionResult.failed(throwableCollector.getFirst().orElse(null)));
         }
 
         testInstance = null;

@@ -19,9 +19,7 @@ package org.antublue.test.engine.internal.util;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Class to implement a named ThreadFactory
- */
+/** Class to implement a named ThreadFactory */
 public final class NamedThreadFactory implements ThreadFactory {
 
     private final AtomicInteger threadId = new AtomicInteger(1);

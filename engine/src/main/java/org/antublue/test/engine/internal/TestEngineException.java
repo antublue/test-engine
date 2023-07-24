@@ -16,9 +16,7 @@
 
 package org.antublue.test.engine.internal;
 
-/**
- * Class to implement a generic TestEngineException
- */
+/** Class to implement a generic TestEngineException */
 public class TestEngineException extends RuntimeException {
 
     /**

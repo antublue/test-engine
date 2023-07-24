@@ -24,97 +24,57 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Interface that contains all TestEngine annotations
- */
+/** Interface that contains all TestEngine annotations */
 public @interface TestEngine {
 
-    /**
-     * ArgumentSupplier annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    /** ArgumentSupplier annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface ArgumentSupplier {
+    @interface ArgumentSupplier {}
 
-    }
-
-    /**
-     * Argument annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
+    /** Argument annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Argument {
+    @interface Argument {}
 
-    }
-
-    /**
-     * Prepare annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    /** Prepare annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Prepare {
+    @interface Prepare {}
 
-    }
-
-    /**
-     * BeforeAll annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    /** BeforeAll annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface BeforeAll {
+    @interface BeforeAll {}
 
-    }
-
-    /**
-     * BeforeEach annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    /** BeforeEach annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface BeforeEach {
+    @interface BeforeEach {}
 
-    }
-
-    /**
-     * Test annotation
-     */
+    /** Test annotation */
     @Testable
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Test {
+    @interface Test {}
 
-    }
-
-    /**
-     * AfterEach annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    /** AfterEach annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface AfterEach {
+    @interface AfterEach {}
 
-    }
-
-    /**
-     * AfterAll annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    /** AfterAll annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface AfterAll {
+    @interface AfterAll {}
 
-    }
-
-    /**
-     * Conclude annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    /** Conclude annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Conclude {
+    @interface Conclude {}
 
-    }
-
-    /**
-     * Order annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
+    /** Order annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @interface Order {
 
@@ -126,28 +86,18 @@ public @interface TestEngine {
         int order();
     }
 
-    /**
-     * Disabled annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
+    /** Disabled annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Disabled {
+    @interface Disabled {}
 
-    }
-
-    /**
-     * BaseClass annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE })
+    /** BaseClass annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface BaseClass {
+    @interface BaseClass {}
 
-    }
-
-    /**
-     * Tag annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
+    /** Tag annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @interface Tag {
 
@@ -159,10 +109,8 @@ public @interface TestEngine {
         String tag();
     }
 
-    /**
-     * DisplayName annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD })
+    /** DisplayName annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @interface DisplayName {
 
@@ -174,10 +122,8 @@ public @interface TestEngine {
         String name();
     }
 
-    /**
-     * AutoClose annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD })
+    /** AutoClose annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
     @Retention(RetentionPolicy.RUNTIME)
     @interface AutoClose {
 
@@ -196,10 +142,8 @@ public @interface TestEngine {
         String method() default "";
     }
 
-    /**
-     * Lock annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    /** Lock annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @Repeatable(ResourceLock.List.class)
     @interface ResourceLock {
@@ -218,10 +162,8 @@ public @interface TestEngine {
          */
         LockMode mode() default LockMode.READ_WRITE;
 
-        /**
-         * Lock.List annotation
-         */
-        @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+        /** Lock.List annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface List {
 
@@ -234,10 +176,8 @@ public @interface TestEngine {
         }
     }
 
-    /**
-     * Lock annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    /** Lock annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @Repeatable(TestEngine.Lock.List.class)
     @interface Lock {
@@ -256,10 +196,8 @@ public @interface TestEngine {
          */
         LockMode mode() default LockMode.READ_WRITE;
 
-        /**
-         * Lock.List annotation
-         */
-        @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+        /** Lock.List annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface List {
 
@@ -272,10 +210,8 @@ public @interface TestEngine {
         }
     }
 
-    /**
-     * Unlock annotation
-     */
-    @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+    /** Unlock annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @Repeatable(Unlock.List.class)
     @interface Unlock {
@@ -294,10 +230,8 @@ public @interface TestEngine {
          */
         LockMode mode() default LockMode.READ_WRITE;
 
-        /**
-         * Unlock.List annotation
-         */
-        @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
+        /** Unlock.List annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface List {
 
@@ -310,19 +244,13 @@ public @interface TestEngine {
         }
     }
 
-    /**
-     * Lock modes
-     */
+    /** Lock modes */
     enum LockMode {
 
-        /**
-         * Read write mode
-         */
+        /** Read write mode */
         READ_WRITE,
 
-        /**
-         * Read mode
-         */
+        /** Read mode */
         READ;
     }
 }

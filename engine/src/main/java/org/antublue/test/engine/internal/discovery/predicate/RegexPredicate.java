@@ -27,19 +27,13 @@ import java.util.regex.Pattern;
  */
 public abstract class RegexPredicate<T> implements Predicate<T> {
 
-    /**
-     * Regular expression
-     */
+    /** Regular expression */
     protected String regex;
 
-    /**
-     * Pattern
-     */
+    /** Pattern */
     protected Pattern pattern;
 
-    /**
-     * Matcher
-     */
+    /** Matcher */
     protected Matcher matcher;
 
     /**

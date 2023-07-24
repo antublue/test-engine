@@ -6,13 +6,10 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * Example test
- */
+/** Example test */
 public class CollectionTest {
 
-    @TestEngine.Argument
-    protected IntegerArgument integerArgument;
+    @TestEngine.Argument protected IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
     public static Collection<IntegerArgument> arguments() {

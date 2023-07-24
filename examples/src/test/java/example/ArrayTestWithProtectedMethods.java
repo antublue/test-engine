@@ -7,15 +7,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class ArrayTestWithProtectedMethods {
 
     private String[] values;
 
-    @TestEngine.Argument
-    protected ObjectArgument<String[]> objectArgument;
+    @TestEngine.Argument protected ObjectArgument<String[]> objectArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<ObjectArgument<String[]>> arguments() {
@@ -24,7 +21,7 @@ public class ArrayTestWithProtectedMethods {
             collection.add(
                     new ObjectArgument<>(
                             "Array [" + i + "]",
-                            new String[] { String.valueOf(i), String.valueOf(i * 2) }));
+                            new String[] {String.valueOf(i), String.valueOf(i * 2)}));
         }
         return collection.stream();
     }

@@ -1,13 +1,13 @@
 package example.locking;
 
+import static org.assertj.core.api.Fail.fail;
+
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Fail.fail;
 
 public class ClassLockingTest1 {
 
@@ -19,15 +19,11 @@ public class ClassLockingTest1 {
         Store.putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
-    @TestEngine.Argument
-    public IntegerArgument integerArgument;
+    @TestEngine.Argument public IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<IntegerArgument> arguments() {
-        return Stream.of(
-                IntegerArgument.of(1),
-                IntegerArgument.of(2),
-                IntegerArgument.of(3));
+        return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
     }
 
     @TestEngine.Prepare

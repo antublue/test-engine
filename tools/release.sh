@@ -17,11 +17,16 @@
 #
 
 function check_exit_code () {
-  if [ ! $? -eq 0 ];
+  if [ ! $? ];
   then
     echo "${1}"
     exit 1
   fi
+}
+
+function emit_error () {
+  echo "${1}"
+  exit 1;
 }
 
 if [ "$#" -ne 1 ];
@@ -31,8 +36,8 @@ then
 fi
 
 VERSION="${1}"
-CURRENT_DIRECTORY=${PWD}
-CURRENT_DIRECTORY=${CURRENT_DIRECTORY:-/}
+GIT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
+cd "${GIT_ROOT_DIRECTORY}"
 
 git diff --quiet HEAD
 if [ ! $? -eq 0 ];
@@ -43,27 +48,34 @@ then
   exit 1
 fi
 
-git branch -D "build-${VERSION}" > /dev/null 2>&1
-
-git checkout -b "build-${VERSION}"
+git checkout -b "release-${VERSION}"
 check_exit_code "Git checkout [${VERSION}] failed"
 
 mvn versions:set -DnewVersion="${VERSION}" -DprocessAllModules
 check_exit_code "Maven update versions [${VERSION}] failed"
 rm -Rf $(find . -name "*versionsBackup")
 
-cd "${CURRENT_DIRECTORY}"
 ./mvnw clean verify
 check_exit_code "Maven build [${VERSION}] failed"
 
-./mvnw -s ~/.m2/antublue.settings.xml -P release clean install
+git add -u
+check_exit_code "Git add failed"
+
+git commit -m "${VERSION}"
+check_exit_code "Git commit failed"
+
+./mvnw -s ~/.m2/antublue.settings.xml -P release clean deploy
 check_exit_code "Maven deploy [${VERSION}] failed"
 
-git reset --hard HEAD
-check_exit_code "Git reset hard failed"
+git push --set-upstream origin release-"${VERSION}"
+check_exit_code "Git push [${VERSION}] failed"
+
+git tag "${VERSION}"
+check_exit_code "Git tag [${VERSION}] failed"
+
+git push origin "${VERSION}"
+check_exit_code "Git tag [${VERSION}] push failed"
 
 git checkout main
 check_exit_code "Git checkout [main] failed"
 
-git branch -D "build-${VERSION}"
-check_exit_code "Git delete branch [build-${VERSION}] failed"

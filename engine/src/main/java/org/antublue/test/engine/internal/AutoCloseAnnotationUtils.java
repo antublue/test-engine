@@ -25,17 +25,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
-/**
- * Class to process @TestEngine.AutoClose annotations
- */
-@SuppressWarnings({ "PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock" })
+/** Class to process @TestEngine.AutoClose annotations */
+@SuppressWarnings({"PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock"})
 public class AutoCloseAnnotationUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoCloseAnnotationUtils.class);
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     private AutoCloseAnnotationUtils() {
         // DO NOTHING
     }
@@ -51,22 +47,26 @@ public class AutoCloseAnnotationUtils {
             Object object, String lifecycle, Consumer<Throwable> throwableConsumer) {
         LOGGER.trace("processAutoCloseFields(%s, %s)", object.getClass().getName(), lifecycle);
 
-        ReflectionUtils
-                .getAutoCloseFields(object.getClass())
+        ReflectionUtils.getAutoCloseFields(object.getClass())
                 .forEach(
                         field -> {
                             LOGGER.trace("closing field [%s]", field.getName());
-                            TestEngine.AutoClose annotation = field.getAnnotation(TestEngine.AutoClose.class);
+                            TestEngine.AutoClose annotation =
+                                    field.getAnnotation(TestEngine.AutoClose.class);
                             String annotationLifecycle = annotation.lifecycle();
                             String annotationMethodName = annotation.method();
                             if (lifecycle.equals(annotationLifecycle)) {
-                                close(object, annotationLifecycle, annotationMethodName, field, throwableConsumer);
+                                close(
+                                        object,
+                                        annotationLifecycle,
+                                        annotationMethodName,
+                                        field,
+                                        throwableConsumer);
                             } else {
                                 LOGGER.trace(
-                                        "skipping field [%s] annotation scope [%s] doesn't match scope [%s]",
-                                        field.getName(),
-                                        annotationLifecycle,
-                                        lifecycle);
+                                        "skipping field [%s] annotation scope [%s] doesn't match"
+                                                + " scope [%s]",
+                                        field.getName(), annotationLifecycle, lifecycle);
                             }
                         });
     }
@@ -81,7 +81,11 @@ public class AutoCloseAnnotationUtils {
      * @param throwableConsumer throwableConsumer
      */
     private static void close(
-            Object object, String lifecycle, String methodName, Field field, Consumer<Throwable> throwableConsumer) {
+            Object object,
+            String lifecycle,
+            String methodName,
+            Field field,
+            Consumer<Throwable> throwableConsumer) {
         LOGGER.trace("close(%s, %s, %s)", object.getClass().getName(), methodName, field.getName());
 
         if (methodName == null || methodName.trim().isEmpty()) {
@@ -93,12 +97,11 @@ public class AutoCloseAnnotationUtils {
             } catch (Throwable t) {
                 throwableConsumer.accept(
                         new TestEngineException(
-                            String.format(
-                                    "Exception closing @TestEngine.AutoClose class [%s] field [%s] scope [%s]",
-                                    object.getClass(),
-                                    field.getName(),
-                                    lifecycle),
-                            t));
+                                String.format(
+                                        "Exception closing @TestEngine.AutoClose class [%s] field"
+                                                + " [%s] scope [%s]",
+                                        object.getClass(), field.getName(), lifecycle),
+                                t));
             }
         } else {
             Throwable throwable = null;
@@ -120,7 +123,8 @@ public class AutoCloseAnnotationUtils {
                 throwableConsumer.accept(
                         new TestEngineException(
                                 String.format(
-                                        "Exception closing @TestEngine.AutoClose class [%s] field [%s] method [%s] scope [%s]",
+                                        "Exception closing @TestEngine.AutoClose class [%s] field"
+                                                + " [%s] method [%s] scope [%s]",
                                         object.getClass(),
                                         field.getName(),
                                         methodName.trim(),

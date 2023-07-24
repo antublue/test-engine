@@ -24,9 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Class to store TestDescriptors based on UniqueId
- */
+/** Class to store TestDescriptors based on UniqueId */
 public final class TestDescriptorStore {
 
     private static final TestDescriptorStore INSTANCE = new TestDescriptorStore();
@@ -42,9 +40,7 @@ public final class TestDescriptorStore {
         return INSTANCE;
     }
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     private TestDescriptorStore() {
         testDescriptorMap = new LinkedHashMap<>();
     }

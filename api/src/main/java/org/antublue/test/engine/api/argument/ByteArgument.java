@@ -18,9 +18,7 @@ package org.antublue.test.engine.api.argument;
 
 import java.util.Objects;
 
-/**
- * Class to implement a ByteArgument
- */
+/** Class to implement a ByteArgument */
 public class ByteArgument extends AbstractArgument {
 
     private final String name;

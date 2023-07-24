@@ -7,13 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class DebugDuplicateOrderTest {
 
-    @TestEngine.Argument
-    protected IntegerArgument integerArgument;
+    @TestEngine.Argument protected IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<IntegerArgument> arguments() {

@@ -30,18 +30,15 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 
-/**
- * Class to process @TestEngine.Lock, @TestEngine.Unlock, @TestEngine.ResourceLock annotations
- */
+/** Class to process @TestEngine.Lock, @TestEngine.Unlock, @TestEngine.ResourceLock annotations */
 public class LockAnnotationUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LockAnnotationUtils.class);
 
-    private static final Map<String, ReentrantReadWriteLock> LOCK_MAP = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<String, ReentrantReadWriteLock> LOCK_MAP =
+            Collections.synchronizedMap(new HashMap<>());
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     private LockAnnotationUtils() {
         // DO NOTHING
     }
@@ -53,9 +50,9 @@ public class LockAnnotationUtils {
      */
     public static void processLockAnnotations(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Lock.class)
-            && !method.isAnnotationPresent(TestEngine.Lock.List.class)
-            && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
-            && !method.isAnnotationPresent(TestEngine.ResourceLock.List.class)) {
+                && !method.isAnnotationPresent(TestEngine.Lock.List.class)
+                && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
+                && !method.isAnnotationPresent(TestEngine.ResourceLock.List.class)) {
             return;
         }
 
@@ -66,13 +63,20 @@ public class LockAnnotationUtils {
                 lock(method, lockAnnotation.name(), lockAnnotation.mode());
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.Lock.List.class)) {
                 TestEngine.Lock.List lockListAnnotation = (TestEngine.Lock.List) annotation;
-                Stream.of(lockListAnnotation.value()).forEach(lock -> lock(method, lock.name(), lock.mode()));
-            } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.class)) {
+                Stream.of(lockListAnnotation.value())
+                        .forEach(lock -> lock(method, lock.name(), lock.mode()));
+            } else if (annotation
+                    .annotationType()
+                    .isAssignableFrom(TestEngine.ResourceLock.class)) {
                 TestEngine.ResourceLock lockAnnotation = (TestEngine.ResourceLock) annotation;
                 lock(method, lockAnnotation.name(), lockAnnotation.mode());
-            } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.List.class)) {
-                TestEngine.ResourceLock.List lockListAnnotation = (TestEngine.ResourceLock.List) annotation;
-                Stream.of(lockListAnnotation.value()).forEach(lock -> lock(method, lock.name(), lock.mode()));
+            } else if (annotation
+                    .annotationType()
+                    .isAssignableFrom(TestEngine.ResourceLock.List.class)) {
+                TestEngine.ResourceLock.List lockListAnnotation =
+                        (TestEngine.ResourceLock.List) annotation;
+                Stream.of(lockListAnnotation.value())
+                        .forEach(lock -> lock(method, lock.name(), lock.mode()));
             }
         }
     }
@@ -95,11 +99,15 @@ public class LockAnnotationUtils {
                             mode,
                             method.getDeclaringClass().getName(),
                             method.getName()));
-            
+
             if (mode == TestEngine.LockMode.READ_WRITE) {
-                LOCK_MAP.computeIfAbsent(trimmedName, n -> new ReentrantReadWriteLock(true)).writeLock().lock();
+                LOCK_MAP.computeIfAbsent(trimmedName, n -> new ReentrantReadWriteLock(true))
+                        .writeLock()
+                        .lock();
             } else {
-                LOCK_MAP.computeIfAbsent(trimmedName, n -> new ReentrantReadWriteLock(true)).readLock().lock();
+                LOCK_MAP.computeIfAbsent(trimmedName, n -> new ReentrantReadWriteLock(true))
+                        .readLock()
+                        .lock();
             }
 
             LOGGER.trace(
@@ -132,12 +140,18 @@ public class LockAnnotationUtils {
                 unlock(method, unlockAnnotation.name(), unlockAnnotation.mode());
             } else if (annotation.annotationType().isAssignableFrom(TestEngine.Unlock.List.class)) {
                 TestEngine.Unlock.List unlockListAnnotation = (TestEngine.Unlock.List) annotation;
-                Stream.of(unlockListAnnotation.value()).forEach(lock -> unlock(method, lock.name(), lock.mode()));
-            } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.class)) {
+                Stream.of(unlockListAnnotation.value())
+                        .forEach(lock -> unlock(method, lock.name(), lock.mode()));
+            } else if (annotation
+                    .annotationType()
+                    .isAssignableFrom(TestEngine.ResourceLock.class)) {
                 TestEngine.ResourceLock unlockAnnotation = (TestEngine.ResourceLock) annotation;
                 unlock(method, unlockAnnotation.name(), unlockAnnotation.mode());
-            } else if (annotation.annotationType().isAssignableFrom(TestEngine.ResourceLock.List.class)) {
-                TestEngine.ResourceLock.List unlockListAnnotation = (TestEngine.ResourceLock.List) annotation;
+            } else if (annotation
+                    .annotationType()
+                    .isAssignableFrom(TestEngine.ResourceLock.List.class)) {
+                TestEngine.ResourceLock.List unlockListAnnotation =
+                        (TestEngine.ResourceLock.List) annotation;
                 List<TestEngine.ResourceLock> list = Arrays.asList(unlockListAnnotation.value());
                 Collections.reverse(list);
                 list.forEach(lock -> unlock(method, lock.name(), lock.mode()));
@@ -156,7 +170,7 @@ public class LockAnnotationUtils {
         if (name != null && !name.trim().isEmpty()) {
             ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
             if (reentrantReadWriteLock != null) {
-                
+
                 LOGGER.trace(
                         String.format(
                                 "Releasing lock [%s] mode [%s] class [%s] method [%s]",
@@ -164,7 +178,7 @@ public class LockAnnotationUtils {
                                 mode,
                                 method.getDeclaringClass().getName(),
                                 method.getName()));
-                
+
                 if (mode == TestEngine.LockMode.READ_WRITE) {
                     reentrantReadWriteLock.writeLock().unlock();
                 } else {
@@ -178,11 +192,12 @@ public class LockAnnotationUtils {
                                 mode,
                                 method.getDeclaringClass().getName(),
                                 method.getName()));
-                
+
             } else {
                 throw new TestClassConfigurationException(
                         String.format(
-                                "@TestEngine.Unlock without @TestEngine.Lock, name [%s] mode [%s] class [%s] method [%s]",
+                                "@TestEngine.Unlock without @TestEngine.Lock, name [%s] mode [%s]"
+                                        + " class [%s] method [%s]",
                                 name.trim(),
                                 mode,
                                 method.getDeclaringClass().getName(),

@@ -20,9 +20,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.PrintStream;
 
-/**
- * Class to implement a MojoExecutionException that doesn't print a stack trace
- */
+/** Class to implement a MojoExecutionException that doesn't print a stack trace */
 public class SuppressedStackTraceException extends MojoExecutionException {
 
     /**

@@ -7,13 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class SimpleExampleTest {
 
-    @TestEngine.Argument
-    protected StringArgument stringArgument;
+    @TestEngine.Argument protected StringArgument stringArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
@@ -31,32 +28,32 @@ public class SimpleExampleTest {
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll(" + stringArgument  + ")");
+        System.out.println("beforeAll(" + stringArgument + ")");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println("beforeEach(" + stringArgument  + ")");
+        System.out.println("beforeEach(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument  + ")");
+        System.out.println("test1(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument  + ")");
+        System.out.println("test2(" + stringArgument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
-        System.out.println("afterEach(" + stringArgument  + ")");
+        System.out.println("afterEach(" + stringArgument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll(" + stringArgument  + ")");
+        System.out.println("afterAll(" + stringArgument + ")");
     }
 
     @TestEngine.Conclude

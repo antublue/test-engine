@@ -5,23 +5,17 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 @TestEngine.DisplayName(name = "_Z_ClassDisplayNameTest")
 public class ClassDisplayNameTest {
 
-    @TestEngine.Argument
-    protected IntegerArgument integerArgument;
+    @TestEngine.Argument protected IntegerArgument integerArgument;
 
     private int value;
 
     @TestEngine.ArgumentSupplier
     public static Stream<IntegerArgument> arguments() {
-        return Stream.of(
-                IntegerArgument.of(1),
-                IntegerArgument.of(2),
-                IntegerArgument.of(3));
+        return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
     }
 
     @TestEngine.BeforeAll

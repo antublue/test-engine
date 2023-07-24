@@ -19,9 +19,7 @@ package org.antublue.test.engine.api.argument;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-/**
- * Class to implement a BigDecimalArgument
- */
+/** Class to implement a BigDecimalArgument */
 public class BigDecimalArgument extends AbstractArgument {
 
     private final String name;

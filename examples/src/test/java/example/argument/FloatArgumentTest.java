@@ -7,13 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class FloatArgumentTest {
 
-    @TestEngine.Argument
-    protected FloatArgument floatArgument;
+    @TestEngine.Argument protected FloatArgument floatArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<FloatArgument> arguments() {

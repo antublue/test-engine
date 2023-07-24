@@ -20,9 +20,7 @@ import org.antublue.test.engine.api.TestEngine;
 
 import java.lang.reflect.Method;
 
-/**
- * Class to implement a test method tag predicate
- */
+/** Class to implement a test method tag predicate */
 public final class TestMethodTagPredicate extends RegexPredicate<Method> {
 
     /**

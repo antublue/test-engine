@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Class to implement a extended EngineDescriptor
- */
+/** Class to implement a extended EngineDescriptor */
 @SuppressWarnings("unchecked")
 public final class ExtendedEngineDescriptor extends EngineDescriptor {
 

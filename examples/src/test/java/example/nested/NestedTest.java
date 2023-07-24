@@ -5,9 +5,7 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class NestedTest {
 
     public static class Concrete1 extends BaseTest {
@@ -27,19 +25,15 @@ public class NestedTest {
     }
 
     @TestEngine.BaseClass
-    public static abstract class BaseTest {
+    public abstract static class BaseTest {
 
-        @TestEngine.Argument
-        protected IntegerArgument integerArgument;
+        @TestEngine.Argument protected IntegerArgument integerArgument;
 
         protected abstract void setup();
 
         @TestEngine.ArgumentSupplier
         public static Stream<IntegerArgument> arguments() {
-            return Stream.of(
-                    IntegerArgument.of(1),
-                    IntegerArgument.of(2),
-                    IntegerArgument.of(3));
+            return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
         }
 
         @TestEngine.BeforeAll

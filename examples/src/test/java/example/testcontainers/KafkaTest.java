@@ -1,5 +1,7 @@
 package example.testcontainers;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -23,12 +25,10 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Example using testcontainers-java and Apache Kafka
- * <p>
- * Disabled by default since users may not have Docker installed
+ *
+ * <p>Disabled by default since users may not have Docker installed
  */
 @TestEngine.Disabled
 public class KafkaTest {
@@ -88,8 +88,10 @@ public class KafkaTest {
 
         Properties properties = new Properties();
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        properties.setProperty(
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        properties.setProperty(
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
         KafkaProducer<String, String> producer = null;
 
@@ -117,8 +119,10 @@ public class KafkaTest {
 
         Properties properties = new Properties();
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.setProperty(
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.setProperty(
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST);
 
@@ -130,7 +134,8 @@ public class KafkaTest {
             consumer = new KafkaConsumer<>(properties);
             consumer.subscribe(topicList);
 
-            ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
+            ConsumerRecords<String, String> consumerRecords =
+                    consumer.poll(Duration.ofMillis(1000));
             for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
                 info("consumed message [%s] from [%s]", consumerRecord.value(), bootstrapServers);
                 assertThat(consumerRecord.value()).isEqualTo(message);
@@ -142,9 +147,7 @@ public class KafkaTest {
         }
     }
 
-    /**
-     * Class to implement a KafkaTestContainer
-     */
+    /** Class to implement a KafkaTestContainer */
     private static class KafkaTestContainer implements Argument, Closeable {
 
         private final String dockerImageName;
@@ -199,9 +202,7 @@ public class KafkaTest {
             return kafkaContainer.getBootstrapServers();
         }
 
-        /**
-         * Method to close (shutdown) the KafkaTestContainer
-         */
+        /** Method to close (shutdown) the KafkaTestContainer */
         public void close() {
             info("test container [%s] stopping ..", dockerImageName);
 
@@ -242,7 +243,7 @@ public class KafkaTest {
         System.out.println(object);
     }
 
-    private static void info(String format, Object ... objects) {
+    private static void info(String format, Object... objects) {
         info(String.format(format, objects));
     }
 }

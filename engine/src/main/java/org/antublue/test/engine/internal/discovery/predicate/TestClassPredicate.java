@@ -16,9 +16,7 @@
 
 package org.antublue.test.engine.internal.discovery.predicate;
 
-/**
- * Class to implement a Predicate that matches a classname
- */
+/** Class to implement a Predicate that matches a classname */
 public final class TestClassPredicate extends RegexPredicate<Class<?>> {
 
     /**

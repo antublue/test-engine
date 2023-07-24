@@ -16,16 +16,12 @@
 
 package org.antublue.test.engine.internal.util;
 
-/**
- * Class to build AnsiColor strings using a fluent pattern
- */
+/** Class to build AnsiColor strings using a fluent pattern */
 public class AnsiColorString {
 
     private final StringBuilder stringBuilder;
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     public AnsiColorString() {
         stringBuilder = new StringBuilder();
     }

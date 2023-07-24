@@ -16,6 +16,14 @@
 # limitations under the License.
 #
 
+GIT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
+cd "${GIT_ROOT_DIRECTORY}"
+
+echo "Checking Java files in [api] for copyright"
 grep -RiL "Copyright (C)" api/src/main/java/
+
+echo "Checking Java files in [engine] for copyright"
 grep -RiL "Copyright (C)" engine/src/main/java/
+
+echo "Checking Java files in [plugin] for copyright"
 grep -RiL "Copyright (C)" plugin/src/main/java/

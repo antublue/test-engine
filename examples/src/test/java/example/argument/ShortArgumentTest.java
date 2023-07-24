@@ -7,13 +7,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class ShortArgumentTest {
 
-    @TestEngine.Argument
-    protected ShortArgument shortArgument;
+    @TestEngine.Argument protected ShortArgument shortArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<ShortArgument> arguments() {

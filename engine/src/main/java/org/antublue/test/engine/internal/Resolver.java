@@ -53,9 +53,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-/**
- * Class to implement a TestEngineTestResolver
- */
+/** Class to implement a TestEngineTestResolver */
 @SuppressWarnings("PMD.NPathComplexity")
 public class Resolver {
 
@@ -75,32 +73,32 @@ public class Resolver {
     private EngineDiscoveryRequest engineDiscoveryRequest;
     private EngineDescriptor engineDescriptor;
 
-    /**
-     * Class to implement a Predicate to determine if a Class is a test class
-     */
-    private static final Predicate<Class<?>> IS_TEST_CLASS = clazz -> {
-        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
-                || clazz.isAnnotationPresent(TestEngine.Disabled.class)
-                || Modifier.isAbstract(clazz.getModifiers())
-                || ReflectionUtils.getTestMethods(clazz).isEmpty()) {
-            LOGGER.trace("is test class [%s] excluded", clazz.getName());
-            return false;
-        }
+    /** Class to implement a Predicate to determine if a Class is a test class */
+    private static final Predicate<Class<?>> IS_TEST_CLASS =
+            clazz -> {
+                if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
+                        || clazz.isAnnotationPresent(TestEngine.Disabled.class)
+                        || Modifier.isAbstract(clazz.getModifiers())
+                        || ReflectionUtils.getTestMethods(clazz).isEmpty()) {
+                    LOGGER.trace("is test class [%s] excluded", clazz.getName());
+                    return false;
+                }
 
-        LOGGER.trace("class [%s] included", clazz.getName());
-        return true;
-    };
+                LOGGER.trace("class [%s] included", clazz.getName());
+                return true;
+            };
 
-    /**
-     * Class to implement a Predicate to determine if a Method is a test method
-     */
-    private static final Predicate<Method> IS_TEST_METHOD = method -> {
-        boolean result =
-                !method.isAnnotationPresent(TestEngine.Disabled.class)
-                && ReflectionUtils.getTestMethods(method.getDeclaringClass()).contains(method);
-        LOGGER.trace("is test method [%s] = [%b]", method.getDeclaringClass().getName(), result);
-        return result;
-    };
+    /** Class to implement a Predicate to determine if a Method is a test method */
+    private static final Predicate<Method> IS_TEST_METHOD =
+            method -> {
+                boolean result =
+                        !method.isAnnotationPresent(TestEngine.Disabled.class)
+                                && ReflectionUtils.getTestMethods(method.getDeclaringClass())
+                                        .contains(method);
+                LOGGER.trace(
+                        "is test method [%s] = [%b]", method.getDeclaringClass().getName(), result);
+                return result;
+            };
 
     /**
      * Method to resolve test classes / test methods
@@ -122,108 +120,120 @@ public class Resolver {
         filter();
     }
 
-    /**
-     * Method to configure the resolver
-     */
+    /** Method to configure the resolver */
     private void configure() {
         LOGGER.trace("configure()");
 
         includeTestClassPredicate =
                 configurationParameters
                         .get(Constants.TEST_CLASS_INCLUDE)
-                        .map(value -> {
-                            LOGGER.trace("%s [%s]", Constants.TEST_CLASS_INCLUDE, value);
-                            return value;
-                        })
+                        .map(
+                                value -> {
+                                    LOGGER.trace("%s [%s]", Constants.TEST_CLASS_INCLUDE, value);
+                                    return value;
+                                })
                         .map(TestClassPredicate::of)
                         .orElse(null);
 
         excludeTestClassPredicate =
                 configurationParameters
                         .get(Constants.TEST_CLASS_EXCLUDE)
-                        .map(value -> {
-                            LOGGER.trace("%s [%s]", Constants.TEST_CLASS_EXCLUDE, value);
-                            return value;
-                        })
+                        .map(
+                                value -> {
+                                    LOGGER.trace("%s [%s]", Constants.TEST_CLASS_EXCLUDE, value);
+                                    return value;
+                                })
                         .map(TestClassPredicate::of)
                         .orElse(null);
 
         includeTestMethodPredicate =
                 configurationParameters
                         .get(Constants.TEST_METHOD_INCLUDE)
-                        .map(value -> {
-                            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_INCLUDE, value);
-                            return value;
-                        })
+                        .map(
+                                value -> {
+                                    LOGGER.trace("%s [%s]", Constants.TEST_METHOD_INCLUDE, value);
+                                    return value;
+                                })
                         .map(TestMethodPredicate::of)
                         .orElse(null);
 
         excludeTestMethodPredicate =
                 configurationParameters
                         .get(Constants.TEST_METHOD_EXCLUDE)
-                        .map(value -> {
-                            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_EXCLUDE, value);
-                            return value;
-                        })
+                        .map(
+                                value -> {
+                                    LOGGER.trace("%s [%s]", Constants.TEST_METHOD_EXCLUDE, value);
+                                    return value;
+                                })
                         .map(TestMethodPredicate::of)
                         .orElse(null);
 
         includeTestClassTagPredicate =
                 configurationParameters
                         .get(Constants.TEST_CLASS_TAG_INCLUDE)
-                        .map(value -> {
-                            LOGGER.trace("%s [%s]", Constants.TEST_CLASS_TAG_INCLUDE, value);
-                            return value;
-                        })
+                        .map(
+                                value -> {
+                                    LOGGER.trace(
+                                            "%s [%s]", Constants.TEST_CLASS_TAG_INCLUDE, value);
+                                    return value;
+                                })
                         .map(TestClassTagPredicate::of)
                         .orElse(null);
 
         excludeTestClassTagPredicate =
                 configurationParameters
                         .get(Constants.TEST_CLASS_TAG_EXCLUDE)
-                        .map(value -> {
-                            LOGGER.trace("%s [%s]", Constants.TEST_CLASS_TAG_EXCLUDE, value);
-                            return value;
-                        })
+                        .map(
+                                value -> {
+                                    LOGGER.trace(
+                                            "%s [%s]", Constants.TEST_CLASS_TAG_EXCLUDE, value);
+                                    return value;
+                                })
                         .map(TestClassTagPredicate::of)
                         .orElse(null);
 
         includeTestMethodTagPredicate =
                 configurationParameters
                         .get(Constants.TEST_METHOD_TAG_INCLUDE)
-                        .map(value -> {
-                            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_TAG_INCLUDE, value);
-                            return value;
-                        })
+                        .map(
+                                value -> {
+                                    LOGGER.trace(
+                                            "%s [%s]", Constants.TEST_METHOD_TAG_INCLUDE, value);
+                                    return value;
+                                })
                         .map(TestMethodTagPredicate::of)
                         .orElse(null);
 
         excludeTestMethodTagPredicate =
                 configurationParameters
                         .get(Constants.TEST_METHOD_TAG_EXCLUDE)
-                        .map(value -> {
-                            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_TAG_EXCLUDE, value);
-                            return value;
-                        })
+                        .map(
+                                value -> {
+                                    LOGGER.trace(
+                                            "%s [%s]", Constants.TEST_METHOD_TAG_EXCLUDE, value);
+                                    return value;
+                                })
                         .map(TestMethodTagPredicate::of)
                         .orElse(null);
     }
 
-    /**
-     * Method to resolve selectors
-     */
+    /** Method to resolve selectors */
     private void resolve() {
         LOGGER.trace("resolve()");
 
-        List<ClassNameFilter> classNameFilters = engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class);
+        List<ClassNameFilter> classNameFilters =
+                engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class);
         LOGGER.trace("classNameFilters count [%d]", classNameFilters.size());
 
-        ClassNameFiltersPredicate classNameFiltersPredicate = new ClassNameFiltersPredicate(classNameFilters);
+        ClassNameFiltersPredicate classNameFiltersPredicate =
+                new ClassNameFiltersPredicate(classNameFilters);
 
-        List<PackageNameFilter> packageNameFilters = engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
+        List<PackageNameFilter> packageNameFilters =
+                engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
         LOGGER.trace("packageNameFilters count [%d]", packageNameFilters.size());
 
-        PackageNameFiltersPredicate packageNameFiltersPredicate = new PackageNameFiltersPredicate(packageNameFilters);
+        PackageNameFiltersPredicate packageNameFiltersPredicate =
+                new PackageNameFiltersPredicate(packageNameFilters);
 
         classMethodSetMap = new LinkedHashMap<>();
 
@@ -231,111 +241,134 @@ public class Resolver {
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClasspathRootSelector.class)
-                .forEach(classpathRootSelector -> {
-                    LOGGER.trace("ClasspathRootSelector.class");
-                    ReflectionUtils
-                            .findAllClasses(classpathRootSelector.getClasspathRoot())
-                            .forEach(clazz -> {
-                                if (IS_TEST_CLASS.test(clazz)
-                                        && packageNameFiltersPredicate.test(clazz)
-                                        && classNameFiltersPredicate.test(clazz)) {
-                                    classMethodSetMap.put(
-                                            clazz,
-                                            new LinkedHashSet<>(ReflectionUtils.getTestMethods(clazz)));
-                                }
-                            });
-                });
+                .forEach(
+                        classpathRootSelector -> {
+                            LOGGER.trace("ClasspathRootSelector.class");
+                            ReflectionUtils.findAllClasses(classpathRootSelector.getClasspathRoot())
+                                    .forEach(
+                                            clazz -> {
+                                                if (IS_TEST_CLASS.test(clazz)
+                                                        && packageNameFiltersPredicate.test(clazz)
+                                                        && classNameFiltersPredicate.test(clazz)) {
+                                                    classMethodSetMap.put(
+                                                            clazz,
+                                                            new LinkedHashSet<>(
+                                                                    ReflectionUtils.getTestMethods(
+                                                                            clazz)));
+                                                }
+                                            });
+                        });
 
         engineDiscoveryRequest
                 .getSelectorsByType(PackageSelector.class)
-                .forEach(packageSelector -> {
-                    LOGGER.trace("PackageSelector.class");
-                    ReflectionUtils
-                            .findAllClasses(packageSelector.getPackageName())
-                            .forEach(clazz -> {
-                                if (IS_TEST_CLASS.test(clazz)
-                                        && packageNameFiltersPredicate.test(clazz)
-                                        && classNameFiltersPredicate.test(clazz)) {
-                                    classMethodSetMap.put(
-                                            clazz,
-                                            new LinkedHashSet<>(ReflectionUtils.getTestMethods(clazz)));
-                                }
-                            });
-                });
+                .forEach(
+                        packageSelector -> {
+                            LOGGER.trace("PackageSelector.class");
+                            ReflectionUtils.findAllClasses(packageSelector.getPackageName())
+                                    .forEach(
+                                            clazz -> {
+                                                if (IS_TEST_CLASS.test(clazz)
+                                                        && packageNameFiltersPredicate.test(clazz)
+                                                        && classNameFiltersPredicate.test(clazz)) {
+                                                    classMethodSetMap.put(
+                                                            clazz,
+                                                            new LinkedHashSet<>(
+                                                                    ReflectionUtils.getTestMethods(
+                                                                            clazz)));
+                                                }
+                                            });
+                        });
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClassSelector.class)
-                .forEach(classSelector -> {
-                    LOGGER.trace("ClassSelector.class");
-                    Class<?> clazz = classSelector.getJavaClass();
-                    if (IS_TEST_CLASS.test(clazz)
-                            && packageNameFiltersPredicate.test(clazz)
-                            && classNameFiltersPredicate.test(clazz)) {
-                        classMethodSetMap.put(
-                                clazz,
-                                new LinkedHashSet<>(ReflectionUtils.getTestMethods(clazz)));
-                    }
-                });
+                .forEach(
+                        classSelector -> {
+                            LOGGER.trace("ClassSelector.class");
+                            Class<?> clazz = classSelector.getJavaClass();
+                            if (IS_TEST_CLASS.test(clazz)
+                                    && packageNameFiltersPredicate.test(clazz)
+                                    && classNameFiltersPredicate.test(clazz)) {
+                                classMethodSetMap.put(
+                                        clazz,
+                                        new LinkedHashSet<>(ReflectionUtils.getTestMethods(clazz)));
+                            }
+                        });
 
         engineDiscoveryRequest
                 .getSelectorsByType(MethodSelector.class)
-                .forEach(methodSelector -> {
-                    LOGGER.trace("MethodSelector.class");
-                    Class<?> clazz = methodSelector.getJavaClass();
-                    if (IS_TEST_METHOD.test(methodSelector.getJavaMethod())
-                            && packageNameFiltersPredicate.test(clazz)
-                            && classNameFiltersPredicate.test(clazz)) {
-                        Set<Method> methods = classMethodSetMap.getOrDefault(clazz, new LinkedHashSet<>());
-                        methods.add(methodSelector.getJavaMethod());
-                        classMethodSetMap.put(clazz, methods);
-                    }
-                });
+                .forEach(
+                        methodSelector -> {
+                            LOGGER.trace("MethodSelector.class");
+                            Class<?> clazz = methodSelector.getJavaClass();
+                            if (IS_TEST_METHOD.test(methodSelector.getJavaMethod())
+                                    && packageNameFiltersPredicate.test(clazz)
+                                    && classNameFiltersPredicate.test(clazz)) {
+                                Set<Method> methods =
+                                        classMethodSetMap.getOrDefault(
+                                                clazz, new LinkedHashSet<>());
+                                methods.add(methodSelector.getJavaMethod());
+                                classMethodSetMap.put(clazz, methods);
+                            }
+                        });
 
         engineDiscoveryRequest
                 .getSelectorsByType(UniqueIdSelector.class)
-                .forEach(uniqueIdSelector -> {
-                    LOGGER.trace("UniqueIdSelector.class");
-                    UniqueId.Segment segment = uniqueIdSelector.getUniqueId().getLastSegment();
-                    if ("class".equals(segment.getType())) {
-                        String className = segment.getValue();
-                        try {
-                            Class<?> clazz = Class.forName(className);
-                            if (IS_TEST_CLASS.test(clazz)
-                                    && packageNameFiltersPredicate.test(clazz)
-                                    && classNameFiltersPredicate.test(clazz)) {
-                                Set<Method> methods = classMethodSetMap.getOrDefault(clazz, new LinkedHashSet<>());
-                                methods.addAll(ReflectionUtils.getTestMethods(clazz));
-                                classMethodSetMap.put(clazz, methods);
+                .forEach(
+                        uniqueIdSelector -> {
+                            LOGGER.trace("UniqueIdSelector.class");
+                            UniqueId.Segment segment =
+                                    uniqueIdSelector.getUniqueId().getLastSegment();
+                            if ("class".equals(segment.getType())) {
+                                String className = segment.getValue();
+                                try {
+                                    Class<?> clazz = Class.forName(className);
+                                    if (IS_TEST_CLASS.test(clazz)
+                                            && packageNameFiltersPredicate.test(clazz)
+                                            && classNameFiltersPredicate.test(clazz)) {
+                                        Set<Method> methods =
+                                                classMethodSetMap.getOrDefault(
+                                                        clazz, new LinkedHashSet<>());
+                                        methods.addAll(ReflectionUtils.getTestMethods(clazz));
+                                        classMethodSetMap.put(clazz, methods);
+                                    }
+                                } catch (ClassNotFoundException e) {
+                                    throw new TestEngineException(
+                                            String.format(
+                                                    "Exception loading class [%s]", className));
+                                }
+                            } else if ("argument".equals(segment.getType())) {
+                                segment =
+                                        uniqueIdSelector
+                                                .getUniqueId()
+                                                .removeLastSegment()
+                                                .getLastSegment();
+                                String className = segment.getValue();
+                                try {
+                                    Class<?> clazz = Class.forName(className);
+                                    if (IS_TEST_CLASS.test(clazz)
+                                            && packageNameFiltersPredicate.test(clazz)
+                                            && classNameFiltersPredicate.test(clazz)) {
+                                        Set<Method> methods =
+                                                classMethodSetMap.getOrDefault(
+                                                        clazz, new LinkedHashSet<>());
+                                        methods.addAll(ReflectionUtils.getTestMethods(clazz));
+                                        classMethodSetMap.put(clazz, methods);
+                                    }
+                                } catch (ClassNotFoundException e) {
+                                    throw new TestEngineException(
+                                            String.format(
+                                                    "Exception loading class [%s]", className));
+                                }
                             }
-                        } catch (ClassNotFoundException e) {
-                            throw new TestEngineException(String.format("Exception loading class [%s]", className));
-                        }
-                    } else if ("argument".equals(segment.getType())) {
-                        segment = uniqueIdSelector.getUniqueId().removeLastSegment().getLastSegment();
-                        String className = segment.getValue();
-                        try {
-                            Class<?> clazz = Class.forName(className);
-                            if (IS_TEST_CLASS.test(clazz)
-                                    && packageNameFiltersPredicate.test(clazz)
-                                    && classNameFiltersPredicate.test(clazz)) {
-                                Set<Method> methods = classMethodSetMap.getOrDefault(clazz, new LinkedHashSet<>());
-                                methods.addAll(ReflectionUtils.getTestMethods(clazz));
-                                classMethodSetMap.put(clazz, methods);
-                            }
-                        } catch (ClassNotFoundException e) {
-                            throw new TestEngineException(String.format("Exception loading class [%s]", className));
-                        }
-                    }
-                });
+                        });
     }
 
-    /**
-     * Method to filter selectors
-     */
+    /** Method to filter selectors */
     private void filter() {
         LOGGER.trace("filter()");
-        
-        Iterator<Map.Entry<Class<?>, Set<Method>>> classMethodMapEntryIterator = classMethodSetMap.entrySet().iterator();
+
+        Iterator<Map.Entry<Class<?>, Set<Method>>> classMethodMapEntryIterator =
+                classMethodSetMap.entrySet().iterator();
         while (classMethodMapEntryIterator.hasNext()) {
             Map.Entry<Class<?>, Set<Method>> entry = classMethodMapEntryIterator.next();
             Class<?> clazz = entry.getKey();
@@ -363,9 +396,11 @@ public class Resolver {
 
             if (includeTestClassTagPredicate != null) {
                 if (includeTestClassTagPredicate.test(clazz)) {
-                    LOGGER.trace("includeTestClassTagPredicate class [%s] included", clazz.getName());
+                    LOGGER.trace(
+                            "includeTestClassTagPredicate class [%s] included", clazz.getName());
                 } else {
-                    LOGGER.trace("includeTestClassTagPredicate class [%s] excluded", clazz.getName());
+                    LOGGER.trace(
+                            "includeTestClassTagPredicate class [%s] excluded", clazz.getName());
                     classMethodMapEntryIterator.remove();
                     continue;
                 }
@@ -373,11 +408,13 @@ public class Resolver {
 
             if (excludeTestClassTagPredicate != null) {
                 if (excludeTestClassTagPredicate.test(clazz)) {
-                    LOGGER.trace("excludeTestClassTagPredicate class [%s] excluded", clazz.getName());
+                    LOGGER.trace(
+                            "excludeTestClassTagPredicate class [%s] excluded", clazz.getName());
                     classMethodMapEntryIterator.remove();
                     continue;
                 } else {
-                    LOGGER.trace("excludeTestClassTagPredicate class [%s] included", clazz.getName());
+                    LOGGER.trace(
+                            "excludeTestClassTagPredicate class [%s] included", clazz.getName());
                 }
             }
 
@@ -387,9 +424,11 @@ public class Resolver {
 
                 if (includeTestMethodPredicate != null) {
                     if (includeTestMethodPredicate.test(method)) {
-                        LOGGER.trace("includeTestMethodPredicate class [%s] included", method.getName());
+                        LOGGER.trace(
+                                "includeTestMethodPredicate class [%s] included", method.getName());
                     } else {
-                        LOGGER.trace("includeTestMethodPredicate class [%s] excluded", method.getName());
+                        LOGGER.trace(
+                                "includeTestMethodPredicate class [%s] excluded", method.getName());
                         methodIterator.remove();
                         continue;
                     }
@@ -397,19 +436,25 @@ public class Resolver {
 
                 if (excludeTestMethodPredicate != null) {
                     if (excludeTestMethodPredicate.test(method)) {
-                        LOGGER.trace("excludeTestMethodPredicate class [%s] excluded", method.getName());
+                        LOGGER.trace(
+                                "excludeTestMethodPredicate class [%s] excluded", method.getName());
                         methodIterator.remove();
                         continue;
                     } else {
-                        LOGGER.trace("excludeTestMethodPredicate class [%s] included", method.getName());
+                        LOGGER.trace(
+                                "excludeTestMethodPredicate class [%s] included", method.getName());
                     }
                 }
 
                 if (includeTestMethodTagPredicate != null) {
                     if (includeTestMethodTagPredicate.test(method)) {
-                        LOGGER.trace("includeTestMethodTagPredicate class [%s] included", method.getName());
+                        LOGGER.trace(
+                                "includeTestMethodTagPredicate class [%s] included",
+                                method.getName());
                     } else {
-                        LOGGER.trace("includeTestMethodTagPredicate class [%s] excluded", method.getName());
+                        LOGGER.trace(
+                                "includeTestMethodTagPredicate class [%s] excluded",
+                                method.getName());
                         methodIterator.remove();
                         continue;
                     }
@@ -417,10 +462,14 @@ public class Resolver {
 
                 if (excludeTestMethodTagPredicate != null) {
                     if (excludeTestMethodTagPredicate.test(method)) {
-                        LOGGER.trace("excludeTestMethodTagPredicate class [%s] excluded", method.getName());
+                        LOGGER.trace(
+                                "excludeTestMethodTagPredicate class [%s] excluded",
+                                method.getName());
                         methodIterator.remove();
                     } else {
-                        LOGGER.trace("excludeTestMethodTagPredicate class [%s] included", method.getName());
+                        LOGGER.trace(
+                                "excludeTestMethodTagPredicate class [%s] included",
+                                method.getName());
                     }
                 }
             }
@@ -437,7 +486,8 @@ public class Resolver {
                     engineDescriptor.getUniqueId().append("class", clazz.getName());
 
             ClassTestDescriptor classTestDescriptor =
-                    TestDescriptorUtils.createClassTestDescriptor(classTestDescritporUniqueId, clazz);
+                    TestDescriptorUtils.createClassTestDescriptor(
+                            classTestDescritporUniqueId, clazz);
 
             engineDescriptor.addChild(classTestDescriptor);
 
@@ -448,28 +498,22 @@ public class Resolver {
 
                 ArgumentTestDescriptor argumentTestDescriptor =
                         TestDescriptorUtils.createArgumentTestDescriptor(
-                                argumentUniqueId,
-                                clazz,
-                                argument);
+                                argumentUniqueId, clazz, argument);
 
                 classTestDescriptor.addChild(argumentTestDescriptor);
 
                 for (Method method : methods) {
-                    UniqueId methodUniqueId =
-                            argumentUniqueId.append("method", method.getName());
+                    UniqueId methodUniqueId = argumentUniqueId.append("method", method.getName());
 
                     MethodTestDescriptor methodTestDescriptor =
                             TestDescriptorUtils.createMethodTestDescriptor(
-                                    methodUniqueId,
-                                    clazz,
-                                    argument,
-                                    method);
+                                    methodUniqueId, clazz, argument, method);
 
                     argumentTestDescriptor.addChild(methodTestDescriptor);
                 }
             }
         }
-        
+
         TestDescriptorUtils.logTestDescriptorTree(engineDescriptor);
     }
 }

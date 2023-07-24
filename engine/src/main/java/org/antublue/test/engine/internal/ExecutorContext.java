@@ -22,9 +22,7 @@ import org.junit.platform.engine.ExecutionRequest;
 
 import java.util.concurrent.CountDownLatch;
 
-/**
- * Class to implement an execution context
- */
+/** Class to implement an execution context */
 public class ExecutorContext {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorContext.class);
@@ -73,9 +71,7 @@ public class ExecutorContext {
         return testInstance;
     }
 
-    /**
-     * Method to mark the execution context complete
-     */
+    /** Method to mark the execution context complete */
     public void complete() {
         LOGGER.trace("complete()");
 

@@ -16,9 +16,7 @@
 
 package org.antublue.test.engine.api;
 
-/**
- * Interface required for all Argument implementations
- */
+/** Interface required for all Argument implementations */
 public interface Argument {
 
     /**

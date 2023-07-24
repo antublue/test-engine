@@ -16,9 +16,7 @@
 
 package org.antublue.test.engine.internal.util;
 
-/**
- * Class to implement an Exception for a Precondition failure
- */
+/** Class to implement an Exception for a Precondition failure */
 public class PreconditionException extends RuntimeException {
 
     /**

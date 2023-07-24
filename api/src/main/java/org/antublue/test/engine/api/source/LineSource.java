@@ -31,14 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-/**
- * Class to create a Stream of Arguments where each Argument value is a line of a Stream
- */
+/** Class to create a Stream of Arguments where each Argument value is a line of a Stream */
 public final class LineSource {
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     private LineSource() {
         // DO NOTHING
     }
@@ -103,7 +99,8 @@ public final class LineSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<StringArgument> of(InputStream inputStream, Charset charset) throws IOException {
+    public static Stream<StringArgument> of(InputStream inputStream, Charset charset)
+            throws IOException {
         if (inputStream == null) {
             throw new IllegalArgumentException("inputStream is null");
         }

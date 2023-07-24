@@ -22,9 +22,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Class to implement a LoggerFactory
- */
+/** Class to implement a LoggerFactory */
 public final class LoggerFactory {
 
     private static final LoggerFactory INSTANCE = new LoggerFactory();
@@ -33,9 +31,7 @@ public final class LoggerFactory {
     private final Map<String, Logger> loggerMap = new HashMap<>();
     private final Level level;
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     private LoggerFactory() {
         Map<String, Level> levelMap = new HashMap<>();
         levelMap.put("ERROR", Level.ERROR);
@@ -48,7 +44,9 @@ public final class LoggerFactory {
         // Convert the system property to an environment variable and get the value
         String value =
                 System.getenv(
-                        ANTUBLUE_TEST_ENGINE_LOG_LEVEL.toUpperCase(Locale.ENGLISH).replace('.', '_'));
+                        ANTUBLUE_TEST_ENGINE_LOG_LEVEL
+                                .toUpperCase(Locale.ENGLISH)
+                                .replace('.', '_'));
 
         Level level = null;
 

@@ -17,7 +17,6 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.internal.ExecutorContext;
-import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
@@ -26,9 +25,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Class to implement an extended AbstractTestDescriptor
- */
+/** Class to implement an extended AbstractTestDescriptor */
 @SuppressWarnings("unchecked")
 abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
 
@@ -51,8 +48,7 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
      */
     public <T> List<T> getChildren(Class<T> clazz) {
         // Clazz is required to be able to get the generic type
-        return getChildren()
-                .stream()
+        return getChildren().stream()
                 .map((Function<TestDescriptor, T>) testDescriptor -> (T) testDescriptor)
                 .collect(Collectors.toList());
     }
@@ -70,7 +66,8 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
      * @param executorContext testEngineExecutorContext
      */
     public void skip(ExecutorContext executorContext) {
-        for (ExtendedAbstractTestDescriptor testDescriptor : getChildren(ExtendedAbstractTestDescriptor.class)) {
+        for (ExtendedAbstractTestDescriptor testDescriptor :
+                getChildren(ExtendedAbstractTestDescriptor.class)) {
             testDescriptor.skip(executorContext);
         }
 

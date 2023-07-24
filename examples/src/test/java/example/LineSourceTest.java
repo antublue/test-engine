@@ -9,15 +9,12 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class LineSourceTest {
 
     private static final String RESOURCE_NAME = "/sample.txt";
 
-    @TestEngine.Argument
-    public StringArgument stringArgument;
+    @TestEngine.Argument public StringArgument stringArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() throws IOException {
@@ -33,12 +30,12 @@ public class LineSourceTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument  + ")");
+        System.out.println("test1(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument  + ")");
+        System.out.println("test2(" + stringArgument + ")");
     }
 
     @TestEngine.AfterAll

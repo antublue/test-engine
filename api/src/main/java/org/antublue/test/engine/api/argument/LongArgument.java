@@ -18,9 +18,7 @@ package org.antublue.test.engine.api.argument;
 
 import java.util.Objects;
 
-/**
- * Class to implement a LongArgument
- */
+/** Class to implement a LongArgument */
 public class LongArgument extends AbstractArgument {
 
     private final String name;

@@ -18,9 +18,7 @@ package org.antublue.test.engine.api.argument;
 
 import java.util.Objects;
 
-/**
- * Class to implement a CharArgument
- */
+/** Class to implement a CharArgument */
 public class CharArgument extends AbstractArgument {
 
     private final String name;
