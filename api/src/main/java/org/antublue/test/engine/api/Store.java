@@ -33,7 +33,7 @@ import java.util.function.Function;
  *
  * <p>Locking of Objects in the Store is the responsibility of the calling code
  */
-@SuppressWarnings("PMD.EmptyCatchBlock")
+@SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
 public class Store {
 
     private static final Store GLOBAL_STORE = new Store();
@@ -187,6 +187,40 @@ public class Store {
         }
     }
 
+    public <T> void remove(String key, Consumer<T> consumer) {
+        AtomicReference<StoreException> storeExceptionAtomicReference = new AtomicReference<>();
+
+        remove(key)
+                .ifPresent(
+                        new Consumer<Object>() {
+
+                            /**
+                             * Performs this operation on the given argument.
+                             *
+                             * @param o the input argument
+                             */
+                            @Override
+                            public void accept(Object o) {
+                                try {
+                                    consumer.accept((T) o);
+                                } catch (Throwable t) {
+                                    storeExceptionAtomicReference.set(
+                                            new StoreException(
+                                                    String.format(
+                                                            "Exception closing Object for key [%s]"
+                                                                    + " object [%s]",
+                                                            key, o.getClass().getName()),
+                                                    t));
+                                }
+                            }
+                        });
+
+        StoreException storeException = storeExceptionAtomicReference.get();
+        if (storeException != null) {
+            throw storeException;
+        }
+    }
+
     /**
      * Method to remove an Object from the Store, closing it if it's an instance of AutoCloseable
      *
@@ -210,40 +244,6 @@ public class Store {
                                 }
                             }
                         });
-    }
-
-    public void removeAndProcess(String key, Consumer<Object> consumer) {
-        AtomicReference<StoreException> storeExceptionAtomicReference = new AtomicReference<>();
-
-        remove(key)
-                .ifPresent(
-                        new Consumer<Object>() {
-
-                            /**
-                             * Performs this operation on the given argument.
-                             *
-                             * @param o the input argument
-                             */
-                            @Override
-                            public void accept(Object o) {
-                                try {
-                                    consumer.accept(o);
-                                } catch (Throwable t) {
-                                    storeExceptionAtomicReference.set(
-                                            new StoreException(
-                                                    String.format(
-                                                            "Exception closing Object for key [%s]"
-                                                                    + " object [%s]",
-                                                            key, o.getClass().getName()),
-                                                    t));
-                                }
-                            }
-                        });
-
-        StoreException storeException = storeExceptionAtomicReference.get();
-        if (storeException != null) {
-            throw storeException;
-        }
     }
 
     /**
