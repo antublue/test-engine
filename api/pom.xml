@@ -181,6 +181,16 @@
                                     </excludes>
                                 </filter>
                             </filters>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.apiguardian:apiguardian-api</exclude>
+                                    <exclude>org.junit.jupiter:junit-jupiter-api</exclude>
+                                    <exclude>org.junit.platform:junit-platform-commons</exclude>
+                                    <exclude>org.junit.platform:junit-platform-engine</exclude>
+                                    <exclude>org.junit.platform:junit-platform-launcher</exclude>
+                                    <exclude>org.opentest4j:opentest4j</exclude>
+                                </excludes>
+                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
@@ -215,7 +225,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <configLocation>../checkstyle/google_checks.xml</configLocation>
+                    <configLocation>${project.basedir}/../checkstyle/google_checks.xml</configLocation>
                 </configuration>
                 <executions>
                     <execution>
@@ -240,7 +250,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.0-RC2</version>
+            <version>5.10.0</version>
         </dependency>
     </dependencies>
 
