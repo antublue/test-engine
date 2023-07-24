@@ -50,6 +50,9 @@ public class MethodOrderTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
+
+        assertThat(stringArgument).isNull();
+
         ACTUAL_ORDER.add("prepare()");
     }
 
@@ -57,18 +60,23 @@ public class MethodOrderTest {
     @TestEngine.Order(order = 0)
     public void prepare2() {
         System.out.println("prepare2()");
+
+        assertThat(stringArgument).isNull();
+
         ACTUAL_ORDER.add("prepare2()");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
+
         ACTUAL_ORDER.add(stringArgument + ".beforeAll()");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
+
         ACTUAL_ORDER.add(stringArgument + ".beforeEach()");
     }
 
@@ -76,6 +84,7 @@ public class MethodOrderTest {
     @TestEngine.Order(order = 1)
     public void test1() {
         System.out.println("test1(" + stringArgument  + ")");
+
         ACTUAL_ORDER.add(stringArgument + ".test1()");
     }
 
@@ -83,18 +92,21 @@ public class MethodOrderTest {
     @TestEngine.Order(order = 0)
     public void test2() {
         System.out.println("test2(" + stringArgument  + ")");
+
         ACTUAL_ORDER.add(stringArgument + ".test2()");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
+
         ACTUAL_ORDER.add(stringArgument + ".afterEach()");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
+
         ACTUAL_ORDER.add(stringArgument + ".afterAll()");
     }
 
@@ -102,12 +114,16 @@ public class MethodOrderTest {
     @TestEngine.Order(order = 0)
     public void afterAll2() {
         System.out.println("afterAll2()");
+
         ACTUAL_ORDER.add(stringArgument + ".afterAll2()");
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
+
+        assertThat(stringArgument).isNull();
+
         ACTUAL_ORDER.add("conclude()");
 
         assertThat(ACTUAL_ORDER).isEqualTo(EXPECTED_ORDER);

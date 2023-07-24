@@ -7,7 +7,6 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
 public class MultipleMethodsLockingTest1 {
@@ -93,7 +92,5 @@ public class MultipleMethodsLockingTest1 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-
-        assertThat(integerArgument).isNull();
     }
 }

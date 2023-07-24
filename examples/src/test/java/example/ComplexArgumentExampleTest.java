@@ -5,8 +5,6 @@ import org.antublue.test.engine.api.argument.AbstractArgument;
 
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Example test
  */
@@ -31,6 +29,7 @@ public class ComplexArgumentExampleTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + complexArgument.name()  + ")");
+
         complexArgument.initialize();
     }
 
@@ -62,8 +61,6 @@ public class ComplexArgumentExampleTest {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-
-        assertThat(complexArgument).isNull();
     }
 
     private static class ComplexArgument extends AbstractArgument implements AutoCloseable {
