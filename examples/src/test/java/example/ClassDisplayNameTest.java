@@ -21,6 +21,7 @@ public class ClassDisplayNameTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
+
         value = integerArgument.value();
     }
 

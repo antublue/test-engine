@@ -29,6 +29,7 @@ public class ArrayTestWithProtectedMethods {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
+
         values = objectArgument.value();
     }
 

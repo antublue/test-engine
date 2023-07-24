@@ -216,28 +216,29 @@ public class Store {
         AtomicReference<StoreException> storeExceptionAtomicReference = new AtomicReference<>();
 
         remove(key)
-                .ifPresent(new Consumer<Object>() {
+                .ifPresent(
+                        new Consumer<Object>() {
 
-                    /**
-                     * Performs this operation on the given argument.
-                     *
-                     * @param o the input argument
-                     */
-                    @Override
-                    public void accept(Object o) {
-                        try {
-                            consumer.accept(o);
-                        } catch (Throwable t) {
-                            storeExceptionAtomicReference.set(
-                                    new StoreException(
-                                    String.format(
-                                            "Exception closing Object for key [%s] object"
-                                                    + " [%s]",
-                                            key, o.getClass().getName()),
-                                    t));
-                        }
-                    }
-                });
+                            /**
+                             * Performs this operation on the given argument.
+                             *
+                             * @param o the input argument
+                             */
+                            @Override
+                            public void accept(Object o) {
+                                try {
+                                    consumer.accept(o);
+                                } catch (Throwable t) {
+                                    storeExceptionAtomicReference.set(
+                                            new StoreException(
+                                                    String.format(
+                                                            "Exception closing Object for key [%s]"
+                                                                    + " object [%s]",
+                                                            key, o.getClass().getName()),
+                                                    t));
+                                }
+                            }
+                        });
 
         StoreException storeException = storeExceptionAtomicReference.get();
         if (storeException != null) {
