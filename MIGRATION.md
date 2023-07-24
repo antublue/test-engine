@@ -1,4 +1,4 @@
-## Migration
+# Migration
 
 ---
 
@@ -6,7 +6,7 @@
 
 Test Engine `6.x.x` versions changed annotations that require values.
 
-## @TestEngine.DisplayName
+### @TestEngine.DisplayName
 
 `5.x.x` code:
 
@@ -40,7 +40,7 @@ public class Test {
 
 ---
 
-## @TestEngine.Order
+### @TestEngine.Order
 
 `5.x.x` code:
 
@@ -74,7 +74,7 @@ public class Test {
 
 ---
 
-## @TestEngine.Tag
+### @TestEngine.Tag
 
 `5.x.x` code:
 
@@ -106,7 +106,7 @@ public class Test {
 }
 ```
 
-## @TestEngine.Lock
+### @TestEngine.Lock
 
 `5.x.x` code:
 
@@ -138,7 +138,7 @@ public class Test {
 }
 ```
 
-## @TestEngine.Unlock
+### @TestEngine.Unlock
 
 `5.x.x` code:
 
@@ -166,6 +166,46 @@ public class Test {
   @TestEngine.Unlock(name = "lock-name")
   public void test() {
     // ... code omitted ...
+  }
+}
+```
+
+## Store
+
+The `Store` object has been refactored to allow both global usage and local test class usage.
+
+Previous static methods have been removed; use `Store.singleton()`
+
+`5.x.x` code:
+
+```java
+public class Test {
+
+  // ... code omitted ...
+
+  @TestEngine.Test
+  @TestEngine.Unlock("lock-name")
+  public void test() {
+    // ... code omitted ...
+      
+    String value = Store.get("key");
+  }
+}
+```
+
+`6.x.x` code:
+
+```java
+public class Test {
+
+  // ... code omitted ...
+  
+  @TestEngine.Test
+  @TestEngine.Unlock(name = "lock-name")
+  public void test() {
+    // ... code omitted ...
+    
+    String value = Store.singleton().get("key");
   }
 }
 ```
