@@ -78,7 +78,7 @@ For changes, you should...
 - Create a branch for your work off of `main`
 - Make changes on your branch
 - Build and test your changes
-- Apply Google Java Style (`./tools/apply-google-java-format.sh`)
+- Apply [Google Java Style](https://google.github.io/styleguide/javaguide.html) (`./tools/apply-google-java-format.sh`)
 - Commit any Google Java Style code changes
 - Open a pull request targeting `main`, tagging `@antublue` for review
 - A [Developer Certificate of Origin](DCO.md) (DCO) is required for all contributions
