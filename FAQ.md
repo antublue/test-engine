@@ -77,8 +77,8 @@ Examples:
 - Locks are reentrant
 
 
-- By default, `@TestEngine.Lock` and `@TestEngine.Unlock` use a `ReentrantReadWriteLock`, locking the write lock.
-  - You can add `mode=TestEngine.LockMode.READ` to use a read lock.
+- By default, `@TestEngine.Lock`, `@TestEngine.Unlock`, `@TestEngine.ResourceLock` use a `ReentrantReadWriteLock`, locking the write lock.
+  - You can add `mode = TestEngine.LockMode.READ` to use a read lock.
 
 ---
 
