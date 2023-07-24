@@ -134,10 +134,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 ReflectionUtils.invoke(
                         testInstance,
                         method,
-                        throwable -> {
-                            throwableCollector.add(throwable);
-                            throwable.printStackTrace();
-                        });
+                        throwableCollector);
 
                 LockAnnotationUtils.processUnlockAnnotations(method);
 
@@ -182,10 +179,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 ReflectionUtils.invoke(
                         testInstance,
                         method,
-                        throwable -> {
-                            throwableCollector.add(throwable);
-                            throwable.printStackTrace();
-                        });
+                        throwableCollector);
 
                 LockAnnotationUtils.processUnlockAnnotations(method);
             }
@@ -194,10 +188,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                     .processAutoCloseAnnotatedFields(
                             testInstance,
                             "@TestEngine.Conclude",
-                            throwable -> {
-                                throwableCollector.add(throwable);
-                                throwable.printStackTrace();
-                            });
+                            throwableCollector);
         }
 
         if (throwableCollector.isEmpty()) {

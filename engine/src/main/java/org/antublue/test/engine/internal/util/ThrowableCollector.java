@@ -19,11 +19,12 @@ package org.antublue.test.engine.internal.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Class to collect a list of Throwable Exceptions
  */
-public class ThrowableCollector {
+public class ThrowableCollector implements Consumer<Throwable> {
 
     private final List<Throwable> throwableList;
 
@@ -90,5 +91,16 @@ public class ThrowableCollector {
      */
     public List<Throwable> getList() {
         return throwableList;
+    }
+
+    /**
+     * Method to accept a Throwable, adding to
+     * the collector and printing the stack trace
+     *
+     * @param throwable throwable
+     */
+    public void accept(Throwable throwable) {
+        add(throwable);
+        throwable.printStackTrace();
     }
 }

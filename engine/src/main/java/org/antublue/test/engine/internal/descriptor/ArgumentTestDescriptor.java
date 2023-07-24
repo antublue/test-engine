@@ -133,6 +133,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
+
         Field field = ReflectionUtils.getArgumentField(testClass);
 
         LOGGER.trace(
@@ -141,10 +142,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 field.getName(),
                 testArgument.name());
 
-        ReflectionUtils.setField(testInstance, field, testArgument, throwable -> {
-            throwableCollector.add(throwable);
-            throwable.printStackTrace();
-        });
+        ReflectionUtils.setField(testInstance, field, testArgument, throwableCollector);
 
         if (throwableCollector.isEmpty()) {
             List<Method> methods = ReflectionUtils.getBeforeAllMethods(testClass);
@@ -160,10 +158,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 ReflectionUtils.invoke(
                         testInstance,
                         method,
-                        throwable -> {
-                            throwableCollector.add(throwable);
-                            throwable.printStackTrace();
-                        });
+                        throwableCollector);
 
                 LockAnnotationUtils.processUnlockAnnotations(method);
 
@@ -207,10 +202,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             ReflectionUtils.invoke(
                     testInstance,
                     method,
-                    throwable -> {
-                        throwableCollector.add(throwable);
-                        throwable.printStackTrace();
-                    });
+                    throwableCollector);
 
             LockAnnotationUtils.processUnlockAnnotations(method);
         }
@@ -219,10 +211,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 .processAutoCloseAnnotatedFields(
                         testInstance,
                         "@TestEngine.AfterAll",
-                        throwable -> {
-                            throwableCollector.add(throwable);
-                            throwable.printStackTrace();
-                        });
+                        throwableCollector);
 
         LOGGER.trace(
                 "set field testClass [%s] field [%s] testArgument[null]",
