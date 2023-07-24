@@ -165,10 +165,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             ReflectionUtils.invoke(
                     testInstance,
                     method,
-                    throwable -> {
-                        throwableCollector.add(throwable);
-                        throwable.printStackTrace();
-                    });
+                    throwableCollector);
 
             LockAnnotationUtils.processUnlockAnnotations(method);
 
@@ -189,10 +186,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             ReflectionUtils.invoke(
                     testInstance,
                     testMethod,
-                    throwable -> {
-                        throwableCollector.add(throwable);
-                        throwable.printStackTrace();
-                    });
+                    throwableCollector);
 
             LockAnnotationUtils.processUnlockAnnotations(testMethod);
         }
@@ -210,10 +204,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             ReflectionUtils.invoke(
                     testInstance,
                     method,
-                    throwable -> {
-                        throwableCollector.add(throwable);
-                        throwable.printStackTrace();
-                    });
+                    throwableCollector);
 
             LockAnnotationUtils.processUnlockAnnotations(method);
         }
@@ -222,10 +213,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 .processAutoCloseAnnotatedFields(
                         testInstance,
                         "@TestEngine.AfterEach",
-                        throwable -> {
-                            throwableCollector.add(throwable);
-                            throwable.printStackTrace();
-                        });
+                        throwableCollector);
 
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
