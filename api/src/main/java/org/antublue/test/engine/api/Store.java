@@ -172,6 +172,8 @@ public class Store {
     }
 
     /**
+     * Method to remove an Object from the Store
+     *
      * @param key key
      * @param clazz clazz
      * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't
@@ -187,6 +189,13 @@ public class Store {
         }
     }
 
+    /**
+     * Method to remove an Object from the Store, calling the Consumer if an Object existed
+     *
+     * @param key key
+     * @param consumer consumer
+     * @param <T> the consumer type
+     */
     public <T> void remove(String key, Consumer<T> consumer) {
         AtomicReference<StoreException> storeExceptionAtomicReference = new AtomicReference<>();
 
@@ -276,7 +285,11 @@ public class Store {
         }
     }
 
-    /** Method to get a singleton Store */
+    /**
+     * Method to get a singleton Store
+     *
+     * @return a singleton Store
+     */
     public static Store singleton() {
         return GLOBAL_STORE;
     }
