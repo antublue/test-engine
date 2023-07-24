@@ -4,7 +4,7 @@
 
 ### Why not use JUnit 5?
 
-Currently, JUnit 5 does not support parameterized testing at the test class level (common for parameterized integration testing.)
+Currently, JUnit 5 does not support parameterized testing at the test class level (common for integration testing.)
 
 - https://github.com/junit-team/junit5/issues/878 (Open since 2017-06-09)
 
