@@ -1,4 +1,4 @@
-package example;
+package example.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 /** Example test */
-public class StoreExampleTest {
+public class StoreExampleTest1 {
 
     private static final String PREFIX = "StoreExampleTest";
     private static final String CLOSEABLE = PREFIX + ".closeable";

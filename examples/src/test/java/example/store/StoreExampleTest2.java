@@ -6,17 +6,18 @@ import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
-import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /** Example test */
-public class StoreSingletonExampleTest {
+public class StoreExampleTest2 {
 
     private static final String PREFIX = "StoreExampleTest";
-    private static final String CLOSEABLE = PREFIX + ".closeable";
-    private static final String AUTO_CLOSEABLE = PREFIX + ".autoCloseable";
+    private static final String TEST_OBJECT = PREFIX + ".testObject";
+
+    private Store store;
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -33,8 +34,8 @@ public class StoreSingletonExampleTest {
     public void prepare() {
         System.out.println("prepare()");
 
-        Store.singleton().put(AUTO_CLOSEABLE, new TestAutoCloseable());
-        Store.singleton().put(CLOSEABLE, new TestCloseable());
+        store = new Store();
+        store.put(TEST_OBJECT, new TestObject());
     }
 
     @TestEngine.BeforeAll
@@ -71,27 +72,14 @@ public class StoreSingletonExampleTest {
     public void conclude() {
         System.out.println("conclude()");
 
-        Store.singleton().removeAndClose(AUTO_CLOSEABLE);
-        Store.singleton().removeAndClose(CLOSEABLE);
+        store.remove(TEST_OBJECT, (Consumer<TestObject>) testObject -> testObject.close());
 
-        assertThat(Store.singleton().get(AUTO_CLOSEABLE)).isNotPresent();
-        assertThat(Store.singleton().get(CLOSEABLE)).isNotPresent();
+        assertThat(store.get(TEST_OBJECT)).isNotPresent();
     }
 
-    private static class TestAutoCloseable implements AutoCloseable {
+    private static class TestObject {
 
-        public TestAutoCloseable() {
-            // DO NOTHING
-        }
-
-        public void close() {
-            System.out.println(getClass().getName() + ".close()");
-        }
-    }
-
-    private static class TestCloseable implements Closeable {
-
-        public TestCloseable() {
+        public TestObject() {
             // DO NOTHING
         }
 
