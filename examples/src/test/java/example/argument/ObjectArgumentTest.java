@@ -7,21 +7,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class ObjectArgumentTest {
 
     private CustomObject customObject;
 
-    @TestEngine.Argument
-    protected ObjectArgument<CustomObject> objectArgument;
+    @TestEngine.Argument protected ObjectArgument<CustomObject> objectArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<ObjectArgument<CustomObject>> arguments() {
         Collection<ObjectArgument<CustomObject>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(new ObjectArgument<>("String " + i, new CustomObject(String.valueOf(i))));
+            collection.add(
+                    new ObjectArgument<>("String " + i, new CustomObject(String.valueOf(i))));
         }
         return collection.stream();
     }

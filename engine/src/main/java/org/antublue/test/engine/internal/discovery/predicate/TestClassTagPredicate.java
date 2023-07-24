@@ -18,9 +18,7 @@ package org.antublue.test.engine.internal.discovery.predicate;
 
 import org.antublue.test.engine.api.TestEngine;
 
-/**
- * Class to implement a test class tag Predicate
- */
+/** Class to implement a test class tag Predicate */
 public final class TestClassTagPredicate extends RegexPredicate<Class<?>> {
 
     /**

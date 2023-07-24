@@ -8,20 +8,19 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class CustomArgumentTest {
 
-    @TestEngine.Argument
-    private CustomArgument customArgument;
+    @TestEngine.Argument private CustomArgument customArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<CustomArgument> arguments() {
         Collection<CustomArgument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(CustomArgument.of("CustomArgument(" + i + ") = " + value, String.valueOf(value)));
+            collection.add(
+                    CustomArgument.of(
+                            "CustomArgument(" + i + ") = " + value, String.valueOf(value)));
         }
         return collection.stream();
     }

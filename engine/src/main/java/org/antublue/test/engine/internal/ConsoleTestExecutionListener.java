@@ -16,8 +16,8 @@
 
 package org.antublue.test.engine.internal;
 
-import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
@@ -41,9 +41,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * Class to collect test information and output a test execution summary
- */
+/** Class to collect test information and output a test execution summary */
 public class ConsoleTestExecutionListener implements TestExecutionListener {
 
     private static final String BANNER =
@@ -78,7 +76,6 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
             AnsiColor.WHITE_BRIGHT.apply(
                     "------------------------------------------------------------------------");
 
-
     private final Summary summary;
     private final boolean detailedOutput;
     private final boolean logTestMessages;
@@ -96,49 +93,53 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
         detailedOutput =
                 configurationParameters
                         .get(Constants.CONSOLE_OUTPUT)
-                        .map(value -> {
-                            try {
-                                return Boolean.parseBoolean(value);
-                            } catch (NumberFormatException e) {
-                                return true;
-                            }
-                        })
+                        .map(
+                                value -> {
+                                    try {
+                                        return Boolean.parseBoolean(value);
+                                    } catch (NumberFormatException e) {
+                                        return true;
+                                    }
+                                })
                         .orElse(true);
 
         logTestMessages =
                 configurationParameters
                         .get(Constants.LOG_TEST_MESSAGES)
-                        .map(value -> {
-                            try {
-                                return Boolean.parseBoolean(value);
-                            } catch (NumberFormatException e) {
-                                return true;
-                            }
-                        })
+                        .map(
+                                value -> {
+                                    try {
+                                        return Boolean.parseBoolean(value);
+                                    } catch (NumberFormatException e) {
+                                        return true;
+                                    }
+                                })
                         .orElse(true);
 
         logPassMessages =
                 configurationParameters
                         .get(Constants.LOG_PASS_MESSAGES)
-                        .map(value -> {
-                            try {
-                                return Boolean.parseBoolean(value);
-                            } catch (NumberFormatException e) {
-                                return true;
-                            }
-                        })
+                        .map(
+                                value -> {
+                                    try {
+                                        return Boolean.parseBoolean(value);
+                                    } catch (NumberFormatException e) {
+                                        return true;
+                                    }
+                                })
                         .orElse(true);
 
         logSkipMessages =
                 configurationParameters
                         .get(Constants.LOG_SKIP_MESSAGES)
-                        .map(value -> {
-                            try {
-                                return Boolean.parseBoolean(value);
-                            } catch (NumberFormatException e) {
-                                return true;
-                            }
-                        })
+                        .map(
+                                value -> {
+                                    try {
+                                        return Boolean.parseBoolean(value);
+                                    } catch (NumberFormatException e) {
+                                        return true;
+                                    }
+                                })
                         .orElse(true);
     }
 
@@ -153,8 +154,9 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
         }
 
         return summary.getTestClassesFailedCount()
-                + summary.getArgumentsFailedCount()
-                + summary.getTestsFailedCount() > 0;
+                        + summary.getArgumentsFailedCount()
+                        + summary.getTestsFailedCount()
+                > 0;
     }
 
     /**
@@ -167,10 +169,11 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
         summary.testPlanExecutionStarted(testPlan);
 
         testPlan.getRoots()
-                .forEach(testIdentifier ->
-                        TestDescriptorStore
-                                .getInstance()
-                                .get(testIdentifier.getUniqueIdObject()).ifPresent(TestDescriptorUtils::logTestDescriptorTree));
+                .forEach(
+                        testIdentifier ->
+                                TestDescriptorStore.getInstance()
+                                        .get(testIdentifier.getUniqueIdObject())
+                                        .ifPresent(TestDescriptorUtils::logTestDescriptorTree));
 
         System.out.println(INFO + SEPARATOR);
         System.out.println(INFO + BANNER);
@@ -185,8 +188,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
     @Override
     public void executionStarted(TestIdentifier testIdentifier) {
         TestDescriptor testDescriptor =
-                TestDescriptorStore
-                        .getInstance()
+                TestDescriptorStore.getInstance()
                         .get(testIdentifier.getUniqueIdObject())
                         .orElse(null);
 
@@ -196,52 +198,62 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
 
         Switch.switchType(
                 testDescriptor,
-                Switch.switchCase(ExtendedEngineDescriptor.class, consumer -> {
-                    // DO NOTHING
-                }),
-                Switch.switchCase(ClassTestDescriptor.class, consumer -> {
-                    ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
-                    Class<?> testClass = classTestDescriptor.getTestClass();
-                    if (logTestMessages) {
-                        stringBuilder
-                                .append(TEST)
-                                .append(" | ")
-                                .append(testClass.getName());
-                    }
-                }),
-                Switch.switchCase(ArgumentTestDescriptor.class, consumer -> {
-                    if (logTestMessages) {
-                        ArgumentTestDescriptor argumentTestDescriptor = (ArgumentTestDescriptor) testDescriptor;
-                        Class<?> testClass = argumentTestDescriptor.getTestClass();
-                        Argument testArgument = argumentTestDescriptor.getTestArgument();
-                        String testArgumentName = testArgument.name();
-                        stringBuilder
-                                .append(TEST)
-                                .append(" | ")
-                                .append(testArgumentName)
-                                .append(" | ")
-                                .append(testClass.getName());
-                    }
-                }),
-                Switch.switchCase(MethodTestDescriptor.class, consumer -> {
-                    if (logTestMessages) {
-                        MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
-                        Class<?> testClass = methodTestDescriptor.getTestClass();
-                        Method testMethod = methodTestDescriptor.getTestMethod();
-                        Argument testArgument = methodTestDescriptor.getTestArgument();
-                        String testArgumentName = testArgument.name();
-                        stringBuilder
-                                .append(TEST)
-                                .append(" | ")
-                                .append(testArgumentName)
-                                .append(" | ")
-                                .append(testClass.getName())
-                                .append(" ")
-                                .append(testMethod.getName())
-                                .append("()");
-                    }
-                })
-        );
+                Switch.switchCase(
+                        ExtendedEngineDescriptor.class,
+                        consumer -> {
+                            // DO NOTHING
+                        }),
+                Switch.switchCase(
+                        ClassTestDescriptor.class,
+                        consumer -> {
+                            ClassTestDescriptor classTestDescriptor =
+                                    (ClassTestDescriptor) testDescriptor;
+                            Class<?> testClass = classTestDescriptor.getTestClass();
+                            if (logTestMessages) {
+                                stringBuilder
+                                        .append(TEST)
+                                        .append(" | ")
+                                        .append(testClass.getName());
+                            }
+                        }),
+                Switch.switchCase(
+                        ArgumentTestDescriptor.class,
+                        consumer -> {
+                            if (logTestMessages) {
+                                ArgumentTestDescriptor argumentTestDescriptor =
+                                        (ArgumentTestDescriptor) testDescriptor;
+                                Class<?> testClass = argumentTestDescriptor.getTestClass();
+                                Argument testArgument = argumentTestDescriptor.getTestArgument();
+                                String testArgumentName = testArgument.name();
+                                stringBuilder
+                                        .append(TEST)
+                                        .append(" | ")
+                                        .append(testArgumentName)
+                                        .append(" | ")
+                                        .append(testClass.getName());
+                            }
+                        }),
+                Switch.switchCase(
+                        MethodTestDescriptor.class,
+                        consumer -> {
+                            if (logTestMessages) {
+                                MethodTestDescriptor methodTestDescriptor =
+                                        (MethodTestDescriptor) testDescriptor;
+                                Class<?> testClass = methodTestDescriptor.getTestClass();
+                                Method testMethod = methodTestDescriptor.getTestMethod();
+                                Argument testArgument = methodTestDescriptor.getTestArgument();
+                                String testArgumentName = testArgument.name();
+                                stringBuilder
+                                        .append(TEST)
+                                        .append(" | ")
+                                        .append(testArgumentName)
+                                        .append(" | ")
+                                        .append(testClass.getName())
+                                        .append(" ")
+                                        .append(testMethod.getName())
+                                        .append("()");
+                            }
+                        }));
 
         if (detailedOutput && stringBuilder.length() > 0) {
             System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
@@ -251,8 +263,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
     @Override
     public void executionSkipped(TestIdentifier testIdentifier, String reason) {
         TestDescriptor testDescriptor =
-                TestDescriptorStore
-                        .getInstance()
+                TestDescriptorStore.getInstance()
                         .get(testIdentifier.getUniqueIdObject())
                         .orElse(null);
 
@@ -262,51 +273,62 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
 
         Switch.switchType(
                 testDescriptor,
-                Switch.switchCase(ExtendedEngineDescriptor.class, consumer -> {
-                    // DO NOTHING
-                }),
-                Switch.switchCase(ClassTestDescriptor.class, consumer -> {
-                    if (logSkipMessages) {
-                        ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
-                        Class<?> testClass = classTestDescriptor.getTestClass();
-                        stringBuilder
-                                .append(SKIP)
-                                .append(" | ")
-                                .append(testClass.getName());
-                    }
-                }),
-                Switch.switchCase(ArgumentTestDescriptor.class, consumer -> {
-                    if (logSkipMessages) {
-                        ArgumentTestDescriptor argumentTestDescriptor = (ArgumentTestDescriptor) testDescriptor;
-                        Class<?> testClass = argumentTestDescriptor.getTestClass();
-                        Argument testArgument = argumentTestDescriptor.getTestArgument();
-                        String testArgumentName = testArgument.name();
-                        stringBuilder
-                                .append(SKIP)
-                                .append(" | ")
-                                .append(testArgumentName)
-                                .append(" | ")
-                                .append(testClass.getName());
-                    }
-                }),
-                Switch.switchCase(MethodTestDescriptor.class, consumer -> {
-                    if (logSkipMessages) {
-                        MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
-                        Class<?> testClass = methodTestDescriptor.getTestClass();
-                        Method testMethod = methodTestDescriptor.getTestMethod();
-                        Argument testArgument = methodTestDescriptor.getTestArgument();
-                        String testArgumentName = testArgument.name();
-                        stringBuilder
-                                .append(SKIP)
-                                .append(" | ")
-                                .append(testArgumentName)
-                                .append(" | ")
-                                .append(testClass.getName())
-                                .append(" ")
-                                .append(testMethod.getName())
-                                .append("()");
-                    }
-                }));
+                Switch.switchCase(
+                        ExtendedEngineDescriptor.class,
+                        consumer -> {
+                            // DO NOTHING
+                        }),
+                Switch.switchCase(
+                        ClassTestDescriptor.class,
+                        consumer -> {
+                            if (logSkipMessages) {
+                                ClassTestDescriptor classTestDescriptor =
+                                        (ClassTestDescriptor) testDescriptor;
+                                Class<?> testClass = classTestDescriptor.getTestClass();
+                                stringBuilder
+                                        .append(SKIP)
+                                        .append(" | ")
+                                        .append(testClass.getName());
+                            }
+                        }),
+                Switch.switchCase(
+                        ArgumentTestDescriptor.class,
+                        consumer -> {
+                            if (logSkipMessages) {
+                                ArgumentTestDescriptor argumentTestDescriptor =
+                                        (ArgumentTestDescriptor) testDescriptor;
+                                Class<?> testClass = argumentTestDescriptor.getTestClass();
+                                Argument testArgument = argumentTestDescriptor.getTestArgument();
+                                String testArgumentName = testArgument.name();
+                                stringBuilder
+                                        .append(SKIP)
+                                        .append(" | ")
+                                        .append(testArgumentName)
+                                        .append(" | ")
+                                        .append(testClass.getName());
+                            }
+                        }),
+                Switch.switchCase(
+                        MethodTestDescriptor.class,
+                        consumer -> {
+                            if (logSkipMessages) {
+                                MethodTestDescriptor methodTestDescriptor =
+                                        (MethodTestDescriptor) testDescriptor;
+                                Class<?> testClass = methodTestDescriptor.getTestClass();
+                                Method testMethod = methodTestDescriptor.getTestMethod();
+                                Argument testArgument = methodTestDescriptor.getTestArgument();
+                                String testArgumentName = testArgument.name();
+                                stringBuilder
+                                        .append(SKIP)
+                                        .append(" | ")
+                                        .append(testArgumentName)
+                                        .append(" | ")
+                                        .append(testClass.getName())
+                                        .append(" ")
+                                        .append(testMethod.getName())
+                                        .append("()");
+                            }
+                        }));
 
         if (detailedOutput && stringBuilder.length() > 0) {
             System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
@@ -320,10 +342,10 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
      * @param testExecutionResult the TestExecutionResult
      */
     @Override
-    public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
+    public void executionFinished(
+            TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
         TestDescriptor testDescriptor =
-                TestDescriptorStore
-                        .getInstance()
+                TestDescriptorStore.getInstance()
                         .get(testIdentifier.getUniqueIdObject())
                         .orElse(null);
 
@@ -333,69 +355,82 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
 
         Switch.switchType(
                 testDescriptor,
-                Switch.switchCase(ExtendedEngineDescriptor.class, consumer -> {
-                    // DO NOTHING
-                }),
-                Switch.switchCase(ClassTestDescriptor.class, consumer -> {
-                    if (logPassMessages) {
-                        ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
-                        Class<?> testClass = classTestDescriptor.getTestClass();
-                        stringBuilder
-                                .append("%s | ")
-                                .append(testClass.getName());
-                    }
-                }),
-                Switch.switchCase(ArgumentTestDescriptor.class, consumer -> {
-                    if (logPassMessages) {
-                        ArgumentTestDescriptor argumentTestDescriptor = (ArgumentTestDescriptor) testDescriptor;
-                        Class<?> testClass = argumentTestDescriptor.getTestClass();
-                        Argument testArgument = argumentTestDescriptor.getTestArgument();
-                        String testArgumentName = testArgument.name();
-                        stringBuilder
-                                .append("%s | ")
-                                .append(testArgumentName)
-                                .append(" | ")
-                                .append(testClass.getName());
-                    }
-                }),
-                Switch.switchCase(MethodTestDescriptor.class, consumer -> {
-                    if (logPassMessages) {
-                        MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
-                        Class<?> testClass = methodTestDescriptor.getTestClass();
-                        Method testMethod = methodTestDescriptor.getTestMethod();
-                        Argument testArgument = methodTestDescriptor.getTestArgument();
-                        String testArgumentName = testArgument.name();
-                        stringBuilder
-                                .append("%s | ")
-                                .append(testArgumentName)
-                                .append(" | ")
-                                .append(testClass.getName())
-                                .append(" ")
-                                .append(testMethod.getName())
-                                .append("()");
-                    }
-                }));
+                Switch.switchCase(
+                        ExtendedEngineDescriptor.class,
+                        consumer -> {
+                            // DO NOTHING
+                        }),
+                Switch.switchCase(
+                        ClassTestDescriptor.class,
+                        consumer -> {
+                            if (logPassMessages) {
+                                ClassTestDescriptor classTestDescriptor =
+                                        (ClassTestDescriptor) testDescriptor;
+                                Class<?> testClass = classTestDescriptor.getTestClass();
+                                stringBuilder.append("%s | ").append(testClass.getName());
+                            }
+                        }),
+                Switch.switchCase(
+                        ArgumentTestDescriptor.class,
+                        consumer -> {
+                            if (logPassMessages) {
+                                ArgumentTestDescriptor argumentTestDescriptor =
+                                        (ArgumentTestDescriptor) testDescriptor;
+                                Class<?> testClass = argumentTestDescriptor.getTestClass();
+                                Argument testArgument = argumentTestDescriptor.getTestArgument();
+                                String testArgumentName = testArgument.name();
+                                stringBuilder
+                                        .append("%s | ")
+                                        .append(testArgumentName)
+                                        .append(" | ")
+                                        .append(testClass.getName());
+                            }
+                        }),
+                Switch.switchCase(
+                        MethodTestDescriptor.class,
+                        consumer -> {
+                            if (logPassMessages) {
+                                MethodTestDescriptor methodTestDescriptor =
+                                        (MethodTestDescriptor) testDescriptor;
+                                Class<?> testClass = methodTestDescriptor.getTestClass();
+                                Method testMethod = methodTestDescriptor.getTestMethod();
+                                Argument testArgument = methodTestDescriptor.getTestArgument();
+                                String testArgumentName = testArgument.name();
+                                stringBuilder
+                                        .append("%s | ")
+                                        .append(testArgumentName)
+                                        .append(" | ")
+                                        .append(testClass.getName())
+                                        .append(" ")
+                                        .append(testMethod.getName())
+                                        .append("()");
+                            }
+                        }));
 
         if (stringBuilder.length() > 0) {
             TestExecutionResult.Status status = testExecutionResult.getStatus();
             String string = null;
             switch (status) {
-                case ABORTED: {
-                    string = String.format(stringBuilder.toString(), SKIP);
-                    break;
-                }
-                case FAILED: {
-                    string = String.format(stringBuilder.toString(), FAIL);
-                    break;
-                }
-                case SUCCESSFUL: {
-                    string = String.format(stringBuilder.toString(), PASS);
-                    break;
-                }
-                default: {
-                    // DO NOTHING
-                    break;
-                }
+                case ABORTED:
+                    {
+                        string = String.format(stringBuilder.toString(), SKIP);
+                        break;
+                    }
+                case FAILED:
+                    {
+                        string = String.format(stringBuilder.toString(), FAIL);
+                        break;
+                    }
+                case SUCCESSFUL:
+                    {
+                        string = String.format(stringBuilder.toString(), PASS);
+                        break;
+                    }
+                default:
+                    {
+                        // DO NOTHING
+                        break;
+                    }
             }
 
             if (detailedOutput && string != null) {
@@ -515,12 +550,17 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
 
         System.out.println(
                 INFO
-                + AnsiColor.WHITE_BRIGHT.apply(
-                        "Total Test Time : "
-                                + HumanReadableTime.toHumanReadable(elapsedTime, false)
-                                + " (" + elapsedTime + " ms)"));
+                        + AnsiColor.WHITE_BRIGHT.apply(
+                                "Total Test Time : "
+                                        + HumanReadableTime.toHumanReadable(elapsedTime, false)
+                                        + " ("
+                                        + elapsedTime
+                                        + " ms)"));
 
-        System.out.println(INFO + AnsiColor.WHITE_BRIGHT.apply("Finished At     : " + HumanReadableTime.now()));
+        System.out.println(
+                INFO
+                        + AnsiColor.WHITE_BRIGHT.apply(
+                                "Finished At     : " + HumanReadableTime.now()));
 
         if (!hasFailures()) {
             System.out.println(INFO + SEPARATOR);
@@ -533,7 +573,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
      * @param values values
      * @return the return value
      */
-    private long getColumnWith(long ... values) {
+    private long getColumnWith(long... values) {
         long width = 0;
 
         for (long value : values) {
@@ -561,9 +601,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
         return paddingStringBuilder.append(stringValue).toString();
     }
 
-    /**
-     * Class to implement test summary metrics
-     */
+    /** Class to implement test summary metrics */
     private static class Summary {
 
         private long startMilliseconds;
@@ -695,26 +733,31 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
             }
         }
 
-        public void executionFinished(TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
+        public void executionFinished(
+                TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
             if (testDescriptor instanceof ClassTestDescriptor) {
                 TestExecutionResult.Status status = testExecutionResult.getStatus();
                 switch (status) {
-                    case SUCCESSFUL: {
-                        testClassesSuccess.incrementAndGet();
-                        break;
-                    }
-                    case FAILED: {
-                        testClassesFailed.incrementAndGet();
-                        break;
-                    }
-                    case ABORTED: {
-                        testClassesSkipped.incrementAndGet();
-                        break;
-                    }
-                    default: {
-                        // DO NOTHING
-                        break;
-                    }
+                    case SUCCESSFUL:
+                        {
+                            testClassesSuccess.incrementAndGet();
+                            break;
+                        }
+                    case FAILED:
+                        {
+                            testClassesFailed.incrementAndGet();
+                            break;
+                        }
+                    case ABORTED:
+                        {
+                            testClassesSkipped.incrementAndGet();
+                            break;
+                        }
+                    default:
+                        {
+                            // DO NOTHING
+                            break;
+                        }
                 }
 
                 return;
@@ -723,44 +766,52 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
             if (testDescriptor instanceof ArgumentTestDescriptor) {
                 TestExecutionResult.Status status = testExecutionResult.getStatus();
                 switch (status) {
-                    case SUCCESSFUL: {
-                        argumentsSuccess.incrementAndGet();
-                        break;
-                    }
-                    case FAILED: {
-                        argumentsFailed.incrementAndGet();
-                        break;
-                    }
-                    case ABORTED: {
-                        argumentsSkipped.incrementAndGet();
-                        break;
-                    }
-                    default: {
-                        // DO NOTHING
-                        break;
-                    }
+                    case SUCCESSFUL:
+                        {
+                            argumentsSuccess.incrementAndGet();
+                            break;
+                        }
+                    case FAILED:
+                        {
+                            argumentsFailed.incrementAndGet();
+                            break;
+                        }
+                    case ABORTED:
+                        {
+                            argumentsSkipped.incrementAndGet();
+                            break;
+                        }
+                    default:
+                        {
+                            // DO NOTHING
+                            break;
+                        }
                 }
             }
 
             if (testDescriptor instanceof MethodTestDescriptor) {
                 TestExecutionResult.Status status = testExecutionResult.getStatus();
                 switch (status) {
-                    case SUCCESSFUL: {
-                        methodsSuccess.incrementAndGet();
-                        break;
-                    }
-                    case FAILED: {
-                        methodsFailed.incrementAndGet();
-                        break;
-                    }
-                    case ABORTED: {
-                        methodsSkipped.incrementAndGet();
-                        break;
-                    }
-                    default: {
-                        // DO NOTHING
-                        break;
-                    }
+                    case SUCCESSFUL:
+                        {
+                            methodsSuccess.incrementAndGet();
+                            break;
+                        }
+                    case FAILED:
+                        {
+                            methodsFailed.incrementAndGet();
+                            break;
+                        }
+                    case ABORTED:
+                        {
+                            methodsSkipped.incrementAndGet();
+                            break;
+                        }
+                    default:
+                        {
+                            // DO NOTHING
+                            break;
+                        }
                 }
             }
         }

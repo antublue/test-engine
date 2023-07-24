@@ -10,8 +10,7 @@ import java.util.stream.Stream;
 @TestEngine.BaseClass
 public class BaseTest {
 
-    @TestEngine.Argument
-    protected IntegerArgument integerArgument;
+    @TestEngine.Argument protected IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
     protected static Stream<IntegerArgument> arguments() {

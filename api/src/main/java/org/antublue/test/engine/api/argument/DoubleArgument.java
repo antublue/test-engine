@@ -18,9 +18,7 @@ package org.antublue.test.engine.api.argument;
 
 import java.util.Objects;
 
-/**
- * Class to implement a DoubleArgument
- */
+/** Class to implement a DoubleArgument */
 public class DoubleArgument extends AbstractArgument {
 
     private final String name;

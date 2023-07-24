@@ -16,6 +16,10 @@
 
 package org.antublue.test.engine.maven.plugin;
 
+import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE;
+import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN;
+import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
+
 import org.antublue.test.engine.internal.ConfigurationParameters;
 import org.antublue.test.engine.internal.ConsoleTestExecutionListener;
 import org.antublue.test.engine.internal.util.AnsiColor;
@@ -47,13 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE;
-import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN;
-import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
-
-/**
- * Class to implement a Maven plugin to run the AntuBLUE Test Engine
- */
+/** Class to implement a Maven plugin to run the AntuBLUE Test Engine */
 @SuppressWarnings({"unused", "deprecation"})
 @Mojo(name = "test", threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST)
 public class TestEngineMavenPlugin extends AbstractMojo {
@@ -80,7 +78,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
 
-    @Parameter(property ="project", required = true, readonly = true)
+    @Parameter(property = "project", required = true, readonly = true)
     private MavenProject mavenProject;
 
     @Parameter(property = "properties")
@@ -107,40 +105,58 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         }
 
         Optional.ofNullable(properties)
-                .ifPresent(map ->
-                        map.forEach((key, value) -> {
-                            if (key != null && value != null) {
-                                System.setProperty(key, value);
-                                debug("system property [%s] = [%s]", key, value);
-                            }
-                        }));
+                .ifPresent(
+                        map ->
+                                map.forEach(
+                                        (key, value) -> {
+                                            if (key != null && value != null) {
+                                                System.setProperty(key, value);
+                                                debug("system property [%s] = [%s]", key, value);
+                                            }
+                                        }));
 
         try {
             Set<Path> artifactPaths = new LinkedHashSet<>();
 
             Optional.ofNullable(mavenProject.getCompileClasspathElements())
                     .ifPresent(
-                            strings -> strings.forEach(string -> artifactPaths.add(new File(string).toPath())));
+                            strings ->
+                                    strings.forEach(
+                                            string ->
+                                                    artifactPaths.add(new File(string).toPath())));
 
             Optional.ofNullable(mavenProject.getRuntimeClasspathElements())
                     .ifPresent(
-                            strings -> strings.forEach(string -> artifactPaths.add(new File(string).toPath())));
+                            strings ->
+                                    strings.forEach(
+                                            string ->
+                                                    artifactPaths.add(new File(string).toPath())));
 
             Optional.ofNullable(mavenProject.getTestClasspathElements())
                     .ifPresent(
-                            strings -> strings.forEach(string -> artifactPaths.add(new File(string).toPath())));
+                            strings ->
+                                    strings.forEach(
+                                            string ->
+                                                    artifactPaths.add(new File(string).toPath())));
 
             Optional.ofNullable(mavenProject.getArtifact())
-                    .ifPresent(
-                            artifact -> artifactPaths.add(artifact.getFile().toPath()));
+                    .ifPresent(artifact -> artifactPaths.add(artifact.getFile().toPath()));
 
             Optional.ofNullable(mavenProject.getDependencyArtifacts())
                     .ifPresent(
-                            artifacts -> artifacts.forEach(artifact -> artifactPaths.add(artifact.getFile().toPath())));
+                            artifacts ->
+                                    artifacts.forEach(
+                                            artifact ->
+                                                    artifactPaths.add(
+                                                            artifact.getFile().toPath())));
 
             Optional.ofNullable(mavenProject.getAttachedArtifacts())
                     .ifPresent(
-                            artifacts -> artifacts.forEach(artifact -> artifactPaths.add(artifact.getFile().toPath())));
+                            artifacts ->
+                                    artifacts.forEach(
+                                            artifact ->
+                                                    artifactPaths.add(
+                                                            artifact.getFile().toPath())));
 
             Set<URL> urls = new LinkedHashSet<>();
             for (Path path : artifactPaths) {
@@ -157,15 +173,13 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
             Thread.currentThread().setContextClassLoader(classLoader);
 
-            org.junit.platform.engine.ConfigurationParameters configurationParameters = new ConfigurationParameters();
+            org.junit.platform.engine.ConfigurationParameters configurationParameters =
+                    new ConfigurationParameters();
 
             ConsoleTestExecutionListener consoleTestExecutionListener =
                     new ConsoleTestExecutionListener(configurationParameters);
 
-            LauncherConfig launcherConfig =
-                    LauncherConfig
-                            .builder()
-                            .build();
+            LauncherConfig launcherConfig = LauncherConfig.builder().build();
 
             LauncherDiscoveryRequest launcherDiscoveryRequest =
                     LauncherDiscoveryRequestBuilder.request()
@@ -202,7 +216,8 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             throw new SuppressedStackTraceException(stringBuilder.toString());
         } catch (Throwable t) {
             t.printStackTrace();
-            throw new MojoExecutionException("General AntuBLUE Test Engine Maven Plugin Exception", t);
+            throw new MojoExecutionException(
+                    "General AntuBLUE Test Engine Maven Plugin Exception", t);
         }
     }
 
@@ -223,7 +238,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      */
     private void debug(String format, Object object) {
         if (log.isDebugEnabled()) {
-            debug(format, new Object[]{object});
+            debug(format, new Object[] {object});
         }
     }
 
@@ -233,7 +248,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      * @param format format
      * @param objects objects
      */
-    private void debug(String format, Object ... objects) {
+    private void debug(String format, Object... objects) {
         if (log.isDebugEnabled()) {
             debug(String.format(format, objects));
         }
@@ -250,9 +265,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         }
     }
 
-    /**
-     * Method to log an empty INFO message
-     */
+    /** Method to log an empty INFO message */
     private void info() {
         info("");
     }
@@ -263,7 +276,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      * @param format format
      * @param objects objects
      */
-    private void info(String format, Object ... objects) {
+    private void info(String format, Object... objects) {
         info(String.format(format, objects));
     }
 

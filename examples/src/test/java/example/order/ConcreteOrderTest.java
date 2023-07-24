@@ -1,5 +1,7 @@
 package example.order;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
@@ -7,11 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Example test
- */
+/** Example test */
 @TestEngine.Order(order = 3)
 public class ConcreteOrderTest extends BaseOrderTest {
 
@@ -41,18 +39,18 @@ public class ConcreteOrderTest extends BaseOrderTest {
 
     @TestEngine.Test
     public void testA() {
-        System.out.println("testA(" + stringArgument  + ")");
+        System.out.println("testA(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     public void testB() {
-        System.out.println("testB(" + stringArgument  + ")");
+        System.out.println("testB(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 2)
     public void test3() {
-        System.out.println("test3(" + stringArgument  + ")");
+        System.out.println("test3(" + stringArgument + ")");
     }
 
     @TestEngine.AfterAll

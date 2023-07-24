@@ -35,9 +35,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Class to implement an argument test descriptor
- */
+/** Class to implement an argument test descriptor */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor {
 
@@ -54,7 +52,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param testClass testClass
      * @param testArgument testArgument
      */
-    ArgumentTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Argument testArgument) {
+    ArgumentTestDescriptor(
+            UniqueId uniqueId, String displayName, Class<?> testClass, Argument testArgument) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testArgument = testArgument;
@@ -72,6 +71,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
     /**
      * Method to get the test descriptor Type
+     *
      * @return the return value
      */
     @Override
@@ -117,21 +117,15 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         return testArgument;
     }
 
-    /**
-     * Method to execute the test descriptor
-     */
+    /** Method to execute the test descriptor */
     @Override
     public void execute(ExecutorContext executorContext) {
         LOGGER.trace(
                 "execute uniqueId [%s] testClass [%s] testArgument [%s]",
-                getUniqueId(),
-                testClass.getName(),
-                testArgument.name());
+                getUniqueId(), testClass.getName(), testArgument.name());
 
         EngineExecutionListener engineExecutionListener =
-                executorContext
-                        .getExecutionRequest()
-                        .getEngineExecutionListener();
+                executorContext.getExecutionRequest().getEngineExecutionListener();
 
         engineExecutionListener.executionStarted(this);
 
@@ -143,9 +137,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         LOGGER.trace(
                 "set field testClass [%s] field [%s] testArgument [%s]",
-                testClass.getName(),
-                field.getName(),
-                testArgument.name());
+                testClass.getName(), field.getName(), testArgument.name());
 
         ReflectionUtils.setField(testInstance, field, testArgument, throwableCollector);
 
@@ -154,16 +146,11 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             for (Method method : methods) {
                 LOGGER.trace(
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
-                        getUniqueId(),
-                        testClass.getName(),
-                        method.getName());
+                        getUniqueId(), testClass.getName(), method.getName());
 
                 LockAnnotationUtils.processLockAnnotations(method);
 
-                ReflectionUtils.invoke(
-                        testInstance,
-                        method,
-                        throwableCollector);
+                ReflectionUtils.invoke(testInstance, method, throwableCollector);
 
                 LockAnnotationUtils.processUnlockAnnotations(method);
 
@@ -176,11 +163,11 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         List<MethodTestDescriptor> methodTestDescriptors = getChildren(MethodTestDescriptor.class);
 
         if (throwableCollector.isEmpty()) {
-           methodTestDescriptors
-                   .forEach(methodTestDescriptor -> methodTestDescriptor.execute(executorContext));
+            methodTestDescriptors.forEach(
+                    methodTestDescriptor -> methodTestDescriptor.execute(executorContext));
         } else {
-            methodTestDescriptors
-                    .forEach(methodTestDescriptor -> {
+            methodTestDescriptors.forEach(
+                    methodTestDescriptor -> {
                         LOGGER.trace(
                                 "skip uniqueId [%s] testClass [%s] testMethod [%s]",
                                 methodTestDescriptor.getUniqueId(),
@@ -195,30 +182,21 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         for (Method method : methods) {
             LOGGER.trace(
                     "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
-                    getUniqueId(),
-                    testClass.getName(),
-                    method.getName());
+                    getUniqueId(), testClass.getName(), method.getName());
 
             LockAnnotationUtils.processLockAnnotations(method);
 
-            ReflectionUtils.invoke(
-                    testInstance,
-                    method,
-                    throwableCollector);
+            ReflectionUtils.invoke(testInstance, method, throwableCollector);
 
             LockAnnotationUtils.processUnlockAnnotations(method);
         }
 
-        AutoCloseAnnotationUtils
-                .processAutoCloseAnnotatedFields(
-                        testInstance,
-                        "@TestEngine.AfterAll",
-                        throwableCollector);
+        AutoCloseAnnotationUtils.processAutoCloseAnnotatedFields(
+                testInstance, "@TestEngine.AfterAll", throwableCollector);
 
         LOGGER.trace(
                 "set field testClass [%s] field [%s] testArgument[null]",
-                testClass.getName(),
-                field.getName());
+                testClass.getName(), field.getName());
 
         ReflectionUtils.setField(testInstance, field, null, throwable -> {});
 
@@ -226,11 +204,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
         } else {
             engineExecutionListener.executionFinished(
-                    this,
-                    TestExecutionResult.failed(
-                            throwableCollector
-                                    .getFirst()
-                                    .orElse(null)));
+                    this, TestExecutionResult.failed(throwableCollector.getFirst().orElse(null)));
         }
     }
 }

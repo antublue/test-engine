@@ -19,15 +19,11 @@ package org.antublue.test.engine.internal.util;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/**
- * Class to implement switch functionally based on an Object's class
- */
+/** Class to implement switch functionally based on an Object's class */
 @SuppressWarnings("unchecked")
 public final class Switch {
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     private Switch() {
         // DO NOTHING
     }
@@ -57,8 +53,7 @@ public final class Switch {
     public static <T> Consumer<T> switchCase(Class<T> clazz, Consumer<T> consumer) {
         if (clazz != null && consumer != null) {
             return object ->
-                    Optional
-                            .ofNullable(object)
+                    Optional.ofNullable(object)
                             .filter(clazz::isInstance)
                             .map(clazz::cast)
                             .ifPresent(consumer);

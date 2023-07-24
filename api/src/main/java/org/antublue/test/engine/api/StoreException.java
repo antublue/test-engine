@@ -16,9 +16,7 @@
 
 package org.antublue.test.engine.api;
 
-/**
- * Class to implement a generic TestEngineException
- */
+/** Class to implement a generic TestEngineException */
 public class StoreException extends RuntimeException {
 
     /**

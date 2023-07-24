@@ -1,5 +1,7 @@
 package example;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
@@ -9,20 +11,14 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Example test
- */
+/** Example test */
 public class FilteredArgumentStreamTest {
 
-    @TestEngine.Argument
-    protected StringArgument stringArgument;
+    @TestEngine.Argument protected StringArgument stringArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
-        return ArgumentSupplier
-                .arguments(integerArgument -> !integerArgument.value().contains("b"))
+        return ArgumentSupplier.arguments(integerArgument -> !integerArgument.value().contains("b"))
                 .collect(Collectors.toList())
                 .stream();
     }
@@ -34,13 +30,13 @@ public class FilteredArgumentStreamTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument  + ")");
+        System.out.println("test1(" + stringArgument + ")");
         assertThat(stringArgument.value()).isNotEqualTo("b");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument  + ")");
+        System.out.println("test2(" + stringArgument + ")");
         assertThat(stringArgument.value()).isNotEqualTo("b");
     }
 
@@ -51,7 +47,7 @@ public class FilteredArgumentStreamTest {
 
     private static class ArgumentSupplier {
 
-        private static final String[] VALUES = { "a", "b", "c" };
+        private static final String[] VALUES = {"a", "b", "c"};
 
         private ArgumentSupplier() {
             // DO NOTHING

@@ -16,9 +16,7 @@
 
 package org.antublue.test.engine.internal;
 
-/**
- * Class to implement a test class configuration exception
- */
+/** Class to implement a test class configuration exception */
 public class TestClassConfigurationException extends RuntimeException {
 
     /**

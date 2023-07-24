@@ -20,9 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-/**
- * Class to get TestEngine information
- */
+/** Class to get TestEngine information */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Information {
 

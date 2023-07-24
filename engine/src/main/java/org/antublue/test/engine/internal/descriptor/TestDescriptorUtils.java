@@ -17,8 +17,8 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.internal.TestClassConfigurationException;
 import org.antublue.test.engine.internal.ReflectionUtils;
+import org.antublue.test.engine.internal.TestClassConfigurationException;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Switch;
@@ -28,16 +28,12 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.lang.reflect.Method;
 
-/**
- * Class to contain TestDescriptor utility methods
- */
+/** Class to contain TestDescriptor utility methods */
 public final class TestDescriptorUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptorUtils.class);
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     private TestDescriptorUtils() {
         // DO NOTHING
     }
@@ -49,14 +45,10 @@ public final class TestDescriptorUtils {
      * @param clazz clazz
      * @return the return value
      */
-    public static ClassTestDescriptor createClassTestDescriptor(
-            UniqueId uniqueId, Class<?> clazz) {
+    public static ClassTestDescriptor createClassTestDescriptor(UniqueId uniqueId, Class<?> clazz) {
         validateTestClass(clazz);
 
-        return new ClassTestDescriptor(
-                uniqueId,
-                ReflectionUtils.getDisplayName(clazz),
-                clazz);
+        return new ClassTestDescriptor(uniqueId, ReflectionUtils.getDisplayName(clazz), clazz);
     }
 
     /**
@@ -88,15 +80,10 @@ public final class TestDescriptorUtils {
         validateTestClass(clazz);
 
         return new MethodTestDescriptor(
-                uniqueId,
-                ReflectionUtils.getDisplayName(method),
-                clazz,
-                argument,
-                method);
+                uniqueId, ReflectionUtils.getDisplayName(method), clazz, argument, method);
     }
 
     /**
-     *
      * @param testDescriptor testDescriptor
      */
     public static void logTestDescriptorTree(TestDescriptor testDescriptor) {
@@ -121,7 +108,8 @@ public final class TestDescriptorUtils {
             stringBuilder.append(" ");
         }
 
-        Switch.switchType(testDescriptor,
+        Switch.switchType(
+                testDescriptor,
                 Switch.switchCase(
                         MethodTestDescriptor.class,
                         methodTestDescriptor ->
@@ -150,9 +138,7 @@ public final class TestDescriptorUtils {
 
         LOGGER.trace(stringBuilder.toString());
 
-        testDescriptor
-                .getChildren()
-                .forEach(t -> logTestDescriptorTree(t, indent + 2));
+        testDescriptor.getChildren().forEach(t -> logTestDescriptorTree(t, indent + 2));
     }
 
     private static void validateTestClass(Class<?> clazz) {
@@ -160,7 +146,8 @@ public final class TestDescriptorUtils {
         if (ReflectionUtils.getArgumentSupplierMethod(clazz) == null) {
             throw new TestClassConfigurationException(
                     String.format(
-                            "Test class [%s] must declare a static @TestEngine.ArgumentSupplier method",
+                            "Test class [%s] must declare a static @TestEngine.ArgumentSupplier"
+                                    + " method",
                             clazz.getName()));
         }
 

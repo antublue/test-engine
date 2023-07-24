@@ -18,9 +18,7 @@ package org.antublue.test.engine.api.argument;
 
 import java.util.Objects;
 
-/**
- * Class to implement a ShortArgument
- */
+/** Class to implement a ShortArgument */
 public class ShortArgument extends AbstractArgument {
 
     private final String name;

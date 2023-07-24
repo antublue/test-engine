@@ -5,14 +5,11 @@ import org.antublue.test.engine.api.argument.StringArgument;
 
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class Junit5ReplacementExampleTest {
 
     // The stringArgument is required by the test engine, but is not actually used in test methods
-    @TestEngine.Argument
-    protected StringArgument stringArgument;
+    @TestEngine.Argument protected StringArgument stringArgument;
 
     // The stringArgument provides a node in the hierarchy, but is not actually used in test methods
     @TestEngine.ArgumentSupplier
@@ -20,7 +17,8 @@ public class Junit5ReplacementExampleTest {
         return Stream.of(StringArgument.of("tests"));
     }
 
-    // For a single Argument, a @TestEngine.Prepare method is equivalent to a @TestEngine.BeforeAll method
+    // For a single Argument, a @TestEngine.Prepare method is equivalent to a @TestEngine.BeforeAll
+    // method
 
     @TestEngine.BeforeAll
     public void beforeAll() {
@@ -52,5 +50,6 @@ public class Junit5ReplacementExampleTest {
         System.out.println("afterAll()");
     }
 
-    // For a single Argument, a @TestEngine.Conclude method is equivalent to a @TestEngine.AfterAll method
+    // For a single Argument, a @TestEngine.Conclude method is equivalent to a @TestEngine.AfterAll
+    // method
 }

@@ -7,11 +7,11 @@ import java.util.stream.Stream;
 public abstract class OddBaseTest extends BaseTest {
 
     protected static Stream<IntegerArgument> arguments() {
-        return BaseTest
-                .arguments()
-                .filter(argument -> {
-                    int value = argument.value();
-                    return (value % 2) != 0;
-                });
+        return BaseTest.arguments()
+                .filter(
+                        argument -> {
+                            int value = argument.value();
+                            return (value % 2) != 0;
+                        });
     }
 }

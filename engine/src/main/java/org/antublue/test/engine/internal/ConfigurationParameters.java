@@ -21,11 +21,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-/**
- * Class to implement TestEngineConfiguration
- */
+/** Class to implement TestEngineConfiguration */
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
-    
+
     @Override
     public Optional<String> get(String key) {
         return Optional.ofNullable(resolve(key));
@@ -55,7 +53,8 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
     }
 
     /**
-     * Method to resolve a configuration key first as a Java property, then as an environment variable
+     * Method to resolve a configuration key first as a Java property, then as an environment
+     * variable
      *
      * @param key key
      * @return the return value

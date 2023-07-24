@@ -18,9 +18,7 @@ package org.antublue.test.engine.api.argument;
 
 import java.util.Objects;
 
-/**
- * Class to implement a StringArgument
- */
+/** Class to implement a StringArgument */
 public class StringArgument extends AbstractArgument {
 
     private final String name;

@@ -6,13 +6,10 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Example test
- */
+/** Example test */
 public class ListTest {
 
-    @TestEngine.Argument
-    protected IntegerArgument integerArgument;
+    @TestEngine.Argument protected IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
     public static List<IntegerArgument> arguments() {

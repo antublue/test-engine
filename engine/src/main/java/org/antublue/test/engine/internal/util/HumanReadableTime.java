@@ -21,16 +21,12 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Class to create a human-readable time from a duration
- */
+/** Class to create a human-readable time from a duration */
 // Suppress PMD.UselessParentheses - PMD has bug around UselessParentheses calculating milliseconds
-@SuppressWarnings({ "PMD.NPathComplexity", "PMD.UselessParentheses" })
+@SuppressWarnings({"PMD.NPathComplexity", "PMD.UselessParentheses"})
 public final class HumanReadableTime {
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     private HumanReadableTime() {
         // DO NOTHING
     }
@@ -57,8 +53,12 @@ public final class HumanReadableTime {
 
         long hours = TimeUnit.MILLISECONDS.toHours(durationPositive);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(durationPositive) - (hours * 60);
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(durationPositive) - ((hours * 60 * 60) + (minutes * 60));
-        long milliseconds = durationPositive - ((hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
+        long seconds =
+                TimeUnit.MILLISECONDS.toSeconds(durationPositive)
+                        - ((hours * 60 * 60) + (minutes * 60));
+        long milliseconds =
+                durationPositive
+                        - ((hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
 
         StringBuilder stringBuilder = new StringBuilder();
 

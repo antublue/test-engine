@@ -1,27 +1,21 @@
 package org.antublue.test.engine.testing;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
-/**
- * Test used for debugging IntelliJ
- */
+/** Test used for debugging IntelliJ */
 @TestEngine.Disabled
 public class DebugTestA {
 
-    @TestEngine.Argument
-    public IntegerArgument integerArgument;
+    @TestEngine.Argument public IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<IntegerArgument> arguments() {
-        return Stream.of(
-                IntegerArgument.of(1),
-                IntegerArgument.of(2),
-                IntegerArgument.of(3));
+        return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
     }
 
     @TestEngine.BeforeAll

@@ -21,16 +21,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/**
- * Class to collect a list of Throwable Exceptions
- */
+/** Class to collect a list of Throwable Exceptions */
 public class ThrowableCollector implements Consumer<Throwable> {
 
     private final List<Throwable> throwableList;
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     public ThrowableCollector() {
         throwableList = new ArrayList<>();
     }
@@ -94,8 +90,7 @@ public class ThrowableCollector implements Consumer<Throwable> {
     }
 
     /**
-     * Method to accept a Throwable, adding to
-     * the collector and printing the stack trace
+     * Method to accept a Throwable, adding to the collector and printing the stack trace
      *
      * @param throwable throwable
      */

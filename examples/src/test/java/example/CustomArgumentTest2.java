@@ -8,14 +8,11 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 @SuppressWarnings("unchecked")
 public class CustomArgumentTest2 {
 
-    @TestEngine.Argument
-    private CustomArgument customArgument;
+    @TestEngine.Argument private CustomArgument customArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<Argument> arguments() {
@@ -23,9 +20,7 @@ public class CustomArgumentTest2 {
         for (int i = 0; i < 10; i++) {
             collection.add(
                     CustomArgument.of(
-                            "CustomArgument(" + i + ")",
-                            "FirstName" + i,
-                            "LastName" + i));
+                            "CustomArgument(" + i + ")", "FirstName" + i, "LastName" + i));
         }
         return collection.stream();
     }
@@ -37,12 +32,22 @@ public class CustomArgumentTest2 {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + customArgument.getFirstName() + " " + customArgument.getLastName() + ")");
+        System.out.println(
+                "test1("
+                        + customArgument.getFirstName()
+                        + " "
+                        + customArgument.getLastName()
+                        + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test1(" + customArgument.getFirstName() + " " + customArgument.getLastName() + ")");
+        System.out.println(
+                "test1("
+                        + customArgument.getFirstName()
+                        + " "
+                        + customArgument.getLastName()
+                        + ")");
     }
 
     @TestEngine.AfterAll

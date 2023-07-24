@@ -24,9 +24,7 @@ import org.junit.platform.engine.discovery.ClassNameFilter;
 import java.util.List;
 import java.util.function.Predicate;
 
-/**
- * Class to implement a Predicate to filter a Class based on a List of ClassNameFilters
- */
+/** Class to implement a Predicate to filter a Class based on a List of ClassNameFilters */
 public class ClassNameFiltersPredicate implements Predicate<Class<?>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassNameFiltersPredicate.class);

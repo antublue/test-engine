@@ -7,14 +7,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 @TestEngine.Order(order = 1)
 public class ClassOrderTest2 {
 
-    @TestEngine.Argument
-    protected StringArgument stringArgument;
+    @TestEngine.Argument protected StringArgument stringArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
@@ -33,12 +30,12 @@ public class ClassOrderTest2 {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument  + ")");
+        System.out.println("test1(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument  + ")");
+        System.out.println("test2(" + stringArgument + ")");
     }
 
     @TestEngine.AfterEach
@@ -56,7 +53,8 @@ public class ClassOrderTest2 {
         public static Stream<StringArgument> arguments() {
             Collection<StringArgument> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(org.antublue.test.engine.api.argument.StringArgument.of(String.valueOf(i)));
+                collection.add(
+                        org.antublue.test.engine.api.argument.StringArgument.of(String.valueOf(i)));
             }
             return collection.stream();
         }

@@ -5,9 +5,7 @@ import org.antublue.test.engine.api.argument.AbstractArgument;
 
 import java.util.stream.Stream;
 
-/**
- * Example test
- */
+/** Example test */
 public class ComplexArgumentExampleTest {
 
     @TestEngine.Argument
@@ -28,34 +26,34 @@ public class ComplexArgumentExampleTest {
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll(" + complexArgument.name()  + ")");
+        System.out.println("beforeAll(" + complexArgument.name() + ")");
 
         complexArgument.initialize();
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println("beforeEach(" + complexArgument.name()  + ")");
+        System.out.println("beforeEach(" + complexArgument.name() + ")");
     }
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + complexArgument.name()  + ")");
+        System.out.println("test1(" + complexArgument.name() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + complexArgument.name()  + ")");
+        System.out.println("test2(" + complexArgument.name() + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
-        System.out.println("afterEach(" + complexArgument.name()  + ")");
+        System.out.println("afterEach(" + complexArgument.name() + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll(" + complexArgument.name()  + ")");
+        System.out.println("afterAll(" + complexArgument.name() + ")");
     }
 
     @TestEngine.Conclude

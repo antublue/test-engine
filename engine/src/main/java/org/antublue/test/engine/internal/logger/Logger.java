@@ -25,9 +25,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * Class to implement a Logger
- */
+/** Class to implement a Logger */
 @SuppressWarnings("PMD.GodClass")
 public class Logger {
 
@@ -130,10 +128,9 @@ public class Logger {
      */
     public void trace(String format, Object object) {
         if (isTraceEnabled()) {
-            trace(format, new Object[]{object});
+            trace(format, new Object[] {object});
         }
     }
-
 
     /**
      * Method to log a TRACE message
@@ -179,7 +176,7 @@ public class Logger {
      */
     public void debug(String format, Object object) {
         if (isDebugEnabled()) {
-            debug(format, new Object[]{object});
+            debug(format, new Object[] {object});
         }
     }
 
@@ -227,7 +224,7 @@ public class Logger {
      */
     public void info(String format, Object object) {
         if (isInfoEnabled()) {
-            info(format, new Object[]{object});
+            info(format, new Object[] {object});
         }
     }
 
@@ -275,7 +272,7 @@ public class Logger {
      */
     public void warn(String format, Object object) {
         if (isWarnEnabled()) {
-            warn(format, new Object[]{object});
+            warn(format, new Object[] {object});
         }
     }
 
@@ -323,7 +320,7 @@ public class Logger {
      */
     public void error(String format, Object object) {
         if (isErrorEnabled()) {
-            error(format, new Object[]{object});
+            error(format, new Object[] {object});
         }
     }
 
@@ -366,12 +363,9 @@ public class Logger {
             dateTime = SIMPLE_DATE_FORMAT.format(new Date());
         }
 
-        return String.format("%s | %s | %s | %s | %s ",
-                dateTime,
-                Thread.currentThread().getName(),
-                level.toString(),
-                name,
-                message);
+        return String.format(
+                "%s | %s | %s | %s | %s ",
+                dateTime, Thread.currentThread().getName(), level.toString(), name, message);
     }
 
     /**

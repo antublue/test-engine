@@ -18,10 +18,8 @@ package org.antublue.test.engine.api.argument;
 
 import java.util.Objects;
 
-/**
- * Class to implement a ObjectArgument
- */
-public class ObjectArgument<T>  extends AbstractArgument {
+/** Class to implement a ObjectArgument */
+public class ObjectArgument<T> extends AbstractArgument {
 
     private final String name;
     private final T value;

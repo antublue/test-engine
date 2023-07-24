@@ -16,99 +16,61 @@
 
 package org.antublue.test.engine;
 
-/**
- * Class that contains Test Engine configuration constants
- */
+/** Class that contains Test Engine configuration constants */
 public final class Constants {
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String TRUE = "true";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String PREFIX = "antublue.test.engine";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String EXPERIMENTAL = ".experimental";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String CONSOLE_OUTPUT = PREFIX + ".console.output";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String THREAD_COUNT = PREFIX + ".thread.count";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String LOG_TEST_MESSAGES = PREFIX + EXPERIMENTAL + ".log.test.messages";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String LOG_PASS_MESSAGES = PREFIX + EXPERIMENTAL + ".log.pass.messages";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String LOG_SKIP_MESSAGES = PREFIX + EXPERIMENTAL + ".log.skip.messages";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String TEST_CLASS_SHUFFLE = PREFIX + ".test.class.shuffle";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String TEST_CLASS_INCLUDE = PREFIX + ".test.class.include";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String TEST_CLASS_EXCLUDE = PREFIX + ".test.class.exclude";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String TEST_METHOD_INCLUDE = PREFIX + ".test.method.include";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String TEST_METHOD_EXCLUDE = PREFIX + ".test.method.exclude";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String TEST_CLASS_TAG_INCLUDE = PREFIX + ".test.class.tag.include";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String TEST_CLASS_TAG_EXCLUDE = PREFIX + ".test.class.tag.exclude";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String TEST_METHOD_TAG_INCLUDE = PREFIX + ".test.method.tag.include";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String TEST_METHOD_TAG_EXCLUDE = PREFIX + ".test.method.tag.exclude";
 
-    /**
-     * Constructor
-     */
+    /** Constructor */
     private Constants() {
         // DO NOTHING
     }

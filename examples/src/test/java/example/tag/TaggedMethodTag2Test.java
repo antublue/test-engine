@@ -10,13 +10,12 @@ import java.util.stream.Stream;
 /**
  * Example test
  *
- * All test methods are executed due to the fact that the test engine system
- * properties / environment variables have to be defined during test discovery
+ * <p>All test methods are executed due to the fact that the test engine system properties /
+ * environment variables have to be defined during test discovery
  */
 public class TaggedMethodTag2Test {
 
-    @TestEngine.Argument
-    protected StringArgument stringArgument;
+    @TestEngine.Argument protected StringArgument stringArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
@@ -36,17 +35,17 @@ public class TaggedMethodTag2Test {
     @TestEngine.Test
     @TestEngine.Tag(tag = "/tag2/")
     public void test1() {
-        System.out.println("test1(" + stringArgument  + ")");
+        System.out.println("test1(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument  + ")");
+        System.out.println("test2(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     public void test3() {
-        System.out.println("test3(" + stringArgument  + ")");
+        System.out.println("test3(" + stringArgument + ")");
     }
 
     @TestEngine.AfterAll

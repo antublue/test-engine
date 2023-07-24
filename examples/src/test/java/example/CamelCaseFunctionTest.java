@@ -1,5 +1,7 @@
 package example;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.ObjectArgument;
 
@@ -9,12 +11,10 @@ import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Example test
  *
- * Made up... in real life you wouldn't do this
+ * <p>Made up... in real life you wouldn't do this
  */
 public class CamelCaseFunctionTest {
 
@@ -22,14 +22,14 @@ public class CamelCaseFunctionTest {
 
     private Tuple tuple;
 
-    @TestEngine.Argument
-    protected ObjectArgument<Tuple> objectArgument;
+    @TestEngine.Argument protected ObjectArgument<Tuple> objectArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<ObjectArgument<Tuple>> arguments() {
         Collection<ObjectArgument<Tuple>> collection = new ArrayList<>();
 
-        Tuple tuple = new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
+        Tuple tuple =
+                new Tuple("THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
         collection.add(new ObjectArgument<>(tuple.input, tuple));
 
         tuple = new Tuple("THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
@@ -53,7 +53,14 @@ public class CamelCaseFunctionTest {
     @TestEngine.Test
     public void test() {
         String actual = FUNCTION.apply(tuple.input);
-        System.out.println("test() input [" + tuple.input + "] expected [" + tuple.expected + "] actual [" + actual + "]");
+        System.out.println(
+                "test() input ["
+                        + tuple.input
+                        + "] expected ["
+                        + tuple.expected
+                        + "] actual ["
+                        + actual
+                        + "]");
         assertThat(actual).isEqualTo(tuple.expected);
     }
 
@@ -74,9 +81,11 @@ public class CamelCaseFunctionTest {
                 if (i == 0) {
                     word = word.isEmpty() ? word : word.toLowerCase(Locale.getDefault());
                 } else {
-                    word = word.isEmpty() ? word :
-                            (word.charAt(0) + "").toUpperCase(Locale.getDefault())
-                                    + word.substring(1).toLowerCase(Locale.getDefault());
+                    word =
+                            word.isEmpty()
+                                    ? word
+                                    : (word.charAt(0) + "").toUpperCase(Locale.getDefault())
+                                            + word.substring(1).toLowerCase(Locale.getDefault());
                 }
 
                 builder.append(word);

@@ -1,5 +1,7 @@
 package org.antublue.test.engine.testing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
@@ -8,11 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Example test
- */
+/** Example test */
 public class MethodOrderTest {
 
     private static final List<String> EXPECTED_ORDER = new ArrayList<>();
@@ -22,25 +20,24 @@ public class MethodOrderTest {
         EXPECTED_ORDER.add("prepare2()");
         EXPECTED_ORDER.add("prepare()");
 
-        StringArgumentSupplier
-                .arguments()
-                .forEach(stringArgument -> {
-                    EXPECTED_ORDER.add(stringArgument + ".beforeAll()");
-                    EXPECTED_ORDER.add(stringArgument + ".beforeEach()");
-                    EXPECTED_ORDER.add(stringArgument + ".test2()");
-                    EXPECTED_ORDER.add(stringArgument + ".afterEach()");
-                    EXPECTED_ORDER.add(stringArgument + ".beforeEach()");
-                    EXPECTED_ORDER.add(stringArgument + ".test1()");
-                    EXPECTED_ORDER.add(stringArgument + ".afterEach()");
-                    EXPECTED_ORDER.add(stringArgument + ".afterAll2()");
-                    EXPECTED_ORDER.add(stringArgument + ".afterAll()");
-                });
+        StringArgumentSupplier.arguments()
+                .forEach(
+                        stringArgument -> {
+                            EXPECTED_ORDER.add(stringArgument + ".beforeAll()");
+                            EXPECTED_ORDER.add(stringArgument + ".beforeEach()");
+                            EXPECTED_ORDER.add(stringArgument + ".test2()");
+                            EXPECTED_ORDER.add(stringArgument + ".afterEach()");
+                            EXPECTED_ORDER.add(stringArgument + ".beforeEach()");
+                            EXPECTED_ORDER.add(stringArgument + ".test1()");
+                            EXPECTED_ORDER.add(stringArgument + ".afterEach()");
+                            EXPECTED_ORDER.add(stringArgument + ".afterAll2()");
+                            EXPECTED_ORDER.add(stringArgument + ".afterAll()");
+                        });
 
         EXPECTED_ORDER.add("conclude()");
     }
 
-    @TestEngine.Argument
-    protected StringArgument stringArgument;
+    @TestEngine.Argument protected StringArgument stringArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
@@ -83,7 +80,7 @@ public class MethodOrderTest {
     @TestEngine.Test
     @TestEngine.Order(order = 1)
     public void test1() {
-        System.out.println("test1(" + stringArgument  + ")");
+        System.out.println("test1(" + stringArgument + ")");
 
         ACTUAL_ORDER.add(stringArgument + ".test1()");
     }
@@ -91,7 +88,7 @@ public class MethodOrderTest {
     @TestEngine.Test
     @TestEngine.Order(order = 0)
     public void test2() {
-        System.out.println("test2(" + stringArgument  + ")");
+        System.out.println("test2(" + stringArgument + ")");
 
         ACTUAL_ORDER.add(stringArgument + ".test2()");
     }

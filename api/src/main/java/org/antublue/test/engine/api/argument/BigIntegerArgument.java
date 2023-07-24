@@ -19,9 +19,7 @@ package org.antublue.test.engine.api.argument;
 import java.math.BigInteger;
 import java.util.Objects;
 
-/**
- * Class to implement a BigIntegerArgument
- */
+/** Class to implement a BigIntegerArgument */
 public class BigIntegerArgument extends AbstractArgument {
 
     private final String name;

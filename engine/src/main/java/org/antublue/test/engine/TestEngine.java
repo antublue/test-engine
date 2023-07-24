@@ -16,13 +16,13 @@
 
 package org.antublue.test.engine;
 
-import org.antublue.test.engine.internal.TestClassConfigurationException;
 import org.antublue.test.engine.internal.ConfigurationParameters;
-import org.antublue.test.engine.internal.TestEngineException;
 import org.antublue.test.engine.internal.Executor;
 import org.antublue.test.engine.internal.Information;
-import org.antublue.test.engine.internal.TestDescriptorStore;
 import org.antublue.test.engine.internal.Resolver;
+import org.antublue.test.engine.internal.TestClassConfigurationException;
+import org.antublue.test.engine.internal.TestDescriptorStore;
+import org.antublue.test.engine.internal.TestEngineException;
 import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -34,42 +34,30 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 import java.util.Optional;
 
-/**
- * Class to implement the AntuBLUE Test Engine
- */
+/** Class to implement the AntuBLUE Test Engine */
 public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String ENGINE_ID = "antublue-test-engine";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String GROUP_ID = "org.antublue";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String ARTIFACT_ID = "test-engine";
 
-    /**
-     * Configuration constant
-     */
+    /** Configuration constant */
     public static final String VERSION = Information.getVersion();
 
-    /**
-     * Configuration constant
-     */
-    public static final String ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN = "__ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN__";
+    /** Configuration constant */
+    public static final String ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN =
+            "__ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN__";
 
-    /**
-     * Configuration constant
-     */
-    public static final String ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE = "__ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE__";
+    /** Configuration constant */
+    public static final String ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE =
+            "__ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE__";
 
     /**
      * Method to get the test engine id
@@ -119,15 +107,19 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      * @return the return value
      */
     @Override
-    public TestDescriptor discover(EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
+    public TestDescriptor discover(
+            EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
         LOGGER.trace("discover()");
 
         try {
-            org.junit.platform.engine.ConfigurationParameters configurationParameters = new ConfigurationParameters();
+            org.junit.platform.engine.ConfigurationParameters configurationParameters =
+                    new ConfigurationParameters();
 
-            EngineDescriptor engineDescriptor = new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
+            EngineDescriptor engineDescriptor =
+                    new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
 
-            new Resolver().resolve(engineDiscoveryRequest, configurationParameters, engineDescriptor);
+            new Resolver()
+                    .resolve(engineDiscoveryRequest, configurationParameters, engineDescriptor);
 
             // Store the test descriptors for use in the test execution listener
             TestDescriptorStore.getInstance().store(engineDescriptor);
