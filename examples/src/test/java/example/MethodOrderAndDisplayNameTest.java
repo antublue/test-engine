@@ -32,15 +32,15 @@ public class MethodOrderAndDisplayNameTest {
     }
 
     @TestEngine.Test
-    @TestEngine.Order(order = 1)
-    @TestEngine.DisplayName(name = "Test 2")
+    @TestEngine.Order(order = 2)
+    @TestEngine.DisplayName(name = "Test A")
     public void testA() {
         System.out.println("testA(" + integerArgument + ")");
     }
 
     @TestEngine.Test
-    @TestEngine.Order(order = 2)
-    @TestEngine.DisplayName(name = "Test 1")
+    @TestEngine.Order(order = 1)
+    @TestEngine.DisplayName(name = "Test B")
     public void testB() {
         System.out.println("testB(" + integerArgument + ")");
     }

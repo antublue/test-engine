@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Example test
  */
@@ -35,7 +37,7 @@ public class AutoCloseExampleTest1 {
 
     @TestEngine.Prepare
     public void prepare() {
-        System.out.println("prepare(" + stringArgument  + ")");
+        System.out.println("prepare()");
         concludeAutoCloseable = new TestAutoCloseable("concludeAutoCloseable");
     }
 
@@ -73,7 +75,9 @@ public class AutoCloseExampleTest1 {
 
     @TestEngine.Conclude
     public void conclude() {
-        System.out.println("conclude(" + stringArgument  + ")");
+        System.out.println("conclude()");
+
+        assertThat(stringArgument).isNull();
     }
 
     private static class TestAutoCloseable implements AutoCloseable {
