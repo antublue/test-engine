@@ -118,7 +118,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
     }
 
     /**
-     * Method to test the test descriptor
+     * Method to execute the test descriptor
      */
     @Override
     public void execute(ExecutorContext executorContext) {
@@ -128,8 +128,14 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 testClass.getName(),
                 testArgument.name());
 
-        EngineExecutionListener engineExecutionListener = executorContext.getEngineExecutionListener();
+        EngineExecutionListener engineExecutionListener =
+                executorContext
+                        .getExecutionRequest()
+                        .getEngineExecutionListener();
+
         engineExecutionListener.executionStarted(this);
+
+        Object testInstance = executorContext.getTestInstance();
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
@@ -171,10 +177,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         if (throwableCollector.isEmpty()) {
            methodTestDescriptors
-                   .forEach(methodTestDescriptor -> {
-                        methodTestDescriptor.setTestInstance(testInstance);
-                        methodTestDescriptor.execute(executorContext);
-                    });
+                   .forEach(methodTestDescriptor -> methodTestDescriptor.execute(executorContext));
         } else {
             methodTestDescriptors
                     .forEach(methodTestDescriptor -> {

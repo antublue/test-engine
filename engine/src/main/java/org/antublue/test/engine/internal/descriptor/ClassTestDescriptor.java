@@ -43,6 +43,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private final Class<?> testClass;
 
+    private Object testInstance;
+
     /**
      * Constructor
      *
@@ -105,20 +107,30 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
     }
 
     /**
-     * Method to test the test descriptor
+     * Method to execute the test descriptor
      */
     @Override
     public void execute(ExecutorContext executorContext) {
         LOGGER.trace("execute uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
-        EngineExecutionListener engineExecutionListener = executorContext.getEngineExecutionListener();
+        EngineExecutionListener engineExecutionListener =
+                executorContext
+                        .getExecutionRequest()
+                        .getEngineExecutionListener();
+
         engineExecutionListener.executionStarted(this);
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
         LOGGER.trace("instantiate testClass [%s]", testClass.getName());
 
-        ReflectionUtils.instantiate(testClass, o -> testInstance = o, throwableCollector::add);
+        ReflectionUtils.instantiate(
+                testClass,
+                o -> {
+                    testInstance = o;
+                    executorContext.setTestInstance(testInstance);
+                },
+                throwableCollector::add);
 
         if (throwableCollector.isEmpty()) {
             List<Method> methods = ReflectionUtils.getPrepareMethods(testClass);
@@ -148,10 +160,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         if (throwableCollector.isEmpty()) {
             argumentTestDescriptors
-                    .forEach(argumentTestDescriptor -> {
-                        argumentTestDescriptor.setTestInstance(testInstance);
-                        argumentTestDescriptor.execute(executorContext);
-                    } );
+                    .forEach(argumentTestDescriptor -> argumentTestDescriptor.execute(executorContext));
         } else {
             argumentTestDescriptors
                     .forEach(argumentTestDescriptor -> {

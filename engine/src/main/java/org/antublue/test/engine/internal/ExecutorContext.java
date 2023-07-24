@@ -16,7 +16,8 @@
 
 package org.antublue.test.engine.internal;
 
-import org.junit.platform.engine.EngineExecutionListener;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.ExecutionRequest;
 
 import java.util.concurrent.CountDownLatch;
@@ -26,9 +27,11 @@ import java.util.concurrent.CountDownLatch;
  */
 public class ExecutorContext {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorContext.class);
+
     private final ExecutionRequest executionRequest;
     private final CountDownLatch countDownLatch;
-    private final EngineExecutionListener engineExecutionListener;
+    private Object testInstance;
 
     /**
      * Constructor
@@ -39,7 +42,6 @@ public class ExecutorContext {
     public ExecutorContext(ExecutionRequest executionRequest, CountDownLatch countDownLatch) {
         this.executionRequest = executionRequest;
         this.countDownLatch = countDownLatch;
-        this.engineExecutionListener = executionRequest.getEngineExecutionListener();
     }
 
     /**
@@ -52,18 +54,31 @@ public class ExecutorContext {
     }
 
     /**
-     * Method to get the EngineExecutionListener
+     * Method to set the testInstance
      *
-     * @return the EngineExecutionListener
+     * @param testInstance testInstance
      */
-    public EngineExecutionListener getEngineExecutionListener() {
-        return engineExecutionListener;
+    public void setTestInstance(Object testInstance) {
+        LOGGER.trace("setTestInstance testInstance [%s]", testInstance.getClass().getName());
+
+        this.testInstance = testInstance;
+    }
+
+    /**
+     * Method to get the test instance
+     *
+     * @return the testInstance
+     */
+    public Object getTestInstance() {
+        return testInstance;
     }
 
     /**
      * Method to mark the execution context complete
      */
     public void complete() {
+        LOGGER.trace("complete()");
+
         this.countDownLatch.countDown();
     }
 }

@@ -17,6 +17,7 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import org.antublue.test.engine.internal.ExecutorContext;
+import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
@@ -30,11 +31,6 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unchecked")
 abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
-
-    /**
-     * Test instance
-     */
-    protected Object testInstance;
 
     /**
      * Constructor
@@ -62,15 +58,6 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     }
 
     /**
-     * Method to set the test instance
-     *
-     * @param testInstance testInstance
-     */
-    public void setTestInstance(Object testInstance) {
-        this.testInstance = testInstance;
-    }
-
-    /**
      * Method to execute the TestDescriptor
      *
      * @param executorContext testEngineExecutorContext
@@ -87,6 +74,9 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
             testDescriptor.skip(executorContext);
         }
 
-        executorContext.getEngineExecutionListener().executionSkipped(this, "Skipped");
+        executorContext
+                .getExecutionRequest()
+                .getEngineExecutionListener()
+                .executionSkipped(this, "Skipped");
     }
 }
