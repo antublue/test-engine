@@ -136,7 +136,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
     }
 
     /**
-     * Method to test the test descriptor
+     * Method to execute the test descriptor
      */
     @Override
     public void execute(ExecutorContext executorContext) {
@@ -147,8 +147,14 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 testArgument.name(),
                 testMethod.getName());
 
-        EngineExecutionListener engineExecutionListener = executorContext.getEngineExecutionListener();
+        EngineExecutionListener engineExecutionListener =
+                executorContext
+                        .getExecutionRequest()
+                        .getEngineExecutionListener();
+
         engineExecutionListener.executionStarted(this);
+
+        Object testInstance = executorContext.getTestInstance();
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
