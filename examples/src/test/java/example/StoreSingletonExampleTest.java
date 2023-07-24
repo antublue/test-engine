@@ -1,5 +1,7 @@
 package example;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -9,16 +11,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /** Example test */
-public class StoreExampleTest {
+public class StoreSingletonExampleTest {
 
     private static final String PREFIX = "StoreExampleTest";
     private static final String CLOSEABLE = PREFIX + ".closeable";
     private static final String AUTO_CLOSEABLE = PREFIX + ".autoCloseable";
-
-    private Store store;
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -35,9 +33,8 @@ public class StoreExampleTest {
     public void prepare() {
         System.out.println("prepare()");
 
-        store = new Store();
-        store.put(AUTO_CLOSEABLE, new TestAutoCloseable());
-        store.put(CLOSEABLE, new TestCloseable());
+        Store.singleton().put(AUTO_CLOSEABLE, new TestAutoCloseable());
+        Store.singleton().put(CLOSEABLE, new TestCloseable());
     }
 
     @TestEngine.BeforeAll
@@ -74,11 +71,11 @@ public class StoreExampleTest {
     public void conclude() {
         System.out.println("conclude()");
 
-        store.removeAndClose(AUTO_CLOSEABLE);
-        store.removeAndClose(CLOSEABLE);
+        Store.singleton().removeAndClose(AUTO_CLOSEABLE);
+        Store.singleton().removeAndClose(CLOSEABLE);
 
-        assertThat(store.get(AUTO_CLOSEABLE)).isNotPresent();
-        assertThat(store.get(CLOSEABLE)).isNotPresent();
+        assertThat(Store.singleton().get(AUTO_CLOSEABLE)).isNotPresent();
+        assertThat(Store.singleton().get(CLOSEABLE)).isNotPresent();
     }
 
     private static class TestAutoCloseable implements AutoCloseable {

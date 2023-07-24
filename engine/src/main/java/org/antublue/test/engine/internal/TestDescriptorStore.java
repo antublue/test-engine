@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/** Class to store TestDescriptors based on UniqueId */
+/** Class to store a TestDescriptor based on UniqueId */
 public final class TestDescriptorStore {
 
     private static final TestDescriptorStore INSTANCE = new TestDescriptorStore();
@@ -55,7 +55,7 @@ public final class TestDescriptorStore {
     }
 
     /**
-     * Method to get a TestDescriptor based on UniqueId
+     * Method to get a TestDescriptor by UniqueId
      *
      * @param uniqueId the unique id
      * @return an Optional that may contain a TestDescriptor
@@ -65,7 +65,7 @@ public final class TestDescriptorStore {
     }
 
     /**
-     * Method to recursively store a TestDescriptor
+     * Method to recursively store a TestDescriptor and it's children
      *
      * @param testDescriptor the test descriptor
      */
