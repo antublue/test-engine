@@ -133,7 +133,6 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
-
         Field field = ReflectionUtils.getArgumentField(testClass);
 
         LOGGER.trace(
