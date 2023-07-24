@@ -59,6 +59,9 @@ class BaseOrderTest {
     @TestEngine.Order(order = 2)
     public void conclude() {
         System.out.println("BaseOrderTest.conclude()");
+
+        assertThat(stringArgument).isNull();
+
         ACTUAL_LIST.add("BaseOrderTest.conclude()");
         assertThat(ACTUAL_LIST).isEqualTo(EXPECTED_LIST);
     }

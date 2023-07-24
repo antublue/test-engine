@@ -13,7 +13,7 @@ import java.util.stream.Stream;
  * The test class is executed due to the fact that the test engine system
  * properties / environment variables have to be defined during test discovery
  */
-@TestEngine.Tag(tag="/tag2/")
+@TestEngine.Tag(tag = "/tag2/")
 public class TaggedClassTag2Test {
 
     @TestEngine.Argument

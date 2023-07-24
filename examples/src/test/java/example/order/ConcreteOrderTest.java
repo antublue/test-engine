@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Example test
  */
@@ -57,6 +59,7 @@ public class ConcreteOrderTest extends BaseOrderTest {
     @TestEngine.Order(order = 1)
     public void afterAll2() {
         System.out.println("ConcreteOrderTest.afterAll()");
+
         ACTUAL_LIST.add("ConcreteOrderTest.afterAll()");
     }
 
@@ -64,6 +67,9 @@ public class ConcreteOrderTest extends BaseOrderTest {
     @TestEngine.Order(order = 1)
     public void conclude() {
         System.out.println("ConcreteOrderTest.conclude()");
+
+        assertThat(stringArgument).isNull();
+
         ACTUAL_LIST.add("ConcreteOrderTest.conclude()");
     }
 }

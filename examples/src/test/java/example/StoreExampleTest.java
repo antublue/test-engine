@@ -34,7 +34,7 @@ public class StoreExampleTest {
 
     @TestEngine.Prepare
     public void prepare() {
-        System.out.println("prepare(" + stringArgument  + ")");
+        System.out.println("prepare()");
         
         Store.put(AUTO_CLOSEABLE, new TestAutoCloseable());
         Store.put(CLOSEABLE, new TestCloseable());
@@ -72,7 +72,9 @@ public class StoreExampleTest {
 
     @TestEngine.Conclude
     public void conclude() {
-        System.out.println("conclude(" + stringArgument  + ")");
+        System.out.println("conclude()");
+
+        assertThat(stringArgument).isNull();
 
         Store.removeAndClose(AUTO_CLOSEABLE);
         Store.removeAndClose(CLOSEABLE);

@@ -34,13 +34,13 @@ public class TaggedMethodTag1And2Test {
     }
 
     @TestEngine.Test
-    @TestEngine.Tag(tag="/tag1/")
+    @TestEngine.Tag(tag = "/tag1/")
     public void test1() {
         System.out.println("test1(" + stringArgument  + ")");
     }
 
     @TestEngine.Test
-    @TestEngine.Tag(tag="/tag2/")
+    @TestEngine.Tag(tag = "/tag2/")
     public void test2() {
         System.out.println("test2(" + stringArgument  + ")");
     }
