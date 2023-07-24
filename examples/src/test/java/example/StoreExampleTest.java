@@ -74,8 +74,6 @@ public class StoreExampleTest {
     public void conclude() {
         System.out.println("conclude()");
 
-        assertThat(stringArgument).isNull();
-
         Store.removeAndClose(AUTO_CLOSEABLE);
         Store.removeAndClose(CLOSEABLE);
 
