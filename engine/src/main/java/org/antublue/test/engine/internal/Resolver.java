@@ -53,7 +53,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-/** Class to implement a TestEngineTestResolver */
+/** Class to implement a resolver to build the test descriptor tree */
 @SuppressWarnings("PMD.NPathComplexity")
 public class Resolver {
 
@@ -67,6 +67,8 @@ public class Resolver {
     private TestClassTagPredicate excludeTestClassTagPredicate;
     private TestMethodTagPredicate includeTestMethodTagPredicate;
     private TestMethodTagPredicate excludeTestMethodTagPredicate;
+    private ClassNameFiltersPredicate classNameFiltersPredicate;
+    private PackageNameFiltersPredicate packageNameFiltersPredicate;
     private Map<Class<?>, Set<Method>> classMethodSetMap;
 
     private ConfigurationParameters configurationParameters;
@@ -124,6 +126,22 @@ public class Resolver {
     private void configure() {
         LOGGER.trace("configure()");
 
+        configureIncludeTestClassPredicate();
+        configureExcludeTestClassPredicate();
+        configureIncludeTestMethodPredicate();
+        configureExcludeTestMethodPredicate();
+        configureIncludeTestClassTagPredicate();
+        configureExcludeTestClassTagPredicate();
+        configureIncludeTestMethodTagPredicate();
+        configureExcludeTestMethodTagPredicate();
+        configureClassNameFiltersPredicate();
+        configurePackageNameFiltersPredicate();
+    }
+
+    /** Method to configure the include test class Predicate */
+    private void configureIncludeTestClassPredicate() {
+        LOGGER.trace("configureIncludeTestClassPredicate()");
+
         includeTestClassPredicate =
                 configurationParameters
                         .get(Constants.TEST_CLASS_INCLUDE)
@@ -134,6 +152,11 @@ public class Resolver {
                                 })
                         .map(TestClassPredicate::of)
                         .orElse(null);
+    }
+
+    /** Method to configure the exclude test class Predicate */
+    private void configureExcludeTestClassPredicate() {
+        LOGGER.trace("configureExcludeTestClassPredicate()");
 
         excludeTestClassPredicate =
                 configurationParameters
@@ -145,6 +168,11 @@ public class Resolver {
                                 })
                         .map(TestClassPredicate::of)
                         .orElse(null);
+    }
+
+    /** Method to configure the include test method Predicate */
+    private void configureIncludeTestMethodPredicate() {
+        LOGGER.trace("configureIncludeTestMethodPredicate()");
 
         includeTestMethodPredicate =
                 configurationParameters
@@ -156,6 +184,11 @@ public class Resolver {
                                 })
                         .map(TestMethodPredicate::of)
                         .orElse(null);
+    }
+
+    /** Method to configure the exclude test method Predicate */
+    private void configureExcludeTestMethodPredicate() {
+        LOGGER.trace("configureExcludeTestMethodPredicate()");
 
         excludeTestMethodPredicate =
                 configurationParameters
@@ -167,6 +200,11 @@ public class Resolver {
                                 })
                         .map(TestMethodPredicate::of)
                         .orElse(null);
+    }
+
+    /** Method to configure the include test class tag Predicate */
+    private void configureIncludeTestClassTagPredicate() {
+        LOGGER.trace("configureIncludeTestClassTagPredicate()");
 
         includeTestClassTagPredicate =
                 configurationParameters
@@ -179,6 +217,11 @@ public class Resolver {
                                 })
                         .map(TestClassTagPredicate::of)
                         .orElse(null);
+    }
+
+    /** Method to configure the exclude test class tag Predicate */
+    private void configureExcludeTestClassTagPredicate() {
+        LOGGER.trace("configureExcludeTestClassTagPredicate()");
 
         excludeTestClassTagPredicate =
                 configurationParameters
@@ -191,6 +234,11 @@ public class Resolver {
                                 })
                         .map(TestClassTagPredicate::of)
                         .orElse(null);
+    }
+
+    /** Method to configure the include test method tag Predicate */
+    private void configureIncludeTestMethodTagPredicate() {
+        LOGGER.trace("configureIncludeTestMethodTagPredicate()");
 
         includeTestMethodTagPredicate =
                 configurationParameters
@@ -203,6 +251,11 @@ public class Resolver {
                                 })
                         .map(TestMethodTagPredicate::of)
                         .orElse(null);
+    }
+
+    /** Method to configure the exclude test method tag Predicate */
+    private void configureExcludeTestMethodTagPredicate() {
+        LOGGER.trace("configureExcludeTestMethodTagPredicate()");
 
         excludeTestMethodTagPredicate =
                 configurationParameters
@@ -217,27 +270,46 @@ public class Resolver {
                         .orElse(null);
     }
 
+    /** Method to configure the class name filters Predicate */
+    private void configureClassNameFiltersPredicate() {
+        LOGGER.trace("configureClassNameFiltersPredicate()");
+
+        List<ClassNameFilter> classNameFilters =
+                engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class);
+
+        LOGGER.trace("classNameFilters count [%d]", classNameFilters.size());
+
+        classNameFiltersPredicate = new ClassNameFiltersPredicate(classNameFilters);
+    }
+
+    /** Method to configure the package name filters Predicate */
+    private void configurePackageNameFiltersPredicate() {
+        LOGGER.trace("configurePackageNameFiltersPredicate()");
+
+        List<PackageNameFilter> packageNameFilters =
+                engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
+
+        LOGGER.trace("packageNameFilters count [%d]", packageNameFilters.size());
+
+        packageNameFiltersPredicate = new PackageNameFiltersPredicate(packageNameFilters);
+    }
+
     /** Method to resolve selectors */
     private void resolve() {
         LOGGER.trace("resolve()");
 
-        List<ClassNameFilter> classNameFilters =
-                engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class);
-        LOGGER.trace("classNameFilters count [%d]", classNameFilters.size());
-
-        ClassNameFiltersPredicate classNameFiltersPredicate =
-                new ClassNameFiltersPredicate(classNameFilters);
-
-        List<PackageNameFilter> packageNameFilters =
-                engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
-        LOGGER.trace("packageNameFilters count [%d]", packageNameFilters.size());
-
-        PackageNameFiltersPredicate packageNameFiltersPredicate =
-                new PackageNameFiltersPredicate(packageNameFilters);
-
         classMethodSetMap = new LinkedHashMap<>();
 
-        // Resolve selectors
+        resolveClasspathRootSelectors();
+        resolvePackageSelectors();
+        resolveClassSelectors();
+        resolveMethodSelectors();
+        resolveUniqueIdSelectors();
+    }
+
+    /** Method to resolve ClasspathRootSelectors */
+    private void resolveClasspathRootSelectors() {
+        LOGGER.trace("resolveClasspathRootSelectors()");
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClasspathRootSelector.class)
@@ -258,6 +330,11 @@ public class Resolver {
                                                 }
                                             });
                         });
+    }
+
+    /** Method to resolve PackageSelector */
+    private void resolvePackageSelectors() {
+        LOGGER.trace("resolvePackageSelectors()");
 
         engineDiscoveryRequest
                 .getSelectorsByType(PackageSelector.class)
@@ -278,6 +355,11 @@ public class Resolver {
                                                 }
                                             });
                         });
+    }
+
+    /** Method to resolve ClassSelectors */
+    private void resolveClassSelectors() {
+        LOGGER.trace("resolveClassSelectors()");
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClassSelector.class)
@@ -293,6 +375,11 @@ public class Resolver {
                                         new LinkedHashSet<>(ReflectionUtils.getTestMethods(clazz)));
                             }
                         });
+    }
+
+    /** Method to resolve MethodSelectors */
+    private void resolveMethodSelectors() {
+        LOGGER.trace("resolveMethodSelectors()");
 
         engineDiscoveryRequest
                 .getSelectorsByType(MethodSelector.class)
@@ -310,6 +397,11 @@ public class Resolver {
                                 classMethodSetMap.put(clazz, methods);
                             }
                         });
+    }
+
+    /** Method to resolve UniqueIdSelectors */
+    private void resolveUniqueIdSelectors() {
+        LOGGER.trace("resolveUniqueIdSelectors()");
 
         engineDiscoveryRequest
                 .getSelectorsByType(UniqueIdSelector.class)
@@ -369,6 +461,7 @@ public class Resolver {
 
         Iterator<Map.Entry<Class<?>, Set<Method>>> classMethodMapEntryIterator =
                 classMethodSetMap.entrySet().iterator();
+
         while (classMethodMapEntryIterator.hasNext()) {
             Map.Entry<Class<?>, Set<Method>> entry = classMethodMapEntryIterator.next();
             Class<?> clazz = entry.getKey();
