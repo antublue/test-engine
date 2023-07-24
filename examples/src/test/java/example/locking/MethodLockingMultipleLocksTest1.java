@@ -17,7 +17,7 @@ public class MethodLockingMultipleLocksTest1 {
     public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
-        Store.putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
+        Store.singleton().putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
     @TestEngine.Argument public IntegerArgument integerArgument;
@@ -50,7 +50,7 @@ public class MethodLockingMultipleLocksTest1 {
     public void test1() {
         System.out.println("test1()");
 
-        AtomicInteger atomicInteger = Store.get(COUNTER_NAME, AtomicInteger.class).get();
+        AtomicInteger atomicInteger = Store.singleton().get(COUNTER_NAME, AtomicInteger.class).get();
         int count = atomicInteger.incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");

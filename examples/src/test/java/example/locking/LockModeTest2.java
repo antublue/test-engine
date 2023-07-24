@@ -15,7 +15,7 @@ public class LockModeTest2 {
     public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
-        Store.putIfAbsent(COUNTER_NAME, k -> 0);
+        Store.singleton().putIfAbsent(COUNTER_NAME, k -> 0);
     }
 
     @TestEngine.Argument public IntegerArgument integerArgument;
@@ -46,23 +46,23 @@ public class LockModeTest2 {
     public void test1() {
         System.out.println("test1()");
 
-        int count = Store.get(COUNTER_NAME, Integer.class).get();
+        int count = Store.singleton().get(COUNTER_NAME, Integer.class).get();
         if (count != 0) {
             fail("expected count = 0");
         }
 
         count++;
-        Store.put(COUNTER_NAME, count);
+        Store.singleton().put(COUNTER_NAME, count);
 
-        count = Store.get(COUNTER_NAME, Integer.class).get();
+        count = Store.singleton().get(COUNTER_NAME, Integer.class).get();
         if (count != 1) {
             fail("expected count = 1");
         }
 
         count--;
-        Store.put(COUNTER_NAME, count);
+        Store.singleton().put(COUNTER_NAME, count);
 
-        count = Store.get(COUNTER_NAME, Integer.class).get();
+        count = Store.singleton().get(COUNTER_NAME, Integer.class).get();
         if (count != 0) {
             fail("expected count = 0");
         }
@@ -73,7 +73,7 @@ public class LockModeTest2 {
     @TestEngine.Unlock(name = LOCK_NAME, mode = TestEngine.LockMode.READ)
     public void test2() {
         System.out.println("test2()");
-        int count = Store.get(COUNTER_NAME, Integer.class).get();
+        int count = Store.singleton().get(COUNTER_NAME, Integer.class).get();
         if (count != 0) {
             fail("expected count = 0");
         }

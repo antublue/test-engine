@@ -19,8 +19,10 @@ package org.antublue.test.engine.api;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -34,12 +36,15 @@ import java.util.function.Function;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Store {
 
-    private static final Lock LOCK = new ReentrantLock(true);
-    private static final Map<String, Object> MAP = new LinkedHashMap<>();
+    private static final Store GLOBAL_STORE = new Store();
+
+    private final Lock lock;
+    private final Map<String, Object> map;
 
     /** Constructor */
-    private Store() {
-        // DO NOTHING
+    public Store() {
+        lock = new ReentrantLock(true);
+        map = new LinkedHashMap<>();
     }
 
     /**
@@ -47,9 +52,9 @@ public class Store {
      *
      * @return the Lock
      */
-    public static Lock lock() {
-        LOCK.lock();
-        return LOCK;
+    public Lock lock() {
+        lock.lock();
+        return lock;
     }
 
     /**
@@ -57,9 +62,9 @@ public class Store {
      *
      * @return the Store Lock
      */
-    public static Lock unlock() {
-        LOCK.unlock();
-        return LOCK;
+    public Lock unlock() {
+        lock.unlock();
+        return lock;
     }
 
     /**
@@ -67,8 +72,8 @@ public class Store {
      *
      * @return the Store Lock
      */
-    public static Lock getLock() {
-        return LOCK;
+    public Lock getLock() {
+        return lock;
     }
 
     /**
@@ -79,12 +84,12 @@ public class Store {
      * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't
      *     exist
      */
-    public static Optional<Object> put(String key, Object object) {
+    public Optional<Object> put(String key, Object object) {
         String validKey = validateKey(key);
 
         try {
             lock();
-            return Optional.ofNullable(MAP.put(validKey, object));
+            return Optional.ofNullable(map.put(validKey, object));
         } finally {
             unlock();
         }
@@ -99,13 +104,13 @@ public class Store {
      * @return an Optional containing the existing Object, or an Optional containing the Object
      *     returned by the Function
      */
-    public static Optional<Object> putIfAbsent(String key, Function<String, Object> function) {
+    public Optional<Object> putIfAbsent(String key, Function<String, Object> function) {
         String validKey = validateKey(key);
         validateObject(function, "function is null");
 
         try {
             lock();
-            return Optional.ofNullable(MAP.computeIfAbsent(validKey, function));
+            return Optional.ofNullable(map.computeIfAbsent(validKey, function));
         } finally {
             unlock();
         }
@@ -118,12 +123,12 @@ public class Store {
      * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't
      *     exist
      */
-    public static Optional<Object> get(String key) {
+    public Optional<Object> get(String key) {
         String validKey = validateKey(key);
 
         try {
             lock();
-            return Optional.ofNullable(MAP.get(validKey));
+            return Optional.ofNullable(map.get(validKey));
         } finally {
             unlock();
         }
@@ -138,13 +143,13 @@ public class Store {
      *     exist
      * @param <T> the return type
      */
-    public static <T> Optional<T> get(String key, Class<T> clazz) {
+    public <T> Optional<T> get(String key, Class<T> clazz) {
         String validKey = validateKey(key);
         validateObject(clazz, "class is null");
 
         try {
             lock();
-            return Optional.ofNullable(clazz.cast(MAP.get(validKey)));
+            return Optional.ofNullable(clazz.cast(map.get(validKey)));
         } finally {
             unlock();
         }
@@ -157,10 +162,10 @@ public class Store {
      * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't
      *     exist
      */
-    public static Optional<Object> remove(String key) {
+    public Optional<Object> remove(String key) {
         try {
             lock();
-            return Optional.ofNullable(MAP.remove(key));
+            return Optional.ofNullable(map.remove(key));
         } finally {
             unlock();
         }
@@ -173,10 +178,10 @@ public class Store {
      *     exist
      * @param <T> the return type
      */
-    public static <T> Optional<T> remove(String key, Class<T> clazz) {
+    public <T> Optional<T> remove(String key, Class<T> clazz) {
         try {
             lock();
-            return Optional.ofNullable(clazz.cast(MAP.remove(key)));
+            return Optional.ofNullable(clazz.cast(map.remove(key)));
         } finally {
             unlock();
         }
@@ -188,7 +193,7 @@ public class Store {
      * @param key key
      * @throws StoreException exception if the AutoCloseable throws an Exception
      */
-    public static void removeAndClose(String key) throws StoreException {
+    public void removeAndClose(String key) throws StoreException {
         remove(key)
                 .ifPresent(
                         o -> {
@@ -207,13 +212,46 @@ public class Store {
                         });
     }
 
+    public void removeAndProcess(String key, Consumer<Object> consumer) {
+        AtomicReference<StoreException> storeExceptionAtomicReference = new AtomicReference<>();
+
+        remove(key)
+                .ifPresent(new Consumer<Object>() {
+
+                    /**
+                     * Performs this operation on the given argument.
+                     *
+                     * @param o the input argument
+                     */
+                    @Override
+                    public void accept(Object o) {
+                        try {
+                            consumer.accept(o);
+                        } catch (Throwable t) {
+                            storeExceptionAtomicReference.set(
+                                    new StoreException(
+                                    String.format(
+                                            "Exception closing Object for key [%s] object"
+                                                    + " [%s]",
+                                            key, o.getClass().getName()),
+                                    t));
+                        }
+                    }
+                });
+
+        StoreException storeException = storeExceptionAtomicReference.get();
+        if (storeException != null) {
+            throw storeException;
+        }
+    }
+
     /**
      * Method to validate a key is not null and not blank
      *
      * @param key key
      * @return the key trimmed
      */
-    private static String validateKey(String key) {
+    private String validateKey(String key) {
         if (key == null) {
             throw new IllegalArgumentException("key is null");
         }
@@ -231,9 +269,14 @@ public class Store {
      * @param object object
      * @param message message
      */
-    private static void validateObject(Object object, String message) {
+    private void validateObject(Object object, String message) {
         if (object == null) {
             throw new IllegalArgumentException(message);
         }
+    }
+
+    /** Method to get a singleton Store */
+    public static Store singleton() {
+        return GLOBAL_STORE;
     }
 }
