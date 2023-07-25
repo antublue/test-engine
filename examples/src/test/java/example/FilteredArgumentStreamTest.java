@@ -18,9 +18,7 @@ public class FilteredArgumentStreamTest {
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
-        return ArgumentSupplier.arguments(integerArgument -> !integerArgument.value().contains("b"))
-                .collect(Collectors.toList())
-                .stream();
+        return ArgumentSupplier.arguments(integerArgument -> !integerArgument.value().contains("b"));
     }
 
     @TestEngine.BeforeAll
