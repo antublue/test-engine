@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+# Function to check exit code
 function check_exit_code () {
   if [ ! $? ];
   then
@@ -24,11 +25,13 @@ function check_exit_code () {
   fi
 }
 
+# Function to emit an error message and exit
 function emit_error () {
   echo "${1}"
   exit 1;
 }
 
+# Usage
 if [ "$#" -ne 1 ];
 then
   echo "Usage: ${0} <version>"
@@ -39,6 +42,7 @@ VERSION="${1}"
 GIT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
 cd "${GIT_ROOT_DIRECTORY}"
 
+# Check for uncommitted changes
 git diff --quiet HEAD
 if [ ! $? -eq 0 ];
 then
@@ -48,34 +52,45 @@ then
   exit 1
 fi
 
+# Verify the code builds
+cd "${GIT_ROOT_DIRECTORY}"
+./mvnw -s ~/.m2/antublue.settings.xml -P release clean verify
+check_exit_code "Maven build failed"
+
+# Checkout a release branch
 git checkout -b "release-${VERSION}"
 check_exit_code "Git checkout [${VERSION}] failed"
 
+# Update the build versions
 mvn versions:set -DnewVersion="${VERSION}" -DprocessAllModules
 check_exit_code "Maven update versions [${VERSION}] failed"
 rm -Rf $(find . -name "*versionsBackup")
 
-./mvnw clean verify
-check_exit_code "Maven build [${VERSION}] failed"
-
+# Add changed files
 git add -u
 check_exit_code "Git add failed"
 
+# Commit the changed files
 git commit -m "${VERSION}"
 check_exit_code "Git commit failed"
 
+# Build and deploy
 ./mvnw -s ~/.m2/antublue.settings.xml -P release clean deploy
 check_exit_code "Maven deploy [${VERSION}] failed"
 
+# Push the branch
 git push --set-upstream origin release-"${VERSION}"
 check_exit_code "Git push [${VERSION}] failed"
 
+# Tag the version
 git tag "${VERSION}"
 check_exit_code "Git tag [${VERSION}] failed"
 
+# Push the tag
 git push origin "${VERSION}"
 check_exit_code "Git tag [${VERSION}] push failed"
 
+# Checkout the main branch
 git checkout main
 check_exit_code "Git checkout [main] failed"
 
