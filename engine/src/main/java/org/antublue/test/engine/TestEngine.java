@@ -148,7 +148,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute()");
 
-        // Execute the ExecutionRequest
+        executionRequest =
+                ExecutionRequest.create(
+                        executionRequest.getRootTestDescriptor(),
+                        executionRequest.getEngineExecutionListener(),
+                        new ConfigurationParameters());
+
         new Executor().execute(executionRequest);
     }
 }
