@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /** Example test */
-public class MethodOrderTest {
+public class LifecycleTest {
 
     private static final List<String> EXPECTED_ORDER = new ArrayList<>();
     private static final List<String> ACTUAL_ORDER = new ArrayList<>();
