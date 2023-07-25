@@ -173,8 +173,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
             Thread.currentThread().setContextClassLoader(classLoader);
 
-            ConfigurationParameters configurationParameters =
-                    new ConfigurationParameters();
+            ConfigurationParameters configurationParameters = new ConfigurationParameters();
 
             ConsoleTestExecutionListener consoleTestExecutionListener =
                     new ConsoleTestExecutionListener(configurationParameters);
