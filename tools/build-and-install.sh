@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+# Function to check exit code
 function check_exit_code () {
   if [ ! $? -eq 0 ];
   then
@@ -24,6 +25,7 @@ function check_exit_code () {
   fi
 }
 
+# Usage
 if [ "$#" -ne 1 ];
 then
   echo "Usage: ${0} <version>"
@@ -33,6 +35,7 @@ fi
 VERSION="${1}"
 GIT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
 
+# Check for any uncommitted changes
 git diff --quiet HEAD
 if [ ! $? -eq 0 ];
 then
@@ -42,27 +45,40 @@ then
   exit 1
 fi
 
+# Verify the code builds
+cd "${GIT_ROOT_DIRECTORY}"
+./mvnw clean verify
+check_exit_code "Maven build failed"
+
+# Delete any previous build branch
 git branch -D "build-${VERSION}" > /dev/null 2>&1
 
+# Checkout the build branch
 git checkout -b "build-${VERSION}"
 check_exit_code "Git checkout [${VERSION}] failed"
 
+# Update the build versions
 mvn versions:set -DnewVersion="${VERSION}" -DprocessAllModules
 check_exit_code "Maven update versions [${VERSION}] failed"
 rm -Rf $(find . -name "*versionsBackup")
 
+# Build the version
 cd "${GIT_ROOT_DIRECTORY}"
 ./mvnw clean verify
 check_exit_code "Maven build [${VERSION}] failed"
 
+# Build the version as a release
 ./mvnw -s ~/.m2/antublue.settings.xml -P release clean install
 check_exit_code "Maven deploy [${VERSION}] failed"
 
+# Reset the branch
 git reset --hard HEAD
 check_exit_code "Git reset hard failed"
 
+# Checkout the main branch
 git checkout main
 check_exit_code "Git checkout [main] failed"
 
+# Delete the build branch
 git branch -D "build-${VERSION}"
 check_exit_code "Git delete branch [build-${VERSION}] failed"
