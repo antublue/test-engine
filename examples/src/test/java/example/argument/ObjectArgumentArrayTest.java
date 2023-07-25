@@ -1,13 +1,13 @@
 package example.argument;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.ObjectArgument;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /** Example test */
 public class ObjectArgumentArrayTest {
@@ -20,13 +20,12 @@ public class ObjectArgumentArrayTest {
     public static Stream<ObjectArgument<int[]>> arguments() {
         Collection<ObjectArgument<int[]>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            int [] values = new int[3];
+            int[] values = new int[3];
             values[0] = i;
             values[1] = i * 2;
             values[2] = i * 3;
 
-            collection.add(
-                    new ObjectArgument<>("values" + i, values));
+            collection.add(new ObjectArgument<>("values" + i, values));
         }
         return collection.stream();
     }
