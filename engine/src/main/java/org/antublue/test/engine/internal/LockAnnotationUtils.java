@@ -101,11 +101,11 @@ public class LockAnnotationUtils {
                             method.getName()));
 
             if (mode == TestEngine.LockMode.READ_WRITE) {
-                LOCK_MAP.computeIfAbsent(trimmedName, n -> new ReentrantReadWriteLock(true))
+                LOCK_MAP.computeIfAbsent(trimmedName, n -> createLock(n, true))
                         .writeLock()
                         .lock();
             } else {
-                LOCK_MAP.computeIfAbsent(trimmedName, n -> new ReentrantReadWriteLock(true))
+                LOCK_MAP.computeIfAbsent(trimmedName, n -> createLock(n, true))
                         .readLock()
                         .lock();
             }
@@ -204,5 +204,18 @@ public class LockAnnotationUtils {
                                 method.getName()));
             }
         }
+    }
+
+    /**
+     * Method to create a ReentrantReadWriteLock
+     *
+     * @param name name
+     * @param fair fair
+     * @return a ReentrantReadWriteLock
+     */
+    private static ReentrantReadWriteLock createLock(String name, boolean fair) {
+        LOGGER.trace("createLock name [%s] fair [%b]", name, fair);
+
+        return new ReentrantReadWriteLock(fair);
     }
 }
