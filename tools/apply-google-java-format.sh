@@ -19,12 +19,15 @@
 GIT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
 cd "${GIT_ROOT_DIRECTORY}"
 
+# Find all Java files
 find . -type f | grep ".java$" > files.txt
 
+# Process this list of Java files
 while read FILE;
 do
   echo "${FILE}"
   java -jar tools/google-java-format-1.17.0-all-deps.jar --aosp -r "${FILE}"
 done < files.txt
 
+# Remove the list of files
 rm -Rf files.txt
