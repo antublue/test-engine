@@ -20,14 +20,18 @@
 function check_exit_code () {
   if [ ! $? ];
   then
+    echo "------------------------------------------------------------------------"
     echo "${1}"
+    echo "------------------------------------------------------------------------"
     exit 1
   fi
 }
 
 # Function to emit an error message and exit
 function emit_error () {
+  echo "------------------------------------------------------------------------"
   echo "${1}"
+  echo "------------------------------------------------------------------------"
   exit 1;
 }
 
@@ -39,21 +43,31 @@ then
 fi
 
 VERSION="${1}"
-GIT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
-cd "${GIT_ROOT_DIRECTORY}"
+PROJECT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
+
+cd "${PROJECT_ROOT_DIRECTORY}"
+check_exit_code "Failed to change to project root directory"
 
 # Check for uncommitted changes
 git diff --quiet HEAD
 if [ ! $? -eq 0 ];
 then
-  echo "Uncommitted changes"
+  echo "------------------------------------------------------------------------"
+  echo "UNCOMMITTED CHANGES"
+  echo "------------------------------------------------------------------------"
   echo ""
   git status
   exit 1
 fi
 
+# Check for missing copyright notices
+tools/copyright-check.sh
+check_exit_code "Copyright check failed"
+
+# Apply Google Java format
+#tools/apply-google-java-format.sh
+
 # Verify the code builds
-cd "${GIT_ROOT_DIRECTORY}"
 ./mvnw -s ~/.m2/antublue.settings.xml -P release clean verify
 check_exit_code "Maven build failed"
 
@@ -94,3 +108,6 @@ check_exit_code "Git tag [${VERSION}] push failed"
 git checkout main
 check_exit_code "Git checkout [main] failed"
 
+echo "------------------------------------------------------------------------"
+echo "SUCCESS"
+echo "------------------------------------------------------------------------"
