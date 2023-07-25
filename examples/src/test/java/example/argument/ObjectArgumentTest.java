@@ -27,6 +27,7 @@ public class ObjectArgumentTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
+
         customObject = objectArgument.value();
     }
 
@@ -37,7 +38,6 @@ public class ObjectArgumentTest {
 
     @TestEngine.Test
     public void test2() {
-        CustomObject customObject = objectArgument.value();
         System.out.println("test2(" + customObject + ")");
     }
 
