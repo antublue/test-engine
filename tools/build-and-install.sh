@@ -53,7 +53,7 @@ check_exit_code "Maven build failed"
 # Delete any previous build branch
 git branch -D "build-${VERSION}" > /dev/null 2>&1
 
-# Checkout the build branch
+# Checkout a build branch
 git checkout -b "build-${VERSION}"
 check_exit_code "Git checkout [${VERSION}] failed"
 
