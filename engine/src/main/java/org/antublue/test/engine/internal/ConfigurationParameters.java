@@ -16,6 +16,9 @@
 
 package org.antublue.test.engine.internal;
 
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
+
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -23,6 +26,8 @@ import java.util.function.Function;
 
 /** Class to implement TestEngineConfiguration */
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationParameters.class);
 
     @Override
     public Optional<String> get(String key) {
@@ -60,18 +65,22 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
      * @return the return value
      */
     private String resolve(String key) {
+        String result = null;
+
         // Convert the system property to an environment variable and get the value
         String value = System.getenv(key.toUpperCase(Locale.ENGLISH).replace('.', '_'));
         if (value != null && !value.trim().isEmpty()) {
-            return value.trim();
+            result = value.trim();
         }
 
         // Get the system property value
         value = System.getProperty(key);
         if (value != null && !value.trim().isEmpty()) {
-            return value.trim();
+            result = value.trim();
         }
 
-        return null;
+        LOGGER.trace("key [%s] result [%s]", key, result);
+
+        return result;
     }
 }
