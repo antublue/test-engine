@@ -8,7 +8,6 @@ import org.antublue.test.engine.api.argument.StringArgument;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** Example test */
@@ -18,7 +17,8 @@ public class FilteredArgumentStreamTest {
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
-        return ArgumentSupplier.arguments(integerArgument -> !integerArgument.value().contains("b"));
+        return ArgumentSupplier.arguments(
+                integerArgument -> !integerArgument.value().contains("b"));
     }
 
     @TestEngine.BeforeAll
