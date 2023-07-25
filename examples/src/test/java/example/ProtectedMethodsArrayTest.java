@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 /** Example test */
-public class ArrayTestWithProtectedMethods {
+public class ProtectedMethodsArrayTest {
 
     private String[] values;
 
