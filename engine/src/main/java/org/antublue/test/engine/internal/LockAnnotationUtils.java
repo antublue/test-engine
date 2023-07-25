@@ -101,13 +101,9 @@ public class LockAnnotationUtils {
                             method.getName()));
 
             if (mode == TestEngine.LockMode.READ_WRITE) {
-                LOCK_MAP.computeIfAbsent(trimmedName, n -> createLock(n, true))
-                        .writeLock()
-                        .lock();
+                LOCK_MAP.computeIfAbsent(trimmedName, n -> createLock(n, true)).writeLock().lock();
             } else {
-                LOCK_MAP.computeIfAbsent(trimmedName, n -> createLock(n, true))
-                        .readLock()
-                        .lock();
+                LOCK_MAP.computeIfAbsent(trimmedName, n -> createLock(n, true)).readLock().lock();
             }
 
             LOGGER.trace(

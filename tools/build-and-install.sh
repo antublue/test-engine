@@ -20,7 +20,9 @@
 function check_exit_code () {
   if [ ! $? -eq 0 ];
   then
+    echo "------------------------------------------------------------------------"
     echo "${1}"
+    echo "------------------------------------------------------------------------"
     exit 1
   fi
 }
@@ -33,20 +35,28 @@ then
 fi
 
 VERSION="${1}"
-GIT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
+PROJECT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
 
 # Check for any uncommitted changes
 git diff --quiet HEAD
 if [ ! $? -eq 0 ];
 then
-  echo "Uncommitted changes"
+  echo "------------------------------------------------------------------------"
+  echo "UNCOMMITTED CHANGES"
+  echo "------------------------------------------------------------------------"
   echo ""
   git status
   exit 1
 fi
 
+cd "${PROJECT_ROOT_DIRECTORY}"
+check_exit_code "Failed to change to project root directory"
+
+# Check for missing copyright notices
+tools/copyright-check.sh
+check_exit_code "Copyright check failed"
+
 # Verify the code builds
-cd "${GIT_ROOT_DIRECTORY}"
 ./mvnw clean verify
 check_exit_code "Maven build failed"
 
@@ -62,8 +72,15 @@ mvn versions:set -DnewVersion="${VERSION}" -DprocessAllModules
 check_exit_code "Maven update versions [${VERSION}] failed"
 rm -Rf $(find . -name "*versionsBackup")
 
+# Add changed files
+git add -u
+check_exit_code "Git add failed"
+
+# Commit the changed files
+git commit -m "${VERSION}"
+check_exit_code "Git commit failed"
+
 # Build the version
-cd "${GIT_ROOT_DIRECTORY}"
 ./mvnw clean verify
 check_exit_code "Maven build [${VERSION}] failed"
 
@@ -82,3 +99,7 @@ check_exit_code "Git checkout [main] failed"
 # Delete the build branch
 git branch -D "build-${VERSION}"
 check_exit_code "Git delete branch [build-${VERSION}] failed"
+
+echo "------------------------------------------------------------------------"
+echo "SUCCESS"
+echo "------------------------------------------------------------------------"

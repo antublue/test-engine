@@ -16,18 +16,30 @@
 # limitations under the License.
 #
 
-GIT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
-cd "${GIT_ROOT_DIRECTORY}"
+# Function to check exit code
+function check_exit_code () {
+  if [ ! $? -eq 0 ];
+  then
+    echo "------------------------------------------------------------------------"
+    echo "${1}"
+    echo "------------------------------------------------------------------------"
+    exit 1
+  fi
+}
+
+PROJECT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
+
+cd "${PROJECT_ROOT_DIRECTORY}"
+check_exit_code "Failed to change to project root directory"
 
 # Find all Java files
-find . -type f | grep ".java$" > files.txt
+find . -type f | grep ".java$" | grep -v ".mvn" > .files.tmp
 
 # Process this list of Java files
 while read FILE;
 do
-  echo "${FILE}"
   java -jar tools/google-java-format-1.17.0-all-deps.jar --aosp -r "${FILE}"
-done < files.txt
+done < .files.tmp
 
 # Remove the list of files
-rm -Rf files.txt
+rm -Rf .files.tmp

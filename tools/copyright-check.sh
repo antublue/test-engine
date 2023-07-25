@@ -16,14 +16,26 @@
 # limitations under the License.
 #
 
-GIT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
-cd "${GIT_ROOT_DIRECTORY}"
+# Function to check exit code
+function check_exit_code () {
+  if [ ! $? -eq 0 ];
+  then
+    echo "------------------------------------------------------------------------"
+    echo "${1}"
+    echo "------------------------------------------------------------------------"
+    exit 1
+  fi
+}
 
-echo "Checking Java files in [api] for copyright"
-grep -RiL "Copyright (C)" api/src/main/java/
+PROJECT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
+cd "${PROJECT_ROOT_DIRECTORY}"
+check_exit_code "Failed to change to project root directory"
 
-echo "Checking Java files in [engine] for copyright"
-grep -RiL "Copyright (C)" engine/src/main/java/
+grep -RiL "Copyright (C) .* The AntuBLUE test-engine project authors" api/src/main/java/
+check_exit_code "Files are missing copyright"
 
-echo "Checking Java files in [plugin] for copyright"
-grep -RiL "Copyright (C)" plugin/src/main/java/
+grep -RiL "Copyright (C) .* The AntuBLUE test-engine project authors" engine/src/main/java/
+check_exit_code "Files are missing copyright"
+
+grep -RiL "Copyright (C) .* The AntuBLUE test-engine project authors" plugin/src/main/java/
+check_exit_code "Files are missing copyright"
