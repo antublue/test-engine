@@ -15,12 +15,12 @@ class BaseOrderTest {
     protected final List<String> EXPECTED_LIST =
             listOf(
                     "BaseOrderTest.prepare()",
-                    "ConcreteOrderTest.prepare()",
+                    "ConcreteOrderTest.prepare2()",
                     "BaseOrderTest.beforeAll()",
                     "ConcreteOrderTest.beforeAll()",
                     "ConcreteOrderTest.afterAll()",
                     "BaseOrderTest.afterAll()",
-                    "ConcreteOrderTest.conclude()",
+                    "ConcreteOrderTest.conclude2()",
                     "BaseOrderTest.conclude()");
 
     protected final List<String> ACTUAL_LIST = new ArrayList<>();
@@ -29,8 +29,9 @@ class BaseOrderTest {
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 1)
-    public void prepare() {
+    public final void prepare() {
         System.out.println("BaseOrderTest.prepare()");
+
         ACTUAL_LIST.add("BaseOrderTest.prepare()");
     }
 
@@ -38,6 +39,7 @@ class BaseOrderTest {
     @TestEngine.Order(order = 1)
     public void beforeAll() {
         System.out.println("BaseOrderTest.beforeAll()");
+
         ACTUAL_LIST.add("BaseOrderTest.beforeAll()");
     }
 
@@ -51,17 +53,19 @@ class BaseOrderTest {
     @TestEngine.Order(order = 2)
     public void afterAll() {
         System.out.println("BaseOrderTest.afterAll()");
+
         ACTUAL_LIST.add("BaseOrderTest.afterAll()");
     }
 
     @TestEngine.Conclude
     @TestEngine.Order(order = 2)
-    public void conclude() {
+    public final void conclude() {
         System.out.println("BaseOrderTest.conclude()");
 
         assertThat(stringArgument).isNull();
 
         ACTUAL_LIST.add("BaseOrderTest.conclude()");
+
         assertThat(ACTUAL_LIST).isEqualTo(EXPECTED_LIST);
     }
 

@@ -26,14 +26,16 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
     @TestEngine.Prepare
     @TestEngine.Order(order = 2)
     public void prepare2() {
-        System.out.println("ConcreteOrderTest.prepare()");
-        ACTUAL_LIST.add("ConcreteOrderTest.prepare()");
+        System.out.println("ConcreteOrderTest.prepare2()");
+
+        ACTUAL_LIST.add("ConcreteOrderTest.prepare2()");
     }
 
     @TestEngine.BeforeAll
     @TestEngine.Order(order = 2)
     public void beforeAll2() {
         System.out.println("ConcreteOrderTest.beforeAll()");
+
         ACTUAL_LIST.add("ConcreteOrderTest.beforeAll()");
     }
 
@@ -63,11 +65,11 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
 
     @TestEngine.Conclude
     @TestEngine.Order(order = 1)
-    public void conclude() {
-        System.out.println("ConcreteOrderTest.conclude()");
+    public void conclude2() {
+        System.out.println("ConcreteOrderTest.conclude2()");
 
         assertThat(stringArgument).isNull();
 
-        ACTUAL_LIST.add("ConcreteOrderTest.conclude()");
+        ACTUAL_LIST.add("ConcreteOrderTest.conclude2()");
     }
 }
