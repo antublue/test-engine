@@ -16,13 +16,12 @@
 
 package org.antublue.test.engine.api;
 
-import org.junit.platform.commons.annotation.Testable;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.junit.platform.commons.annotation.Testable;
 
 /** Interface that contains all TestEngine annotations */
 public @interface TestEngine {

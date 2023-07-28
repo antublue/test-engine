@@ -1,8 +1,7 @@
 package example.inheritance;
 
-import org.antublue.test.engine.api.argument.IntegerArgument;
-
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.argument.IntegerArgument;
 
 public abstract class EvenBaseTest extends BaseTest {
 

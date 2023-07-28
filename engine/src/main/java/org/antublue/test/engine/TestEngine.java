@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine;
 
+import java.util.Optional;
 import org.antublue.test.engine.internal.ConfigurationParameters;
 import org.antublue.test.engine.internal.Executor;
 import org.antublue.test.engine.internal.Information;
@@ -31,8 +32,6 @@ import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
-
-import java.util.Optional;
 
 /** Class to implement the AntuBLUE Test Engine */
 public class TestEngine implements org.junit.platform.engine.TestEngine {

@@ -1,12 +1,11 @@
 package example.argument;
 
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.BigDecimalArgument;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.BigDecimalArgument;
 
 /** Example test */
 public class BigDecimalArgumentTest {

@@ -1,14 +1,13 @@
 package example;
 
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
-import org.antublue.test.engine.api.source.LineSource;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.source.LineSource;
 
 /** Example test */
 public class LineSourceTest2 {

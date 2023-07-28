@@ -16,6 +16,11 @@
 
 package org.antublue.test.engine.internal;
 
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.api.Argument;
@@ -34,12 +39,6 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestIdentifier;
 import org.junit.platform.launcher.TestPlan;
-
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 /** Class to collect test information and output a test execution summary */
 public class ConsoleTestExecutionListener implements TestExecutionListener {

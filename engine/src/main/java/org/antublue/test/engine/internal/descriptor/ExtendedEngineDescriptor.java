@@ -16,13 +16,12 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import org.junit.platform.engine.TestSource;
-import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.EngineDescriptor;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.junit.platform.engine.TestSource;
+import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a extended EngineDescriptor */
 @SuppressWarnings("unchecked")

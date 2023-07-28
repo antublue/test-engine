@@ -16,13 +16,12 @@
 
 package org.antublue.test.engine.internal;
 
-import org.junit.platform.engine.TestDescriptor;
-import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.EngineDescriptor;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to store a TestDescriptor based on UniqueId */
 public final class TestDescriptorStore {

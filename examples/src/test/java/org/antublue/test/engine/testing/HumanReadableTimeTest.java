@@ -2,11 +2,10 @@ package org.antublue.test.engine.testing;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
-
-import java.util.stream.Stream;
 
 /** Test for HumanReadableTime */
 public class HumanReadableTimeTest {

@@ -2,12 +2,11 @@ package example.locking;
 
 import static org.assertj.core.api.Fail.fail;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 
 public class ResourceLockMethodLockingTest2 {
 
