@@ -1,12 +1,11 @@
 package example.argument;
 
-import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.TestEngine;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
 @SuppressWarnings("unchecked")

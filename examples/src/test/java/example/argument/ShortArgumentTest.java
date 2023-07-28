@@ -1,11 +1,10 @@
 package example.argument;
 
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.ShortArgument;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.ShortArgument;
 
 /** Example test */
 public class ShortArgumentTest {

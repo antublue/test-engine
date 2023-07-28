@@ -16,11 +16,10 @@
 
 package org.antublue.test.engine.internal.logger;
 
-import org.antublue.test.engine.internal.util.Precondition;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import org.antublue.test.engine.internal.util.Precondition;
 
 /** Class to implement a LoggerFactory */
 public final class LoggerFactory {

@@ -16,6 +16,15 @@
 
 package org.antublue.test.engine.internal;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
@@ -42,16 +51,6 @@ import org.junit.platform.engine.discovery.PackageNameFilter;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
 
 /** Class to implement a resolver to build the test descriptor tree */
 @SuppressWarnings("PMD.NPathComplexity")

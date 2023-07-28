@@ -2,6 +2,13 @@ package example.testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.Closeable;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+import java.util.Random;
+import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -16,14 +23,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
-
-import java.io.Closeable;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import java.util.Random;
-import java.util.stream.Stream;
 
 /**
  * Example using testcontainers-java and Apache Kafka

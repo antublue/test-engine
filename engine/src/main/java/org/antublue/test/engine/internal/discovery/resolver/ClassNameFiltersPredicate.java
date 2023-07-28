@@ -16,13 +16,12 @@
 
 package org.antublue.test.engine.internal.discovery.resolver;
 
+import java.util.List;
+import java.util.function.Predicate;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.discovery.ClassNameFilter;
-
-import java.util.List;
-import java.util.function.Predicate;
 
 /** Class to implement a Predicate to filter a Class based on a List of ClassNameFilters */
 public class ClassNameFiltersPredicate implements Predicate<Class<?>> {

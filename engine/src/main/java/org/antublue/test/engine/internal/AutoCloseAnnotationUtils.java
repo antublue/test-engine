@@ -16,14 +16,13 @@
 
 package org.antublue.test.engine.internal;
 
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 /** Class to process @TestEngine.AutoClose annotations */
 @SuppressWarnings({"PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock"})

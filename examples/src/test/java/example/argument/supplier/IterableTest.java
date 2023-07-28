@@ -1,9 +1,8 @@
 package example.argument.supplier;
 
+import java.util.ArrayList;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
-
-import java.util.ArrayList;
 
 /** Example test */
 public class IterableTest {
