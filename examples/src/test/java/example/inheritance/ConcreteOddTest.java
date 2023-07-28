@@ -2,10 +2,9 @@ package example.inheritance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
-
-import java.util.stream.Stream;
 
 public class ConcreteOddTest extends OddBaseTest {
 

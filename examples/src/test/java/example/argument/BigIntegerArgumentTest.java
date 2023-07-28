@@ -1,12 +1,11 @@
 package example.argument;
 
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.BigIntegerArgument;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.argument.BigIntegerArgument;
 
 /** Example test */
 public class BigIntegerArgumentTest {

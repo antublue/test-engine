@@ -16,8 +16,6 @@
 
 package org.antublue.test.engine.api.source;
 
-import org.antublue.test.engine.api.argument.StringArgument;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,6 +28,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Class to create a Stream of Arguments where each Argument value is a line of a Stream */
 public final class LineSource {

@@ -16,13 +16,6 @@
 
 package org.antublue.test.engine.internal;
 
-import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.Precondition;
-import org.junit.platform.commons.support.ReflectionSupport;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -41,6 +34,12 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.Precondition;
+import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to implement methods to get test class fields / methods, caching the results */
 @SuppressWarnings({

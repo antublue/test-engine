@@ -16,11 +16,10 @@
 
 package org.antublue.test.engine.internal;
 
+import java.util.concurrent.CountDownLatch;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.ExecutionRequest;
-
-import java.util.concurrent.CountDownLatch;
 
 /** Class to implement an executor context */
 public class ExecutorContext {

@@ -16,14 +16,13 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.antublue.test.engine.internal.ExecutorContext;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
-
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /** Class to implement an extended AbstractTestDescriptor */
 @SuppressWarnings("unchecked")

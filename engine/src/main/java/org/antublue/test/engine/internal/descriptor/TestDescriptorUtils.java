@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import java.lang.reflect.Method;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.TestClassConfigurationException;
@@ -25,8 +26,6 @@ import org.antublue.test.engine.internal.util.Switch;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
-
-import java.lang.reflect.Method;
 
 /** Class to contain TestDescriptor utility methods */
 public final class TestDescriptorUtils {

@@ -16,9 +16,8 @@
 
 package org.antublue.test.engine.maven.plugin;
 
-import org.apache.maven.plugin.MojoExecutionException;
-
 import java.io.PrintStream;
+import org.apache.maven.plugin.MojoExecutionException;
 
 /** Class to implement a MojoExecutionException that doesn't print a stack trace */
 public class SuppressedStackTraceException extends MojoExecutionException {

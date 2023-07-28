@@ -16,13 +16,12 @@
 
 package org.antublue.test.engine.internal;
 
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
-
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 /** Class to implement TestEngineConfiguration */
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {

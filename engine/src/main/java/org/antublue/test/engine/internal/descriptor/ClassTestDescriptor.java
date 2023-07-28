@@ -16,6 +16,9 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
 import org.antublue.test.engine.internal.AutoCloseAnnotationUtils;
 import org.antublue.test.engine.internal.ExecutorContext;
 import org.antublue.test.engine.internal.LockAnnotationUtils;
@@ -28,10 +31,6 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
-
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Optional;
 
 /** Class to implement a class test descriptor */
 @SuppressWarnings({"PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock"})

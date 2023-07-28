@@ -1,9 +1,8 @@
 package example;
 
+import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
-
-import java.util.stream.Stream;
 
 /** Example test */
 @TestEngine.DisplayName(name = "_A_ClassDisplayNameMethodDisplayNameTest")
