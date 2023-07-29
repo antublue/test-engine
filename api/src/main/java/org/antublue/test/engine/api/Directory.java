@@ -14,26 +14,30 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.experimental;
+package org.antublue.test.engine.api;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Objects;
 
-/** Class to implement a TempDir class */
+/** Class to implement a Directory class */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Directory implements AutoCloseable {
 
+    private static final String JAVA_TMPDIR = System.getenv("java.io.tmpdir");
+
     /** Path type */
     public enum PathType {
+        /** Relative path to "java.io.tmpdir" */
         RELATIVE,
+        /** Absolute path */
         ABSOLUTE
     }
 
-    private final String absolutePath;
+    private final String path;
     private final PathType pathType;
+    private final File file;
 
     /**
      * Constructor
@@ -41,26 +45,41 @@ public class Directory implements AutoCloseable {
      * @param path path
      */
     private Directory(String path, PathType pathType) throws IOException {
-        this.absolutePath = Files.createTempDirectory(path).toFile().getAbsolutePath();
+        if (pathType == PathType.ABSOLUTE) {
+            this.file = new File(path).getAbsoluteFile();
+        } else {
+            this.file = new File(JAVA_TMPDIR + path).getAbsoluteFile();
+        }
+
+        Files.createDirectory(this.file.toPath());
+
+        this.path = this.file.getAbsolutePath();
         this.pathType = pathType;
     }
 
-    /** Method to close (delete) the temporary directory */
-    public void close() {
-        System.out.println(String.format("close [%s]", absolutePath));
+    /**
+     * Method to get a File
+     *
+     * @return a File
+     */
+    public File getFile() {
+        return file;
+    }
 
-        if (absolutePath != null) {
+    /** Method to close (delete) the directory */
+    public void close() {
+        if (path != null) {
             try {
-                delete(new File(absolutePath));
+                delete(new File(path));
             } catch (IOException e) {
-                // DO NOTHING
+                e.printStackTrace();
             }
         }
     }
 
     @Override
     public String toString() {
-        return absolutePath;
+        return file.getAbsolutePath();
     }
 
     @Override
@@ -68,13 +87,14 @@ public class Directory implements AutoCloseable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Directory directory = (Directory) o;
-        return Objects.equals(absolutePath, directory.absolutePath)
-                && pathType == directory.pathType;
+        return Objects.equals(path, directory.path)
+                && pathType == directory.pathType
+                && Objects.equals(file, directory.file);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(absolutePath, pathType);
+        return Objects.hash(path, pathType, file);
     }
 
     private void delete(File f) throws IOException {
@@ -85,7 +105,7 @@ public class Directory implements AutoCloseable {
         }
 
         if (!f.delete()) {
-            throw new FileNotFoundException(String.format("Failed to delete file [%s]", f));
+            throw new IOException(String.format("Failed to delete file [%s]", f));
         }
     }
 

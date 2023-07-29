@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package example.experimental;
+package example.directory;
 
-import static org.antublue.test.engine.api.experimental.Directory.PathType.RELATIVE;
+import static org.antublue.test.engine.api.Directory.PathType.ABSOLUTE;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Directory;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
-import org.antublue.test.engine.api.experimental.Directory;
 
 /** Example test */
-public class DirectoryTest2 {
+public class DirectoryTest3 {
+
+    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude")
+    private Directory directory1;
 
     @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll")
-    private Directory directory;
+    private Directory directory2;
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -45,17 +48,21 @@ public class DirectoryTest2 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public void prepare() throws IOException {
         System.out.println("prepare()");
+
+        directory1 = Directory.create("/tmp/directory-" + UUID.randomUUID(), ABSOLUTE);
+
+        System.out.println(String.format("directory1 [%s]", directory1));
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() throws IOException {
         System.out.println("beforeAll(" + stringArgument + ")");
 
-        directory = Directory.create(UUID.randomUUID().toString(), RELATIVE);
+        directory2 = Directory.create("/tmp/directory-" + UUID.randomUUID(), ABSOLUTE);
 
-        System.out.println(String.format("directory [%s]", directory));
+        System.out.println(String.format("directory2 [%s]", directory2));
     }
 
     @TestEngine.BeforeEach
