@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package example.experimental;
+package example.directory;
 
-import static org.antublue.test.engine.api.experimental.Directory.PathType.RELATIVE;
+import static org.antublue.test.engine.api.Directory.PathType.RELATIVE;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Directory;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
-import org.antublue.test.engine.api.experimental.Directory;
 
 /** Example test */
 public class DirectoryTest1 {
