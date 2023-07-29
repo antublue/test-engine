@@ -69,20 +69,8 @@ mvn versions:set -DnewVersion="${VERSION}" -DprocessAllModules
 check_exit_code "Maven update versions [${VERSION}] failed"
 rm -Rf $(find . -name "*versionsBackup")
 
-# Add changed files
-git add -u
-check_exit_code "Git add failed"
-
-# Commit the changed files
-git commit -m "${VERSION}"
-check_exit_code "Git commit failed"
-
-# Build the version
-./mvnw clean verify
-check_exit_code "Maven build [${VERSION}] failed"
-
 # Build the version as a release
-./mvnw -s ~/.m2/antublue.settings.xml -P release clean install
+./mvnw -s ~/.m2/antublue.settings.xml -P clean install
 check_exit_code "Maven deploy [${VERSION}] failed"
 
 # Reset the branch
