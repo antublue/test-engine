@@ -212,6 +212,9 @@
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>2.38.0</version>
                 <configuration>
+                    <licenseHeader>
+                        <file>LICENSE_HEADER.txt</file>
+                    </licenseHeader>
                     <java>
                         <googleJavaFormat>
                             <version>1.17.0</version>
