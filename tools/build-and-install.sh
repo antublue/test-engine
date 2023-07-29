@@ -70,7 +70,7 @@ check_exit_code "Maven update versions [${VERSION}] failed"
 rm -Rf $(find . -name "*versionsBackup")
 
 # Build the version as a release
-./mvnw -s ~/.m2/antublue.settings.xml -P clean install
+./mvnw clean install
 check_exit_code "Maven deploy [${VERSION}] failed"
 
 # Reset the branch
