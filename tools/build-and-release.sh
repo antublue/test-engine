@@ -44,6 +44,12 @@ fi
 
 VERSION="${1}"
 PROJECT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+if [ "${CURRENT_BRANCH}" != "main" ];
+then
+   emit_error "Release should always be from [main] branch not [${CURRENT_BRANCH}] branch"
+fi
 
 cd "${PROJECT_ROOT_DIRECTORY}"
 check_exit_code "Failed to change to project root directory"
