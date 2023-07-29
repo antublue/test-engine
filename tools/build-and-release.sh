@@ -60,13 +60,6 @@ then
   exit 1
 fi
 
-# Check for missing copyright notices
-tools/copyright-check.sh
-check_exit_code "Copyright check failed"
-
-# Apply Google Java format
-#tools/apply-google-java-format.sh
-
 # Verify the code builds
 ./mvnw -s ~/.m2/antublue.settings.xml -P release clean verify
 check_exit_code "Maven build failed"

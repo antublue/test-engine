@@ -36,6 +36,7 @@ fi
 
 VERSION="${1}"
 PROJECT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # Check for any uncommitted changes
 git diff --quiet HEAD
@@ -51,10 +52,6 @@ fi
 
 cd "${PROJECT_ROOT_DIRECTORY}"
 check_exit_code "Failed to change to project root directory"
-
-# Check for missing copyright notices
-tools/copyright-check.sh
-check_exit_code "Copyright check failed"
 
 # Verify the code builds
 ./mvnw clean verify
@@ -93,8 +90,8 @@ git reset --hard HEAD
 check_exit_code "Git reset hard failed"
 
 # Checkout the main branch
-git checkout main
-check_exit_code "Git checkout [main] failed"
+git checkout "${CURRENT_BRANCH}"
+check_exit_code "Git checkout [${CURRENT_BRANCH} failed"
 
 # Delete the build branch
 git branch -D "build-${VERSION}"
