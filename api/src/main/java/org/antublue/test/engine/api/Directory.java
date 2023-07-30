@@ -22,7 +22,6 @@ import java.nio.file.Files;
 import java.util.Objects;
 
 /** Class to implement a Directory class */
-@SuppressWarnings("PMD.EmptyCatchBlock")
 public class Directory implements AutoCloseable {
 
     private static final String JAVA_TMPDIR = System.getenv("java.io.tmpdir");
