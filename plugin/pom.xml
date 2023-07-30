@@ -185,7 +185,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>10.12.1</version>
+                        <version>10.12.2</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -273,7 +273,7 @@
         <dependency>
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-api</artifactId>
-            <version>1.9.13</version>
+            <version>1.9.14</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
