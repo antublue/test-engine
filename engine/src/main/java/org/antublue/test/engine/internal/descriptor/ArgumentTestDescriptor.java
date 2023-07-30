@@ -133,12 +133,15 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
         Field field = ReflectionUtils.getArgumentField(testClass);
+        if (field != null) {
+            LOGGER.trace(
+                    "set argument field testClass [%s] field [%s] testArgument [%s]",
+                    testClass.getName(), field.getName(), testArgument.name());
 
-        LOGGER.trace(
-                "set field testClass [%s] field [%s] testArgument [%s]",
-                testClass.getName(), field.getName(), testArgument.name());
-
-        ReflectionUtils.setField(testInstance, field, testArgument, throwableCollector);
+            ReflectionUtils.setField(testInstance, field, testArgument, throwableCollector);
+        } else {
+            LOGGER.trace("no argument field testClass [%s]", testClass.getName());
+        }
 
         if (throwableCollector.isEmpty()) {
             List<Method> methods = ReflectionUtils.getBeforeAllMethods(testClass);
@@ -149,7 +152,18 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
                 LockAnnotationUtils.processLockAnnotations(method);
 
-                ReflectionUtils.invoke(testInstance, method, throwableCollector);
+                boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
+
+                LOGGER.trace(
+                        "class [%s] method [%s] acceptsArgument [%b]",
+                        testClass.getName(), method.getName(), acceptsArgument);
+
+                if (acceptsArgument) {
+                    ReflectionUtils.invoke(
+                            testInstance, method, new Object[] {testArgument}, throwableCollector);
+                } else {
+                    ReflectionUtils.invoke(testInstance, method, throwableCollector);
+                }
 
                 LockAnnotationUtils.processUnlockAnnotations(method);
 
@@ -185,7 +199,18 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
             LockAnnotationUtils.processLockAnnotations(method);
 
-            ReflectionUtils.invoke(testInstance, method, throwableCollector);
+            boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
+
+            LOGGER.trace(
+                    "class [%s] method [%s] acceptsArgument [%b]",
+                    testClass.getName(), method.getName(), acceptsArgument);
+
+            if (acceptsArgument) {
+                ReflectionUtils.invoke(
+                        testInstance, method, new Object[] {testArgument}, throwableCollector);
+            } else {
+                ReflectionUtils.invoke(testInstance, method, throwableCollector);
+            }
 
             LockAnnotationUtils.processUnlockAnnotations(method);
         }
@@ -193,11 +218,15 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         AutoCloseAnnotationUtils.processAutoCloseAnnotatedFields(
                 testInstance, "@TestEngine.AfterAll", throwableCollector);
 
-        LOGGER.trace(
-                "set field testClass [%s] field [%s] testArgument[null]",
-                testClass.getName(), field.getName());
+        if (field != null) {
+            LOGGER.trace(
+                    "set argument field testClass [%s] field [%s] testArgument[null]",
+                    testClass.getName(), field.getName());
 
-        ReflectionUtils.setField(testInstance, field, null, throwable -> {});
+            ReflectionUtils.setField(testInstance, field, null, throwable -> {});
+        } else {
+            LOGGER.trace("no argument field testClass [%s]", testClass.getName());
+        }
 
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
