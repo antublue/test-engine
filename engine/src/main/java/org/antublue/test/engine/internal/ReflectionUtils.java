@@ -111,6 +111,13 @@ public final class ReflectionUtils {
         return classes;
     }
 
+    public static boolean acceptsArgument(Method method, Argument testArgument) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        return parameterTypes != null
+                && parameterTypes.length == 1
+                && parameterTypes[0].isAssignableFrom(testArgument.getClass());
+    }
+
     /**
      * Method to get a @TestEngine.ArgumentSupplier Method
      *
@@ -304,16 +311,21 @@ public final class ReflectionUtils {
                     "class [%s] @TestEngine.Argument field count [%d]",
                     clazz.getName(), argumentFields.size());
 
-            if (argumentFields.size() != 1) {
+            Field field = null;
+
+            if (argumentFields.size() == 0) {
+                ARGUMENT_FIELD_CACHE.put(clazz, null);
+            } else if (argumentFields.size() == 1) {
+                field = argumentFields.get(0);
+                ARGUMENT_FIELD_CACHE.put(clazz, field);
+            } else if (argumentFields.size() != 1) {
                 throw new TestClassConfigurationException(
                         String.format(
                                 "Test class [%s] must define one @TestEngine.Argument field",
                                 clazz.getName()));
             }
 
-            ARGUMENT_FIELD_CACHE.put(clazz, argumentFields.get(0));
-
-            return argumentFields.get(0);
+            return field;
         }
     }
 
@@ -370,6 +382,14 @@ public final class ReflectionUtils {
                                             !method.isAnnotationPresent(TestEngine.Disabled.class))
                             .collect(Collectors.toList());
 
+            methods.addAll(
+                    getMethods(
+                            clazz,
+                            TestEngine.BeforeAll.class,
+                            Scope.NON_STATIC,
+                            Void.class,
+                            Argument.class));
+
             LOGGER.trace(
                     "class [%s] @TestEngine.BeforeAll method count [%d]",
                     clazz.getName(), methods.size());
@@ -412,6 +432,14 @@ public final class ReflectionUtils {
                                     method ->
                                             !method.isAnnotationPresent(TestEngine.Disabled.class))
                             .collect(Collectors.toList());
+
+            methods.addAll(
+                    getMethods(
+                            clazz,
+                            TestEngine.BeforeEach.class,
+                            Scope.NON_STATIC,
+                            Void.class,
+                            Argument.class));
 
             LOGGER.trace(
                     "class [%s] @TestEngine.BeforeEach method count [%d]",
@@ -456,6 +484,19 @@ public final class ReflectionUtils {
                                             !method.isAnnotationPresent(TestEngine.Disabled.class))
                             .collect(Collectors.toList());
 
+            methods.addAll(
+                    getMethods(
+                                    clazz,
+                                    TestEngine.Test.class,
+                                    Scope.NON_STATIC,
+                                    Void.class,
+                                    Argument.class)
+                            .stream()
+                            .filter(
+                                    method ->
+                                            !method.isAnnotationPresent(TestEngine.Disabled.class))
+                            .collect(Collectors.toList()));
+
             LOGGER.trace(
                     "class [%s] @TestEngine.Test method count [%d]",
                     clazz.getName(), methods.size());
@@ -499,6 +540,14 @@ public final class ReflectionUtils {
                                             !method.isAnnotationPresent(TestEngine.Disabled.class))
                             .collect(Collectors.toList());
 
+            methods.addAll(
+                    getMethods(
+                            clazz,
+                            TestEngine.AfterEach.class,
+                            Scope.NON_STATIC,
+                            Void.class,
+                            Argument.class));
+
             LOGGER.trace(
                     "class [%s] @TestEngine.AfterEach method count [%d]",
                     clazz.getName(), methods.size());
@@ -541,6 +590,14 @@ public final class ReflectionUtils {
                                     method ->
                                             !method.isAnnotationPresent(TestEngine.Disabled.class))
                             .collect(Collectors.toList());
+
+            methods.addAll(
+                    getMethods(
+                            clazz,
+                            TestEngine.AfterAll.class,
+                            Scope.NON_STATIC,
+                            Void.class,
+                            Argument.class));
 
             LOGGER.trace(
                     "class [%s] @TestEngine.AfterAll method count [%d]",
