@@ -16,17 +16,51 @@
 
 package org.antublue.test.engine.internal;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.function.Function;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 /** Class to implement TestEngineConfiguration */
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationParameters.class);
+    private static final String USER_HOME = System.getProperty("user.home");
+
+    private final Properties properties;
+    private final Map<String, Optional> cache;
+
+    public ConfigurationParameters() {
+        cache = Collections.synchronizedMap(new HashMap<>());
+        properties = new Properties();
+
+        LOGGER.trace("user.home [%s]", USER_HOME);
+
+        if (USER_HOME != null) {
+            File file = new File(USER_HOME + "/.antublue-test-engine.properties");
+            if (file.exists() && file.isFile() && file.canRead()) {
+                try (BufferedReader bufferedReader =
+                        Files.newBufferedReader(file.toPath().toAbsolutePath())) {
+                    properties.load(bufferedReader);
+                } catch (IOException e) {
+                    LOGGER.warn(
+                            "Exception loading test engine properties [%s]",
+                            file.toPath().toAbsolutePath());
+                }
+            }
+        }
+    }
 
     @Override
     public Optional<String> get(String key) {
@@ -64,21 +98,54 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
      * @return the return value
      */
     private String resolve(String key) {
+        LOGGER.trace("resolve [%s]", key);
+
+        String location = null;
+
+        // Check the cache
+        Optional<String> cachedResult = cache.get(key);
+        if (cachedResult != null) {
+            if (cachedResult.isPresent()) {
+                return cachedResult.get();
+            } else {
+                return null;
+            }
+        }
+
         String result = null;
 
         // Convert the system property to an environment variable and get the value
         String value = System.getenv(key.toUpperCase(Locale.ENGLISH).replace('.', '_'));
         if (value != null && !value.trim().isEmpty()) {
             result = value.trim();
+            location = "environment variable";
         }
 
-        // Get the system property value
-        value = System.getProperty(key);
-        if (value != null && !value.trim().isEmpty()) {
-            result = value.trim();
+        if (result == null) {
+            // Get the system property value
+            value = System.getProperty(key);
+            if (value != null && !value.trim().isEmpty()) {
+                result = value.trim();
+                location = "system property";
+            }
         }
 
-        LOGGER.trace("key [%s] result [%s]", key, result);
+        if (result == null) {
+            // Get the file property values
+            value = properties.getProperty(key);
+            if (value != null && !value.trim().isEmpty()) {
+                result = value.trim();
+                location = "properties file";
+            }
+        }
+
+        if (result == null) {
+            location = "not found";
+        }
+
+        LOGGER.trace("resolve key [%s] result [%s] location [%s]", key, result, location);
+
+        cache.put(key, Optional.ofNullable(result));
 
         return result;
     }

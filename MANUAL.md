@@ -208,8 +208,18 @@ Build and test your project...
 
 ### Test Engine Configuration
 
-The test engine has seven configuration parameters.
-<br/>
+The test engine has seven core configuration parameters.
+
+Properties are resolved in the following order:
+
+1. Environment variable
+2. System property
+3. `<user.home>/.antublue-test-engine.properties` file
+
+**Notes**
+
+- The first configuration source that contains the configuration parameter is used.
+
 <br/>
 
 | Thread count         |                                   |
