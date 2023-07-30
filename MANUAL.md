@@ -60,7 +60,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 ### Additional Test Annotations
 
-| Annotation                                    | Scope            | Required | Usage                                                                                                                               |
+| Annotation                                    | Scope            | Required | Usage                                                                                                                              |
 |-----------------------------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
 | `@TestEngine.Disabled`                        | class<br/>method | no       | Marks a test class or method disabled                                                                                              |
 | `@TestEngine.BaseClass`                       | class            | no       | Marks a test class as being a base test class (skips direct execution)                                                             |
@@ -231,7 +231,7 @@ Properties are resolved in the following order:
 
 <br/>
 
-| <nobr>Test class name include filter</nobr> |                                          |
+| <nobr>Test class name include filter</nobr> |                                         |
 |-------------------------------------------------|-----------------------------------------|
 | Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_CLASS_INCLUDE |
 | System property                                 | antublue.test.engine.test.class.include |
@@ -240,58 +240,58 @@ Properties are resolved in the following order:
 <br/>
 
 | <nobr>Test class name exclude filter</nobr> |                                         |
-|-------------------------------------------------|-----------------------------------------|
-| Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE |
-| System property                                 | antublue.test.engine.test.class.exclude |
-| Type                                            | regex string                            |
+|---------------------------------------------|-----------------------------------------|
+| Environment variable                        | ANTUBLUE_TEST_ENGINE_TEST_CLASS_EXCLUDE |
+| System property                             | antublue.test.engine.test.class.exclude |
+| Type                                        | regex string                            |
 
 <br/>
 
 | <nobr>Test method name include filter</nobr> |                                          |
-|--------------------------------------------------|------------------------------------------|
-| Environment variable                             | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE |
-| System property                                  | antublue.test.engine.test.method.include |
-| Type                                             | regex string                             |
+|----------------------------------------------|------------------------------------------|
+| Environment variable                         | ANTUBLUE_TEST_ENGINE_TEST_METHOD_INCLUDE |
+| System property                              | antublue.test.engine.test.method.include |
+| Type                                         | regex string                             |
 
 <br/>
 
 | <nobr>Test method name exclude filter</nobr> |                                          |
-|--------------------------------------------------|------------------------------------------|
-| Environment variable                             | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE |
-| System property                                  | antublue.test.engine.test.method.exclude |
-| Type                                             | regex string                             |
+|----------------------------------------------|------------------------------------------|
+| Environment variable                         | ANTUBLUE_TEST_ENGINE_TEST_METHOD_EXCLUDE |
+| System property                              | antublue.test.engine.test.method.exclude |
+| Type                                         | regex string                             |
 
 <br/>
 
 | <nobr>Test class tag include filter</nobr> |                                             |
-|------------------------------------------------|---------------------------------------------|
-| Environment variable                           | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE |
-| System property                                | antublue.test.engine.test.class.tag.include |
-| Type                                           | regex string                                |
+|--------------------------------------------|---------------------------------------------|
+| Environment variable                       | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_INCLUDE |
+| System property                            | antublue.test.engine.test.class.tag.include |
+| Type                                       | regex string                                |
 
 <br/>
 
 | <nobr>Test class tag exclude filter</nobr> |                                             |
-|------------------------------------------------|---------------------------------------------|
-| Environment variable                           | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE |
-| System property                                | antublue.test.engine.test.class.tag.exclude |
-| Type                                           | regex string                                |
+|--------------------------------------------|---------------------------------------------|
+| Environment variable                       | ANTUBLUE_TEST_ENGINE_TEST_CLASS_TAG_EXCLUDE |
+| System property                            | antublue.test.engine.test.class.tag.exclude |
+| Type                                       | regex string                                |
 
 <br/>
 
 | <nobr>Test method tag include filter</nobr> |                                              |
-|-------------------------------------------------|----------------------------------------------|
-| Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_INCLUDE |
-| System property                                 | antublue.test.engine.test.method.tag.include |
-| Type                                            | regex string                                 |
+|---------------------------------------------|----------------------------------------------|
+| Environment variable                        | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_INCLUDE |
+| System property                             | antublue.test.engine.test.method.tag.include |
+| Type                                        | regex string                                 |
 
 <br/>
 
 | <nobr>Test method tag exclude filter</nobr> |                                              |
-|-------------------------------------------------|----------------------------------------------|
-| Environment variable                            | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_EXCLUDE |
-| System property                                 | antublue.test.engine.test.method.tag.exclude |
-| Type                                            | regex string                                 |
+|---------------------------------------------|----------------------------------------------|
+| Environment variable                        | ANTUBLUE_TEST_ENGINE_TEST_METHOD_TAG_EXCLUDE |
+| System property                             | antublue.test.engine.test.method.tag.exclude |
+| Type                                        | regex string                                 |
 
 <br/>
 Using a combination of the system properties (and/or environment variables) allows for including / excluding individual test classes / test methods.
@@ -302,11 +302,11 @@ The test engine as two experimental configuration parameters.
 
 
 | <nobr>Output console TEST messages</nobr> |                                                     |
-|-----------------------------------------------|-----------------------------------------------------|
-| Environment variable                          | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_TEST_MESSAGES |
-| System property                               | antublue.test.engine.experimental.log.test.messages |
-| Type                                          | boolean                                             |
-| Default                                       | true                                                |
+|-------------------------------------------|-----------------------------------------------------|
+| Environment variable                      | ANTUBLUE_TEST_ENGINE_EXPERIMENTAL_LOG_TEST_MESSAGES |
+| System property                           | antublue.test.engine.experimental.log.test.messages |
+| Type                                      | boolean                                             |
+| Default                                   | true                                                |
 
 <br/>
 
