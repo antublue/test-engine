@@ -539,7 +539,7 @@ public final class ReflectionUtils {
                                     method ->
                                             !method.isAnnotationPresent(TestEngine.Disabled.class))
                             .collect(Collectors.toList());
-          
+
             methods.addAll(
                     getMethods(
                             clazz,
