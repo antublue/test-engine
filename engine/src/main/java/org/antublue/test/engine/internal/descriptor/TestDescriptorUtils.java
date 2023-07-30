@@ -151,12 +151,14 @@ public final class TestDescriptorUtils {
         }
 
         // Validate we have a @TestEngine.Argument field
+        /*
         if (ReflectionUtils.getArgumentField(clazz) == null) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a @TestEngine.Argument field",
                             clazz.getName()));
         }
+        */
 
         // Validate we have a @TestEngine.Test method
         if (ReflectionUtils.getTestMethods(clazz).size() < 1) {
