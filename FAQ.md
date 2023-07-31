@@ -100,3 +100,12 @@ You can use the test engine in place of Junit 5 in scenarios where you don't rea
 Example:
 
 - [Junit5ReplacementExampleTest.java](/examples/src/test/java/example/Junit5ReplacementExampleTest.java)
+
+---
+
+### Where is the `Extension` model/paradigm?
+
+Currently, there is no `Extension` model/paradigm. It's not yet been required/requested.
+
+If you feel this is required and can provide a real test scenario, please open an issue or discussion so it can be designed/implemented.
+
