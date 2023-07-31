@@ -41,6 +41,7 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
     private final Properties properties;
     private final Map<String, Optional> cache;
 
+    /** Constructor */
     public ConfigurationParameters() {
         cache = Collections.synchronizedMap(new HashMap<>());
         properties = new Properties();

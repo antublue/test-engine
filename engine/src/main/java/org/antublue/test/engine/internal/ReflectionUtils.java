@@ -111,11 +111,18 @@ public final class ReflectionUtils {
         return classes;
     }
 
-    public static boolean acceptsArgument(Method method, Argument testArgument) {
+    /**
+     * Method to return if a Method accepts an Argument
+     *
+     * @param method method
+     * @param argument argument
+     * @return the return value
+     */
+    public static boolean acceptsArgument(Method method, Argument argument) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         return parameterTypes != null
                 && parameterTypes.length == 1
-                && parameterTypes[0].isAssignableFrom(testArgument.getClass());
+                && parameterTypes[0].isAssignableFrom(argument.getClass());
     }
 
     /**
