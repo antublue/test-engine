@@ -26,16 +26,32 @@ Versions prior to `v4.2.3` should not be used due to a critical bug ...
 
 ## API
 
+Test classes support both `Argument` injection (`@TestEngine.Argument` annotated field) and/or method an `Argument` for the following methods:
+
+- `@TestEngine.BeforeAll`
+- `@TestEngine.BeforeEach`
+- `@TestEngine.Test` 
+- `@TestEngine.AfterEach`
+- `@TestEngine.AfterAll`
+
+`@TestEngine.Argument` injection example:
+
+- [SimpleTestExample.java](/examples/src/test/java/example/SimpleExampleTest.java)
+
+`@TestEngine` method injection example
+
+- [NoArgumentDeclarationTest.java](/examples/src/test/java/example/NoArgumentDeclarationTest.java)
+
 ### Test Annotations
 
 | Annotation                     | Static | Type   | Required | Example                                                                                                                                                                            |
 |--------------------------------|--------|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `@TestEngine.ArgumentSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments();`</nobr> |
-| `@TestEngine.Argument`         | no     | field  | yes      | `public Argument argument;`                                                                                                                                                        |
-| `@TestEngine.Prepare`          | no     | method | no       | `public void prepare();`                                                                                                                                                           | `public void prepare();`                                                         |
+| `@TestEngine.Argument`         | no     | field  | no       | `public Argument argument;`                                                                                                                                                        |
+| `@TestEngine.Prepare`          | no     | method | no       | `public void prepare();`                                                                                                                                                           |
 | `@TestEngine.BeforeAll`        | no     | method | no       | `public void beforeAll();`                                                                                                                                                         |
 | `@TestEngine.BeforeEach`       | no     | method | no       | `public void beforeEach();`                                                                                                                                                        |
-| `@TestEngine.Test`             | no     | method | yes      | `public void test();`                                                                                                                                                              |
+| `@TestEngine.Test`             | no     | method | yes      | `public void test();` or `public void test(Argument argument)`                                                                                                                     |
 | `@TestEngine.AfterEach`        | no     | method | no       | `public void afterEach();`                                                                                                                                                         |
 | `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                          |
 | `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                          |
@@ -407,7 +423,7 @@ for (each test class in the Collection<Class<?>>) {
     
     for (each Argument) {
     
-      set the test instance "@TestEngine.Argument" field to the Argument object
+      set the test instance "@TestEngine.Argument" annotated field (if it exists)
        
       invoke all test instance "@TestEngine.BeforeAll" methods
       
@@ -421,6 +437,8 @@ for (each test class in the Collection<Class<?>>) {
       }
       
       invoke all test instance "@TestEngine.AfterAll" methods
+      
+      set the test instance "@TestEngine.Argument" annotated field to "null" (if it exists)
     }
     
     invoke all test instance "@TestEngine.Conclude" methods
