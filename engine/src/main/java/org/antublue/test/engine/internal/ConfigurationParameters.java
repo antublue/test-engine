@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Function;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
@@ -46,19 +47,45 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
         cache = Collections.synchronizedMap(new HashMap<>());
         properties = new Properties();
 
-        LOGGER.trace("user.home [%s]", USER_HOME);
+        LOGGER.trace("[%s] = [%s]", "user.home", USER_HOME);
 
-        if (USER_HOME != null) {
-            File file = new File(USER_HOME + "/.antublue-test-engine.properties");
-            if (file.exists() && file.isFile() && file.canRead()) {
-                try (BufferedReader bufferedReader =
-                        Files.newBufferedReader(file.toPath().toAbsolutePath())) {
-                    properties.load(bufferedReader);
-                } catch (IOException e) {
-                    LOGGER.warn(
-                            "Exception loading test engine properties [%s]",
-                            file.toPath().toAbsolutePath());
-                }
+        // Resolve the properties file if defined (environment variable, system property, use.home
+        // properties file)
+
+        String propertiesFilename = null;
+
+        String value =
+                System.getenv(
+                        Constants.TEST_ENGINE_PROPERTIES
+                                .toUpperCase(Locale.ENGLISH)
+                                .replace('.', '_'));
+
+        if (value != null && !value.trim().isEmpty()) {
+            propertiesFilename = value.trim();
+        }
+
+        if (propertiesFilename == null) {
+            value = System.getProperty(Constants.TEST_ENGINE_PROPERTIES);
+            if (value != null && !value.trim().isEmpty()) {
+                propertiesFilename = value.trim();
+            }
+        }
+
+        if (propertiesFilename == null && USER_HOME != null) {
+            propertiesFilename = USER_HOME + "/.antublue-test-engine.properties";
+        }
+
+        LOGGER.trace("[%s] = [%s]", Constants.TEST_ENGINE_PROPERTIES, propertiesFilename);
+
+        File file = new File(propertiesFilename);
+        if (file.exists() && file.isFile() && file.canRead()) {
+            try (BufferedReader bufferedReader =
+                    Files.newBufferedReader(file.toPath().toAbsolutePath())) {
+                properties.load(bufferedReader);
+            } catch (IOException e) {
+                LOGGER.warn(
+                        "Exception loading test engine properties [%s]",
+                        file.toPath().toAbsolutePath());
             }
         }
     }
@@ -92,8 +119,8 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
     }
 
     /**
-     * Method to resolve a configuration key first as a Java property, then as an environment
-     * variable
+     * Method to resolve a configuration value (environment variable, system property, properties
+     * file)
      *
      * @param key key
      * @return the return value
@@ -144,7 +171,7 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
             location = "not found";
         }
 
-        LOGGER.trace("resolve key [%s] result [%s] location [%s]", key, result, location);
+        LOGGER.trace("[%s] = [%s] (location [%s])", key, result, location);
 
         cache.put(key, Optional.ofNullable(result));
 
