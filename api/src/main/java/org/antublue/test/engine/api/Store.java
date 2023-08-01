@@ -201,26 +201,17 @@ public class Store {
 
         remove(key)
                 .ifPresent(
-                        new Consumer<Object>() {
-
-                            /**
-                             * Performs this operation on the given argument.
-                             *
-                             * @param o the input argument
-                             */
-                            @Override
-                            public void accept(Object o) {
-                                try {
-                                    consumer.accept((T) o);
-                                } catch (Throwable t) {
-                                    storeExceptionAtomicReference.set(
-                                            new StoreException(
-                                                    String.format(
-                                                            "Exception closing Object for key [%s]"
-                                                                    + " object [%s]",
-                                                            key, o.getClass().getName()),
-                                                    t));
-                                }
+                        o -> {
+                            try {
+                                consumer.accept((T) o);
+                            } catch (Throwable t) {
+                                storeExceptionAtomicReference.set(
+                                        new StoreException(
+                                                String.format(
+                                                        "Exception closing Object for key [%s]"
+                                                                + " object [%s]",
+                                                        key, o.getClass().getName()),
+                                                t));
                             }
                         });
 
