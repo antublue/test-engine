@@ -29,6 +29,9 @@ public final class Constants {
     public static final String EXPERIMENTAL = ".experimental";
 
     /** Configuration constant */
+    public static final String TEST_ENGINE_PROPERTIES = PREFIX + ".properties";
+
+    /** Configuration constant */
     public static final String CONSOLE_OUTPUT = PREFIX + ".console.output";
 
     /** Configuration constant */
