@@ -40,16 +40,15 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodTestDescriptor.class);
 
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.singleton();
+
     private enum State {
         BEFORE_EACH,
         BEFORE_EACH_SUCCESS,
         BEFORE_EACH_FAIL,
         EXECUTE,
         EXECUTE_SUCCESS,
-        EXECUTE_FAIL,
-        AFTER_EACH,
-        AFTER_EACH_SUCCESS,
-        AFTER_EACH_FAIL
+        EXECUTE_FAIL
     }
 
     private final Class<?> testClass;
@@ -165,7 +164,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         StateMachine<State> stateMachine = new StateMachine<>(this.toString(), State.BEFORE_EACH);
 
-        List<Method> methods = ReflectionUtils.getBeforeEachMethods(testClass);
+        List<Method> methods = REFLECTION_UTILS.getBeforeEachMethods(testClass);
         for (Method method : methods) {
             LOGGER.trace(
                     "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
@@ -173,17 +172,17 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
             lockAnnotationUtils.processLockAnnotations(method);
 
-            boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
+            boolean acceptsArgument = REFLECTION_UTILS.acceptsArgument(method, testArgument);
 
             LOGGER.trace(
                     "class [%s] method [%s] acceptsArgument [%b]",
                     testClass.getName(), method.getName(), acceptsArgument);
 
             if (acceptsArgument) {
-                ReflectionUtils.invoke(
+                REFLECTION_UTILS.invoke(
                         testInstance, method, new Object[] {testArgument}, throwableCollector);
             } else {
-                ReflectionUtils.invoke(testInstance, method, throwableCollector);
+                REFLECTION_UTILS.invoke(testInstance, method, throwableCollector);
             }
 
             lockAnnotationUtils.processUnlockAnnotations(method);
@@ -203,17 +202,17 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
             lockAnnotationUtils.processLockAnnotations(testMethod);
 
-            boolean acceptsArgument = ReflectionUtils.acceptsArgument(testMethod, testArgument);
+            boolean acceptsArgument = REFLECTION_UTILS.acceptsArgument(testMethod, testArgument);
 
             LOGGER.trace(
                     "class [%s] method [%s] acceptsArgument [%b]",
                     testClass.getName(), testMethod.getName(), acceptsArgument);
 
             if (acceptsArgument) {
-                ReflectionUtils.invoke(
+                REFLECTION_UTILS.invoke(
                         testInstance, testMethod, new Object[] {testArgument}, throwableCollector);
             } else {
-                ReflectionUtils.invoke(testInstance, testMethod, throwableCollector);
+                REFLECTION_UTILS.invoke(testInstance, testMethod, throwableCollector);
             }
 
             lockAnnotationUtils.processUnlockAnnotations(testMethod);
@@ -224,7 +223,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         // Always run AfterEach methods
 
-        methods = ReflectionUtils.getAfterEachMethods(testClass);
+        methods = REFLECTION_UTILS.getAfterEachMethods(testClass);
         for (Method method : methods) {
             LOGGER.trace(
                     "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
@@ -232,17 +231,17 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
             lockAnnotationUtils.processLockAnnotations(method);
 
-            boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
+            boolean acceptsArgument = REFLECTION_UTILS.acceptsArgument(method, testArgument);
 
             LOGGER.trace(
                     "class [%s] method [%s] acceptsArgument [%b]",
                     testClass.getName(), method.getName(), acceptsArgument);
 
             if (acceptsArgument) {
-                ReflectionUtils.invoke(
+                REFLECTION_UTILS.invoke(
                         testInstance, method, new Object[] {testArgument}, throwableCollector);
             } else {
-                ReflectionUtils.invoke(testInstance, method, throwableCollector);
+                REFLECTION_UTILS.invoke(testInstance, method, throwableCollector);
             }
 
             lockAnnotationUtils.processUnlockAnnotations(method);

@@ -39,6 +39,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassTestDescriptor.class);
 
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.singleton();
+
     private enum State {
         INSTANTIATE_TEST_INSTANCE,
         INSTANTIATE_TEST_INSTANCE_SUCCESS,
@@ -138,7 +140,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         LOGGER.trace("instantiate testClass [%s]", testClass.getName());
 
-        ReflectionUtils.instantiate(
+        REFLECTION_UTILS.instantiate(
                 testClass,
                 o -> {
                     testInstance = o;
@@ -152,7 +154,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 State.INSTANTIATE_TEST_INSTANCE_FAIL);
 
         if (stateMachine.ifThen(State.INSTANTIATE_TEST_INSTANCE_SUCCESS, State.PREPARE)) {
-            List<Method> methods = ReflectionUtils.getPrepareMethods(testClass);
+            List<Method> methods = REFLECTION_UTILS.getPrepareMethods(testClass);
             for (Method method : methods) {
                 LOGGER.trace(
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
@@ -160,7 +162,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
                 lockAnnotationUtils.processLockAnnotations(method);
 
-                ReflectionUtils.invoke(testInstance, method, throwableCollector);
+                REFLECTION_UTILS.invoke(testInstance, method, throwableCollector);
 
                 lockAnnotationUtils.processUnlockAnnotations(method);
 
@@ -200,7 +202,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         }
 
         if (stateMachine.ifNotThen(State.INSTANTIATE_TEST_INSTANCE_FAIL, State.CONCLUDE)) {
-            List<Method> methods = ReflectionUtils.getConcludeMethods(testClass);
+            List<Method> methods = REFLECTION_UTILS.getConcludeMethods(testClass);
             for (Method method : methods) {
                 LOGGER.trace(
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
@@ -208,7 +210,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
                 lockAnnotationUtils.processLockAnnotations(method);
 
-                ReflectionUtils.invoke(testInstance, method, throwableCollector);
+                REFLECTION_UTILS.invoke(testInstance, method, throwableCollector);
 
                 lockAnnotationUtils.processUnlockAnnotations(method);
             }

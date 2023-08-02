@@ -30,6 +30,8 @@ public class AutoCloseAnnotationUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoCloseAnnotationUtils.class);
 
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.singleton();
+
     private static final AutoCloseAnnotationUtils SINGLETON = new AutoCloseAnnotationUtils();
 
     /** Constructor */
@@ -57,7 +59,8 @@ public class AutoCloseAnnotationUtils {
             Object object, String lifecycle, Consumer<Throwable> throwableConsumer) {
         LOGGER.trace("processAutoCloseFields(%s, %s)", object.getClass().getName(), lifecycle);
 
-        ReflectionUtils.getAutoCloseFields(object.getClass())
+        REFLECTION_UTILS
+                .getAutoCloseFields(object.getClass())
                 .forEach(
                         field -> {
                             LOGGER.trace("closing field [%s]", field.getName());

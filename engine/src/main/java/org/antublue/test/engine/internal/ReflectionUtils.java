@@ -52,25 +52,36 @@ public final class ReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
 
+    private static final ReflectionUtils SINGLETON = new ReflectionUtils();
+
     private enum Scope {
         STATIC,
         NON_STATIC
     }
 
-    private static final Map<Class<?>, Method> ARGUMENT_SUPPLIER_METHOD_CACHE = new HashMap<>();
-    private static final Map<Class<?>, Optional<Field>> ARGUMENT_FIELD_CACHE = new HashMap<>();
-    private static final Map<Class<?>, List<Field>> AUTO_CLOSE_FIELD_CACHE = new HashMap<>();
-    private static final Map<Class<?>, List<Method>> PREPARE_METHOD_CACHE = new HashMap<>();
-    private static final Map<Class<?>, List<Method>> BEFORE_ALL_METHOD_CACHE = new HashMap<>();
-    private static final Map<Class<?>, List<Method>> BEFORE_EACH_METHOD_CACHE = new HashMap<>();
-    private static final Map<Class<?>, List<Method>> TEST_METHOD_CACHE = new HashMap<>();
-    private static final Map<Class<?>, List<Method>> AFTER_EACH_METHOD_CACHE = new HashMap<>();
-    private static final Map<Class<?>, List<Method>> AFTER_ALL_METHOD_CACHE = new HashMap<>();
-    private static final Map<Class<?>, List<Method>> CONCLUDE_METHOD_CACHE = new HashMap<>();
+    private final Map<Class<?>, Method> ARGUMENT_SUPPLIER_METHOD_CACHE = new HashMap<>();
+    private final Map<Class<?>, Optional<Field>> ARGUMENT_FIELD_CACHE = new HashMap<>();
+    private final Map<Class<?>, List<Field>> AUTO_CLOSE_FIELD_CACHE = new HashMap<>();
+    private final Map<Class<?>, List<Method>> PREPARE_METHOD_CACHE = new HashMap<>();
+    private final Map<Class<?>, List<Method>> BEFORE_ALL_METHOD_CACHE = new HashMap<>();
+    private final Map<Class<?>, List<Method>> BEFORE_EACH_METHOD_CACHE = new HashMap<>();
+    private final Map<Class<?>, List<Method>> TEST_METHOD_CACHE = new HashMap<>();
+    private final Map<Class<?>, List<Method>> AFTER_EACH_METHOD_CACHE = new HashMap<>();
+    private final Map<Class<?>, List<Method>> AFTER_ALL_METHOD_CACHE = new HashMap<>();
+    private final Map<Class<?>, List<Method>> CONCLUDE_METHOD_CACHE = new HashMap<>();
 
     /** Constructor */
     private ReflectionUtils() {
         // DO NOTHING
+    }
+
+    /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static ReflectionUtils singleton() {
+        return SINGLETON;
     }
 
     /**
@@ -79,7 +90,7 @@ public final class ReflectionUtils {
      * @param uri uri
      * @return the return value
      */
-    public static List<Class<?>> findAllClasses(URI uri) {
+    public List<Class<?>> findAllClasses(URI uri) {
         List<Class<?>> classes =
                 org.junit.platform.commons.util.ReflectionUtils.findAllClassesInClasspathRoot(
                         uri, classFilter -> true, classNameFilter -> true);
@@ -97,7 +108,7 @@ public final class ReflectionUtils {
      * @param packageName packageName
      * @return the return value
      */
-    public static List<Class<?>> findAllClasses(String packageName) {
+    public List<Class<?>> findAllClasses(String packageName) {
         List<Class<?>> classes =
                 ReflectionSupport.findAllClassesInPackage(
                         packageName, classFilter -> true, classNameFilter -> true);
@@ -116,7 +127,7 @@ public final class ReflectionUtils {
      * @param argument argument
      * @return the return value
      */
-    public static boolean acceptsArgument(Method method, Argument argument) {
+    public boolean acceptsArgument(Method method, Argument argument) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         return parameterTypes != null
                 && parameterTypes.length == 1
@@ -129,7 +140,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return Method the return value
      */
-    public static Method getArgumentSupplierMethod(Class<?> clazz) {
+    public Method getArgumentSupplierMethod(Class<?> clazz) {
         synchronized (ARGUMENT_SUPPLIER_METHOD_CACHE) {
             LOGGER.trace("getArgumentSupplierMethod(%s)", clazz.getName());
 
@@ -180,7 +191,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return list of Arguments
      */
-    public static List<Argument> getArgumentsList(Class<?> clazz) {
+    public List<Argument> getArgumentsList(Class<?> clazz) {
         LOGGER.trace("getArgumentsList(%s)", clazz.getName());
 
         try {
@@ -219,7 +230,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return list of Methods
      */
-    public static List<Method> getPrepareMethods(Class<?> clazz) {
+    public List<Method> getPrepareMethods(Class<?> clazz) {
         synchronized (PREPARE_METHOD_CACHE) {
             LOGGER.trace("getPrepareMethods(%s)", clazz.getName());
 
@@ -263,7 +274,7 @@ public final class ReflectionUtils {
      * @return Optional that contains an @TestEngine.Argument annotated Field if it exists or is
      *     empty
      */
-    public static Optional<Field> getArgumentField(Class<?> clazz) {
+    public Optional<Field> getArgumentField(Class<?> clazz) {
         synchronized (ARGUMENT_FIELD_CACHE) {
             LOGGER.trace("getArgumentField(%s)", clazz.getName());
 
@@ -305,7 +316,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return List of Fields
      */
-    public static List<Field> getAutoCloseFields(Class<?> clazz) {
+    public List<Field> getAutoCloseFields(Class<?> clazz) {
         synchronized (AUTO_CLOSE_FIELD_CACHE) {
             LOGGER.trace("getAutoCloseFields(%s)", clazz.getName());
 
@@ -332,7 +343,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return list of Methods
      */
-    public static List<Method> getBeforeAllMethods(Class<?> clazz) {
+    public List<Method> getBeforeAllMethods(Class<?> clazz) {
         synchronized (BEFORE_ALL_METHOD_CACHE) {
             LOGGER.trace("getBeforeAllMethods(%s)", clazz.getName());
 
@@ -388,7 +399,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return list of Methods
      */
-    public static List<Method> getBeforeEachMethods(Class<?> clazz) {
+    public List<Method> getBeforeEachMethods(Class<?> clazz) {
         synchronized (BEFORE_EACH_METHOD_CACHE) {
             LOGGER.trace("getBeforeEachMethods(%s)", clazz.getName());
 
@@ -444,7 +455,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return list of Methods
      */
-    public static List<Method> getTestMethods(Class<?> clazz) {
+    public List<Method> getTestMethods(Class<?> clazz) {
         synchronized (TEST_METHOD_CACHE) {
             LOGGER.trace("getTestMethods(%s)", clazz.getName());
 
@@ -500,7 +511,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return list of Methods
      */
-    public static List<Method> getAfterEachMethods(Class<?> clazz) {
+    public List<Method> getAfterEachMethods(Class<?> clazz) {
         synchronized (AFTER_EACH_METHOD_CACHE) {
             LOGGER.trace("getAfterEachMethods(%s)", clazz.getName());
 
@@ -556,7 +567,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return list of Methods
      */
-    public static List<Method> getAfterAllMethods(Class<?> clazz) {
+    public List<Method> getAfterAllMethods(Class<?> clazz) {
         synchronized (AFTER_ALL_METHOD_CACHE) {
             LOGGER.trace("getAfterAllMethods(%s)", clazz.getName());
 
@@ -612,7 +623,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return Method the return value
      */
-    public static List<Method> getConcludeMethods(Class<?> clazz) {
+    public List<Method> getConcludeMethods(Class<?> clazz) {
         synchronized (CONCLUDE_METHOD_CACHE) {
             LOGGER.trace("getConcludeMethods(%s)", clazz.getName());
 
@@ -655,7 +666,7 @@ public final class ReflectionUtils {
      * @param method method to get the display name for
      * @return the display name
      */
-    public static String getDisplayName(Method method) {
+    public String getDisplayName(Method method) {
         String displayName = method.getName();
 
         TestEngine.DisplayName annotation = method.getAnnotation(TestEngine.DisplayName.class);
@@ -677,7 +688,7 @@ public final class ReflectionUtils {
      * @param clazz class to get the display name for
      * @return the display name
      */
-    public static String getDisplayName(Class<?> clazz) {
+    public String getDisplayName(Class<?> clazz) {
         String displayName = clazz.getName();
 
         TestEngine.DisplayName annotation = clazz.getAnnotation(TestEngine.DisplayName.class);
@@ -700,7 +711,7 @@ public final class ReflectionUtils {
      * @param objectConsumer objectConsumer
      * @param throwableConsumer throwableConsumer
      */
-    public static void instantiate(
+    public void instantiate(
             Class<?> clazz,
             Consumer<Object> objectConsumer,
             Consumer<Throwable> throwableConsumer) {
@@ -721,7 +732,7 @@ public final class ReflectionUtils {
      * @param value value
      * @param throwableConsumer throwableConsumer
      */
-    public static void setField(
+    public void setField(
             Object object, Field field, Object value, Consumer<Throwable> throwableConsumer) {
         try {
             field.setAccessible(true);
@@ -739,7 +750,7 @@ public final class ReflectionUtils {
      * @param method method
      * @param throwableConsumer throwableConsumer
      */
-    public static void invoke(Object object, Method method, Consumer<Throwable> throwableConsumer) {
+    public void invoke(Object object, Method method, Consumer<Throwable> throwableConsumer) {
         invoke(object, method, null, throwableConsumer);
     }
 
@@ -751,7 +762,7 @@ public final class ReflectionUtils {
      * @param arguments arguments
      * @param throwableConsumer throwableConsumer
      */
-    public static void invoke(
+    public void invoke(
             Object object,
             Method method,
             Object[] arguments,
@@ -771,7 +782,7 @@ public final class ReflectionUtils {
      * @param fieldType field type that is required
      * @return list of Fields
      */
-    private static List<Field> getFields(
+    private List<Field> getFields(
             Class<?> clazz, Class<? extends Annotation> annotation, Class<?> fieldType) {
         LOGGER.trace(
                 "getFields(%s, %s, %s)",
@@ -795,7 +806,7 @@ public final class ReflectionUtils {
      * @param fieldType field type that is required
      * @param fieldSet set of Fields
      */
-    private static void resolveFields(
+    private void resolveFields(
             Class<?> clazz,
             Class<? extends Annotation> annotation,
             Class<?> fieldType,
@@ -831,7 +842,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return list of Methods
      */
-    private static List<Method> getMethods(
+    private List<Method> getMethods(
             Class<?> clazz,
             Class<? extends Annotation> annotation,
             Scope scope,
@@ -871,7 +882,7 @@ public final class ReflectionUtils {
      * @param parameterTypes parameter types that are required
      * @param methodMap map of Methods
      */
-    private static void resolveMethods(
+    private void resolveMethods(
             Class<?> clazz,
             Class<? extends Annotation> annotation,
             Scope scope,
@@ -978,7 +989,7 @@ public final class ReflectionUtils {
      *
      * @param classes list of Classes to sort
      */
-    public static void sortClasses(List<Class<?>> classes) {
+    public void sortClasses(List<Class<?>> classes) {
         classes.sort(
                 (o1, o2) -> {
                     boolean o1AnnotationPresent = o1.isAnnotationPresent(TestEngine.Order.class);
@@ -1010,7 +1021,7 @@ public final class ReflectionUtils {
      *
      * @param classes classes
      */
-    private static void validateDistinctOrder(List<Class<?>> classes) {
+    private void validateDistinctOrder(List<Class<?>> classes) {
         Map<Integer, Class<?>> orderToClassMap = new LinkedHashMap<>();
 
         classes.forEach(
@@ -1040,7 +1051,7 @@ public final class ReflectionUtils {
      *
      * @param methods list of Methods to sort
      */
-    public static void sortMethods(List<Method> methods) {
+    public void sortMethods(List<Method> methods) {
         methods.sort(
                 (o1, o2) -> {
                     TestEngine.Order o1Annotation = o1.getAnnotation(TestEngine.Order.class);
@@ -1073,7 +1084,7 @@ public final class ReflectionUtils {
      * @param clazz clazz
      * @param methods methods
      */
-    private static void validateDistinctOrder(Class<?> clazz, List<Method> methods) {
+    private void validateDistinctOrder(Class<?> clazz, List<Method> methods) {
         Set<Integer> integers = new HashSet<>();
 
         methods.forEach(
@@ -1100,7 +1111,7 @@ public final class ReflectionUtils {
      * @param annotation to look for
      * @return the display name
      */
-    private static String getAnnotationDisplayName(Class<? extends Annotation> annotation) {
+    private String getAnnotationDisplayName(Class<? extends Annotation> annotation) {
         return String.format(
                 "@%s.%s",
                 annotation.getDeclaringClass().getSimpleName(), annotation.getSimpleName());
