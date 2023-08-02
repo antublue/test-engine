@@ -26,6 +26,7 @@ import org.antublue.test.engine.internal.LockAnnotationUtils;
 import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.StateMachine;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestExecutionResult;
@@ -38,6 +39,21 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentTestDescriptor.class);
+
+    private enum State {
+        SET_FIELD,
+        SET_FIELD_SUCCESS,
+        SET_FIELD_FAIL,
+        BEFORE_ALL,
+        BEFORE_ALL_SUCCESS,
+        BEFORE_ALL_FAIL,
+        EXECUTE,
+        EXECUTE_SUCCESS,
+        SKIP,
+        SKIP_SUCCESS,
+        AFTER_ALL,
+        AFTER_ALL_SUCCESS,
+    }
 
     private final Class<?> testClass;
     private final Argument testArgument;
@@ -131,6 +147,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
+        StateMachine<State> stateMachine =
+                new StateMachine<State>(this.toString(), State.SET_FIELD);
+
         ReflectionUtils.getArgumentField(testClass)
                 .ifPresent(
                         field -> {
@@ -141,9 +160,16 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
                             ReflectionUtils.setField(
                                     testInstance, field, testArgument, throwableCollector);
+
+                            stateMachine.ifTrueThenElse(
+                                    throwableCollector.isEmpty(),
+                                    State.SET_FIELD_SUCCESS,
+                                    State.SET_FIELD_FAIL);
                         });
 
-        if (throwableCollector.isEmpty()) {
+        stateMachine.ifThen(State.SET_FIELD, State.SET_FIELD_SUCCESS);
+
+        if (stateMachine.ifThen(State.SET_FIELD_SUCCESS, State.BEFORE_ALL)) {
             List<Method> methods = ReflectionUtils.getBeforeAllMethods(testClass);
             for (Method method : methods) {
                 LOGGER.trace(
@@ -171,14 +197,21 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     break;
                 }
             }
+
+            stateMachine.ifTrueThenElse(
+                    throwableCollector.isEmpty(), State.BEFORE_ALL_SUCCESS, State.BEFORE_ALL_FAIL);
         }
 
         List<MethodTestDescriptor> methodTestDescriptors = getChildren(MethodTestDescriptor.class);
 
-        if (throwableCollector.isEmpty()) {
+        if (stateMachine.ifThen(State.BEFORE_ALL_SUCCESS, State.EXECUTE)) {
             methodTestDescriptors.forEach(
                     methodTestDescriptor -> methodTestDescriptor.execute(executorContext));
-        } else {
+
+            stateMachine.set(State.EXECUTE_SUCCESS);
+        }
+
+        if (stateMachine.ifThen(State.BEFORE_ALL_FAIL, State.SKIP)) {
             methodTestDescriptors.forEach(
                     methodTestDescriptor -> {
                         LOGGER.trace(
@@ -189,9 +222,11 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
                         methodTestDescriptor.skip(executorContext);
                     });
+
+            stateMachine.set(State.SKIP_SUCCESS);
         }
 
-        if (throwableCollector.isEmpty()) {
+        if (stateMachine.ifNotThen(State.SET_FIELD_FAIL, State.AFTER_ALL)) {
             List<Method> methods = ReflectionUtils.getAfterAllMethods(testClass);
             for (Method method : methods) {
                 LOGGER.trace(
@@ -215,6 +250,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
                 LockAnnotationUtils.processUnlockAnnotations(method);
             }
+
+            stateMachine.set(State.AFTER_ALL_SUCCESS);
         }
 
         AutoCloseAnnotationUtils.processAutoCloseAnnotatedFields(
