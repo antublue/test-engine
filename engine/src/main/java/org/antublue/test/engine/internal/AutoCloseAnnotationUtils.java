@@ -30,9 +30,20 @@ public class AutoCloseAnnotationUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoCloseAnnotationUtils.class);
 
+    private static final AutoCloseAnnotationUtils SINGLETON = new AutoCloseAnnotationUtils();
+
     /** Constructor */
     private AutoCloseAnnotationUtils() {
         // DO NOTHING
+    }
+
+    /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static AutoCloseAnnotationUtils singleton() {
+        return SINGLETON;
     }
 
     /**
@@ -42,7 +53,7 @@ public class AutoCloseAnnotationUtils {
      * @param lifecycle lifecycle
      * @param throwableConsumer throwableConsumer
      */
-    public static void processAutoCloseAnnotatedFields(
+    public void processAutoCloseAnnotatedFields(
             Object object, String lifecycle, Consumer<Throwable> throwableConsumer) {
         LOGGER.trace("processAutoCloseFields(%s, %s)", object.getClass().getName(), lifecycle);
 
@@ -79,7 +90,7 @@ public class AutoCloseAnnotationUtils {
      * @param field field
      * @param throwableConsumer throwableConsumer
      */
-    private static void close(
+    private void close(
             Object object,
             String lifecycle,
             String methodName,

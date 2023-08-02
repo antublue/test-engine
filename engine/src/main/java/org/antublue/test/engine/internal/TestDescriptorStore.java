@@ -26,22 +26,22 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 /** Class to store a TestDescriptor based on UniqueId */
 public final class TestDescriptorStore {
 
-    private static final TestDescriptorStore INSTANCE = new TestDescriptorStore();
+    private static final TestDescriptorStore SINGLETON = new TestDescriptorStore();
 
     private final Map<UniqueId, TestDescriptor> testDescriptorMap;
-
-    /**
-     * Method to get an instance of the TestEngineTestDescriptorStore
-     *
-     * @return the singleton instance of a TestEngineTestDescriptorStore
-     */
-    public static TestDescriptorStore getInstance() {
-        return INSTANCE;
-    }
 
     /** Constructor */
     private TestDescriptorStore() {
         testDescriptorMap = new LinkedHashMap<>();
+    }
+
+    /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static TestDescriptorStore singleton() {
+        return SINGLETON;
     }
 
     /**

@@ -34,7 +34,9 @@ public class LockAnnotationUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LockAnnotationUtils.class);
 
-    private static final Map<String, ReentrantReadWriteLock> LOCK_MAP =
+    private static final LockAnnotationUtils SINGLETON = new LockAnnotationUtils();
+
+    private final Map<String, ReentrantReadWriteLock> LOCK_MAP =
             Collections.synchronizedMap(new HashMap<>());
 
     /** Constructor */
@@ -43,11 +45,20 @@ public class LockAnnotationUtils {
     }
 
     /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static LockAnnotationUtils singleton() {
+        return SINGLETON;
+    }
+
+    /**
      * Method to perform locking on a Method, if annotated
      *
      * @param method method
      */
-    public static void processLockAnnotations(Method method) {
+    public void processLockAnnotations(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Lock.class)
                 && !method.isAnnotationPresent(TestEngine.Lock.List.class)
                 && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
@@ -87,7 +98,7 @@ public class LockAnnotationUtils {
      * @param name name
      * @param mode mode
      */
-    private static void lock(Method method, String name, TestEngine.LockMode mode) {
+    private void lock(Method method, String name, TestEngine.LockMode mode) {
         if (name != null && !name.trim().isEmpty()) {
             String trimmedName = name.trim();
 
@@ -120,7 +131,7 @@ public class LockAnnotationUtils {
      *
      * @param method method
      */
-    public static void processUnlockAnnotations(Method method) {
+    public void processUnlockAnnotations(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Unlock.class)
                 && !method.isAnnotationPresent(TestEngine.Unlock.List.class)
                 && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
@@ -161,7 +172,7 @@ public class LockAnnotationUtils {
      * @param name name
      * @param mode mode
      */
-    private static void unlock(Method method, String name, TestEngine.LockMode mode) {
+    private void unlock(Method method, String name, TestEngine.LockMode mode) {
         if (name != null && !name.trim().isEmpty()) {
             ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
             if (reentrantReadWriteLock != null) {
@@ -208,7 +219,7 @@ public class LockAnnotationUtils {
      * @param fair fair
      * @return a ReentrantReadWriteLock
      */
-    private static ReentrantReadWriteLock createLock(String name, boolean fair) {
+    private ReentrantReadWriteLock createLock(String name, boolean fair) {
         LOGGER.trace("createLock name [%s] fair [%b]", name, fair);
 
         return new ReentrantReadWriteLock(fair);
