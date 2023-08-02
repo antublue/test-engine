@@ -39,7 +39,6 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.Precondition;
 import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to implement methods to get test class fields / methods, caching the results */
@@ -362,7 +361,7 @@ public final class ReflectionUtils {
 
             List<Field> autoCloseFields =
                     getFields(clazz, TestEngine.AutoClose.class, Object.class);
-            
+
             LOGGER.trace(
                     "class [%s] @TestEngine.AutoClose field count [%d]",
                     clazz.getName(), autoCloseFields.size());
@@ -751,10 +750,6 @@ public final class ReflectionUtils {
             Class<?> clazz,
             Consumer<Object> objectConsumer,
             Consumer<Throwable> throwableConsumer) {
-        Precondition.notNull(clazz, "clazz is null");
-        Precondition.notNull(objectConsumer, "objectConsumer is null");
-        Precondition.notNull(throwableConsumer, "throwableConsumer is null");
-
         try {
             Object object =
                     clazz.getDeclaredConstructor((Class<?>[]) null).newInstance((Object[]) null);
@@ -774,10 +769,6 @@ public final class ReflectionUtils {
      */
     public static void setField(
             Object object, Field field, Object value, Consumer<Throwable> throwableConsumer) {
-        Precondition.notNull(object, "object is null");
-        Precondition.notNull(field, "field is null");
-        Precondition.notNull(throwableConsumer, "throwableConsumer is null");
-
         try {
             field.setAccessible(true);
             field.set(object, value);
@@ -795,10 +786,6 @@ public final class ReflectionUtils {
      * @param throwableConsumer throwableConsumer
      */
     public static void invoke(Object object, Method method, Consumer<Throwable> throwableConsumer) {
-        Precondition.notNull(object, "object is null");
-        Precondition.notNull(method, "method is null");
-        Precondition.notNull(throwableConsumer, "throwableConsumer is null");
-
         invoke(object, method, null, throwableConsumer);
     }
 
@@ -815,10 +802,6 @@ public final class ReflectionUtils {
             Method method,
             Object[] arguments,
             Consumer<Throwable> throwableConsumer) {
-        Precondition.notNull(object, "object is null");
-        Precondition.notNull(method, "method is null");
-        Precondition.notNull(throwableConsumer, "throwableConsumer is null");
-
         try {
             method.invoke(object, arguments);
         } catch (Throwable t) {
