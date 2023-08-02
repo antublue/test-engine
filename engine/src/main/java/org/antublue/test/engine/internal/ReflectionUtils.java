@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -58,7 +59,7 @@ public final class ReflectionUtils {
     }
 
     private static final Map<Class<?>, Method> ARGUMENT_SUPPLIER_METHOD_CACHE = new HashMap<>();
-    private static final Map<Class<?>, Field> ARGUMENT_FIELD_CACHE = new HashMap<>();
+    private static final Map<Class<?>, Optional<Field>> ARGUMENT_FIELD_CACHE = new HashMap<>();
     // private static final Map<Class<?>, Optional<Method>> EXCEPTION_HANDLER_METHOD_CACHE = new
     // HashMap<>();
     private static final Map<Class<?>, List<Field>> AUTO_CLOSE_FIELD_CACHE = new HashMap<>();
@@ -306,9 +307,10 @@ public final class ReflectionUtils {
      * Method to get @TestEngine.Argument Field
      *
      * @param clazz class to inspect
-     * @return Field the Argument field
+     * @return Optional that contains an @TestEngine.Argument annotated Field if it exists or is
+     *     empty
      */
-    public static Field getArgumentField(Class<?> clazz) {
+    public static Optional<Field> getArgumentField(Class<?> clazz) {
         synchronized (ARGUMENT_FIELD_CACHE) {
             LOGGER.trace("getArgumentField(%s)", clazz.getName());
 
@@ -323,21 +325,24 @@ public final class ReflectionUtils {
                     "class [%s] @TestEngine.Argument field count [%d]",
                     clazz.getName(), argumentFields.size());
 
-            Field field = null;
+            Field field;
+            Optional<Field> optionalField;
 
             if (argumentFields.size() == 0) {
-                ARGUMENT_FIELD_CACHE.put(clazz, null);
+                optionalField = Optional.empty();
+                ARGUMENT_FIELD_CACHE.put(clazz, optionalField);
             } else if (argumentFields.size() == 1) {
                 field = argumentFields.get(0);
-                ARGUMENT_FIELD_CACHE.put(clazz, field);
-            } else if (argumentFields.size() != 1) {
+                optionalField = Optional.of(field);
+                ARGUMENT_FIELD_CACHE.put(clazz, optionalField);
+            } else {
                 throw new TestClassConfigurationException(
                         String.format(
                                 "Test class [%s] must define one @TestEngine.Argument field",
                                 clazz.getName()));
             }
 
-            return field;
+            return optionalField;
         }
     }
 
@@ -357,6 +362,7 @@ public final class ReflectionUtils {
 
             List<Field> autoCloseFields =
                     getFields(clazz, TestEngine.AutoClose.class, Object.class);
+            
             LOGGER.trace(
                     "class [%s] @TestEngine.AutoClose field count [%d]",
                     clazz.getName(), autoCloseFields.size());
