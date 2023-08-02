@@ -40,6 +40,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentTestDescriptor.class);
 
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.singleton();
+
     private enum State {
         SET_FIELD,
         SET_FIELD_SUCCESS,
@@ -80,7 +82,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      */
     @Override
     public Optional<TestSource> getSource() {
-        return Optional.of(MethodSource.from(ReflectionUtils.getArgumentSupplierMethod(testClass)));
+        return Optional.of(
+                MethodSource.from(REFLECTION_UTILS.getArgumentSupplierMethod(testClass)));
     }
 
     /**
@@ -152,7 +155,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         StateMachine<State> stateMachine =
                 new StateMachine<State>(this.toString(), State.SET_FIELD);
 
-        ReflectionUtils.getArgumentField(testClass)
+        REFLECTION_UTILS
+                .getArgumentField(testClass)
                 .ifPresent(
                         field -> {
                             LOGGER.trace(
@@ -160,7 +164,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                                             + " [%s]",
                                     testClass.getName(), field.getName(), testArgument.name());
 
-                            ReflectionUtils.setField(
+                            REFLECTION_UTILS.setField(
                                     testInstance, field, testArgument, throwableCollector);
 
                             stateMachine.ifTrueThenElse(
@@ -172,7 +176,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         stateMachine.ifThen(State.SET_FIELD, State.SET_FIELD_SUCCESS);
 
         if (stateMachine.ifThen(State.SET_FIELD_SUCCESS, State.BEFORE_ALL)) {
-            List<Method> methods = ReflectionUtils.getBeforeAllMethods(testClass);
+            List<Method> methods = REFLECTION_UTILS.getBeforeAllMethods(testClass);
             for (Method method : methods) {
                 LOGGER.trace(
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
@@ -180,17 +184,17 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
                 lockAnnotationUtils.processLockAnnotations(method);
 
-                boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
+                boolean acceptsArgument = REFLECTION_UTILS.acceptsArgument(method, testArgument);
 
                 LOGGER.trace(
                         "class [%s] method [%s] acceptsArgument [%b]",
                         testClass.getName(), method.getName(), acceptsArgument);
 
                 if (acceptsArgument) {
-                    ReflectionUtils.invoke(
+                    REFLECTION_UTILS.invoke(
                             testInstance, method, new Object[] {testArgument}, throwableCollector);
                 } else {
-                    ReflectionUtils.invoke(testInstance, method, throwableCollector);
+                    REFLECTION_UTILS.invoke(testInstance, method, throwableCollector);
                 }
 
                 lockAnnotationUtils.processUnlockAnnotations(method);
@@ -229,7 +233,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         }
 
         if (stateMachine.ifNotThen(State.SET_FIELD_FAIL, State.AFTER_ALL)) {
-            List<Method> methods = ReflectionUtils.getAfterAllMethods(testClass);
+            List<Method> methods = REFLECTION_UTILS.getAfterAllMethods(testClass);
             for (Method method : methods) {
                 LOGGER.trace(
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
@@ -237,17 +241,17 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
                 lockAnnotationUtils.processLockAnnotations(method);
 
-                boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
+                boolean acceptsArgument = REFLECTION_UTILS.acceptsArgument(method, testArgument);
 
                 LOGGER.trace(
                         "class [%s] method [%s] acceptsArgument [%b]",
                         testClass.getName(), method.getName(), acceptsArgument);
 
                 if (acceptsArgument) {
-                    ReflectionUtils.invoke(
+                    REFLECTION_UTILS.invoke(
                             testInstance, method, new Object[] {testArgument}, throwableCollector);
                 } else {
-                    ReflectionUtils.invoke(testInstance, method, throwableCollector);
+                    REFLECTION_UTILS.invoke(testInstance, method, throwableCollector);
                 }
 
                 lockAnnotationUtils.processUnlockAnnotations(method);
@@ -260,7 +264,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 .processAutoCloseAnnotatedFields(
                         testInstance, "@TestEngine.AfterAll", throwableCollector);
 
-        ReflectionUtils.getArgumentField(testClass)
+        REFLECTION_UTILS
+                .getArgumentField(testClass)
                 .ifPresent(
                         field -> {
                             LOGGER.trace(
@@ -268,7 +273,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                                             + " [%s]",
                                     testClass.getName(), field.getName(), null);
 
-                            ReflectionUtils.setField(testInstance, field, null, throwableCollector);
+                            REFLECTION_UTILS.setField(
+                                    testInstance, field, null, throwableCollector);
                         });
 
         if (throwableCollector.isEmpty()) {
