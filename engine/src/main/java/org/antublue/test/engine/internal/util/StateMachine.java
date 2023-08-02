@@ -35,6 +35,7 @@ public class StateMachine<T extends Enum> {
      * Constructor
      *
      * @param name name
+     * @param state state
      */
     public StateMachine(String name, T state) {
         LOGGER.trace("StateMachine name [%s] state [%s]", name, state);
