@@ -48,6 +48,15 @@ public class Store {
     }
 
     /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static Store singleton() {
+        return SINGLETON;
+    }
+
+    /**
      * Method to lock the Store, returning the Store's Lock
      *
      * @return the Lock
@@ -274,14 +283,5 @@ public class Store {
         if (object == null) {
             throw new IllegalArgumentException(message);
         }
-    }
-
-    /**
-     * Method to get a singleton Store
-     *
-     * @return a singleton Store
-     */
-    public static Store singleton() {
-        return SINGLETON;
     }
 }

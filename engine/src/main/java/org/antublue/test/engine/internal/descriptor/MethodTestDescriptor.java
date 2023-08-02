@@ -157,9 +157,11 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         engineExecutionListener.executionStarted(this);
 
-        Object testInstance = executorContext.getTestInstance();
-
         ThrowableCollector throwableCollector = new ThrowableCollector();
+
+        LockAnnotationUtils lockAnnotationUtils = LockAnnotationUtils.singleton();
+
+        Object testInstance = executorContext.getTestInstance();
 
         StateMachine<State> stateMachine = new StateMachine<>(this.toString(), State.BEFORE_EACH);
 
@@ -169,7 +171,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
                     getUniqueId(), testClass.getName(), method.getName());
 
-            LockAnnotationUtils.processLockAnnotations(method);
+            lockAnnotationUtils.processLockAnnotations(method);
 
             boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
 
@@ -184,7 +186,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 ReflectionUtils.invoke(testInstance, method, throwableCollector);
             }
 
-            LockAnnotationUtils.processUnlockAnnotations(method);
+            lockAnnotationUtils.processUnlockAnnotations(method);
 
             if (throwableCollector.isNotEmpty()) {
                 break;
@@ -199,7 +201,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
                     getUniqueId(), testClass.getName(), testMethod.getName());
 
-            LockAnnotationUtils.processLockAnnotations(testMethod);
+            lockAnnotationUtils.processLockAnnotations(testMethod);
 
             boolean acceptsArgument = ReflectionUtils.acceptsArgument(testMethod, testArgument);
 
@@ -214,7 +216,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 ReflectionUtils.invoke(testInstance, testMethod, throwableCollector);
             }
 
-            LockAnnotationUtils.processUnlockAnnotations(testMethod);
+            lockAnnotationUtils.processUnlockAnnotations(testMethod);
 
             stateMachine.ifTrueThenElse(
                     throwableCollector.isEmpty(), State.EXECUTE_SUCCESS, State.EXECUTE_FAIL);
@@ -228,7 +230,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
                     getUniqueId(), testClass.getName(), method.getName());
 
-            LockAnnotationUtils.processLockAnnotations(method);
+            lockAnnotationUtils.processLockAnnotations(method);
 
             boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
 
@@ -243,11 +245,12 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 ReflectionUtils.invoke(testInstance, method, throwableCollector);
             }
 
-            LockAnnotationUtils.processUnlockAnnotations(method);
+            lockAnnotationUtils.processUnlockAnnotations(method);
         }
 
-        AutoCloseAnnotationUtils.processAutoCloseAnnotatedFields(
-                testInstance, "@TestEngine.AfterEach", throwableCollector);
+        AutoCloseAnnotationUtils.singleton()
+                .processAutoCloseAnnotatedFields(
+                        testInstance, "@TestEngine.AfterEach", throwableCollector);
 
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());

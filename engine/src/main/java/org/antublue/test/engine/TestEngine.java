@@ -121,7 +121,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     .resolve(engineDiscoveryRequest, configurationParameters, engineDescriptor);
 
             // Store the test descriptors for use in the test execution listener
-            TestDescriptorStore.getInstance().store(engineDescriptor);
+            TestDescriptorStore.singleton().store(engineDescriptor);
 
             return engineDescriptor;
         } catch (TestClassConfigurationException | TestEngineException t) {

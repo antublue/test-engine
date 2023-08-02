@@ -33,7 +33,7 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 /** Class to implement TestEngineConfiguration */
-@SuppressWarnings("PMD.EmptyCatchBlock")
+@SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationParameters.class);

@@ -147,6 +147,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
+        LockAnnotationUtils lockAnnotationUtils = LockAnnotationUtils.singleton();
+
         StateMachine<State> stateMachine =
                 new StateMachine<State>(this.toString(), State.SET_FIELD);
 
@@ -176,7 +178,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
                         getUniqueId(), testClass.getName(), method.getName());
 
-                LockAnnotationUtils.processLockAnnotations(method);
+                lockAnnotationUtils.processLockAnnotations(method);
 
                 boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
 
@@ -191,7 +193,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     ReflectionUtils.invoke(testInstance, method, throwableCollector);
                 }
 
-                LockAnnotationUtils.processUnlockAnnotations(method);
+                lockAnnotationUtils.processUnlockAnnotations(method);
 
                 if (throwableCollector.isNotEmpty()) {
                     break;
@@ -233,7 +235,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
                         getUniqueId(), testClass.getName(), method.getName());
 
-                LockAnnotationUtils.processLockAnnotations(method);
+                lockAnnotationUtils.processLockAnnotations(method);
 
                 boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
 
@@ -248,14 +250,15 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     ReflectionUtils.invoke(testInstance, method, throwableCollector);
                 }
 
-                LockAnnotationUtils.processUnlockAnnotations(method);
+                lockAnnotationUtils.processUnlockAnnotations(method);
             }
 
             stateMachine.set(State.AFTER_ALL_SUCCESS);
         }
 
-        AutoCloseAnnotationUtils.processAutoCloseAnnotatedFields(
-                testInstance, "@TestEngine.AfterAll", throwableCollector);
+        AutoCloseAnnotationUtils.singleton()
+                .processAutoCloseAnnotatedFields(
+                        testInstance, "@TestEngine.AfterAll", throwableCollector);
 
         ReflectionUtils.getArgumentField(testClass)
                 .ifPresent(

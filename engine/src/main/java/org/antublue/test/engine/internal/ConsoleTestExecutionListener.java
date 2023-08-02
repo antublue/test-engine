@@ -170,7 +170,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
         testPlan.getRoots()
                 .forEach(
                         testIdentifier ->
-                                TestDescriptorStore.getInstance()
+                                TestDescriptorStore.singleton()
                                         .get(testIdentifier.getUniqueIdObject())
                                         .ifPresent(TestDescriptorUtils::logTestDescriptorTree));
 
@@ -187,7 +187,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
     @Override
     public void executionStarted(TestIdentifier testIdentifier) {
         TestDescriptor testDescriptor =
-                TestDescriptorStore.getInstance()
+                TestDescriptorStore.singleton()
                         .get(testIdentifier.getUniqueIdObject())
                         .orElse(null);
 
@@ -262,7 +262,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
     @Override
     public void executionSkipped(TestIdentifier testIdentifier, String reason) {
         TestDescriptor testDescriptor =
-                TestDescriptorStore.getInstance()
+                TestDescriptorStore.singleton()
                         .get(testIdentifier.getUniqueIdObject())
                         .orElse(null);
 
@@ -344,7 +344,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
     public void executionFinished(
             TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
         TestDescriptor testDescriptor =
-                TestDescriptorStore.getInstance()
+                TestDescriptorStore.singleton()
                         .get(testIdentifier.getUniqueIdObject())
                         .orElse(null);
 

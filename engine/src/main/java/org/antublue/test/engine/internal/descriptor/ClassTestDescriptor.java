@@ -131,6 +131,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
+        LockAnnotationUtils lockAnnotationUtils = LockAnnotationUtils.singleton();
+
         StateMachine<State> stateMachine =
                 new StateMachine<>(this.toString(), State.INSTANTIATE_TEST_INSTANCE);
 
@@ -156,11 +158,11 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
                         getUniqueId(), testClass.getName(), method.getName());
 
-                LockAnnotationUtils.processLockAnnotations(method);
+                lockAnnotationUtils.processLockAnnotations(method);
 
                 ReflectionUtils.invoke(testInstance, method, throwableCollector);
 
-                LockAnnotationUtils.processUnlockAnnotations(method);
+                lockAnnotationUtils.processUnlockAnnotations(method);
 
                 if (throwableCollector.isNotEmpty()) {
                     break;
@@ -204,15 +206,16 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
                         getUniqueId(), testClass.getName(), method.getName());
 
-                LockAnnotationUtils.processLockAnnotations(method);
+                lockAnnotationUtils.processLockAnnotations(method);
 
                 ReflectionUtils.invoke(testInstance, method, throwableCollector);
 
-                LockAnnotationUtils.processUnlockAnnotations(method);
+                lockAnnotationUtils.processUnlockAnnotations(method);
             }
 
-            AutoCloseAnnotationUtils.processAutoCloseAnnotatedFields(
-                    testInstance, "@TestEngine.Conclude", throwableCollector);
+            AutoCloseAnnotationUtils.singleton()
+                    .processAutoCloseAnnotatedFields(
+                            testInstance, "@TestEngine.Conclude", throwableCollector);
 
             stateMachine.set(State.CONCLUDE_SUCCESS);
         }
