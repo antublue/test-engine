@@ -26,6 +26,7 @@ import org.antublue.test.engine.internal.LockAnnotationUtils;
 import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.StateMachine;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestExecutionResult;
@@ -38,6 +39,18 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodTestDescriptor.class);
+
+    private enum State {
+        BEFORE_EACH,
+        BEFORE_EACH_SUCCESS,
+        BEFORE_EACH_FAIL,
+        EXECUTE,
+        EXECUTE_SUCCESS,
+        EXECUTE_FAIL,
+        AFTER_EACH,
+        AFTER_EACH_SUCCESS,
+        AFTER_EACH_FAIL
+    }
 
     private final Class<?> testClass;
     private final Argument testArgument;
@@ -148,6 +161,8 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
+        StateMachine<State> stateMachine = new StateMachine<>(this.toString(), State.BEFORE_EACH);
+
         List<Method> methods = ReflectionUtils.getBeforeEachMethods(testClass);
         for (Method method : methods) {
             LOGGER.trace(
@@ -176,7 +191,10 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             }
         }
 
-        if (throwableCollector.isEmpty()) {
+        stateMachine.ifTrueThenElse(
+                throwableCollector.isEmpty(), State.BEFORE_EACH_SUCCESS, State.BEFORE_EACH_FAIL);
+
+        if (stateMachine.ifThen(State.BEFORE_EACH_SUCCESS, State.EXECUTE)) {
             LOGGER.trace(
                     "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
                     getUniqueId(), testClass.getName(), testMethod.getName());
@@ -197,7 +215,12 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             }
 
             LockAnnotationUtils.processUnlockAnnotations(testMethod);
+
+            stateMachine.ifTrueThenElse(
+                    throwableCollector.isEmpty(), State.EXECUTE_SUCCESS, State.EXECUTE_FAIL);
         }
+
+        // Always run AfterEach methods
 
         methods = ReflectionUtils.getAfterEachMethods(testClass);
         for (Method method : methods) {

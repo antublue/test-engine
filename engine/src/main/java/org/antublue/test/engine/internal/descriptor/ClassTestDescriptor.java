@@ -25,6 +25,7 @@ import org.antublue.test.engine.internal.LockAnnotationUtils;
 import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.StateMachine;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestExecutionResult;
@@ -37,6 +38,21 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassTestDescriptor.class);
+
+    private enum State {
+        INSTANTIATE_TEST_INSTANCE,
+        INSTANTIATE_TEST_INSTANCE_SUCCESS,
+        INSTANTIATE_TEST_INSTANCE_FAIL,
+        PREPARE,
+        PREPARE_SUCCESS,
+        PREPARE_FAIL,
+        EXECUTE,
+        EXECUTE_SUCCESS,
+        SKIP,
+        SKIP_SUCCESS,
+        CONCLUDE,
+        CONCLUDE_SUCCESS,
+    }
 
     private final Class<?> testClass;
 
@@ -115,6 +131,9 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
+        StateMachine<State> stateMachine =
+                new StateMachine<>(this.toString(), State.INSTANTIATE_TEST_INSTANCE);
+
         LOGGER.trace("instantiate testClass [%s]", testClass.getName());
 
         ReflectionUtils.instantiate(
@@ -125,7 +144,12 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 },
                 throwableCollector::add);
 
-        if (throwableCollector.isEmpty()) {
+        stateMachine.ifTrueThenElse(
+                throwableCollector.isEmpty(),
+                State.INSTANTIATE_TEST_INSTANCE_SUCCESS,
+                State.INSTANTIATE_TEST_INSTANCE_FAIL);
+
+        if (stateMachine.ifThen(State.INSTANTIATE_TEST_INSTANCE_SUCCESS, State.PREPARE)) {
             List<Method> methods = ReflectionUtils.getPrepareMethods(testClass);
             for (Method method : methods) {
                 LOGGER.trace(
@@ -142,15 +166,23 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                     break;
                 }
             }
+
+            stateMachine.ifTrueThenElse(
+                    throwableCollector.isEmpty(), State.PREPARE_SUCCESS, State.PREPARE_FAIL);
         }
 
-        List<ArgumentTestDescriptor> argumentTestDescriptors =
-                getChildren(ArgumentTestDescriptor.class);
+        if (stateMachine.ifThen(State.PREPARE_SUCCESS, State.EXECUTE)) {
+            List<ArgumentTestDescriptor> argumentTestDescriptors =
+                    getChildren(ArgumentTestDescriptor.class);
 
-        if (throwableCollector.isEmpty()) {
             argumentTestDescriptors.forEach(
                     argumentTestDescriptor -> argumentTestDescriptor.execute(executorContext));
-        } else {
+
+            stateMachine.set(State.EXECUTE_SUCCESS);
+        } else if (stateMachine.ifThen(State.PREPARE_FAIL, State.SKIP)) {
+            List<ArgumentTestDescriptor> argumentTestDescriptors =
+                    getChildren(ArgumentTestDescriptor.class);
+
             argumentTestDescriptors.forEach(
                     argumentTestDescriptor -> {
                         LOGGER.trace(
@@ -161,9 +193,11 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
                         argumentTestDescriptor.skip(executorContext);
                     });
+
+            stateMachine.set(State.SKIP_SUCCESS);
         }
 
-        if (testInstance != null) {
+        if (stateMachine.ifNotThen(State.INSTANTIATE_TEST_INSTANCE_FAIL, State.CONCLUDE)) {
             List<Method> methods = ReflectionUtils.getConcludeMethods(testClass);
             for (Method method : methods) {
                 LOGGER.trace(
@@ -179,6 +213,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
             AutoCloseAnnotationUtils.processAutoCloseAnnotatedFields(
                     testInstance, "@TestEngine.Conclude", throwableCollector);
+
+            stateMachine.set(State.CONCLUDE_SUCCESS);
         }
 
         if (throwableCollector.isEmpty()) {
