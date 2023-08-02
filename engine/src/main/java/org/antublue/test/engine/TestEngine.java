@@ -38,6 +38,9 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
+    private static final ConfigurationParameters CONFIGURATION_PARAMETERS =
+            ConfigurationParameters.singleton();
+
     /** Configuration constant */
     public static final String ENGINE_ID = "antublue-test-engine";
 
@@ -111,14 +114,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("discover()");
 
         try {
-            org.junit.platform.engine.ConfigurationParameters configurationParameters =
-                    new ConfigurationParameters();
-
             EngineDescriptor engineDescriptor =
                     new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
 
             new Resolver()
-                    .resolve(engineDiscoveryRequest, configurationParameters, engineDescriptor);
+                    .resolve(engineDiscoveryRequest, CONFIGURATION_PARAMETERS, engineDescriptor);
 
             // Store the test descriptors for use in the test execution listener
             TestDescriptorStore.singleton().store(engineDescriptor);
@@ -152,6 +152,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         ExecutionRequest.create(
                                 executionRequest.getRootTestDescriptor(),
                                 executionRequest.getEngineExecutionListener(),
-                                new ConfigurationParameters()));
+                                CONFIGURATION_PARAMETERS));
     }
 }
