@@ -37,13 +37,17 @@ import org.antublue.test.engine.internal.logger.LoggerFactory;
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationParameters.class);
+
     private static final String USER_HOME = System.getProperty("user.home");
+
+    private static final ConfigurationParameters CONFIGURATION_PARAMETERS =
+            new ConfigurationParameters();
 
     private final Properties properties;
     private final Map<String, Optional> cache;
 
     /** Constructor */
-    public ConfigurationParameters() {
+    private ConfigurationParameters() {
         cache = Collections.synchronizedMap(new HashMap<>());
         properties = new Properties();
 
@@ -88,6 +92,15 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
                         file.toPath().toAbsolutePath());
             }
         }
+    }
+
+    /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static ConfigurationParameters singleton() {
+        return CONFIGURATION_PARAMETERS;
     }
 
     @Override
