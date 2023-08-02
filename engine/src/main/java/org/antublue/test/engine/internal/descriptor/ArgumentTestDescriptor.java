@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -132,16 +131,17 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         ThrowableCollector throwableCollector = new ThrowableCollector();
 
-        Field field = ReflectionUtils.getArgumentField(testClass);
-        if (field != null) {
-            LOGGER.trace(
-                    "set argument field testClass [%s] field [%s] testArgument [%s]",
-                    testClass.getName(), field.getName(), testArgument.name());
+        ReflectionUtils.getArgumentField(testClass)
+                .ifPresent(
+                        field -> {
+                            LOGGER.trace(
+                                    "set argument field testClass [%s] field [%s] testArgument"
+                                            + " [%s]",
+                                    testClass.getName(), field.getName(), testArgument.name());
 
-            ReflectionUtils.setField(testInstance, field, testArgument, throwableCollector);
-        } else {
-            LOGGER.trace("no argument field testClass [%s]", testClass.getName());
-        }
+                            ReflectionUtils.setField(
+                                    testInstance, field, testArgument, throwableCollector);
+                        });
 
         if (throwableCollector.isEmpty()) {
             List<Method> methods = ReflectionUtils.getBeforeAllMethods(testClass);
@@ -191,42 +191,45 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     });
         }
 
-        List<Method> methods = ReflectionUtils.getAfterAllMethods(testClass);
-        for (Method method : methods) {
-            LOGGER.trace(
-                    "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
-                    getUniqueId(), testClass.getName(), method.getName());
+        if (throwableCollector.isEmpty()) {
+            List<Method> methods = ReflectionUtils.getAfterAllMethods(testClass);
+            for (Method method : methods) {
+                LOGGER.trace(
+                        "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
+                        getUniqueId(), testClass.getName(), method.getName());
 
-            LockAnnotationUtils.processLockAnnotations(method);
+                LockAnnotationUtils.processLockAnnotations(method);
 
-            boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
+                boolean acceptsArgument = ReflectionUtils.acceptsArgument(method, testArgument);
 
-            LOGGER.trace(
-                    "class [%s] method [%s] acceptsArgument [%b]",
-                    testClass.getName(), method.getName(), acceptsArgument);
+                LOGGER.trace(
+                        "class [%s] method [%s] acceptsArgument [%b]",
+                        testClass.getName(), method.getName(), acceptsArgument);
 
-            if (acceptsArgument) {
-                ReflectionUtils.invoke(
-                        testInstance, method, new Object[] {testArgument}, throwableCollector);
-            } else {
-                ReflectionUtils.invoke(testInstance, method, throwableCollector);
+                if (acceptsArgument) {
+                    ReflectionUtils.invoke(
+                            testInstance, method, new Object[] {testArgument}, throwableCollector);
+                } else {
+                    ReflectionUtils.invoke(testInstance, method, throwableCollector);
+                }
+
+                LockAnnotationUtils.processUnlockAnnotations(method);
             }
-
-            LockAnnotationUtils.processUnlockAnnotations(method);
         }
 
         AutoCloseAnnotationUtils.processAutoCloseAnnotatedFields(
                 testInstance, "@TestEngine.AfterAll", throwableCollector);
 
-        if (field != null) {
-            LOGGER.trace(
-                    "set argument field testClass [%s] field [%s] testArgument[null]",
-                    testClass.getName(), field.getName());
+        ReflectionUtils.getArgumentField(testClass)
+                .ifPresent(
+                        field -> {
+                            LOGGER.trace(
+                                    "set argument field testClass [%s] field [%s] testArgument"
+                                            + " [%s]",
+                                    testClass.getName(), field.getName(), null);
 
-            ReflectionUtils.setField(testInstance, field, null, throwable -> {});
-        } else {
-            LOGGER.trace("no argument field testClass [%s]", testClass.getName());
-        }
+                            ReflectionUtils.setField(testInstance, field, null, throwableCollector);
+                        });
 
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
