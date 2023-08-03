@@ -79,6 +79,6 @@ public class CharArgument extends AbstractArgument {
      * @return the return value
      */
     public static CharArgument of(char value) {
-        return new CharArgument(String.valueOf(value).toUpperCase(), value);
+        return new CharArgument(String.valueOf(value), value);
     }
 }

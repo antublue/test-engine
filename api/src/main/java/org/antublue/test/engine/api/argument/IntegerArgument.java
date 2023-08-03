@@ -79,6 +79,6 @@ public class IntegerArgument extends AbstractArgument {
      * @return the return value
      */
     public static IntegerArgument of(int value) {
-        return new IntegerArgument(String.valueOf(value).toUpperCase(), value);
+        return new IntegerArgument(String.valueOf(value), value);
     }
 }

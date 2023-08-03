@@ -79,6 +79,6 @@ public class DoubleArgument extends AbstractArgument {
      * @return the return value
      */
     public static DoubleArgument of(double value) {
-        return new DoubleArgument(String.valueOf(value).toUpperCase(), value);
+        return new DoubleArgument(String.valueOf(value), value);
     }
 }

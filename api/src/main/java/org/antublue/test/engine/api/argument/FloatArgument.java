@@ -79,6 +79,6 @@ public class FloatArgument extends AbstractArgument {
      * @return the return value
      */
     public static FloatArgument of(float value) {
-        return new FloatArgument(String.valueOf(value).toUpperCase(), value);
+        return new FloatArgument(String.valueOf(value), value);
     }
 }

@@ -79,6 +79,6 @@ public class ByteArgument extends AbstractArgument {
      * @return the return value
      */
     public static ByteArgument of(byte value) {
-        return new ByteArgument(String.valueOf(value).toUpperCase(), value);
+        return new ByteArgument(String.valueOf(value), value);
     }
 }
