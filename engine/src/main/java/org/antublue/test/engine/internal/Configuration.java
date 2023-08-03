@@ -27,6 +27,9 @@ import java.util.Properties;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Configuration {
 
+    public static final String ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE =
+            "ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE";
+
     private static final String ANTUBLUE_TEST_ENGINE_PROPERTIES_ENVIRONMENT_VARIABLE =
             "ANTUBLUE_TEST_ENGINE_PROPERTIES";
 
@@ -36,7 +39,10 @@ public class Configuration {
     private static final String ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME =
             ".antublue-test-engine.properties";
 
-    private static Configuration SINGLETON = new Configuration();
+    private static final boolean TRACE =
+            "true".equals(System.getenv(ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE));
+
+    private static Configuration SINGLETON;
 
     private static final String USER_HOME = System.getProperty("user.home");
 
@@ -44,6 +50,8 @@ public class Configuration {
 
     /** Constructor */
     private Configuration() {
+        trace("Entering constructor");
+
         properties = new Properties();
 
         String propertiesFilename = null;
@@ -74,13 +82,20 @@ public class Configuration {
             }
         }
 
+        trace("properties filename [%s]", propertiesFilename);
+
         if (propertiesFilename != null) {
+            trace("loading properties filename [%s]", propertiesFilename);
+
             try (Reader reader = new FileReader(propertiesFilename)) {
                 properties.load(reader);
+                trace("properties loaded filename [%s]", propertiesFilename);
             } catch (IOException e) {
                 // TODO ?
             }
         }
+
+        trace("Leaving constructor");
     }
 
     /**
@@ -88,7 +103,10 @@ public class Configuration {
      *
      * @return the singleton
      */
-    public static Configuration singleton() {
+    public static synchronized Configuration singleton() {
+        if (SINGLETON == null) {
+            SINGLETON = new Configuration();
+        }
         return SINGLETON;
     }
 
@@ -99,6 +117,8 @@ public class Configuration {
      * @return the property value
      */
     public Optional<String> get(String name) {
+        String value = properties.getProperty(name);
+        trace("get() name [%s] value [%s]", name, value);
         return Optional.ofNullable(properties.getProperty(name));
     }
 
@@ -111,9 +131,24 @@ public class Configuration {
     public Optional<Boolean> getBoolean(String name) {
         Optional<String> value = get(name);
         if (value.isPresent()) {
-            return Optional.of(Boolean.parseBoolean(value.get()));
+            String string = value.get();
+            trace("getBoolean() name [%s] value [%s]", name, string);
+            return Optional.of(Boolean.parseBoolean(string));
         } else {
+            trace("getBoolean() name [%s] value [%s]", name, null);
             return Optional.empty();
+        }
+    }
+
+    private void trace(String format, Object... objects) {
+        if (TRACE) {
+            trace(String.format(format, objects));
+        }
+    }
+
+    private void trace(String message) {
+        if (TRACE) {
+            System.out.println("[TRACE] " + getClass().getName() + " " + message);
         }
     }
 }
