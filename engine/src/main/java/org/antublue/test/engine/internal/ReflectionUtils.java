@@ -992,27 +992,29 @@ public final class ReflectionUtils {
     public void sortClasses(List<Class<?>> classes) {
         classes.sort(
                 (o1, o2) -> {
-                    boolean o1AnnotationPresent = o1.isAnnotationPresent(TestEngine.Order.class);
-                    boolean o2AnnotationPresent = o2.isAnnotationPresent(TestEngine.Order.class);
-                    if (o1AnnotationPresent) {
-                        if (o2AnnotationPresent) {
-                            // Sort based on @TestEngine.Order value
-                            int o1Order = o1.getAnnotation(TestEngine.Order.class).order();
-                            int o2Order = o2.getAnnotation(TestEngine.Order.class).order();
-                            return Integer.compare(o1Order, o2Order);
-                        } else {
-                            return -1;
-                        }
-                    } else if (o2AnnotationPresent) {
-                        return 1;
-                    } else {
-                        // Order by display name which is either
-                        // the name declared by @TestEngine.DisplayName
-                        // or the real class name
-                        String o1DisplayName = getDisplayName(o1);
-                        String o2DisplayName = getDisplayName(o2);
-                        return o1DisplayName.compareTo(o2DisplayName);
+                    int o1Order = Integer.MAX_VALUE;
+                    TestEngine.Order o1Annotation = o1.getAnnotation(TestEngine.Order.class);
+                    if (o1Annotation != null) {
+                        o1Order = o1Annotation.order();
                     }
+
+                    int o2Order = Integer.MAX_VALUE;
+                    TestEngine.Order o2Annotation = o2.getAnnotation(TestEngine.Order.class);
+                    if (o2Annotation != null) {
+                        o2Order = o2Annotation.order();
+                    }
+
+                    if (o1Order != o2Order) {
+                        return Integer.compare(o1Order, o2Order);
+                    }
+
+                    // Order by display name which is either
+                    // the name declared by @TestEngine.DisplayName
+                    // or the real method name
+                    String o1DisplayName = getDisplayName(o1);
+                    String o2DisplayName = getDisplayName(o2);
+
+                    return o1DisplayName.compareTo(o2DisplayName);
                 });
     }
 
@@ -1054,27 +1056,29 @@ public final class ReflectionUtils {
     public void sortMethods(List<Method> methods) {
         methods.sort(
                 (o1, o2) -> {
+                    int o1Order = Integer.MAX_VALUE;
                     TestEngine.Order o1Annotation = o1.getAnnotation(TestEngine.Order.class);
-                    TestEngine.Order o2Annotation = o2.getAnnotation(TestEngine.Order.class);
                     if (o1Annotation != null) {
-                        if (o2Annotation != null) {
-                            // Sort based on @TestEngine.Order value
-                            int o1Order = o1Annotation.order();
-                            int o2Order = o2Annotation.order();
-                            return Integer.compare(o1Order, o2Order);
-                        } else {
-                            return -1;
-                        }
-                    } else if (o2Annotation != null) {
-                        return 1;
-                    } else {
-                        // Order by display name which is either
-                        // the name declared by @TestEngine.DisplayName
-                        // or the real method name
-                        String o1DisplayName = getDisplayName(o1);
-                        String o2DisplayName = getDisplayName(o2);
-                        return o1DisplayName.compareTo(o2DisplayName);
+                        o1Order = o1Annotation.order();
                     }
+
+                    int o2Order = Integer.MAX_VALUE;
+                    TestEngine.Order o2Annotation = o2.getAnnotation(TestEngine.Order.class);
+                    if (o2Annotation != null) {
+                        o2Order = o2Annotation.order();
+                    }
+
+                    if (o1Order != o2Order) {
+                        return Integer.compare(o1Order, o2Order);
+                    }
+
+                    // Order by display name which is either
+                    // the name declared by @TestEngine.DisplayName
+                    // or the real method name
+                    String o1DisplayName = getDisplayName(o1);
+                    String o2DisplayName = getDisplayName(o2);
+
+                    return o1DisplayName.compareTo(o2DisplayName);
                 });
     }
 
