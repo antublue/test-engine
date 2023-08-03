@@ -79,6 +79,6 @@ public class BooleanArgument extends AbstractArgument {
      * @return the return value
      */
     public static BooleanArgument of(boolean value) {
-        return new BooleanArgument(String.valueOf(value).toUpperCase(), value);
+        return new BooleanArgument(String.valueOf(value), value);
     }
 }

@@ -84,6 +84,6 @@ public class BigDecimalArgument extends AbstractArgument {
             throw new IllegalArgumentException("value is null");
         }
 
-        return new BigDecimalArgument(String.valueOf(value).toUpperCase(), value);
+        return new BigDecimalArgument(String.valueOf(value), value);
     }
 }

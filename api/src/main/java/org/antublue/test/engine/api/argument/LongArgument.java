@@ -79,6 +79,6 @@ public class LongArgument extends AbstractArgument {
      * @return the return value
      */
     public static LongArgument of(long value) {
-        return new LongArgument(String.valueOf(value).toUpperCase(), value);
+        return new LongArgument(String.valueOf(value), value);
     }
 }

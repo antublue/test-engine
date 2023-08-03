@@ -84,6 +84,6 @@ public class BigIntegerArgument extends AbstractArgument {
             throw new IllegalArgumentException("value is null");
         }
 
-        return new BigIntegerArgument(String.valueOf(value).toUpperCase(), value);
+        return new BigIntegerArgument(String.valueOf(value), value);
     }
 }

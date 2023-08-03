@@ -74,6 +74,6 @@ public class ShortArgument extends AbstractArgument {
      * @return the return value
      */
     public static ShortArgument of(short value) {
-        return new ShortArgument(String.valueOf(value).toUpperCase(), value);
+        return new ShortArgument(String.valueOf(value), value);
     }
 }
