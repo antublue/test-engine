@@ -19,15 +19,18 @@ package org.antublue.test.engine.internal.logger;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import org.antublue.test.engine.internal.util.Precondition;
+import java.util.Optional;
+
+import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.internal.Configuration;
 
 /** Class to implement a LoggerFactory */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public final class LoggerFactory {
 
-    private static final LoggerFactory INSTANCE = new LoggerFactory();
+    private static LoggerFactory SINGLETON;
 
-    private static final String ANTUBLUE_TEST_ENGINE_LOG_LEVEL = "antublue.test.engine.log.level";
+    private static final Configuration CONFIGURATION = Configuration.singleton();
 
     private static final Map<String, Level> LEVEL_MAP = new HashMap<>();
 
@@ -46,22 +49,12 @@ public final class LoggerFactory {
 
     /** Constructor */
     private LoggerFactory() {
-        // Convert the system property to an environment variable and get the value
-        String value =
-                System.getenv(
-                        ANTUBLUE_TEST_ENGINE_LOG_LEVEL
-                                .toUpperCase(Locale.ENGLISH)
-                                .replace('.', '_'));
-
         Level level = null;
 
-        if (value != null && !value.trim().isEmpty()) {
-            value = value.trim().toUpperCase(Locale.ENGLISH);
-            level = LEVEL_MAP.get(value);
-        }
+        Optional<String> optional = CONFIGURATION.get(Constants.LOG_LEVEL);
 
-        if (level == null) {
-            value = System.getProperty(ANTUBLUE_TEST_ENGINE_LOG_LEVEL);
+        if (optional.isPresent()) {
+            String value = optional.get();
             if (value != null && !value.trim().isEmpty()) {
                 value = value.trim().toUpperCase(Locale.ENGLISH);
                 level = LEVEL_MAP.get(value);
@@ -93,26 +86,8 @@ public final class LoggerFactory {
     }
 
     private Level getLevel(String name) {
-        String value =
-                System.getenv(name.toUpperCase(Locale.ENGLISH).replace('.', '_') + "_LOG_LEVEL");
-
-        Level level = null;
-
-        if (value != null && !value.trim().isEmpty()) {
-            value = value.trim().toUpperCase(Locale.ENGLISH);
-            level = LEVEL_MAP.get(value);
-        }
-
-        if (level == null) {
-            value = System.getProperty(name + ".log.level");
-            if (value != null && !value.trim().isEmpty()) {
-                value = value.trim().toUpperCase(Locale.ENGLISH);
-                level = LEVEL_MAP.get(value);
-            }
-        }
-
-        if (level == null) {
-            level = Level.INFO;
+        if (name.equals("~")) {
+            return Level.ERROR;
         }
 
         return level;
@@ -125,8 +100,6 @@ public final class LoggerFactory {
      * @return the return value
      */
     public static Logger getLogger(Class<?> clazz) {
-        Precondition.notNull(clazz);
-
         return getLogger(clazz.getName());
     }
 
@@ -137,9 +110,12 @@ public final class LoggerFactory {
      * @return the return value
      */
     public static Logger getLogger(String name) {
-        Precondition.notNull(name);
-        Precondition.notBlank(name);
+        synchronized (CONFIGURATION) {
+            if (SINGLETON == null) {
+                SINGLETON = new LoggerFactory();
+            }
+        }
 
-        return INSTANCE.createLogger(name);
+        return SINGLETON.createLogger(name);
     }
 }
