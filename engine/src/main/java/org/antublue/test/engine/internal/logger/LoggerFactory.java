@@ -54,11 +54,6 @@ public final class LoggerFactory {
         Optional<String> optional = CONFIGURATION.get(ANTUBLUE_TEST_ENGINE_LOG_LEVEL);
 
         if (optional.isPresent()) {
-            System.out.println(
-                    String.format(
-                            "[TRACE] name [%s] value [%s]",
-                            ANTUBLUE_TEST_ENGINE_LOG_LEVEL, optional.get()));
-
             String value = optional.get();
             if (value != null && !value.trim().isEmpty()) {
                 value = value.trim().toUpperCase(Locale.ENGLISH);
@@ -69,10 +64,6 @@ public final class LoggerFactory {
         if (level == null) {
             level = Level.INFO;
         }
-
-        System.out.println(
-                String.format(
-                        "[TRACE] name [%s] value [%s]", ANTUBLUE_TEST_ENGINE_LOG_LEVEL, level));
 
         this.level = level;
     }
