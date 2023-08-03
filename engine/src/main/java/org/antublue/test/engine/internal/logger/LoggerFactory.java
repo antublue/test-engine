@@ -104,6 +104,14 @@ public final class LoggerFactory {
         }
 
         if (level == null) {
+            value = System.getProperty(name + ".log.level");
+            if (value != null && !value.trim().isEmpty()) {
+                value = value.trim().toUpperCase(Locale.ENGLISH);
+                level = LEVEL_MAP.get(value);
+            }
+        }
+
+        if (level == null) {
             level = Level.INFO;
         }
 
