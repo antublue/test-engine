@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.Configuration;
 
 /** Class to implement a LoggerFactory */
@@ -27,8 +29,6 @@ import org.antublue.test.engine.internal.Configuration;
 public final class LoggerFactory {
 
     private static LoggerFactory SINGLETON;
-
-    private static final String ANTUBLUE_TEST_ENGINE_LOG_LEVEL = "antublue.test.engine.log.level";
 
     private static final Configuration CONFIGURATION = Configuration.singleton();
 
@@ -51,7 +51,7 @@ public final class LoggerFactory {
     private LoggerFactory() {
         Level level = null;
 
-        Optional<String> optional = CONFIGURATION.get(ANTUBLUE_TEST_ENGINE_LOG_LEVEL);
+        Optional<String> optional = CONFIGURATION.get(Constants.LOG_LEVEL);
 
         if (optional.isPresent()) {
             String value = optional.get();
