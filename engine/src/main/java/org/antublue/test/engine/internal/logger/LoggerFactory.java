@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.Configuration;
 
