@@ -41,6 +41,16 @@ public class ThrowableCollector implements Consumer<Throwable> {
     }
 
     /**
+     * Method to accept a Throwable, adding it to the collector and printing the stack trace
+     *
+     * @param throwable throwable
+     */
+    public void accept(Throwable throwable) {
+        add(throwable);
+        throwable.printStackTrace();
+    }
+
+    /**
      * Method to get the number of Throwable Exception collected
      *
      * @return the return value
@@ -87,15 +97,5 @@ public class ThrowableCollector implements Consumer<Throwable> {
      */
     public List<Throwable> getList() {
         return throwableList;
-    }
-
-    /**
-     * Method to accept a Throwable, adding to the collector and printing the stack trace
-     *
-     * @param throwable throwable
-     */
-    public void accept(Throwable throwable) {
-        add(throwable);
-        throwable.printStackTrace();
     }
 }

@@ -989,7 +989,7 @@ public final class ReflectionUtils {
      *
      * @param classes list of Classes to sort
      */
-    public void sortClasses(List<Class<?>> classes) {
+    private void sortClasses(List<Class<?>> classes) {
         classes.sort(
                 (o1, o2) -> {
                     int o1Order = Integer.MAX_VALUE;
@@ -1053,7 +1053,7 @@ public final class ReflectionUtils {
      *
      * @param methods list of Methods to sort
      */
-    public void sortMethods(List<Method> methods) {
+    private void sortMethods(List<Method> methods) {
         methods.sort(
                 (o1, o2) -> {
                     int o1Order = Integer.MAX_VALUE;
