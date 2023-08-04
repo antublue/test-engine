@@ -47,7 +47,8 @@ public class ThrowableCollector implements Consumer<Throwable> {
      */
     public void accept(Throwable throwable) {
         add(throwable);
-        throwable.printStackTrace();
+        throwable.printStackTrace(System.out);
+        System.out.flush();
     }
 
     /**

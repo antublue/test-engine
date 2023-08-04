@@ -16,6 +16,8 @@
 
 package example;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -42,31 +44,37 @@ public class NoArgumentDeclarationTest {
     @TestEngine.BeforeAll
     public void beforeAll(StringArgument stringArgument) {
         System.out.println("beforeAll(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.BeforeEach
     public void beforeEach(StringArgument stringArgument) {
         System.out.println("beforeEach(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.Test
     public void test1(StringArgument stringArgument) {
         System.out.println("test1(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.Test
     public void test2(StringArgument stringArgument) {
         System.out.println("test2(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.AfterEach
     public void afterEach(StringArgument stringArgument) {
         System.out.println("afterEach(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.AfterAll
     public void afterAll(StringArgument stringArgument) {
         System.out.println("afterAll(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.Conclude
