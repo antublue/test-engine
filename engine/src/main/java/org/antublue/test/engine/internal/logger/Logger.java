@@ -23,10 +23,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.internal.Configuration;
 
 /** Class to implement a Logger */
-@SuppressWarnings("PMD.GodClass")
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public class Logger {
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
@@ -41,17 +45,34 @@ public class Logger {
     private static final int ALL = Integer.MAX_VALUE;
 
     private final String name;
-    private final AtomicReference<Level> level;
+    private final Level level;
 
     /**
      * Constructor
      *
      * @param name name
-     * @param level level
      */
-    public Logger(String name, Level level) {
+    public Logger(String name) {
         this.name = name;
-        this.level = new AtomicReference<>(level);
+
+        Level derivedLevel = Level.INFO;
+
+        Optional<String> optionalRegex =
+                Configuration.singleton().getOrDefault(Constants.LOG_LEVEL_REGEX, ".*");
+        Optional<String> optionalLevel =
+                Configuration.singleton().getOrDefault(Constants.LOG_LEVEL, Level.INFO.toString());
+
+        try {
+            Pattern pattern = Pattern.compile(optionalRegex.get());
+            Matcher matcher = pattern.matcher(name);
+            if (matcher.find()) {
+                derivedLevel = Level.toLevel(optionalLevel.get(), Level.INFO);
+            }
+        } catch (Throwable t) {
+            // DO NOTHING
+        }
+
+        this.level = derivedLevel;
     }
 
     /**
@@ -60,7 +81,7 @@ public class Logger {
      * @return the return value
      */
     public boolean isTraceEnabled() {
-        return level.get().toInt() >= Level.TRACE.toInt();
+        return level.toInt() >= Level.TRACE.toInt();
     }
 
     /**
@@ -69,7 +90,7 @@ public class Logger {
      * @return the return value
      */
     public boolean isDebugEnabled() {
-        return level.get().toInt() >= Level.DEBUG.toInt();
+        return level.toInt() >= Level.DEBUG.toInt();
     }
 
     /**
@@ -78,7 +99,7 @@ public class Logger {
      * @return the return value
      */
     public boolean isInfoEnabled() {
-        return level.get().toInt() >= Level.INFO.toInt();
+        return level.toInt() >= Level.INFO.toInt();
     }
 
     /**
@@ -87,7 +108,7 @@ public class Logger {
      * @return the return value
      */
     public boolean isWarnEnabled() {
-        return level.get().toInt() >= Level.WARN.toInt();
+        return level.toInt() >= Level.WARN.toInt();
     }
 
     /**
@@ -96,7 +117,7 @@ public class Logger {
      * @return the return value
      */
     public boolean isErrorEnabled() {
-        return level.get().toInt() >= Level.ERROR.toInt();
+        return level.toInt() >= Level.ERROR.toInt();
     }
 
     /**
@@ -106,7 +127,7 @@ public class Logger {
      * @return the return value
      */
     public boolean isEnabled(Level level) {
-        return this.level.get().toInt() >= level.toInt();
+        return this.level.toInt() >= level.toInt();
     }
 
     /**
