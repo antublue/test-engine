@@ -16,6 +16,9 @@
 
 package org.antublue.test.engine.internal.logger;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /** Class to represent Logger levels */
 public final class Level {
 
@@ -36,6 +39,17 @@ public final class Level {
 
     /** ALL log level */
     public static final Level ALL = new Level(Integer.MAX_VALUE, "ALL");
+
+    private static Map<String, Level> LEVEL_MAP = new HashMap<>();
+
+    static {
+        LEVEL_MAP.put(ERROR.toString(), ERROR);
+        LEVEL_MAP.put(WARN.toString(), WARN);
+        LEVEL_MAP.put(INFO.toString(), INFO);
+        LEVEL_MAP.put(DEBUG.toString(), DEBUG);
+        LEVEL_MAP.put(TRACE.toString(), TRACE);
+        LEVEL_MAP.put(ALL.toString(), ALL);
+    }
 
     private final int level;
     private final String string;
@@ -68,5 +82,16 @@ public final class Level {
     @Override
     public String toString() {
         return string;
+    }
+
+    /**
+     * Method to map a Level string to a Level
+     *
+     * @param string string
+     * @param defaultLevel defaultLevel
+     * @return the return value
+     */
+    public static Level toLevel(String string, Level defaultLevel) {
+        return LEVEL_MAP.getOrDefault(string, defaultLevel);
     }
 }
