@@ -42,6 +42,8 @@ public class StateMachine<T> {
      * @param begin begin
      */
     public StateMachine(String id, T begin) {
+        LOGGER.trace("StateNachine id [%s] state [%s]", id, begin);
+
         this.id = id;
         this.previous = begin;
         this.current = begin;
@@ -54,6 +56,8 @@ public class StateMachine<T> {
      * @param transition transition
      */
     public void mapTransition(T state, Transition<T> transition) {
+        LOGGER.trace("mapTransition state [%s]", state);
+
         if (map.containsKey(state)) {
             RuntimeException runtimeException =
                     new RuntimeException(
@@ -73,6 +77,21 @@ public class StateMachine<T> {
      * @param transition transition
      */
     public void mapTransition(T[] states, Transition<T> transition) {
+        if (LOGGER.isTraceEnabled()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("[");
+            for (int i = 0; i < states.length; i++) {
+                if (i > 0) {
+                    stringBuilder.append(", ");
+                }
+
+                stringBuilder.append(states[i].toString());
+            }
+            stringBuilder.append("]");
+
+            LOGGER.trace("mapTransition states [%s]", stringBuilder);
+        }
+
         for (T state : states) {
             mapTransition(state, transition);
         }
@@ -126,13 +145,15 @@ public class StateMachine<T> {
     /** Method to run the state machine */
     public void run() {
         while (current != null) {
-            LOGGER.trace("current [%s]", current);
+            LOGGER.trace("run current state [%s]", current);
             map.get(current).run(this);
         }
     }
 
     /** Method to signal the state machine to exit */
     public void finish() {
+        LOGGER.trace("finish");
+
         previous = current;
         current = null;
     }

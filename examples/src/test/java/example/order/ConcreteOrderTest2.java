@@ -49,9 +49,9 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
     @TestEngine.BeforeAll
     @TestEngine.Order(order = 2)
     public void beforeAll2() {
-        System.out.println("ConcreteOrderTest.beforeAll()");
+        System.out.println("ConcreteOrderTest.beforeAll2()");
 
-        ACTUAL_LIST.add("ConcreteOrderTest.beforeAll()");
+        ACTUAL_LIST.add("ConcreteOrderTest.beforeAll2()");
     }
 
     @TestEngine.Test
@@ -73,9 +73,9 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
     @TestEngine.AfterAll
     @TestEngine.Order(order = 1)
     public void afterAll2() {
-        System.out.println("ConcreteOrderTest.afterAll()");
+        System.out.println("ConcreteOrderTest.afterAll2()");
 
-        ACTUAL_LIST.add("ConcreteOrderTest.afterAll()");
+        ACTUAL_LIST.add("ConcreteOrderTest.afterAll2()");
     }
 
     @TestEngine.Conclude
@@ -86,5 +86,7 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
         assertThat(stringArgument).isNull();
 
         ACTUAL_LIST.add("ConcreteOrderTest.conclude2()");
+
+        assertThat(ACTUAL_LIST).isEqualTo(EXPECTED_LIST);
     }
 }

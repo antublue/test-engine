@@ -8,22 +8,6 @@
 
 The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically for parameterized testing at the test class level.
 
-### Versions prior to v4.2.3
-
-Versions prior to `v4.2.3` should not be used due to a critical bug ...
-
-- [#32](https://github.com/antublue/test-engine/issues/32) Tests may be skipped on a slow machine or scenarios where there are a large number of test classes
-
-**Notes**
-
-- `v4.x.x` tests, if using `Store`, will need to be changed to use the `v5.x.x` version of `Store`
-
-
-- `v4.x.x` tests, if using `Fail`, will need to be changed to throw an `AssertionError` or other `RuntimeException`.
-
-
-- `v4.x.x` deprecated classes were removed
-
 ## API
 
 Test classes support both `Argument` injection (`@TestEngine.Argument` annotated field) and/or method an `Argument` for the following methods:
@@ -38,7 +22,7 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 
 - [SimpleTestExample.java](/examples/src/test/java/example/SimpleExampleTest.java)
 
-`@TestEngine` method injection example
+`@TestEngine` without method injection example:
 
 - [NoArgumentDeclarationTest.java](/examples/src/test/java/example/NoArgumentDeclarationTest.java)
 
@@ -56,6 +40,9 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 | `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                          |
 | `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                          |
 
+Annotated methods are execute via an inheritance model (superclass methods before subclass methods) except for `@TestEngine.ArgumentSupplier`
+- `@TestEngine.ArgumentSupplier` is resolved subclass then superclass.
+
 Reference the [Design](https://github.com/antublue/test-engine#design) for the test engine execution flow.
 
 **Notes**
@@ -69,8 +56,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - `@TestEngine.Order` can be used to control test class order / test method order of execution.
   - Classes/methods are sorted by the order annotation value first, then alphabetically by the class name/method name.
   - The test method name can be changed by using the `@TestEngine.DisplayName` annotation.
-  - Method order is relative to other methods in a test class with the same annotation regardless of superclass / subclass location.
-
+  - Method order is relative to the class (superclass or subclass) and other methods with the same annotation defined in the class.
 
 - **Class execution order can't be guaranteed unless the test engine is configured to use a single thread.**
 
@@ -93,7 +79,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - Abstract test classes are not executed.
 
 
-- `@TestEngine.Order(order = <int>)` is inheritance agnostic (test class and super classes are treated equally.)
+- `@TestEngine.Order(order = <int>)` is applies to methods defined in the class.
 
 
 - `@TestEngine.Order(order = <int>)` is ignored for abstract and `@TestEngine.BaseClass` annotated classes.

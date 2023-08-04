@@ -57,7 +57,9 @@ public class AutoCloseAnnotationUtils {
      */
     public void processAutoCloseAnnotatedFields(
             Object object, String lifecycle, Consumer<Throwable> throwableConsumer) {
-        LOGGER.trace("processAutoCloseFields(%s, %s)", object.getClass().getName(), lifecycle);
+        LOGGER.trace(
+                "processAutoCloseFields class [%s] lifecycle [%s]",
+                object.getClass().getName(), lifecycle);
 
         REFLECTION_UTILS
                 .getAutoCloseFields(object.getClass())
@@ -99,7 +101,9 @@ public class AutoCloseAnnotationUtils {
             String methodName,
             Field field,
             Consumer<Throwable> throwableConsumer) {
-        LOGGER.trace("close(%s, %s, %s)", object.getClass().getName(), methodName, field.getName());
+        LOGGER.trace(
+                "close class [%s] method name [%s] field [%s]",
+                object.getClass().getName(), methodName, field.getName());
 
         if (methodName == null || methodName.trim().isEmpty()) {
             try {
