@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -40,21 +41,22 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentTestDescriptor.class);
 
+    private static final Object[] NO_ARGS = null;
+
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.singleton();
 
     private enum State {
-        SET_FIELD,
+        BEGIN,
         SET_FIELD_SUCCESS,
         SET_FIELD_FAIL,
-        BEFORE_ALL,
         BEFORE_ALL_SUCCESS,
         BEFORE_ALL_FAIL,
-        EXECUTE,
         EXECUTE_SUCCESS,
-        SKIP,
         SKIP_SUCCESS,
-        AFTER_ALL,
-        AFTER_ALL_SUCCESS,
+        CLEAR_FIELD_SUCCESS,
+        CLEAR_FIELD_FAILED,
+        AFTER_ALL_FAIL,
+        AFTER_ALL_SUCCESS
     }
 
     private final Class<?> testClass;
@@ -152,130 +154,123 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         LockAnnotationUtils lockAnnotationUtils = LockAnnotationUtils.singleton();
 
-        StateMachine<State> stateMachine =
-                new StateMachine<State>(this.toString(), State.SET_FIELD);
+        StateMachine<State> stateMachine = new StateMachine<>(this.toString(), State.BEGIN);
 
-        REFLECTION_UTILS
-                .getArgumentField(testClass)
-                .ifPresent(
-                        field -> {
-                            LOGGER.trace(
-                                    "set argument field testClass [%s] field [%s] testArgument"
-                                            + " [%s]",
-                                    testClass.getName(), field.getName(), testArgument.name());
+        stateMachine.mapTransition(
+                State.BEGIN,
+                sm -> {
+                    try {
+                        Optional<Field> optional = REFLECTION_UTILS.getArgumentField(testClass);
+                        if (optional.isPresent()) {
+                            Field field = optional.get();
+                            field.set(testInstance, testArgument);
+                        }
+                        sm.next(State.SET_FIELD_SUCCESS);
+                    } catch (Throwable t) {
+                        throwableCollector.accept(t);
+                        sm.next(State.SET_FIELD_FAIL);
+                    }
+                });
 
-                            REFLECTION_UTILS.setField(
-                                    testInstance, field, testArgument, throwableCollector);
+        stateMachine.mapTransition(
+                State.SET_FIELD_SUCCESS,
+                sm -> {
+                    try {
+                        List<Method> methods = REFLECTION_UTILS.getBeforeAllMethods(testClass);
+                        for (Method method : methods) {
+                            try {
+                                lockAnnotationUtils.processLockAnnotations(method);
+                                if (REFLECTION_UTILS.acceptsArgument(method, testArgument)) {
+                                    method.invoke(testInstance, testArgument);
+                                } else {
+                                    method.invoke(testInstance, NO_ARGS);
+                                }
+                            } finally {
+                                lockAnnotationUtils.processUnlockAnnotations(method);
+                            }
+                        }
+                        sm.next(State.BEFORE_ALL_SUCCESS);
+                    } catch (Throwable t) {
+                        throwableCollector.accept(t);
+                        sm.next(State.BEFORE_ALL_FAIL);
+                    }
+                });
 
-                            stateMachine.ifTrueThenElse(
-                                    throwableCollector.isEmpty(),
-                                    State.SET_FIELD_SUCCESS,
-                                    State.SET_FIELD_FAIL);
-                        });
+        stateMachine.mapTransition(
+                State.BEFORE_ALL_SUCCESS,
+                sm -> {
+                    getChildren(MethodTestDescriptor.class)
+                            .forEach(
+                                    methodTestDescriptor ->
+                                            methodTestDescriptor.execute(executorContext));
 
-        stateMachine.ifThen(State.SET_FIELD, State.SET_FIELD_SUCCESS);
+                    sm.next(State.EXECUTE_SUCCESS);
+                });
 
-        if (stateMachine.ifThen(State.SET_FIELD_SUCCESS, State.BEFORE_ALL)) {
-            List<Method> methods = REFLECTION_UTILS.getBeforeAllMethods(testClass);
-            for (Method method : methods) {
-                LOGGER.trace(
-                        "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
-                        getUniqueId(), testClass.getName(), method.getName());
+        stateMachine.mapTransition(
+                State.BEFORE_ALL_FAIL,
+                sm -> {
+                    getChildren(MethodTestDescriptor.class)
+                            .forEach(
+                                    methodTestDescriptor ->
+                                            methodTestDescriptor.skip(executorContext));
 
-                lockAnnotationUtils.processLockAnnotations(method);
+                    sm.next(State.SKIP_SUCCESS);
+                });
 
-                boolean acceptsArgument = REFLECTION_UTILS.acceptsArgument(method, testArgument);
+        StateMachine.Transition<State> transition =
+                sm -> {
+                    List<Method> methods = REFLECTION_UTILS.getAfterAllMethods(testClass);
+                    for (Method method : methods) {
+                        try {
+                            lockAnnotationUtils.processLockAnnotations(method);
+                            if (REFLECTION_UTILS.acceptsArgument(method, testArgument)) {
+                                method.invoke(testInstance, testArgument);
+                            } else {
+                                method.invoke(testInstance, NO_ARGS);
+                            }
+                        } catch (Throwable t) {
+                            throwableCollector.accept(t);
+                        } finally {
+                            lockAnnotationUtils.processUnlockAnnotations(method);
+                        }
+                    }
 
-                LOGGER.trace(
-                        "class [%s] method [%s] acceptsArgument [%b]",
-                        testClass.getName(), method.getName(), acceptsArgument);
+                    if (throwableCollector.isEmpty()) {
+                        sm.next(State.AFTER_ALL_SUCCESS);
+                    } else {
+                        sm.next(State.AFTER_ALL_FAIL);
+                    }
+                };
 
-                if (acceptsArgument) {
-                    REFLECTION_UTILS.invoke(
-                            testInstance, method, new Object[] {testArgument}, throwableCollector);
-                } else {
-                    REFLECTION_UTILS.invoke(testInstance, method, throwableCollector);
-                }
+        stateMachine.mapTransition(
+                new State[] {State.EXECUTE_SUCCESS, State.SKIP_SUCCESS}, transition);
 
-                lockAnnotationUtils.processUnlockAnnotations(method);
+        stateMachine.mapTransition(
+                new State[] {State.AFTER_ALL_FAIL, State.AFTER_ALL_SUCCESS},
+                sm -> {
+                    try {
+                        Optional<Field> optional = REFLECTION_UTILS.getArgumentField(testClass);
+                        if (optional.isPresent()) {
+                            Field field = optional.get();
+                            field.setAccessible(true);
+                            field.set(testInstance, null);
+                        }
+                        sm.next(State.CLEAR_FIELD_SUCCESS);
+                    } catch (Throwable t) {
+                        throwableCollector.accept(t);
+                        sm.next(State.CLEAR_FIELD_FAILED);
+                    }
+                });
 
-                if (throwableCollector.isNotEmpty()) {
-                    break;
-                }
-            }
+        stateMachine.mapTransition(
+                new State[] {State.CLEAR_FIELD_SUCCESS, State.CLEAR_FIELD_FAILED},
+                StateMachine::finish);
 
-            stateMachine.ifTrueThenElse(
-                    throwableCollector.isEmpty(), State.BEFORE_ALL_SUCCESS, State.BEFORE_ALL_FAIL);
-        }
-
-        List<MethodTestDescriptor> methodTestDescriptors = getChildren(MethodTestDescriptor.class);
-
-        if (stateMachine.ifThen(State.BEFORE_ALL_SUCCESS, State.EXECUTE)) {
-            methodTestDescriptors.forEach(
-                    methodTestDescriptor -> methodTestDescriptor.execute(executorContext));
-
-            stateMachine.set(State.EXECUTE_SUCCESS);
-        }
-
-        if (stateMachine.ifThen(State.BEFORE_ALL_FAIL, State.SKIP)) {
-            methodTestDescriptors.forEach(
-                    methodTestDescriptor -> {
-                        LOGGER.trace(
-                                "skip uniqueId [%s] testClass [%s] testMethod [%s]",
-                                methodTestDescriptor.getUniqueId(),
-                                testClass.getName(),
-                                methodTestDescriptor.getTestMethod().getName());
-
-                        methodTestDescriptor.skip(executorContext);
-                    });
-
-            stateMachine.set(State.SKIP_SUCCESS);
-        }
-
-        if (stateMachine.ifNotThen(State.SET_FIELD_FAIL, State.AFTER_ALL)) {
-            List<Method> methods = REFLECTION_UTILS.getAfterAllMethods(testClass);
-            for (Method method : methods) {
-                LOGGER.trace(
-                        "invoke uniqueId [%s] testClass [%s] testMethod [%s]",
-                        getUniqueId(), testClass.getName(), method.getName());
-
-                lockAnnotationUtils.processLockAnnotations(method);
-
-                boolean acceptsArgument = REFLECTION_UTILS.acceptsArgument(method, testArgument);
-
-                LOGGER.trace(
-                        "class [%s] method [%s] acceptsArgument [%b]",
-                        testClass.getName(), method.getName(), acceptsArgument);
-
-                if (acceptsArgument) {
-                    REFLECTION_UTILS.invoke(
-                            testInstance, method, new Object[] {testArgument}, throwableCollector);
-                } else {
-                    REFLECTION_UTILS.invoke(testInstance, method, throwableCollector);
-                }
-
-                lockAnnotationUtils.processUnlockAnnotations(method);
-            }
-
-            stateMachine.set(State.AFTER_ALL_SUCCESS);
-        }
-
+        stateMachine.run();
         AutoCloseAnnotationUtils.singleton()
                 .processAutoCloseAnnotatedFields(
                         testInstance, "@TestEngine.AfterAll", throwableCollector);
-
-        REFLECTION_UTILS
-                .getArgumentField(testClass)
-                .ifPresent(
-                        field -> {
-                            LOGGER.trace(
-                                    "set argument field testClass [%s] field [%s] testArgument"
-                                            + " [%s]",
-                                    testClass.getName(), field.getName(), null);
-
-                            REFLECTION_UTILS.setField(
-                                    testInstance, field, null, throwableCollector);
-                        });
 
         if (throwableCollector.isEmpty()) {
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());

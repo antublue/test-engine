@@ -27,6 +27,7 @@ import java.util.Properties;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Configuration {
 
+    /** Configuration constant */
     public static final String ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE =
             "ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE";
 

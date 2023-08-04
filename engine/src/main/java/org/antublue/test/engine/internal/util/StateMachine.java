@@ -16,130 +16,144 @@
 
 package org.antublue.test.engine.internal.util;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 /**
  * Class to implement a StateMachine
  *
- * @param <T> state type
+ * @param <T> state
  */
-public class StateMachine<T extends Enum> {
+public class StateMachine<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StateMachine.class);
 
-    private final String name;
-    private T state;
+    private final Map<T, Transition<T>> map = new HashMap<>();
+    private final String id;
+    private T previous;
+    private T current;
 
     /**
      * Constructor
      *
-     * @param name name
+     * @param id id
+     * @param begin begin
+     */
+    public StateMachine(String id, T begin) {
+        this.id = id;
+        this.previous = begin;
+        this.current = begin;
+    }
+
+    /**
+     * Method to map Transition
+     *
      * @param state state
+     * @param transition transition
      */
-    public StateMachine(String name, T state) {
-        LOGGER.trace("StateMachine name [%s] state [%s]", name, state);
-
-        this.name = name;
-        this.state = state;
-    }
-
-    /**
-     * Method to get the name
-     *
-     * @return the name
-     */
-    public String name() {
-        return name;
-    }
-
-    /**
-     * Method to get the state
-     *
-     * @return the state
-     */
-    public T state() {
-        return state;
-    }
-
-    /**
-     * Method to set the state
-     *
-     * @param state the state
-     */
-    public void set(T state) {
-        LOGGER.trace("set state [%s]", state);
-        this.state = state;
-    }
-
-    /**
-     * Method to transition to a state if the current state matches
-     *
-     * @param checkState the state to check
-     * @param nextState the next state
-     * @return true if the transition occurs, else false
-     */
-    public boolean ifThen(T checkState, T nextState) {
-        T currentState = state;
-        boolean result = false;
-
-        if (state == checkState) {
-            state = nextState;
-            result = true;
+    public void mapTransition(T state, Transition<T> transition) {
+        if (map.containsKey(state)) {
+            RuntimeException runtimeException =
+                    new RuntimeException(
+                            String.format(
+                                    "Programming error, transition already mapped to [%s]", state));
+            runtimeException.printStackTrace();
+            throw runtimeException;
         }
 
-        LOGGER.trace(
-                "ifThen state [%s] checkState [%s] nextState [%s] result (%b) new state [%s]",
-                currentState, checkState, nextState, result, state);
-
-        return result;
+        map.put(state, transition);
     }
 
     /**
-     * Method to transition to a state if the current state doesn't match
+     * Method to map an array of Transitions
      *
-     * @param checkState the state to check
-     * @param nextState the next state
-     * @return true if the transition occurs, else false
+     * @param states states
+     * @param transition transition
      */
-    public boolean ifNotThen(T checkState, T nextState) {
-        T currentState = state;
-        boolean result = false;
-
-        if (state != checkState) {
-            state = nextState;
-            result = true;
+    public void mapTransition(T[] states, Transition<T> transition) {
+        for (T state : states) {
+            mapTransition(state, transition);
         }
-
-        LOGGER.trace(
-                "ifNotThen state [%s] checkState [%s] nextState [%s] result (%b) new state [%s]",
-                currentState, checkState, nextState, result, state);
-
-        return result;
     }
 
     /**
-     * Method to check a boolean. If true, transition to the first state, else transition to the
-     * second state
+     * Method to get the id
      *
-     * @param value the value to check
-     * @param trueState the next state if the value is true
-     * @param falseState the next state if the value is false
+     * @return the id
      */
-    public void ifTrueThenElse(boolean value, T trueState, T falseState) {
-        if (value) {
-            state = trueState;
-        } else {
-            state = falseState;
+    public String id() {
+        return id;
+    }
+
+    /**
+     * Method to get the previous state
+     *
+     * @return the previous state
+     */
+    public T previous() {
+        return previous;
+    }
+
+    /**
+     * Method to get the current statue
+     *
+     * @return the current state
+     */
+    public T current() {
+        return current;
+    }
+
+    /**
+     * Method to transition to the next state
+     *
+     * @param next the next state
+     */
+    public void next(T next) {
+        if (!map.containsKey(next)) {
+            RuntimeException runtimeException =
+                    new RuntimeException(
+                            String.format("Programming error, no transition mapped to [%s]", next));
+            runtimeException.printStackTrace();
+            throw runtimeException;
         }
 
-        LOGGER.trace(
-                "ifTrueThenElse value [%b] trueState [%s] falseState [%s] next state [%s]",
-                value, trueState, falseState, state);
+        previous = current;
+        current = next;
+    }
+
+    /** Method to run the state machine */
+    public void run() {
+        while (current != null) {
+            LOGGER.trace("current [%s]", current);
+            map.get(current).run(this);
+        }
+    }
+
+    /** Method to signal the state machine to exit */
+    public void finish() {
+        previous = current;
+        current = null;
     }
 
     @Override
     public String toString() {
-        return state.toString();
+        return current.toString();
+    }
+
+    /**
+     * Interface to implement a Transition
+     *
+     * @param <T> state
+     */
+    public interface Transition<T> {
+
+        /**
+         * Method to run the Transition
+         *
+         * @param stateMachine simpleStateMachine
+         */
+        void run(StateMachine<T> stateMachine);
     }
 }
