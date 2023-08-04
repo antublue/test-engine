@@ -28,9 +28,6 @@ c  - The latest release was on February 13, 2021.
 - It doesn't provide annotations to run methods before / after all test methods and before / after each test argument.
 
 
-- It uses a test class constructor approach, limiting you to Java inheritance semantics. (superclass before subclass construction.)
-
-
 - It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
 
 ---
