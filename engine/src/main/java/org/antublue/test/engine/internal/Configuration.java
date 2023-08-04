@@ -47,12 +47,10 @@ public class Configuration {
 
     private static final String USER_HOME = System.getProperty("user.home");
 
-    private Properties properties;
+    private final Properties properties;
 
     /** Constructor */
     private Configuration() {
-        trace("Entering constructor");
-
         properties = new Properties();
 
         String propertiesFilename = null;
@@ -95,8 +93,6 @@ public class Configuration {
                 // TODO ?
             }
         }
-
-        trace("Leaving constructor");
     }
 
     /**
@@ -114,30 +110,64 @@ public class Configuration {
     /**
      * Method to get a configuration property
      *
-     * @param name the property name
-     * @return the property value
+     * @param key the key
+     * @return the value
      */
-    public Optional<String> get(String name) {
-        String value = properties.getProperty(name);
-        trace("get() name [%s] value [%s]", name, value);
-        return Optional.ofNullable(properties.getProperty(name));
+    public Optional<String> get(String key) {
+        String value = properties.getProperty(key);
+        trace("get name [%s] value [%s]", key, value);
+        return Optional.ofNullable(value);
     }
 
     /**
      * Method to get a configuration property
      *
-     * @param name the property name
+     * @param key the key
+     * @param defaultValue the default value
      * @return the property value
      */
-    public Optional<Boolean> getBoolean(String name) {
-        Optional<String> value = get(name);
+    public Optional<String> getOrDefault(String key, String defaultValue) {
+        String value = properties.getProperty(key, defaultValue);
+        trace("get name [%s] defaultValue [%s] value [%s]", key, defaultValue, value);
+        return Optional.ofNullable(value);
+    }
+
+    /**
+     * Method to get a configuration property
+     *
+     * @param key the key
+     * @return the value
+     */
+    public Optional<Boolean> getBoolean(String key) {
+        Optional<String> value = get(key);
         if (value.isPresent()) {
             String string = value.get();
-            trace("getBoolean() name [%s] value [%s]", name, string);
+            trace("getBoolean name [%s] value [%s]", key, string);
             return Optional.of(Boolean.parseBoolean(string));
         } else {
-            trace("getBoolean() name [%s] value [%s]", name, null);
+            trace("getBoolean name [%s] value [%s]", key, null);
             return Optional.empty();
+        }
+    }
+
+    /**
+     * Method to get a configuration property
+     *
+     * @param key the key
+     * @param defaultValue the default value
+     * @return the value
+     */
+    public Optional<Boolean> getBooleanOrDefault(String key, boolean defaultValue) {
+        Optional<String> optional = get(key);
+        if (optional.isPresent()) {
+            String value = optional.get();
+            trace("getBoolean name [%s] defaultValue [%s] value [%s]", key, defaultValue, value);
+            return Optional.of(Boolean.parseBoolean(value));
+        } else {
+            trace(
+                    "getBoolean name [%s] defaultValue [%s] value [%s]",
+                    key, defaultValue, defaultValue);
+            return Optional.of(defaultValue);
         }
     }
 

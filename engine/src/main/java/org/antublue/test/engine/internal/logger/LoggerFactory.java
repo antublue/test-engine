@@ -17,10 +17,7 @@
 package org.antublue.test.engine.internal.logger;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
-import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.Configuration;
 
 /** Class to implement a LoggerFactory */
@@ -31,40 +28,11 @@ public final class LoggerFactory {
 
     private static final Configuration CONFIGURATION = Configuration.singleton();
 
-    private static final Map<String, Level> LEVEL_MAP = new HashMap<>();
-
     private final Map<String, Logger> loggerMap = new HashMap<>();
-
-    private final Level level;
-
-    static {
-        LEVEL_MAP.put("ERROR", Level.ERROR);
-        LEVEL_MAP.put("WARN", Level.WARN);
-        LEVEL_MAP.put("INFO", Level.INFO);
-        LEVEL_MAP.put("DEBUG", Level.DEBUG);
-        LEVEL_MAP.put("TRACE", Level.TRACE);
-        LEVEL_MAP.put("ALL", Level.ALL);
-    }
 
     /** Constructor */
     private LoggerFactory() {
-        Level level = null;
-
-        Optional<String> optional = CONFIGURATION.get(Constants.LOG_LEVEL);
-
-        if (optional.isPresent()) {
-            String value = optional.get();
-            if (value != null && !value.trim().isEmpty()) {
-                value = value.trim().toUpperCase(Locale.ENGLISH);
-                level = LEVEL_MAP.get(value);
-            }
-        }
-
-        if (level == null) {
-            level = Level.INFO;
-        }
-
-        this.level = level;
+        // DO NOTHING
     }
 
     /**
@@ -77,19 +45,11 @@ public final class LoggerFactory {
         synchronized (this) {
             Logger logger = loggerMap.get(name);
             if (logger == null) {
-                logger = new Logger(name, getLevel(name));
+                logger = new Logger(name);
                 loggerMap.put(name, logger);
             }
             return logger;
         }
-    }
-
-    private Level getLevel(String name) {
-        if (name.equals("~")) {
-            return Level.ERROR;
-        }
-
-        return level;
     }
 
     /**

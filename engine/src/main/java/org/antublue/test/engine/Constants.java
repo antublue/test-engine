@@ -29,6 +29,9 @@ public final class Constants {
     public static final String EXPERIMENTAL = ".experimental";
 
     /** Configuration constant */
+    public static final String LOG_LEVEL_REGEX = PREFIX + ".log.level.regex";
+
+    /** Configuration constant */
     public static final String LOG_LEVEL = PREFIX + ".log.level";
 
     /** Configuration constant */
