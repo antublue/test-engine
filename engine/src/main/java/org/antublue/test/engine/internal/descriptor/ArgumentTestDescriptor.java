@@ -253,7 +253,6 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                         Optional<Field> optional = REFLECTION_UTILS.getArgumentField(testClass);
                         if (optional.isPresent()) {
                             Field field = optional.get();
-                            field.setAccessible(true);
                             field.set(testInstance, null);
                         }
                         sm.next(State.CLEAR_FIELD_SUCCESS);
