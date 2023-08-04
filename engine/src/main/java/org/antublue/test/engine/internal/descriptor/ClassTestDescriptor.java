@@ -51,8 +51,6 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         PREPARE_FAIL,
         EXECUTE_SUCCESS,
         SKIP_SUCCESS,
-        EXTENSION_SUCCESS,
-        EXTENSION_FAIL,
         CONCLUDE_SUCCESS,
         CONCLUDE_FAIL
     }
