@@ -156,6 +156,12 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         StateMachine<State> stateMachine = new StateMachine<>(this.toString(), State.BEGIN);
 
+        /*
+         * BEGIN
+         *
+         * SET_FIELD_SUCCESS
+         * SET_FIELD_FAIL
+         */
         stateMachine.mapTransition(
                 State.BEGIN,
                 sm -> {
@@ -172,6 +178,12 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     }
                 });
 
+        /*
+         * SET_FIELD_SUCCESS
+         *
+         * BEFORE_ALL_SUCCESS
+         * BEFORE_ALL_FAIL
+         */
         stateMachine.mapTransition(
                 State.SET_FIELD_SUCCESS,
                 sm -> {
@@ -196,6 +208,11 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     }
                 });
 
+        /*
+         * BEFORE_ALL_SUCCESS
+         *
+         * EXECUTE_SUCCESS
+         */
         stateMachine.mapTransition(
                 State.BEFORE_ALL_SUCCESS,
                 sm -> {
@@ -207,6 +224,11 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     sm.next(State.EXECUTE_SUCCESS);
                 });
 
+        /*
+         * BEFORE_ALL_FAIL
+         *
+         * SKIP_SUCCESS
+         */
         stateMachine.mapTransition(
                 State.BEFORE_ALL_FAIL,
                 sm -> {
@@ -218,7 +240,15 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     sm.next(State.SKIP_SUCCESS);
                 });
 
-        StateMachine.Transition<State> transition =
+        /*
+         * EXECUTE_SUCCESS
+         * SKIP_SUCCESS
+         *
+         * AFTER_ALL_SUCCESS
+         * AFTER_ALL_FAIL
+         */
+        stateMachine.mapTransition(
+                stateMachine.asList(State.EXECUTE_SUCCESS, State.SKIP_SUCCESS),
                 sm -> {
                     List<Method> methods = REFLECTION_UTILS.getAfterAllMethods(testClass);
                     for (Method method : methods) {
@@ -241,13 +271,17 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     } else {
                         sm.next(State.AFTER_ALL_FAIL);
                     }
-                };
+                });
 
+        /*
+         * AFTER_ALL_SUCCESS
+         * AFTER_ALL_FAIL
+         *
+         * CLEAR_FIELD_SUCCESS
+         * CLEAR_FIELD_FAILED
+         */
         stateMachine.mapTransition(
-                new State[] {State.EXECUTE_SUCCESS, State.SKIP_SUCCESS}, transition);
-
-        stateMachine.mapTransition(
-                new State[] {State.AFTER_ALL_FAIL, State.AFTER_ALL_SUCCESS},
+                stateMachine.asList(State.AFTER_ALL_SUCCESS, State.AFTER_ALL_FAIL),
                 sm -> {
                     try {
                         Optional<Field> optional = REFLECTION_UTILS.getArgumentField(testClass);
@@ -262,11 +296,18 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     }
                 });
 
+        /*
+         * CLEAR_FIELD_SUCCESS
+         * CLEAR_FIELD_FAILED
+         *
+         * finish()
+         */
         stateMachine.mapTransition(
-                new State[] {State.CLEAR_FIELD_SUCCESS, State.CLEAR_FIELD_FAILED},
+                stateMachine.asList(State.CLEAR_FIELD_SUCCESS, State.CLEAR_FIELD_FAILED),
                 StateMachine::finish);
 
         stateMachine.run();
+
         AutoCloseAnnotationUtils.singleton()
                 .processAutoCloseAnnotatedFields(
                         testInstance, "@TestEngine.AfterAll", throwableCollector);

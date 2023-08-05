@@ -16,7 +16,9 @@
 
 package org.antublue.test.engine.internal.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -26,6 +28,7 @@ import org.antublue.test.engine.internal.logger.LoggerFactory;
  *
  * @param <T> state
  */
+@SuppressWarnings("unchecked")
 public class StateMachine<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StateMachine.class);
@@ -42,7 +45,7 @@ public class StateMachine<T> {
      * @param begin begin
      */
     public StateMachine(String id, T begin) {
-        LOGGER.trace("StateNachine id [%s] state [%s]", id, begin);
+        LOGGER.trace("StateMachine id [%s] state [%s]", id, begin);
 
         this.id = id;
         this.previous = begin;
@@ -50,7 +53,7 @@ public class StateMachine<T> {
     }
 
     /**
-     * Method to map Transition
+     * Method to map a state to a transition
      *
      * @param state state
      * @param transition transition
@@ -62,8 +65,9 @@ public class StateMachine<T> {
             RuntimeException runtimeException =
                     new RuntimeException(
                             String.format(
-                                    "Programming error, transition already mapped to [%s]", state));
-            runtimeException.printStackTrace();
+                                    "PROGRAMMING ERROR transition already mapped to [%s]", state));
+            runtimeException.printStackTrace(System.out);
+            System.out.flush();
             throw runtimeException;
         }
 
@@ -71,21 +75,22 @@ public class StateMachine<T> {
     }
 
     /**
-     * Method to map an array of Transitions
+     * Method to map a list of states to a Transition
      *
      * @param states states
      * @param transition transition
      */
-    public void mapTransition(T[] states, Transition<T> transition) {
+    public void mapTransition(List<T> states, Transition<T> transition) {
         if (LOGGER.isTraceEnabled()) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("[");
-            for (int i = 0; i < states.length; i++) {
-                if (i > 0) {
+            int count = 0;
+            for (T state : states) {
+                if (count > 0) {
                     stringBuilder.append(", ");
                 }
-
-                stringBuilder.append(states[i].toString());
+                stringBuilder.append(state.toString());
+                count++;
             }
             stringBuilder.append("]");
 
@@ -133,8 +138,9 @@ public class StateMachine<T> {
         if (!map.containsKey(next)) {
             RuntimeException runtimeException =
                     new RuntimeException(
-                            String.format("Programming error, no transition mapped to [%s]", next));
-            runtimeException.printStackTrace();
+                            String.format("PROGRAMMING ERROR no transition mapped to [%s]", next));
+            runtimeException.printStackTrace(System.out);
+            System.out.flush();
             throw runtimeException;
         }
 
@@ -158,6 +164,20 @@ public class StateMachine<T> {
         current = null;
     }
 
+    /**
+     * Method to convert an array of states to a list
+     *
+     * @param states array of states
+     * @return list of states
+     */
+    public List<T> asList(T... states) {
+        List<T> list = new ArrayList<>(states.length);
+        for (T state : states) {
+            list.add(state);
+        }
+        return list;
+    }
+
     @Override
     public String toString() {
         return current.toString();
@@ -173,7 +193,7 @@ public class StateMachine<T> {
         /**
          * Method to run the Transition
          *
-         * @param stateMachine simpleStateMachine
+         * @param stateMachine stateMachine
          */
         void run(StateMachine<T> stateMachine);
     }

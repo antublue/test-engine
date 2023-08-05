@@ -167,6 +167,12 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         StateMachine<State> stateMachine = new StateMachine<>(this.toString(), State.BEGIN);
 
+        /*
+         * BEGIN
+         *
+         * BEFORE_EACH_SUCCESS
+         * BEFORE_EACH_FAIL
+         */
         stateMachine.mapTransition(
                 State.BEGIN,
                 sm -> {
@@ -191,6 +197,12 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     }
                 });
 
+        /*
+         * BEFORE_EACH_SUCCESS
+         *
+         * EXECUTE_SUCCESS
+         * EXECUTE_FAIL
+         */
         stateMachine.mapTransition(
                 State.BEFORE_EACH_SUCCESS,
                 sm -> {
@@ -212,7 +224,17 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     }
                 });
 
-        StateMachine.Transition<State> transition =
+        /*
+         * BEFORE_EACH_FAIL
+         * EXECUTE_SUCCESS
+         * EXECUTE_FAIL
+         *
+         * AFTER_EACH_SUCCESS
+         * AFTER_EACH_FAIL
+         */
+        stateMachine.mapTransition(
+                stateMachine.asList(
+                        State.BEFORE_EACH_FAIL, State.EXECUTE_SUCCESS, State.EXECUTE_FAIL),
                 sm -> {
                     List<Method> methods = REFLECTION_UTILS.getAfterEachMethods(testClass);
                     for (Method method : methods) {
@@ -235,14 +257,16 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     } else {
                         sm.next(State.AFTER_EACH_FAIL);
                     }
-                };
+                });
 
+        /*
+         * AFTER_EACH_SUCCESS
+         * AFTER_EACH_FAIL
+         *
+         * finish()
+         */
         stateMachine.mapTransition(
-                new State[] {State.BEFORE_EACH_FAIL, State.EXECUTE_SUCCESS, State.EXECUTE_FAIL},
-                transition);
-
-        stateMachine.mapTransition(
-                new State[] {State.AFTER_EACH_SUCCESS, State.AFTER_EACH_FAIL},
+                stateMachine.asList(State.AFTER_EACH_SUCCESS, State.AFTER_EACH_FAIL),
                 StateMachine::finish);
 
         stateMachine.run();

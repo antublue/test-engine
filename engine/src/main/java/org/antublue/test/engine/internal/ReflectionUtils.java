@@ -51,6 +51,10 @@ public final class ReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
 
+    private static final Class[] NO_CLASS_ARGS = null;
+
+    private static final Object[] NO_OBJECT_ARGS = null;
+
     private static final ReflectionUtils SINGLETON = new ReflectionUtils();
 
     private enum Scope {
@@ -200,7 +204,7 @@ public final class ReflectionUtils {
 
         try {
             Method method = getArgumentSupplierMethod(clazz);
-            Object object = method.invoke(null, (Object[]) null);
+            Object object = method.invoke(null, NO_OBJECT_ARGS);
             if (object instanceof Stream) {
                 List<Argument> arguments = ((Stream<Argument>) object).collect(Collectors.toList());
                 LOGGER.trace("class [%s] argument count [%d]", clazz.getName(), arguments.size());

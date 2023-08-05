@@ -126,7 +126,7 @@ public class Resolver {
 
     /** Method to configure the resolver */
     private void configure() {
-        LOGGER.trace("configure()");
+        LOGGER.trace("configure");
 
         configureIncludeTestClassPredicate();
         configureExcludeTestClassPredicate();
@@ -142,7 +142,7 @@ public class Resolver {
 
     /** Method to configure the include test class Predicate */
     private void configureIncludeTestClassPredicate() {
-        LOGGER.trace("configureIncludeTestClassPredicate()");
+        LOGGER.trace("configureIncludeTestClassPredicate");
 
         includeTestClassPredicate =
                 configurationParameters
@@ -158,7 +158,7 @@ public class Resolver {
 
     /** Method to configure the exclude test class Predicate */
     private void configureExcludeTestClassPredicate() {
-        LOGGER.trace("configureExcludeTestClassPredicate()");
+        LOGGER.trace("configureExcludeTestClassPredicate");
 
         excludeTestClassPredicate =
                 configurationParameters
@@ -174,7 +174,7 @@ public class Resolver {
 
     /** Method to configure the include test method Predicate */
     private void configureIncludeTestMethodPredicate() {
-        LOGGER.trace("configureIncludeTestMethodPredicate()");
+        LOGGER.trace("configureIncludeTestMethodPredicate");
 
         includeTestMethodPredicate =
                 configurationParameters
@@ -190,7 +190,7 @@ public class Resolver {
 
     /** Method to configure the exclude test method Predicate */
     private void configureExcludeTestMethodPredicate() {
-        LOGGER.trace("configureExcludeTestMethodPredicate()");
+        LOGGER.trace("configureExcludeTestMethodPredicate");
 
         excludeTestMethodPredicate =
                 configurationParameters
@@ -206,7 +206,7 @@ public class Resolver {
 
     /** Method to configure the include test class tag Predicate */
     private void configureIncludeTestClassTagPredicate() {
-        LOGGER.trace("configureIncludeTestClassTagPredicate()");
+        LOGGER.trace("configureIncludeTestClassTagPredicate");
 
         includeTestClassTagPredicate =
                 configurationParameters
@@ -223,7 +223,7 @@ public class Resolver {
 
     /** Method to configure the exclude test class tag Predicate */
     private void configureExcludeTestClassTagPredicate() {
-        LOGGER.trace("configureExcludeTestClassTagPredicate()");
+        LOGGER.trace("configureExcludeTestClassTagPredicate");
 
         excludeTestClassTagPredicate =
                 configurationParameters
@@ -240,7 +240,7 @@ public class Resolver {
 
     /** Method to configure the include test method tag Predicate */
     private void configureIncludeTestMethodTagPredicate() {
-        LOGGER.trace("configureIncludeTestMethodTagPredicate()");
+        LOGGER.trace("configureIncludeTestMethodTagPredicate");
 
         includeTestMethodTagPredicate =
                 configurationParameters
@@ -257,7 +257,7 @@ public class Resolver {
 
     /** Method to configure the exclude test method tag Predicate */
     private void configureExcludeTestMethodTagPredicate() {
-        LOGGER.trace("configureExcludeTestMethodTagPredicate()");
+        LOGGER.trace("configureExcludeTestMethodTagPredicate");
 
         excludeTestMethodTagPredicate =
                 configurationParameters
@@ -274,7 +274,7 @@ public class Resolver {
 
     /** Method to configure the class name filters Predicate */
     private void configureClassNameFiltersPredicate() {
-        LOGGER.trace("configureClassNameFiltersPredicate()");
+        LOGGER.trace("configureClassNameFiltersPredicate");
 
         List<ClassNameFilter> classNameFilters =
                 engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class);
@@ -286,7 +286,7 @@ public class Resolver {
 
     /** Method to configure the package name filters Predicate */
     private void configurePackageNameFiltersPredicate() {
-        LOGGER.trace("configurePackageNameFiltersPredicate()");
+        LOGGER.trace("configurePackageNameFiltersPredicate");
 
         List<PackageNameFilter> packageNameFilters =
                 engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
@@ -298,7 +298,7 @@ public class Resolver {
 
     /** Method to resolve selectors */
     private void resolve() {
-        LOGGER.trace("resolve()");
+        LOGGER.trace("resolve");
 
         classMethodSetMap = new LinkedHashMap<>();
 
@@ -311,7 +311,7 @@ public class Resolver {
 
     /** Method to resolve ClasspathRootSelectors */
     private void resolveClasspathRootSelectors() {
-        LOGGER.trace("resolveClasspathRootSelectors()");
+        LOGGER.trace("resolveClasspathRootSelectors");
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClasspathRootSelector.class)
@@ -337,7 +337,7 @@ public class Resolver {
 
     /** Method to resolve PackageSelector */
     private void resolvePackageSelectors() {
-        LOGGER.trace("resolvePackageSelectors()");
+        LOGGER.trace("resolvePackageSelectors");
 
         engineDiscoveryRequest
                 .getSelectorsByType(PackageSelector.class)
@@ -363,7 +363,7 @@ public class Resolver {
 
     /** Method to resolve ClassSelectors */
     private void resolveClassSelectors() {
-        LOGGER.trace("resolveClassSelectors()");
+        LOGGER.trace("resolveClassSelectors");
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClassSelector.class)
@@ -384,7 +384,7 @@ public class Resolver {
 
     /** Method to resolve MethodSelectors */
     private void resolveMethodSelectors() {
-        LOGGER.trace("resolveMethodSelectors()");
+        LOGGER.trace("resolveMethodSelectors");
 
         engineDiscoveryRequest
                 .getSelectorsByType(MethodSelector.class)
@@ -406,7 +406,7 @@ public class Resolver {
 
     /** Method to resolve UniqueIdSelectors */
     private void resolveUniqueIdSelectors() {
-        LOGGER.trace("resolveUniqueIdSelectors()");
+        LOGGER.trace("resolveUniqueIdSelectors");
 
         engineDiscoveryRequest
                 .getSelectorsByType(UniqueIdSelector.class)
@@ -462,7 +462,7 @@ public class Resolver {
 
     /** Method to filter selectors */
     private void filter() {
-        LOGGER.trace("filter()");
+        LOGGER.trace("filter");
 
         Iterator<Map.Entry<Class<?>, Set<Method>>> classMethodMapEntryIterator =
                 classMethodSetMap.entrySet().iterator();

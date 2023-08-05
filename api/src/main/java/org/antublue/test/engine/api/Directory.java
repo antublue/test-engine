@@ -71,7 +71,8 @@ public class Directory implements AutoCloseable {
             try {
                 delete(new File(path));
             } catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(System.out);
+                System.out.flush();
             }
         }
     }

@@ -136,19 +136,25 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         StateMachine<State> stateMachine = new StateMachine<>(this.toString(), State.BEGIN);
 
+        /*
+         * BEGIN
+         *
+         * INSTANTIATE_SUCCESS
+         * INSTANTIATE_FAIL
+         */
         stateMachine.mapTransition(
                 State.BEGIN,
-                simpleStateMachine -> {
+                sm -> {
                     try {
                         testInstance =
                                 testClass
                                         .getDeclaredConstructor((Class<?>[]) null)
                                         .newInstance((Object[]) null);
                         executorContext.setTestInstance(testInstance);
-                        simpleStateMachine.next(State.INSTANTIATE_TEST_INSTANCE_SUCCESS);
+                        sm.next(State.INSTANTIATE_TEST_INSTANCE_SUCCESS);
                     } catch (Throwable t) {
                         throwableCollector.accept(t);
-                        simpleStateMachine.next(State.INSTANTIATE_TEST_INSTANCE_FAIL);
+                        sm.next(State.INSTANTIATE_TEST_INSTANCE_FAIL);
                     }
                 });
 
@@ -224,10 +230,11 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 };
 
         stateMachine.mapTransition(
-                new State[] {State.EXECUTE_SUCCESS, State.SKIP_SUCCESS}, transition);
+                stateMachine.asList(State.EXECUTE_SUCCESS, State.SKIP_SUCCESS), transition);
 
         stateMachine.mapTransition(
-                new State[] {State.CONCLUDE_SUCCESS, State.CONCLUDE_FAIL}, StateMachine::finish);
+                stateMachine.asList(State.CONCLUDE_SUCCESS, State.CONCLUDE_FAIL),
+                StateMachine::finish);
 
         stateMachine.run();
 
