@@ -173,7 +173,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
          * BEFORE_EACH_SUCCESS
          * BEFORE_EACH_FAIL
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 State.BEGIN,
                 sm -> {
                     try {
@@ -190,10 +190,10 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                                 lockAnnotationUtils.processUnlockAnnotations(method);
                             }
                         }
-                        sm.next(State.BEFORE_EACH_SUCCESS);
+                        sm.transition(State.BEFORE_EACH_SUCCESS);
                     } catch (Throwable t) {
                         throwableCollector.accept(t);
-                        sm.next(State.BEFORE_EACH_FAIL);
+                        sm.transition(State.BEFORE_EACH_FAIL);
                     }
                 });
 
@@ -203,7 +203,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
          * EXECUTE_SUCCESS
          * EXECUTE_FAIL
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 State.BEFORE_EACH_SUCCESS,
                 sm -> {
                     try {
@@ -214,13 +214,13 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                             } else {
                                 testMethod.invoke(testInstance, NO_ARGS);
                             }
-                            sm.next(State.EXECUTE_SUCCESS);
+                            sm.transition(State.EXECUTE_SUCCESS);
                         } finally {
                             lockAnnotationUtils.processUnlockAnnotations(testMethod);
                         }
                     } catch (Throwable t) {
                         throwableCollector.accept(t);
-                        sm.next(State.EXECUTE_FAIL);
+                        sm.transition(State.EXECUTE_FAIL);
                     }
                 });
 
@@ -232,7 +232,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
          * AFTER_EACH_SUCCESS
          * AFTER_EACH_FAIL
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 stateMachine.asList(
                         State.BEFORE_EACH_FAIL, State.EXECUTE_SUCCESS, State.EXECUTE_FAIL),
                 sm -> {
@@ -253,9 +253,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     }
 
                     if (throwableCollector.isEmpty()) {
-                        sm.next(State.AFTER_EACH_SUCCESS);
+                        sm.transition(State.AFTER_EACH_SUCCESS);
                     } else {
-                        sm.next(State.AFTER_EACH_FAIL);
+                        sm.transition(State.AFTER_EACH_FAIL);
                     }
                 });
 
@@ -265,9 +265,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
          *
          * finish()
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 stateMachine.asList(State.AFTER_EACH_SUCCESS, State.AFTER_EACH_FAIL),
-                StateMachine::finish);
+                StateMachine::stop);
 
         stateMachine.run();
 

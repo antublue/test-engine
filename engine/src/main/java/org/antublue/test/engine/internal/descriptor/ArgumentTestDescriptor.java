@@ -162,7 +162,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
          * SET_FIELD_SUCCESS
          * SET_FIELD_FAIL
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 State.BEGIN,
                 sm -> {
                     try {
@@ -171,10 +171,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                             Field field = optional.get();
                             field.set(testInstance, testArgument);
                         }
-                        sm.next(State.SET_FIELD_SUCCESS);
+                        sm.transition(State.SET_FIELD_SUCCESS);
                     } catch (Throwable t) {
                         throwableCollector.accept(t);
-                        sm.next(State.SET_FIELD_FAIL);
+                        sm.transition(State.SET_FIELD_FAIL);
                     }
                 });
 
@@ -184,7 +184,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
          * BEFORE_ALL_SUCCESS
          * BEFORE_ALL_FAIL
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 State.SET_FIELD_SUCCESS,
                 sm -> {
                     try {
@@ -201,10 +201,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                                 lockAnnotationUtils.processUnlockAnnotations(method);
                             }
                         }
-                        sm.next(State.BEFORE_ALL_SUCCESS);
+                        sm.transition(State.BEFORE_ALL_SUCCESS);
                     } catch (Throwable t) {
                         throwableCollector.accept(t);
-                        sm.next(State.BEFORE_ALL_FAIL);
+                        sm.transition(State.BEFORE_ALL_FAIL);
                     }
                 });
 
@@ -213,7 +213,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
          *
          * EXECUTE_SUCCESS
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 State.BEFORE_ALL_SUCCESS,
                 sm -> {
                     getChildren(MethodTestDescriptor.class)
@@ -221,7 +221,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                                     methodTestDescriptor ->
                                             methodTestDescriptor.execute(executorContext));
 
-                    sm.next(State.EXECUTE_SUCCESS);
+                    sm.transition(State.EXECUTE_SUCCESS);
                 });
 
         /*
@@ -229,7 +229,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
          *
          * SKIP_SUCCESS
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 State.BEFORE_ALL_FAIL,
                 sm -> {
                     getChildren(MethodTestDescriptor.class)
@@ -237,7 +237,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                                     methodTestDescriptor ->
                                             methodTestDescriptor.skip(executorContext));
 
-                    sm.next(State.SKIP_SUCCESS);
+                    sm.transition(State.SKIP_SUCCESS);
                 });
 
         /*
@@ -247,7 +247,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
          * AFTER_ALL_SUCCESS
          * AFTER_ALL_FAIL
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 stateMachine.asList(State.EXECUTE_SUCCESS, State.SKIP_SUCCESS),
                 sm -> {
                     List<Method> methods = REFLECTION_UTILS.getAfterAllMethods(testClass);
@@ -267,9 +267,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     }
 
                     if (throwableCollector.isEmpty()) {
-                        sm.next(State.AFTER_ALL_SUCCESS);
+                        sm.transition(State.AFTER_ALL_SUCCESS);
                     } else {
-                        sm.next(State.AFTER_ALL_FAIL);
+                        sm.transition(State.AFTER_ALL_FAIL);
                     }
                 });
 
@@ -280,7 +280,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
          * CLEAR_FIELD_SUCCESS
          * CLEAR_FIELD_FAILED
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 stateMachine.asList(State.AFTER_ALL_SUCCESS, State.AFTER_ALL_FAIL),
                 sm -> {
                     try {
@@ -289,10 +289,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                             Field field = optional.get();
                             field.set(testInstance, null);
                         }
-                        sm.next(State.CLEAR_FIELD_SUCCESS);
+                        sm.transition(State.CLEAR_FIELD_SUCCESS);
                     } catch (Throwable t) {
                         throwableCollector.accept(t);
-                        sm.next(State.CLEAR_FIELD_FAILED);
+                        sm.transition(State.CLEAR_FIELD_FAILED);
                     }
                 });
 
@@ -302,9 +302,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
          *
          * finish()
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 stateMachine.asList(State.CLEAR_FIELD_SUCCESS, State.CLEAR_FIELD_FAILED),
-                StateMachine::finish);
+                StateMachine::stop);
 
         stateMachine.run();
 

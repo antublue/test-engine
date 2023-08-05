@@ -17,6 +17,7 @@
 package org.antublue.test.engine.internal.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,32 +34,30 @@ public class StateMachine<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StateMachine.class);
 
-    private final Map<T, Transition<T>> map = new HashMap<>();
+    private final Map<T, Behavior<T>> map = new HashMap<>();
     private final String id;
-    private T previous;
-    private T current;
+    private T state;
 
     /**
      * Constructor
      *
-     * @param id id
-     * @param begin begin
+     * @param id the state machine id
+     * @param initialState the initialState
      */
-    public StateMachine(String id, T begin) {
-        LOGGER.trace("StateMachine id [%s] state [%s]", id, begin);
+    public StateMachine(String id, T initialState) {
+        LOGGER.trace("StateMachine id [%s] initial state [%s]", id, initialState);
 
         this.id = id;
-        this.previous = begin;
-        this.current = begin;
+        this.state = initialState;
     }
 
     /**
-     * Method to map a state to a transition
+     * Method to add a behavior
      *
-     * @param state state
-     * @param transition transition
+     * @param state the state
+     * @param behavior the Behavior
      */
-    public void mapTransition(T state, Transition<T> transition) {
+    public StateMachine addBehavior(T state, Behavior<T> behavior) {
         LOGGER.trace("mapTransition state [%s]", state);
 
         if (map.containsKey(state)) {
@@ -71,130 +70,96 @@ public class StateMachine<T> {
             throw runtimeException;
         }
 
-        map.put(state, transition);
+        map.put(state, behavior);
+
+        return this;
     }
 
     /**
-     * Method to map a list of states to a Transition
+     * Method to add a behavior
      *
-     * @param states states
-     * @param transition transition
+     * @param states the states
+     * @param behavior the Behavior
      */
-    public void mapTransition(List<T> states, Transition<T> transition) {
-        if (LOGGER.isTraceEnabled()) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("[");
-            int count = 0;
-            for (T state : states) {
-                if (count > 0) {
-                    stringBuilder.append(", ");
-                }
-                stringBuilder.append(state.toString());
-                count++;
-            }
-            stringBuilder.append("]");
-
-            LOGGER.trace("mapTransition states [%s]", stringBuilder);
-        }
-
+    public StateMachine addBehavior(List<T> states, Behavior<T> behavior) {
         for (T state : states) {
-            mapTransition(state, transition);
+            addBehavior(state, behavior);
         }
+
+        return this;
     }
 
     /**
-     * Method to get the id
+     * Method to get the state machine id
      *
-     * @return the id
+     * @return the state machine id
      */
     public String id() {
         return id;
     }
 
     /**
-     * Method to get the previous state
-     *
-     * @return the previous state
-     */
-    public T previous() {
-        return previous;
-    }
-
-    /**
-     * Method to get the current statue
-     *
-     * @return the current state
-     */
-    public T current() {
-        return current;
-    }
-
-    /**
      * Method to transition to the next state
      *
-     * @param next the next state
+     * @param nextState the next state
      */
-    public void next(T next) {
-        if (!map.containsKey(next)) {
+    public void transition(T nextState) {
+        if (!map.containsKey(nextState)) {
             RuntimeException runtimeException =
                     new RuntimeException(
-                            String.format("PROGRAMMING ERROR no transition mapped to [%s]", next));
+                            String.format(
+                                    "PROGRAMMING ERROR no transition mapped to [%s]", nextState));
             runtimeException.printStackTrace(System.out);
             System.out.flush();
             throw runtimeException;
         }
 
-        previous = current;
-        current = next;
+        state = nextState;
     }
 
     /** Method to run the state machine */
     public void run() {
-        while (current != null) {
-            LOGGER.trace("run current state [%s]", current);
-            map.get(current).run(this);
+        while (state != null) {
+            LOGGER.trace("state [%s]", state);
+            map.get(state).perform(this);
         }
     }
 
-    /** Method to signal the state machine to exit */
-    public void finish() {
-        LOGGER.trace("finish");
-
-        previous = current;
-        current = null;
+    /** Method to signal the state machine to stop */
+    public void stop() {
+        LOGGER.trace("stop");
+        state = null;
     }
 
     /**
      * Method to convert an array of states to a list
      *
-     * @param states array of states
-     * @return list of states
+     * @param states then array of states
+     * @return a list of states
      */
     public List<T> asList(T... states) {
         List<T> list = new ArrayList<>(states.length);
-        for (T state : states) {
-            list.add(state);
-        }
+        list.addAll(Arrays.asList(states));
         return list;
     }
 
     @Override
     public String toString() {
-        return current.toString();
+        return state.toString();
     }
 
     /**
-     * Interface to implement a Transition
+     * Interface to implement a Behavior
      *
      * @param <T> state
      */
-    public interface Transition<T> {
+    public interface Behavior<T> {
 
         /**
-         * Method to run the Transition
+         * Method to perform the behavior
          *
-         * @param stateMachine stateMachine
+         * @param sm the state machine
          */
-        void run(StateMachine<T> stateMachine);
+        void perform(StateMachine<T> sm);
     }
 }

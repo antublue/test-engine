@@ -142,7 +142,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
          * INSTANTIATE_SUCCESS
          * INSTANTIATE_FAIL
          */
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 State.BEGIN,
                 sm -> {
                     try {
@@ -151,14 +151,14 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                                         .getDeclaredConstructor((Class<?>[]) null)
                                         .newInstance((Object[]) null);
                         executorContext.setTestInstance(testInstance);
-                        sm.next(State.INSTANTIATE_TEST_INSTANCE_SUCCESS);
+                        sm.transition(State.INSTANTIATE_TEST_INSTANCE_SUCCESS);
                     } catch (Throwable t) {
                         throwableCollector.accept(t);
-                        sm.next(State.INSTANTIATE_TEST_INSTANCE_FAIL);
+                        sm.transition(State.INSTANTIATE_TEST_INSTANCE_FAIL);
                     }
                 });
 
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 State.INSTANTIATE_TEST_INSTANCE_SUCCESS,
                 simpleStateMachine -> {
                     try {
@@ -171,14 +171,14 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                                 lockAnnotationUtils.processUnlockAnnotations(method);
                             }
                         }
-                        simpleStateMachine.next(State.PREPARE_SUCCESS);
+                        simpleStateMachine.transition(State.PREPARE_SUCCESS);
                     } catch (Throwable t) {
                         throwableCollector.accept(t);
-                        simpleStateMachine.next(State.PREPARE_FAIL);
+                        simpleStateMachine.transition(State.PREPARE_FAIL);
                     }
                 });
 
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 State.PREPARE_SUCCESS,
                 simpleStateMachine -> {
                     getChildren(ArgumentTestDescriptor.class)
@@ -186,10 +186,10 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                                     argumentTestDescriptor ->
                                             argumentTestDescriptor.execute(executorContext));
 
-                    stateMachine.next(State.EXECUTE_SUCCESS);
+                    stateMachine.transition(State.EXECUTE_SUCCESS);
                 });
 
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 State.PREPARE_FAIL,
                 sm -> {
                     getChildren(ArgumentTestDescriptor.class)
@@ -205,10 +205,10 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                                         argumentTestDescriptor.skip(executorContext);
                                     });
 
-                    sm.next(State.SKIP_SUCCESS);
+                    sm.transition(State.SKIP_SUCCESS);
                 });
 
-        StateMachine.Transition<State> transition =
+        StateMachine.Behavior<State> behavior =
                 sm -> {
                     List<Method> methods = REFLECTION_UTILS.getConcludeMethods(testClass);
                     for (Method method : methods) {
@@ -223,18 +223,18 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                     }
 
                     if (throwableCollector.isEmpty()) {
-                        sm.next(State.CONCLUDE_SUCCESS);
+                        sm.transition(State.CONCLUDE_SUCCESS);
                     } else {
-                        sm.next(State.CONCLUDE_FAIL);
+                        sm.transition(State.CONCLUDE_FAIL);
                     }
                 };
 
-        stateMachine.mapTransition(
-                stateMachine.asList(State.EXECUTE_SUCCESS, State.SKIP_SUCCESS), transition);
+        stateMachine.addBehavior(
+                stateMachine.asList(State.EXECUTE_SUCCESS, State.SKIP_SUCCESS), behavior);
 
-        stateMachine.mapTransition(
+        stateMachine.addBehavior(
                 stateMachine.asList(State.CONCLUDE_SUCCESS, State.CONCLUDE_FAIL),
-                StateMachine::finish);
+                StateMachine::stop);
 
         stateMachine.run();
 
