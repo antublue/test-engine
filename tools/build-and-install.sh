@@ -34,57 +34,35 @@ then
   exit 1
 fi
 
-VERSION="${1}"
 PROJECT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-# Check for any uncommitted changes
-git diff --quiet HEAD
-if [ ! $? -eq 0 ];
-then
-  echo "------------------------------------------------------------------------"
-  echo "UNCOMMITTED CHANGES"
-  echo "------------------------------------------------------------------------"
-  echo ""
-  git status
-  exit 1
-fi
-
+# Change to the project root directory
 cd "${PROJECT_ROOT_DIRECTORY}"
 check_exit_code "Failed to change to project root directory"
 
-# Verify the code builds
-./mvnw clean verify
-check_exit_code "Maven build failed"
+# Get the current version
+CURRENT_VERSION=$(./mvnw -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+BUILD_VERSION="${1}"
 
-# Delete any previous build branch
-git branch -D "build-${VERSION}" > /dev/null 2>&1
-
-# Checkout a build branch
-git checkout -b "build-${VERSION}"
-check_exit_code "Git checkout [${VERSION}] failed"
-
-# Update the build versions
-mvn versions:set -DnewVersion="${VERSION}" -DprocessAllModules
-check_exit_code "Maven update versions [${VERSION}] failed"
+# Update the versions
+./mvnw versions:set -DnewVersion="${BUILD_VERSION}" -DprocessAllModules >> /dev/null
+check_exit_code "Maven update versions [${BUILD_VERSION}] failed"
 rm -Rf $(find . -name "*versionsBackup")
 
-# Build the version as a release
+# Build and install the jars
 ./mvnw clean install
-check_exit_code "Maven deploy [${VERSION}] failed"
+BUILD_EXIT_CODE="$?"
 
-# Reset the branch
-git reset --hard HEAD
-check_exit_code "Git reset hard failed"
-
-# Checkout the main branch
-git checkout "${CURRENT_BRANCH}"
-check_exit_code "Git checkout [${CURRENT_BRANCH} failed"
-
-# Delete the build branch
-git branch -D "build-${VERSION}"
-check_exit_code "Git delete branch [build-${VERSION}] failed"
+# Revert the versions
+./mvnw versions:set -DnewVersion="${CURRENT_VERSION}" -DprocessAllModules >> /dev/null
+check_exit_code "Maven update versions [${CURRENT_VERSION}] failed"
+rm -Rf $(find . -name "*versionsBackup")
 
 echo "------------------------------------------------------------------------"
-echo "SUCCESS"
+if [ "${BUILD_EXIT_CODE}" == "0" ];
+then
+    echo "SUCCESS"
+else
+    echo "FAILURE"
+fi
 echo "------------------------------------------------------------------------"

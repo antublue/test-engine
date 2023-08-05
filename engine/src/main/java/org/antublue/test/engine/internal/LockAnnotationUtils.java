@@ -20,9 +20,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
@@ -36,8 +36,7 @@ public class LockAnnotationUtils {
 
     private static final LockAnnotationUtils SINGLETON = new LockAnnotationUtils();
 
-    private final Map<String, ReentrantReadWriteLock> LOCK_MAP =
-            Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, ReentrantReadWriteLock> LOCK_MAP = new ConcurrentHashMap<>();
 
     /** Constructor */
     private LockAnnotationUtils() {

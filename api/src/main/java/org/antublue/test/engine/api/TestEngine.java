@@ -250,6 +250,6 @@ public @interface TestEngine {
         READ_WRITE,
 
         /** Read mode */
-        READ;
+        READ
     }
 }

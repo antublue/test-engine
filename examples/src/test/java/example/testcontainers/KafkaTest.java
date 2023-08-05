@@ -120,7 +120,7 @@ public class KafkaTest {
             }
         }
 
-        System.out.println(String.format("message [%s] produced", message));
+        System.out.format("message [%s] produced", message).println();
     }
 
     @TestEngine.Test

@@ -26,13 +26,11 @@ import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestDescriptorUtils;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorString;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
-import org.antublue.test.engine.internal.util.Switch;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -177,6 +175,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
         System.out.println(INFO + SEPARATOR);
         System.out.println(INFO + BANNER);
         System.out.println(INFO + SEPARATOR);
+        System.out.flush();
     }
 
     /**
@@ -193,69 +192,46 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
 
         summary.executionStarted(testDescriptor);
 
-        StringBuilder stringBuilder = new StringBuilder();
+        if (logTestMessages) {
+            StringBuilder stringBuilder = new StringBuilder();
 
-        Switch.switchType(
-                testDescriptor,
-                Switch.switchCase(
-                        ExtendedEngineDescriptor.class,
-                        consumer -> {
-                            // DO NOTHING
-                        }),
-                Switch.switchCase(
-                        ClassTestDescriptor.class,
-                        consumer -> {
-                            ClassTestDescriptor classTestDescriptor =
-                                    (ClassTestDescriptor) testDescriptor;
-                            Class<?> testClass = classTestDescriptor.getTestClass();
-                            if (logTestMessages) {
-                                stringBuilder
-                                        .append(TEST)
-                                        .append(" | ")
-                                        .append(testClass.getName());
-                            }
-                        }),
-                Switch.switchCase(
-                        ArgumentTestDescriptor.class,
-                        consumer -> {
-                            if (logTestMessages) {
-                                ArgumentTestDescriptor argumentTestDescriptor =
-                                        (ArgumentTestDescriptor) testDescriptor;
-                                Class<?> testClass = argumentTestDescriptor.getTestClass();
-                                Argument testArgument = argumentTestDescriptor.getTestArgument();
-                                String testArgumentName = testArgument.name();
-                                stringBuilder
-                                        .append(TEST)
-                                        .append(" | ")
-                                        .append(testArgumentName)
-                                        .append(" | ")
-                                        .append(testClass.getName());
-                            }
-                        }),
-                Switch.switchCase(
-                        MethodTestDescriptor.class,
-                        consumer -> {
-                            if (logTestMessages) {
-                                MethodTestDescriptor methodTestDescriptor =
-                                        (MethodTestDescriptor) testDescriptor;
-                                Class<?> testClass = methodTestDescriptor.getTestClass();
-                                Method testMethod = methodTestDescriptor.getTestMethod();
-                                Argument testArgument = methodTestDescriptor.getTestArgument();
-                                String testArgumentName = testArgument.name();
-                                stringBuilder
-                                        .append(TEST)
-                                        .append(" | ")
-                                        .append(testArgumentName)
-                                        .append(" | ")
-                                        .append(testClass.getName())
-                                        .append(" ")
-                                        .append(testMethod.getName())
-                                        .append("()");
-                            }
-                        }));
+            if (testDescriptor instanceof ClassTestDescriptor) {
+                ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
+                Class<?> testClass = classTestDescriptor.getTestClass();
+                stringBuilder.append(TEST).append(" | ").append(testClass.getName());
+            } else if (testDescriptor instanceof ArgumentTestDescriptor) {
+                ArgumentTestDescriptor argumentTestDescriptor =
+                        (ArgumentTestDescriptor) testDescriptor;
+                Class<?> testClass = argumentTestDescriptor.getTestClass();
+                Argument testArgument = argumentTestDescriptor.getTestArgument();
+                String testArgumentName = testArgument.name();
+                stringBuilder
+                        .append(TEST)
+                        .append(" | ")
+                        .append(testArgumentName)
+                        .append(" | ")
+                        .append(testClass.getName());
+            } else if (testDescriptor instanceof MethodTestDescriptor) {
+                MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
+                Class<?> testClass = methodTestDescriptor.getTestClass();
+                Method testMethod = methodTestDescriptor.getTestMethod();
+                Argument testArgument = methodTestDescriptor.getTestArgument();
+                String testArgumentName = testArgument.name();
+                stringBuilder
+                        .append(TEST)
+                        .append(" | ")
+                        .append(testArgumentName)
+                        .append(" | ")
+                        .append(testClass.getName())
+                        .append(" ")
+                        .append(testMethod.getName())
+                        .append("()");
+            }
 
-        if (detailedOutput && stringBuilder.length() > 0) {
-            System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
+            if (detailedOutput && stringBuilder.length() > 0) {
+                System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
+                System.out.flush();
+            }
         }
     }
 
@@ -268,69 +244,46 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
 
         summary.executionSkipped(testDescriptor, reason);
 
-        StringBuilder stringBuilder = new StringBuilder();
+        if (logSkipMessages) {
+            StringBuilder stringBuilder = new StringBuilder();
 
-        Switch.switchType(
-                testDescriptor,
-                Switch.switchCase(
-                        ExtendedEngineDescriptor.class,
-                        consumer -> {
-                            // DO NOTHING
-                        }),
-                Switch.switchCase(
-                        ClassTestDescriptor.class,
-                        consumer -> {
-                            if (logSkipMessages) {
-                                ClassTestDescriptor classTestDescriptor =
-                                        (ClassTestDescriptor) testDescriptor;
-                                Class<?> testClass = classTestDescriptor.getTestClass();
-                                stringBuilder
-                                        .append(SKIP)
-                                        .append(" | ")
-                                        .append(testClass.getName());
-                            }
-                        }),
-                Switch.switchCase(
-                        ArgumentTestDescriptor.class,
-                        consumer -> {
-                            if (logSkipMessages) {
-                                ArgumentTestDescriptor argumentTestDescriptor =
-                                        (ArgumentTestDescriptor) testDescriptor;
-                                Class<?> testClass = argumentTestDescriptor.getTestClass();
-                                Argument testArgument = argumentTestDescriptor.getTestArgument();
-                                String testArgumentName = testArgument.name();
-                                stringBuilder
-                                        .append(SKIP)
-                                        .append(" | ")
-                                        .append(testArgumentName)
-                                        .append(" | ")
-                                        .append(testClass.getName());
-                            }
-                        }),
-                Switch.switchCase(
-                        MethodTestDescriptor.class,
-                        consumer -> {
-                            if (logSkipMessages) {
-                                MethodTestDescriptor methodTestDescriptor =
-                                        (MethodTestDescriptor) testDescriptor;
-                                Class<?> testClass = methodTestDescriptor.getTestClass();
-                                Method testMethod = methodTestDescriptor.getTestMethod();
-                                Argument testArgument = methodTestDescriptor.getTestArgument();
-                                String testArgumentName = testArgument.name();
-                                stringBuilder
-                                        .append(SKIP)
-                                        .append(" | ")
-                                        .append(testArgumentName)
-                                        .append(" | ")
-                                        .append(testClass.getName())
-                                        .append(" ")
-                                        .append(testMethod.getName())
-                                        .append("()");
-                            }
-                        }));
+            if (testDescriptor instanceof ClassTestDescriptor) {
+                ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
+                Class<?> testClass = classTestDescriptor.getTestClass();
+                stringBuilder.append(SKIP).append(" | ").append(testClass.getName());
+            } else if (testDescriptor instanceof ArgumentTestDescriptor) {
+                ArgumentTestDescriptor argumentTestDescriptor =
+                        (ArgumentTestDescriptor) testDescriptor;
+                Class<?> testClass = argumentTestDescriptor.getTestClass();
+                Argument testArgument = argumentTestDescriptor.getTestArgument();
+                String testArgumentName = testArgument.name();
+                stringBuilder
+                        .append(SKIP)
+                        .append(" | ")
+                        .append(testArgumentName)
+                        .append(" | ")
+                        .append(testClass.getName());
+            } else if (testDescriptor instanceof MethodTestDescriptor) {
+                MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
+                Class<?> testClass = methodTestDescriptor.getTestClass();
+                Method testMethod = methodTestDescriptor.getTestMethod();
+                Argument testArgument = methodTestDescriptor.getTestArgument();
+                String testArgumentName = testArgument.name();
+                stringBuilder
+                        .append(SKIP)
+                        .append(" | ")
+                        .append(testArgumentName)
+                        .append(" | ")
+                        .append(testClass.getName())
+                        .append(" ")
+                        .append(testMethod.getName())
+                        .append("()");
+            }
 
-        if (detailedOutput && stringBuilder.length() > 0) {
-            System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
+            if (detailedOutput && stringBuilder.length() > 0) {
+                System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
+                System.out.flush();
+            }
         }
     }
 
@@ -350,90 +303,71 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
 
         summary.executionFinished(testDescriptor, testExecutionResult);
 
-        StringBuilder stringBuilder = new StringBuilder();
+        if (logPassMessages) {
+            StringBuilder stringBuilder = new StringBuilder();
 
-        Switch.switchType(
-                testDescriptor,
-                Switch.switchCase(
-                        ExtendedEngineDescriptor.class,
-                        consumer -> {
-                            // DO NOTHING
-                        }),
-                Switch.switchCase(
-                        ClassTestDescriptor.class,
-                        consumer -> {
-                            if (logPassMessages) {
-                                ClassTestDescriptor classTestDescriptor =
-                                        (ClassTestDescriptor) testDescriptor;
-                                Class<?> testClass = classTestDescriptor.getTestClass();
-                                stringBuilder.append("%s | ").append(testClass.getName());
-                            }
-                        }),
-                Switch.switchCase(
-                        ArgumentTestDescriptor.class,
-                        consumer -> {
-                            if (logPassMessages) {
-                                ArgumentTestDescriptor argumentTestDescriptor =
-                                        (ArgumentTestDescriptor) testDescriptor;
-                                Class<?> testClass = argumentTestDescriptor.getTestClass();
-                                Argument testArgument = argumentTestDescriptor.getTestArgument();
-                                String testArgumentName = testArgument.name();
-                                stringBuilder
-                                        .append("%s | ")
-                                        .append(testArgumentName)
-                                        .append(" | ")
-                                        .append(testClass.getName());
-                            }
-                        }),
-                Switch.switchCase(
-                        MethodTestDescriptor.class,
-                        consumer -> {
-                            if (logPassMessages) {
-                                MethodTestDescriptor methodTestDescriptor =
-                                        (MethodTestDescriptor) testDescriptor;
-                                Class<?> testClass = methodTestDescriptor.getTestClass();
-                                Method testMethod = methodTestDescriptor.getTestMethod();
-                                Argument testArgument = methodTestDescriptor.getTestArgument();
-                                String testArgumentName = testArgument.name();
-                                stringBuilder
-                                        .append("%s | ")
-                                        .append(testArgumentName)
-                                        .append(" | ")
-                                        .append(testClass.getName())
-                                        .append(" ")
-                                        .append(testMethod.getName())
-                                        .append("()");
-                            }
-                        }));
+            if (testDescriptor instanceof ClassTestDescriptor) {
+                ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
+                Class<?> testClass = classTestDescriptor.getTestClass();
+                stringBuilder.append("%s | ").append(testClass.getName());
+            } else if (testDescriptor instanceof ArgumentTestDescriptor) {
+                ArgumentTestDescriptor argumentTestDescriptor =
+                        (ArgumentTestDescriptor) testDescriptor;
+                Class<?> testClass = argumentTestDescriptor.getTestClass();
+                Argument testArgument = argumentTestDescriptor.getTestArgument();
+                String testArgumentName = testArgument.name();
+                stringBuilder
+                        .append("%s | ")
+                        .append(testArgumentName)
+                        .append(" | ")
+                        .append(testClass.getName());
 
-        if (stringBuilder.length() > 0) {
-            TestExecutionResult.Status status = testExecutionResult.getStatus();
-            String string = null;
-            switch (status) {
-                case ABORTED:
-                    {
-                        string = String.format(stringBuilder.toString(), SKIP);
-                        break;
-                    }
-                case FAILED:
-                    {
-                        string = String.format(stringBuilder.toString(), FAIL);
-                        break;
-                    }
-                case SUCCESSFUL:
-                    {
-                        string = String.format(stringBuilder.toString(), PASS);
-                        break;
-                    }
-                default:
-                    {
-                        // DO NOTHING
-                        break;
-                    }
+            } else if (testDescriptor instanceof MethodTestDescriptor) {
+                MethodTestDescriptor methodTestDescriptor = (MethodTestDescriptor) testDescriptor;
+                Class<?> testClass = methodTestDescriptor.getTestClass();
+                Method testMethod = methodTestDescriptor.getTestMethod();
+                Argument testArgument = methodTestDescriptor.getTestArgument();
+                String testArgumentName = testArgument.name();
+                stringBuilder
+                        .append("%s | ")
+                        .append(testArgumentName)
+                        .append(" | ")
+                        .append(testClass.getName())
+                        .append(" ")
+                        .append(testMethod.getName())
+                        .append("()");
             }
 
-            if (detailedOutput && string != null) {
-                System.out.println(INFO + Thread.currentThread().getName() + " | " + string);
+            if (stringBuilder.length() > 0) {
+                TestExecutionResult.Status status = testExecutionResult.getStatus();
+                String string = null;
+                switch (status) {
+                    case ABORTED:
+                        {
+                            string = String.format(stringBuilder.toString(), SKIP);
+                            break;
+                        }
+                    case FAILED:
+                        {
+                            string = String.format(stringBuilder.toString(), FAIL);
+                            break;
+                        }
+                    case SUCCESSFUL:
+                        {
+                            string = String.format(stringBuilder.toString(), PASS);
+                            break;
+                        }
+                    default:
+                        {
+                            // DO NOTHING
+                            break;
+                        }
+                }
+
+                if (detailedOutput && string != null) {
+                    System.out.println(INFO + Thread.currentThread().getName() + " | " + string);
+                    System.out.flush();
+                }
             }
         }
     }
@@ -564,6 +498,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
         if (!hasFailures()) {
             System.out.println(INFO + SEPARATOR);
         }
+
+        System.out.flush();
     }
 
     /**

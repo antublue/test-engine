@@ -18,65 +18,52 @@ package example.inheritance;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
-@TestEngine.BaseClass
-public class BaseTest {
+public class SubclassTest extends BaseTest {
 
-    @TestEngine.Argument protected IntegerArgument integerArgument;
-
-    @TestEngine.ArgumentSupplier
-    protected static Stream<IntegerArgument> arguments() {
-        Collection<IntegerArgument> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            collection.add(IntegerArgument.of(i));
-        }
-        return collection.stream();
-    }
+    @TestEngine.Argument protected IntegerArgument integerArgument2;
 
     @TestEngine.Prepare
-    public void prepare() {
-        System.out.println("prepare()");
+    public void prepare2() {
+        System.out.println("  prepare2()");
         assertThat(integerArgument).isNull();
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll() {
-        System.out.println("beforeAll()");
+    public void beforeAll2() {
+        System.out.println("  beforeAll2()");
         assertThat(integerArgument).isNotNull();
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach() {
-        System.out.println("beforeEach()");
+    public void beforeEach2() {
+        System.out.println("  beforeEach2()");
         assertThat(integerArgument).isNotNull();
     }
 
     @TestEngine.Test
-    public void testA() {
-        System.out.println("testA()");
+    public void testB() {
+        System.out.println("  testB()");
         assertThat(integerArgument).isNotNull();
     }
 
     @TestEngine.AfterEach
-    public void afterEach() {
-        System.out.println("afterEach()");
+    public void afterEach2() {
+        System.out.println("  afterEach2()");
         assertThat(integerArgument).isNotNull();
     }
 
     @TestEngine.AfterAll
-    public void afterAll() {
-        System.out.println("afterAll()");
+    public void afterAll2() {
+        System.out.println("  afterAll2()");
         assertThat(integerArgument).isNotNull();
     }
 
     @TestEngine.Conclude
-    public void conclude() {
-        System.out.println("conclude()");
+    public void conclude2() {
+        System.out.println("  conclude2()");
         assertThat(integerArgument).isNull();
     }
 }
