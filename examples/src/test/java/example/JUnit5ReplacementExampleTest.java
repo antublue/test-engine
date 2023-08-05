@@ -21,7 +21,7 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class Junit5ReplacementExampleTest {
+public class JUnit5ReplacementExampleTest {
 
     // The stringArgument is required by the test engine, but is not actually used in test methods
     @TestEngine.Argument protected StringArgument stringArgument;
@@ -29,7 +29,7 @@ public class Junit5ReplacementExampleTest {
     // The stringArgument provides a node in the hierarchy, but is not actually used in test methods
     @TestEngine.ArgumentSupplier
     protected static Stream<StringArgument> arguments() {
-        return Stream.of(StringArgument.of("tests"));
+        return Stream.of(StringArgument.of("----"));
     }
 
     // For a single Argument, a @TestEngine.Prepare method is equivalent to a @TestEngine.BeforeAll

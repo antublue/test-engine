@@ -19,7 +19,7 @@ package org.antublue.test.engine.internal;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.function.Consumer;
+import java.util.List;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -53,10 +53,10 @@ public class AutoCloseAnnotationUtils {
      *
      * @param object object
      * @param lifecycle lifecycle
-     * @param throwableConsumer throwableConsumer
+     * @param throwables throwables
      */
     public void processAutoCloseAnnotatedFields(
-            Object object, String lifecycle, Consumer<Throwable> throwableConsumer) {
+            Object object, String lifecycle, List<Throwable> throwables) {
         LOGGER.trace(
                 "processAutoCloseFields class [%s] lifecycle [%s]",
                 object.getClass().getName(), lifecycle);
@@ -76,7 +76,7 @@ public class AutoCloseAnnotationUtils {
                                         annotationLifecycle,
                                         annotationMethodName,
                                         field,
-                                        throwableConsumer);
+                                        throwables);
                             } else {
                                 LOGGER.trace(
                                         "skipping field [%s] annotation scope [%s] doesn't match"
@@ -93,14 +93,14 @@ public class AutoCloseAnnotationUtils {
      * @param lifecycle lifecycle
      * @param methodName methodName
      * @param field field
-     * @param throwableConsumer throwableConsumer
+     * @param throwables throwables
      */
     private void close(
             Object object,
             String lifecycle,
             String methodName,
             Field field,
-            Consumer<Throwable> throwableConsumer) {
+            List<Throwable> throwables) {
         LOGGER.trace(
                 "close class [%s] method name [%s] field [%s]",
                 object.getClass().getName(), methodName, field.getName());
@@ -112,7 +112,7 @@ public class AutoCloseAnnotationUtils {
                     ((AutoCloseable) o).close();
                 }
             } catch (Throwable t) {
-                throwableConsumer.accept(
+                throwables.add(
                         new TestEngineException(
                                 String.format(
                                         "Exception closing @TestEngine.AutoClose class [%s] field"
@@ -137,7 +137,7 @@ public class AutoCloseAnnotationUtils {
             }
 
             if (throwable != null) {
-                throwableConsumer.accept(
+                throwables.add(
                         new TestEngineException(
                                 String.format(
                                         "Exception closing @TestEngine.AutoClose class [%s] field"

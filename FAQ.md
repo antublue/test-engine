@@ -102,7 +102,9 @@ Example:
 
 ### Where is the `Extension` model/paradigm?
 
-Currently, there is no `Extension` model/paradigm. It's not yet been required/requested.
+Currently, there is no `Extension` model/paradigm.
 
-If you feel this is required and can provide a real test scenario, please open an issue or discussion so it can be designed/implemented.
+Preliminary work has been done, but it hasn't been required/requested.
+
+Any implementation will most likely not be able to use Junit 5 extensions.
 

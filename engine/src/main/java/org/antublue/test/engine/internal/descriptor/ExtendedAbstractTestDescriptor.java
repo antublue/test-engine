@@ -16,10 +16,16 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN;
+
+import java.io.PrintStream;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.ExecutorContext;
+import org.antublue.test.engine.internal.LockAnnotationUtils;
+import org.antublue.test.engine.internal.ReflectionUtils;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
@@ -27,6 +33,23 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 /** Class to implement an extended AbstractTestDescriptor */
 @SuppressWarnings("unchecked")
 abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
+
+    /** ReflectionUtils */
+    protected static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.singleton();
+
+    /** LockAnnotationUtils */
+    protected static final LockAnnotationUtils LOCK_ANNOTATION_UTILS =
+            LockAnnotationUtils.singleton();
+
+    /** Constant to represent no class arguments */
+    protected static final Class<?>[] NO_CLASS_ARGS = null;
+
+    /** Constant to represent no object arguments */
+    protected static final Object[] NO_OBJECT_ARGS = null;
+
+    /** Constant to determine we are being executed via the Maven Test Engine plugin */
+    protected static final boolean EXECUTED_VIA_ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN =
+            Constants.TRUE.equals(System.getProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN));
 
     /**
      * Constructor
@@ -74,5 +97,19 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
                 .getExecutionRequest()
                 .getEngineExecutionListener()
                 .executionSkipped(this, "Skipped");
+    }
+
+    /**
+     * Method to print a stacktrace depending on whether we have been executed via the Maven Test
+     * Engine plugin
+     *
+     * @param printStream printStream
+     * @param throwable throwable
+     */
+    protected void printStackTrace(PrintStream printStream, Throwable throwable) {
+        if (EXECUTED_VIA_ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN) {
+            throwable.printStackTrace(printStream);
+            printStream.flush();
+        }
     }
 }

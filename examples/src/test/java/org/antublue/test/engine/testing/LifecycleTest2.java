@@ -33,12 +33,20 @@ public class LifecycleTest2 {
 
     static {
         EXPECTED_ORDER.add("prepare2()");
+        EXPECTED_ORDER.add("prepare()");
 
         StringArgumentSupplier.arguments()
                 .forEach(
                         stringArgument -> {
+                            EXPECTED_ORDER.add(stringArgument + ".beforeAll()");
+                            EXPECTED_ORDER.add(stringArgument + ".beforeEach()");
                             EXPECTED_ORDER.add(stringArgument + ".test2()");
+                            EXPECTED_ORDER.add(stringArgument + ".afterEach()");
+                            EXPECTED_ORDER.add(stringArgument + ".beforeEach()");
                             EXPECTED_ORDER.add(stringArgument + ".test1()");
+                            EXPECTED_ORDER.add(stringArgument + ".afterEach()");
+                            EXPECTED_ORDER.add(stringArgument + ".afterAll2()");
+                            EXPECTED_ORDER.add(stringArgument + ".afterAll()");
                         });
 
         EXPECTED_ORDER.add("conclude()");
@@ -51,7 +59,6 @@ public class LifecycleTest2 {
         return StringArgumentSupplier.arguments();
     }
 
-    @TestEngine.Disabled
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
@@ -71,7 +78,6 @@ public class LifecycleTest2 {
         ACTUAL_ORDER.add("prepare2()");
     }
 
-    @TestEngine.Disabled
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
@@ -79,7 +85,6 @@ public class LifecycleTest2 {
         ACTUAL_ORDER.add(stringArgument + ".beforeAll()");
     }
 
-    @TestEngine.Disabled
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
@@ -103,7 +108,6 @@ public class LifecycleTest2 {
         ACTUAL_ORDER.add(stringArgument + ".test2()");
     }
 
-    @TestEngine.Disabled
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
@@ -111,7 +115,6 @@ public class LifecycleTest2 {
         ACTUAL_ORDER.add(stringArgument + ".afterEach()");
     }
 
-    @TestEngine.Disabled
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
@@ -119,7 +122,6 @@ public class LifecycleTest2 {
         ACTUAL_ORDER.add(stringArgument + ".afterAll()");
     }
 
-    @TestEngine.Disabled
     @TestEngine.AfterAll
     @TestEngine.Order(order = 0)
     public void afterAll2() {

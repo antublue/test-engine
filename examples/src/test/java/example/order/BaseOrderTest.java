@@ -33,10 +33,10 @@ class BaseOrderTest {
                     "ConcreteOrderTest.prepare2()",
                     "BaseOrderTest.beforeAll()",
                     "ConcreteOrderTest.beforeAll2()",
-                    "BaseOrderTest.afterAll()",
                     "ConcreteOrderTest.afterAll2()",
-                    "BaseOrderTest.conclude()",
-                    "ConcreteOrderTest.conclude2()");
+                    "BaseOrderTest.afterAll()",
+                    "ConcreteOrderTest.conclude2()",
+                    "BaseOrderTest.conclude()");
 
     protected final List<String> ACTUAL_LIST = new ArrayList<>();
 
@@ -80,6 +80,8 @@ class BaseOrderTest {
         assertThat(stringArgument).isNull();
 
         ACTUAL_LIST.add("BaseOrderTest.conclude()");
+
+        assertThat(ACTUAL_LIST).isEqualTo(EXPECTED_LIST);
     }
 
     private static List<String> listOf(String... strings) {

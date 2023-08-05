@@ -51,7 +51,7 @@ public final class ReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
 
-    private static final Class[] NO_CLASS_ARGS = null;
+    private static final Class<?>[] NO_CLASS_ARGS = null;
 
     private static final Object[] NO_OBJECT_ARGS = null;
 
@@ -162,7 +162,7 @@ public final class ReflectionUtils {
                             TestEngine.ArgumentSupplier.class,
                             Scope.STATIC,
                             Stream.class,
-                            (Class<?>[]) null);
+                            NO_CLASS_ARGS);
 
             if (methodList.isEmpty()) {
                 methodList =
@@ -171,7 +171,7 @@ public final class ReflectionUtils {
                                 TestEngine.ArgumentSupplier.class,
                                 Scope.STATIC,
                                 Iterable.class,
-                                (Class<?>[]) null);
+                                NO_CLASS_ARGS);
             }
 
             LOGGER.trace(
@@ -181,9 +181,9 @@ public final class ReflectionUtils {
             if (methodList.size() != 1) {
                 throw new TestClassConfigurationException(
                         String.format(
-                                "Test class [%s] must define one @TestEngine.ArgumentSupplier"
-                                        + " method",
-                                clazz.getName()));
+                                "Test class [%s] must define exactly 1 @TestEngine.ArgumentSupplier"
+                                        + " method, %d methods were found",
+                                clazz.getName(), methodList.size()));
             }
 
             Method method = methodList.get(0);
@@ -252,7 +252,7 @@ public final class ReflectionUtils {
                                     TestEngine.Prepare.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -298,15 +298,10 @@ public final class ReflectionUtils {
             if (argumentFields.isEmpty()) {
                 optionalField = Optional.empty();
                 ARGUMENT_FIELD_CACHE.put(clazz, optionalField);
-            } else if (argumentFields.size() == 1) {
+            } else {
                 field = argumentFields.get(0);
                 optionalField = Optional.of(field);
                 ARGUMENT_FIELD_CACHE.put(clazz, optionalField);
-            } else {
-                throw new TestClassConfigurationException(
-                        String.format(
-                                "Test class [%s] must define one @TestEngine.Argument field",
-                                clazz.getName()));
             }
 
             return optionalField;
@@ -360,7 +355,7 @@ public final class ReflectionUtils {
                                     TestEngine.BeforeAll.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -411,7 +406,7 @@ public final class ReflectionUtils {
                                     TestEngine.BeforeEach.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -462,7 +457,7 @@ public final class ReflectionUtils {
                                     TestEngine.Test.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -509,12 +504,12 @@ public final class ReflectionUtils {
             }
 
             List<Method> methods =
-                    getMethodsSuperclassFirst(
+                    getMethodsSubclassFirst(
                                     clazz,
                                     TestEngine.AfterEach.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -522,7 +517,7 @@ public final class ReflectionUtils {
                             .collect(Collectors.toList());
 
             methods.addAll(
-                    getMethodsSuperclassFirst(
+                    getMethodsSubclassFirst(
                                     clazz,
                                     TestEngine.AfterEach.class,
                                     Scope.NON_STATIC,
@@ -560,12 +555,12 @@ public final class ReflectionUtils {
             }
 
             List<Method> methods =
-                    getMethodsSuperclassFirst(
+                    getMethodsSubclassFirst(
                                     clazz,
                                     TestEngine.AfterAll.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -573,7 +568,7 @@ public final class ReflectionUtils {
                             .collect(Collectors.toList());
 
             methods.addAll(
-                    getMethodsSuperclassFirst(
+                    getMethodsSubclassFirst(
                                     clazz,
                                     TestEngine.AfterAll.class,
                                     Scope.NON_STATIC,
@@ -611,12 +606,12 @@ public final class ReflectionUtils {
             }
 
             List<Method> methods =
-                    getMethodsSuperclassFirst(
+                    getMethodsSubclassFirst(
                                     clazz,
                                     TestEngine.Conclude.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -756,13 +751,12 @@ public final class ReflectionUtils {
             Class<?>... parameterTypes) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
-                    String.format(
-                            "getMethodsSuperclassFirst annotation [%s] class [%s] parameterTypes"
-                                    + " [%s] returnType [%s]",
-                            annotation.getName(),
-                            clazz.getName(),
-                            toString(parameterTypes),
-                            returnType.getName()));
+                    "getMethodsSuperclassFirst annotation [%s] class [%s] parameterTypes"
+                            + " [%s] returnType [%s]",
+                    annotation.getName(),
+                    clazz.getName(),
+                    toString(parameterTypes),
+                    returnType.getName());
         }
 
         Set<Class<?>> classes = new LinkedHashSet<>();
@@ -808,13 +802,12 @@ public final class ReflectionUtils {
             Class<?>... parameterTypes) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
-                    String.format(
-                            "getMethodsSubclassFirst annotation [%s] class [%s] parameterTypes [%s]"
-                                    + " returnType [%s]",
-                            annotation.getName(),
-                            clazz.getName(),
-                            toString(parameterTypes),
-                            returnType.getName()));
+                    "getMethodsSubclassFirst annotation [%s] class [%s] parameterTypes [%s]"
+                            + " returnType [%s]",
+                    annotation.getName(),
+                    clazz.getName(),
+                    toString(parameterTypes),
+                    returnType.getName());
         }
 
         Set<Class<?>> classes = new LinkedHashSet<>();
@@ -865,13 +858,12 @@ public final class ReflectionUtils {
             Map<String, Method> methods) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
-                    String.format(
-                            "resolveMethodsSuperclassFirst annotation [%s] class [%s]"
-                                    + " parameterTypes [%s] returnType [%s]",
-                            annotation.getName(),
-                            clazz.getName(),
-                            toString(parameterTypes),
-                            returnType.getName()));
+                    "resolveMethodsSuperclassFirst annotation [%s] class [%s]"
+                            + " parameterTypes [%s] returnType [%s]",
+                    annotation.getName(),
+                    clazz.getName(),
+                    toString(parameterTypes),
+                    returnType.getName());
         }
 
         try {
@@ -1113,8 +1105,8 @@ public final class ReflectionUtils {
     /**
      * Method to convert an array of parameter types to a loggable string
      *
-     * @param parameterTypes
-     * @return parameters types as a loggable string
+     * @param parameterTypes the parameter types
+     * @return parameters the parameter types as a loggable string
      */
     private String toString(Class<?>[] parameterTypes) {
         StringBuilder stringBuilder = new StringBuilder();

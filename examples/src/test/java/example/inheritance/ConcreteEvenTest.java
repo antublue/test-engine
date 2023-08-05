@@ -38,14 +38,14 @@ public class ConcreteEvenTest extends EvenBaseTest {
     public void test1() {
         System.out.println("test1(" + integerArgument + ")");
 
-        assertThat((Integer) integerArgument.value() % 2).isEven();
+        assertThat(integerArgument.value() % 2).isEven();
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + integerArgument + ")");
 
-        assertThat((Integer) integerArgument.value() % 2).isEven();
+        assertThat(integerArgument.value() % 2).isEven();
     }
 
     @TestEngine.AfterEach

@@ -18,18 +18,15 @@ package org.antublue.test.engine.internal.descriptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.AutoCloseAnnotationUtils;
 import org.antublue.test.engine.internal.ExecutorContext;
-import org.antublue.test.engine.internal.LockAnnotationUtils;
-import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.StateMachine;
-import org.antublue.test.engine.internal.util.ThrowableCollector;
-import org.junit.platform.engine.EngineExecutionListener;
+import org.antublue.test.engine.internal.statemachine.StateMachine;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -41,26 +38,26 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentTestDescriptor.class);
 
-    private static final Object[] NO_ARGS = null;
-
-    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.singleton();
+    private final Class<?> testClass;
+    private final Argument testArgument;
+    private final List<Throwable> throwables;
+    private final StateMachine<State> stateMachine;
+    private ExecutorContext executorContext;
+    private Object testInstance;
 
     private enum State {
         BEGIN,
-        SET_FIELD_SUCCESS,
-        SET_FIELD_FAIL,
-        BEFORE_ALL_SUCCESS,
-        BEFORE_ALL_FAIL,
-        EXECUTE_SUCCESS,
-        SKIP_SUCCESS,
-        CLEAR_FIELD_SUCCESS,
-        CLEAR_FIELD_FAILED,
-        AFTER_ALL_FAIL,
-        AFTER_ALL_SUCCESS
+        PRE_BEFORE_ALL,
+        BEFORE_ALL,
+        POST_BEFORE_ALL,
+        EXECUTE,
+        SKIP,
+        SKIP2,
+        PRE_AFTER_ALL,
+        AFTER_ALL,
+        POST_AFTER_ALL,
+        END
     }
-
-    private final Class<?> testClass;
-    private final Argument testArgument;
 
     /**
      * Constructor
@@ -75,6 +72,20 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testArgument = testArgument;
+        this.throwables = new ArrayList<>();
+        this.stateMachine =
+                new StateMachine<State>(getClass().getName())
+                        .addTransition(State.BEGIN, this::begin)
+                        .addTransition(State.PRE_BEFORE_ALL, this::preBeforeAll)
+                        .addTransition(State.BEFORE_ALL, this::beforeAll)
+                        .addTransition(State.POST_BEFORE_ALL, this::postBeforeAll)
+                        .addTransition(State.EXECUTE, this::execute)
+                        .addTransition(State.SKIP, this::skip)
+                        .addTransition(State.SKIP2, this::skip2)
+                        .addTransition(State.PRE_AFTER_ALL, this::preAfterAll)
+                        .addTransition(State.AFTER_ALL, this::afterAll)
+                        .addTransition(State.POST_AFTER_ALL, this::postAfterAll)
+                        .addTransition(State.END, this::end);
     }
 
     /**
@@ -136,187 +147,256 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         return testArgument;
     }
 
-    /** Method to execute the test descriptor */
+    /**
+     * Method to execute the test descriptor
+     *
+     * @param executorContext executorContext
+     */
     @Override
     public void execute(ExecutorContext executorContext) {
         LOGGER.trace(
                 "execute uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        EngineExecutionListener engineExecutionListener =
-                executorContext.getExecutionRequest().getEngineExecutionListener();
+        this.executorContext = executorContext;
 
-        engineExecutionListener.executionStarted(this);
+        try {
+            stateMachine.run(State.BEGIN);
+        } catch (Throwable t) {
+            printStackTrace(System.out, t);
+            System.out.flush();
+        }
+    }
 
-        Object testInstance = executorContext.getTestInstance();
+    /**
+     * State machine transition
+     *
+     * @param stateMachine stateMachine
+     */
+    private void begin(StateMachine<State> stateMachine) {
+        try {
+            executorContext
+                    .getExecutionRequest()
+                    .getEngineExecutionListener()
+                    .executionStarted(this);
 
-        ThrowableCollector throwableCollector = new ThrowableCollector();
+            testInstance = executorContext.getTestInstance();
 
-        LockAnnotationUtils lockAnnotationUtils = LockAnnotationUtils.singleton();
+            Optional<Field> optionalField = REFLECTION_UTILS.getArgumentField(testClass);
+            if (optionalField.isPresent()) {
+                LOGGER.trace("injecting test argument");
+                optionalField.get().set(testInstance, testArgument);
+            }
 
-        StateMachine<State> stateMachine = new StateMachine<>(this.toString(), State.BEGIN);
+            stateMachine.signal(State.PRE_BEFORE_ALL);
+        } catch (Throwable t) {
+            throwables.add(t);
+            printStackTrace(System.out, t);
+            stateMachine.signal(State.SKIP);
+        } finally {
+            System.out.flush();
+        }
+    }
 
-        /*
-         * BEGIN
-         *
-         * SET_FIELD_SUCCESS
-         * SET_FIELD_FAIL
-         */
-        stateMachine.mapTransition(
-                State.BEGIN,
-                sm -> {
-                    try {
-                        Optional<Field> optional = REFLECTION_UTILS.getArgumentField(testClass);
-                        if (optional.isPresent()) {
-                            Field field = optional.get();
-                            field.set(testInstance, testArgument);
-                        }
-                        sm.next(State.SET_FIELD_SUCCESS);
-                    } catch (Throwable t) {
-                        throwableCollector.accept(t);
-                        sm.next(State.SET_FIELD_FAIL);
-                    }
-                });
+    /**
+     * State machine transition
+     *
+     * @param stateMachine stateMachine
+     */
+    private void preBeforeAll(StateMachine<State> stateMachine) {
+        stateMachine.signal(State.BEFORE_ALL);
+    }
 
-        /*
-         * SET_FIELD_SUCCESS
-         *
-         * BEFORE_ALL_SUCCESS
-         * BEFORE_ALL_FAIL
-         */
-        stateMachine.mapTransition(
-                State.SET_FIELD_SUCCESS,
-                sm -> {
-                    try {
-                        List<Method> methods = REFLECTION_UTILS.getBeforeAllMethods(testClass);
-                        for (Method method : methods) {
-                            try {
-                                lockAnnotationUtils.processLockAnnotations(method);
-                                if (REFLECTION_UTILS.acceptsArgument(method, testArgument)) {
-                                    method.invoke(testInstance, testArgument);
-                                } else {
-                                    method.invoke(testInstance, NO_ARGS);
-                                }
-                            } finally {
-                                lockAnnotationUtils.processUnlockAnnotations(method);
-                            }
-                        }
-                        sm.next(State.BEFORE_ALL_SUCCESS);
-                    } catch (Throwable t) {
-                        throwableCollector.accept(t);
-                        sm.next(State.BEFORE_ALL_FAIL);
-                    }
-                });
-
-        /*
-         * BEFORE_ALL_SUCCESS
-         *
-         * EXECUTE_SUCCESS
-         */
-        stateMachine.mapTransition(
-                State.BEFORE_ALL_SUCCESS,
-                sm -> {
-                    getChildren(MethodTestDescriptor.class)
-                            .forEach(
-                                    methodTestDescriptor ->
-                                            methodTestDescriptor.execute(executorContext));
-
-                    sm.next(State.EXECUTE_SUCCESS);
-                });
-
-        /*
-         * BEFORE_ALL_FAIL
-         *
-         * SKIP_SUCCESS
-         */
-        stateMachine.mapTransition(
-                State.BEFORE_ALL_FAIL,
-                sm -> {
-                    getChildren(MethodTestDescriptor.class)
-                            .forEach(
-                                    methodTestDescriptor ->
-                                            methodTestDescriptor.skip(executorContext));
-
-                    sm.next(State.SKIP_SUCCESS);
-                });
-
-        /*
-         * EXECUTE_SUCCESS
-         * SKIP_SUCCESS
-         *
-         * AFTER_ALL_SUCCESS
-         * AFTER_ALL_FAIL
-         */
-        stateMachine.mapTransition(
-                stateMachine.asList(State.EXECUTE_SUCCESS, State.SKIP_SUCCESS),
-                sm -> {
-                    List<Method> methods = REFLECTION_UTILS.getAfterAllMethods(testClass);
-                    for (Method method : methods) {
-                        try {
-                            lockAnnotationUtils.processLockAnnotations(method);
-                            if (REFLECTION_UTILS.acceptsArgument(method, testArgument)) {
-                                method.invoke(testInstance, testArgument);
-                            } else {
-                                method.invoke(testInstance, NO_ARGS);
-                            }
-                        } catch (Throwable t) {
-                            throwableCollector.accept(t);
-                        } finally {
-                            lockAnnotationUtils.processUnlockAnnotations(method);
-                        }
-                    }
-
-                    if (throwableCollector.isEmpty()) {
-                        sm.next(State.AFTER_ALL_SUCCESS);
+    /**
+     * State machine transition
+     *
+     * @param stateMachine stateMachine
+     */
+    private void beforeAll(StateMachine<State> stateMachine) {
+        try {
+            List<Method> methods = REFLECTION_UTILS.getBeforeAllMethods(testClass);
+            for (Method method : methods) {
+                try {
+                    LOCK_ANNOTATION_UTILS.processLockAnnotations(method);
+                    if (REFLECTION_UTILS.acceptsArgument(method, testArgument)) {
+                        method.invoke(testInstance, testArgument);
                     } else {
-                        sm.next(State.AFTER_ALL_FAIL);
+                        method.invoke(testInstance, NO_OBJECT_ARGS);
                     }
-                });
+                } finally {
+                    LOCK_ANNOTATION_UTILS.processUnlockAnnotations(method);
+                    System.out.flush();
+                }
+            }
+        } catch (Throwable t) {
+            throwables.add(t);
+            printStackTrace(System.out, t);
+        } finally {
+            stateMachine.signal(State.POST_BEFORE_ALL);
+            System.out.flush();
+        }
+    }
 
-        /*
-         * AFTER_ALL_SUCCESS
-         * AFTER_ALL_FAIL
-         *
-         * CLEAR_FIELD_SUCCESS
-         * CLEAR_FIELD_FAILED
-         */
-        stateMachine.mapTransition(
-                stateMachine.asList(State.AFTER_ALL_SUCCESS, State.AFTER_ALL_FAIL),
-                sm -> {
-                    try {
-                        Optional<Field> optional = REFLECTION_UTILS.getArgumentField(testClass);
-                        if (optional.isPresent()) {
-                            Field field = optional.get();
-                            field.set(testInstance, null);
-                        }
-                        sm.next(State.CLEAR_FIELD_SUCCESS);
-                    } catch (Throwable t) {
-                        throwableCollector.accept(t);
-                        sm.next(State.CLEAR_FIELD_FAILED);
-                    }
-                });
-
-        /*
-         * CLEAR_FIELD_SUCCESS
-         * CLEAR_FIELD_FAILED
-         *
-         * finish()
-         */
-        stateMachine.mapTransition(
-                stateMachine.asList(State.CLEAR_FIELD_SUCCESS, State.CLEAR_FIELD_FAILED),
-                StateMachine::finish);
-
-        stateMachine.run();
-
-        AutoCloseAnnotationUtils.singleton()
-                .processAutoCloseAnnotatedFields(
-                        testInstance, "@TestEngine.AfterAll", throwableCollector);
-
-        if (throwableCollector.isEmpty()) {
-            engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
+    /**
+     * State machine transition
+     *
+     * @param stateMachine stateMachine
+     */
+    private void postBeforeAll(StateMachine<State> stateMachine) {
+        if (throwables.isEmpty()) {
+            stateMachine.signal(State.EXECUTE);
         } else {
-            engineExecutionListener.executionFinished(
-                    this, TestExecutionResult.failed(throwableCollector.getFirst().orElse(null)));
+            stateMachine.signal(State.SKIP);
+        }
+    }
+
+    /**
+     * State machine transition
+     *
+     * @param stateMachine stateMachine
+     */
+    private void execute(StateMachine<State> stateMachine) {
+        try {
+            List<MethodTestDescriptor> methodTestDescriptors =
+                    getChildren(MethodTestDescriptor.class);
+            for (MethodTestDescriptor methodTestDescriptor : methodTestDescriptors) {
+                methodTestDescriptor.execute(executorContext);
+            }
+        } catch (Throwable t) {
+            throwables.add(t);
+            printStackTrace(System.out, t);
+        } finally {
+            stateMachine.signal(State.PRE_AFTER_ALL);
+            System.out.flush();
+        }
+    }
+
+    /**
+     * State machine transition
+     *
+     * @param stateMachine stateMachine
+     */
+    private void skip(StateMachine<State> stateMachine) {
+        try {
+            List<MethodTestDescriptor> methodTestDescriptors =
+                    getChildren(MethodTestDescriptor.class);
+            for (MethodTestDescriptor methodTestDescriptor : methodTestDescriptors) {
+                methodTestDescriptor.skip(executorContext);
+            }
+        } catch (Throwable t) {
+            throwables.add(t);
+            printStackTrace(System.out, t);
+        } finally {
+            stateMachine.signal(State.PRE_AFTER_ALL);
+            System.out.flush();
+        }
+    }
+
+    /**
+     * State machine transition
+     *
+     * @param stateMachine stateMachine
+     */
+    private void skip2(StateMachine<State> stateMachine) {
+        try {
+            List<MethodTestDescriptor> methodTestDescriptors =
+                    getChildren(MethodTestDescriptor.class);
+            for (MethodTestDescriptor methodTestDescriptor : methodTestDescriptors) {
+                methodTestDescriptor.skip(executorContext);
+            }
+        } catch (Throwable t) {
+            throwables.add(t);
+            printStackTrace(System.out, t);
+        } finally {
+            stateMachine.signal(State.END);
+            System.out.flush();
+        }
+    }
+
+    /**
+     * State machine transition
+     *
+     * @param stateMachine stateMachine
+     */
+    private void preAfterAll(StateMachine<State> stateMachine) {
+        stateMachine.signal(State.AFTER_ALL);
+    }
+
+    /**
+     * State machine transition
+     *
+     * @param stateMachine stateMachine
+     */
+    private void afterAll(StateMachine<State> stateMachine) {
+        try {
+            List<Method> methods = REFLECTION_UTILS.getAfterAllMethods(testClass);
+            for (Method method : methods) {
+                try {
+                    LOCK_ANNOTATION_UTILS.processLockAnnotations(method);
+                    if (REFLECTION_UTILS.acceptsArgument(method, testArgument)) {
+                        method.invoke(testInstance, testArgument);
+                    } else {
+                        method.invoke(testInstance, NO_OBJECT_ARGS);
+                    }
+                } catch (Throwable t) {
+                    throwables.add(t);
+                    printStackTrace(System.out, t);
+                } finally {
+                    LOCK_ANNOTATION_UTILS.processUnlockAnnotations(method);
+                    System.out.flush();
+                }
+            }
+        } catch (Throwable t) {
+            throwables.add(t);
+            printStackTrace(System.out, t);
+        } finally {
+            stateMachine.signal(State.POST_AFTER_ALL);
+            System.out.flush();
+        }
+    }
+
+    /**
+     * State machine transition
+     *
+     * @param stateMachine stateMachine
+     */
+    private void postAfterAll(StateMachine<State> stateMachine) {
+        stateMachine.signal(State.END);
+    }
+
+    /**
+     * State machine transition
+     *
+     * @param stateMachine stateMachine
+     */
+    private void end(StateMachine<State> stateMachine) {
+        try {
+            Optional<Field> optionalField = REFLECTION_UTILS.getArgumentField(testClass);
+            if (optionalField.isPresent()) {
+                LOGGER.trace("injecting test argument");
+                optionalField.get().set(testInstance, null);
+            }
+        } catch (Throwable t) {
+            // DO NOTHING
+        } finally {
+            AutoCloseAnnotationUtils.singleton()
+                    .processAutoCloseAnnotatedFields(
+                            testInstance, "@TestEngine.AfterAll", throwables);
+
+            if (throwables.isEmpty()) {
+                executorContext
+                        .getExecutionRequest()
+                        .getEngineExecutionListener()
+                        .executionFinished(this, TestExecutionResult.successful());
+            } else {
+                executorContext
+                        .getExecutionRequest()
+                        .getEngineExecutionListener()
+                        .executionFinished(this, TestExecutionResult.failed(throwables.get(0)));
+            }
+
+            stateMachine.stop();
+            System.out.flush();
         }
     }
 }

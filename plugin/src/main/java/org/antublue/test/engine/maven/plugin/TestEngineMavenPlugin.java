@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.ConfigurationParameters;
 import org.antublue.test.engine.internal.ConsoleTestExecutionListener;
 import org.antublue.test.engine.internal.util.AnsiColor;
@@ -95,8 +96,8 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         debug(BANNER);
         debug(SEPARATOR);
 
-        System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN, "true");
-        debug("system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN + "] = [%s]", "true");
+        System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN, Constants.TRUE);
+        debug("system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN + "] = [%s]", Constants.TRUE);
 
         if (!mavenSession.getRequest().isInteractiveMode()) {
             System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE, "true");

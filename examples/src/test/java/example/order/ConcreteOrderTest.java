@@ -86,7 +86,5 @@ public class ConcreteOrderTest extends BaseOrderTest {
         assertThat(stringArgument).isNull();
 
         ACTUAL_LIST.add("ConcreteOrderTest.conclude2()");
-
-        assertThat(ACTUAL_LIST).isEqualTo(EXPECTED_LIST);
     }
 }
