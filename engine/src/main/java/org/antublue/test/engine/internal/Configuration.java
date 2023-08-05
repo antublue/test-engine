@@ -173,13 +173,9 @@ public class Configuration {
 
     private void trace(String format, Object... objects) {
         if (TRACE) {
-            trace(String.format(format, objects));
-        }
-    }
-
-    private void trace(String message) {
-        if (TRACE) {
-            System.out.println("[TRACE] " + getClass().getName() + " " + message);
+            System.out.println(
+                    "[TRACE] " + getClass().getName() + " " + String.format(format, objects));
+            System.out.flush();
         }
     }
 }

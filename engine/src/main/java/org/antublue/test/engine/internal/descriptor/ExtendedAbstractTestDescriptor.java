@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.antublue.test.engine.internal.ExecutorContext;
+import org.antublue.test.engine.internal.LockAnnotationUtils;
+import org.antublue.test.engine.internal.ReflectionUtils;
+import org.antublue.test.engine.internal.util.ThrowableUtils;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
@@ -27,6 +30,17 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 /** Class to implement an extended AbstractTestDescriptor */
 @SuppressWarnings("unchecked")
 abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
+
+    protected static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.singleton();
+
+    protected static final ThrowableUtils THROWABLE_UTILS = ThrowableUtils.singleton();
+
+    protected static final LockAnnotationUtils LOCK_ANNOTATION_UTILS =
+            LockAnnotationUtils.singleton();
+
+    protected static final Class<?>[] NO_CLASS_ARGS = null;
+
+    protected static final Object[] NO_OBJECT_ARGS = null;
 
     /**
      * Constructor

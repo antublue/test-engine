@@ -75,7 +75,7 @@ git checkout -b "release-${VERSION}"
 check_exit_code "Git checkout [${VERSION}] failed"
 
 # Update the build versions
-mvn versions:set -DnewVersion="${VERSION}" -DprocessAllModules
+./mvnw versions:set -DnewVersion="${VERSION}" -DprocessAllModules
 check_exit_code "Maven update versions [${VERSION}] failed"
 rm -Rf $(find . -name "*versionsBackup")
 

@@ -32,6 +32,9 @@ public final class Constants {
     public static final String THREAD_COUNT = PREFIX + ".thread.count";
 
     /** Configuration constant */
+    public static final String PRUNE_STACK_TRACES = PREFIX + ".prune.stackTraces";
+
+    /** Configuration constant */
     public static final String LOG_LEVEL_REGEX = PREFIX + ".log.level.regex";
 
     /** Configuration constant */

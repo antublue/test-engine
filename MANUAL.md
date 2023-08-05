@@ -125,9 +125,21 @@ Additionally, there is an `ObjectArgument<T>` argument implementation that allow
 
 ### What is a `Store` ?
 
-A `Store` is a thread-safe convenience object that allow sharing of Objects between tests.
+A `Store` is a thread-safe convenience class that allow sharing of Objects between tests.
 
 - [Store.java](/api/src/main/java/org/antublue/test/engine/api/Store.java)
+
+### What is a `StateMachine`?
+
+A `StateMachine` is convenience class that allows for workflow testing.
+
+Example:
+
+- [OrderAccessWorkFlow.java](/examples/src/test/java/example/statemachine/OrderAccessWorkflow.java)
+
+**Interesting Fact**
+
+- The test engine's implementation uses `StateMachine` instances for execution.
 
 ## Code Examples
 
@@ -258,7 +270,7 @@ Example
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine 6.1.0 Summary
+[INFO] AntuBLUE Test Engine <VERSION> Summary
 [INFO] ------------------------------------------------------------------------
 [INFO] Test Classes :  62, PASSED :  62, FAILED : 0, SKIPPED : 0
 [INFO] Test Methods : 791, PASSED : 791, FAILED : 0, SKIPPED : 0
@@ -326,7 +338,7 @@ for (each test class in the Collection<Class<?>>) {
     for (each Argument) {
     
       set the test instance "@TestEngine.Argument" annotated field (if it exists)
-       
+      
       invoke all test instance "@TestEngine.BeforeAll" methods
       
       for (each "@TestEngine.Test" method in the test class) {

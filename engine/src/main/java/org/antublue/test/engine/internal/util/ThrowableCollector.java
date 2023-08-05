@@ -32,21 +32,12 @@ public class ThrowableCollector implements Consumer<Throwable> {
     }
 
     /**
-     * Method to collect a Throwable Exceptions
-     *
-     * @param throwable throwable
-     */
-    public void add(Throwable throwable) {
-        throwableList.add(throwable);
-    }
-
-    /**
      * Method to accept a Throwable, adding it to the collector and printing the stack trace
      *
      * @param throwable throwable
      */
     public void accept(Throwable throwable) {
-        add(throwable);
+        throwableList.add(throwable);
         throwable.printStackTrace(System.out);
         System.out.flush();
     }
@@ -67,15 +58,6 @@ public class ThrowableCollector implements Consumer<Throwable> {
      */
     public boolean isEmpty() {
         return throwableList.isEmpty();
-    }
-
-    /**
-     * Method to return whether the ThrowableCollector is not empty
-     *
-     * @return the return value
-     */
-    public boolean isNotEmpty() {
-        return !throwableList.isEmpty();
     }
 
     /**

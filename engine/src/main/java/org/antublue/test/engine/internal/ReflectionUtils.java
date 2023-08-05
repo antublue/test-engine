@@ -51,8 +51,6 @@ public final class ReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
 
-    private static final Class[] NO_CLASS_ARGS = null;
-
     private static final Object[] NO_OBJECT_ARGS = null;
 
     private static final ReflectionUtils SINGLETON = new ReflectionUtils();
@@ -756,13 +754,12 @@ public final class ReflectionUtils {
             Class<?>... parameterTypes) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
-                    String.format(
-                            "getMethodsSuperclassFirst annotation [%s] class [%s] parameterTypes"
-                                    + " [%s] returnType [%s]",
-                            annotation.getName(),
-                            clazz.getName(),
-                            toString(parameterTypes),
-                            returnType.getName()));
+                    "getMethodsSuperclassFirst annotation [%s] class [%s] parameterTypes"
+                            + " [%s] returnType [%s]",
+                    annotation.getName(),
+                    clazz.getName(),
+                    toString(parameterTypes),
+                    returnType.getName());
         }
 
         Set<Class<?>> classes = new LinkedHashSet<>();
@@ -808,13 +805,12 @@ public final class ReflectionUtils {
             Class<?>... parameterTypes) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
-                    String.format(
-                            "getMethodsSubclassFirst annotation [%s] class [%s] parameterTypes [%s]"
-                                    + " returnType [%s]",
-                            annotation.getName(),
-                            clazz.getName(),
-                            toString(parameterTypes),
-                            returnType.getName()));
+                    "getMethodsSubclassFirst annotation [%s] class [%s] parameterTypes [%s]"
+                            + " returnType [%s]",
+                    annotation.getName(),
+                    clazz.getName(),
+                    toString(parameterTypes),
+                    returnType.getName());
         }
 
         Set<Class<?>> classes = new LinkedHashSet<>();
@@ -865,13 +861,12 @@ public final class ReflectionUtils {
             Map<String, Method> methods) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
-                    String.format(
-                            "resolveMethodsSuperclassFirst annotation [%s] class [%s]"
-                                    + " parameterTypes [%s] returnType [%s]",
-                            annotation.getName(),
-                            clazz.getName(),
-                            toString(parameterTypes),
-                            returnType.getName()));
+                    "resolveMethodsSuperclassFirst annotation [%s] class [%s]"
+                            + " parameterTypes [%s] returnType [%s]",
+                    annotation.getName(),
+                    clazz.getName(),
+                    toString(parameterTypes),
+                    returnType.getName());
         }
 
         try {
@@ -1113,8 +1108,8 @@ public final class ReflectionUtils {
     /**
      * Method to convert an array of parameter types to a loggable string
      *
-     * @param parameterTypes
-     * @return parameters types as a loggable string
+     * @param parameterTypes the parameter types
+     * @return parameters the parameter types as a loggable string
      */
     private String toString(Class<?>[] parameterTypes) {
         StringBuilder stringBuilder = new StringBuilder();

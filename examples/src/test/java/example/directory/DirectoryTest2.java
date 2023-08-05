@@ -55,7 +55,7 @@ public class DirectoryTest2 {
 
         directory = Directory.create(UUID.randomUUID().toString(), RELATIVE);
 
-        System.out.println(String.format("directory [%s]", directory));
+        System.out.format("directory [%s]", directory).println();
     }
 
     @TestEngine.BeforeEach
