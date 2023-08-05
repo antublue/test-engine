@@ -29,6 +29,9 @@ public final class Constants {
     public static final String EXPERIMENTAL = ".experimental";
 
     /** Configuration constant */
+    public static final String THREAD_COUNT = PREFIX + ".thread.count";
+
+    /** Configuration constant */
     public static final String LOG_LEVEL_REGEX = PREFIX + ".log.level.regex";
 
     /** Configuration constant */
@@ -36,9 +39,6 @@ public final class Constants {
 
     /** Configuration constant */
     public static final String CONSOLE_OUTPUT = PREFIX + ".console.output";
-
-    /** Configuration constant */
-    public static final String THREAD_COUNT = PREFIX + ".thread.count";
 
     /** Configuration constant */
     public static final String LOG_TEST_MESSAGES = PREFIX + EXPERIMENTAL + ".log.test.messages";
