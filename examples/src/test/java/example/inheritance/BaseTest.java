@@ -16,6 +16,8 @@
 
 package example.inheritance;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -39,35 +41,42 @@ public class BaseTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
+        assertThat(integerArgument).isNull();
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
+        assertThat(integerArgument).isNotNull();
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
+        assertThat(integerArgument).isNotNull();
     }
 
     @TestEngine.Test
     public void testA() {
         System.out.println("testA()");
+        assertThat(integerArgument).isNotNull();
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
+        assertThat(integerArgument).isNotNull();
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
+        assertThat(integerArgument).isNotNull();
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
+        assertThat(integerArgument).isNull();
     }
 }
