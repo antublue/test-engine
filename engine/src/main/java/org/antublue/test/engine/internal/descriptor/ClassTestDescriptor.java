@@ -269,7 +269,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 }
             }
         } catch (Throwable t) {
-            throwableCollector.accept(t);
+            throwableCollector.accept(THROWABLE_UTILS.pruneStackTrace(testClass, t));
         } finally {
             stateMachine.signal(State.POST_CONCLUDE);
             System.out.flush();
