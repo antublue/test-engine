@@ -65,15 +65,15 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param uniqueId uniqueId
      * @param displayName displayName
      * @param testClass testClass
-     * @param testArgument testArgument
      * @param testMethod testMethod
+     * @param testArgument testArgument
      */
     MethodTestDescriptor(
             UniqueId uniqueId,
             String displayName,
             Class<?> testClass,
-            Argument testArgument,
-            Method testMethod) {
+            Method testMethod,
+            Argument testArgument) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testArgument = testArgument;
@@ -182,6 +182,10 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         }
     }
 
+    public void foo() {
+        System.out.println("foo");
+    }
+
     private void begin(StateMachine<State> stateMachine) {
         try {
             executorContext
@@ -216,7 +220,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 }
             }
         } catch (Throwable t) {
-            throwableCollector.accept(t);
+            throwableCollector.accept(THROWABLE_UTILS.pruneStackTrace(testClass, t));
         } finally {
             stateMachine.signal(State.POST_BEFORE_EACH);
             System.out.flush();
@@ -250,7 +254,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 System.out.flush();
             }
         } catch (Throwable t) {
-            throwableCollector.accept(t);
+            throwableCollector.accept(THROWABLE_UTILS.pruneStackTrace(testClass, t));
         } finally {
             stateMachine.signal(State.POST_TEST);
             System.out.flush();
@@ -284,7 +288,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 }
             }
         } catch (Throwable t) {
-            throwableCollector.accept(t);
+            throwableCollector.accept(THROWABLE_UTILS.pruneStackTrace(testClass, t));
         } finally {
             stateMachine.signal(State.POST_AFTER_EACH);
             System.out.flush();
