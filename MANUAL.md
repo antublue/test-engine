@@ -40,8 +40,34 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 | `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                          |
 | `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                          |
 
-Annotated methods are execute via an inheritance model (superclass methods before subclass methods) except for `@TestEngine.ArgumentSupplier`
-- `@TestEngine.ArgumentSupplier` is resolved subclass then superclass.
+Annotated methods ...
+
+- `@TestEngine.Prepare`
+- `@TestEngine.BeforeAll`
+- `@TestEngine.BeforeAll`
+- `@TestEngine.BeforeEach`
+- `@TestEngine.AfterEach`
+- `@TestEngine.AfterAll`
+- `@TestEngine.Conclude`
+
+... are execute using a wrapping model.
+
+```
+superclass @TestEngine.Prepare
+  subclass @TestEngine.Prepare
+    superclass @TestEngine.BeforeAll
+      subclass @TestEngine.BeforeAll
+        superclass @TestEngine.BeforeEach
+          subclass @TestEngine.BeforeEach
+            superclass @TestEngine.Test
+            subclass @TestEngine.Test
+          subclass @TestEngine.AfterEach
+        superclass @TestEngine.AfterEach
+      subclass @TestEngine.AfterAll
+    superclass @TestEngine.AfterAll
+  subclass @TestEngine.Conclude
+superclass @TestEngine.Conclude
+```
 
 Reference the [Design](https://github.com/antublue/test-engine#design) for the test engine execution flow.
 
@@ -50,7 +76,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - `public` and `protected` methods are supported for `@TestEngine.X` annotations.
 
 
-- By default, methods are executed in alphabetical order based on class/method name, regardless of where they are declared (class or superclasses.)
+- By default, methods are executed in alphabetical order based on class/method name, with respect to location (superclass / subclass.)
 
 
 - `@TestEngine.Order` can be used to control test class order / test method order of execution.
@@ -62,17 +88,17 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 ### Additional Test Annotations
 
-| Annotation                                    | Scope            | Required | Usage                                                                                                                              |
-|-----------------------------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
-| `@TestEngine.Disabled`                        | class<br/>method | no       | Marks a test class or method disabled                                                                                              |
-| `@TestEngine.BaseClass`                       | class            | no       | Marks a test class as being a base test class (skips direct execution)                                                             |
-| `@TestEngine.Order(order = <int>)`            | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
-| `@TestEngine.Tag(tag = <string>)`             | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
-| `@TestEngine.DisplayName(name = <string>)`    | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
-| `@TestEngine.Lock(name = <string>)`           | method           | no       | Provides a way to acquire a named lock, and lock it before method execution                                                        |
-| `@TestEngine.Unlock(name = <string>)`         | method           | no       | Provides a way to acquire a named lock, and unlock it after method execution                                                       |
-| `@TestEngine.ResourceLock(name = <string>)`   | method           | no       | Provides a way to acquire a named lock, locking it before method execution and unlocking it after method execution                 |
-| `@TestEngine.AutoClose(lifecycle = <string>)` | field            | no       | Provides a way to close `AutoCloseable` field                                                                                      |
+| Annotation                                      | Scope            | Required | Usage                                                                                                                              |
+|-------------------------------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.Disabled`                          | class<br/>method | no       | Marks a test class or method disabled                                                                                              |
+| `@TestEngine.BaseClass`                         | class            | no       | Marks a test class as being a base test class (skips direct execution)                                                             |
+| `@TestEngine.Order(order = <int>)`              | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
+| `@TestEngine.Tag(tag = "<string>")`             | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
+| `@TestEngine.DisplayName(name = "<string>")`    | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
+| `@TestEngine.Lock(name = "<string>")`           | method           | no       | Provides a way to acquire a named lock, and lock it before method execution                                                        |
+| `@TestEngine.Unlock(name = "<string>")`         | method           | no       | Provides a way to acquire a named lock, and unlock it after method execution                                                       |
+| `@TestEngine.ResourceLock(name = "<string>")`   | method           | no       | Provides a way to acquire a named lock, locking it before method execution and unlocking it after method execution                 |
+| `@TestEngine.AutoClose(lifecycle = "<string>")` | field            | no       | Provides a way to close `AutoCloseable` field                                                                                      |
 
 **Notes**
 
@@ -85,7 +111,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - `@TestEngine.Order(order = <int>)` is ignored for abstract and `@TestEngine.BaseClass` annotated classes.
 
 
-- For `@TestEngine.Tag(tag = <string>)` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`.
+- For `@TestEngine.Tag(tag = "<string>")` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`.
 
 
 - By default, `@TestEngine.Lock`, `@TestEngine.Unlock`, and `@TestEngine.ResourceLock` use a `ReentrantReadWriteLock`, locking the write lock.
