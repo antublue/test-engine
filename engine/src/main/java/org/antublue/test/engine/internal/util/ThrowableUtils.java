@@ -30,7 +30,7 @@ public class ThrowableUtils {
 
     private static final ThrowableUtils SINGLETON = new ThrowableUtils();
 
-    private static boolean pruneStackTraces;
+    private final boolean pruneStackTraces;
 
     /** Constructor */
     private ThrowableUtils() {
