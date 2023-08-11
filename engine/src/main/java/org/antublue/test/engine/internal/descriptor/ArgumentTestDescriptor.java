@@ -266,7 +266,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 methodTestDescriptor.skip(executorContext);
             }
         } catch (Throwable t) {
-            throwableCollector.accept(t);
+            throwableCollector.accept(THROWABLE_UTILS.pruneStackTrace(testClass, t));
         } finally {
             stateStateMachine.signal(State.END);
             System.out.flush();
@@ -296,7 +296,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 }
             }
         } catch (Throwable t) {
-            throwableCollector.accept(t);
+            throwableCollector.accept(THROWABLE_UTILS.pruneStackTrace(testClass, t));
         } finally {
             stateStateMachine.signal(State.POST_AFTER_ALL);
             System.out.flush();

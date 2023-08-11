@@ -179,9 +179,9 @@ public final class ReflectionUtils {
             if (methodList.size() != 1) {
                 throw new TestClassConfigurationException(
                         String.format(
-                                "Test class [%s] must define one @TestEngine.ArgumentSupplier"
-                                        + " method",
-                                clazz.getName()));
+                                "Test class [%s] must define exactly 1 @TestEngine.ArgumentSupplier"
+                                        + " method, %d methods were found",
+                                clazz.getName(), methodList.size()));
             }
 
             Method method = methodList.get(0);
@@ -296,15 +296,10 @@ public final class ReflectionUtils {
             if (argumentFields.isEmpty()) {
                 optionalField = Optional.empty();
                 ARGUMENT_FIELD_CACHE.put(clazz, optionalField);
-            } else if (argumentFields.size() == 1) {
+            } else {
                 field = argumentFields.get(0);
                 optionalField = Optional.of(field);
                 ARGUMENT_FIELD_CACHE.put(clazz, optionalField);
-            } else {
-                throw new TestClassConfigurationException(
-                        String.format(
-                                "Test class [%s] must define one @TestEngine.Argument field",
-                                clazz.getName()));
             }
 
             return optionalField;
