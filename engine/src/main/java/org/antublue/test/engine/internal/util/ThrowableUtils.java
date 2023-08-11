@@ -25,12 +25,14 @@ import java.util.Optional;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.Configuration;
 
+/** Class to implement ThrowableUtils */
 public class ThrowableUtils {
 
     private static final ThrowableUtils SINGLETON = new ThrowableUtils();
 
     private static boolean pruneStackTraces;
 
+    /** Constructor */
     private ThrowableUtils() {
         Optional<String> optional = Configuration.singleton().get(Constants.PRUNE_STACK_TRACES);
         pruneStackTraces = optional.map(Constants.TRUE::equals).orElse(true);
