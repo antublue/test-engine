@@ -72,16 +72,16 @@ public final class TestDescriptorUtils {
      *
      * @param uniqueId uniqueId
      * @param clazz clazz
-     * @param argument argument
      * @param method method
+     * @param argument argument
      * @return the return value
      */
     public static MethodTestDescriptor createMethodTestDescriptor(
-            UniqueId uniqueId, Class<?> clazz, Argument argument, Method method) {
+            UniqueId uniqueId, Class<?> clazz, Method method, Argument argument) {
         validateTestClass(clazz);
 
         return new MethodTestDescriptor(
-                uniqueId, REFLECTION_UTILS.getDisplayName(method), clazz, argument, method);
+                uniqueId, REFLECTION_UTILS.getDisplayName(method), clazz, method, argument);
     }
 
     /**
@@ -151,16 +151,6 @@ public final class TestDescriptorUtils {
                                     + " method",
                             clazz.getName()));
         }
-
-        // Validate we have a @TestEngine.Argument field
-        /*
-        if (ReflectionUtils.getArgumentField(clazz) == null) {
-            throw new TestClassConfigurationException(
-                    String.format(
-                            "Test class [%s] must declare a @TestEngine.Argument field",
-                            clazz.getName()));
-        }
-        */
 
         // Validate we have a @TestEngine.Test method
         if (REFLECTION_UTILS.getTestMethods(clazz).size() < 1) {

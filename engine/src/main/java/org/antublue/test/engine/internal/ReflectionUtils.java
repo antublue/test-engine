@@ -51,6 +51,8 @@ public final class ReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
 
+    private static final Class<?>[] NO_CLASS_ARGS = null;
+
     private static final Object[] NO_OBJECT_ARGS = null;
 
     private static final ReflectionUtils SINGLETON = new ReflectionUtils();
@@ -160,7 +162,7 @@ public final class ReflectionUtils {
                             TestEngine.ArgumentSupplier.class,
                             Scope.STATIC,
                             Stream.class,
-                            (Class<?>[]) null);
+                            NO_CLASS_ARGS);
 
             if (methodList.isEmpty()) {
                 methodList =
@@ -169,7 +171,7 @@ public final class ReflectionUtils {
                                 TestEngine.ArgumentSupplier.class,
                                 Scope.STATIC,
                                 Iterable.class,
-                                (Class<?>[]) null);
+                                NO_CLASS_ARGS);
             }
 
             LOGGER.trace(
@@ -250,7 +252,7 @@ public final class ReflectionUtils {
                                     TestEngine.Prepare.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -353,7 +355,7 @@ public final class ReflectionUtils {
                                     TestEngine.BeforeAll.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -404,7 +406,7 @@ public final class ReflectionUtils {
                                     TestEngine.BeforeEach.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -455,7 +457,7 @@ public final class ReflectionUtils {
                                     TestEngine.Test.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -507,7 +509,7 @@ public final class ReflectionUtils {
                                     TestEngine.AfterEach.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -558,7 +560,7 @@ public final class ReflectionUtils {
                                     TestEngine.AfterAll.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->
@@ -609,7 +611,7 @@ public final class ReflectionUtils {
                                     TestEngine.Conclude.class,
                                     Scope.NON_STATIC,
                                     Void.class,
-                                    (Class<?>[]) null)
+                                    NO_CLASS_ARGS)
                             .stream()
                             .filter(
                                     method ->

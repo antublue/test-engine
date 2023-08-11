@@ -29,6 +29,7 @@ public class StateMachine<S> {
     private final String id;
     private final AtomicReference<S> state;
     private final AtomicBoolean stop;
+    private Throwable throwable;
 
     /** Constructor */
     public StateMachine() {
@@ -121,16 +122,26 @@ public class StateMachine<S> {
             } catch (Throwable t) {
                 throw new StateMachineException(
                         String.format(
-                                "unhandled exception in transition for state [%s]"
-                                        + this.getState()),
+                                "unhandled exception in transition for state [%s]",
+                                this.getState()),
                         t);
             }
+        }
+
+        if (throwable != null) {
+            throw throwable;
         }
     }
 
     /** Method to stop the state machine */
     public void stop() {
+        stop(null);
+    }
+
+    /** Method to stop the state machine */
+    public void stop(Throwable throwable) {
         stop.set(true);
+        this.throwable = throwable;
     }
 
     /**

@@ -29,6 +29,7 @@ public class OrderAccessWorkflowTest {
 
     @TestEngine.Argument protected OrderAccessWorkflow orderAccessWorkflow;
 
+    /** Order access workflow arguments */
     @TestEngine.ArgumentSupplier
     public static Stream<OrderAccessWorkflow> arguments() {
         Collection<OrderAccessWorkflow> collection = new ArrayList<>();
@@ -40,11 +41,13 @@ public class OrderAccessWorkflowTest {
         return collection.stream();
     }
 
+    /** Method to test the order access workflow */
     @TestEngine.Test
     @TestEngine.DisplayName(name = "OrderAccessWorkflow")
     public void orderAccessWorkflow() throws Throwable {
         StateMachine<OrderAccessWorkflow.State> stateMachine = new StateMachine<>();
 
+        /* Set up the state machine states and transitions */
         stateMachine
                 .addTransition(
                         OrderAccessWorkflow.State.BEGIN,
@@ -62,6 +65,7 @@ public class OrderAccessWorkflowTest {
                 .run(OrderAccessWorkflow.State.BEGIN);
     }
 
+    /** Class to implement an OrderAccessWorkflow */
     public static class OrderAccessWorkflow implements Argument {
 
         private final String username;
@@ -70,6 +74,7 @@ public class OrderAccessWorkflowTest {
         private final String string;
         private int loginAttempts;
 
+        /** OrderAccessWorkflow states */
         public enum State {
             BEGIN,
             LOGIN,
@@ -79,6 +84,13 @@ public class OrderAccessWorkflowTest {
             END
         }
 
+        /**
+         * Constructor
+         *
+         * @param username username
+         * @param password password
+         * @param orderId orderId
+         */
         private OrderAccessWorkflow(String username, String password, int orderId) {
             this.username = username;
             this.password = password;
@@ -91,10 +103,20 @@ public class OrderAccessWorkflowTest {
             return string;
         }
 
+        /**
+         * Method to get the username
+         *
+         * @return the username
+         */
         public String getUsername() {
             return username;
         }
 
+        /**
+         * Method to get the password
+         *
+         * @return the password
+         */
         public String getPassword() {
             return password;
         }
@@ -104,6 +126,11 @@ public class OrderAccessWorkflowTest {
             return string;
         }
 
+        /**
+         * Method to perform the login transition
+         *
+         * @param stateMachine stateMachine
+         */
         public void login(StateMachine<State> stateMachine) {
             System.out.println("logging in > " + this);
             loginAttempts++;
@@ -123,6 +150,11 @@ public class OrderAccessWorkflowTest {
             stateMachine.signal(State.ACCESS_ORDER);
         }
 
+        /**
+         * Method to perform the access order transition
+         *
+         * @param stateMachine stateMachine
+         */
         public void accessOrder(StateMachine<State> stateMachine) {
             System.out.format(this + " > accessing order [%d]", this.orderId).println();
 
@@ -134,6 +166,11 @@ public class OrderAccessWorkflowTest {
             stateMachine.signal(State.ACCESS_ORDER_DETAILS);
         }
 
+        /**
+         * Method to perform the access order details transition
+         *
+         * @param stateMachine stateMachine
+         */
         public void accessOrderDetails(StateMachine<State> stateMachine) {
             System.out.format(this + " > accessing order [%d] details", this.orderId).println();
 
@@ -145,6 +182,11 @@ public class OrderAccessWorkflowTest {
             stateMachine.signal(State.LOGOUT);
         }
 
+        /**
+         * Method to perform the logout transition
+         *
+         * @param stateMachine stateMachine
+         */
         public void logout(StateMachine<State> stateMachine) {
             System.out.println("logging out > " + this);
 
@@ -164,6 +206,14 @@ public class OrderAccessWorkflowTest {
             }
         }
 
+        /**
+         * Method to create an OrderAccessWorkflow
+         *
+         * @param username username
+         * @param password password
+         * @param orderId orderId
+         * @return an OrderAccessWorkflow
+         */
         public static OrderAccessWorkflow of(String username, String password, int orderId) {
             return new OrderAccessWorkflow(username, password, orderId);
         }

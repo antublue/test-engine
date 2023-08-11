@@ -605,7 +605,7 @@ public class Resolver {
 
                     MethodTestDescriptor methodTestDescriptor =
                             TestDescriptorUtils.createMethodTestDescriptor(
-                                    methodUniqueId, clazz, argument, method);
+                                    methodUniqueId, clazz, method, argument);
 
                     argumentTestDescriptor.addChild(methodTestDescriptor);
                 }

@@ -73,10 +73,10 @@ public class ThrowableUtils {
         while (stackTraceElementIterator.hasNext()) {
             StackTraceElement stackTraceElement = stackTraceElementIterator.next();
             String stackTraceClassName = stackTraceElement.getClassName();
+            workingStackTrace.add(stackTraceElement);
             if (!stackTraceClassName.equals(className)) {
                 break;
             }
-            workingStackTrace.add(stackTraceElement);
         }
 
         prunedThrowable.setStackTrace(workingStackTrace.toArray(new StackTraceElement[0]));
