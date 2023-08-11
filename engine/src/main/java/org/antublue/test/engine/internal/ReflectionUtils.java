@@ -507,7 +507,7 @@ public final class ReflectionUtils {
             }
 
             List<Method> methods =
-                    getMethodsSuperclassFirst(
+                    getMethodsSubclassFirst(
                                     clazz,
                                     TestEngine.AfterEach.class,
                                     Scope.NON_STATIC,
@@ -520,7 +520,7 @@ public final class ReflectionUtils {
                             .collect(Collectors.toList());
 
             methods.addAll(
-                    getMethodsSuperclassFirst(
+                    getMethodsSubclassFirst(
                                     clazz,
                                     TestEngine.AfterEach.class,
                                     Scope.NON_STATIC,
@@ -558,7 +558,7 @@ public final class ReflectionUtils {
             }
 
             List<Method> methods =
-                    getMethodsSuperclassFirst(
+                    getMethodsSubclassFirst(
                                     clazz,
                                     TestEngine.AfterAll.class,
                                     Scope.NON_STATIC,
@@ -571,7 +571,7 @@ public final class ReflectionUtils {
                             .collect(Collectors.toList());
 
             methods.addAll(
-                    getMethodsSuperclassFirst(
+                    getMethodsSubclassFirst(
                                     clazz,
                                     TestEngine.AfterAll.class,
                                     Scope.NON_STATIC,
@@ -609,7 +609,7 @@ public final class ReflectionUtils {
             }
 
             List<Method> methods =
-                    getMethodsSuperclassFirst(
+                    getMethodsSubclassFirst(
                                     clazz,
                                     TestEngine.Conclude.class,
                                     Scope.NON_STATIC,

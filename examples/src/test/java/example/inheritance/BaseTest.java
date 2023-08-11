@@ -36,6 +36,16 @@ public class BaseTest {
         return collection.stream();
     }
 
+    @TestEngine.Prepare
+    public void prepare() {
+        System.out.println("prepare()");
+    }
+
+    @TestEngine.BeforeAll
+    public void beforeAll() {
+        System.out.println("beforeAll()");
+    }
+
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
@@ -49,5 +59,15 @@ public class BaseTest {
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
+    }
+
+    @TestEngine.AfterAll
+    public void afterAll() {
+        System.out.println("afterAll()");
+    }
+
+    @TestEngine.Conclude
+    public void conclude() {
+        System.out.println("conclude()");
     }
 }
