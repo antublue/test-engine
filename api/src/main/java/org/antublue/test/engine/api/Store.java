@@ -143,6 +143,26 @@ public class Store {
     }
 
     /**
+     * Method to get a value from the store, calling a function to transform it
+     *
+     * @param key kjey
+     * @param function function
+     * @return on Optional containing the value returned by the function
+     * @param <T>
+     */
+    public <T> Optional<T> get(String key, Function<Object, T> function) {
+        String validKey = checkKey(key);
+        checkNotNull(function, "function is null");
+
+        try {
+            lock();
+            return Optional.ofNullable(function.apply(map.get(validKey)));
+        } finally {
+            unlock();
+        }
+    }
+
+    /**
      * Method to get an value from the store, casting it to a specific type
      *
      * @param key key
