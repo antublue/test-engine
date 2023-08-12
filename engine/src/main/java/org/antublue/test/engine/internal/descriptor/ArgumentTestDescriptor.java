@@ -174,6 +174,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param stateMachine stateMachine
      */
     private void begin(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "begin uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(), testClass.getName(), testArgument.name());
+
         try {
             executorContext
                     .getExecutionRequest()
@@ -204,6 +208,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param stateMachine stateMachine
      */
     private void preBeforeAll(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "preBeforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(), testClass.getName(), testArgument.name());
         stateMachine.signal(State.BEFORE_ALL);
     }
 
@@ -213,6 +220,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param stateMachine stateMachine
      */
     private void beforeAll(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "beforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(), testClass.getName(), testArgument.name());
+
         try {
             List<Method> methods = REFLECTION_UTILS.getBeforeAllMethods(testClass);
             for (Method method : methods) {
@@ -243,6 +254,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param stateMachine stateMachine
      */
     private void postBeforeAll(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "postBeforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(), testClass.getName(), testArgument.name());
+
         if (throwables.isEmpty()) {
             stateMachine.signal(State.EXECUTE);
         } else {
@@ -256,6 +271,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param stateMachine stateMachine
      */
     private void execute(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "execute uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(), testClass.getName(), testArgument.name());
+
         try {
             List<MethodTestDescriptor> methodTestDescriptors =
                     getChildren(MethodTestDescriptor.class);
@@ -277,6 +296,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param stateMachine stateMachine
      */
     private void skip(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "skip uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(), testClass.getName(), testArgument.name());
+
         try {
             List<MethodTestDescriptor> methodTestDescriptors =
                     getChildren(MethodTestDescriptor.class);
@@ -298,6 +321,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param stateMachine stateMachine
      */
     private void skip2(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "skip2 uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(), testClass.getName(), testArgument.name());
+
         try {
             List<MethodTestDescriptor> methodTestDescriptors =
                     getChildren(MethodTestDescriptor.class);
@@ -319,6 +346,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param stateMachine stateMachine
      */
     private void preAfterAll(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "preAfterAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(), testClass.getName(), testArgument.name());
         stateMachine.signal(State.AFTER_ALL);
     }
 
@@ -328,6 +358,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param stateMachine stateMachine
      */
     private void afterAll(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "afterAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(), testClass.getName(), testArgument.name());
+
         try {
             List<Method> methods = REFLECTION_UTILS.getAfterAllMethods(testClass);
             for (Method method : methods) {
@@ -361,6 +395,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param stateMachine stateMachine
      */
     private void postAfterAll(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "postAfterAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(), testClass.getName(), testArgument.name());
         stateMachine.signal(State.END);
     }
 
@@ -370,6 +407,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      * @param stateMachine stateMachine
      */
     private void end(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "end uniqueId [%s] testClass [%s] testArgument [%s]",
+                getUniqueId(), testClass.getName(), testArgument.name());
+
         try {
             Optional<Field> optionalField = REFLECTION_UTILS.getArgumentField(testClass);
             if (optionalField.isPresent()) {

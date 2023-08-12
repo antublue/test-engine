@@ -155,6 +155,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void begin(StateMachine<State> stateMachine) {
+        LOGGER.trace("begin uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+
         try {
             executorContext
                     .getExecutionRequest()
@@ -182,6 +184,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void prePrepare(StateMachine<State> stateMachine) {
+        LOGGER.trace("prePrepare uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
         stateMachine.signal(State.PREPARE);
     }
 
@@ -191,6 +194,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void prepare(StateMachine<State> stateMachine) {
+        LOGGER.trace("prepare uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+
         try {
             List<Method> methods = REFLECTION_UTILS.getPrepareMethods(testClass);
             for (Method method : methods) {
@@ -217,6 +222,9 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void postPrepare(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "postPrepare uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+
         try {
             if (throwables.isEmpty()) {
                 stateMachine.signal(State.EXECUTE);
@@ -234,6 +242,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void execute(StateMachine<State> stateMachine) {
+        LOGGER.trace("execute uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+
         try {
             List<ArgumentTestDescriptor> argumentTestDescriptors =
                     getChildren(ArgumentTestDescriptor.class);
@@ -255,6 +265,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void skip(StateMachine<State> stateMachine) {
+        LOGGER.trace("skip uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+
         try {
             List<ArgumentTestDescriptor> argumentTestDescriptors =
                     getChildren(ArgumentTestDescriptor.class);
@@ -276,6 +288,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void skip2(StateMachine<State> stateMachine) {
+        LOGGER.trace("skip2 uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+
         try {
             List<ArgumentTestDescriptor> argumentTestDescriptors =
                     getChildren(ArgumentTestDescriptor.class);
@@ -297,6 +311,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void preConclude(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "preConclude uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
         stateMachine.signal(State.CONCLUDE);
     }
 
@@ -306,6 +322,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void conclude(StateMachine<State> stateMachine) {
+        LOGGER.trace("conclude uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+
         try {
             List<Method> methods = REFLECTION_UTILS.getConcludeMethods(testClass);
             for (Method method : methods) {
@@ -335,6 +353,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void postConclude(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "postConclude uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
         stateMachine.signal(State.END);
     }
 
@@ -344,6 +364,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void end(StateMachine<State> stateMachine) {
+        LOGGER.trace("end uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+
         AutoCloseAnnotationUtils.singleton()
                 .processAutoCloseAnnotatedFields(testInstance, "@TestEngine.Conclude", throwables);
 
