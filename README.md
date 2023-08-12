@@ -20,12 +20,6 @@ Release information can be found in GitHub Releases
 
 - [Migration](/MIGRATION.md)
 
-**Notes**
-
-Test Engine versions prior to `4.2.3` should not be used due to a critical bug ...
-
-- [#32](https://github.com/antublue/test-engine/issues/32) Tests may be skipped on a slow machine or scenarios where there are a large number of test classes.
-
 # Documentation
 
 **Documentation is specific to a release.**
