@@ -273,9 +273,10 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.0</version>
+            <groupId>org.antublue</groupId>
+            <artifactId>test-engine-api</artifactId>
+            <version>6.2.0</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
