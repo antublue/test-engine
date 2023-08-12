@@ -36,14 +36,6 @@ public class Logger {
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd | HH:mm:ss.SSS", Locale.getDefault());
 
-    private static final int OFF = 0;
-    private static final int ERROR = 100;
-    private static final int WARNING = 200;
-    private static final int INFO = 300;
-    private static final int DEBUG = 400;
-    private static final int TRACE = 500;
-    private static final int ALL = Integer.MAX_VALUE;
-
     private final String name;
     private final Level level;
 
@@ -59,6 +51,7 @@ public class Logger {
 
         Optional<String> optionalRegex =
                 Configuration.singleton().getOrDefault(Constants.LOG_LEVEL_REGEX, ".*");
+
         Optional<String> optionalLevel =
                 Configuration.singleton().getOrDefault(Constants.LOG_LEVEL, Level.INFO.toString());
 
