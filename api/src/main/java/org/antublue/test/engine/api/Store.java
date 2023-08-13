@@ -32,7 +32,7 @@ import java.util.function.Function;
  *
  * <p>Locking of Objects in the Store is the responsibility of the calling code
  */
-@SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
+@SuppressWarnings("unchecked")
 public class Store {
 
     private static final Store SINGLETON = new Store();
@@ -256,7 +256,7 @@ public class Store {
         try {
             lock.lock();
             Object object = map.remove(validKey);
-            if (object != null && object instanceof AutoCloseable) {
+            if (object instanceof AutoCloseable) {
                 try {
                     ((AutoCloseable) object).close();
                 } catch (Throwable t) {
