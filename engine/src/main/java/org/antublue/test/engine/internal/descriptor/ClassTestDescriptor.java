@@ -42,7 +42,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         POST_PREPARE,
         EXECUTE,
         SKIP,
-        SKIP2,
+        SKIP_END,
         PRE_CONCLUDE,
         CONCLUDE,
         POST_CONCLUDE,
@@ -74,7 +74,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         .addTransition(State.POST_PREPARE, this::postPrepare)
                         .addTransition(State.EXECUTE, this::execute)
                         .addTransition(State.SKIP, this::skip)
-                        .addTransition(State.SKIP2, this::skip2)
+                        .addTransition(State.SKIP_END, this::skipEnd)
                         .addTransition(State.PRE_CONCLUDE, this::preConclude)
                         .addTransition(State.CONCLUDE, this::conclude)
                         .addTransition(State.POST_CONCLUDE, this::postConclude)
@@ -172,7 +172,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         } catch (Throwable t) {
             throwables.add(t);
             printStackTrace(System.out, t);
-            stateMachine.signal(State.SKIP2);
+            stateMachine.signal(State.SKIP_END);
         } finally {
             System.out.flush();
         }
@@ -287,7 +287,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void skip2(StateMachine<State> stateMachine) {
+    private void skipEnd(StateMachine<State> stateMachine) {
         LOGGER.trace("skip2 uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
         try {

@@ -52,7 +52,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         POST_BEFORE_ALL,
         EXECUTE,
         SKIP,
-        SKIP2,
+        SKIP_END,
         PRE_AFTER_ALL,
         AFTER_ALL,
         POST_AFTER_ALL,
@@ -81,7 +81,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                         .addTransition(State.POST_BEFORE_ALL, this::postBeforeAll)
                         .addTransition(State.EXECUTE, this::execute)
                         .addTransition(State.SKIP, this::skip)
-                        .addTransition(State.SKIP2, this::skip2)
+                        .addTransition(State.SKIP_END, this::skipEnd)
                         .addTransition(State.PRE_AFTER_ALL, this::preAfterAll)
                         .addTransition(State.AFTER_ALL, this::afterAll)
                         .addTransition(State.POST_AFTER_ALL, this::postAfterAll)
@@ -320,7 +320,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      *
      * @param stateMachine stateMachine
      */
-    private void skip2(StateMachine<State> stateMachine) {
+    private void skipEnd(StateMachine<State> stateMachine) {
         LOGGER.trace(
                 "skip2 uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
