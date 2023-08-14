@@ -33,7 +33,7 @@ import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.ConfigurationParameters;
 import org.antublue.test.engine.internal.ConsoleTestExecutionListener;
 import org.antublue.test.engine.internal.util.AnsiColor;
-import org.antublue.test.engine.internal.util.AnsiColorString;
+import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -61,7 +61,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     private static final String VERSION = Information.getVersion();
 
     private static final String BANNER =
-            new AnsiColorString()
+            new AnsiColorStringBuilder()
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append("Antu")
                     .color(AnsiColor.BLUE_BOLD_BRIGHT)
@@ -214,7 +214,8 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
             throw new SuppressedStackTraceException(stringBuilder.toString());
         } catch (Throwable t) {
-            t.printStackTrace();
+            t.printStackTrace(System.out);
+            System.out.flush();
             throw new MojoExecutionException(
                     "General AntuBLUE Test Engine Maven Plugin Exception", t);
         }
@@ -286,7 +287,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
      */
     private void info(String message) {
         System.out.println(
-                new AnsiColorString()
+                new AnsiColorStringBuilder()
                         .append("[")
                         .color(AnsiColor.BLUE_BOLD)
                         .append("INFO")

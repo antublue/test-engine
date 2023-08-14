@@ -29,7 +29,7 @@ import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestDescriptorUtils;
 import org.antublue.test.engine.internal.util.AnsiColor;
-import org.antublue.test.engine.internal.util.AnsiColorString;
+import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
@@ -42,7 +42,7 @@ import org.junit.platform.launcher.TestPlan;
 public class ConsoleTestExecutionListener implements TestExecutionListener {
 
     private static final String BANNER =
-            new AnsiColorString()
+            new AnsiColorStringBuilder()
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append("Antu")
                     .color(AnsiColor.BLUE_BOLD_BRIGHT)
@@ -50,18 +50,20 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append(" Test Engine ")
                     .append(TestEngine.VERSION)
+                    .color(AnsiColor.RESET)
                     .toString();
 
     private static final String SUMMARY_BANNER = BANNER + AnsiColor.WHITE_BRIGHT.apply(" Summary");
 
     private static final String INFO =
-            new AnsiColorString()
+            new AnsiColorStringBuilder()
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append("[")
                     .color(AnsiColor.BLUE_BOLD)
                     .append("INFO")
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append("] ")
+                    .color(AnsiColor.RESET)
                     .toString();
 
     private static final String TEST = AnsiColor.WHITE_BRIGHT.apply("TEST");
@@ -410,9 +412,9 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                             summary.getArgumentsSkippedCount(),
                             summary.getTestsSkippedCount());
 
-            AnsiColorString ansiColorString = new AnsiColorString();
+            AnsiColorStringBuilder ansiColorStringBuilder = new AnsiColorStringBuilder();
 
-            ansiColorString
+            ansiColorStringBuilder
                     .append(INFO)
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append("Test Classes")
@@ -437,9 +439,10 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                     .append(" : ")
                     .append(pad(summary.getTestClassesSkippedCount(), column4Width));
 
-            System.out.println(ansiColorString);
+            System.out.println(ansiColorStringBuilder);
+            ansiColorStringBuilder.setLength(0);
 
-            ansiColorString
+            ansiColorStringBuilder
                     .append(INFO)
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append("Test Methods")
@@ -464,7 +467,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                     .append(" : ")
                     .append(pad(summary.getTestsSkippedCount(), column4Width));
 
-            System.out.println(ansiColorString);
+            System.out.println(ansiColorStringBuilder);
+            ansiColorStringBuilder.setLength(0);
         } else {
             System.out.println(INFO + AnsiColor.RED_BOLD_BRIGHT.apply("NO TESTS FOUND"));
         }
