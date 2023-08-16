@@ -174,12 +174,15 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         this.executorContext = executorContext;
 
-        try {
-            stateMachine.run(State.BEGIN);
-        } catch (Throwable t) {
-            printStackTrace(System.out, t);
-            System.out.flush();
-        }
+        stateMachine
+                .run(State.BEGIN)
+                .ifPresent(
+                        throwable -> {
+                            if (EXECUTED_VIA_ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN) {
+                                throwable.printStackTrace(System.out);
+                                System.out.flush();
+                            }
+                        });
     }
 
     /**

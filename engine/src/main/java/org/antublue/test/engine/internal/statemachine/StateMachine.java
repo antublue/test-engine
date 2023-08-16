@@ -16,20 +16,20 @@
 
 package org.antublue.test.engine.internal.statemachine;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /** Class to implement a StateMachine */
 public class StateMachine<S> {
 
-    private final Map<S, Transition<S>> map = new HashMap<>();
+    private final Map<S, Transition<S>> transitionMap = new ConcurrentHashMap<>();
     private final String id;
     private final AtomicReference<S> state;
     private final AtomicBoolean stop;
-    private Throwable throwable;
 
     /** Constructor */
     public StateMachine() {
@@ -63,12 +63,12 @@ public class StateMachine<S> {
         notNull(state, "state is null");
         notNull(transition, "transition is null");
 
-        if (map.containsKey(state)) {
+        if (transitionMap.containsKey(state)) {
             throw new StateMachineException(
                     String.format("transition already defined for state [%s]", state));
         }
 
-        map.put(state, transition);
+        transitionMap.put(state, transition);
 
         return this;
     }
@@ -83,6 +83,15 @@ public class StateMachine<S> {
     }
 
     /**
+     * Method to get the current state
+     *
+     * @return the current state
+     */
+    public S getState() {
+        return state.get();
+    }
+
+    /**
      * Method to set the state
      *
      * @param state the state
@@ -91,16 +100,24 @@ public class StateMachine<S> {
         this.state.set(state);
     }
 
+    /** Method to stop the state machine */
+    public void stop() {
+        stop.set(true);
+    }
+
     /**
-     * Method start the state machine
+     * Method to run the state machine
      *
      * @param state the beginning state
-     * @throws Throwable an exception encountered when running
+     * @return Optional containing a Throwable if an exception occured during a transition, else an
+     *     empty Optional
      */
-    public void run(S state) throws Throwable {
-        if (!map.containsKey(state)) {
-            throw new StateMachineException(
-                    String.format("no transition defined for state [%s]", state));
+    public Optional<Throwable> run(S state) {
+        if (!transitionMap.containsKey(state)) {
+            stop.set(true);
+            return Optional.of(
+                    new StateMachineException(
+                            String.format("no transition defined for state [%s]", state)));
         }
 
         this.state.set(state);
@@ -112,55 +129,29 @@ public class StateMachine<S> {
                 break;
             }
 
-            Transition<S> transition = map.get(nextState);
+            Transition<S> transition = transitionMap.get(nextState);
             if (transition == null) {
-                throw new StateMachineException(
-                        String.format("no transition defined for state [%s]", nextState));
+                stop.set(true);
+                return Optional.of(
+                        new StateMachineException(
+                                String.format("no transition defined for state [%s]", nextState)));
             }
 
             try {
                 transition.execute(this);
             } catch (Throwable t) {
-                throw new StateMachineException(
-                        String.format(
-                                "unhandled exception in transition for state [%s]",
-                                this.getState()),
-                        t);
+                stop.set(true);
+                return Optional.of(t);
             }
         }
 
-        if (throwable != null) {
-            throw throwable;
-        }
-    }
-
-    /** Method to stop the state machine */
-    public void stop() {
-        stop(null);
-    }
-
-    /**
-     * Method to stop the state machine
-     *
-     * @param throwable throwable
-     */
-    public void stop(Throwable throwable) {
         stop.set(true);
-        this.throwable = throwable;
-    }
-
-    /**
-     * Method to get the current state
-     *
-     * @return the current state
-     */
-    public S getState() {
-        return state.get();
+        return Optional.empty();
     }
 
     @Override
     public String toString() {
-        return state.toString();
+        return "{id = [" + id + "], state = [" + state.toString() + "]}";
     }
 
     private static void notNull(Object object, String message) {
