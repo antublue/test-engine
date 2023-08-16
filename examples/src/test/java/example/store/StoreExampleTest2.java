@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Key;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -29,8 +30,7 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class StoreExampleTest2 {
 
-    private static final String PREFIX = "StoreExampleTest";
-    private static final String TEST_OBJECT = PREFIX + ".testObject";
+    private static final String TEST_OBJECT_KEY = Key.of(StoreExampleTest2.class, "testObject");
 
     private Store store;
 
@@ -50,7 +50,7 @@ public class StoreExampleTest2 {
         System.out.println("prepare()");
 
         store = new Store();
-        store.put(TEST_OBJECT, new TestObject());
+        store.put(TEST_OBJECT_KEY, new TestObject());
     }
 
     @TestEngine.BeforeAll
@@ -87,9 +87,9 @@ public class StoreExampleTest2 {
     public void conclude() {
         System.out.println("conclude()");
 
-        store.remove(TEST_OBJECT, (Consumer<TestObject>) testObject -> testObject.close());
+        store.remove(TEST_OBJECT_KEY, (Consumer<TestObject>) testObject -> testObject.close());
 
-        assertThat(store.get(TEST_OBJECT)).isNotPresent();
+        assertThat(store.get(TEST_OBJECT_KEY)).isNotPresent();
     }
 
     private static class TestObject {

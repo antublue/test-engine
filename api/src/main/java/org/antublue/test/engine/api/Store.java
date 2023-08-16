@@ -33,7 +33,7 @@ import java.util.function.Function;
  * <p>Locking of Objects in the Store is the responsibility of the calling code
  */
 @SuppressWarnings("unchecked")
-public class Store {
+public final class Store {
 
     private static final Store SINGLETON = new Store();
 
@@ -278,7 +278,7 @@ public class Store {
      * @param key key
      * @return the key trimmed
      */
-    private String checkKey(String key) {
+    private static String checkKey(String key) {
         if (key == null) {
             throw new IllegalArgumentException("key is null");
         }
@@ -291,12 +291,12 @@ public class Store {
     }
 
     /**
-     * Method to validate an value is not null
+     * Method to validate a value is not null
      *
      * @param object object
      * @param message message
      */
-    private void checkNotNull(Object object, String message) {
+    private static void checkNotNull(Object object, String message) {
         if (object == null) {
             throw new IllegalArgumentException(message);
         }

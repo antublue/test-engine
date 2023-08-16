@@ -22,6 +22,7 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Key;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -29,9 +30,9 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class StoreExampleTest1 {
 
-    private static final String PREFIX = "StoreExampleTest";
-    private static final String CLOSEABLE = PREFIX + ".closeable";
-    private static final String AUTO_CLOSEABLE = PREFIX + ".autoCloseable";
+    private static final String CLOSEABLE_KEY = Key.of(StoreExampleTest1.class, "closeable");
+    private static final String AUTO_CLOSEABLE_KEY =
+            Key.of(StoreExampleTest1.class, "autoClosable");
 
     private Store store;
 
@@ -51,8 +52,8 @@ public class StoreExampleTest1 {
         System.out.println("prepare()");
 
         store = new Store();
-        store.put(AUTO_CLOSEABLE, new TestAutoCloseable());
-        store.put(CLOSEABLE, new TestCloseable());
+        store.put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
+        store.put(CLOSEABLE_KEY, new TestCloseable());
     }
 
     @TestEngine.BeforeAll
@@ -89,11 +90,11 @@ public class StoreExampleTest1 {
     public void conclude() {
         System.out.println("conclude()");
 
-        store.removeAndClose(AUTO_CLOSEABLE);
-        store.removeAndClose(CLOSEABLE);
+        store.removeAndClose(AUTO_CLOSEABLE_KEY);
+        store.removeAndClose(CLOSEABLE_KEY);
 
-        assertThat(store.get(AUTO_CLOSEABLE)).isNotPresent();
-        assertThat(store.get(CLOSEABLE)).isNotPresent();
+        assertThat(store.get(AUTO_CLOSEABLE_KEY)).isNotPresent();
+        assertThat(store.get(CLOSEABLE_KEY)).isNotPresent();
     }
 
     private static class TestAutoCloseable implements AutoCloseable {
