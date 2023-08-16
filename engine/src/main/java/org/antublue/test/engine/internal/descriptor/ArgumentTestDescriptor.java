@@ -164,10 +164,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 .run(State.BEGIN)
                 .ifPresent(
                         throwable -> {
-                            if (EXECUTED_VIA_ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN) {
-                                throwable.printStackTrace(System.out);
-                                System.out.flush();
-                            }
+                            printStackTrace(System.out, throwable);
                         });
     }
 
@@ -197,8 +194,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
             stateMachine.signal(State.PRE_BEFORE_ALL);
         } catch (Throwable t) {
-            throwables.add(t);
-            printStackTrace(System.out, t);
+            Throwable prunedThrowable = prune(testClass, t);
+            throwables.add(prunedThrowable);
+            printStackTrace(System.out, prunedThrowable);
             stateMachine.signal(State.SKIP);
         } finally {
             System.out.flush();
@@ -243,8 +241,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 }
             }
         } catch (Throwable t) {
-            throwables.add(t);
-            printStackTrace(System.out, t);
+            Throwable prunedThrowable = prune(testClass, t);
+            throwables.add(prunedThrowable);
+            printStackTrace(System.out, prunedThrowable);
         } finally {
             stateMachine.signal(State.POST_BEFORE_ALL);
             System.out.flush();
@@ -285,8 +284,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 methodTestDescriptor.execute(executorContext);
             }
         } catch (Throwable t) {
-            throwables.add(t);
-            printStackTrace(System.out, t);
+            Throwable prunedThrowable = prune(testClass, t);
+            throwables.add(prunedThrowable);
+            printStackTrace(System.out, prunedThrowable);
         } finally {
             stateMachine.signal(State.PRE_AFTER_ALL);
             System.out.flush();
@@ -310,8 +310,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 methodTestDescriptor.skip(executorContext);
             }
         } catch (Throwable t) {
-            throwables.add(t);
-            printStackTrace(System.out, t);
+            Throwable prunedThrowable = prune(testClass, t);
+            throwables.add(prunedThrowable);
+            printStackTrace(System.out, prunedThrowable);
         } finally {
             stateMachine.signal(State.PRE_AFTER_ALL);
             System.out.flush();
@@ -335,8 +336,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 methodTestDescriptor.skip(executorContext);
             }
         } catch (Throwable t) {
-            throwables.add(t);
-            printStackTrace(System.out, t);
+            Throwable prunedThrowable = prune(testClass, t);
+            throwables.add(prunedThrowable);
+            printStackTrace(System.out, prunedThrowable);
         } finally {
             stateMachine.signal(State.END);
             System.out.flush();
@@ -376,16 +378,18 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                         method.invoke(testInstance, NO_OBJECT_ARGS);
                     }
                 } catch (Throwable t) {
-                    throwables.add(t);
-                    printStackTrace(System.out, t);
+                    Throwable prunedThrowable = prune(testClass, t);
+                    throwables.add(prunedThrowable);
+                    printStackTrace(System.out, prunedThrowable);
                 } finally {
                     LOCK_ANNOTATION_UTILS.processUnlockAnnotations(method);
                     System.out.flush();
                 }
             }
         } catch (Throwable t) {
-            throwables.add(t);
-            printStackTrace(System.out, t);
+            Throwable prunedThrowable = prune(testClass, t);
+            throwables.add(prunedThrowable);
+            printStackTrace(System.out, prunedThrowable);
         } finally {
             stateMachine.signal(State.POST_AFTER_ALL);
             System.out.flush();

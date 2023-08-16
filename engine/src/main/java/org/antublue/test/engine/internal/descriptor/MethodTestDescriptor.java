@@ -178,10 +178,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 .run(State.BEGIN)
                 .ifPresent(
                         throwable -> {
-                            if (EXECUTED_VIA_ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN) {
-                                throwable.printStackTrace(System.out);
-                                System.out.flush();
-                            }
+                            printStackTrace(System.out, throwable);
                         });
     }
 
@@ -245,8 +242,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 }
             }
         } catch (Throwable t) {
-            throwables.add(t);
-            printStackTrace(System.out, t);
+            Throwable prunedThrowable = prune(testClass, t);
+            throwables.add(prunedThrowable);
+            printStackTrace(System.out, prunedThrowable);
         } finally {
             stateMachine.signal(State.POST_BEFORE_EACH);
             System.out.flush();
@@ -306,8 +304,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 System.out.flush();
             }
         } catch (Throwable t) {
-            throwables.add(t);
-            printStackTrace(System.out, t);
+            Throwable prunedThrowable = prune(testClass, t);
+            throwables.add(prunedThrowable);
+            printStackTrace(System.out, prunedThrowable);
         } finally {
             stateMachine.signal(State.POST_TEST);
             System.out.flush();
@@ -359,16 +358,18 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                         method.invoke(testInstance, NO_OBJECT_ARGS);
                     }
                 } catch (Throwable t) {
-                    throwables.add(t);
-                    printStackTrace(System.out, t);
+                    Throwable prunedThrowable = prune(testClass, t);
+                    throwables.add(prunedThrowable);
+                    printStackTrace(System.out, prunedThrowable);
                 } finally {
                     LOCK_ANNOTATION_UTILS.processUnlockAnnotations(method);
                     System.out.flush();
                 }
             }
         } catch (Throwable t) {
-            throwables.add(t);
-            printStackTrace(System.out, t);
+            Throwable prunedThrowable = prune(testClass, t);
+            throwables.add(prunedThrowable);
+            printStackTrace(System.out, prunedThrowable);
         } finally {
             stateMachine.signal(State.POST_AFTER_EACH);
             System.out.flush();

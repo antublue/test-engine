@@ -99,6 +99,25 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
                 .executionSkipped(this, "Skipped");
     }
 
+    protected Throwable prune(Class<?> clazz, Throwable throwable) {
+        // TODO fix
+        return throwable;
+        /*
+        Throwable prunedThrowable = throwable;
+        if (!isClassInStackTrace(clazz, throwable)) {
+            prunedThrowable = throwable.getCause();
+        }
+
+        Throwable t = prunedThrowable;
+        while (t != null) {
+            pruneStackTraceElements(t);
+            t = t.getCause();
+        }
+
+        return prunedThrowable;
+        */
+    }
+
     /**
      * Method to print a stacktrace depending on whether we have been executed via the Maven Test
      * Engine plugin
@@ -112,4 +131,33 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
             printStream.flush();
         }
     }
+
+    /*
+    private static boolean isClassInStackTrace(Class<?> clazz, Throwable throwable) {
+        String className = clazz.getName();
+        StackTraceElement[] stackTraceElements = throwable.getStackTrace();
+        for (StackTraceElement stackTraceElement : stackTraceElements) {
+            if (stackTraceElement.toString().startsWith(className)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void pruneStackTraceElements(Throwable throwable) {
+        List<StackTraceElement> prunedStackTraceElements = new ArrayList<>();
+        List<StackTraceElement> stackTraceElements = Arrays.asList(throwable.getStackTrace());
+
+        for (StackTraceElement stackTraceElement : stackTraceElements) {
+            if (stackTraceElement
+                    .toString()
+                    .startsWith("org.antublue.test.engine.internal.descriptor.")) {
+                break;
+            }
+            prunedStackTraceElements.add(stackTraceElement);
+        }
+
+        throwable.setStackTrace(prunedStackTraceElements.toArray(new StackTraceElement[0]));
+    }
+    */
 }

@@ -139,16 +139,23 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
-        </dependency>
-        <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine</artifactId>
             <version>6.2.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.antublue</groupId>
+            <artifactId>test-engine-extras</artifactId>
+            <version>6.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
+        </dependency>
+
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
