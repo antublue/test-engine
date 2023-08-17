@@ -94,7 +94,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
 
         detailedOutput =
                 configurationParameters
-                        .get(Constants.CONSOLE_OUTPUT)
+                        .get(Constants.CONSOLE)
                         .map(
                                 value -> {
                                     try {

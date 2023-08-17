@@ -265,24 +265,24 @@ The properties filename is resolved using the following in order:
 
 ### Standard Test Engine properties
 
-| Property                                     | Type         | Default value        |
-|----------------------------------------------|--------------|----------------------|
-| antublue.test.engine.thread.count            | integer      | number of processors |
-| antublue.test.engine.test.class.include      | regex string |                      |
-| antublue.test.engine.test.class.exclude      | regex string |                      |
-| antublue.test.engine.test.method.include     | regex string |                      |
-| antublue.test.engine.test.class.tag.include  | regex string |                      |
-| antublue.test.engine.test.class.tag.exclude  | regex string |                      |
-| antublue.test.engine.test.method.tag.include | regex string |                      |
-| antublue.test.engine.test.method.tag.exclude | regex string |                      |
-| antublue.test.class.shuffle                  | boolean      | false                |
+| Property                                       | Type         | Default value        |
+|------------------------------------------------|--------------|----------------------|
+| antublue.test.engine.thread.count              | integer      | number of processors |
+| antublue.test.engine.console.log.test.messages | boolean      | true                 |
+| antublue.test.engine.test.class.include        | regex string |                      |
+| antublue.test.engine.test.class.exclude        | regex string |                      |
+| antublue.test.engine.test.method.include       | regex string |                      |
+| antublue.test.engine.test.class.tag.include    | regex string |                      |
+| antublue.test.engine.test.class.tag.exclude    | regex string |                      |
+| antublue.test.engine.test.method.tag.include   | regex string |                      |
+| antublue.test.engine.test.method.tag.exclude   | regex string |                      |
+| antublue.test.engine.test.class.shuffle        | boolean      | false                |
 
 ### Experimental Test Engine Configuration
 
-| Property                                            | Type    | Default value |
-|-----------------------------------------------------|---------|---------------|
-| antublue.test.engine.experimental.log.test.messages | boolean | true          |
-| antublue.test.engine.experimental.log.pass.messages | boolean | true          |
+| Property                                                    | Type    | Default value |
+|-------------------------------------------------------------|---------|---------------|
+| antublue.test.engine.experimental.console.log.pass.messages | boolean | true          |
 
 **Notes**
 

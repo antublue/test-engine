@@ -38,13 +38,14 @@ public final class Constants {
     public static final String LOG_LEVEL = PREFIX + ".log.level";
 
     /** Configuration constant */
-    public static final String CONSOLE_OUTPUT = PREFIX + ".console.output";
+    public static final String CONSOLE = PREFIX + ".console";
 
     /** Configuration constant */
-    public static final String LOG_TEST_MESSAGES = PREFIX + EXPERIMENTAL + ".log.test.messages";
+    public static final String LOG_TEST_MESSAGES = CONSOLE + ".log.test.messages";
 
     /** Configuration constant */
-    public static final String LOG_PASS_MESSAGES = PREFIX + EXPERIMENTAL + ".log.pass.messages";
+    public static final String LOG_PASS_MESSAGES =
+            PREFIX + EXPERIMENTAL + ".console.log.pass.messages";
 
     /** Configuration constant */
     public static final String LOG_SKIP_MESSAGES = PREFIX + EXPERIMENTAL + ".log.skip.messages";
