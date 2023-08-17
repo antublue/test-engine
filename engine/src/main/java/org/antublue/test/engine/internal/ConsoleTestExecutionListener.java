@@ -30,6 +30,8 @@ import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ExtendedAbstractTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestDescriptorUtils;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
@@ -43,6 +45,9 @@ import org.junit.platform.launcher.TestPlan;
 
 /** Class to collect test information and output a test execution summary */
 public class ConsoleTestExecutionListener implements TestExecutionListener {
+
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ConsoleTestExecutionListener.class);
 
     private static final String BANNER =
             new AnsiColorStringBuilder()
@@ -79,10 +84,10 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                     "------------------------------------------------------------------------");
 
     private final Summary summary;
-    private final boolean detailedOutput;
     private final boolean logTestMessages;
     private final boolean logPassMessages;
     private final boolean logSkipMessages;
+    private final boolean logTiming;
 
     /**
      * Constructor
@@ -92,9 +97,9 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
     public ConsoleTestExecutionListener(ConfigurationParameters configurationParameters) {
         summary = new Summary();
 
-        detailedOutput =
+        logTiming =
                 configurationParameters
-                        .get(Constants.CONSOLE)
+                        .get(Constants.LOG_TIMING)
                         .map(
                                 value -> {
                                     try {
@@ -104,6 +109,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                                     }
                                 })
                         .orElse(true);
+
+        LOGGER.trace("configuration [%s] = [%b]", Constants.LOG_TIMING, logTiming);
 
         logTestMessages =
                 configurationParameters
@@ -118,6 +125,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                                 })
                         .orElse(true);
 
+        LOGGER.trace("configuration [%s] = [%b]", Constants.LOG_TEST_MESSAGES, logTestMessages);
+
         logPassMessages =
                 configurationParameters
                         .get(Constants.LOG_PASS_MESSAGES)
@@ -131,6 +140,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                                 })
                         .orElse(true);
 
+        LOGGER.trace("configuration [%s] = [%b]", Constants.LOG_PASS_MESSAGES, logPassMessages);
+
         logSkipMessages =
                 configurationParameters
                         .get(Constants.LOG_SKIP_MESSAGES)
@@ -143,6 +154,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                                     }
                                 })
                         .orElse(true);
+
+        LOGGER.trace("configuration [%s] = [%b]", Constants.LOG_SKIP_MESSAGES, logSkipMessages);
     }
 
     /**
@@ -233,7 +246,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                         .append("()");
             }
 
-            if (detailedOutput && stringBuilder.length() > 0) {
+            if (stringBuilder.length() > 0) {
                 System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
                 System.out.flush();
             }
@@ -285,8 +298,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                         .append("()");
             }
 
-            if (detailedOutput && stringBuilder.length() > 0) {
-                if (testDescriptor instanceof ExtendedAbstractTestDescriptor) {
+            if (stringBuilder.length() > 0) {
+                if (logTiming && testDescriptor instanceof ExtendedAbstractTestDescriptor) {
                     ExtendedAbstractTestDescriptor extendedAbstractTestDescriptor =
                             (ExtendedAbstractTestDescriptor) testDescriptor;
                     StopWatch stopWatch = extendedAbstractTestDescriptor.getStopWatch();
@@ -380,16 +393,17 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                         }
                 }
 
-                if (detailedOutput && string != null) {
-                    if (testDescriptor instanceof ExtendedAbstractTestDescriptor) {
+                if (string != null) {
+                    if (logTiming && testDescriptor instanceof ExtendedAbstractTestDescriptor) {
                         ExtendedAbstractTestDescriptor extendedAbstractTestDescriptor =
                                 (ExtendedAbstractTestDescriptor) testDescriptor;
                         StopWatch stopWatch = extendedAbstractTestDescriptor.getStopWatch();
                         stopWatch.stop();
-                        stringBuilder
-                                .append(" ")
-                                .append(stopWatch.elapsedTime(TimeUnit.MILLISECONDS))
-                                .append(" ms");
+                        string +=
+                                new StringBuilder()
+                                        .append(" ")
+                                        .append(stopWatch.elapsedTime(TimeUnit.MILLISECONDS))
+                                        .append(" ms");
                     }
 
                     System.out.println(INFO + Thread.currentThread().getName() + " | " + string);

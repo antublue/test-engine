@@ -268,7 +268,6 @@ The properties filename is resolved using the following in order:
 | Property                                       | Type         | Default value        |
 |------------------------------------------------|--------------|----------------------|
 | antublue.test.engine.thread.count              | integer      | number of processors |
-| antublue.test.engine.console.log.test.messages | boolean      | true                 |
 | antublue.test.engine.test.class.include        | regex string |                      |
 | antublue.test.engine.test.class.exclude        | regex string |                      |
 | antublue.test.engine.test.method.include       | regex string |                      |
@@ -277,6 +276,8 @@ The properties filename is resolved using the following in order:
 | antublue.test.engine.test.method.tag.include   | regex string |                      |
 | antublue.test.engine.test.method.tag.exclude   | regex string |                      |
 | antublue.test.engine.test.class.shuffle        | boolean      | false                |
+| antublue.test.engine.console.log.timing        | boolean      | true                 |
+| antublue.test.engine.console.log.test.messages | boolean      | true                 |
 
 ### Experimental Test Engine Configuration
 

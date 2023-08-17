@@ -41,6 +41,12 @@ public final class Constants {
     public static final String CONSOLE = PREFIX + ".console";
 
     /** Configuration constant */
+    public static final String LOG_TIMING = CONSOLE + ".log.timing";
+
+    /** Configuration constant */
+    public static final String TIMING_UNITS = LOG_TIMING + ".units";
+
+    /** Configuration constant */
     public static final String LOG_TEST_MESSAGES = CONSOLE + ".log.test.messages";
 
     /** Configuration constant */
