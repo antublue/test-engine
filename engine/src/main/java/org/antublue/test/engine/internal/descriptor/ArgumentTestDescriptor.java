@@ -76,15 +76,15 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         this.stateMachine =
                 new StateMachine<State>(getClass().getName())
                         .addTransition(State.BEGIN, this::begin)
-                        .addTransition(State.PRE_BEFORE_ALL, this::preBeforeAll)
+                        .addTransition(State.PRE_BEFORE_ALL, this::beforeBeforeAll)
                         .addTransition(State.BEFORE_ALL, this::beforeAll)
-                        .addTransition(State.POST_BEFORE_ALL, this::postBeforeAll)
+                        .addTransition(State.POST_BEFORE_ALL, this::afterBeforeAll)
                         .addTransition(State.EXECUTE, this::execute)
                         .addTransition(State.SKIP, this::skip)
                         .addTransition(State.SKIP_END, this::skipEnd)
-                        .addTransition(State.PRE_AFTER_ALL, this::preAfterAll)
+                        .addTransition(State.PRE_AFTER_ALL, this::beforeAfterAll)
                         .addTransition(State.AFTER_ALL, this::afterAll)
-                        .addTransition(State.POST_AFTER_ALL, this::postAfterAll)
+                        .addTransition(State.POST_AFTER_ALL, this::afterAfterAll)
                         .addTransition(State.END, this::end);
     }
 
@@ -208,9 +208,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      *
      * @param stateMachine stateMachine
      */
-    private void preBeforeAll(StateMachine<State> stateMachine) {
+    private void beforeBeforeAll(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "preBeforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                "beforeBeforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
         stateMachine.signal(State.BEFORE_ALL);
     }
@@ -255,9 +255,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      *
      * @param stateMachine stateMachine
      */
-    private void postBeforeAll(StateMachine<State> stateMachine) {
+    private void afterBeforeAll(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "postBeforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                "afterBeforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         if (throwables.isEmpty()) {
@@ -326,7 +326,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      */
     private void skipEnd(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "skip2 uniqueId [%s] testClass [%s] testArgument [%s]",
+                "skipEnd uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         try {
@@ -350,9 +350,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      *
      * @param stateMachine stateMachine
      */
-    private void preAfterAll(StateMachine<State> stateMachine) {
+    private void beforeAfterAll(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "preAfterAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                "beforeAfterAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
         stateMachine.signal(State.AFTER_ALL);
     }
@@ -401,9 +401,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      *
      * @param stateMachine stateMachine
      */
-    private void postAfterAll(StateMachine<State> stateMachine) {
+    private void afterAfterAll(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "postAfterAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                "afterAfterAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
         stateMachine.signal(State.END);
     }

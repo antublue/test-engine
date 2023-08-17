@@ -82,15 +82,15 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         this.stateMachine =
                 new StateMachine<State>(getClass().getName())
                         .addTransition(State.BEGIN, this::begin)
-                        .addTransition(State.PRE_BEFORE_EACH, this::preBeforeEach)
+                        .addTransition(State.PRE_BEFORE_EACH, this::beforeBeforeEach)
                         .addTransition(State.BEFORE_EACH, this::beforeEach)
-                        .addTransition(State.POST_BEFORE_EACH, this::postBeforeEach)
-                        .addTransition(State.PRE_TEST, this::preTest)
+                        .addTransition(State.POST_BEFORE_EACH, this::afterBeforeEach)
+                        .addTransition(State.PRE_TEST, this::beforeTest)
                         .addTransition(State.TEST, this::test)
-                        .addTransition(State.POST_TEST, this::postTest)
-                        .addTransition(State.PRE_AFTER_EACH, this::preAfterEach)
+                        .addTransition(State.POST_TEST, this::afterTest)
+                        .addTransition(State.PRE_AFTER_EACH, this::beforeAfterEach)
                         .addTransition(State.AFTER_EACH, this::afterEach)
-                        .addTransition(State.POST_AFTER_EACH, this::postAfterEach)
+                        .addTransition(State.POST_AFTER_EACH, this::afterAfterEach)
                         .addTransition(State.END, this::end);
     }
 
@@ -209,9 +209,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void preBeforeEach(StateMachine<State> stateMachine) {
+    private void beforeBeforeEach(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "preBeforeEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
+                "beforeBeforeEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
         stateMachine.signal(State.BEFORE_EACH);
     }
@@ -256,9 +256,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void postBeforeEach(StateMachine<State> stateMachine) {
+    private void afterBeforeEach(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "postBeforeEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
+                "afterBeforeEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
         if (throwables.isEmpty()) {
@@ -273,9 +273,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void preTest(StateMachine<State> stateMachine) {
+    private void beforeTest(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "preTest uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
+                "beforeTest uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
         stateMachine.signal(State.TEST);
     }
@@ -318,9 +318,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void postTest(StateMachine<State> stateMachine) {
+    private void afterTest(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "postTest uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
+                "afterTest uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
         stateMachine.signal(State.PRE_AFTER_EACH);
     }
@@ -330,9 +330,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void preAfterEach(StateMachine<State> stateMachine) {
+    private void beforeAfterEach(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "preAfterEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
+                "beforeAfterEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
         stateMachine.signal(State.AFTER_EACH);
     }
@@ -381,9 +381,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void postAfterEach(StateMachine<State> stateMachine) {
+    private void afterAfterEach(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "postAfterEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
+                "afterAfterEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
         stateMachine.signal(State.END);
     }

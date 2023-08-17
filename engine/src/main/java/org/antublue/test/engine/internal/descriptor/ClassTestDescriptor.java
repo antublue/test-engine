@@ -69,15 +69,15 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         this.stateMachine =
                 new StateMachine<State>(getClass().getName())
                         .addTransition(State.BEGIN, this::begin)
-                        .addTransition(State.PRE_PREPARE, this::prePrepare)
+                        .addTransition(State.PRE_PREPARE, this::beforePrepare)
                         .addTransition(State.PREPARE, this::prepare)
-                        .addTransition(State.POST_PREPARE, this::postPrepare)
+                        .addTransition(State.POST_PREPARE, this::afterPrepare)
                         .addTransition(State.EXECUTE, this::execute)
                         .addTransition(State.SKIP, this::skip)
                         .addTransition(State.SKIP_END, this::skipEnd)
-                        .addTransition(State.PRE_CONCLUDE, this::preConclude)
+                        .addTransition(State.PRE_CONCLUDE, this::beforeConclude)
                         .addTransition(State.CONCLUDE, this::conclude)
-                        .addTransition(State.POST_CONCLUDE, this::postConclude)
+                        .addTransition(State.POST_CONCLUDE, this::afterConclude)
                         .addTransition(State.END, this::end);
     }
 
@@ -184,8 +184,9 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void prePrepare(StateMachine<State> stateMachine) {
-        LOGGER.trace("prePrepare uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+    private void beforePrepare(StateMachine<State> stateMachine) {
+        LOGGER.trace(
+                "beforePrepare uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
         stateMachine.signal(State.PREPARE);
     }
 
@@ -223,9 +224,9 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void postPrepare(StateMachine<State> stateMachine) {
+    private void afterPrepare(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "postPrepare uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+                "afterPrepare uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
         try {
             if (throwables.isEmpty()) {
@@ -292,7 +293,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      * @param stateMachine stateMachine
      */
     private void skipEnd(StateMachine<State> stateMachine) {
-        LOGGER.trace("skip2 uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+        LOGGER.trace("skipEnd uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
         try {
             List<ArgumentTestDescriptor> argumentTestDescriptors =
@@ -315,9 +316,9 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void preConclude(StateMachine<State> stateMachine) {
+    private void beforeConclude(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "preConclude uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+                "beforeConclude uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
         stateMachine.signal(State.CONCLUDE);
     }
 
@@ -359,9 +360,9 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void postConclude(StateMachine<State> stateMachine) {
+    private void afterConclude(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "postConclude uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+                "afterConclude uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
         stateMachine.signal(State.END);
     }
 
