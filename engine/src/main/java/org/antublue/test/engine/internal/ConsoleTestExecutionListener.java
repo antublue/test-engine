@@ -286,12 +286,16 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
             }
 
             if (detailedOutput && stringBuilder.length() > 0) {
-                StopWatch stopWatch =
-                        ((ExtendedAbstractTestDescriptor) testDescriptor).getStopWatch();
-                stringBuilder
-                        .append(" ")
-                        .append(stopWatch.elapsedTime(TimeUnit.MILLISECONDS))
-                        .append(" ms");
+                if (testDescriptor instanceof ExtendedAbstractTestDescriptor) {
+                    ExtendedAbstractTestDescriptor extendedAbstractTestDescriptor =
+                            (ExtendedAbstractTestDescriptor) testDescriptor;
+                    StopWatch stopWatch = extendedAbstractTestDescriptor.getStopWatch();
+                    stopWatch.stop();
+                    stringBuilder
+                            .append(" ")
+                            .append(stopWatch.elapsedTime(TimeUnit.MILLISECONDS))
+                            .append(" ms");
+                }
 
                 System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
                 System.out.flush();
@@ -377,9 +381,16 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                 }
 
                 if (detailedOutput && string != null) {
-                    StopWatch stopWatch =
-                            ((ExtendedAbstractTestDescriptor) testDescriptor).getStopWatch();
-                    string += " " + stopWatch.elapsedTime(TimeUnit.MILLISECONDS) + " ms";
+                    if (testDescriptor instanceof ExtendedAbstractTestDescriptor) {
+                        ExtendedAbstractTestDescriptor extendedAbstractTestDescriptor =
+                                (ExtendedAbstractTestDescriptor) testDescriptor;
+                        StopWatch stopWatch = extendedAbstractTestDescriptor.getStopWatch();
+                        stopWatch.stop();
+                        stringBuilder
+                                .append(" ")
+                                .append(stopWatch.elapsedTime(TimeUnit.MILLISECONDS))
+                                .append(" ms");
+                    }
 
                     System.out.println(INFO + Thread.currentThread().getName() + " | " + string);
                     System.out.flush();
