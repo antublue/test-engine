@@ -44,15 +44,17 @@ public class HumanReadableTimeTest {
 
     @TestEngine.Test
     public void testHumanReadableTime() {
-        long milliseconds = humanReadableTimeTestArgument.milliseconds();
+        long nanoseconds = (long) (humanReadableTimeTestArgument.milliseconds() * 1e+6);
         String expectedHumanReadableTime = humanReadableTimeTestArgument.humanReadableTime();
-        String actualHumanReadableTime = HumanReadableTime.toHumanReadable(milliseconds);
+        String actualHumanReadableTime = HumanReadableTime.toHumanReadable(nanoseconds);
 
         if (!actualHumanReadableTime.equals(expectedHumanReadableTime)) {
             fail(
                     String.format(
                             "testHumanReadableTime() milliseconds [%d] expected [%s] actual [%s]",
-                            milliseconds, expectedHumanReadableTime, actualHumanReadableTime));
+                            humanReadableTimeTestArgument.milliseconds(),
+                            expectedHumanReadableTime,
+                            actualHumanReadableTime));
         }
     }
 

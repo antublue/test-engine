@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.TestEngine;
@@ -35,6 +34,7 @@ import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
+import org.antublue.test.engine.internal.util.NanosecondsConverter;
 import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
@@ -84,10 +84,11 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                     "------------------------------------------------------------------------");
 
     private final Summary summary;
+    private final boolean logTiming;
+    private final NanosecondsConverter nanoSecondsConverter;
     private final boolean logTestMessages;
     private final boolean logPassMessages;
     private final boolean logSkipMessages;
-    private final boolean logTiming;
 
     /**
      * Constructor
@@ -111,6 +112,14 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                         .orElse(true);
 
         LOGGER.trace("configuration [%s] = [%b]", Constants.LOG_TIMING, logTiming);
+
+        nanoSecondsConverter =
+                configurationParameters
+                        .get(Constants.LOG_TIMING_UNITS)
+                        .map(NanosecondsConverter::decode)
+                        .orElse(NanosecondsConverter.MILLISECONDS);
+
+        LOGGER.trace("configuration [%s] = [%s]", Constants.LOG_TIMING_UNITS, nanoSecondsConverter);
 
         logTestMessages =
                 configurationParameters
@@ -306,8 +315,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                     stopWatch.stop();
                     stringBuilder
                             .append(" ")
-                            .append(stopWatch.elapsedTime(TimeUnit.MILLISECONDS))
-                            .append(" ms");
+                            .append(nanoSecondsConverter.toString(stopWatch.elapsedTime()));
                 }
 
                 System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
@@ -402,8 +410,9 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                         string +=
                                 new StringBuilder()
                                         .append(" ")
-                                        .append(stopWatch.elapsedTime(TimeUnit.MILLISECONDS))
-                                        .append(" ms");
+                                        .append(
+                                                nanoSecondsConverter.toString(
+                                                        stopWatch.elapsedTime()));
                     }
 
                     System.out.println(INFO + Thread.currentThread().getName() + " | " + string);
@@ -530,8 +539,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                                 "Total Test Time : "
                                         + HumanReadableTime.toHumanReadable(elapsedTime, false)
                                         + " ("
-                                        + elapsedTime
-                                        + " ms)"));
+                                        + NanosecondsConverter.MILLISECONDS.convert(elapsedTime))
+                        + " ms)");
 
         System.out.println(
                 INFO

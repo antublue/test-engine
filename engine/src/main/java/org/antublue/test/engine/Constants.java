@@ -44,7 +44,7 @@ public final class Constants {
     public static final String LOG_TIMING = CONSOLE + ".log.timing";
 
     /** Configuration constant */
-    public static final String TIMING_UNITS = LOG_TIMING + ".units";
+    public static final String LOG_TIMING_UNITS = LOG_TIMING + ".units";
 
     /** Configuration constant */
     public static final String LOG_TEST_MESSAGES = CONSOLE + ".log.test.messages";

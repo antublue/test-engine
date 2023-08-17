@@ -277,7 +277,17 @@ The properties filename is resolved using the following in order:
 | antublue.test.engine.test.method.tag.exclude   | regex string |                      |
 | antublue.test.engine.test.class.shuffle        | boolean      | false                |
 | antublue.test.engine.console.log.timing        | boolean      | true                 |
+| antublue.test.engine.console.log.timing.units  | string       | milliseconds         |
 | antublue.test.engine.console.log.test.messages | boolean      | true                 |
+
+**Notes**
+
+`antublue.test.engine.console.log.timing.units` supports the following values:
+
+- `nanoseconds`
+- `microseconds`
+- `milliseconds`
+- `seconds`
 
 ### Experimental Test Engine Configuration
 

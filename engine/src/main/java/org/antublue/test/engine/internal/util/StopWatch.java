@@ -16,14 +16,8 @@
 
 package org.antublue.test.engine.internal.util;
 
-import java.util.concurrent.TimeUnit;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
-
 /** Class to implement a stop watch */
 public class StopWatch {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(StopWatch.class);
 
     private long startNanoTime;
     private long stopNanoTime;
@@ -35,7 +29,6 @@ public class StopWatch {
      */
     public StopWatch start() {
         startNanoTime = System.nanoTime();
-        LOGGER.trace("start [%d]", startNanoTime);
         return this;
     }
 
@@ -46,28 +39,15 @@ public class StopWatch {
      */
     public StopWatch stop() {
         stopNanoTime = System.nanoTime();
-        LOGGER.trace("stop [%d]", stopNanoTime);
         return this;
-    }
-
-    /**
-     * Method to get the elapsed time in milliseconds
-     *
-     * @return the elapsed time in milliseconds
-     */
-    public long elapsedTime() {
-        long elapsedTime = elapsedTime(TimeUnit.MILLISECONDS);
-        LOGGER.trace("elapsedTime [%d]", elapsedTime);
-        return elapsedTime;
     }
 
     /**
      * Method to get the elapsed time
      *
-     * @param timeUnit timeUnit
-     * @return the elapsed time based on the timeUnit
+     * @return the elapsed time in nanoseconds
      */
-    public long elapsedTime(TimeUnit timeUnit) {
-        return timeUnit.convert(stopNanoTime - startNanoTime, TimeUnit.NANOSECONDS);
+    public long elapsedTime() {
+        return stopNanoTime - startNanoTime;
     }
 }

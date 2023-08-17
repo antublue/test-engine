@@ -44,20 +44,21 @@ public final class HumanReadableTime {
     /**
      * Method to convert a duration into a human-readable time
      *
-     * @param duration duration
+     * @param nanoseconds nanoseconds
      * @param useShortFormat useShortFormat
      * @return the return value
      */
-    public static String toHumanReadable(long duration, boolean useShortFormat) {
-        long durationPositive = duration > 0 ? duration : -duration;
-
-        long hours = TimeUnit.MILLISECONDS.toHours(durationPositive);
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(durationPositive) - (hours * 60);
+    public static String toHumanReadable(long nanoseconds, boolean useShortFormat) {
+        long nanosecondsPositive = nanoseconds > 0 ? nanoseconds : -nanoseconds;
+        long millisecondsDuration =
+                (long) NanosecondsConverter.MILLISECONDS.convert(nanosecondsPositive);
+        long hours = TimeUnit.MILLISECONDS.toHours(millisecondsDuration);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millisecondsDuration) - (hours * 60);
         long seconds =
-                TimeUnit.MILLISECONDS.toSeconds(durationPositive)
+                TimeUnit.MILLISECONDS.toSeconds(millisecondsDuration)
                         - ((hours * 60 * 60) + (minutes * 60));
         long milliseconds =
-                durationPositive
+                millisecondsDuration
                         - ((hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
 
         StringBuilder stringBuilder = new StringBuilder();
