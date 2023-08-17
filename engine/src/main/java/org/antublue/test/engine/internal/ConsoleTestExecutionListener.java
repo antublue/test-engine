@@ -485,7 +485,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                     .append("SKIPPED")
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
-                    .append(pad(summary.getTestClassesSkippedCount(), column4Width));
+                    .append(pad(summary.getTestClassesSkippedCount(), column4Width))
+                    .color(AnsiColor.RESET);
 
             System.out.println(ansiColorStringBuilder);
             ansiColorStringBuilder.setLength(0);
@@ -513,7 +514,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                     .append("SKIPPED")
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append(" : ")
-                    .append(pad(summary.getTestsSkippedCount(), column4Width));
+                    .append(pad(summary.getTestsSkippedCount(), column4Width))
+                    .color(AnsiColor.RESET);
 
             System.out.println(ansiColorStringBuilder);
             ansiColorStringBuilder.setLength(0);

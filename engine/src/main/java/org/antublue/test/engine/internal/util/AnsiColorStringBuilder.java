@@ -173,19 +173,8 @@ public class AnsiColorStringBuilder {
         return this;
     }
 
-    /**
-     * Method to append a StringBuilder
-     *
-     * @param stringBuilder StringBuilder
-     * @return this
-     */
-    public AnsiColorStringBuilder append(StringBuilder stringBuilder) {
-        stringBuilder.append(stringBuilder);
-        return this;
-    }
-
     @Override
     public String toString() {
-        return stringBuilder.append(AnsiColor.RESET).toString();
+        return stringBuilder.toString();
     }
 }

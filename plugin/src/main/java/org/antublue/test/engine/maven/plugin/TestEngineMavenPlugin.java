@@ -69,6 +69,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                     .color(AnsiColor.WHITE_BRIGHT)
                     .append(" Test Engine Maven Plugin ")
                     .append(VERSION)
+                    .color(AnsiColor.RESET)
                     .toString();
 
     private static final String SEPARATOR =
@@ -293,6 +294,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                         .append("INFO")
                         .color(AnsiColor.RESET)
                         .append("] ")
-                        .append(message));
+                        .append(message)
+                        .color(AnsiColor.RESET));
     }
 }
