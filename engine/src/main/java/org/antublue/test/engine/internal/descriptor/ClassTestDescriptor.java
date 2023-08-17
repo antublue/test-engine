@@ -37,15 +37,15 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private enum State {
         BEGIN,
-        PRE_PREPARE,
+        BEFORE_PREPARE,
         PREPARE,
-        POST_PREPARE,
+        AFTER_PREPARE,
         EXECUTE,
         SKIP,
         SKIP_END,
-        PRE_CONCLUDE,
+        BEFORE_CONCLUDE,
         CONCLUDE,
-        POST_CONCLUDE,
+        AFTER_CONCLUDE,
         END
     }
 
@@ -69,15 +69,15 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         this.stateMachine =
                 new StateMachine<State>(getClass().getName())
                         .addTransition(State.BEGIN, this::begin)
-                        .addTransition(State.PRE_PREPARE, this::beforePrepare)
+                        .addTransition(State.BEFORE_PREPARE, this::beforePrepare)
                         .addTransition(State.PREPARE, this::prepare)
-                        .addTransition(State.POST_PREPARE, this::afterPrepare)
+                        .addTransition(State.AFTER_PREPARE, this::afterPrepare)
                         .addTransition(State.EXECUTE, this::execute)
                         .addTransition(State.SKIP, this::skip)
                         .addTransition(State.SKIP_END, this::skipEnd)
-                        .addTransition(State.PRE_CONCLUDE, this::beforeConclude)
+                        .addTransition(State.BEFORE_CONCLUDE, this::beforeConclude)
                         .addTransition(State.CONCLUDE, this::conclude)
-                        .addTransition(State.POST_CONCLUDE, this::afterConclude)
+                        .addTransition(State.AFTER_CONCLUDE, this::afterConclude)
                         .addTransition(State.END, this::end);
     }
 
@@ -167,7 +167,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
             executorContext.setTestInstance(testInstance);
 
-            stateMachine.signal(State.PRE_PREPARE);
+            stateMachine.signal(State.BEFORE_PREPARE);
         } catch (Throwable t) {
             Throwable prunedThrowable = prune(testClass, t);
             throwables.add(prunedThrowable);
@@ -213,7 +213,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
-            stateMachine.signal(State.POST_PREPARE);
+            stateMachine.signal(State.AFTER_PREPARE);
             System.out.flush();
         }
     }
@@ -257,7 +257,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
-            stateMachine.signal(State.PRE_CONCLUDE);
+            stateMachine.signal(State.BEFORE_CONCLUDE);
             System.out.flush();
         }
     }
@@ -281,7 +281,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
-            stateMachine.signal(State.PRE_CONCLUDE);
+            stateMachine.signal(State.BEFORE_CONCLUDE);
             System.out.flush();
         }
     }
@@ -349,7 +349,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
-            stateMachine.signal(State.POST_CONCLUDE);
+            stateMachine.signal(State.AFTER_CONCLUDE);
             System.out.flush();
         }
     }

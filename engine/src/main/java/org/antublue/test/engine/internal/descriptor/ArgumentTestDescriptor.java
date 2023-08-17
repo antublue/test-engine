@@ -47,15 +47,15 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
     private enum State {
         BEGIN,
-        PRE_BEFORE_ALL,
+        BEFORE_BEFORE_ALL,
         BEFORE_ALL,
-        POST_BEFORE_ALL,
+        AFTER_BEFORE_ALL,
         EXECUTE,
         SKIP,
         SKIP_END,
-        PRE_AFTER_ALL,
+        BEFORE_AFTER_ALL,
         AFTER_ALL,
-        POST_AFTER_ALL,
+        AFTER_AFTER_ALL,
         END
     }
 
@@ -76,15 +76,15 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         this.stateMachine =
                 new StateMachine<State>(getClass().getName())
                         .addTransition(State.BEGIN, this::begin)
-                        .addTransition(State.PRE_BEFORE_ALL, this::beforeBeforeAll)
+                        .addTransition(State.BEFORE_BEFORE_ALL, this::beforeBeforeAll)
                         .addTransition(State.BEFORE_ALL, this::beforeAll)
-                        .addTransition(State.POST_BEFORE_ALL, this::afterBeforeAll)
+                        .addTransition(State.AFTER_BEFORE_ALL, this::afterBeforeAll)
                         .addTransition(State.EXECUTE, this::execute)
                         .addTransition(State.SKIP, this::skip)
                         .addTransition(State.SKIP_END, this::skipEnd)
-                        .addTransition(State.PRE_AFTER_ALL, this::beforeAfterAll)
+                        .addTransition(State.BEFORE_AFTER_ALL, this::beforeAfterAll)
                         .addTransition(State.AFTER_ALL, this::afterAll)
-                        .addTransition(State.POST_AFTER_ALL, this::afterAfterAll)
+                        .addTransition(State.AFTER_AFTER_ALL, this::afterAfterAll)
                         .addTransition(State.END, this::end);
     }
 
@@ -191,7 +191,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 optionalField.get().set(testInstance, testArgument);
             }
 
-            stateMachine.signal(State.PRE_BEFORE_ALL);
+            stateMachine.signal(State.BEFORE_BEFORE_ALL);
         } catch (Throwable t) {
             Throwable prunedThrowable = prune(testClass, t);
             throwables.add(prunedThrowable);
@@ -244,7 +244,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
-            stateMachine.signal(State.POST_BEFORE_ALL);
+            stateMachine.signal(State.AFTER_BEFORE_ALL);
             System.out.flush();
         }
     }
@@ -287,7 +287,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
-            stateMachine.signal(State.PRE_AFTER_ALL);
+            stateMachine.signal(State.BEFORE_AFTER_ALL);
             System.out.flush();
         }
     }
@@ -313,7 +313,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
-            stateMachine.signal(State.PRE_AFTER_ALL);
+            stateMachine.signal(State.BEFORE_AFTER_ALL);
             System.out.flush();
         }
     }
@@ -390,7 +390,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
-            stateMachine.signal(State.POST_AFTER_ALL);
+            stateMachine.signal(State.AFTER_AFTER_ALL);
             System.out.flush();
         }
     }

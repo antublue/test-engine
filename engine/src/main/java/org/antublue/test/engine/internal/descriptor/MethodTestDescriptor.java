@@ -38,15 +38,15 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
     private enum State {
         BEGIN,
-        PRE_BEFORE_EACH,
+        BEFORE_BEFORE_EACH,
         BEFORE_EACH,
-        POST_BEFORE_EACH,
-        PRE_TEST,
+        AFTER_BEFORE_EACH,
+        BEFORE_TEST,
         TEST,
-        POST_TEST,
-        PRE_AFTER_EACH,
+        AFTER_TEST,
+        BEFORE_AFTER_EACH,
         AFTER_EACH,
-        POST_AFTER_EACH,
+        AFTER_AFTER_EACH,
         END
     }
 
@@ -82,15 +82,15 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         this.stateMachine =
                 new StateMachine<State>(getClass().getName())
                         .addTransition(State.BEGIN, this::begin)
-                        .addTransition(State.PRE_BEFORE_EACH, this::beforeBeforeEach)
+                        .addTransition(State.BEFORE_BEFORE_EACH, this::beforeBeforeEach)
                         .addTransition(State.BEFORE_EACH, this::beforeEach)
-                        .addTransition(State.POST_BEFORE_EACH, this::afterBeforeEach)
-                        .addTransition(State.PRE_TEST, this::beforeTest)
+                        .addTransition(State.AFTER_BEFORE_EACH, this::afterBeforeEach)
+                        .addTransition(State.BEFORE_TEST, this::beforeTest)
                         .addTransition(State.TEST, this::test)
-                        .addTransition(State.POST_TEST, this::afterTest)
-                        .addTransition(State.PRE_AFTER_EACH, this::beforeAfterEach)
+                        .addTransition(State.AFTER_TEST, this::afterTest)
+                        .addTransition(State.BEFORE_AFTER_EACH, this::beforeAfterEach)
                         .addTransition(State.AFTER_EACH, this::afterEach)
-                        .addTransition(State.POST_AFTER_EACH, this::afterAfterEach)
+                        .addTransition(State.AFTER_AFTER_EACH, this::afterAfterEach)
                         .addTransition(State.END, this::end);
     }
 
@@ -197,7 +197,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     .getEngineExecutionListener()
                     .executionStarted(this);
             testInstance = executorContext.getTestInstance();
-            stateMachine.signal(State.PRE_BEFORE_EACH);
+            stateMachine.signal(State.BEFORE_BEFORE_EACH);
         } finally {
             System.out.flush();
         }
@@ -245,7 +245,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
-            stateMachine.signal(State.POST_BEFORE_EACH);
+            stateMachine.signal(State.AFTER_BEFORE_EACH);
             System.out.flush();
         }
     }
@@ -261,9 +261,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
         if (throwables.isEmpty()) {
-            stateMachine.signal(State.PRE_TEST);
+            stateMachine.signal(State.BEFORE_TEST);
         } else {
-            stateMachine.signal(State.PRE_AFTER_EACH);
+            stateMachine.signal(State.BEFORE_AFTER_EACH);
         }
     }
 
@@ -307,7 +307,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
-            stateMachine.signal(State.POST_TEST);
+            stateMachine.signal(State.AFTER_TEST);
             System.out.flush();
         }
     }
@@ -321,7 +321,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         LOGGER.trace(
                 "afterTest uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
-        stateMachine.signal(State.PRE_AFTER_EACH);
+        stateMachine.signal(State.BEFORE_AFTER_EACH);
     }
 
     /**
@@ -370,7 +370,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
-            stateMachine.signal(State.POST_AFTER_EACH);
+            stateMachine.signal(State.AFTER_AFTER_EACH);
             System.out.flush();
         }
     }
