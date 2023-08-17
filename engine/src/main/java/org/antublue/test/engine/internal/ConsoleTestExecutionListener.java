@@ -199,10 +199,9 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                                         .get(testIdentifier.getUniqueIdObject())
                                         .ifPresent(TestDescriptorUtils::logTestDescriptorTree));
 
-        System.out.println(INFO + SEPARATOR);
-        System.out.println(INFO + BANNER);
-        System.out.println(INFO + SEPARATOR);
-        System.out.flush();
+        println(INFO + SEPARATOR);
+        println(INFO + BANNER);
+        println(INFO + SEPARATOR);
     }
 
     /**
@@ -256,7 +255,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
             }
 
             if (stringBuilder.length() > 0) {
-                System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
+                println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
                 System.out.flush();
             }
         }
@@ -318,7 +317,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                             .append(nanoSecondsConverter.toString(stopWatch.elapsedTime()));
                 }
 
-                System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
+                println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
                 System.out.flush();
             }
         }
@@ -415,7 +414,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                                                         stopWatch.elapsedTime()));
                     }
 
-                    System.out.println(INFO + Thread.currentThread().getName() + " | " + string);
+                    println(INFO + Thread.currentThread().getName() + " | " + string);
                     System.out.flush();
                 }
             }
@@ -431,9 +430,9 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
     public void testPlanExecutionFinished(TestPlan testPlan) {
         summary.testPlanExecutionFinished(testPlan);
 
-        System.out.println(INFO + SEPARATOR);
-        System.out.println(INFO + SUMMARY_BANNER);
-        System.out.println(INFO + SEPARATOR);
+        println(INFO + SEPARATOR);
+        println(INFO + SUMMARY_BANNER);
+        println(INFO + SEPARATOR);
 
         if (summary.getTestClassCount() != 0) {
             long column1Width =
@@ -488,7 +487,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                     .append(pad(summary.getTestClassesSkippedCount(), column4Width))
                     .color(AnsiColor.RESET);
 
-            System.out.println(ansiColorStringBuilder);
+            println(ansiColorStringBuilder);
             ansiColorStringBuilder.setLength(0);
 
             ansiColorStringBuilder
@@ -517,25 +516,25 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                     .append(pad(summary.getTestsSkippedCount(), column4Width))
                     .color(AnsiColor.RESET);
 
-            System.out.println(ansiColorStringBuilder);
+            println(ansiColorStringBuilder);
             ansiColorStringBuilder.setLength(0);
         } else {
-            System.out.println(INFO + AnsiColor.RED_BOLD_BRIGHT.apply("NO TESTS FOUND"));
+            println(INFO + AnsiColor.RED_BOLD_BRIGHT.apply("NO TESTS FOUND"));
         }
 
-        System.out.println(INFO + SEPARATOR);
+        println(INFO + SEPARATOR);
 
         if (hasFailures()) {
-            System.out.println(INFO + FAIL);
+            println(INFO + FAIL);
         } else {
-            System.out.println(INFO + PASS);
+            println(INFO + PASS);
         }
 
         long elapsedTime = summary.getStopWatch().elapsedTime();
 
-        System.out.println(INFO + SEPARATOR);
+        println(INFO + SEPARATOR);
 
-        System.out.println(
+        println(
                 INFO
                         + AnsiColor.WHITE_BRIGHT.apply(
                                 "Total Test Time : "
@@ -544,13 +543,13 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                                         + NanosecondsConverter.MILLISECONDS.convert(elapsedTime))
                         + " ms)");
 
-        System.out.println(
+        println(
                 INFO
                         + AnsiColor.WHITE_BRIGHT.apply(
                                 "Finished At     : " + HumanReadableTime.now()));
 
         if (!hasFailures()) {
-            System.out.println(INFO + SEPARATOR);
+            println(INFO + SEPARATOR);
         }
 
         System.out.flush();
@@ -588,6 +587,16 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
         }
 
         return paddingStringBuilder.append(stringValue).toString();
+    }
+
+    /**
+     * Method to println an Object
+     *
+     * @param object object
+     */
+    private void println(Object object) {
+        System.out.println(object);
+        System.out.flush();
     }
 
     /** Class to implement test summary metrics */
