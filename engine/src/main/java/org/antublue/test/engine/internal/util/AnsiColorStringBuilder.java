@@ -46,13 +46,15 @@ public class AnsiColorStringBuilder {
     }
 
     /**
-     * Method to set the current color
+     * Method to set the current color. If the color is null, defaults to AnsiColor.RESET
      *
      * @param ansiColor ansiColor
      * @return this
      */
     public AnsiColorStringBuilder color(AnsiColor ansiColor) {
-        if (ansiColor != null) {
+        if (ansiColor == null) {
+            stringBuilder.append(AnsiColor.RESET);
+        } else {
             stringBuilder.append(ansiColor);
         }
 
@@ -167,7 +169,7 @@ public class AnsiColorStringBuilder {
      * @return this
      */
     public AnsiColorStringBuilder append(StringBuilder stringBuilder) {
-        stringBuilder.append(stringBuilder.toString());
+        stringBuilder.append(stringBuilder);
         return this;
     }
 

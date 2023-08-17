@@ -108,32 +108,6 @@ public class AnsiColor {
     /** AnsiColor constant */
     public static final AnsiColor WHITE_UNDERLINED = new AnsiColor("\033[4;37m"); // WHITE
 
-    // Background
-
-    /** AnsiColor constant */
-    public static final AnsiColor BLACK_BACKGROUND = new AnsiColor("\033[40m"); // BLACK
-
-    /** AnsiColor constant */
-    public static final AnsiColor RED_BACKGROUND = new AnsiColor("\033[41m"); // RED
-
-    /** AnsiColor constant */
-    public static final AnsiColor GREEN_BACKGROUND = new AnsiColor("\033[42m"); // GREEN
-
-    /** AnsiColor constant */
-    public static final AnsiColor YELLOW_BACKGROUND = new AnsiColor("\033[43m"); // YELLOW
-
-    /** AnsiColor constant */
-    public static final AnsiColor BLUE_BACKGROUND = new AnsiColor("\033[44m"); // BLUE
-
-    /** AnsiColor constant */
-    public static final AnsiColor PURPLE_BACKGROUND = new AnsiColor("\033[45m"); // PURPLE
-
-    /** AnsiColor constant */
-    public static final AnsiColor CYAN_BACKGROUND = new AnsiColor("\033[46m"); // CYAN
-
-    /** AnsiColor constant */
-    public static final AnsiColor WHITE_BACKGROUND = new AnsiColor("\033[47m"); // WHITE
-
     // High Intensity
 
     /** AnsiColor constant */
@@ -187,6 +161,32 @@ public class AnsiColor {
     /** AnsiColor constant */
     public static final AnsiColor WHITE_BOLD_BRIGHT = new AnsiColor("\033[1;97m"); // WHITE
 
+    // Background
+
+    /** AnsiColor constant */
+    public static final AnsiColor BLACK_BACKGROUND = new AnsiColor("\033[40m"); // BLACK
+
+    /** AnsiColor constant */
+    public static final AnsiColor RED_BACKGROUND = new AnsiColor("\033[41m"); // RED
+
+    /** AnsiColor constant */
+    public static final AnsiColor GREEN_BACKGROUND = new AnsiColor("\033[42m"); // GREEN
+
+    /** AnsiColor constant */
+    public static final AnsiColor YELLOW_BACKGROUND = new AnsiColor("\033[43m"); // YELLOW
+
+    /** AnsiColor constant */
+    public static final AnsiColor BLUE_BACKGROUND = new AnsiColor("\033[44m"); // BLUE
+
+    /** AnsiColor constant */
+    public static final AnsiColor PURPLE_BACKGROUND = new AnsiColor("\033[45m"); // PURPLE
+
+    /** AnsiColor constant */
+    public static final AnsiColor CYAN_BACKGROUND = new AnsiColor("\033[46m"); // CYAN
+
+    /** AnsiColor constant */
+    public static final AnsiColor WHITE_BACKGROUND = new AnsiColor("\033[47m"); // WHITE
+
     // High Intensity backgrounds
 
     /** AnsiColor constant */
@@ -231,26 +231,27 @@ public class AnsiColor {
         }
     }
 
-    private final String ansiColorCodeSequence;
+    private final String escapeSequence;
 
     /**
      * Constructor
      *
-     * @param ansiColorCodeSequence ansiColorCodeSequence
+     * @param escapeSequence sequence
      */
-    private AnsiColor(String ansiColorCodeSequence) {
-        this.ansiColorCodeSequence = ansiColorCodeSequence;
+    private AnsiColor(String escapeSequence) {
+        this.escapeSequence = escapeSequence;
     }
 
     /**
-     * Method to wrap a String with an ANSI color escape sequence
+     * Method to wrap an Object's string representation (toString()) with an ANSI color escape
+     * sequence
      *
      * @param object object
      * @return the return value
      */
     public String apply(Object object) {
         if (ANSI_COLOR_SUPPORTED) {
-            return ansiColorCodeSequence + object + AnsiColor.RESET;
+            return escapeSequence + object + AnsiColor.RESET;
         } else {
             return String.valueOf(object);
         }
@@ -259,23 +260,33 @@ public class AnsiColor {
     /**
      * Method to get the ANSI color escape sequence String
      *
-     * @return the return value
+     * @return the ANSI color escape sequence if ANSI color is supported else an empty string
      */
     @Override
     public String toString() {
         if (ANSI_COLOR_SUPPORTED) {
-            return ansiColorCodeSequence;
+            return escapeSequence;
         } else {
             return EMPTY_STRING;
         }
     }
 
     /**
-     * Method to indicate whether ANSI color sequences are supported
+     * Method to indicate whether ANSI color escape sequences are supported
      *
      * @return the return value
      */
     public static boolean isSupported() {
         return ANSI_COLOR_SUPPORTED;
+    }
+
+    /**
+     * Method to get an ANSI color for a custom ANSI color escape sequence
+     *
+     * @param escapeSequence escapeSequence
+     * @return an AnsiColor
+     */
+    public static AnsiColor ofSequence(String escapeSequence) {
+        return new AnsiColor(escapeSequence);
     }
 }
