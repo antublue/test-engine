@@ -109,7 +109,7 @@ public class StateMachine<S> {
      * Method to run the state machine
      *
      * @param state the beginning state
-     * @return Optional containing a Throwable if an exception occured during a transition, else an
+     * @return Optional containing a Throwable if an exception occurred during a transition, else an
      *     empty Optional
      */
     public Optional<Throwable> run(S state) {

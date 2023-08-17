@@ -143,10 +143,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         stateMachine
                 .run(State.BEGIN)
-                .ifPresent(
-                        throwable -> {
-                            printStackTrace(System.out, throwable);
-                        });
+                .ifPresent(throwable -> printStackTrace(System.out, throwable));
     }
 
     /**

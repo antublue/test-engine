@@ -23,7 +23,7 @@ import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
-/** Class to implement a extended EngineDescriptor */
+/** Class to implement an extended EngineDescriptor */
 @SuppressWarnings("unchecked")
 public final class ExtendedEngineDescriptor extends EngineDescriptor {
 
