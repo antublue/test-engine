@@ -20,17 +20,20 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ExtendedAbstractTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestDescriptorUtils;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.internal.util.HumanReadableTime;
+import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -283,6 +286,13 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
             }
 
             if (detailedOutput && stringBuilder.length() > 0) {
+                StopWatch stopWatch =
+                        ((ExtendedAbstractTestDescriptor) testDescriptor).getStopWatch();
+                stringBuilder
+                        .append(" ")
+                        .append(stopWatch.elapsedTime(TimeUnit.MILLISECONDS))
+                        .append(" ms");
+
                 System.out.println(INFO + Thread.currentThread().getName() + " | " + stringBuilder);
                 System.out.flush();
             }
@@ -367,6 +377,10 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                 }
 
                 if (detailedOutput && string != null) {
+                    StopWatch stopWatch =
+                            ((ExtendedAbstractTestDescriptor) testDescriptor).getStopWatch();
+                    string += " " + stopWatch.elapsedTime(TimeUnit.MILLISECONDS) + " ms";
+
                     System.out.println(INFO + Thread.currentThread().getName() + " | " + string);
                     System.out.flush();
                 }
@@ -481,7 +495,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
             System.out.println(INFO + PASS);
         }
 
-        long elapsedTime = summary.getTimeFinished() - summary.getTimeStarted();
+        long elapsedTime = summary.getStopWatch().elapsedTime();
 
         System.out.println(INFO + SEPARATOR);
 
@@ -543,9 +557,6 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
     /** Class to implement test summary metrics */
     private static class Summary {
 
-        private long startMilliseconds;
-        private long finishedMilliseconds;
-
         private final Set<Class<?>> testClasses;
         private final AtomicLong testClassesFound;
         private final AtomicLong testClassesSuccess;
@@ -561,6 +572,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
         private final AtomicLong methodsSuccess;
         private final AtomicLong methodsFailed;
         private final AtomicLong methodsSkipped;
+
+        private final StopWatch stopWatch;
 
         public Summary() {
             testClasses = Collections.synchronizedSet(new HashSet<>());
@@ -579,10 +592,8 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
             methodsSuccess = new AtomicLong();
             methodsFailed = new AtomicLong();
             methodsSkipped = new AtomicLong();
-        }
 
-        public long getTimeStarted() {
-            return startMilliseconds;
+            stopWatch = new StopWatch();
         }
 
         public long getTestClassCount() {
@@ -633,13 +644,12 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
             return methodsSkipped.get();
         }
 
-        public long getTimeFinished() {
-            return finishedMilliseconds;
+        public StopWatch getStopWatch() {
+            return stopWatch;
         }
 
         public void testPlanExecutionStarted(TestPlan testPlan) {
-            startMilliseconds = System.currentTimeMillis();
-            finishedMilliseconds = startMilliseconds;
+            stopWatch.start();
         }
 
         public void executionStarted(TestDescriptor testDescriptor) {
@@ -756,7 +766,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
         }
 
         public void testPlanExecutionFinished(TestPlan testPlan) {
-            finishedMilliseconds = System.currentTimeMillis();
+            stopWatch.stop();
         }
     }
 }

@@ -26,13 +26,14 @@ import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.ExecutorContext;
 import org.antublue.test.engine.internal.LockAnnotationUtils;
 import org.antublue.test.engine.internal.ReflectionUtils;
+import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 /** Class to implement an extended AbstractTestDescriptor */
 @SuppressWarnings("unchecked")
-abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
+public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
 
     /** ReflectionUtils */
     protected static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.singleton();
@@ -51,6 +52,8 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
     protected static final boolean EXECUTED_VIA_ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN =
             Constants.TRUE.equals(System.getProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN));
 
+    private final StopWatch stopWatch;
+
     /**
      * Constructor
      *
@@ -59,6 +62,8 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
      */
     protected ExtendedAbstractTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
+
+        stopWatch = new StopWatch();
     }
 
     /**
@@ -73,6 +78,10 @@ abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
         return getChildren().stream()
                 .map((Function<TestDescriptor, T>) testDescriptor -> (T) testDescriptor)
                 .collect(Collectors.toList());
+    }
+
+    public StopWatch getStopWatch() {
+        return stopWatch;
     }
 
     /**

@@ -176,6 +176,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         try {
+            getStopWatch().start();
+
             executorContext
                     .getExecutionRequest()
                     .getEngineExecutionListener()
@@ -427,6 +429,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
             AutoCloseAnnotationUtils.singleton()
                     .processAutoCloseAnnotatedFields(
                             testInstance, "@TestEngine.AfterAll", throwables);
+
+            getStopWatch().stop();
 
             if (throwables.isEmpty()) {
                 executorContext

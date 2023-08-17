@@ -155,6 +155,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         LOGGER.trace("begin uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
         try {
+            getStopWatch().start();
+
             executorContext
                     .getExecutionRequest()
                     .getEngineExecutionListener()
@@ -373,6 +375,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         AutoCloseAnnotationUtils.singleton()
                 .processAutoCloseAnnotatedFields(testInstance, "@TestEngine.Conclude", throwables);
+
+        getStopWatch().stop();
 
         if (throwables.isEmpty()) {
             executorContext

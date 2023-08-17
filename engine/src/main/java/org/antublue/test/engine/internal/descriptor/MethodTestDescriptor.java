@@ -190,6 +190,8 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
         try {
+            getStopWatch().start();
+
             executorContext
                     .getExecutionRequest()
                     .getEngineExecutionListener()
@@ -397,6 +399,8 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         AutoCloseAnnotationUtils.singleton()
                 .processAutoCloseAnnotatedFields(testInstance, "@TestEngine.AfterEach", throwables);
+
+        getStopWatch().stop();
 
         if (throwables.isEmpty()) {
             executorContext
