@@ -163,6 +163,17 @@ public class AnsiColorStringBuilder {
     }
 
     /**
+     * Method to append an object's toString()
+     *
+     * @param object object
+     * @return this
+     */
+    public AnsiColorStringBuilder append(Object object) {
+        stringBuilder.append(object.toString());
+        return this;
+    }
+
+    /**
      * Method to append a StringBuilder
      *
      * @param stringBuilder StringBuilder
