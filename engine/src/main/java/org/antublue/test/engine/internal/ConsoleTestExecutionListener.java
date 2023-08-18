@@ -546,7 +546,7 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                                                         elapsedTime))
                                         + " ms)"));
 
-        println
+        println(
                 INFO
                         + AnsiColor.WHITE_BRIGHT.apply(
                                 "Finished At     : " + HumanReadableTime.now()));
