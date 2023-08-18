@@ -540,10 +540,13 @@ public class ConsoleTestExecutionListener implements TestExecutionListener {
                                 "Total Test Time : "
                                         + HumanReadableTime.toHumanReadable(elapsedTime, false)
                                         + " ("
-                                        + NanosecondsConverter.MILLISECONDS.convert(elapsedTime))
-                        + " ms)");
+                                        + String.format(
+                                                "%.3f",
+                                                NanosecondsConverter.MILLISECONDS.convert(
+                                                        elapsedTime))
+                                        + " ms)"));
 
-        println(
+        println
                 INFO
                         + AnsiColor.WHITE_BRIGHT.apply(
                                 "Finished At     : " + HumanReadableTime.now()));

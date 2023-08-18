@@ -87,7 +87,7 @@ public class NanosecondsConverter {
             return String.format("%d %s", nanoseconds, suffix);
         }
 
-        return String.format("%.4f %s", ((double) nanoseconds) / factor, suffix);
+        return String.format("%.3f %s", ((double) nanoseconds) / factor, suffix);
     }
 
     /**
