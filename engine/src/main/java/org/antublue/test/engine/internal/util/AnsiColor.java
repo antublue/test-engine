@@ -19,7 +19,6 @@ package org.antublue.test.engine.internal.util;
 import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE;
 
 /** Class to implement ANSI colors */
-// Based on https://www.w3schools.blog/ansi-colors-java
 public class AnsiColor {
 
     private static final String NO_COLOR = "NO_COLOR";
@@ -132,8 +131,7 @@ public class AnsiColor {
     public static final AnsiColor CYAN_BRIGHT = new AnsiColor("\033[0;96m"); // CYAN
 
     /** AnsiColor constant */
-    public static final AnsiColor WHITE_BRIGHT =
-            new AnsiColor("\033[1;97m"); // "\033[38;2;255;255;255m");  // WHITE
+    public static final AnsiColor WHITE_BRIGHT = new AnsiColor("\033[1;97m");
 
     // Bold High Intensity
 
@@ -216,11 +214,7 @@ public class AnsiColor {
     private static boolean ANSI_COLOR_SUPPORTED;
 
     static {
-        if (System.console() != null) {
-            ANSI_COLOR_SUPPORTED = true;
-        } else {
-            ANSI_COLOR_SUPPORTED = false;
-        }
+        ANSI_COLOR_SUPPORTED = System.console() != null;
 
         if (ONE.equals(System.getenv(NO_COLOR))) {
             ANSI_COLOR_SUPPORTED = false;
@@ -278,6 +272,15 @@ public class AnsiColor {
      */
     public static boolean isSupported() {
         return ANSI_COLOR_SUPPORTED;
+    }
+
+    /**
+     * Method to set/force ANSI color escape sequences to be supported
+     *
+     * @param ansiColorSupported ansiColorSupported
+     */
+    public static void setSupported(boolean ansiColorSupported) {
+        ANSI_COLOR_SUPPORTED = ansiColorSupported;
     }
 
     /**
