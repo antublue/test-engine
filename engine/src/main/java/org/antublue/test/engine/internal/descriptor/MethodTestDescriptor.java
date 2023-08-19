@@ -243,7 +243,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 }
             }
         } catch (Throwable t) {
-            Throwable prunedThrowable = prune(testClass, t);
+            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
@@ -305,7 +305,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 System.out.flush();
             }
         } catch (Throwable t) {
-            Throwable prunedThrowable = prune(testClass, t);
+            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
@@ -359,7 +359,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                         method.invoke(testInstance, NO_OBJECT_ARGS);
                     }
                 } catch (Throwable t) {
-                    Throwable prunedThrowable = prune(testClass, t);
+                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 } finally {
@@ -368,7 +368,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 }
             }
         } catch (Throwable t) {
-            Throwable prunedThrowable = prune(testClass, t);
+            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {

@@ -196,7 +196,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
             stateMachine.signal(State.BEFORE_BEFORE_ALL);
         } catch (Throwable t) {
-            Throwable prunedThrowable = prune(testClass, t);
+            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
             stateMachine.signal(State.SKIP);
@@ -243,7 +243,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 }
             }
         } catch (Throwable t) {
-            Throwable prunedThrowable = prune(testClass, t);
+            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
@@ -286,7 +286,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 methodTestDescriptor.execute(executorContext);
             }
         } catch (Throwable t) {
-            Throwable prunedThrowable = prune(testClass, t);
+            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
@@ -312,7 +312,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 methodTestDescriptor.skip(executorContext);
             }
         } catch (Throwable t) {
-            Throwable prunedThrowable = prune(testClass, t);
+            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
@@ -338,7 +338,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 methodTestDescriptor.skip(executorContext);
             }
         } catch (Throwable t) {
-            Throwable prunedThrowable = prune(testClass, t);
+            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
@@ -380,7 +380,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                         method.invoke(testInstance, NO_OBJECT_ARGS);
                     }
                 } catch (Throwable t) {
-                    Throwable prunedThrowable = prune(testClass, t);
+                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 } finally {
@@ -389,7 +389,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 }
             }
         } catch (Throwable t) {
-            Throwable prunedThrowable = prune(testClass, t);
+            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
             throwables.add(prunedThrowable);
             printStackTrace(System.out, prunedThrowable);
         } finally {
