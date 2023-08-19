@@ -32,8 +32,6 @@ public final class TestDescriptorUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptorUtils.class);
 
-    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.singleton();
-
     /** Constructor */
     private TestDescriptorUtils() {
         // DO NOTHING
@@ -49,7 +47,8 @@ public final class TestDescriptorUtils {
     public static ClassTestDescriptor createClassTestDescriptor(UniqueId uniqueId, Class<?> clazz) {
         validateTestClass(clazz);
 
-        return new ClassTestDescriptor(uniqueId, REFLECTION_UTILS.getDisplayName(clazz), clazz);
+        return new ClassTestDescriptor(
+                uniqueId, ReflectionUtils.singleton().getDisplayName(clazz), clazz);
     }
 
     /**
@@ -81,7 +80,11 @@ public final class TestDescriptorUtils {
         validateTestClass(clazz);
 
         return new MethodTestDescriptor(
-                uniqueId, REFLECTION_UTILS.getDisplayName(method), clazz, method, argument);
+                uniqueId,
+                ReflectionUtils.singleton().getDisplayName(method),
+                clazz,
+                method,
+                argument);
     }
 
     /**
@@ -144,7 +147,7 @@ public final class TestDescriptorUtils {
 
     private static void validateTestClass(Class<?> clazz) {
         // Validate we have a @TestEngine.ArgumentSupplier method
-        if (REFLECTION_UTILS.getArgumentSupplierMethod(clazz) == null) {
+        if (ReflectionUtils.singleton().getArgumentSupplierMethod(clazz) == null) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a static @TestEngine.ArgumentSupplier"
@@ -153,7 +156,7 @@ public final class TestDescriptorUtils {
         }
 
         // Validate we have a @TestEngine.Test method
-        if (REFLECTION_UTILS.getTestMethods(clazz).size() < 1) {
+        if (ReflectionUtils.singleton().getTestMethods(clazz).size() < 1) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a @TestEngine.Test method",
@@ -162,11 +165,11 @@ public final class TestDescriptorUtils {
 
         // Get other method optional annotated methods
         // which will check for duplicate @TestEngine.Order values
-        REFLECTION_UTILS.getPrepareMethods(clazz);
-        REFLECTION_UTILS.getBeforeAllMethods(clazz);
-        REFLECTION_UTILS.getBeforeEachMethods(clazz);
-        REFLECTION_UTILS.getAfterEachMethods(clazz);
-        REFLECTION_UTILS.getAfterAllMethods(clazz);
-        REFLECTION_UTILS.getConcludeMethods(clazz);
+        ReflectionUtils.singleton().getPrepareMethods(clazz);
+        ReflectionUtils.singleton().getBeforeAllMethods(clazz);
+        ReflectionUtils.singleton().getBeforeEachMethods(clazz);
+        ReflectionUtils.singleton().getAfterEachMethods(clazz);
+        ReflectionUtils.singleton().getAfterAllMethods(clazz);
+        ReflectionUtils.singleton().getConcludeMethods(clazz);
     }
 }

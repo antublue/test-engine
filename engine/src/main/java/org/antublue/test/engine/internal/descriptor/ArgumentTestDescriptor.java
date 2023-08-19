@@ -24,6 +24,8 @@ import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.AutoCloseAnnotationUtils;
 import org.antublue.test.engine.internal.ExecutorContext;
+import org.antublue.test.engine.internal.LockAnnotationUtils;
+import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
@@ -96,7 +98,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
     @Override
     public Optional<TestSource> getSource() {
         return Optional.of(
-                MethodSource.from(REFLECTION_UTILS.getArgumentSupplierMethod(testClass)));
+                MethodSource.from(
+                        ReflectionUtils.singleton().getArgumentSupplierMethod(testClass)));
     }
 
     /**
@@ -185,7 +188,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
             testInstance = executorContext.getTestInstance();
 
-            Optional<Field> optionalField = REFLECTION_UTILS.getArgumentField(testClass);
+            Optional<Field> optionalField = ReflectionUtils.singleton().getArgumentField(testClass);
             if (optionalField.isPresent()) {
                 LOGGER.trace("injecting test argument");
                 optionalField.get().set(testInstance, testArgument);
@@ -225,17 +228,17 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         try {
-            List<Method> methods = REFLECTION_UTILS.getBeforeAllMethods(testClass);
+            List<Method> methods = ReflectionUtils.singleton().getBeforeAllMethods(testClass);
             for (Method method : methods) {
                 try {
-                    LOCK_ANNOTATION_UTILS.processLockAnnotations(method);
-                    if (REFLECTION_UTILS.acceptsArgument(method, testArgument)) {
+                    LockAnnotationUtils.singleton().processLockAnnotations(method);
+                    if (ReflectionUtils.singleton().acceptsArgument(method, testArgument)) {
                         method.invoke(testInstance, testArgument);
                     } else {
                         method.invoke(testInstance, NO_OBJECT_ARGS);
                     }
                 } finally {
-                    LOCK_ANNOTATION_UTILS.processUnlockAnnotations(method);
+                    LockAnnotationUtils.singleton().processUnlockAnnotations(method);
                     System.out.flush();
                 }
             }
@@ -367,11 +370,11 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         try {
-            List<Method> methods = REFLECTION_UTILS.getAfterAllMethods(testClass);
+            List<Method> methods = ReflectionUtils.singleton().getAfterAllMethods(testClass);
             for (Method method : methods) {
                 try {
-                    LOCK_ANNOTATION_UTILS.processLockAnnotations(method);
-                    if (REFLECTION_UTILS.acceptsArgument(method, testArgument)) {
+                    LockAnnotationUtils.singleton().processLockAnnotations(method);
+                    if (ReflectionUtils.singleton().acceptsArgument(method, testArgument)) {
                         method.invoke(testInstance, testArgument);
                     } else {
                         method.invoke(testInstance, NO_OBJECT_ARGS);
@@ -381,7 +384,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 } finally {
-                    LOCK_ANNOTATION_UTILS.processUnlockAnnotations(method);
+                    LockAnnotationUtils.singleton().processUnlockAnnotations(method);
                     System.out.flush();
                 }
             }
@@ -418,7 +421,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         try {
-            Optional<Field> optionalField = REFLECTION_UTILS.getArgumentField(testClass);
+            Optional<Field> optionalField = ReflectionUtils.singleton().getArgumentField(testClass);
             if (optionalField.isPresent()) {
                 LOGGER.trace("injecting test argument");
                 optionalField.get().set(testInstance, null);
