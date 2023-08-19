@@ -84,7 +84,7 @@ public class NanosecondsConverter {
      */
     public String toString(long nanoseconds) {
         if (factor == 1f) {
-            return String.format("%d %s", nanoseconds, suffix);
+            return nanoseconds + " " + suffix;
         }
 
         return String.format("%.3f %s", ((double) nanoseconds) / factor, suffix);

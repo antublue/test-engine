@@ -156,7 +156,7 @@ public final class TestDescriptorUtils {
         }
 
         // Validate we have a @TestEngine.Test method
-        if (ReflectionUtils.singleton().getTestMethods(clazz).size() < 1) {
+        if (ReflectionUtils.singleton().getTestMethods(clazz).isEmpty()) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a @TestEngine.Test method",

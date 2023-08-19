@@ -1091,9 +1091,7 @@ public final class ReflectionUtils {
      */
     private String getAnnotationDisplayName(Class<? extends Annotation> annotation) {
         String displayName =
-                String.format(
-                        "@%s.%s",
-                        annotation.getDeclaringClass().getSimpleName(), annotation.getSimpleName());
+                annotation.getDeclaringClass().getSimpleName() + "." + annotation.getSimpleName();
 
         LOGGER.trace(
                 "getAnnotationDisplayName annotation [%s] display name [%s]",

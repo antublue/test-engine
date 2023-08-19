@@ -102,12 +102,8 @@ public class LockAnnotationUtils {
             String trimmedName = name.trim();
 
             LOGGER.trace(
-                    String.format(
-                            "Acquiring lock [%s] mode [%s] class [%s] method [%s]",
-                            trimmedName,
-                            mode,
-                            method.getDeclaringClass().getName(),
-                            method.getName()));
+                    "Acquiring lock [%s] mode [%s] class [%s] method [%s]",
+                    trimmedName, mode, method.getDeclaringClass().getName(), method.getName());
 
             if (mode == TestEngine.LockMode.READ_WRITE) {
                 LOCK_MAP.computeIfAbsent(trimmedName, n -> createLock(n, true)).writeLock().lock();
@@ -116,12 +112,8 @@ public class LockAnnotationUtils {
             }
 
             LOGGER.trace(
-                    String.format(
-                            "Acquired lock [%s] mode [%s] class [%s] method [%s]",
-                            trimmedName,
-                            mode,
-                            method.getDeclaringClass().getName(),
-                            method.getName()));
+                    "Acquired lock [%s] mode [%s] class [%s] method [%s]",
+                    trimmedName, mode, method.getDeclaringClass().getName(), method.getName());
         }
     }
 
@@ -175,14 +167,9 @@ public class LockAnnotationUtils {
         if (name != null && !name.trim().isEmpty()) {
             ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
             if (reentrantReadWriteLock != null) {
-
                 LOGGER.trace(
-                        String.format(
-                                "Releasing lock [%s] mode [%s] class [%s] method [%s]",
-                                name.trim(),
-                                mode,
-                                method.getDeclaringClass().getName(),
-                                method.getName()));
+                        "Releasing lock [%s] mode [%s] class [%s] method [%s]",
+                        name.trim(), mode, method.getDeclaringClass().getName(), method.getName());
 
                 if (mode == TestEngine.LockMode.READ_WRITE) {
                     reentrantReadWriteLock.writeLock().unlock();
@@ -191,12 +178,8 @@ public class LockAnnotationUtils {
                 }
 
                 LOGGER.trace(
-                        String.format(
-                                "Released lock [%s] mode [%s] class [%s] method [%s]",
-                                name.trim(),
-                                mode,
-                                method.getDeclaringClass().getName(),
-                                method.getName()));
+                        "Released lock [%s] mode [%s] class [%s] method [%s]",
+                        name.trim(), mode, method.getDeclaringClass().getName(), method.getName());
 
             } else {
                 throw new TestClassConfigurationException(

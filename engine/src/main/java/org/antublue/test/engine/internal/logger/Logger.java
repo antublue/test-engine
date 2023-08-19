@@ -366,7 +366,7 @@ public class Logger {
     /**
      * Method to create a log message
      *
-     * @apram level
+     * @param level level
      * @param message message
      * @return the return value
      */
@@ -377,9 +377,16 @@ public class Logger {
             dateTime = SIMPLE_DATE_FORMAT.format(new Date());
         }
 
-        return String.format(
-                "%s | %s | %s | %s | %s ",
-                dateTime, Thread.currentThread().getName(), level.toString(), name, message);
+        return dateTime
+                + " | "
+                + Thread.currentThread().getName()
+                + " | "
+                + level.toString()
+                + " | "
+                + name
+                + " | "
+                + message
+                + " ";
     }
 
     /**
