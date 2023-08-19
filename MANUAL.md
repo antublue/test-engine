@@ -268,6 +268,7 @@ The properties filename is resolved using the following in order:
 | Property                                       | Type         | Default value        |
 |------------------------------------------------|--------------|----------------------|
 | antublue.test.engine.thread.count              | integer      | number of processors |
+| antublue.test.engine.stack.trace.pruning       | boolean      | true                 |
 | antublue.test.engine.test.class.include        | regex string |                      |
 | antublue.test.engine.test.class.exclude        | regex string |                      |
 | antublue.test.engine.test.method.include       | regex string |                      |
