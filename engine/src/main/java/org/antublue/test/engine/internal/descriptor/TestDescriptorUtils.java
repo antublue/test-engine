@@ -18,8 +18,8 @@ package org.antublue.test.engine.internal.descriptor;
 
 import java.lang.reflect.Method;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.internal.ReflectionUtils;
 import org.antublue.test.engine.internal.TestClassConfigurationException;
+import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Switch;
@@ -48,7 +48,7 @@ public final class TestDescriptorUtils {
         validateTestClass(clazz);
 
         return new ClassTestDescriptor(
-                uniqueId, ReflectionUtils.singleton().getDisplayName(clazz), clazz);
+                uniqueId, TestEngineReflectionUtils.singleton().getDisplayName(clazz), clazz);
     }
 
     /**
@@ -81,7 +81,7 @@ public final class TestDescriptorUtils {
 
         return new MethodTestDescriptor(
                 uniqueId,
-                ReflectionUtils.singleton().getDisplayName(method),
+                TestEngineReflectionUtils.singleton().getDisplayName(method),
                 clazz,
                 method,
                 argument);
@@ -147,7 +147,7 @@ public final class TestDescriptorUtils {
 
     private static void validateTestClass(Class<?> clazz) {
         // Validate we have a @TestEngine.ArgumentSupplier method
-        if (ReflectionUtils.singleton().getArgumentSupplierMethod(clazz) == null) {
+        if (TestEngineReflectionUtils.singleton().getArgumentSupplierMethod(clazz) == null) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a static @TestEngine.ArgumentSupplier"
@@ -156,7 +156,7 @@ public final class TestDescriptorUtils {
         }
 
         // Validate we have a @TestEngine.Test method
-        if (ReflectionUtils.singleton().getTestMethods(clazz).isEmpty()) {
+        if (TestEngineReflectionUtils.singleton().getTestMethods(clazz).isEmpty()) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a @TestEngine.Test method",
@@ -165,11 +165,11 @@ public final class TestDescriptorUtils {
 
         // Get other method optional annotated methods
         // which will check for duplicate @TestEngine.Order values
-        ReflectionUtils.singleton().getPrepareMethods(clazz);
-        ReflectionUtils.singleton().getBeforeAllMethods(clazz);
-        ReflectionUtils.singleton().getBeforeEachMethods(clazz);
-        ReflectionUtils.singleton().getAfterEachMethods(clazz);
-        ReflectionUtils.singleton().getAfterAllMethods(clazz);
-        ReflectionUtils.singleton().getConcludeMethods(clazz);
+        TestEngineReflectionUtils.singleton().getPrepareMethods(clazz);
+        TestEngineReflectionUtils.singleton().getBeforeAllMethods(clazz);
+        TestEngineReflectionUtils.singleton().getBeforeEachMethods(clazz);
+        TestEngineReflectionUtils.singleton().getAfterEachMethods(clazz);
+        TestEngineReflectionUtils.singleton().getAfterAllMethods(clazz);
+        TestEngineReflectionUtils.singleton().getConcludeMethods(clazz);
     }
 }

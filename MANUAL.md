@@ -289,6 +289,7 @@ The properties filename is resolved using the following in order:
 - `microseconds`
 - `milliseconds`
 - `seconds`
+- `minutes`
 
 ### Experimental Test Engine Configuration
 

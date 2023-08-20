@@ -39,10 +39,15 @@ public class NanosecondsConverter {
     public static final NanosecondsConverter SECONDS =
             new NanosecondsConverter("seconds", "s", 1e+9);
 
+    /** Seconds converter */
+    public static final NanosecondsConverter MINUTES =
+            new NanosecondsConverter("minutes", "m", 1e+12);
+
     private static final Map<String, NanosecondsConverter> map;
 
     static {
         map = new HashMap<>();
+        map.put("minutes", MINUTES);
         map.put("seconds", SECONDS);
         map.put("milliseconds", MILLISECONDS);
         map.put("microseconds", MICROSECONDS);

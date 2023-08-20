@@ -25,7 +25,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.AutoCloseAnnotationUtils;
 import org.antublue.test.engine.internal.ExecutorContext;
 import org.antublue.test.engine.internal.LockAnnotationUtils;
-import org.antublue.test.engine.internal.ReflectionUtils;
+import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
@@ -99,7 +99,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
     public Optional<TestSource> getSource() {
         return Optional.of(
                 MethodSource.from(
-                        ReflectionUtils.singleton().getArgumentSupplierMethod(testClass)));
+                        TestEngineReflectionUtils.singleton()
+                                .getArgumentSupplierMethod(testClass)));
     }
 
     /**
@@ -188,7 +189,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
             testInstance = executorContext.getTestInstance();
 
-            Optional<Field> optionalField = ReflectionUtils.singleton().getArgumentField(testClass);
+            Optional<Field> optionalField =
+                    TestEngineReflectionUtils.singleton().getArgumentField(testClass);
             if (optionalField.isPresent()) {
                 LOGGER.trace("injecting test argument");
                 optionalField.get().set(testInstance, testArgument);
@@ -228,11 +230,13 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         try {
-            List<Method> methods = ReflectionUtils.singleton().getBeforeAllMethods(testClass);
+            List<Method> methods =
+                    TestEngineReflectionUtils.singleton().getBeforeAllMethods(testClass);
             for (Method method : methods) {
                 try {
                     LockAnnotationUtils.singleton().processLockAnnotations(method);
-                    if (ReflectionUtils.singleton().acceptsArgument(method, testArgument)) {
+                    if (TestEngineReflectionUtils.singleton()
+                            .acceptsArgument(method, testArgument)) {
                         method.invoke(testInstance, testArgument);
                     } else {
                         method.invoke(testInstance, NO_OBJECT_ARGS);
@@ -370,11 +374,13 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         try {
-            List<Method> methods = ReflectionUtils.singleton().getAfterAllMethods(testClass);
+            List<Method> methods =
+                    TestEngineReflectionUtils.singleton().getAfterAllMethods(testClass);
             for (Method method : methods) {
                 try {
                     LockAnnotationUtils.singleton().processLockAnnotations(method);
-                    if (ReflectionUtils.singleton().acceptsArgument(method, testArgument)) {
+                    if (TestEngineReflectionUtils.singleton()
+                            .acceptsArgument(method, testArgument)) {
                         method.invoke(testInstance, testArgument);
                     } else {
                         method.invoke(testInstance, NO_OBJECT_ARGS);
@@ -421,7 +427,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         try {
-            Optional<Field> optionalField = ReflectionUtils.singleton().getArgumentField(testClass);
+            Optional<Field> optionalField =
+                    TestEngineReflectionUtils.singleton().getArgumentField(testClass);
             if (optionalField.isPresent()) {
                 LOGGER.trace("injecting test argument");
                 optionalField.get().set(testInstance, null);

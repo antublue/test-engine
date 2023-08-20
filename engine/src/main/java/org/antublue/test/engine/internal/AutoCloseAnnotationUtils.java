@@ -59,7 +59,7 @@ public class AutoCloseAnnotationUtils {
                 "processAutoCloseFields class [%s] lifecycle [%s]",
                 object.getClass().getName(), lifecycle);
 
-        ReflectionUtils.singleton()
+        TestEngineReflectionUtils.singleton()
                 .getAutoCloseFields(object.getClass())
                 .forEach(
                         field -> {
