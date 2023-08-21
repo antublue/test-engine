@@ -129,6 +129,10 @@ public final class ReflectionUtils {
                     Class<?> superClass = clazz.getSuperclass();
                     resolveClasses(superClass, order, classSet);
                 }
+            default:
+                {
+                    // DO NOTHING
+                }
         }
     }
 
@@ -190,6 +194,10 @@ public final class ReflectionUtils {
                     }
                     Class<?> superClass = clazz.getSuperclass();
                     resolveFields(superClass, order, fieldSet);
+                }
+            default:
+                {
+                    // DO NOTHING
                 }
         }
     }
@@ -253,6 +261,10 @@ public final class ReflectionUtils {
                         Class<?> superClass = clazz.getSuperclass();
                         resolveMethods(superClass, order, methodMap);
                         break;
+                    }
+                default:
+                    {
+                        // DO NOTHING
                     }
             }
         } catch (NoClassDefFoundError e) {
