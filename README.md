@@ -40,14 +40,14 @@ GitHub's Discussions is the current mechanism for help / support.
 
 - [Frequently Asked Questions](FAQ.md)
 
-# Building
+# Building and Installing
 
 Java 8 or greater is required to build the project. The project targets Java 8 as a baseline.
 
 ```shell
 git clone https://github.com/antublue/test-engine
 cd test-engine
-./mvnw clean verify
+./mvnw clean install
 ```
 
 # Contributing
