@@ -97,26 +97,32 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         debug(BANNER);
         debug(SEPARATOR);
 
-        System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN, Constants.TRUE);
-        debug("system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN + "] = [%s]", Constants.TRUE);
-
-        if (!mavenSession.getRequest().isInteractiveMode()) {
-            System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE, "true");
-            debug("system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE + "] = [%s]", "true");
-        }
-
-        Optional.ofNullable(properties)
-                .ifPresent(
-                        map ->
-                                map.forEach(
-                                        (key, value) -> {
-                                            if (key != null && value != null) {
-                                                System.setProperty(key, value);
-                                                debug("system property [%s] = [%s]", key, value);
-                                            }
-                                        }));
-
         try {
+            System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN, Constants.TRUE);
+            debug(
+                    "system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN + "] = [%s]",
+                    Constants.TRUE);
+
+            if (!mavenSession.getRequest().isInteractiveMode()) {
+                System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE, "true");
+                debug(
+                        "system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE + "] = [%s]",
+                        "true");
+            }
+
+            Optional.ofNullable(properties)
+                    .ifPresent(
+                            map ->
+                                    map.forEach(
+                                            (key, value) -> {
+                                                if (key != null && value != null) {
+                                                    System.setProperty(key, value);
+                                                    debug(
+                                                            "system property [%s] = [%s]",
+                                                            key, value);
+                                                }
+                                            }));
+
             Set<Path> artifactPaths = new LinkedHashSet<>();
 
             Optional.ofNullable(mavenProject.getCompileClasspathElements())
@@ -198,6 +204,8 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                 throw new SuppressedStackTraceException("Test failures");
             }
         } catch (SuppressedStackTraceException e) {
+            e.printStackTrace();
+            System.err.flush();
             throw e;
         } catch (JUnitException e) {
             String message = e.getMessage();
@@ -213,12 +221,13 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             .append(message)
                             .append(System.lineSeparator());
 
+            e.printStackTrace();
+            System.err.flush();
             throw new SuppressedStackTraceException(stringBuilder.toString());
         } catch (Throwable t) {
-            t.printStackTrace(System.out);
-            System.out.flush();
-            throw new MojoExecutionException(
-                    "General AntuBLUE Test Engine Maven Plugin Exception", t);
+            t.printStackTrace(System.err);
+            System.err.flush();
+            throw new MojoExecutionException("General AntuBLUE Test Engine Exception", t);
         }
     }
 

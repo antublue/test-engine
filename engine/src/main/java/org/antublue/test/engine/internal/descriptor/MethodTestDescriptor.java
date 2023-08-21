@@ -24,7 +24,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.AutoCloseAnnotationUtils;
 import org.antublue.test.engine.internal.ExecutorContext;
 import org.antublue.test.engine.internal.LockAnnotationUtils;
-import org.antublue.test.engine.internal.ReflectionUtils;
+import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
@@ -228,11 +228,13 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
         try {
-            List<Method> methods = ReflectionUtils.singleton().getBeforeEachMethods(testClass);
+            List<Method> methods =
+                    TestEngineReflectionUtils.singleton().getBeforeEachMethods(testClass);
             for (Method method : methods) {
                 try {
                     LockAnnotationUtils.singleton().processLockAnnotations(method);
-                    if (ReflectionUtils.singleton().acceptsArgument(method, testArgument)) {
+                    if (TestEngineReflectionUtils.singleton()
+                            .acceptsArgument(method, testArgument)) {
                         method.invoke(testInstance, testArgument);
                     } else {
                         method.invoke(testInstance, NO_OBJECT_ARGS);
@@ -295,7 +297,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             Method method = testMethod;
             try {
                 LockAnnotationUtils.singleton().processLockAnnotations(method);
-                if (ReflectionUtils.singleton().acceptsArgument(method, testArgument)) {
+                if (TestEngineReflectionUtils.singleton().acceptsArgument(method, testArgument)) {
                     method.invoke(testInstance, testArgument);
                 } else {
                     method.invoke(testInstance, NO_OBJECT_ARGS);
@@ -349,11 +351,13 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
         try {
-            List<Method> methods = ReflectionUtils.singleton().getAfterEachMethods(testClass);
+            List<Method> methods =
+                    TestEngineReflectionUtils.singleton().getAfterEachMethods(testClass);
             for (Method method : methods) {
                 try {
                     LockAnnotationUtils.singleton().processLockAnnotations(method);
-                    if (ReflectionUtils.singleton().acceptsArgument(method, testArgument)) {
+                    if (TestEngineReflectionUtils.singleton()
+                            .acceptsArgument(method, testArgument)) {
                         method.invoke(testInstance, testArgument);
                     } else {
                         method.invoke(testInstance, NO_OBJECT_ARGS);

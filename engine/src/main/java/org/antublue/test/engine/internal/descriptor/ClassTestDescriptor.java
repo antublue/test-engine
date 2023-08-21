@@ -23,7 +23,7 @@ import java.util.Optional;
 import org.antublue.test.engine.internal.AutoCloseAnnotationUtils;
 import org.antublue.test.engine.internal.ExecutorContext;
 import org.antublue.test.engine.internal.LockAnnotationUtils;
-import org.antublue.test.engine.internal.ReflectionUtils;
+import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
@@ -200,7 +200,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         LOGGER.trace("prepare uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
         try {
-            List<Method> methods = ReflectionUtils.singleton().getPrepareMethods(testClass);
+            List<Method> methods =
+                    TestEngineReflectionUtils.singleton().getPrepareMethods(testClass);
             for (Method method : methods) {
                 try {
                     LockAnnotationUtils.singleton().processLockAnnotations(method);
@@ -332,7 +333,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         LOGGER.trace("conclude uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
         try {
-            List<Method> methods = ReflectionUtils.singleton().getConcludeMethods(testClass);
+            List<Method> methods =
+                    TestEngineReflectionUtils.singleton().getConcludeMethods(testClass);
             for (Method method : methods) {
                 try {
                     LockAnnotationUtils.singleton().processLockAnnotations(method);
