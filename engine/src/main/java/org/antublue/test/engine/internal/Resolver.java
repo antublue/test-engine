@@ -17,17 +17,14 @@
 package org.antublue.test.engine.internal;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
@@ -73,34 +70,6 @@ public class Resolver {
     private ConfigurationParameters configurationParameters;
     private EngineDiscoveryRequest engineDiscoveryRequest;
     private EngineDescriptor engineDescriptor;
-
-    /** Class to implement a Predicate to determine if a Class is a test class */
-    private static final Predicate<Class<?>> IS_TEST_CLASS =
-            clazz -> {
-                if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
-                        || clazz.isAnnotationPresent(TestEngine.Disabled.class)
-                        || Modifier.isAbstract(clazz.getModifiers())
-                        || TestEngineReflectionUtils.singleton().getTestMethods(clazz).isEmpty()) {
-                    LOGGER.trace("is test class [%s] excluded", clazz.getName());
-                    return false;
-                }
-
-                LOGGER.trace("class [%s] included", clazz.getName());
-                return true;
-            };
-
-    /** Class to implement a Predicate to determine if a Method is a test method */
-    private static final Predicate<Method> IS_TEST_METHOD =
-            method -> {
-                boolean result =
-                        !method.isAnnotationPresent(TestEngine.Disabled.class)
-                                && TestEngineReflectionUtils.singleton()
-                                        .getTestMethods(method.getDeclaringClass())
-                                        .contains(method);
-                LOGGER.trace(
-                        "is test method [%s] = [%b]", method.getDeclaringClass().getName(), result);
-                return result;
-            };
 
     /**
      * Method to resolve test classes / test methods
@@ -311,6 +280,8 @@ public class Resolver {
     private void resolveClasspathRootSelectors() {
         LOGGER.trace("resolveClasspathRootSelectors");
 
+        TestEngineReflectionUtils testEngineReflectionUtils = TestEngineReflectionUtils.singleton();
+
         engineDiscoveryRequest
                 .getSelectorsByType(ClasspathRootSelector.class)
                 .forEach(
@@ -320,14 +291,14 @@ public class Resolver {
                                     .findAllClasses(classpathRootSelector.getClasspathRoot())
                                     .forEach(
                                             clazz -> {
-                                                if (IS_TEST_CLASS.test(clazz)
-                                                        && packageNameFiltersPredicate.test(clazz)
-                                                        && classNameFiltersPredicate.test(clazz)) {
+                                                if (packageNameFiltersPredicate.test(clazz)
+                                                        && classNameFiltersPredicate.test(clazz)
+                                                        && testEngineReflectionUtils.isTestClass(
+                                                                clazz)) {
                                                     classMethodSetMap.put(
                                                             clazz,
                                                             new LinkedHashSet<>(
-                                                                    TestEngineReflectionUtils
-                                                                            .singleton()
+                                                                    testEngineReflectionUtils
                                                                             .getTestMethods(
                                                                                     clazz)));
                                                 }
@@ -339,6 +310,8 @@ public class Resolver {
     private void resolvePackageSelectors() {
         LOGGER.trace("resolvePackageSelectors");
 
+        TestEngineReflectionUtils testEngineReflectionUtils = TestEngineReflectionUtils.singleton();
+
         engineDiscoveryRequest
                 .getSelectorsByType(PackageSelector.class)
                 .forEach(
@@ -348,14 +321,14 @@ public class Resolver {
                                     .findAllClasses(packageSelector.getPackageName())
                                     .forEach(
                                             clazz -> {
-                                                if (IS_TEST_CLASS.test(clazz)
-                                                        && packageNameFiltersPredicate.test(clazz)
-                                                        && classNameFiltersPredicate.test(clazz)) {
+                                                if (packageNameFiltersPredicate.test(clazz)
+                                                        && classNameFiltersPredicate.test(clazz)
+                                                        && testEngineReflectionUtils.isTestClass(
+                                                                clazz)) {
                                                     classMethodSetMap.put(
                                                             clazz,
                                                             new LinkedHashSet<>(
-                                                                    TestEngineReflectionUtils
-                                                                            .singleton()
+                                                                    testEngineReflectionUtils
                                                                             .getTestMethods(
                                                                                     clazz)));
                                                 }
@@ -367,20 +340,21 @@ public class Resolver {
     private void resolveClassSelectors() {
         LOGGER.trace("resolveClassSelectors");
 
+        TestEngineReflectionUtils testEngineReflectionUtils = TestEngineReflectionUtils.singleton();
+
         engineDiscoveryRequest
                 .getSelectorsByType(ClassSelector.class)
                 .forEach(
                         classSelector -> {
                             LOGGER.trace("ClassSelector.class");
                             Class<?> clazz = classSelector.getJavaClass();
-                            if (IS_TEST_CLASS.test(clazz)
-                                    && packageNameFiltersPredicate.test(clazz)
-                                    && classNameFiltersPredicate.test(clazz)) {
+                            if (packageNameFiltersPredicate.test(clazz)
+                                    && classNameFiltersPredicate.test(clazz)
+                                    && testEngineReflectionUtils.isTestClass(clazz)) {
                                 classMethodSetMap.put(
                                         clazz,
                                         new LinkedHashSet<>(
-                                                TestEngineReflectionUtils.singleton()
-                                                        .getTestMethods(clazz)));
+                                                testEngineReflectionUtils.getTestMethods(clazz)));
                             }
                         });
     }
@@ -395,9 +369,10 @@ public class Resolver {
                         methodSelector -> {
                             LOGGER.trace("MethodSelector.class");
                             Class<?> clazz = methodSelector.getJavaClass();
-                            if (IS_TEST_METHOD.test(methodSelector.getJavaMethod())
-                                    && packageNameFiltersPredicate.test(clazz)
-                                    && classNameFiltersPredicate.test(clazz)) {
+                            if (packageNameFiltersPredicate.test(clazz)
+                                    && classNameFiltersPredicate.test(clazz)
+                                    && TestEngineReflectionUtils.singleton()
+                                            .isTestMethod(methodSelector.getJavaMethod())) {
                                 Set<Method> methods =
                                         classMethodSetMap.getOrDefault(
                                                 clazz, new LinkedHashSet<>());
@@ -411,6 +386,8 @@ public class Resolver {
     private void resolveUniqueIdSelectors() {
         LOGGER.trace("resolveUniqueIdSelectors");
 
+        TestEngineReflectionUtils testEngineReflectionUtils = TestEngineReflectionUtils.singleton();
+
         engineDiscoveryRequest
                 .getSelectorsByType(UniqueIdSelector.class)
                 .forEach(
@@ -422,15 +399,14 @@ public class Resolver {
                                 String className = segment.getValue();
                                 try {
                                     Class<?> clazz = Class.forName(className);
-                                    if (IS_TEST_CLASS.test(clazz)
-                                            && packageNameFiltersPredicate.test(clazz)
-                                            && classNameFiltersPredicate.test(clazz)) {
+                                    if (packageNameFiltersPredicate.test(clazz)
+                                            && classNameFiltersPredicate.test(clazz)
+                                            && testEngineReflectionUtils.isTestClass(clazz)) {
                                         Set<Method> methods =
                                                 classMethodSetMap.getOrDefault(
                                                         clazz, new LinkedHashSet<>());
                                         methods.addAll(
-                                                TestEngineReflectionUtils.singleton()
-                                                        .getTestMethods(clazz));
+                                                testEngineReflectionUtils.getTestMethods(clazz));
                                         classMethodSetMap.put(clazz, methods);
                                     }
                                 } catch (ClassNotFoundException e) {
@@ -447,15 +423,14 @@ public class Resolver {
                                 String className = segment.getValue();
                                 try {
                                     Class<?> clazz = Class.forName(className);
-                                    if (IS_TEST_CLASS.test(clazz)
-                                            && packageNameFiltersPredicate.test(clazz)
-                                            && classNameFiltersPredicate.test(clazz)) {
+                                    if (packageNameFiltersPredicate.test(clazz)
+                                            && classNameFiltersPredicate.test(clazz)
+                                            && testEngineReflectionUtils.isTestClass(clazz)) {
                                         Set<Method> methods =
                                                 classMethodSetMap.getOrDefault(
                                                         clazz, new LinkedHashSet<>());
                                         methods.addAll(
-                                                TestEngineReflectionUtils.singleton()
-                                                        .getTestMethods(clazz));
+                                                testEngineReflectionUtils.getTestMethods(clazz));
                                         classMethodSetMap.put(clazz, methods);
                                     }
                                 } catch (ClassNotFoundException e) {

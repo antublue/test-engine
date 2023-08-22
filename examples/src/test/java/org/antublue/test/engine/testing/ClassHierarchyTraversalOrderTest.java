@@ -23,8 +23,8 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-@TestEngine.Order(order = 1)
-public class ClassOrderTest2 {
+@TestEngine.Order(order = 0)
+public class ClassHierarchyTraversalOrderTest {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -68,8 +68,7 @@ public class ClassOrderTest2 {
         public static Stream<StringArgument> arguments() {
             Collection<StringArgument> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(
-                        org.antublue.test.engine.api.argument.StringArgument.of(String.valueOf(i)));
+                collection.add(StringArgument.of(String.valueOf(i)));
             }
             return collection.stream();
         }

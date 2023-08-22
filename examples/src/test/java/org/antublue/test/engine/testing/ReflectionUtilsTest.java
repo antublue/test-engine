@@ -16,8 +16,11 @@
 
 package org.antublue.test.engine.testing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
@@ -36,69 +39,114 @@ public class ReflectionUtilsTest {
     }
 
     @TestEngine.Test
-    public void getClassHierarchy() {
-        List<Class<?>> classHierarchy =
-                ReflectionUtils.singleton()
-                        .getClassHierarchy(SubClass4.class, ReflectionUtils.Order.SUB_CLASS_FIRST);
+    public void getClassHierarchyTopDown() {
+        List<Class<?>> expectedList = new ArrayList<>();
+        expectedList.add(SubClass4.class);
+        expectedList.add(SubClass3.class);
+        expectedList.add(SubClass2.class);
+        expectedList.add(SubClass1.class);
 
-        for (Class<?> clazz : classHierarchy) {
-            System.out.format("%s", clazz.getName()).println();
-        }
-    }
-
-    @TestEngine.Test
-    public void getClassHierarchySuperClassFirst() {
         List<Class<?>> classHierarchy =
                 ReflectionUtils.singleton()
                         .getClassHierarchy(
-                                SubClass4.class, ReflectionUtils.Order.SUPER_CLASS_FIRST);
+                                SubClass4.class, ReflectionUtils.HierarchyTraversalOrder.TOP_DOWN);
 
-        for (Class<?> clazz : classHierarchy) {
-            System.out.format("%s", clazz.getName()).println();
-        }
+        assertThat(classHierarchy).isEqualTo(expectedList);
     }
 
     @TestEngine.Test
-    public void getMethodsSuperClassFirst() {
+    public void getClassHierarchyBottomUp() {
+        List<Class<?>> expectedList = new ArrayList<>();
+        expectedList.add(SubClass1.class);
+        expectedList.add(SubClass2.class);
+        expectedList.add(SubClass3.class);
+        expectedList.add(SubClass4.class);
+
+        List<Class<?>> classHierarchy =
+                ReflectionUtils.singleton()
+                        .getClassHierarchy(
+                                SubClass4.class, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP);
+
+        assertThat(classHierarchy).isEqualTo(expectedList);
+    }
+
+    @TestEngine.Test
+    public void getMethodsTopDown() {
+        List<String> expectedList = new ArrayList<>();
+        expectedList.add("subClass4Method");
+        expectedList.add("subClass3Method");
+        expectedList.add("subClass2Method");
+        expectedList.add("subClass1Method");
+
         List<Method> methods =
                 ReflectionUtils.singleton()
-                        .getMethods(SubClass4.class, ReflectionUtils.Order.SUPER_CLASS_FIRST);
+                        .getMethods(
+                                SubClass4.class, ReflectionUtils.HierarchyTraversalOrder.TOP_DOWN);
 
-        for (Method method : methods) {
-            System.out.format("%s", method.getName()).println();
+        assertThat(methods.size()).isEqualTo(expectedList.size());
+
+        for (int i = 0; i < expectedList.size(); i++) {
+            assertThat(methods.get(i).getName()).isEqualTo(expectedList.get(i));
         }
     }
 
     @TestEngine.Test
-    public void getMethodsSubClassFirst() {
+    public void getMethodsBottomUp() {
+        List<String> expectedList = new ArrayList<>();
+        expectedList.add("subClass1Method");
+        expectedList.add("subClass2Method");
+        expectedList.add("subClass3Method");
+        expectedList.add("subClass4Method");
+
         List<Method> methods =
                 ReflectionUtils.singleton()
-                        .getMethods(SubClass4.class, ReflectionUtils.Order.SUB_CLASS_FIRST);
+                        .getMethods(
+                                SubClass4.class, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP);
 
-        for (Method method : methods) {
-            System.out.format("%s", method.getName()).println();
+        assertThat(methods.size()).isEqualTo(expectedList.size());
+
+        for (int i = 0; i < expectedList.size(); i++) {
+            assertThat(methods.get(i).getName()).isEqualTo(expectedList.get(i));
         }
     }
 
     @TestEngine.Test
-    public void getFieldsSuperClassFirst() {
+    public void getFieldsTopDown() {
+        List<String> expectedList = new ArrayList<>();
+        expectedList.add("subClass4Field");
+        expectedList.add("subClass3Field");
+        expectedList.add("subClass2Field");
+        expectedList.add("subClass1Field");
+
         List<Field> fields =
                 ReflectionUtils.singleton()
-                        .getFields(SubClass4.class, ReflectionUtils.Order.SUPER_CLASS_FIRST);
+                        .getFields(
+                                SubClass4.class, ReflectionUtils.HierarchyTraversalOrder.TOP_DOWN);
 
-        for (Field field : fields) {
-            System.out.format("%s", field.getName()).println();
+        assertThat(fields.size()).isEqualTo(expectedList.size());
+
+        for (int i = 0; i < expectedList.size(); i++) {
+            assertThat(fields.get(i).getName()).isEqualTo(expectedList.get(i));
         }
     }
 
     @TestEngine.Test
-    public void getFieldsSubClassFirst() {
+    public void getFieldsBottomUp() {
+        List<String> expectedList = new ArrayList<>();
+        expectedList.add("subClass1Field");
+        expectedList.add("subClass2Field");
+        expectedList.add("subClass3Field");
+        expectedList.add("subClass4Field");
+
         List<Field> fields =
                 ReflectionUtils.singleton()
-                        .getFields(SubClass4.class, ReflectionUtils.Order.SUB_CLASS_FIRST);
+                        .getFields(
+                                SubClass4.class, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP);
 
-        for (Field field : fields) {
-            System.out.format("%s", field.getName()).println();
+        assertThat(fields.size()).isEqualTo(expectedList.size());
+
+        for (int i = 0; i < expectedList.size(); i++) {
+            assertThat(fields.get(i).getName()).isEqualTo(expectedList.get(i));
         }
     }
 }

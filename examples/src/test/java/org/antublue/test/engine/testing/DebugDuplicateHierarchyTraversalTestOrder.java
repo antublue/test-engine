@@ -23,7 +23,7 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
 /** Example test */
-public class DebugDuplicateOrderTest {
+public class DebugDuplicateHierarchyTraversalTestOrder {
 
     @TestEngine.Argument protected IntegerArgument integerArgument;
 

@@ -19,7 +19,7 @@ package org.antublue.test.engine;
 import java.util.Optional;
 import org.antublue.test.engine.internal.ConfigurationParameters;
 import org.antublue.test.engine.internal.Executor;
-import org.antublue.test.engine.internal.Information;
+import org.antublue.test.engine.internal.InformationUtils;
 import org.antublue.test.engine.internal.Resolver;
 import org.antublue.test.engine.internal.TestClassConfigurationException;
 import org.antublue.test.engine.internal.TestDescriptorStore;
@@ -51,7 +51,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static final String ARTIFACT_ID = "test-engine";
 
     /** Configuration constant */
-    public static final String VERSION = Information.getVersion();
+    public static final String VERSION = InformationUtils.getVersion();
 
     /** Configuration constant */
     public static final String ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN =

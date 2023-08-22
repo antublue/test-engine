@@ -29,6 +29,7 @@ import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
+import org.antublue.test.engine.internal.util.InvocationUtils;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -179,32 +180,42 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "begin uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        try {
-            getStopWatch().start();
+        Optional<Throwable> optionalThrowable =
+                InvocationUtils.run(
+                        () -> {
+                            getStopWatch().start();
 
-            executorContext
-                    .getExecutionRequest()
-                    .getEngineExecutionListener()
-                    .executionStarted(this);
+                            executorContext
+                                    .getExecutionRequest()
+                                    .getEngineExecutionListener()
+                                    .executionStarted(this);
 
-            testInstance = executorContext.getTestInstance();
+                            testInstance = executorContext.getTestInstance();
 
-            Optional<Field> optionalField =
-                    TestEngineReflectionUtils.singleton().getArgumentField(testClass);
-            if (optionalField.isPresent()) {
-                LOGGER.trace("injecting test argument");
-                optionalField.get().set(testInstance, testArgument);
-            }
+                            List<Field> fields =
+                                    TestEngineReflectionUtils.singleton()
+                                            .getArgumentFields(testClass);
 
-            stateMachine.signal(State.BEFORE_BEFORE_ALL);
-        } catch (Throwable t) {
-            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
-            throwables.add(prunedThrowable);
-            printStackTrace(System.out, prunedThrowable);
-            stateMachine.signal(State.SKIP);
-        } finally {
-            System.out.flush();
-        }
+                            LOGGER.trace(
+                                    "testClass [%s] field count [%d]",
+                                    testClass.getName(), fields.size());
+
+                            for (Field field : fields) {
+                                LOGGER.trace("injecting test argument");
+                                field.set(testInstance, testArgument);
+                            }
+                        });
+
+        optionalThrowable.ifPresent(
+                throwable -> {
+                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    throwables.add(prunedThrowable);
+                    printStackTrace(System.out, prunedThrowable);
+                    stateMachine.signal(State.SKIP);
+                });
+
+        stateMachine.signal(State.BEFORE_BEFORE_ALL);
+        System.out.flush();
     }
 
     /**
@@ -229,31 +240,38 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "beforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        try {
-            List<Method> methods =
-                    TestEngineReflectionUtils.singleton().getBeforeAllMethods(testClass);
-            for (Method method : methods) {
-                try {
-                    LockAnnotationUtils.singleton().processLockAnnotations(method);
-                    if (TestEngineReflectionUtils.singleton()
-                            .acceptsArgument(method, testArgument)) {
-                        method.invoke(testInstance, testArgument);
-                    } else {
-                        method.invoke(testInstance, NO_OBJECT_ARGS);
-                    }
-                } finally {
-                    LockAnnotationUtils.singleton().processUnlockAnnotations(method);
-                    System.out.flush();
-                }
-            }
-        } catch (Throwable t) {
-            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
-            throwables.add(prunedThrowable);
-            printStackTrace(System.out, prunedThrowable);
-        } finally {
-            stateMachine.signal(State.AFTER_BEFORE_ALL);
-            System.out.flush();
-        }
+        Optional<Throwable> optionalThrowable =
+                InvocationUtils.run(
+                        () -> {
+                            List<Method> methods =
+                                    TestEngineReflectionUtils.singleton()
+                                            .getBeforeAllMethods(testClass);
+                            for (Method method : methods) {
+                                try {
+                                    LockAnnotationUtils.singleton().processLockAnnotations(method);
+                                    if (TestEngineReflectionUtils.singleton()
+                                            .acceptsArgument(method, testArgument)) {
+                                        method.invoke(testInstance, testArgument);
+                                    } else {
+                                        method.invoke(testInstance, NO_OBJECT_ARGS);
+                                    }
+                                } finally {
+                                    LockAnnotationUtils.singleton()
+                                            .processUnlockAnnotations(method);
+                                    System.out.flush();
+                                }
+                            }
+                        });
+
+        optionalThrowable.ifPresent(
+                throwable -> {
+                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    throwables.add(prunedThrowable);
+                    printStackTrace(System.out, prunedThrowable);
+                });
+
+        stateMachine.signal(State.AFTER_BEFORE_ALL);
+        System.out.flush();
     }
 
     /**
@@ -283,20 +301,26 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "execute uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        try {
-            List<MethodTestDescriptor> methodTestDescriptors =
-                    getChildren(MethodTestDescriptor.class);
-            for (MethodTestDescriptor methodTestDescriptor : methodTestDescriptors) {
-                methodTestDescriptor.execute(executorContext);
-            }
-        } catch (Throwable t) {
-            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
-            throwables.add(prunedThrowable);
-            printStackTrace(System.out, prunedThrowable);
-        } finally {
-            stateMachine.signal(State.BEFORE_AFTER_ALL);
-            System.out.flush();
-        }
+        Optional<Throwable> optionalThrowable =
+                InvocationUtils.run(
+                        () -> {
+                            List<MethodTestDescriptor> methodTestDescriptors =
+                                    getChildren(MethodTestDescriptor.class);
+                            for (MethodTestDescriptor methodTestDescriptor :
+                                    methodTestDescriptors) {
+                                methodTestDescriptor.execute(executorContext);
+                            }
+                        });
+
+        optionalThrowable.ifPresent(
+                throwable -> {
+                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    throwables.add(prunedThrowable);
+                    printStackTrace(System.out, prunedThrowable);
+                });
+
+        stateMachine.signal(State.BEFORE_AFTER_ALL);
+        System.out.flush();
     }
 
     /**
@@ -309,20 +333,26 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "skip uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        try {
-            List<MethodTestDescriptor> methodTestDescriptors =
-                    getChildren(MethodTestDescriptor.class);
-            for (MethodTestDescriptor methodTestDescriptor : methodTestDescriptors) {
-                methodTestDescriptor.skip(executorContext);
-            }
-        } catch (Throwable t) {
-            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
-            throwables.add(prunedThrowable);
-            printStackTrace(System.out, prunedThrowable);
-        } finally {
-            stateMachine.signal(State.BEFORE_AFTER_ALL);
-            System.out.flush();
-        }
+        Optional<Throwable> optionalThrowable =
+                InvocationUtils.run(
+                        () -> {
+                            List<MethodTestDescriptor> methodTestDescriptors =
+                                    getChildren(MethodTestDescriptor.class);
+                            for (MethodTestDescriptor methodTestDescriptor :
+                                    methodTestDescriptors) {
+                                methodTestDescriptor.skip(executorContext);
+                            }
+                        });
+
+        optionalThrowable.ifPresent(
+                throwable -> {
+                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    throwables.add(prunedThrowable);
+                    printStackTrace(System.out, prunedThrowable);
+                });
+
+        stateMachine.signal(State.BEFORE_AFTER_ALL);
+        System.out.flush();
     }
 
     /**
@@ -335,20 +365,26 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "skipEnd uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        try {
-            List<MethodTestDescriptor> methodTestDescriptors =
-                    getChildren(MethodTestDescriptor.class);
-            for (MethodTestDescriptor methodTestDescriptor : methodTestDescriptors) {
-                methodTestDescriptor.skip(executorContext);
-            }
-        } catch (Throwable t) {
-            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
-            throwables.add(prunedThrowable);
-            printStackTrace(System.out, prunedThrowable);
-        } finally {
-            stateMachine.signal(State.END);
-            System.out.flush();
-        }
+        Optional<Throwable> optionalThrowable =
+                InvocationUtils.run(
+                        () -> {
+                            List<MethodTestDescriptor> methodTestDescriptors =
+                                    getChildren(MethodTestDescriptor.class);
+                            for (MethodTestDescriptor methodTestDescriptor :
+                                    methodTestDescriptors) {
+                                methodTestDescriptor.skip(executorContext);
+                            }
+                        });
+
+        optionalThrowable.ifPresent(
+                throwable -> {
+                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    throwables.add(prunedThrowable);
+                    printStackTrace(System.out, prunedThrowable);
+                });
+
+        stateMachine.signal(State.END);
+        System.out.flush();
     }
 
     /**
@@ -373,35 +409,43 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "afterAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        try {
-            List<Method> methods =
-                    TestEngineReflectionUtils.singleton().getAfterAllMethods(testClass);
-            for (Method method : methods) {
-                try {
-                    LockAnnotationUtils.singleton().processLockAnnotations(method);
-                    if (TestEngineReflectionUtils.singleton()
-                            .acceptsArgument(method, testArgument)) {
-                        method.invoke(testInstance, testArgument);
-                    } else {
-                        method.invoke(testInstance, NO_OBJECT_ARGS);
-                    }
-                } catch (Throwable t) {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
+        Optional<Throwable> optionalThrowable =
+                InvocationUtils.run(
+                        () -> {
+                            List<Method> methods =
+                                    TestEngineReflectionUtils.singleton()
+                                            .getAfterAllMethods(testClass);
+                            for (Method method : methods) {
+                                try {
+                                    LockAnnotationUtils.singleton().processLockAnnotations(method);
+                                    if (TestEngineReflectionUtils.singleton()
+                                            .acceptsArgument(method, testArgument)) {
+                                        method.invoke(testInstance, testArgument);
+                                    } else {
+                                        method.invoke(testInstance, NO_OBJECT_ARGS);
+                                    }
+                                } catch (Throwable t) {
+                                    PrunedThrowable prunedThrowable =
+                                            PrunedThrowable.of(testClass, t);
+                                    throwables.add(prunedThrowable);
+                                    printStackTrace(System.out, prunedThrowable);
+                                } finally {
+                                    LockAnnotationUtils.singleton()
+                                            .processUnlockAnnotations(method);
+                                    System.out.flush();
+                                }
+                            }
+                        });
+
+        optionalThrowable.ifPresent(
+                throwable -> {
+                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
-                } finally {
-                    LockAnnotationUtils.singleton().processUnlockAnnotations(method);
-                    System.out.flush();
-                }
-            }
-        } catch (Throwable t) {
-            PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, t);
-            throwables.add(prunedThrowable);
-            printStackTrace(System.out, prunedThrowable);
-        } finally {
-            stateMachine.signal(State.AFTER_AFTER_ALL);
-            System.out.flush();
-        }
+                });
+
+        stateMachine.signal(State.AFTER_AFTER_ALL);
+        System.out.flush();
     }
 
     /**
@@ -413,6 +457,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         LOGGER.trace(
                 "afterAfterAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
+
         stateMachine.signal(State.END);
     }
 
@@ -427,11 +472,10 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         try {
-            Optional<Field> optionalField =
-                    TestEngineReflectionUtils.singleton().getArgumentField(testClass);
-            if (optionalField.isPresent()) {
-                LOGGER.trace("injecting test argument");
-                optionalField.get().set(testInstance, null);
+            List<Field> fields = TestEngineReflectionUtils.singleton().getArgumentFields(testClass);
+            for (Field field : fields) {
+                LOGGER.trace("removing test argument");
+                field.set(testInstance, null);
             }
         } catch (Throwable t) {
             // DO NOTHING
