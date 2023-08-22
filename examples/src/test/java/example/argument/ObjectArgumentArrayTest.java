@@ -48,21 +48,18 @@ public class ObjectArgumentArrayTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-
         values = objectArgument.value();
     }
 
     @TestEngine.Test
     public void test1() {
         System.out.println("test1()");
-
         assertThat(values[1]).isEqualTo(values[0] * 2);
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test1()");
-
         assertThat(values[2]).isEqualTo(values[0] * 3);
     }
 

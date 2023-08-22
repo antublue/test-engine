@@ -47,7 +47,6 @@ public class HumanReadableTimeTest {
         long nanoseconds = (long) (humanReadableTimeTestArgument.milliseconds() * 1e+6);
         String expectedHumanReadableTime = humanReadableTimeTestArgument.humanReadableTime();
         String actualHumanReadableTime = HumanReadableTime.toHumanReadable(nanoseconds);
-
         if (!actualHumanReadableTime.equals(expectedHumanReadableTime)) {
             fail(
                     String.format(

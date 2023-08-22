@@ -44,14 +44,12 @@ public class FilteredArgumentStreamTest {
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + stringArgument + ")");
-
         assertThat(stringArgument.value()).isNotEqualTo("b");
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + stringArgument + ")");
-
         assertThat(stringArgument.value()).isNotEqualTo("b");
     }
 

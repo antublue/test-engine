@@ -50,18 +50,14 @@ public class DirectoryTest3 {
     @TestEngine.Prepare
     public void prepare() throws IOException {
         System.out.println("prepare()");
-
         directory1 = Directory.create("/tmp/directory-" + UUID.randomUUID(), ABSOLUTE);
-
         System.out.format("directory1 [%s]", directory1).println();
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() throws IOException {
         System.out.println("beforeAll(" + stringArgument + ")");
-
         directory2 = Directory.create("/tmp/directory-" + UUID.randomUUID(), ABSOLUTE);
-
         System.out.format("directory2 [%s]", directory2).println();
     }
 

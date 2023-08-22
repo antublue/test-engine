@@ -27,7 +27,7 @@ import org.antublue.test.engine.api.argument.StringArgument;
 @TestEngine.Order(order = 3)
 class BaseOrderTest {
 
-    protected final List<String> EXPECTED_LIST =
+    protected final List<String> EXPECTED =
             listOf(
                     "BaseOrderTest.prepare()",
                     "ConcreteOrderTest.prepare2()",
@@ -38,7 +38,7 @@ class BaseOrderTest {
                     "ConcreteOrderTest.conclude2()",
                     "BaseOrderTest.conclude()");
 
-    protected final List<String> ACTUAL_LIST = new ArrayList<>();
+    protected final List<String> actual = new ArrayList<>();
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -46,16 +46,14 @@ class BaseOrderTest {
     @TestEngine.Order(order = 1)
     public final void prepare() {
         System.out.println("BaseOrderTest.prepare()");
-
-        ACTUAL_LIST.add("BaseOrderTest.prepare()");
+        actual.add("BaseOrderTest.prepare()");
     }
 
     @TestEngine.BeforeAll
     @TestEngine.Order(order = 1)
     public void beforeAll() {
         System.out.println("BaseOrderTest.beforeAll()");
-
-        ACTUAL_LIST.add("BaseOrderTest.beforeAll()");
+        actual.add("BaseOrderTest.beforeAll()");
     }
 
     @TestEngine.Test
@@ -68,20 +66,16 @@ class BaseOrderTest {
     @TestEngine.Order(order = 2)
     public void afterAll() {
         System.out.println("BaseOrderTest.afterAll()");
-
-        ACTUAL_LIST.add("BaseOrderTest.afterAll()");
+        actual.add("BaseOrderTest.afterAll()");
     }
 
     @TestEngine.Conclude
     @TestEngine.Order(order = 2)
     public final void conclude() {
         System.out.println("BaseOrderTest.conclude()");
-
         assertThat(stringArgument).isNull();
-
-        ACTUAL_LIST.add("BaseOrderTest.conclude()");
-
-        assertThat(ACTUAL_LIST).isEqualTo(EXPECTED_LIST);
+        actual.add("BaseOrderTest.conclude()");
+        assertThat(actual).isEqualTo(EXPECTED);
     }
 
     private static List<String> listOf(String... strings) {

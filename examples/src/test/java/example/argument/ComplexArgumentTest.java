@@ -42,7 +42,6 @@ public class ComplexArgumentTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + complexArgument.name() + ")");
-
         complexArgument.initialize();
     }
 

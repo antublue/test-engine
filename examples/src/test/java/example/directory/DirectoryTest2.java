@@ -52,9 +52,7 @@ public class DirectoryTest2 {
     @TestEngine.BeforeAll
     public void beforeAll() throws IOException {
         System.out.println("beforeAll(" + stringArgument + ")");
-
         directory = Directory.create(UUID.randomUUID().toString(), RELATIVE);
-
         System.out.format("directory [%s]", directory).println();
     }
 

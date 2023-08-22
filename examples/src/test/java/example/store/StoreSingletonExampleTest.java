@@ -48,7 +48,6 @@ public class StoreSingletonExampleTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-
         Store.singleton().put(CLOSEABLE_KEY, new TestCloseable());
         Store.singleton().put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
     }
@@ -86,10 +85,8 @@ public class StoreSingletonExampleTest {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-
         Store.singleton().removeAndClose(CLOSEABLE_KEY);
         Store.singleton().removeAndClose(AUTO_CLOSEABLE_KEY);
-
         assertThat(Store.singleton().get(CLOSEABLE_KEY)).isNotPresent();
         assertThat(Store.singleton().get(AUTO_CLOSEABLE_KEY)).isNotPresent();
     }

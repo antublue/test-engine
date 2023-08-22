@@ -48,21 +48,18 @@ public class AutoCloseExampleTest3 {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-
         concludeTestObject = new TestObject("concludeTestObject");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + stringArgument + ")");
-
         afterAllTestObject = new TestObject("afterAllTestObject");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + stringArgument + ")");
-
         afterEachTestObject = new TestObject("afterEachTestObject");
     }
 
