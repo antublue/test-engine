@@ -72,7 +72,6 @@ public class CamelCaseFunctionTest {
     @TestEngine.Test
     public void test() {
         String actual = FUNCTION.apply(inputOutputArgument.input);
-
         System.out.println(
                 "test() input ["
                         + inputOutputArgument.input
@@ -81,7 +80,6 @@ public class CamelCaseFunctionTest {
                         + "] actual ["
                         + actual
                         + "]");
-
         assertThat(actual).isEqualTo(inputOutputArgument.expected);
     }
 

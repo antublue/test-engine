@@ -50,7 +50,6 @@ public class StoreExampleTest1 {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-
         store = new Store();
         store.put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
         store.put(CLOSEABLE_KEY, new TestCloseable());
@@ -89,10 +88,8 @@ public class StoreExampleTest1 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-
         store.removeAndClose(AUTO_CLOSEABLE_KEY);
         store.removeAndClose(CLOSEABLE_KEY);
-
         assertThat(store.get(AUTO_CLOSEABLE_KEY)).isNotPresent();
         assertThat(store.get(CLOSEABLE_KEY)).isNotPresent();
     }

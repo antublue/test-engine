@@ -16,10 +16,12 @@
 
 package org.antublue.test.engine.testing;
 
+/** Class for testing */
 public class SubClass2 extends SubClass1 {
 
     private String subClass2Field;
 
+    /** Method for testing */
     public void subClass2Method() {
         // DO NOTHING
     }

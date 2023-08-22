@@ -50,7 +50,6 @@ public class StoreExampleTest3 {
     public void prepare() {
         System.out.println("prepare()");
         System.out.format("key [%s]", TEST_OBJECT_KEY).println();
-
         store = new Store();
         store.put(TEST_OBJECT_KEY, new TestObject());
     }
@@ -88,13 +87,9 @@ public class StoreExampleTest3 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-
         Optional<TestObject> optional = store.get(TEST_OBJECT_KEY, o -> (TestObject) o);
-
         assertThat(optional).isPresent();
-
         store.remove(TEST_OBJECT_KEY, (Consumer<TestObject>) testObject -> testObject.close());
-
         assertThat(store.get(TEST_OBJECT_KEY)).isNotPresent();
     }
 

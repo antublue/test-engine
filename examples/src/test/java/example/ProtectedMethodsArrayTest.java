@@ -44,7 +44,6 @@ public class ProtectedMethodsArrayTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-
         values = objectArgument.value();
     }
 

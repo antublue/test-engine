@@ -48,7 +48,6 @@ public class StoreExampleTest2 {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-
         store = new Store();
         store.put(TEST_OBJECT_KEY, new TestObject());
     }
@@ -86,9 +85,7 @@ public class StoreExampleTest2 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-
         store.remove(TEST_OBJECT_KEY, (Consumer<TestObject>) testObject -> testObject.close());
-
         assertThat(store.get(TEST_OBJECT_KEY)).isNotPresent();
     }
 
