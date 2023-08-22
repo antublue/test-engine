@@ -334,12 +334,12 @@ public final class ReflectionUtils {
 
     public boolean acceptsParameters(Method method, Class<?>... parameterTypes) {
         Class<?>[] methodParameterTypes = method.getParameterTypes();
-        if (parameterTypes.length != methodParameterTypes.length) {
+        if (methodParameterTypes.length != parameterTypes.length) {
             return false;
         }
 
         for (int i = 0; i < parameterTypes.length; i++) {
-            if (parameterTypes[i].isAssignableFrom(methodParameterTypes[i])) {
+            if (methodParameterTypes[i].isAssignableFrom(parameterTypes[i])) {
                 return false;
             }
         }

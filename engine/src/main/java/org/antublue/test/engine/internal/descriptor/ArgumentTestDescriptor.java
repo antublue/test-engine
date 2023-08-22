@@ -30,6 +30,7 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
 import org.antublue.test.engine.internal.util.InvocationUtils;
+import org.antublue.test.engine.internal.util.ThrowableUtils;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -208,7 +209,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         optionalThrowable.ifPresent(
                 throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                     stateMachine.signal(State.SKIP);
@@ -265,7 +266,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         optionalThrowable.ifPresent(
                 throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 });
@@ -314,7 +315,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         optionalThrowable.ifPresent(
                 throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 });
@@ -346,7 +347,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         optionalThrowable.ifPresent(
                 throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 });
@@ -378,7 +379,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         optionalThrowable.ifPresent(
                 throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 });
@@ -425,8 +426,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                                         method.invoke(testInstance, NO_OBJECT_ARGS);
                                     }
                                 } catch (Throwable t) {
-                                    PrunedThrowable prunedThrowable =
-                                            PrunedThrowable.of(testClass, t);
+                                    Throwable prunedThrowable = ThrowableUtils.prune(t, testClass);
                                     throwables.add(prunedThrowable);
                                     printStackTrace(System.out, prunedThrowable);
                                 } finally {
@@ -439,7 +439,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         optionalThrowable.ifPresent(
                 throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 });

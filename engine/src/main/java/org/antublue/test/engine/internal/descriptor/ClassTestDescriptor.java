@@ -29,6 +29,7 @@ import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
 import org.antublue.test.engine.internal.util.InvocationUtils;
 import org.antublue.test.engine.internal.util.OptionalUtils;
+import org.antublue.test.engine.internal.util.ThrowableUtils;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -179,7 +180,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         OptionalUtils.ifPresentOrElse(
                 optionalThrowable,
                 throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                     stateMachine.signal(State.SKIP_END);
@@ -229,7 +230,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         optionalThrowable.ifPresent(
                 throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 });
@@ -279,7 +280,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         optionalThrowable.ifPresent(
                 throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 });
@@ -309,7 +310,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         optionalThrowable.ifPresent(
                 throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 });
@@ -339,7 +340,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         optionalThrowable.ifPresent(
                 throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
+                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
                     throwables.add(prunedThrowable);
                     printStackTrace(System.out, prunedThrowable);
                 });
@@ -379,8 +380,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                                     LockAnnotationUtils.singleton().processLockAnnotations(method);
                                     method.invoke(testInstance, NO_OBJECT_ARGS);
                                 } catch (Throwable t) {
-                                    PrunedThrowable prunedThrowable =
-                                            PrunedThrowable.of(testClass, t);
+                                    Throwable prunedThrowable = ThrowableUtils.prune(t, testClass);
                                     throwables.add(prunedThrowable);
                                     printStackTrace(System.out, prunedThrowable);
                                 } finally {
@@ -391,12 +391,16 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                             }
                         });
 
-        optionalThrowable.ifPresent(
-                throwable -> {
-                    PrunedThrowable prunedThrowable = PrunedThrowable.of(testClass, throwable);
-                    throwables.add(prunedThrowable);
-                    printStackTrace(System.out, prunedThrowable);
-                });
+        try {
+            optionalThrowable.ifPresent(
+                    throwable -> {
+                        Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
+                        throwables.add(prunedThrowable);
+                        printStackTrace(System.out, prunedThrowable);
+                    });
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
 
         stateMachine.signal(State.AFTER_CONCLUDE);
         System.out.flush();
@@ -410,6 +414,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
     private void afterConclude(StateMachine<State> stateMachine) {
         LOGGER.trace(
                 "afterConclude uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+
         stateMachine.signal(State.END);
     }
 

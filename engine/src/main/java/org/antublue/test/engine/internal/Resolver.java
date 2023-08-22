@@ -287,7 +287,7 @@ public class Resolver {
                 .forEach(
                         classpathRootSelector -> {
                             LOGGER.trace("ClasspathRootSelector.class");
-                            TestEngineReflectionUtils.singleton()
+                            testEngineReflectionUtils
                                     .findAllClasses(classpathRootSelector.getClasspathRoot())
                                     .forEach(
                                             clazz -> {
@@ -317,7 +317,7 @@ public class Resolver {
                 .forEach(
                         packageSelector -> {
                             LOGGER.trace("PackageSelector.class");
-                            TestEngineReflectionUtils.singleton()
+                            testEngineReflectionUtils
                                     .findAllClasses(packageSelector.getPackageName())
                                     .forEach(
                                             clazz -> {
