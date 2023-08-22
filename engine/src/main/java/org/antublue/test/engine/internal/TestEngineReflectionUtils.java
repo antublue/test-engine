@@ -16,20 +16,18 @@
 
 package org.antublue.test.engine.internal;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
@@ -50,20 +48,213 @@ public final class TestEngineReflectionUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineReflectionUtils.class);
 
-    private static final Object[] NO_OBJECT_ARGS = null;
-
     private static final TestEngineReflectionUtils SINGLETON = new TestEngineReflectionUtils();
 
-    private final Map<Class<?>, Method> ARGUMENT_SUPPLIER_METHOD_CACHE = new HashMap<>();
-    private final Map<Class<?>, Optional<Field>> ARGUMENT_FIELD_CACHE = new HashMap<>();
-    private final Map<Class<?>, List<Field>> AUTO_CLOSE_FIELD_CACHE = new HashMap<>();
-    private final Map<Class<?>, List<Method>> PREPARE_METHOD_CACHE = new HashMap<>();
-    private final Map<Class<?>, List<Method>> BEFORE_ALL_METHOD_CACHE = new HashMap<>();
-    private final Map<Class<?>, List<Method>> BEFORE_EACH_METHOD_CACHE = new HashMap<>();
-    private final Map<Class<?>, List<Method>> TEST_METHOD_CACHE = new HashMap<>();
-    private final Map<Class<?>, List<Method>> AFTER_EACH_METHOD_CACHE = new HashMap<>();
-    private final Map<Class<?>, List<Method>> AFTER_ALL_METHOD_CACHE = new HashMap<>();
-    private final Map<Class<?>, List<Method>> CONCLUDE_METHOD_CACHE = new HashMap<>();
+    private static final Object[] NO_OBJECT_ARGS = null;
+
+    private final Predicate<Field> AUTO_CLOSE_FIELD_FILTER =
+            field -> field.isAnnotationPresent(TestEngine.AutoClose.class);
+
+    private static final Predicate<Field> ARGUMENT_FIELD_FILTER =
+            field -> {
+                if (!field.isAnnotationPresent(TestEngine.Argument.class)) {
+                    return false;
+                }
+                return Argument.class.isAssignableFrom(field.getType());
+            };
+
+    private static final Predicate<Method> PREPARE_METHOD_FILTER =
+            method -> {
+                if (!method.isAnnotationPresent(TestEngine.Prepare.class)) {
+                    return false;
+                }
+                if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                    return false;
+                }
+                ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
+                if (reflectionUtils.isStatic(method)) {
+                    return false;
+                }
+                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                    return false;
+                }
+                if (!(reflectionUtils.hasParameterCount(method, 0)
+                        || reflectionUtils.acceptsParameters(method, Argument.class))) {
+                    return false;
+                }
+                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                    return false;
+                }
+                method.setAccessible(true);
+                return true;
+            };
+
+    private static final Predicate<Method> BEFORE_ALL_METHOD_FILTER =
+            method -> {
+                if (!method.isAnnotationPresent(TestEngine.BeforeAll.class)) {
+                    return false;
+                }
+                if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                    return false;
+                }
+                ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
+                if (reflectionUtils.isStatic(method)) {
+                    return false;
+                }
+                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                    return false;
+                }
+                if (!(reflectionUtils.hasParameterCount(method, 0)
+                        || reflectionUtils.acceptsParameters(method, Argument.class))) {
+                    return false;
+                }
+                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                    return false;
+                }
+                method.setAccessible(true);
+                return true;
+            };
+
+    private static final Predicate<Method> BEFORE_EACH_METHOD_FILTER =
+            method -> {
+                if (!method.isAnnotationPresent(TestEngine.BeforeEach.class)) {
+                    return false;
+                }
+                if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                    return false;
+                }
+                ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
+                if (reflectionUtils.isStatic(method)) {
+                    return false;
+                }
+                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                    return false;
+                }
+                if (!(reflectionUtils.hasParameterCount(method, 0)
+                        || reflectionUtils.acceptsParameters(method, Argument.class))) {
+                    return false;
+                }
+                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                    return false;
+                }
+                method.setAccessible(true);
+                return true;
+            };
+
+    private static final Predicate<Method> TEST_METHOD_FILTER =
+            method -> {
+                if (!method.isAnnotationPresent(TestEngine.Test.class)) {
+                    return false;
+                }
+                if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                    return false;
+                }
+                ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
+                if (reflectionUtils.isStatic(method)) {
+                    return false;
+                }
+                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                    return false;
+                }
+                if (!(reflectionUtils.hasParameterCount(method, 0)
+                        || reflectionUtils.acceptsParameters(method, Argument.class))) {
+                    return false;
+                }
+                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                    return false;
+                }
+                method.setAccessible(true);
+                return true;
+            };
+
+    private static final Predicate<Method> AFTER_EACH_METHOD_FILTER =
+            method -> {
+                if (!method.isAnnotationPresent(TestEngine.AfterEach.class)) {
+                    return false;
+                }
+                if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                    return false;
+                }
+                ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
+                if (reflectionUtils.isStatic(method)) {
+                    return false;
+                }
+                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                    return false;
+                }
+                if (!(reflectionUtils.hasParameterCount(method, 0)
+                        || reflectionUtils.acceptsParameters(method, Argument.class))) {
+                    return false;
+                }
+                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                    return false;
+                }
+                method.setAccessible(true);
+                return true;
+            };
+
+    private static final Predicate<Method> AFTER_ALL_METHOD_FILTER =
+            method -> {
+                if (!method.isAnnotationPresent(TestEngine.AfterAll.class)) {
+                    return false;
+                }
+                if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                    return false;
+                }
+                ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
+                if (reflectionUtils.isStatic(method)) {
+                    return false;
+                }
+                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                    return false;
+                }
+                if (!(reflectionUtils.hasParameterCount(method, 0)
+                        || reflectionUtils.acceptsParameters(method, Argument.class))) {
+                    return false;
+                }
+                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                    return false;
+                }
+                method.setAccessible(true);
+                return true;
+            };
+
+    private static final Predicate<Method> CONCLUDE_METHOD_FILTER =
+            method -> {
+                if (!method.isAnnotationPresent(TestEngine.Conclude.class)) {
+                    return false;
+                }
+                if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                    return false;
+                }
+                ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
+                if (reflectionUtils.isStatic(method)) {
+                    return false;
+                }
+                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                    return false;
+                }
+                if (!(reflectionUtils.hasParameterCount(method, 0)
+                        || reflectionUtils.acceptsParameters(method, Argument.class))) {
+                    return false;
+                }
+                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                    return false;
+                }
+                method.setAccessible(true);
+                return true;
+            };
+
+    private final Map<Class<?>, Method> argumentSupplierMethodCache = new HashMap<>();
+    private final Map<Class<?>, List<Field>> argumentFieldCache = new HashMap<>();
+    private final Map<Class<?>, List<Field>> autoCloseFieldCache = new HashMap<>();
+    private final Map<Class<?>, List<Method>> prepareMethodCache = new HashMap<>();
+    private final Map<Class<?>, List<Method>> beforeAllMethodCache = new HashMap<>();
+    private final Map<Class<?>, List<Method>> beforeEachMethodCache = new HashMap<>();
+    private final Map<Class<?>, List<Method>> testMethodCache = new HashMap<>();
+    private final Map<Class<?>, List<Method>> afterEachMethodCache = new HashMap<>();
+    private final Map<Class<?>, List<Method>> afterAllMethodCache = new HashMap<>();
+    private final Map<Class<?>, List<Method>> concludeMethodCache = new HashMap<>();
 
     /** Constructor */
     private TestEngineReflectionUtils() {
@@ -110,6 +301,47 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
+     * Method to test if a Class is a test class
+     *
+     * @param clazz clazz
+     * @return true if the Class is a test class, otherwise false
+     */
+    public boolean isTestClass(Class<?> clazz) {
+        boolean isTestClass;
+
+        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
+                || clazz.isAnnotationPresent(TestEngine.Disabled.class)
+                || Modifier.isAbstract(clazz.getModifiers())
+                || TestEngineReflectionUtils.singleton().getTestMethods(clazz).isEmpty()) {
+            isTestClass = false;
+        } else {
+            isTestClass = true;
+        }
+
+        LOGGER.trace("isTestClass class [%s] result [%b] ", clazz.getName(), isTestClass);
+
+        return isTestClass;
+    }
+
+    /**
+     * Method to test if a Method is a test method
+     *
+     * @param method method
+     * @return true if the Method is a test method, otherwise false
+     */
+    public boolean isTestMethod(Method method) {
+        boolean result =
+                !method.isAnnotationPresent(TestEngine.Disabled.class)
+                        && getTestMethods(method.getDeclaringClass()).contains(method);
+
+        LOGGER.trace(
+                "isTestMethod method [%s] result [%b]",
+                method.getDeclaringClass().getName(), result);
+
+        return result;
+    }
+
+    /**
      * Method to return if a Method accepts an Argument
      *
      * @param method method
@@ -135,15 +367,15 @@ public final class TestEngineReflectionUtils {
 
         Method argumentSupplierMethod;
 
-        synchronized (ARGUMENT_SUPPLIER_METHOD_CACHE) {
-            argumentSupplierMethod = ARGUMENT_SUPPLIER_METHOD_CACHE.get(clazz);
+        synchronized (argumentSupplierMethodCache) {
+            argumentSupplierMethod = argumentSupplierMethodCache.get(clazz);
 
             if (argumentSupplierMethod == null) {
                 ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
                 List<Method> methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUB_CLASS_FIRST)
+                                .getMethods(clazz, ReflectionUtils.HierarchyTraversalOrder.TOP_DOWN)
                                 .stream()
                                 .filter(
                                         method ->
@@ -174,7 +406,7 @@ public final class TestEngineReflectionUtils {
 
                 argumentSupplierMethod = methods.get(0);
 
-                ARGUMENT_SUPPLIER_METHOD_CACHE.put(clazz, argumentSupplierMethod);
+                argumentSupplierMethodCache.put(clazz, argumentSupplierMethod);
             }
         }
 
@@ -247,42 +479,24 @@ public final class TestEngineReflectionUtils {
 
         List<Method> methods;
 
-        synchronized (PREPARE_METHOD_CACHE) {
-            methods = PREPARE_METHOD_CACHE.get(clazz);
+        synchronized (prepareMethodCache) {
+            methods = prepareMethodCache.get(clazz);
 
             if (methods == null) {
                 ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
                 methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPER_CLASS_FIRST)
+                                .getMethods(
+                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
                                 .stream()
-                                .filter(
-                                        method ->
-                                                method.isAnnotationPresent(
-                                                        TestEngine.Prepare.class))
-                                .filter(
-                                        method ->
-                                                !method.isAnnotationPresent(
-                                                        TestEngine.Disabled.class))
-                                .filter(reflectionUtils::isNotStatic)
-                                .filter(
-                                        method ->
-                                                reflectionUtils.isPublic(method)
-                                                        || reflectionUtils.isProtected(method))
-                                .filter(
-                                        method ->
-                                                reflectionUtils.hasParameterCount(method, 0)
-                                                        || reflectionUtils.acceptsParameters(
-                                                                method, Argument.class))
-                                .filter(method -> reflectionUtils.hasReturnType(method, Void.class))
-                                .peek(method -> method.setAccessible(true))
+                                .filter(PREPARE_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
                 sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
 
-                PREPARE_METHOD_CACHE.put(clazz, methods);
+                prepareMethodCache.put(clazz, methods);
             }
         }
 
@@ -307,30 +521,27 @@ public final class TestEngineReflectionUtils {
      * Method to get @TestEngine.Argument Field
      *
      * @param clazz class to inspect
-     * @return Optional that contains an @TestEngine.Argument annotated Field if it exists or is
-     *     empty
+     * @return List of Fields
      */
-    public Optional<Field> getArgumentField(Class<?> clazz) {
+    public List<Field> getArgumentFields(Class<?> clazz) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("getArgumentField class [%s]", clazz.getName());
+            LOGGER.trace("getArgumentFields class [%s]", clazz.getName());
         }
 
-        Optional<Field> optionalField;
+        List<Field> fields;
 
-        synchronized (ARGUMENT_FIELD_CACHE) {
-            optionalField = ARGUMENT_FIELD_CACHE.get(clazz);
+        synchronized (argumentFieldCache) {
+            fields = argumentFieldCache.get(clazz);
 
-            if (optionalField == null) {
-                List<Field> argumentFields =
-                        getFields(clazz, TestEngine.Argument.class, Argument.class);
-                if (argumentFields.isEmpty()) {
-                    optionalField = Optional.empty();
-                    ARGUMENT_FIELD_CACHE.put(clazz, optionalField);
-                } else {
-                    Field field = argumentFields.get(0);
-                    optionalField = Optional.of(field);
-                    ARGUMENT_FIELD_CACHE.put(clazz, optionalField);
-                }
+            if (fields == null) {
+                fields =
+                        ReflectionUtils.singleton()
+                                .getFields(clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
+                                .stream()
+                                .filter(ARGUMENT_FIELD_FILTER)
+                                .collect(Collectors.toList());
+
+                argumentFieldCache.put(clazz, fields);
             }
         }
 
@@ -338,15 +549,17 @@ public final class TestEngineReflectionUtils {
             synchronized (LOGGER) {
                 LOGGER.trace(
                         " class [%s] @TestEngine.Argument field count [%d]",
-                        clazz.getName(), optionalField.isPresent() ? 1 : 0);
+                        clazz.getName(), fields.size());
 
-                LOGGER.trace(
-                        " class [%s] @TestEngine.Argument argument field [%s]",
-                        clazz.getName(), optionalField.map(Field::getName).orElse("ERROR"));
+                for (Field field : fields) {
+                    LOGGER.trace(
+                            " class [%s] @TestEngine.Argument argument field [%s]",
+                            clazz.getName(), field.getName());
+                }
             }
         }
 
-        return optionalField;
+        return fields;
     }
 
     /**
@@ -362,13 +575,18 @@ public final class TestEngineReflectionUtils {
 
         List<Field> fields;
 
-        synchronized (AUTO_CLOSE_FIELD_CACHE) {
-            fields = AUTO_CLOSE_FIELD_CACHE.get(clazz);
+        synchronized (autoCloseFieldCache) {
+            fields = autoCloseFieldCache.get(clazz);
 
             if (fields == null) {
-                fields = getFields(clazz, TestEngine.AutoClose.class, Object.class);
+                fields =
+                        ReflectionUtils.singleton()
+                                .getFields(clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
+                                .stream()
+                                .filter(AUTO_CLOSE_FIELD_FILTER)
+                                .collect(Collectors.toList());
 
-                AUTO_CLOSE_FIELD_CACHE.put(clazz, fields);
+                autoCloseFieldCache.put(clazz, fields);
             }
         }
 
@@ -402,42 +620,24 @@ public final class TestEngineReflectionUtils {
 
         List<Method> methods;
 
-        synchronized (BEFORE_ALL_METHOD_CACHE) {
-            methods = BEFORE_ALL_METHOD_CACHE.get(clazz);
+        synchronized (beforeAllMethodCache) {
+            methods = beforeAllMethodCache.get(clazz);
 
             if (methods == null) {
                 ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
                 methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPER_CLASS_FIRST)
+                                .getMethods(
+                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
                                 .stream()
-                                .filter(
-                                        method ->
-                                                method.isAnnotationPresent(
-                                                        TestEngine.BeforeAll.class))
-                                .filter(
-                                        method ->
-                                                !method.isAnnotationPresent(
-                                                        TestEngine.Disabled.class))
-                                .filter(reflectionUtils::isNotStatic)
-                                .filter(
-                                        method ->
-                                                reflectionUtils.isPublic(method)
-                                                        || reflectionUtils.isProtected(method))
-                                .filter(
-                                        method ->
-                                                reflectionUtils.hasParameterCount(method, 0)
-                                                        || reflectionUtils.acceptsParameters(
-                                                                method, Argument.class))
-                                .filter(method -> reflectionUtils.hasReturnType(method, Void.class))
-                                .peek(method -> method.setAccessible(true))
+                                .filter(BEFORE_ALL_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
                 sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
 
-                BEFORE_ALL_METHOD_CACHE.put(clazz, methods);
+                beforeAllMethodCache.put(clazz, methods);
             }
         }
 
@@ -471,42 +671,24 @@ public final class TestEngineReflectionUtils {
 
         List<Method> methods;
 
-        synchronized (BEFORE_EACH_METHOD_CACHE) {
-            methods = BEFORE_EACH_METHOD_CACHE.get(clazz);
+        synchronized (beforeEachMethodCache) {
+            methods = beforeEachMethodCache.get(clazz);
 
             if (methods == null) {
                 ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
                 methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPER_CLASS_FIRST)
+                                .getMethods(
+                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
                                 .stream()
-                                .filter(
-                                        method ->
-                                                method.isAnnotationPresent(
-                                                        TestEngine.BeforeEach.class))
-                                .filter(
-                                        method ->
-                                                !method.isAnnotationPresent(
-                                                        TestEngine.Disabled.class))
-                                .filter(reflectionUtils::isNotStatic)
-                                .filter(
-                                        method ->
-                                                reflectionUtils.isPublic(method)
-                                                        || reflectionUtils.isProtected(method))
-                                .filter(
-                                        method ->
-                                                reflectionUtils.hasParameterCount(method, 0)
-                                                        || reflectionUtils.acceptsParameters(
-                                                                method, Argument.class))
-                                .filter(method -> reflectionUtils.hasReturnType(method, Void.class))
-                                .peek(method -> method.setAccessible(true))
+                                .filter(BEFORE_EACH_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
                 sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
 
-                BEFORE_EACH_METHOD_CACHE.put(clazz, methods);
+                beforeEachMethodCache.put(clazz, methods);
             }
         }
 
@@ -538,39 +720,24 @@ public final class TestEngineReflectionUtils {
 
         List<Method> methods;
 
-        synchronized (TEST_METHOD_CACHE) {
-            methods = TEST_METHOD_CACHE.get(clazz);
+        synchronized (testMethodCache) {
+            methods = testMethodCache.get(clazz);
 
             if (methods == null) {
                 ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
                 methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPER_CLASS_FIRST)
+                                .getMethods(
+                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
                                 .stream()
-                                .filter(method -> method.isAnnotationPresent(TestEngine.Test.class))
-                                .filter(
-                                        method ->
-                                                !method.isAnnotationPresent(
-                                                        TestEngine.Disabled.class))
-                                .filter(reflectionUtils::isNotStatic)
-                                .filter(
-                                        method ->
-                                                reflectionUtils.isPublic(method)
-                                                        || reflectionUtils.isProtected(method))
-                                .filter(
-                                        method ->
-                                                reflectionUtils.hasParameterCount(method, 0)
-                                                        || reflectionUtils.acceptsParameters(
-                                                                method, Argument.class))
-                                .filter(method -> reflectionUtils.hasReturnType(method, Void.class))
-                                .peek(method -> method.setAccessible(true))
+                                .filter(TEST_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
                 sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
 
-                TEST_METHOD_CACHE.put(clazz, methods);
+                testMethodCache.put(clazz, methods);
             }
         }
 
@@ -604,42 +771,24 @@ public final class TestEngineReflectionUtils {
 
         List<Method> methods;
 
-        synchronized (AFTER_EACH_METHOD_CACHE) {
-            methods = AFTER_EACH_METHOD_CACHE.get(clazz);
+        synchronized (afterEachMethodCache) {
+            methods = afterEachMethodCache.get(clazz);
 
             if (methods == null) {
                 ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
                 methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPER_CLASS_FIRST)
+                                .getMethods(
+                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
                                 .stream()
-                                .filter(
-                                        method ->
-                                                method.isAnnotationPresent(
-                                                        TestEngine.AfterEach.class))
-                                .filter(
-                                        method ->
-                                                !method.isAnnotationPresent(
-                                                        TestEngine.Disabled.class))
-                                .filter(reflectionUtils::isNotStatic)
-                                .filter(
-                                        method ->
-                                                reflectionUtils.isPublic(method)
-                                                        || reflectionUtils.isProtected(method))
-                                .filter(
-                                        method ->
-                                                reflectionUtils.hasParameterCount(method, 0)
-                                                        || reflectionUtils.acceptsParameters(
-                                                                method, Argument.class))
-                                .filter(method -> reflectionUtils.hasReturnType(method, Void.class))
-                                .peek(method -> method.setAccessible(true))
+                                .filter(AFTER_EACH_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
                 sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
 
-                AFTER_EACH_METHOD_CACHE.put(clazz, methods);
+                afterEachMethodCache.put(clazz, methods);
             }
         }
 
@@ -673,42 +822,24 @@ public final class TestEngineReflectionUtils {
 
         List<Method> methods;
 
-        synchronized (AFTER_ALL_METHOD_CACHE) {
-            methods = AFTER_ALL_METHOD_CACHE.get(clazz);
+        synchronized (afterAllMethodCache) {
+            methods = afterAllMethodCache.get(clazz);
 
             if (methods == null) {
                 ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
                 methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPER_CLASS_FIRST)
+                                .getMethods(
+                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
                                 .stream()
-                                .filter(
-                                        method ->
-                                                method.isAnnotationPresent(
-                                                        TestEngine.AfterAll.class))
-                                .filter(
-                                        method ->
-                                                !method.isAnnotationPresent(
-                                                        TestEngine.Disabled.class))
-                                .filter(reflectionUtils::isNotStatic)
-                                .filter(
-                                        method ->
-                                                reflectionUtils.isPublic(method)
-                                                        || reflectionUtils.isProtected(method))
-                                .filter(
-                                        method ->
-                                                reflectionUtils.hasParameterCount(method, 0)
-                                                        || reflectionUtils.acceptsParameters(
-                                                                method, Argument.class))
-                                .filter(method -> reflectionUtils.hasReturnType(method, Void.class))
-                                .peek(method -> method.setAccessible(true))
+                                .filter(AFTER_ALL_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
                 sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
 
-                AFTER_ALL_METHOD_CACHE.put(clazz, methods);
+                afterAllMethodCache.put(clazz, methods);
             }
         }
 
@@ -742,42 +873,24 @@ public final class TestEngineReflectionUtils {
 
         List<Method> methods;
 
-        synchronized (CONCLUDE_METHOD_CACHE) {
-            methods = CONCLUDE_METHOD_CACHE.get(clazz);
+        synchronized (concludeMethodCache) {
+            methods = concludeMethodCache.get(clazz);
 
             if (methods == null) {
                 ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
                 methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPER_CLASS_FIRST)
+                                .getMethods(
+                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
                                 .stream()
-                                .filter(
-                                        method ->
-                                                method.isAnnotationPresent(
-                                                        TestEngine.Conclude.class))
-                                .filter(
-                                        method ->
-                                                !method.isAnnotationPresent(
-                                                        TestEngine.Disabled.class))
-                                .filter(reflectionUtils::isNotStatic)
-                                .filter(
-                                        method ->
-                                                reflectionUtils.isPublic(method)
-                                                        || reflectionUtils.isProtected(method))
-                                .filter(
-                                        method ->
-                                                reflectionUtils.hasParameterCount(method, 0)
-                                                        || reflectionUtils.acceptsParameters(
-                                                                method, Argument.class))
-                                .filter(method -> reflectionUtils.hasReturnType(method, Void.class))
-                                .peek(method -> method.setAccessible(true))
+                                .filter(CONCLUDE_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
                 sortMethods(methods);
                 validateDistinctOrder(clazz, methods);
 
-                CONCLUDE_METHOD_CACHE.put(clazz, methods);
+                concludeMethodCache.put(clazz, methods);
             }
         }
 
@@ -849,76 +962,6 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get a List of all fields from a Class and super Classes
-     *
-     * @param clazz class to inspect
-     * @param annotation annotation that is required
-     * @param fieldType field type that is required
-     * @return list of Fields
-     */
-    private List<Field> getFields(
-            Class<?> clazz, Class<? extends Annotation> annotation, Class<?> fieldType) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(
-                    "getFields class [%s] annotation [%s] fieldType [%s]",
-                    clazz.getName(), annotation.getName(), fieldType.getName());
-        }
-
-        Set<Field> fieldSet = new LinkedHashSet<>();
-        resolveFields(clazz, annotation, fieldType, fieldSet);
-        List<Field> fields = new ArrayList<>(fieldSet);
-        fields.sort(Comparator.comparing(Field::getName));
-
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("class [%s] argument field count [%d]", clazz.getName(), fieldSet.size());
-        }
-
-        return fields;
-    }
-
-    /**
-     * Method to recursively resolve Fields
-     *
-     * @param clazz class to inspect
-     * @param annotation annotation that is required
-     * @param fieldType field type that is required
-     * @param fieldSet set of Fields
-     */
-    private void resolveFields(
-            Class<?> clazz,
-            Class<? extends Annotation> annotation,
-            Class<?> fieldType,
-            Set<Field> fieldSet) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(
-                    "resolveFields class [%s] annotation [%s] fieldType [%s]",
-                    clazz.getName(), annotation.getName(), fieldType.getName());
-        }
-
-        List<Field> fields =
-                Stream.of(clazz.getDeclaredFields())
-                        .filter(
-                                field -> {
-                                    int modifiers = field.getModifiers();
-                                    return !Modifier.isFinal(modifiers)
-                                            && !Modifier.isStatic(modifiers)
-                                            && field.isAnnotationPresent(annotation)
-                                            && fieldType.isAssignableFrom(field.getType());
-                                })
-                        .collect(Collectors.toList());
-
-        for (Field field : fields) {
-            field.setAccessible(true);
-            fieldSet.add(field);
-        }
-
-        Class<?> declaringClass = clazz.getSuperclass();
-        if (declaringClass != null && !declaringClass.equals(Object.class)) {
-            resolveFields(declaringClass, annotation, fieldType, fieldSet);
-        }
-    }
-
-    /**
      * Method to sort a List of classes first by @TestEngine.Order annotation, then by display name
      * / class name
      *
@@ -962,7 +1005,6 @@ public final class TestEngineReflectionUtils {
      *
      * @param classes classes
      */
-    /*
     private void validateDistinctOrder(List<Class<?>> classes) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("validateDistinctOrder count [%s]", classes.size());
@@ -990,7 +1032,6 @@ public final class TestEngineReflectionUtils {
             }
         }
     }
-    */
 
     /**
      * Method to sort a List of methods first by @TestEngine.Order annotation, then alphabetically

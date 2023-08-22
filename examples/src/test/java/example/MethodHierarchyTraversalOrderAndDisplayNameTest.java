@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.testing;
+package example;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.argument.IntegerArgument;
 
 /** Example test */
-@TestEngine.Order(order = 0)
-public class ClassOrderTest {
+public class MethodHierarchyTraversalOrderAndDisplayNameTest {
 
-    @TestEngine.Argument protected StringArgument stringArgument;
+    @TestEngine.Argument protected IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
-        return StringArgumentSupplier.arguments();
+    public static Stream<IntegerArgument> arguments() {
+        return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
     }
 
     @TestEngine.BeforeAll
@@ -44,13 +41,17 @@ public class ClassOrderTest {
     }
 
     @TestEngine.Test
-    public void test1() {
-        System.out.println("test1(" + stringArgument + ")");
+    @TestEngine.Order(order = 2)
+    @TestEngine.DisplayName(name = "Test A")
+    public void testA() {
+        System.out.println("testA(" + integerArgument + ")");
     }
 
     @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + stringArgument + ")");
+    @TestEngine.Order(order = 1)
+    @TestEngine.DisplayName(name = "Test B")
+    public void testB() {
+        System.out.println("testB(" + integerArgument + ")");
     }
 
     @TestEngine.AfterEach
@@ -61,16 +62,5 @@ public class ClassOrderTest {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
-    }
-
-    private static class StringArgumentSupplier {
-
-        public static Stream<StringArgument> arguments() {
-            Collection<StringArgument> collection = new ArrayList<>();
-            for (int i = 0; i < 10; i++) {
-                collection.add(StringArgument.of(String.valueOf(i)));
-            }
-            return collection.stream();
-        }
     }
 }

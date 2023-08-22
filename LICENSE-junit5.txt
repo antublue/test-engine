@@ -44,7 +44,7 @@ contents of the Program, including, for purposes of clarity any new file
 in Source Code form that contains any contents of the Program. Modified
 Works shall not include works that contain only declarations,
 interfaces, types, classes, structures, or files of the Program solely
-in each case in order to link to, bind by name, or subclass the Program
+in each case in hierarchyTraversalOrder to link to, bind by name, or subclass the Program
 or Modified Works thereof.
 
 "Distribute" means the acts of a) distributing or b) making available
@@ -168,7 +168,7 @@ Contributor to the extent caused by the acts or omissions of such
 Commercial Contributor in connection with its distribution of the Program
 in a commercial product offering. The obligations in this section do not
 apply to any claims or Losses relating to any actual or alleged
-intellectual property infringement. In order to qualify, an Indemnified
+intellectual property infringement. In hierarchyTraversalOrder to qualify, an Indemnified
 Contributor must: a) promptly notify the Commercial Contributor in
 writing of such claim, and b) allow the Commercial Contributor to control,
 and cooperate with the Commercial Contributor in, the defense and any
@@ -237,7 +237,7 @@ However, Recipient's obligations under this Agreement and any licenses
 granted by Recipient relating to the Program shall continue and survive.
 
 Everyone is permitted to copy and distribute copies of this Agreement,
-but in order to avoid inconsistency the Agreement is copyrighted and
+but in hierarchyTraversalOrder to avoid inconsistency the Agreement is copyrighted and
 may only be modified in the following manner. The Agreement Steward
 reserves the right to publish new versions (including revisions) of
 this Agreement from time to time. No one other than the Agreement

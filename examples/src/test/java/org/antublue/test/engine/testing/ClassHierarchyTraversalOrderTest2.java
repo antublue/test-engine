@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package example;
+package org.antublue.test.engine.testing;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class MethodOrderAndDisplayNameTest {
+@TestEngine.Order(order = 1)
+public class ClassHierarchyTraversalOrderTest2 {
 
-    @TestEngine.Argument protected IntegerArgument integerArgument;
+    @TestEngine.Argument protected StringArgument stringArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<IntegerArgument> arguments() {
-        return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
+    public static Stream<StringArgument> arguments() {
+        return StringArgumentSupplier.arguments();
     }
 
     @TestEngine.BeforeAll
@@ -41,17 +44,13 @@ public class MethodOrderAndDisplayNameTest {
     }
 
     @TestEngine.Test
-    @TestEngine.Order(order = 2)
-    @TestEngine.DisplayName(name = "Test A")
-    public void testA() {
-        System.out.println("testA(" + integerArgument + ")");
+    public void test1() {
+        System.out.println("test1(" + stringArgument + ")");
     }
 
     @TestEngine.Test
-    @TestEngine.Order(order = 1)
-    @TestEngine.DisplayName(name = "Test B")
-    public void testB() {
-        System.out.println("testB(" + integerArgument + ")");
+    public void test2() {
+        System.out.println("test2(" + stringArgument + ")");
     }
 
     @TestEngine.AfterEach
@@ -62,5 +61,17 @@ public class MethodOrderAndDisplayNameTest {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
+    }
+
+    private static class StringArgumentSupplier {
+
+        public static Stream<StringArgument> arguments() {
+            Collection<StringArgument> collection = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                collection.add(
+                        org.antublue.test.engine.api.argument.StringArgument.of(String.valueOf(i)));
+            }
+            return collection.stream();
+        }
     }
 }

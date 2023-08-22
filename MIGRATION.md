@@ -65,7 +65,7 @@ public class Test {
   // ... code omitted ...
   
   @TestEngine.Test
-  @TestEngine.Order(order = 1)
+  @TestEngine.Order(hierarchyTraversalOrder = 1)
   public void test() {
     // ... code omitted ...
   }

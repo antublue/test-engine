@@ -24,7 +24,7 @@ import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
 @TestEngine.Disabled
-public class DuplicateOrderTest {
+public class DuplicateHierarchyTraversalOrderTest {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 

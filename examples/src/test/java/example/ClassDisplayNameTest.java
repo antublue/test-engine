@@ -26,8 +26,6 @@ public class ClassDisplayNameTest {
 
     @TestEngine.Argument protected IntegerArgument integerArgument;
 
-    private int value;
-
     @TestEngine.ArgumentSupplier
     public static Stream<IntegerArgument> arguments() {
         return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
@@ -36,8 +34,6 @@ public class ClassDisplayNameTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-
-        value = integerArgument.value();
     }
 
     @TestEngine.BeforeEach

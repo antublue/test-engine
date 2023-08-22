@@ -22,7 +22,7 @@ import java.util.Properties;
 
 /** Class to get TestEngine information */
 @SuppressWarnings("PMD.EmptyCatchBlock")
-public class Information {
+public class InformationUtils {
 
     private static final String RESOURCE_PATH = "/test-engine.properties";
     private static final String VERSION = "version";
@@ -47,7 +47,7 @@ public class Information {
     private static String getProperty(String key, String defaultValue) {
         String value = defaultValue;
 
-        try (InputStream inputStream = Information.class.getResourceAsStream(RESOURCE_PATH)) {
+        try (InputStream inputStream = InformationUtils.class.getResourceAsStream(RESOURCE_PATH)) {
             if (inputStream != null) {
                 Properties properties = new Properties();
                 properties.load(inputStream);

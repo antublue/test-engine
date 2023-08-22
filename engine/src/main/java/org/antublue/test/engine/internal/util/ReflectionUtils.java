@@ -21,11 +21,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.antublue.test.engine.api.Key;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -38,9 +40,12 @@ public final class ReflectionUtils {
 
     private static final ReflectionUtils SINGLETON = new ReflectionUtils();
 
-    public enum Order {
-        SUPER_CLASS_FIRST,
-        SUB_CLASS_FIRST
+    private final Map<String, List<Field>> fieldCache = new HashMap<>();
+    private final Map<String, List<Method>> methodCache = new HashMap<>();
+
+    public enum HierarchyTraversalOrder {
+        TOP_DOWN,
+        BOTTOM_UP
     }
 
     /** Constructor */
@@ -97,38 +102,45 @@ public final class ReflectionUtils {
      * Method to get a List of classes from Class
      *
      * @param clazz clazz to inspect
-     * @param order order
+     * @param hierarchyTraversalOrder order
      * @return a List of Classes
      */
-    public List<Class<?>> getClassHierarchy(Class<?> clazz, Order order) {
+    public List<Class<?>> getClassHierarchy(
+            Class<?> clazz, HierarchyTraversalOrder hierarchyTraversalOrder) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("getClassHierarchy class [%s] order [%s]", clazz.getName(), order);
+            LOGGER.trace(
+                    "getClassHierarchy class [%s] order [%s]",
+                    clazz.getName(), hierarchyTraversalOrder);
         }
 
         Set<Class<?>> classSet = new LinkedHashSet<>();
-        resolveClasses(clazz, order, classSet);
+        resolveClasses(clazz, hierarchyTraversalOrder, classSet);
 
         return new ArrayList<>(classSet);
     }
 
-    private void resolveClasses(Class<?> clazz, Order order, Set<Class<?>> classSet) {
+    private void resolveClasses(
+            Class<?> clazz,
+            HierarchyTraversalOrder hierarchyTraversalOrder,
+            Set<Class<?>> classSet) {
         if (clazz == Object.class) {
             return;
         }
 
-        switch (order) {
-            case SUPER_CLASS_FIRST:
-                {
-                    Class<?> superClass = clazz.getSuperclass();
-                    resolveClasses(superClass, order, classSet);
-                    classSet.add(clazz);
-                }
-            case SUB_CLASS_FIRST:
+        switch (hierarchyTraversalOrder) {
+            case TOP_DOWN:
                 {
                     classSet.add(clazz);
                     Class<?> superClass = clazz.getSuperclass();
-                    resolveClasses(superClass, order, classSet);
+                    resolveClasses(superClass, hierarchyTraversalOrder, classSet);
                 }
+            case BOTTOM_UP:
+                {
+                    Class<?> superClass = clazz.getSuperclass();
+                    resolveClasses(superClass, hierarchyTraversalOrder, classSet);
+                    classSet.add(clazz);
+                }
+
             default:
                 {
                     // DO NOTHING
@@ -142,14 +154,23 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return list of Fields
      */
-    public List<Field> getFields(Class<?> clazz, Order order) {
+    public List<Field> getFields(Class<?> clazz, HierarchyTraversalOrder hierarchyTraversalOrder) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("getFields class [%s] ", clazz.getName());
         }
 
-        Set<Field> fieldSet = new LinkedHashSet<>();
-        resolveFields(clazz, order, fieldSet);
-        List<Field> fields = new ArrayList<>(fieldSet);
+        List<Field> fields;
+
+        synchronized (fieldCache) {
+            String key = Key.of(clazz, "/", hierarchyTraversalOrder);
+            fields = fieldCache.get(key);
+            if (fields == null) {
+                Set<Field> fieldSet = new LinkedHashSet<>();
+                resolveFields(clazz, hierarchyTraversalOrder, fieldSet);
+                fields = new ArrayList<>(fieldSet);
+                fieldCache.put(key, fields);
+            }
+        }
 
         LOGGER.trace(" class [%s] field count [%d]", clazz.getName(), fields.size());
 
@@ -162,7 +183,8 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @param fieldSet set of Fields
      */
-    private void resolveFields(Class<?> clazz, Order order, Set<Field> fieldSet) {
+    private void resolveFields(
+            Class<?> clazz, HierarchyTraversalOrder hierarchyTraversalOrder, Set<Field> fieldSet) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("resolveFields class [%s]", clazz.getName());
         }
@@ -171,11 +193,22 @@ public final class ReflectionUtils {
             return;
         }
 
-        switch (order) {
-            case SUPER_CLASS_FIRST:
+        switch (hierarchyTraversalOrder) {
+            case TOP_DOWN:
+                {
+                    Field[] fields = clazz.getDeclaredFields();
+                    for (Field field : fields) {
+                        if (fieldSet.add(field)) {
+                            field.setAccessible(true);
+                        }
+                    }
+                    Class<?> superClass = clazz.getSuperclass();
+                    resolveFields(superClass, hierarchyTraversalOrder, fieldSet);
+                }
+            case BOTTOM_UP:
                 {
                     Class<?> superClass = clazz.getSuperclass();
-                    resolveFields(superClass, order, fieldSet);
+                    resolveFields(superClass, hierarchyTraversalOrder, fieldSet);
                     Field[] fields = clazz.getDeclaredFields();
                     for (Field field : fields) {
                         if (fieldSet.add(field)) {
@@ -183,17 +216,6 @@ public final class ReflectionUtils {
                         }
                     }
                     break;
-                }
-            case SUB_CLASS_FIRST:
-                {
-                    Field[] fields = clazz.getDeclaredFields();
-                    for (Field field : fields) {
-                        if (fieldSet.add(field)) {
-                            field.setAccessible(true);
-                        }
-                    }
-                    Class<?> superClass = clazz.getSuperclass();
-                    resolveFields(superClass, order, fieldSet);
                 }
             default:
                 {
@@ -208,34 +230,52 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return list of Methods
      */
-    public List<Method> getMethods(Class<?> clazz, Order order) {
+    public List<Method> getMethods(
+            Class<?> clazz, HierarchyTraversalOrder hierarchyTraversalOrder) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("getMethods class [%s] method order [%s]", clazz.getName(), order);
+            LOGGER.trace(
+                    "getMethods class [%s] method order [%s]",
+                    clazz.getName(), hierarchyTraversalOrder);
         }
 
-        Map<String, Method> methodMap = new LinkedHashMap<>();
-        resolveMethods(clazz, order, methodMap);
+        List<Method> methods;
 
-        if (LOGGER.isTraceEnabled()) {
-            synchronized (LOGGER) {
-                LOGGER.trace(" class [%s] method count [%d]", clazz.getName(), methodMap.size());
+        synchronized (methodCache) {
+            String key = Key.of(clazz, "/", hierarchyTraversalOrder);
+            methods = methodCache.get(key);
+            if (methods == null) {
+                Map<String, Method> methodMap = new LinkedHashMap<>();
+                resolveMethods(clazz, hierarchyTraversalOrder, methodMap);
+                methods = new ArrayList<>(methodMap.values());
+                methodCache.put(key, methods);
+                if (LOGGER.isTraceEnabled()) {
+                    synchronized (LOGGER) {
+                        LOGGER.trace(
+                                " class [%s] method count [%d]", clazz.getName(), methodMap.size());
 
-                for (Method method : methodMap.values()) {
-                    LOGGER.trace(
-                            " class [%s] method [%s %s]",
-                            clazz.getName(),
-                            method.getDeclaringClass().getName(),
-                            method.getName());
+                        for (Method method : methodMap.values()) {
+                            LOGGER.trace(
+                                    " class [%s] method [%s %s]",
+                                    clazz.getName(),
+                                    method.getDeclaringClass().getName(),
+                                    method.getName());
+                        }
+                    }
                 }
             }
         }
 
-        return new ArrayList<>(methodMap.values());
+        return methods;
     }
 
-    private void resolveMethods(Class<?> clazz, Order order, Map<String, Method> methodMap) {
+    private void resolveMethods(
+            Class<?> clazz,
+            HierarchyTraversalOrder hierarchyTraversalOrder,
+            Map<String, Method> methodMap) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("resolveMethods class [%s] method order [%s]", clazz.getName(), order);
+            LOGGER.trace(
+                    "resolveMethods class [%s] method order [%s]",
+                    clazz.getName(), hierarchyTraversalOrder);
         }
 
         if (clazz == Object.class) {
@@ -243,23 +283,23 @@ public final class ReflectionUtils {
         }
 
         try {
-            switch (order) {
-                case SUPER_CLASS_FIRST:
+            switch (hierarchyTraversalOrder) {
+                case TOP_DOWN:
                     {
-                        Class<?> superClass = clazz.getSuperclass();
-                        resolveMethods(superClass, order, methodMap);
                         for (Method method : clazz.getDeclaredMethods()) {
                             methodMap.putIfAbsent(method.getName(), method);
                         }
+                        Class<?> superClass = clazz.getSuperclass();
+                        resolveMethods(superClass, hierarchyTraversalOrder, methodMap);
                         break;
                     }
-                case SUB_CLASS_FIRST:
+                case BOTTOM_UP:
                     {
+                        Class<?> superClass = clazz.getSuperclass();
+                        resolveMethods(superClass, hierarchyTraversalOrder, methodMap);
                         for (Method method : clazz.getDeclaredMethods()) {
                             methodMap.putIfAbsent(method.getName(), method);
                         }
-                        Class<?> superClass = clazz.getSuperclass();
-                        resolveMethods(superClass, order, methodMap);
                         break;
                     }
                 default:
