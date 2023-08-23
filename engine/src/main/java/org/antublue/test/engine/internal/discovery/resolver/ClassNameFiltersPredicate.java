@@ -61,6 +61,7 @@ public class ClassNameFiltersPredicate implements Predicate<Class<?>> {
         }
 
         LOGGER.trace("class [%s] included", clazz.getName());
+
         return true;
     }
 }

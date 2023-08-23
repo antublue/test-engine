@@ -37,7 +37,7 @@ public final class TestMethodPredicate extends RegexPredicate<Method> {
      * @return whether to accept the Method
      */
     @Override
-    public boolean test(Method method) {
+    public synchronized boolean test(Method method) {
         return matcher.reset(method.getName()).find();
     }
 

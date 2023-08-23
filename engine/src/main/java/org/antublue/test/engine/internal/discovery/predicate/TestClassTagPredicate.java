@@ -37,7 +37,7 @@ public final class TestClassTagPredicate extends RegexPredicate<Class<?>> {
      * @return whether to accept the Class
      */
     @Override
-    public boolean test(Class<?> clazz) {
+    public synchronized boolean test(Class<?> clazz) {
         TestEngine.Tag annotation = clazz.getAnnotation(TestEngine.Tag.class);
         if (annotation == null) {
             return false;

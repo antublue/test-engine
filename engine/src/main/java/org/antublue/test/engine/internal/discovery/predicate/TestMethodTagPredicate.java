@@ -38,7 +38,7 @@ public final class TestMethodTagPredicate extends RegexPredicate<Method> {
      * @return whether to accept the method
      */
     @Override
-    public boolean test(Method method) {
+    public synchronized boolean test(Method method) {
         TestEngine.Tag annotation = method.getAnnotation(TestEngine.Tag.class);
         if (annotation == null) {
             return false;

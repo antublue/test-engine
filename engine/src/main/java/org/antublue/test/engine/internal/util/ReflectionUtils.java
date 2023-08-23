@@ -316,10 +316,6 @@ public final class ReflectionUtils {
         return Modifier.isStatic(method.getModifiers());
     }
 
-    public boolean isNotStatic(Method method) {
-        return !isStatic(method);
-    }
-
     public boolean isPublic(Method method) {
         return Modifier.isPublic(method.getModifiers());
     }

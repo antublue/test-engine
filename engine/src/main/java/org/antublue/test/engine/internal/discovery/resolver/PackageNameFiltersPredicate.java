@@ -63,6 +63,7 @@ public class PackageNameFiltersPredicate implements Predicate<Class<?>> {
         }
 
         LOGGER.trace("package [%s] included", packageName);
+
         return true;
     }
 }

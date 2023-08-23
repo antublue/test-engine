@@ -311,14 +311,11 @@ public final class TestEngineReflectionUtils {
 
         TestEngineReflectionUtils testEngineReflectionUtils = TestEngineReflectionUtils.singleton();
 
-        if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
-                || clazz.isAnnotationPresent(TestEngine.Disabled.class)
-                || Modifier.isAbstract(clazz.getModifiers())
-                || testEngineReflectionUtils.getTestMethods(clazz).isEmpty()) {
-            isTestClass = false;
-        } else {
-            isTestClass = true;
-        }
+        isTestClass =
+                !clazz.isAnnotationPresent(TestEngine.BaseClass.class)
+                        && !clazz.isAnnotationPresent(TestEngine.Disabled.class)
+                        && !Modifier.isAbstract(clazz.getModifiers())
+                        && !testEngineReflectionUtils.getTestMethods(clazz).isEmpty();
 
         LOGGER.trace("isTestClass class [%s] result [%b] ", clazz.getName(), isTestClass);
 
