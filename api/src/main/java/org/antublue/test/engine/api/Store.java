@@ -145,10 +145,10 @@ public final class Store {
     /**
      * Method to get a value from the store, calling a function to transform it
      *
-     * @param key kjey
+     * @param key key
      * @param function function
      * @return on Optional containing the value returned by the function
-     * @param <T>
+     * @param <T> the return type
      */
     public <T> Optional<T> get(String key, Function<Object, T> function) {
         String validKey = checkKey(key);
