@@ -288,13 +288,11 @@ public class Resolver {
                         classpathRootSelector -> {
                             LOGGER.trace("ClasspathRootSelector.class");
                             testEngineReflectionUtils
-                                    .findAllClasses(classpathRootSelector.getClasspathRoot())
+                                    .findAllTestClasses(classpathRootSelector.getClasspathRoot())
                                     .forEach(
                                             clazz -> {
                                                 if (packageNameFiltersPredicate.test(clazz)
-                                                        && classNameFiltersPredicate.test(clazz)
-                                                        && testEngineReflectionUtils.isTestClass(
-                                                                clazz)) {
+                                                        && classNameFiltersPredicate.test(clazz)) {
                                                     classMethodSetMap.put(
                                                             clazz,
                                                             new LinkedHashSet<>(
@@ -318,13 +316,11 @@ public class Resolver {
                         packageSelector -> {
                             LOGGER.trace("PackageSelector.class");
                             testEngineReflectionUtils
-                                    .findAllClasses(packageSelector.getPackageName())
+                                    .findAllTestClasses(packageSelector.getPackageName())
                                     .forEach(
                                             clazz -> {
                                                 if (packageNameFiltersPredicate.test(clazz)
-                                                        && classNameFiltersPredicate.test(clazz)
-                                                        && testEngineReflectionUtils.isTestClass(
-                                                                clazz)) {
+                                                        && classNameFiltersPredicate.test(clazz)) {
                                                     classMethodSetMap.put(
                                                             clazz,
                                                             new LinkedHashSet<>(

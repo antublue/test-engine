@@ -271,33 +271,53 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to find all classes for a URI
+     * Method to find all test classes for a URI
      *
      * @param uri uri
      * @return the return value
      */
-    public List<Class<?>> findAllClasses(URI uri) {
+    public List<Class<?>> findAllTestClasses(URI uri) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("findAllClasses uri [%s]", uri.toASCIIString());
+            LOGGER.trace("findAllTestClasses uri [%s]", uri.toASCIIString());
         }
 
+        List<Class<?>> testClasses = new ArrayList<>();
+
         List<Class<?>> classes = ReflectionUtils.singleton().findAllClasses(uri);
-        sortClasses(classes);
-        return classes;
+        for (Class<?> clazz : classes) {
+            if (isTestClass(clazz)) {
+                testClasses.add(clazz);
+            }
+        }
+
+        sortClasses(testClasses);
+        validateDistinctOrder(testClasses);
+
+        return testClasses;
     }
 
     /**
-     * Method to find all classes with a package name
+     * Method to find all test classes with a package name
      *
      * @param packageName packageName
      * @return the return value
      */
-    public List<Class<?>> findAllClasses(String packageName) {
-        LOGGER.trace("findAllClasses package name [%s]", packageName);
+    public List<Class<?>> findAllTestClasses(String packageName) {
+        LOGGER.trace("findAllTestClasses package name [%s]", packageName);
+
+        List<Class<?>> testClasses = new ArrayList<>();
 
         List<Class<?>> classes = ReflectionUtils.singleton().findAllClasses(packageName);
-        sortClasses(classes);
-        return classes;
+        for (Class<?> clazz : classes) {
+            if (isTestClass(clazz)) {
+                testClasses.add(clazz);
+            }
+        }
+
+        sortClasses(testClasses);
+        validateDistinctOrder(testClasses);
+
+        return testClasses;
     }
 
     /**
