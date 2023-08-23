@@ -309,10 +309,12 @@ public final class TestEngineReflectionUtils {
     public boolean isTestClass(Class<?> clazz) {
         boolean isTestClass;
 
+        TestEngineReflectionUtils testEngineReflectionUtils = TestEngineReflectionUtils.singleton();
+
         if (clazz.isAnnotationPresent(TestEngine.BaseClass.class)
                 || clazz.isAnnotationPresent(TestEngine.Disabled.class)
                 || Modifier.isAbstract(clazz.getModifiers())
-                || TestEngineReflectionUtils.singleton().getTestMethods(clazz).isEmpty()) {
+                || testEngineReflectionUtils.getTestMethods(clazz).isEmpty()) {
             isTestClass = false;
         } else {
             isTestClass = true;

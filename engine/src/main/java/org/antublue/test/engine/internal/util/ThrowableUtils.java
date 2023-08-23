@@ -31,14 +31,7 @@ public class ThrowableUtils {
             Configuration.singleton().getBooleanOrDefault(Constants.STACK_TRACE_PRUNE, true).get();
 
     private static final Predicate<String> EXCLUDE =
-            s -> {
-                if (s.startsWith("org.antublue.test.engine.internal.")
-                        || s.startsWith("java.base/")) {
-                    return true;
-                }
-
-                return false;
-            };
+            s -> s.startsWith("org.antublue.test.engine.internal.") || s.startsWith("java.base/");
 
     /** Constructor */
     private ThrowableUtils() {
