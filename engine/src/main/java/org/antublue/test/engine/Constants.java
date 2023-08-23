@@ -35,9 +35,15 @@ public final class Constants {
     public static final String STACK_TRACE_PRUNE = PREFIX + ".stack.trace.pruning";
 
     /** Configuration constant */
+    public static final String LOGGER_REGEX = PREFIX + ".logger.regex";
+
+    /** Configuration constant - DEPRECATED */
     public static final String LOG_LEVEL_REGEX = PREFIX + ".log.level.regex";
 
     /** Configuration constant */
+    public static final String LOGGER_LEVEL = PREFIX + ".logger.level";
+
+    /** Configuration constant - DEPRECATED */
     public static final String LOG_LEVEL = PREFIX + ".log.level";
 
     /** Configuration constant */

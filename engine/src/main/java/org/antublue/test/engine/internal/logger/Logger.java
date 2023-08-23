@@ -47,13 +47,22 @@ public class Logger {
     public Logger(String name) {
         this.name = name;
 
+        Configuration configuration = Configuration.singleton();
+
         Level derivedLevel = Level.INFO;
 
-        Optional<String> optionalRegex =
-                Configuration.singleton().getOrDefault(Constants.LOG_LEVEL_REGEX, ".*");
+        Optional<String> optionalLevel = configuration.get(Constants.LOG_LEVEL);
 
-        Optional<String> optionalLevel =
-                Configuration.singleton().getOrDefault(Constants.LOG_LEVEL, Level.INFO.toString());
+        if (!optionalLevel.isPresent()) {
+            optionalLevel =
+                    configuration.getOrDefault(Constants.LOGGER_LEVEL, Level.INFO.toString());
+        }
+
+        Optional<String> optionalRegex = configuration.get(Constants.LOG_LEVEL_REGEX);
+
+        if (!optionalRegex.isPresent()) {
+            optionalRegex = configuration.getOrDefault(Constants.LOGGER_REGEX, ".*");
+        }
 
         try {
             Pattern pattern = Pattern.compile(optionalRegex.get());
