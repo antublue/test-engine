@@ -21,13 +21,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import org.antublue.test.engine.api.Key;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -40,12 +42,12 @@ public final class ReflectionUtils {
 
     private static final ReflectionUtils SINGLETON = new ReflectionUtils();
 
-    private final Map<String, List<Field>> fieldCache = new HashMap<>();
-    private final Map<String, List<Method>> methodCache = new HashMap<>();
+    private final Map<Class<?>, List<Field>> fieldCache = new HashMap<>();
+    private final Map<ClassOrderKey, List<Method>> methodCache = new HashMap<>();
 
-    public enum HierarchyTraversalOrder {
-        TOP_DOWN,
-        BOTTOM_UP
+    public enum Order {
+        SUPERCLASS_FIRST,
+        SUPERCLASS_LAST
     }
 
     /** Constructor */
@@ -99,235 +101,176 @@ public final class ReflectionUtils {
     }
 
     /**
-     * Method to get a List of classes from Class
+     * Method to get a Class hierarchy
      *
      * @param clazz clazz to inspect
-     * @param hierarchyTraversalOrder order
-     * @return a List of Classes
+     * @param order order
+     * @return a List representing the Class hierarchy based on order
      */
-    public List<Class<?>> getClassHierarchy(
-            Class<?> clazz, HierarchyTraversalOrder hierarchyTraversalOrder) {
+    private List<Class<?>> buildClassHierarchy(Class<?> clazz, Order order) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(
-                    "getClassHierarchy class [%s] order [%s]",
-                    clazz.getName(), hierarchyTraversalOrder);
+            LOGGER.info("getClassHierarchy class [%s] order [%s]", clazz.getName(), order);
         }
 
         Set<Class<?>> classSet = new LinkedHashSet<>();
-        resolveClasses(clazz, hierarchyTraversalOrder, classSet);
+        resolveClasses(clazz, classSet);
 
-        return new ArrayList<>(classSet);
+        List<Class<?>> classes = new ArrayList<>(classSet);
+
+        if (order == Order.SUPERCLASS_LAST) {
+            Collections.reverse(classes);
+        }
+
+        return classes;
     }
 
-    private void resolveClasses(
-            Class<?> clazz,
-            HierarchyTraversalOrder hierarchyTraversalOrder,
-            Set<Class<?>> classSet) {
+    /**
+     * Method to recursively resolve a Class hierarchy (superclass first)
+     *
+     * @param clazz clazz
+     * @param classSet classSet
+     */
+    private void resolveClasses(Class<?> clazz, Set<Class<?>> classSet) {
         if (clazz == Object.class) {
             return;
         }
 
-        switch (hierarchyTraversalOrder) {
-            case TOP_DOWN:
-                {
-                    classSet.add(clazz);
-                    Class<?> superClass = clazz.getSuperclass();
-                    resolveClasses(superClass, hierarchyTraversalOrder, classSet);
-                }
-            case BOTTOM_UP:
-                {
-                    Class<?> superClass = clazz.getSuperclass();
-                    resolveClasses(superClass, hierarchyTraversalOrder, classSet);
-                    classSet.add(clazz);
-                }
-
-            default:
-                {
-                    // DO NOTHING
-                }
-        }
+        Class<?> superClass = clazz.getSuperclass();
+        resolveClasses(superClass, classSet);
+        classSet.add(clazz);
     }
 
     /**
-     * Method to get a List of all fields from a Class and super Classes
+     * Method to get a List of all fields (superclass first)
      *
      * @param clazz class to inspect
      * @return list of Fields
      */
-    public List<Field> getFields(Class<?> clazz, HierarchyTraversalOrder hierarchyTraversalOrder) {
+    public List<Field> getFields(Class<?> clazz) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("getFields class [%s] ", clazz.getName());
         }
 
         List<Field> fields;
+        Set<Field> uniqueFields = new HashSet<>();
 
         synchronized (fieldCache) {
-            String key = Key.of(clazz, "/", hierarchyTraversalOrder);
-            fields = fieldCache.get(key);
+            fields = fieldCache.get(clazz);
             if (fields == null) {
-                Set<Field> fieldSet = new LinkedHashSet<>();
-                resolveFields(clazz, hierarchyTraversalOrder, fieldSet);
-                fields = new ArrayList<>(fieldSet);
-                fieldCache.put(key, fields);
+                fields = new ArrayList<>();
+                List<Class<?>> classes = buildClassHierarchy(clazz, Order.SUPERCLASS_LAST);
+                for (Class<?> c : classes) {
+                    Field[] declaredFields = c.getDeclaredFields();
+                    for (Field field : declaredFields) {
+                        if (uniqueFields.contains(field)) {
+                            continue;
+                        }
+                        uniqueFields.add(field);
+                        fields.add(field);
+                    }
+                }
+                fieldCache.put(clazz, fields);
             }
         }
 
-        LOGGER.trace(" class [%s] field count [%d]", clazz.getName(), fields.size());
-
         return fields;
-    }
-
-    /**
-     * Method to recursively resolve Fields for a Class and super Classes
-     *
-     * @param clazz class to inspect
-     * @param fieldSet set of Fields
-     */
-    private void resolveFields(
-            Class<?> clazz, HierarchyTraversalOrder hierarchyTraversalOrder, Set<Field> fieldSet) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("resolveFields class [%s]", clazz.getName());
-        }
-
-        if (clazz == Object.class) {
-            return;
-        }
-
-        switch (hierarchyTraversalOrder) {
-            case TOP_DOWN:
-                {
-                    Field[] fields = clazz.getDeclaredFields();
-                    for (Field field : fields) {
-                        if (fieldSet.add(field)) {
-                            field.setAccessible(true);
-                        }
-                    }
-                    Class<?> superClass = clazz.getSuperclass();
-                    resolveFields(superClass, hierarchyTraversalOrder, fieldSet);
-                }
-            case BOTTOM_UP:
-                {
-                    Class<?> superClass = clazz.getSuperclass();
-                    resolveFields(superClass, hierarchyTraversalOrder, fieldSet);
-                    Field[] fields = clazz.getDeclaredFields();
-                    for (Field field : fields) {
-                        if (fieldSet.add(field)) {
-                            field.setAccessible(true);
-                        }
-                    }
-                    break;
-                }
-            default:
-                {
-                    // DO NOTHING
-                }
-        }
     }
 
     /**
      * Method to get a List of all methods
      *
      * @param clazz class to inspect
+     * @param order order to resolve
      * @return list of Methods
      */
-    public List<Method> getMethods(
-            Class<?> clazz, HierarchyTraversalOrder hierarchyTraversalOrder) {
+    public List<Method> getMethods(Class<?> clazz, Order order) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(
-                    "getMethods class [%s] method order [%s]",
-                    clazz.getName(), hierarchyTraversalOrder);
+            LOGGER.trace("getMethods class [%s] order [%s]", clazz.getName(), order);
         }
 
         List<Method> methods;
 
-        synchronized (methodCache) {
-            String key = Key.of(clazz, "/", hierarchyTraversalOrder);
-            methods = methodCache.get(key);
-            if (methods == null) {
-                Map<String, Method> methodMap = new LinkedHashMap<>();
-                resolveMethods(clazz, hierarchyTraversalOrder, methodMap);
-                methods = new ArrayList<>(methodMap.values());
-                methodCache.put(key, methods);
-                if (LOGGER.isTraceEnabled()) {
-                    synchronized (LOGGER) {
-                        LOGGER.trace(
-                                " class [%s] method count [%d]", clazz.getName(), methodMap.size());
+        ClassOrderKey classOrderKey = ClassOrderKey.of(clazz, order);
+        Set<MethodKey> uniqueMethodKeys = new HashSet<>();
 
-                        for (Method method : methodMap.values()) {
-                            LOGGER.trace(
-                                    " class [%s] method [%s %s]",
-                                    clazz.getName(),
-                                    method.getDeclaringClass().getName(),
-                                    method.getName());
+        synchronized (methodCache) {
+            methods = methodCache.get(classOrderKey);
+            if (methods == null) {
+                methods = new ArrayList<>();
+                List<Class<?>> classes = buildClassHierarchy(clazz, order);
+                for (Class<?> c : classes) {
+                    try {
+                        Method[] declaredMethods = c.getDeclaredMethods();
+                        for (Method method : declaredMethods) {
+                            MethodKey methodKey = MethodKey.of(method);
+                            if (uniqueMethodKeys.contains(methodKey)) {
+                                continue;
+                            }
+                            uniqueMethodKeys.add(methodKey);
+                            methods.add(method);
                         }
+                    } catch (NoClassDefFoundError e) {
+                        // DO NOTHING
+                        //
+                        // Occurs when discover finds a class in tests that the test engine can't
+                        // resolve
                     }
                 }
+                methodCache.put(classOrderKey, methods);
             }
         }
 
         return methods;
     }
 
-    private void resolveMethods(
-            Class<?> clazz,
-            HierarchyTraversalOrder hierarchyTraversalOrder,
-            Map<String, Method> methodMap) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(
-                    "resolveMethods class [%s] method order [%s]",
-                    clazz.getName(), hierarchyTraversalOrder);
-        }
-
-        if (clazz == Object.class) {
-            return;
-        }
-
-        try {
-            switch (hierarchyTraversalOrder) {
-                case TOP_DOWN:
-                    {
-                        for (Method method : clazz.getDeclaredMethods()) {
-                            methodMap.putIfAbsent(method.getName(), method);
-                        }
-                        Class<?> superClass = clazz.getSuperclass();
-                        resolveMethods(superClass, hierarchyTraversalOrder, methodMap);
-                        break;
-                    }
-                case BOTTOM_UP:
-                    {
-                        Class<?> superClass = clazz.getSuperclass();
-                        resolveMethods(superClass, hierarchyTraversalOrder, methodMap);
-                        for (Method method : clazz.getDeclaredMethods()) {
-                            methodMap.putIfAbsent(method.getName(), method);
-                        }
-                        break;
-                    }
-                default:
-                    {
-                        // DO NOTHING
-                    }
-            }
-        } catch (NoClassDefFoundError e) {
-            // DO NOTHING
-        }
-    }
-
+    /**
+     * Method to determine if a Method is static
+     *
+     * @param method method
+     * @return true if the Method is static, otherwise false
+     */
     public boolean isStatic(Method method) {
         return Modifier.isStatic(method.getModifiers());
     }
 
+    /**
+     * Method to determine if a Method is public
+     *
+     * @param method method
+     * @return true if the Method is public, otherwise false
+     */
     public boolean isPublic(Method method) {
         return Modifier.isPublic(method.getModifiers());
     }
 
+    /**
+     * Method to determine if a Method is protected
+     *
+     * @param method method
+     * @return true if the Method is protected, otherwise false
+     */
     public boolean isProtected(Method method) {
         return Modifier.isProtected(method.getModifiers());
     }
 
+    /**
+     * Method to determine if a Method has a specified parameter count
+     *
+     * @param method method
+     * @param parameterCount parameterCount
+     * @return true if the Method has the specified parameter count, otherwise false
+     */
     public boolean hasParameterCount(Method method, int parameterCount) {
         return method.getParameterCount() == parameterCount;
     }
 
+    /**
+     * Method to determine if a Method accepts a specified set of parameters
+     *
+     * @param method method
+     * @param parameterTypes parameterTypes
+     * @return true if the Method accepts the specified parameters, otherwise false
+     */
     public boolean acceptsParameters(Method method, Class<?>... parameterTypes) {
         Class<?>[] methodParameterTypes = method.getParameterTypes();
         if (methodParameterTypes.length != parameterTypes.length) {
@@ -343,11 +286,94 @@ public final class ReflectionUtils {
         return true;
     }
 
+    /**
+     * Method to determine if a Method returns a specific type
+     *
+     * @param method method
+     * @param clazz clazz
+     * @return true if the Method returns a specific type, otherwise false
+     */
     public boolean hasReturnType(Method method, Class<?> clazz) {
         if (clazz == Void.class) {
             return method.getReturnType().getName().equals("void");
         }
 
         return clazz.isAssignableFrom(method.getReturnType());
+    }
+
+    private static class MethodKey {
+
+        private final boolean protectedOrPublic;
+        private final Class<?> returnType;
+        private final String name;
+        private final Class<?>[] parameterTypes;
+
+        private MethodKey(
+                int modifiers, Class<?> returnType, String name, Class<?>[] parameterTypes) {
+            this.protectedOrPublic =
+                    Modifier.isProtected(modifiers) || Modifier.isPublic(modifiers);
+            this.returnType = returnType;
+            this.name = name;
+            this.parameterTypes = parameterTypes;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) return true;
+            if (object == null || getClass() != object.getClass()) return false;
+            MethodKey methodKey = (MethodKey) object;
+            return protectedOrPublic == methodKey.protectedOrPublic
+                    && Objects.equals(returnType, methodKey.returnType)
+                    && Objects.equals(name, methodKey.name)
+                    && Arrays.equals(parameterTypes, methodKey.parameterTypes);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Objects.hash(protectedOrPublic, returnType, name);
+            result = 31 * result + Arrays.hashCode(parameterTypes);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return protectedOrPublic + " / " + returnType + " / " + name + " / " + parameterTypes;
+        }
+
+        public static MethodKey of(Method method) {
+            return new MethodKey(
+                    method.getModifiers(),
+                    method.getReturnType(),
+                    method.getName(),
+                    method.getParameterTypes());
+        }
+    }
+
+    private static class ClassOrderKey {
+
+        private final Class<?> clazz;
+        private final Order order;
+
+        private ClassOrderKey(Class<?> clazz, Order order) {
+            this.clazz = clazz;
+            this.order = order;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (this == object) return true;
+            if (object == null || getClass() != object.getClass()) return false;
+            ClassOrderKey that = (ClassOrderKey) object;
+            return Objects.equals(clazz, that.clazz) && order == that.order;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(clazz, order);
+        }
+
+        public static ClassOrderKey of(Class<?> clazz, Order order) {
+            return new ClassOrderKey(clazz, order);
+        }
     }
 }
