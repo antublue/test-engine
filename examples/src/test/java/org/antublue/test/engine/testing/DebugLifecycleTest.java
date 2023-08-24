@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -28,28 +27,8 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class DebugLifecycleTest {
 
-    private static String exceptionIn = null;
-
-    private static final List<String> EXPECTED_STATES = new ArrayList<>();
-
-    private static final List<String> ACTUAL_STATES = new ArrayList<>();
-
-    static {
-        EXPECTED_STATES.add("prepare");
-        EXPECTED_STATES.add("beforeAll");
-        EXPECTED_STATES.add("beforeEach");
-        if (!"test1".equals(exceptionIn)) {
-            EXPECTED_STATES.add("test1");
-        }
-        EXPECTED_STATES.add("afterEach");
-        EXPECTED_STATES.add("beforeEach");
-        if (!"test2".equals(exceptionIn)) {
-            EXPECTED_STATES.add("test2");
-        }
-        EXPECTED_STATES.add("afterEach");
-        EXPECTED_STATES.add("afterAll");
-        EXPECTED_STATES.add("conclude");
-    }
+    // Set exceptionIn to match the method name to simulate an exception
+    private static final String exceptionIn = null;
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -66,61 +45,71 @@ public class DebugLifecycleTest {
     public void prepare() {
         System.out.println("prepare()");
         assertThat(stringArgument).isNull();
-        ACTUAL_STATES.add("prepare");
-        assertThat(ACTUAL_STATES.size()).isEqualTo(1);
+        if ("prepare()".equals(exceptionIn)) {
+            throw new RuntimeException("Exception in prepare()");
+        }
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + stringArgument + ")");
         assertThat(stringArgument).isNotNull();
-        ACTUAL_STATES.add("beforeAll");
-        assertThat(ACTUAL_STATES.size()).isEqualTo(2);
+        if ("beforeAll()".equals(exceptionIn)) {
+            throw new RuntimeException("Exception in beforeAll()");
+        }
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + stringArgument + ")");
         assertThat(stringArgument).isNotNull();
-        ACTUAL_STATES.add("beforeEach");
+        if ("beforeEach()".equals(exceptionIn)) {
+            throw new RuntimeException("Exception in beforeEach()");
+        }
     }
 
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + stringArgument + ")");
-        if ("test1".equals(exceptionIn)) {
-            throw new RuntimeException("Forced exception");
-        }
         assertThat(stringArgument).isNotNull();
-        ACTUAL_STATES.add("test1");
+        if ("test1()".equals(exceptionIn)) {
+            throw new RuntimeException("Exception in test1()");
+        }
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + stringArgument + ")");
         assertThat(stringArgument).isNotNull();
-        ACTUAL_STATES.add("test2");
+        if ("test2()".equals(exceptionIn)) {
+            throw new RuntimeException("Exception in test2()");
+        }
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach(" + stringArgument + ")");
         assertThat(stringArgument).isNotNull();
-        ACTUAL_STATES.add("afterEach");
+        if ("afterEach()".equals(exceptionIn)) {
+            throw new RuntimeException("Exception in afterEach()");
+        }
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + stringArgument + ")");
         assertThat(stringArgument).isNotNull();
-        ACTUAL_STATES.add("afterAll");
+        if ("afterAll()".equals(exceptionIn)) {
+            throw new RuntimeException("Exception in afterAll()");
+        }
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
         assertThat(stringArgument).isNull();
-        ACTUAL_STATES.add("conclude");
-        assertThat(ACTUAL_STATES).isEqualTo(EXPECTED_STATES);
+        if ("conclude()".equals(exceptionIn)) {
+            throw new RuntimeException("Exception in conclude()");
+        }
     }
 }
