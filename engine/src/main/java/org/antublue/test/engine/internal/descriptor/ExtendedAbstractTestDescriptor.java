@@ -71,6 +71,11 @@ public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescrip
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Method to get this test descriptor's stop watch
+     *
+     * @return the descriptor's stop watch
+     */
     public StopWatch getStopWatch() {
         return stopWatch;
     }

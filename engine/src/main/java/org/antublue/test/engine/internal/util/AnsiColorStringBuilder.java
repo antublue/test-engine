@@ -38,6 +38,7 @@ public class AnsiColorStringBuilder {
     /**
      * Method to reset the length
      *
+     * @param length length
      * @return this
      */
     public AnsiColorStringBuilder setLength(int length) {

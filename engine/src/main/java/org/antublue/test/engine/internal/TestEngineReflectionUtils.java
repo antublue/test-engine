@@ -52,6 +52,11 @@ public final class TestEngineReflectionUtils {
 
     private static final Object[] NO_OBJECT_ARGS = null;
 
+    private enum Sort {
+        NORMAL,
+        REVERSE
+    }
+
     private final Predicate<Field> AUTO_CLOSE_FIELD_FILTER =
             field -> field.isAnnotationPresent(TestEngine.AutoClose.class);
 
@@ -373,12 +378,6 @@ public final class TestEngineReflectionUtils {
                 && parameterTypes[0].isAssignableFrom(argument.getClass());
     }
 
-    /**
-     * Method to get a @TestEngine.ArgumentSupplier Method
-     *
-     * @param clazz class to inspect
-     * @return Method the return value
-     */
     public Method getArgumentSupplierMethod(Class<?> clazz) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("getArgumentSupplierMethod class [%s]", clazz.getName());
@@ -394,7 +393,7 @@ public final class TestEngineReflectionUtils {
 
                 List<Method> methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.HierarchyTraversalOrder.TOP_DOWN)
+                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_LAST)
                                 .stream()
                                 .filter(
                                         method ->
@@ -415,6 +414,27 @@ public final class TestEngineReflectionUtils {
                                 .peek(method -> method.setAccessible(true))
                                 .collect(Collectors.toList());
 
+                /*
+                // collate
+                Map<Class<?>, List<Method>> collateMap = new LinkedHashMap<>();
+                for (Method method : methods) {
+                    collateMap
+                            .computeIfAbsent(method.getDeclaringClass(), m -> new ArrayList<>())
+                            .add(method);
+                }
+
+                for (Map.Entry<Class<?>, List<Method>> entry : collateMap.entrySet()) {
+                    if (entry.getValue().size() > 1) {
+                        throw new TestClassConfigurationException(
+                                String.format(
+                                        "Test class [%s] must define exactly [1]"
+                                            + " @TestEngine.ArgumentSupplier method, [%d] found",
+                                        entry.getClass().getName(), methods.size()));
+                    }
+                }
+                */
+
+                /*
                 if (methods.size() != 1) {
                     throw new TestClassConfigurationException(
                             String.format(
@@ -422,6 +442,7 @@ public final class TestEngineReflectionUtils {
                                             + " @TestEngine.ArgumentSupplier method, [%d] found",
                                     clazz, methods.size()));
                 }
+                */
 
                 argumentSupplierMethod = methods.get(0);
 
@@ -477,6 +498,7 @@ public final class TestEngineReflectionUtils {
         } catch (TestClassConfigurationException e) {
             throw e;
         } catch (Throwable t) {
+            t.printStackTrace();
             throw new TestClassConfigurationException(
                     String.format(
                             "Can't get Stream<Argument> or Iterable<Argument> from test class [%s]",
@@ -506,13 +528,12 @@ public final class TestEngineReflectionUtils {
 
                 methods =
                         reflectionUtils
-                                .getMethods(
-                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
+                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_FIRST)
                                 .stream()
                                 .filter(PREPARE_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
-                sortMethods(methods);
+                sortMethods(methods, Sort.NORMAL);
                 validateDistinctOrder(clazz, methods);
 
                 prepareMethodCache.put(clazz, methods);
@@ -554,10 +575,9 @@ public final class TestEngineReflectionUtils {
 
             if (fields == null) {
                 fields =
-                        ReflectionUtils.singleton()
-                                .getFields(clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
-                                .stream()
+                        ReflectionUtils.singleton().getFields(clazz).stream()
                                 .filter(ARGUMENT_FIELD_FILTER)
+                                .peek(field -> field.setAccessible(true))
                                 .collect(Collectors.toList());
 
                 argumentFieldCache.put(clazz, fields);
@@ -599,10 +619,9 @@ public final class TestEngineReflectionUtils {
 
             if (fields == null) {
                 fields =
-                        ReflectionUtils.singleton()
-                                .getFields(clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
-                                .stream()
+                        ReflectionUtils.singleton().getFields(clazz).stream()
                                 .filter(AUTO_CLOSE_FIELD_FILTER)
+                                .peek(field -> field.setAccessible(true))
                                 .collect(Collectors.toList());
 
                 autoCloseFieldCache.put(clazz, fields);
@@ -647,13 +666,12 @@ public final class TestEngineReflectionUtils {
 
                 methods =
                         reflectionUtils
-                                .getMethods(
-                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
+                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_FIRST)
                                 .stream()
                                 .filter(BEFORE_ALL_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
-                sortMethods(methods);
+                sortMethods(methods, Sort.NORMAL);
                 validateDistinctOrder(clazz, methods);
 
                 beforeAllMethodCache.put(clazz, methods);
@@ -698,13 +716,12 @@ public final class TestEngineReflectionUtils {
 
                 methods =
                         reflectionUtils
-                                .getMethods(
-                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
+                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_FIRST)
                                 .stream()
                                 .filter(BEFORE_EACH_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
-                sortMethods(methods);
+                sortMethods(methods, Sort.REVERSE);
                 validateDistinctOrder(clazz, methods);
 
                 beforeEachMethodCache.put(clazz, methods);
@@ -747,13 +764,12 @@ public final class TestEngineReflectionUtils {
 
                 methods =
                         reflectionUtils
-                                .getMethods(
-                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
+                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_LAST)
                                 .stream()
                                 .filter(TEST_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
-                sortMethods(methods);
+                sortMethods(methods, Sort.NORMAL);
                 validateDistinctOrder(clazz, methods);
 
                 testMethodCache.put(clazz, methods);
@@ -798,13 +814,12 @@ public final class TestEngineReflectionUtils {
 
                 methods =
                         reflectionUtils
-                                .getMethods(
-                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
+                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_LAST)
                                 .stream()
                                 .filter(AFTER_EACH_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
-                sortMethods(methods);
+                sortMethods(methods, Sort.REVERSE);
                 validateDistinctOrder(clazz, methods);
 
                 afterEachMethodCache.put(clazz, methods);
@@ -818,7 +833,7 @@ public final class TestEngineReflectionUtils {
                         clazz.getName(), methods.size());
 
                 for (Method method : methods) {
-                    LOGGER.trace(
+                    LOGGER.info(
                             " class [%s] @TestEngine.AfterEach method [%s]",
                             clazz.getName(), method.getName());
                 }
@@ -849,13 +864,12 @@ public final class TestEngineReflectionUtils {
 
                 methods =
                         reflectionUtils
-                                .getMethods(
-                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
+                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_LAST)
                                 .stream()
                                 .filter(AFTER_ALL_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
-                sortMethods(methods);
+                sortMethods(methods, Sort.REVERSE);
                 validateDistinctOrder(clazz, methods);
 
                 afterAllMethodCache.put(clazz, methods);
@@ -900,13 +914,12 @@ public final class TestEngineReflectionUtils {
 
                 methods =
                         reflectionUtils
-                                .getMethods(
-                                        clazz, ReflectionUtils.HierarchyTraversalOrder.BOTTOM_UP)
+                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_LAST)
                                 .stream()
                                 .filter(CONCLUDE_METHOD_FILTER)
                                 .collect(Collectors.toList());
 
-                sortMethods(methods);
+                sortMethods(methods, Sort.REVERSE);
                 validateDistinctOrder(clazz, methods);
 
                 concludeMethodCache.put(clazz, methods);
@@ -1057,7 +1070,7 @@ public final class TestEngineReflectionUtils {
      *
      * @param methods list of Methods to sort
      */
-    private void sortMethods(List<Method> methods) {
+    private void sortMethods(List<Method> methods, Sort sort) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("sortMethods count [%s]", methods.size());
         }
@@ -1086,7 +1099,20 @@ public final class TestEngineReflectionUtils {
                     String o1DisplayName = getDisplayName(o1);
                     String o2DisplayName = getDisplayName(o2);
 
-                    return o1DisplayName.compareTo(o2DisplayName);
+                    switch (sort) {
+                        case NORMAL:
+                            {
+                                return o1DisplayName.compareTo(o2DisplayName);
+                            }
+                        case REVERSE:
+                            {
+                                return -o1DisplayName.compareTo(o2DisplayName);
+                            }
+                        default:
+                            {
+                                return 0;
+                            }
+                    }
                 });
     }
 

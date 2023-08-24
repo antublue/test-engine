@@ -99,7 +99,8 @@ public class NanosecondsConverter {
      * Method to decode a string to a converter type
      *
      * @param string string
-     * @returns a converter based on the string type or Nanoseconds.MILLISECONDS
+     * @return a converter based on the string type or Nanoseconds.MILLISECONDS if the type is
+     *     invalid
      */
     public static NanosecondsConverter decode(String string) {
         if (string == null || string.trim().isEmpty()) {

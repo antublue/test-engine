@@ -33,6 +33,7 @@ public class OptionalUtils {
      * @param optional optional
      * @param consumer consumer
      * @param runnable runnable
+     * @param <T> the optional type
      */
     public static <T> void ifPresentOrElse(
             Optional<T> optional, Consumer<T> consumer, Runnable runnable) {
