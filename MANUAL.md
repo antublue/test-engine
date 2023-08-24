@@ -54,18 +54,18 @@ Annotated methods ...
 
 ```
 superclass @TestEngine.Prepare
-  subclass @TestEngine.Prepare
+  class @TestEngine.Prepare2
     superclass @TestEngine.BeforeAll
-      subclass @TestEngine.BeforeAll
+      class @TestEngine.BeforeAll2
         superclass @TestEngine.BeforeEach
-          subclass @TestEngine.BeforeEach
+          class @TestEngine.BeforeEach2
             superclass @TestEngine.Test
-            subclass @TestEngine.Test
-          subclass @TestEngine.AfterEach
+            class @TestEngine.Test2
+          class @TestEngine.AfterEach2
         superclass @TestEngine.AfterEach
-      subclass @TestEngine.AfterAll
+      class @TestEngine.AfterAll2
     superclass @TestEngine.AfterAll
-  subclass @TestEngine.Conclude
+  class @TestEngine.Conclude2
 superclass @TestEngine.Conclude
 ```
 
@@ -75,16 +75,12 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 - `public` and `protected` methods are supported for `@TestEngine.X` annotations.
 
-
-- By default, methods are executed in alphabetical hierarchyTraversalOrder based on class/method name, with respect to location (superclass / subclass.)
-
-
-- `@TestEngine.Order` can be used to control test class hierarchyTraversalOrder / test method hierarchyTraversalOrder of execution.
-  - Classes/methods are sorted by the hierarchyTraversalOrder annotation value first, then alphabetically by the class name/method name.
+- `@TestEngine.Order` can be used to control test class order / test method order of execution.
+  - Classes/methods are sorted by the order annotation value first, then alphabetically by the class name/method name.
   - The test method name can be changed by using the `@TestEngine.DisplayName` annotation.
-  - Method hierarchyTraversalOrder is relative to the class (superclass or subclass) and other methods with the same annotation defined in the class.
+  - Method order is relative to the class (superclass or subclass) and other methods with the same annotation defined in the class.
 
-- **Class execution hierarchyTraversalOrder can't be guaranteed unless the test engine is configured to use a single thread.**
+- **Class execution order can't be guaranteed unless the test engine is configured to use a single thread.**
 
 ### Additional Test Annotations
 
@@ -92,7 +88,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 |-------------------------------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
 | `@TestEngine.Disabled`                          | class<br/>method | no       | Marks a test class or method disabled                                                                                              |
 | `@TestEngine.BaseClass`                         | class            | no       | Marks a test class as being a base test class (skips direct execution)                                                             |
-| `@TestEngine.Order(hierarchyTraversalOrder = <int>)`              | class<br/>method | no       | Provides a way to specify class execution hierarchyTraversalOrder and/or method execution hierarchyTraversalOrder (relative to other methods with the same annotation) |
+| `@TestEngine.Order(order = <int>)`              | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
 | `@TestEngine.Tag(tag = "<string>")`             | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
 | `@TestEngine.DisplayName(name = "<string>")`    | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
 | `@TestEngine.Lock(name = "<string>")`           | method           | no       | Provides a way to acquire a named lock, and lock it before method execution                                                        |
@@ -105,10 +101,10 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - Abstract test classes are not executed.
 
 
-- `@TestEngine.Order(hierarchyTraversalOrder = <int>)` is applies to methods defined in the class.
+- `@TestEngine.Order(order = <int>)` is applies to methods defined in the class.
 
 
-- `@TestEngine.Order(hierarchyTraversalOrder = <int>)` is ignored for abstract and `@TestEngine.BaseClass` annotated classes.
+- `@TestEngine.Order(order = <int>)` is ignored for abstract and `@TestEngine.BaseClass` annotated classes.
 
 
 - For `@TestEngine.Tag(tag = "<string>")` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`.
@@ -154,18 +150,6 @@ Additionally, there is an `ObjectArgument<T>` argument implementation that allow
 A `Store` is a thread-safe convenience class that allow sharing of Objects between tests.
 
 - [Store.java](/api/src/main/java/org/antublue/test/engine/api/Store.java)
-
-### What is a `StateMachine`?
-
-A `StateMachine` is convenience class that allows for workflow testing.
-
-Example:
-
-- [OrderAccessWorkFlow.java](/examples/src/test/java/example/statemachine/OrderAccessWorkflow.java)
-
-**Interesting Fact**
-
-- The test engine's implementation uses `StateMachine` instances for execution.
 
 ## Code Examples
 
@@ -250,7 +234,7 @@ Build and test your project...
 
 The test engine uses a properties file for configuration.
 
-The properties filename is resolved using the following in hierarchyTraversalOrder:
+The properties filename is resolved using the following in order:
 
 - Environment variable `ANTUBLUE_TEST_ENGINE_PROPERTIES`
 
