@@ -378,6 +378,12 @@ public final class TestEngineReflectionUtils {
                 && parameterTypes[0].isAssignableFrom(argument.getClass());
     }
 
+    /**
+     * Method to get the @TestEngine.ArgumentSupplier method
+     *
+     * @param clazz clazz
+     * @return the argument supplier method
+     */
     public Method getArgumentSupplierMethod(Class<?> clazz) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("getArgumentSupplierMethod class [%s]", clazz.getName());

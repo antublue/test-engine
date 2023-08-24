@@ -45,8 +45,11 @@ public final class ReflectionUtils {
     private final Map<Class<?>, List<Field>> fieldCache = new HashMap<>();
     private final Map<ClassOrderKey, List<Method>> methodCache = new HashMap<>();
 
+    /** Enum to represent hierarchy order */
     public enum Order {
+        /** superclass first */
         SUPERCLASS_FIRST,
+        /** superclass last */
         SUPERCLASS_LAST
     }
 

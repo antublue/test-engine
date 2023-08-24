@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.extras;
 
+/** PlaceHolder class to prevent Maven warnings */
 public class PlaceHolder {
 
     // DO NOTHING
