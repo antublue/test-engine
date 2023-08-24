@@ -399,7 +399,7 @@ public final class TestEngineReflectionUtils {
 
                 List<Method> methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_LAST)
+                                .getMethods(clazz, ReflectionUtils.Order.CLASS_FIRST)
                                 .stream()
                                 .filter(
                                         method ->
@@ -420,35 +420,13 @@ public final class TestEngineReflectionUtils {
                                 .peek(method -> method.setAccessible(true))
                                 .collect(Collectors.toList());
 
-                /*
-                // collate
-                Map<Class<?>, List<Method>> collateMap = new LinkedHashMap<>();
-                for (Method method : methods) {
-                    collateMap
-                            .computeIfAbsent(method.getDeclaringClass(), m -> new ArrayList<>())
-                            .add(method);
-                }
-
-                for (Map.Entry<Class<?>, List<Method>> entry : collateMap.entrySet()) {
-                    if (entry.getValue().size() > 1) {
-                        throw new TestClassConfigurationException(
-                                String.format(
-                                        "Test class [%s] must define exactly [1]"
-                                            + " @TestEngine.ArgumentSupplier method, [%d] found",
-                                        entry.getClass().getName(), methods.size()));
-                    }
-                }
-                */
-
-                /*
                 if (methods.size() != 1) {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] must define exactly [1]"
-                                            + " @TestEngine.ArgumentSupplier method, [%d] found",
+                                    "Test class [%s] must define a single"
+                                        + " @TestEngineArgument.Supplier method, %d methods found",
                                     clazz, methods.size()));
                 }
-                */
 
                 argumentSupplierMethod = methods.get(0);
 
@@ -770,7 +748,7 @@ public final class TestEngineReflectionUtils {
 
                 methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_LAST)
+                                .getMethods(clazz, ReflectionUtils.Order.CLASS_FIRST)
                                 .stream()
                                 .filter(TEST_METHOD_FILTER)
                                 .collect(Collectors.toList());
@@ -820,7 +798,7 @@ public final class TestEngineReflectionUtils {
 
                 methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_LAST)
+                                .getMethods(clazz, ReflectionUtils.Order.CLASS_FIRST)
                                 .stream()
                                 .filter(AFTER_EACH_METHOD_FILTER)
                                 .collect(Collectors.toList());
@@ -870,7 +848,7 @@ public final class TestEngineReflectionUtils {
 
                 methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_LAST)
+                                .getMethods(clazz, ReflectionUtils.Order.CLASS_FIRST)
                                 .stream()
                                 .filter(AFTER_ALL_METHOD_FILTER)
                                 .collect(Collectors.toList());
@@ -920,7 +898,7 @@ public final class TestEngineReflectionUtils {
 
                 methods =
                         reflectionUtils
-                                .getMethods(clazz, ReflectionUtils.Order.SUPERCLASS_LAST)
+                                .getMethods(clazz, ReflectionUtils.Order.CLASS_FIRST)
                                 .stream()
                                 .filter(CONCLUDE_METHOD_FILTER)
                                 .collect(Collectors.toList());

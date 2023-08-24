@@ -49,8 +49,8 @@ public final class ReflectionUtils {
     public enum Order {
         /** superclass first */
         SUPERCLASS_FIRST,
-        /** superclass last */
-        SUPERCLASS_LAST
+        /** class first */
+        CLASS_FIRST
     }
 
     /** Constructor */
@@ -120,7 +120,7 @@ public final class ReflectionUtils {
 
         List<Class<?>> classes = new ArrayList<>(classSet);
 
-        if (order == Order.SUPERCLASS_LAST) {
+        if (order == Order.CLASS_FIRST) {
             Collections.reverse(classes);
         }
 
@@ -161,7 +161,7 @@ public final class ReflectionUtils {
             fields = fieldCache.get(clazz);
             if (fields == null) {
                 fields = new ArrayList<>();
-                List<Class<?>> classes = buildClassHierarchy(clazz, Order.SUPERCLASS_LAST);
+                List<Class<?>> classes = buildClassHierarchy(clazz, Order.CLASS_FIRST);
                 for (Class<?> c : classes) {
                     Field[] declaredFields = c.getDeclaredFields();
                     for (Field field : declaredFields) {
