@@ -57,9 +57,6 @@ public final class TestEngineReflectionUtils {
         REVERSE
     }
 
-    private final Predicate<Field> AUTO_CLOSE_FIELD_FILTER =
-            field -> field.isAnnotationPresent(TestEngine.AutoClose.class);
-
     private static final Predicate<Field> ARGUMENT_FIELD_FILTER =
             field -> {
                 if (!field.isAnnotationPresent(TestEngine.Argument.class)) {
@@ -67,6 +64,17 @@ public final class TestEngineReflectionUtils {
                 }
                 return Argument.class.isAssignableFrom(field.getType());
             };
+
+    private static final Predicate<Field> RANDOM_FIELD_FILTER =
+            field ->
+                    field.isAnnotationPresent(TestEngine.Random.Boolean.class)
+                            || field.isAnnotationPresent(TestEngine.Random.Integer.class)
+                            || field.isAnnotationPresent(TestEngine.Random.Long.class)
+                            || field.isAnnotationPresent(TestEngine.Random.Float.class)
+                            || field.isAnnotationPresent(TestEngine.Random.Double.class);
+
+    private final Predicate<Field> AUTO_CLOSE_FIELD_FILTER =
+            field -> field.isAnnotationPresent(TestEngine.AutoClose.class);
 
     private static final Predicate<Method> PREPARE_METHOD_FILTER =
             method -> {
@@ -578,6 +586,40 @@ public final class TestEngineReflectionUtils {
                     LOGGER.trace(
                             " class [%s] @TestEngine.Argument argument field [%s]",
                             clazz.getName(), field.getName());
+                }
+            }
+        }
+
+        return fields;
+    }
+
+    /**
+     * Method to get @TestEngine.Random.X Fields
+     *
+     * @param clazz class to inspect
+     * @return List of Fields
+     */
+    public List<Field> getRandomFields(Class<?> clazz) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("getRandomFields class [%s]", clazz.getName());
+        }
+
+        List<Field> fields =
+                ReflectionUtils.singleton().getFields(clazz).stream()
+                        .filter(RANDOM_FIELD_FILTER)
+                        .peek(field -> field.setAccessible(true))
+                        .collect(Collectors.toList());
+
+        if (LOGGER.isTraceEnabled()) {
+            synchronized (LOGGER) {
+                LOGGER.trace(
+                        " class [%s] @TestEngine.Random.X field count [%d]",
+                        clazz.getName(), fields.size());
+
+                for (Field field : fields) {
+                    LOGGER.trace(
+                            " class [%s] @TestEngine.Random.X field [%s] type [%s]",
+                            clazz.getName(), field.getName(), field.getType().getName());
                 }
             }
         }

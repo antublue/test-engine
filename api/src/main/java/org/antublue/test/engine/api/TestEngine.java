@@ -141,6 +141,59 @@ public @interface TestEngine {
         String method() default "";
     }
 
+    /** Random annotation */
+    @interface Random {
+
+        /** Random integer annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Boolean {}
+
+        /** Random integer annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Integer {
+            /** Minimum value */
+            int minimum() default java.lang.Integer.MIN_VALUE;
+
+            /** Maximum value */
+            int maximum() default java.lang.Integer.MAX_VALUE;
+        }
+
+        /** Random long annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Long {
+            /** Minimum value */
+            long minimum() default java.lang.Long.MIN_VALUE;
+
+            /** Maximum value */
+            long maximum() default java.lang.Long.MAX_VALUE;
+        }
+
+        /** Random float annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Float {
+            /** Minimum value */
+            float minimum() default java.lang.Float.MIN_VALUE;
+
+            /** Maximum value */
+            float maximum() default java.lang.Float.MAX_VALUE;
+        }
+
+        /** Random float annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Double {
+            /** Minimum value */
+            double minimum() default java.lang.Double.MIN_VALUE;
+
+            /** Maximum value */
+            double maximum() default java.lang.Double.MAX_VALUE;
+        }
+    }
+
     /** Lock annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
