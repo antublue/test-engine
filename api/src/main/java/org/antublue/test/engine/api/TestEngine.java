@@ -153,10 +153,18 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface Integer {
-            /** Minimum value */
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
             int minimum() default java.lang.Integer.MIN_VALUE;
 
-            /** Maximum value */
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
             int maximum() default java.lang.Integer.MAX_VALUE;
         }
 
@@ -164,10 +172,18 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface Long {
-            /** Minimum value */
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
             long minimum() default java.lang.Long.MIN_VALUE;
 
-            /** Maximum value */
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
             long maximum() default java.lang.Long.MAX_VALUE;
         }
 
@@ -175,10 +191,18 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface Float {
-            /** Minimum value */
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
             float minimum() default java.lang.Float.MIN_VALUE;
 
-            /** Maximum value */
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
             float maximum() default java.lang.Float.MAX_VALUE;
         }
 
@@ -186,10 +210,18 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface Double {
-            /** Minimum value */
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
             double minimum() default java.lang.Double.MIN_VALUE;
 
-            /** Maximum value */
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
             double maximum() default java.lang.Double.MAX_VALUE;
         }
     }
