@@ -43,6 +43,8 @@ public class RandomUtils {
     /**
      * Method to get a random integer in a range (minimum and maximum are both inclusive)
      *
+     * @param minimum minimum
+     * @param maximum maximum
      * @return a random integer
      */
     public static int nextInteger(int minimum, int maximum) {
@@ -68,6 +70,8 @@ public class RandomUtils {
     /**
      * Method to get a random long in a range (minimum and maximum are both inclusive)
      *
+     * @param minimum minimum
+     * @param maximum maximum
      * @return a random long
      */
     public static long nextLong(long minimum, long maximum) {
@@ -93,6 +97,8 @@ public class RandomUtils {
     /**
      * Method to get a random float in a range (minimum and maximum are both inclusive)
      *
+     * @param minimum minimum
+     * @param maximum maximum
      * @return a random float
      */
     public static float nextFloat(float minimum, float maximum) {
@@ -107,6 +113,8 @@ public class RandomUtils {
     /**
      * Method to get a random double in a range (minimum and maximum are both inclusive)
      *
+     * @param minimum minimum
+     * @param maximum maximum
      * @return a random double
      */
     public static double nextDouble(double minimum, double maximum) {
@@ -240,9 +248,6 @@ public class RandomUtils {
                 new BigDecimal(new BigInteger(bitCount, ThreadLocalRandom.current()))
                         .movePointLeft(digitCount);
 
-        BigDecimal random =
-                minimum.add(maximum.subtract(minimum).multiply(alpha, new MathContext(digitCount)));
-
-        return random;
+        return minimum.add(maximum.subtract(minimum).multiply(alpha, new MathContext(digitCount)));
     }
 }
