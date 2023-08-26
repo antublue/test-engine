@@ -25,6 +25,7 @@ import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.RandomUtils;
 
 /** Class to process @TestEngine.RandomX annotations */
+@SuppressWarnings("PMD.NPathComplexity")
 public class FieldAnnotationUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldAnnotationUtils.class);
