@@ -18,19 +18,17 @@ package org.antublue.test.engine.internal;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Random;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.RandomUtils;
 
-/** Class to process @TestEngine.Random.X annotations */
+/** Class to process @TestEngine.RandomX annotations */
 public class RandomAnnotationUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomAnnotationUtils.class);
 
     private static final RandomAnnotationUtils SINGLETON = new RandomAnnotationUtils();
-
-    private final Random RANDOM = new Random();
 
     /** Constructor */
     private RandomAnnotationUtils() {
@@ -47,20 +45,20 @@ public class RandomAnnotationUtils {
     }
 
     /**
-     * Method to process @TestEngine.Random.X annotated fields
+     * Method to process @TestEngine.RandomX annotated fields
      *
      * @param object object
      * @param throwables throwables
      */
     public void processRandomAnnotatedFields(Object object, List<Throwable> throwables) {
-        LOGGER.trace("processAutoCloseFields class [%s]", object.getClass().getName());
+        LOGGER.trace("processRandomAnnotatedFields class [%s]", object.getClass().getName());
 
         TestEngineReflectionUtils.singleton()
                 .getRandomFields(object.getClass())
                 .forEach(
                         field -> {
                             try {
-                                set(object, field);
+                                processRandomAnnotatedField(object, field);
                             } catch (Throwable t) {
                                 throwables.add(t);
                             }
@@ -74,35 +72,52 @@ public class RandomAnnotationUtils {
      * @param field field
      * @throws Throwable Throwable
      */
-    private void set(Object object, Field field) throws Throwable {
-        if (field.isAnnotationPresent(TestEngine.Random.Boolean.class)) {
+    private void processRandomAnnotatedField(Object object, Field field) throws Throwable {
+        LOGGER.trace(
+                "processRandomAnnotatedField class [%s] field [%s] type [%s]",
+                object.getClass().getName(), field.getName(), field.getType().getName());
+
+        if (field.isAnnotationPresent(TestEngine.RandomBoolean.class)) {
             setBoolean(object, field);
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.Random.Integer.class)) {
-            TestEngine.Random.Integer annotation =
-                    field.getAnnotation(TestEngine.Random.Integer.class);
+        if (field.isAnnotationPresent(TestEngine.RandomInteger.class)) {
+            TestEngine.RandomInteger annotation =
+                    field.getAnnotation(TestEngine.RandomInteger.class);
             setInteger(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.Random.Long.class)) {
-            TestEngine.Random.Long annotation = field.getAnnotation(TestEngine.Random.Long.class);
+        if (field.isAnnotationPresent(TestEngine.RandomLong.class)) {
+            TestEngine.RandomLong annotation = field.getAnnotation(TestEngine.RandomLong.class);
             setLong(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.Random.Float.class)) {
-            TestEngine.Random.Float annotation = field.getAnnotation(TestEngine.Random.Float.class);
+        if (field.isAnnotationPresent(TestEngine.RandomFloat.class)) {
+            TestEngine.RandomFloat annotation = field.getAnnotation(TestEngine.RandomFloat.class);
             setFloat(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.Random.Double.class)) {
-            TestEngine.Random.Double annotation =
-                    field.getAnnotation(TestEngine.Random.Double.class);
+        if (field.isAnnotationPresent(TestEngine.RandomDouble.class)) {
+            TestEngine.RandomDouble annotation = field.getAnnotation(TestEngine.RandomDouble.class);
             setDouble(object, field, annotation.minimum(), annotation.maximum());
+            return;
+        }
+
+        if (field.isAnnotationPresent(TestEngine.RandomBigInteger.class)) {
+            TestEngine.RandomBigInteger annotation =
+                    field.getAnnotation(TestEngine.RandomBigInteger.class);
+            setBigInteger(object, field, annotation.minimum(), annotation.maximum());
+            return;
+        }
+
+        if (field.isAnnotationPresent(TestEngine.RandomBigDecimal.class)) {
+            TestEngine.RandomBigDecimal annotation =
+                    field.getAnnotation(TestEngine.RandomBigDecimal.class);
+            setBigDecimal(object, field, annotation.minimum(), annotation.maximum());
         }
     }
 
@@ -114,8 +129,11 @@ public class RandomAnnotationUtils {
      * @throws Throwable Throwable
      */
     private void setBoolean(Object object, Field field) throws Throwable {
-        LOGGER.trace("injecting random boolean");
-        field.set(object, RANDOM.nextBoolean());
+        LOGGER.trace(
+                "injecting random boolean class [%s] field [%s]",
+                object.getClass().getName(), field.getName());
+
+        field.set(object, RandomUtils.nextBoolean());
     }
 
     /**
@@ -123,11 +141,16 @@ public class RandomAnnotationUtils {
      *
      * @param object object
      * @param field field
+     * @param minimum minimum
+     * @param maximum maximum
      * @throws Throwable Throwable
      */
     private void setInteger(Object object, Field field, int minimum, int maximum) throws Throwable {
-        LOGGER.trace("injecting random integer");
-        field.set(object, (int) randomDouble(minimum, maximum));
+        LOGGER.trace(
+                "injecting random integer class [%s] field [%s] minimum [%s] maximum [%s]",
+                object.getClass().getName(), field.getName(), minimum, maximum);
+
+        field.set(object, RandomUtils.nextInteger(minimum, maximum));
     }
 
     /**
@@ -135,11 +158,16 @@ public class RandomAnnotationUtils {
      *
      * @param object object
      * @param field field
+     * @param minimum minimum
+     * @param maximum maximum
      * @throws Throwable Throwable
      */
     private void setLong(Object object, Field field, long minimum, long maximum) throws Throwable {
-        LOGGER.trace("injecting random long");
-        field.set(object, (long) randomDouble(minimum, maximum));
+        LOGGER.trace(
+                "injecting random long class [%s] field [%s] minimum [%s] maximum [%s]",
+                object.getClass().getName(), field.getName(), minimum, maximum);
+
+        field.set(object, RandomUtils.nextLong(minimum, maximum));
     }
 
     /**
@@ -147,12 +175,17 @@ public class RandomAnnotationUtils {
      *
      * @param object object
      * @param field field
+     * @param minimum minimum
+     * @param maximum maximum
      * @throws Throwable Throwable
      */
     private void setFloat(Object object, Field field, float minimum, float maximum)
             throws Throwable {
-        LOGGER.trace("injecting random float");
-        field.set(object, (float) randomDouble(minimum, maximum));
+        LOGGER.trace(
+                "injecting random float class [%s] field [%s] minimum [%s] maximum [%s]",
+                object.getClass().getName(), field.getName(), minimum, maximum);
+
+        field.set(object, RandomUtils.nextFloat(minimum, maximum));
     }
 
     /**
@@ -160,22 +193,52 @@ public class RandomAnnotationUtils {
      *
      * @param object object
      * @param field field
+     * @param minimum minimum
+     * @param maximum maximum
      * @throws Throwable Throwable
      */
     private void setDouble(Object object, Field field, double minimum, double maximum)
             throws Throwable {
-        LOGGER.trace("injecting random double");
-        field.set(object, randomDouble(minimum, maximum));
+        LOGGER.trace(
+                "injecting random double class [%s] field [%s] minimum [%s] maximum [%s]",
+                object.getClass().getName(), field.getName(), minimum, maximum);
+
+        field.set(object, RandomUtils.nextDouble(minimum, maximum));
     }
 
     /**
-     * Method to get a random double in a range (inclusive)
+     * Method to set a BigInteger field
      *
+     * @param object object
+     * @param field field
      * @param minimum minimum
      * @param maximum maximum
-     * @return a random double in a range (inclusive)
+     * @throws Throwable Throwable
      */
-    private double randomDouble(double minimum, double maximum) {
-        return Math.random() * (maximum - minimum) + minimum;
+    private void setBigInteger(Object object, Field field, String minimum, String maximum)
+            throws Throwable {
+        LOGGER.trace(
+                "injecting random BigInteger class [%s] field [%s] minimum [%s] maximum [%s]",
+                object.getClass().getName(), field.getName(), minimum, maximum);
+
+        field.set(object, RandomUtils.nextBigInteger(minimum, maximum));
+    }
+
+    /**
+     * Method to set a BigDecimal field
+     *
+     * @param object object
+     * @param field field
+     * @param minimum minimum
+     * @param maximum maximum
+     * @throws Throwable Throwable
+     */
+    private void setBigDecimal(Object object, Field field, String minimum, String maximum)
+            throws Throwable {
+        LOGGER.trace(
+                "injecting random BigDecimal class [%s] field [%s] minimum [%s] maximum [%s]",
+                object.getClass().getName(), field.getName(), minimum, maximum);
+
+        field.set(object, RandomUtils.nextBigDecimal(minimum, maximum));
     }
 }

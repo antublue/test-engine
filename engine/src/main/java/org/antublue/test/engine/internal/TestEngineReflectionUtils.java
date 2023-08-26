@@ -67,11 +67,13 @@ public final class TestEngineReflectionUtils {
 
     private static final Predicate<Field> RANDOM_FIELD_FILTER =
             field ->
-                    field.isAnnotationPresent(TestEngine.Random.Boolean.class)
-                            || field.isAnnotationPresent(TestEngine.Random.Integer.class)
-                            || field.isAnnotationPresent(TestEngine.Random.Long.class)
-                            || field.isAnnotationPresent(TestEngine.Random.Float.class)
-                            || field.isAnnotationPresent(TestEngine.Random.Double.class);
+                    field.isAnnotationPresent(TestEngine.RandomBoolean.class)
+                            || field.isAnnotationPresent(TestEngine.RandomInteger.class)
+                            || field.isAnnotationPresent(TestEngine.RandomLong.class)
+                            || field.isAnnotationPresent(TestEngine.RandomFloat.class)
+                            || field.isAnnotationPresent(TestEngine.RandomDouble.class)
+                            || field.isAnnotationPresent(TestEngine.RandomBigInteger.class)
+                            || field.isAnnotationPresent(TestEngine.RandomBigDecimal.class);
 
     private final Predicate<Field> AUTO_CLOSE_FIELD_FILTER =
             field -> field.isAnnotationPresent(TestEngine.AutoClose.class);
@@ -594,7 +596,7 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get @TestEngine.Random.X Fields
+     * Method to get @TestEngine.RandomX Fields
      *
      * @param clazz class to inspect
      * @return List of Fields
@@ -613,12 +615,12 @@ public final class TestEngineReflectionUtils {
         if (LOGGER.isTraceEnabled()) {
             synchronized (LOGGER) {
                 LOGGER.trace(
-                        " class [%s] @TestEngine.Random.X field count [%d]",
+                        " class [%s] @TestEngine.RandomX field count [%d]",
                         clazz.getName(), fields.size());
 
                 for (Field field : fields) {
                     LOGGER.trace(
-                            " class [%s] @TestEngine.Random.X field [%s] type [%s]",
+                            " class [%s] @TestEngine.RandomX field [%s] type [%s]",
                             clazz.getName(), field.getName(), field.getType().getName());
                 }
             }
