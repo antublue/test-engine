@@ -136,6 +136,11 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
   - The `minimum` and `maximum` values are inclusive.
   - If `minimum` is greater than `maximum`, then the values are swapped to create a valid range.
 
+
+- `@TestEngine.RandomBigInteger` and `@TestEngine.RandomBigDecimal` have required `minimum` and `maximum` values.
+  - The `minimum` and `maximum` values are inclusive.
+  - If `minimum` is greater than `maximum`, then the values are swapped to create a valid range.
+
 ### What is an `Argument`?
 
 `Argument` is an interface all argument objects must implement to provide a name.
