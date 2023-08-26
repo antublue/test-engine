@@ -100,7 +100,8 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 | `@TestEngine.Random.Long`                       | field            | no       | Provides a way to inject a random long value                                                                                       |
 | `@TestEngine.Random.Float`                      | field            | no       | Provides a way to inject a random double value                                                                                     |
 | `@TestEngine.Random.Double`                     | field            | no       | Provides a way to inject a random float value                                                                                      |
-
+| `@TestEngine.Random.BigInteger`                 | field            | no       | Provides a way to inject a random BigInteger value                                                                                 |
+| `@TestEngine.Random.BigDecimal`                 | field            | no       | Provides a way to inject a random BigDecimal value                                                                                 |
 
 **Notes**
 
@@ -129,7 +130,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 - `@TestEngine.Random.Integer`, `@TestEngine.Random.Long`, `@TestEngine.Random.Float`, and `@TestEngine.Random.Double` all have optional minimum and maximum values.
   - The `minimum` and `maximum` values are inclusive.
-  - If `minimum` is greater than `maximum`, then the values are swap to use to generate a valid range.
+  - If `minimum` is greater than `maximum`, then the values are swapped to create a valid range.
 
 ### What is an `Argument`?
 
