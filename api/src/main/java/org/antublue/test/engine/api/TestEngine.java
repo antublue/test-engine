@@ -196,7 +196,7 @@ public @interface TestEngine {
              *
              * @return the minimum value
              */
-            float minimum() default java.lang.Float.MIN_VALUE;
+            float minimum() default -java.lang.Float.MAX_VALUE;
 
             /**
              * Maximum value
@@ -215,7 +215,7 @@ public @interface TestEngine {
              *
              * @return the minimum value
              */
-            double minimum() default java.lang.Double.MIN_VALUE;
+            double minimum() default -java.lang.Double.MAX_VALUE;
 
             /**
              * Maximum value
@@ -223,6 +223,44 @@ public @interface TestEngine {
              * @return the maximum value
              */
             double maximum() default java.lang.Double.MAX_VALUE;
+        }
+
+        /** Random BigInteger annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface BigInteger {
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
+            String minimum();
+
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
+            String maximum();
+        }
+
+        /** Random BigDecimal annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface BigDecimal {
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
+            String minimum();
+
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
+            String maximum();
         }
     }
 

@@ -1,0 +1,34 @@
+------
+Source
+------
+
+https://stackoverflow.com/questions/5023421/generating-random-bigdecimal-value-from-given-range
+
+----
+Code
+----
+
+public static BigDecimal between(BigDecimal min, BigDecimal MAX) {
+  int digitCount = Math.max(min.precision(), MAX.precision());
+  int bitCount = (int)(digitCount / Math.log10(2.0));
+
+  // convert Random BigInteger to a BigDecimal between 0 and 1
+  BigDecimal alpha = new BigDecimal(
+    new BigInteger( bitCount, new Random() )
+  ).movePointLeft(digitCount);
+
+  return min.add(MAX.subtract(min).multiply(alpha, new MathContext(digitCount)));
+}
+
+---------
+Copyright
+---------
+
+2022 (c) by Ben McKenneby
+
+Code is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+ 
+You should have received a copy of the license along with this
+work. If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
+
+-------------------------------------------------------------------

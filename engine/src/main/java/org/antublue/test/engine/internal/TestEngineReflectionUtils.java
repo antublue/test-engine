@@ -71,7 +71,9 @@ public final class TestEngineReflectionUtils {
                             || field.isAnnotationPresent(TestEngine.Random.Integer.class)
                             || field.isAnnotationPresent(TestEngine.Random.Long.class)
                             || field.isAnnotationPresent(TestEngine.Random.Float.class)
-                            || field.isAnnotationPresent(TestEngine.Random.Double.class);
+                            || field.isAnnotationPresent(TestEngine.Random.Double.class)
+                            || field.isAnnotationPresent(TestEngine.Random.BigInteger.class)
+                            || field.isAnnotationPresent(TestEngine.Random.BigDecimal.class);
 
     private final Predicate<Field> AUTO_CLOSE_FIELD_FILTER =
             field -> field.isAnnotationPresent(TestEngine.AutoClose.class);

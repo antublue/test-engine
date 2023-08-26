@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package example;
+package example.random;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,15 +25,23 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class RandomTest2 {
+public class RandomFieldTest4 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
     @TestEngine.Random.Boolean protected Boolean randomBoolean;
-    @TestEngine.Random.Integer protected Integer randomInteger;
-    @TestEngine.Random.Long protected Long randomLong;
-    @TestEngine.Random.Float protected Float randomFloat;
-    @TestEngine.Random.Double protected Double randomDouble;
+
+    @TestEngine.Random.Integer(minimum = 0, maximum = Integer.MAX_VALUE)
+    protected Integer randomInteger;
+
+    @TestEngine.Random.Long(minimum = 0L, maximum = Long.MAX_VALUE)
+    protected Long randomLong;
+
+    @TestEngine.Random.Float(minimum = 0F, maximum = Float.MAX_VALUE)
+    protected Float randomFloat;
+
+    @TestEngine.Random.Double(minimum = 0D, maximum = Double.MAX_VALUE)
+    protected Double randomDouble;
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
@@ -55,6 +65,11 @@ public class RandomTest2 {
         System.out.println("randomLong [" + randomLong + "]");
         System.out.println("randomFloat [" + randomFloat + "]");
         System.out.println("randomDouble [" + randomDouble + "]");
+
+        assertThat(randomInteger).isBetween(0, Integer.MAX_VALUE);
+        assertThat(randomLong).isBetween(0L, Long.MAX_VALUE);
+        assertThat(randomFloat).isBetween(0F, Float.MAX_VALUE);
+        assertThat(randomDouble).isBetween(0D, Double.MAX_VALUE);
     }
 
     @TestEngine.BeforeEach

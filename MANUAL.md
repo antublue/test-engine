@@ -95,6 +95,12 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 | `@TestEngine.Unlock(name = "<string>")`         | method           | no       | Provides a way to acquire a named lock, and unlock it after method execution                                                       |
 | `@TestEngine.ResourceLock(name = "<string>")`   | method           | no       | Provides a way to acquire a named lock, locking it before method execution and unlocking it after method execution                 |
 | `@TestEngine.AutoClose(lifecycle = "<string>")` | field            | no       | Provides a way to close `AutoCloseable` field                                                                                      |
+| `@TestEngine.Random.Boolean`                    | field            | no       | Provides a way to inject a random boolean value                                                                                    |
+| `@TestEngine.Random.Integer`                    | field            | no       | Provides a way to inject a random integer value                                                                                    |
+| `@TestEngine.Random.Long`                       | field            | no       | Provides a way to inject a random long value                                                                                       |
+| `@TestEngine.Random.Float`                      | field            | no       | Provides a way to inject a random double value                                                                                     |
+| `@TestEngine.Random.Double`                     | field            | no       | Provides a way to inject a random float value                                                                                      |
+
 
 **Notes**
 
@@ -120,6 +126,10 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - `@TestEngine.AutoClose` fields are processed after `@TestEngine.AfterEach`, `@TestEngine.AfterAll`, and `@TestEngine.Conclude` methods depending on lifecycle.
   - Lifecycle must be `@TestEngine.AfterEach`, `@TestEngine.AfterAll`, or `@TestEngine.Conclude`.
   - The annotation has an optional value `method` (Object method name) to call a method of an Object that doesn't implement `AutoCloseable`.
+
+- `@TestEngine.Random.Integer`, `@TestEngine.Random.Long`, `@TestEngine.Random.Float`, and `@TestEngine.Random.Double` all have optional minimum and maximum values.
+  - The `minimum` and `maximum` values are inclusive.
+  - If `minimum` is greater than `maximum`, then the values are swap to use to generate a valid range.
 
 ### What is an `Argument`?
 
