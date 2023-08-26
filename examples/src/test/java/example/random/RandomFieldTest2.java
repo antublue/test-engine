@@ -27,11 +27,11 @@ public class RandomFieldTest2 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.Random.Boolean protected Boolean randomBoolean;
-    @TestEngine.Random.Integer protected Integer randomInteger;
-    @TestEngine.Random.Long protected Long randomLong;
-    @TestEngine.Random.Float protected Float randomFloat;
-    @TestEngine.Random.Double protected Double randomDouble;
+    @TestEngine.RandomBoolean protected Boolean randomBoolean;
+    @TestEngine.RandomInteger protected Integer randomInteger;
+    @TestEngine.RandomLong protected Long randomLong;
+    @TestEngine.RandomFloat protected Float randomFloat;
+    @TestEngine.RandomDouble protected Double randomDouble;
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {

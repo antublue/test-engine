@@ -23,7 +23,7 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.RandomUtils;
 
-/** Class to process @TestEngine.Random.X annotations */
+/** Class to process @TestEngine.RandomX annotations */
 public class RandomAnnotationUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomAnnotationUtils.class);
@@ -45,7 +45,7 @@ public class RandomAnnotationUtils {
     }
 
     /**
-     * Method to process @TestEngine.Random.X annotated fields
+     * Method to process @TestEngine.RandomX annotated fields
      *
      * @param object object
      * @param throwables throwables
@@ -77,47 +77,46 @@ public class RandomAnnotationUtils {
                 "processRandomAnnotatedField class [%s] field [%s] type [%s]",
                 object.getClass().getName(), field.getName(), field.getType().getName());
 
-        if (field.isAnnotationPresent(TestEngine.Random.Boolean.class)) {
+        if (field.isAnnotationPresent(TestEngine.RandomBoolean.class)) {
             setBoolean(object, field);
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.Random.Integer.class)) {
-            TestEngine.Random.Integer annotation =
-                    field.getAnnotation(TestEngine.Random.Integer.class);
+        if (field.isAnnotationPresent(TestEngine.RandomInteger.class)) {
+            TestEngine.RandomInteger annotation =
+                    field.getAnnotation(TestEngine.RandomInteger.class);
             setInteger(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.Random.Long.class)) {
-            TestEngine.Random.Long annotation = field.getAnnotation(TestEngine.Random.Long.class);
+        if (field.isAnnotationPresent(TestEngine.RandomLong.class)) {
+            TestEngine.RandomLong annotation = field.getAnnotation(TestEngine.RandomLong.class);
             setLong(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.Random.Float.class)) {
-            TestEngine.Random.Float annotation = field.getAnnotation(TestEngine.Random.Float.class);
+        if (field.isAnnotationPresent(TestEngine.RandomFloat.class)) {
+            TestEngine.RandomFloat annotation = field.getAnnotation(TestEngine.RandomFloat.class);
             setFloat(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.Random.Double.class)) {
-            TestEngine.Random.Double annotation =
-                    field.getAnnotation(TestEngine.Random.Double.class);
+        if (field.isAnnotationPresent(TestEngine.RandomDouble.class)) {
+            TestEngine.RandomDouble annotation = field.getAnnotation(TestEngine.RandomDouble.class);
             setDouble(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.Random.BigInteger.class)) {
-            TestEngine.Random.BigInteger annotation =
-                    field.getAnnotation(TestEngine.Random.BigInteger.class);
+        if (field.isAnnotationPresent(TestEngine.RandomBigInteger.class)) {
+            TestEngine.RandomBigInteger annotation =
+                    field.getAnnotation(TestEngine.RandomBigInteger.class);
             setBigInteger(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.Random.BigDecimal.class)) {
-            TestEngine.Random.BigDecimal annotation =
-                    field.getAnnotation(TestEngine.Random.BigDecimal.class);
+        if (field.isAnnotationPresent(TestEngine.RandomBigDecimal.class)) {
+            TestEngine.RandomBigDecimal annotation =
+                    field.getAnnotation(TestEngine.RandomBigDecimal.class);
             setBigDecimal(object, field, annotation.minimum(), annotation.maximum());
         }
     }

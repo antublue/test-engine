@@ -29,18 +29,18 @@ public class RandomFieldTest5 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.Random.Boolean protected Boolean randomBoolean;
+    @TestEngine.RandomBoolean protected Boolean randomBoolean;
 
-    @TestEngine.Random.Integer(minimum = Integer.MIN_VALUE, maximum = 0)
+    @TestEngine.RandomInteger(minimum = Integer.MIN_VALUE, maximum = 0)
     protected Integer randomInteger;
 
-    @TestEngine.Random.Long(minimum = Long.MIN_VALUE, maximum = 0)
+    @TestEngine.RandomLong(minimum = Long.MIN_VALUE, maximum = 0)
     protected Long randomLong;
 
-    @TestEngine.Random.Float(minimum = -Float.MAX_VALUE, maximum = 0)
+    @TestEngine.RandomFloat(minimum = -Float.MAX_VALUE, maximum = 0)
     protected Float randomFloat;
 
-    @TestEngine.Random.Double(minimum = -Double.MAX_VALUE, maximum = 0)
+    @TestEngine.RandomDouble(minimum = -Double.MAX_VALUE, maximum = 0)
     protected Double randomDouble;
 
     @TestEngine.ArgumentSupplier

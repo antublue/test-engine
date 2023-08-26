@@ -16,6 +16,8 @@
 
 package example.random;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -27,21 +29,21 @@ public class RandomFieldTest {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.Random.Boolean protected boolean randomBoolean;
-    @TestEngine.Random.Integer protected int randomInteger;
-    @TestEngine.Random.Long protected long randomLong;
-    @TestEngine.Random.Float protected float randomFloat;
-    @TestEngine.Random.Double protected double randomDouble;
+    @TestEngine.RandomBoolean protected boolean randomBoolean;
+    @TestEngine.RandomInteger protected int randomInteger;
+    @TestEngine.RandomLong protected long randomLong;
+    @TestEngine.RandomFloat protected float randomFloat;
+    @TestEngine.RandomDouble protected double randomDouble;
 
-    @TestEngine.Random.BigInteger(
+    @TestEngine.RandomBigInteger(
             minimum = "-10000000000000000000",
             maximum = "10000000000000000000")
-    protected java.math.BigInteger randomBigInteger;
+    protected BigInteger randomBigInteger;
 
-    @TestEngine.Random.BigDecimal(
+    @TestEngine.RandomBigDecimal(
             minimum = "-10000000000000000000",
             maximum = "10000000000000000000")
-    protected java.math.BigDecimal randomBigDecimal;
+    protected BigDecimal randomBigDecimal;
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
