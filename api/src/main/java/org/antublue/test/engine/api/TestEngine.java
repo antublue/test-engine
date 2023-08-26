@@ -260,6 +260,11 @@ public @interface TestEngine {
         String maximum();
     }
 
+    /** UUID annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface UUID {}
+
     /** Lock annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)

@@ -24,8 +24,8 @@ import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.AutoCloseAnnotationUtils;
 import org.antublue.test.engine.internal.ExecutorContext;
+import org.antublue.test.engine.internal.FieldAnnotationUtils;
 import org.antublue.test.engine.internal.LockAnnotationUtils;
-import org.antublue.test.engine.internal.RandomAnnotationUtils;
 import org.antublue.test.engine.internal.TestEngineReflectionUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -203,8 +203,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                                 field.set(testInstance, testArgument);
                             }
 
-                            RandomAnnotationUtils.singleton()
-                                    .processRandomAnnotatedFields(testInstance, throwables);
+                            FieldAnnotationUtils.singleton()
+                                    .processAnnotatedFields(testInstance, throwables);
                         });
 
         optionalThrowable.ifPresent(

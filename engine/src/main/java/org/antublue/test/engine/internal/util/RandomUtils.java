@@ -23,6 +23,7 @@ import java.math.RoundingMode;
 import java.util.concurrent.ThreadLocalRandom;
 
 /** Class to implement RandomUtils */
+@SuppressWarnings("PMD.NPathComplexity")
 public class RandomUtils {
 
     /** Constructor */
