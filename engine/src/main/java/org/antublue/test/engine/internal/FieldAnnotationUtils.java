@@ -18,20 +18,21 @@ package org.antublue.test.engine.internal;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.UUID;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.RandomUtils;
 
 /** Class to process @TestEngine.RandomX annotations */
-public class RandomAnnotationUtils {
+public class FieldAnnotationUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RandomAnnotationUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldAnnotationUtils.class);
 
-    private static final RandomAnnotationUtils SINGLETON = new RandomAnnotationUtils();
+    private static final FieldAnnotationUtils SINGLETON = new FieldAnnotationUtils();
 
     /** Constructor */
-    private RandomAnnotationUtils() {
+    private FieldAnnotationUtils() {
         // DO NOTHING
     }
 
@@ -40,7 +41,7 @@ public class RandomAnnotationUtils {
      *
      * @return the singleton
      */
-    public static RandomAnnotationUtils singleton() {
+    public static FieldAnnotationUtils singleton() {
         return SINGLETON;
     }
 
@@ -50,15 +51,15 @@ public class RandomAnnotationUtils {
      * @param object object
      * @param throwables throwables
      */
-    public void processRandomAnnotatedFields(Object object, List<Throwable> throwables) {
+    public void processAnnotatedFields(Object object, List<Throwable> throwables) {
         LOGGER.trace("processRandomAnnotatedFields class [%s]", object.getClass().getName());
 
         TestEngineReflectionUtils.singleton()
-                .getRandomFields(object.getClass())
+                .getAnnotatedFields(object.getClass())
                 .forEach(
                         field -> {
                             try {
-                                processRandomAnnotatedField(object, field);
+                                processAnnotatedFields(object, field);
                             } catch (Throwable t) {
                                 throwables.add(t);
                             }
@@ -72,9 +73,9 @@ public class RandomAnnotationUtils {
      * @param field field
      * @throws Throwable Throwable
      */
-    private void processRandomAnnotatedField(Object object, Field field) throws Throwable {
+    private void processAnnotatedFields(Object object, Field field) throws Throwable {
         LOGGER.trace(
-                "processRandomAnnotatedField class [%s] field [%s] type [%s]",
+                "processAnnotatedFields class [%s] field [%s] type [%s]",
                 object.getClass().getName(), field.getName(), field.getType().getName());
 
         if (field.isAnnotationPresent(TestEngine.RandomBoolean.class)) {
@@ -118,6 +119,18 @@ public class RandomAnnotationUtils {
             TestEngine.RandomBigDecimal annotation =
                     field.getAnnotation(TestEngine.RandomBigDecimal.class);
             setBigDecimal(object, field, annotation.minimum(), annotation.maximum());
+        }
+
+        if (field.isAnnotationPresent(TestEngine.UUID.class)) {
+            LOGGER.trace(
+                    "injecting UUID class [%s] field [%s]",
+                    object.getClass().getName(), field.getName());
+
+            if (field.getType().equals(String.class)) {
+                field.set(object, UUID.randomUUID().toString());
+            } else {
+                field.set(object, UUID.randomUUID());
+            }
         }
     }
 

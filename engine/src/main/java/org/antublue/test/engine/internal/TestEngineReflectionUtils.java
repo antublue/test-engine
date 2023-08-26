@@ -65,7 +65,7 @@ public final class TestEngineReflectionUtils {
                 return Argument.class.isAssignableFrom(field.getType());
             };
 
-    private static final Predicate<Field> RANDOM_FIELD_FILTER =
+    private static final Predicate<Field> ANNOTATED_FIELD_FILTER =
             field ->
                     field.isAnnotationPresent(TestEngine.RandomBoolean.class)
                             || field.isAnnotationPresent(TestEngine.RandomInteger.class)
@@ -73,7 +73,8 @@ public final class TestEngineReflectionUtils {
                             || field.isAnnotationPresent(TestEngine.RandomFloat.class)
                             || field.isAnnotationPresent(TestEngine.RandomDouble.class)
                             || field.isAnnotationPresent(TestEngine.RandomBigInteger.class)
-                            || field.isAnnotationPresent(TestEngine.RandomBigDecimal.class);
+                            || field.isAnnotationPresent(TestEngine.RandomBigDecimal.class)
+                            || field.isAnnotationPresent(TestEngine.UUID.class);
 
     private final Predicate<Field> AUTO_CLOSE_FIELD_FILTER =
             field -> field.isAnnotationPresent(TestEngine.AutoClose.class);
@@ -596,31 +597,31 @@ public final class TestEngineReflectionUtils {
     }
 
     /**
-     * Method to get @TestEngine.RandomX Fields
+     * Method to process @TestEngine.X annotated fields
      *
      * @param clazz class to inspect
      * @return List of Fields
      */
-    public List<Field> getRandomFields(Class<?> clazz) {
+    public List<Field> getAnnotatedFields(Class<?> clazz) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("getRandomFields class [%s]", clazz.getName());
+            LOGGER.trace("getAnnotatedFields class [%s]", clazz.getName());
         }
 
         List<Field> fields =
                 ReflectionUtils.singleton().getFields(clazz).stream()
-                        .filter(RANDOM_FIELD_FILTER)
+                        .filter(ANNOTATED_FIELD_FILTER)
                         .peek(field -> field.setAccessible(true))
                         .collect(Collectors.toList());
 
-        if (LOGGER.isTraceEnabled()) {
+        if (LOGGER.isInfoEnabled()) {
             synchronized (LOGGER) {
-                LOGGER.trace(
-                        " class [%s] @TestEngine.RandomX field count [%d]",
+                LOGGER.info(
+                        " class [%s] @TestEngine.X field count [%d]",
                         clazz.getName(), fields.size());
 
                 for (Field field : fields) {
-                    LOGGER.trace(
-                            " class [%s] @TestEngine.RandomX field [%s] type [%s]",
+                    LOGGER.info(
+                            " class [%s] @TestEngine.X field [%s] type [%s]",
                             clazz.getName(), field.getName(), field.getType().getName());
                 }
             }
