@@ -96,7 +96,7 @@ You can use the test engine in place of Junit 5 in scenarios where you don't rea
 
 Example:
 
-- [Junit5ReplacementExampleTest.java](/examples/src/test/java/example/Junit5ReplacementExampleTest.java)
+- [Junit5ReplacementTest.java](/examples/src/test/java/example/Junit5ReplacementTest.java)
 
 ---
 

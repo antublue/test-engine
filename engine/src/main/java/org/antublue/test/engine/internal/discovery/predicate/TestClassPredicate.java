@@ -31,12 +31,12 @@ public final class TestClassPredicate extends RegexPredicate<Class<?>> {
     /**
      * Method to test the Predicate
      *
-     * @param clazz the input argument
+     * @param testClass the input argument
      * @return whether to accept the Class
      */
     @Override
-    public synchronized boolean test(Class<?> clazz) {
-        return matcher.reset(clazz.getName()).find();
+    public synchronized boolean test(Class<?> testClass) {
+        return matcher.reset(testClass.getName()).find();
     }
 
     /**

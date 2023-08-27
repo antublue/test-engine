@@ -20,7 +20,7 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 
 `@TestEngine.Argument` injection example:
 
-- [SimpleTestExample.java](/examples/src/test/java/example/SimpleExampleTest.java)
+- [SimpleTest.java](/examples/src/test/java/example/SimpleTest.java)
 
 `@TestEngine` without method injection example:
 

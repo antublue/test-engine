@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 /** Class to implement RandomUtils */
@@ -29,6 +30,15 @@ public class RandomUtils {
     /** Constructor */
     private RandomUtils() {
         // DO NOTHING
+    }
+
+    /**
+     * Method to get a random UUID
+     *
+     * @return a random UUID
+     */
+    public static UUID nextUUID() {
+        return UUID.randomUUID();
     }
 
     /**

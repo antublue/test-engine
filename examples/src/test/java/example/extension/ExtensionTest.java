@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package example;
+package example.extension;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class SimpleExampleTest {
+public class ExtensionTest {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -33,6 +34,19 @@ public class SimpleExampleTest {
         for (int i = 0; i < 2; i++) {
             collection.add(StringArgument.of("StringArgument " + i));
         }
+        return collection.stream();
+    }
+
+    @TestEngine.ExtensionSupplier
+    public static Stream<Extension> extensions() {
+        Collection<Extension> collection = new ArrayList<>();
+
+        // Add a global extension instance
+        collection.add(StopWatchExtension.singleton());
+
+        // Add a test class specific extension instance
+        collection.add(new ExampleExtension());
+
         return collection.stream();
     }
 

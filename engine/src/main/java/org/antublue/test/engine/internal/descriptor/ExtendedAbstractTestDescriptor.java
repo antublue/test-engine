@@ -60,12 +60,12 @@ public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescrip
     /**
      * Method to get a List of children cast as a specific Class
      *
-     * @param clazz clazz
+     * @param testClass testClass
      * @return the return value
      * @param <T> the return type
      */
-    public <T> List<T> getChildren(Class<T> clazz) {
-        // Clazz is required to be able to get the generic type
+    public <T> List<T> getChildren(Class<T> testClass) {
+        // testClass is required to be able to get the generic type
         return getChildren().stream()
                 .map((Function<TestDescriptor, T>) testDescriptor -> (T) testDescriptor)
                 .collect(Collectors.toList());
@@ -104,6 +104,11 @@ public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescrip
                 .executionSkipped(this, "Skipped");
     }
 
+    protected void println(String format, Object... objects) {
+        System.out.println(String.format(format, objects));
+        System.out.flush();
+    }
+
     /**
      * Method to print a stacktrace depending on whether we have been executed via the Maven Test
      * Engine plugin
@@ -116,5 +121,9 @@ public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescrip
             throwable.printStackTrace(printStream);
             printStream.flush();
         }
+    }
+
+    protected void flush() {
+        System.out.flush();
     }
 }

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
 /** Class to implement Configuration */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -72,6 +73,13 @@ public class Configuration {
             if (file.exists() && file.canRead() && file.isFile()) {
                 propertiesFilename = file.getAbsolutePath();
             }
+        }
+
+        if (propertiesFilename == null) {
+            AtomicReference<String> atomicReference = new AtomicReference<>();
+            recuresivleFindTestEnginePropertiesFile(
+                    new File(".").getAbsoluteFile(), atomicReference);
+            propertiesFilename = atomicReference.get();
         }
 
         if (propertiesFilename == null) {
@@ -168,6 +176,27 @@ public class Configuration {
                     "getBoolean name [%s] defaultValue [%s] value [%s]",
                     key, defaultValue, defaultValue);
             return Optional.of(defaultValue);
+        }
+    }
+
+    private void recuresivleFindTestEnginePropertiesFile(
+            File directory, AtomicReference<String> atomicReference) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                if (f.exists()
+                        && f.isFile()
+                        && f.canRead()
+                        && ".antublue-test-engine.properties".equals(f.getName())) {
+                    atomicReference.set(f.getAbsolutePath());
+                    // System.out.format("found [%s]", f.getAbsolutePath()).println();
+                    return;
+                }
+            }
+        }
+
+        if (directory.getParentFile() != null) {
+            recuresivleFindTestEnginePropertiesFile(directory.getParentFile(), atomicReference);
         }
     }
 

@@ -16,6 +16,8 @@
 
 package example.autoclose;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -23,7 +25,7 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class AutoCloseExampleTest3 {
+public class AutoCloseTest2 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -43,12 +45,12 @@ public class AutoCloseExampleTest3 {
     private TestObject afterAllTestObject;
 
     @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude", method = "destroy")
-    private TestObject concludeTestObject;
+    private TestObject afterConcludeTestObject;
 
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        concludeTestObject = new TestObject("concludeTestObject");
+        afterConcludeTestObject = new TestObject("afterConcludeTestObject");
     }
 
     @TestEngine.BeforeAll
@@ -81,16 +83,19 @@ public class AutoCloseExampleTest3 {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + stringArgument + ")");
+        assertThat(afterEachTestObject.isDestroyed()).isTrue();
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
+        assertThat(afterAllTestObject.isDestroyed()).isTrue();
     }
 
     private static class TestObject {
 
         private final String name;
+        private boolean isDestroyed;
 
         public TestObject(String name) {
             this.name = name;
@@ -98,6 +103,11 @@ public class AutoCloseExampleTest3 {
 
         public void destroy() {
             System.out.println(name + ".destroy()");
+            isDestroyed = true;
+        }
+
+        public boolean isDestroyed() {
+            return isDestroyed;
         }
     }
 }

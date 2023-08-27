@@ -19,7 +19,7 @@ package org.antublue.test.engine.internal.descriptor;
 import java.lang.reflect.Method;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.TestClassConfigurationException;
-import org.antublue.test.engine.internal.TestEngineReflectionUtils;
+import org.antublue.test.engine.internal.TestEngineUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Switch;
@@ -41,48 +41,49 @@ public final class TestDescriptorUtils {
      * Method to create a ClassTestDescriptor
      *
      * @param uniqueId uniqueId
-     * @param clazz clazz
+     * @param testClass testClass
      * @return the return value
      */
-    public static ClassTestDescriptor createClassTestDescriptor(UniqueId uniqueId, Class<?> clazz) {
-        validateTestClass(clazz);
+    public static ClassTestDescriptor createClassTestDescriptor(
+            UniqueId uniqueId, Class<?> testClass) {
+        validateTestClass(testClass);
 
         return new ClassTestDescriptor(
-                uniqueId, TestEngineReflectionUtils.singleton().getDisplayName(clazz), clazz);
+                uniqueId, TestEngineUtils.singleton().getDisplayName(testClass), testClass);
     }
 
     /**
      * Method to create an ArgumentTestDescriptor
      *
      * @param uniqueId uniqueId
-     * @param clazz clazz
+     * @param testClass testClass
      * @param argument argument
      * @return the return value
      */
     public static ArgumentTestDescriptor createArgumentTestDescriptor(
-            UniqueId uniqueId, Class<?> clazz, Argument argument) {
-        validateTestClass(clazz);
+            UniqueId uniqueId, Class<?> testClass, Argument argument) {
+        validateTestClass(testClass);
 
-        return new ArgumentTestDescriptor(uniqueId, argument.name(), clazz, argument);
+        return new ArgumentTestDescriptor(uniqueId, argument.name(), testClass, argument);
     }
 
     /**
      * Method to create a MethodTestDescriptor
      *
      * @param uniqueId uniqueId
-     * @param clazz clazz
+     * @param testClass testClass
      * @param method method
      * @param argument argument
      * @return the return value
      */
     public static MethodTestDescriptor createMethodTestDescriptor(
-            UniqueId uniqueId, Class<?> clazz, Method method, Argument argument) {
-        validateTestClass(clazz);
+            UniqueId uniqueId, Class<?> testClass, Method method, Argument argument) {
+        validateTestClass(testClass);
 
         return new MethodTestDescriptor(
                 uniqueId,
-                TestEngineReflectionUtils.singleton().getDisplayName(method),
-                clazz,
+                TestEngineUtils.singleton().getDisplayName(method),
+                testClass,
                 method,
                 argument);
     }
@@ -145,31 +146,31 @@ public final class TestDescriptorUtils {
         testDescriptor.getChildren().forEach(t -> logTestDescriptorTree(t, indent + 2));
     }
 
-    private static void validateTestClass(Class<?> clazz) {
+    private static void validateTestClass(Class<?> testClass) {
         // Validate we have a @TestEngine.ArgumentSupplier method
-        if (TestEngineReflectionUtils.singleton().getArgumentSupplierMethod(clazz) == null) {
+        if (TestEngineUtils.singleton().getArgumentSupplierMethod(testClass) == null) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a static @TestEngine.ArgumentSupplier"
                                     + " method",
-                            clazz.getName()));
+                            testClass.getName()));
         }
 
         // Validate we have a @TestEngine.Test method
-        if (TestEngineReflectionUtils.singleton().getTestMethods(clazz).isEmpty()) {
+        if (TestEngineUtils.singleton().getTestMethods(testClass).isEmpty()) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare a @TestEngine.Test method",
-                            clazz.getName()));
+                            testClass.getName()));
         }
 
         // Get other method optional annotated methods
         // which will check for duplicate @TestEngine.Order values
-        TestEngineReflectionUtils.singleton().getPrepareMethods(clazz);
-        TestEngineReflectionUtils.singleton().getBeforeAllMethods(clazz);
-        TestEngineReflectionUtils.singleton().getBeforeEachMethods(clazz);
-        TestEngineReflectionUtils.singleton().getAfterEachMethods(clazz);
-        TestEngineReflectionUtils.singleton().getAfterAllMethods(clazz);
-        TestEngineReflectionUtils.singleton().getConcludeMethods(clazz);
+        TestEngineUtils.singleton().getPrepareMethods(testClass);
+        TestEngineUtils.singleton().getBeforeAllMethods(testClass);
+        TestEngineUtils.singleton().getBeforeEachMethods(testClass);
+        TestEngineUtils.singleton().getAfterEachMethods(testClass);
+        TestEngineUtils.singleton().getAfterAllMethods(testClass);
+        TestEngineUtils.singleton().getConcludeMethods(testClass);
     }
 }

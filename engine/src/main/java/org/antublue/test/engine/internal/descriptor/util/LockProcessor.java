@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal;
+package org.antublue.test.engine.internal.descriptor.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -26,20 +26,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.TestClassConfigurationException;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 /** Class to process @TestEngine.Lock, @TestEngine.Unlock, @TestEngine.ResourceLock annotations */
-public class LockAnnotationUtils {
+public class LockProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LockAnnotationUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LockProcessor.class);
 
-    private static final LockAnnotationUtils SINGLETON = new LockAnnotationUtils();
+    private static final LockProcessor SINGLETON = new LockProcessor();
 
     private final Map<String, ReentrantReadWriteLock> LOCK_MAP = new ConcurrentHashMap<>();
 
     /** Constructor */
-    private LockAnnotationUtils() {
+    private LockProcessor() {
         // DO NOTHING
     }
 
@@ -48,16 +49,16 @@ public class LockAnnotationUtils {
      *
      * @return the singleton instance
      */
-    public static LockAnnotationUtils singleton() {
+    public static LockProcessor singleton() {
         return SINGLETON;
     }
 
     /**
-     * Method to perform locking on a Method, if annotated
+     * Method to process locking/unlocking on a Method, if annotated
      *
      * @param method method
      */
-    public void processLockAnnotations(Method method) {
+    public void processLocks(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Lock.class)
                 && !method.isAnnotationPresent(TestEngine.Lock.List.class)
                 && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
@@ -122,7 +123,7 @@ public class LockAnnotationUtils {
      *
      * @param method method
      */
-    public void processUnlockAnnotations(Method method) {
+    public void processUnlocks(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Unlock.class)
                 && !method.isAnnotationPresent(TestEngine.Unlock.List.class)
                 && !method.isAnnotationPresent(TestEngine.ResourceLock.class)

@@ -16,20 +16,23 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.internal.AutoCloseAnnotationUtils;
+import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.ExecutorContext;
-import org.antublue.test.engine.internal.LockAnnotationUtils;
-import org.antublue.test.engine.internal.TestEngineReflectionUtils;
+import org.antublue.test.engine.internal.TestEngineUtils;
+import org.antublue.test.engine.internal.descriptor.util.AutoCloseProcessor;
+import org.antublue.test.engine.internal.descriptor.util.LockProcessor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
-import org.antublue.test.engine.internal.util.InvocationUtils;
-import org.antublue.test.engine.internal.util.ThrowableUtils;
+import org.antublue.test.engine.internal.util.Invoker;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -57,9 +60,8 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
     private final Class<?> testClass;
     private final Argument testArgument;
     private final Method testMethod;
-
-    private final List<Throwable> throwables;
     private final StateMachine<State> stateMachine;
+    private final ThrowableCollector throwableCollector;
     private ExecutorContext executorContext;
     private Object testInstance;
 
@@ -82,7 +84,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         this.testClass = testClass;
         this.testArgument = testArgument;
         this.testMethod = testMethod;
-        this.throwables = new ArrayList<>();
+
         this.stateMachine =
                 new StateMachine<State>(getClass().getName())
                         .addTransition(State.BEGIN, this::begin)
@@ -96,6 +98,8 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                         .addTransition(State.AFTER_EACH, this::afterEach)
                         .addTransition(State.AFTER_AFTER_EACH, this::afterAfterEach)
                         .addTransition(State.END, this::end);
+
+        this.throwableCollector = new ThrowableCollector();
     }
 
     /**
@@ -193,18 +197,13 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "begin uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
-        try {
-            getStopWatch().start();
+        getStopWatch().start();
 
-            executorContext
-                    .getExecutionRequest()
-                    .getEngineExecutionListener()
-                    .executionStarted(this);
-            testInstance = executorContext.getTestInstance();
-            stateMachine.signal(State.BEFORE_BEFORE_EACH);
-        } finally {
-            System.out.flush();
-        }
+        executorContext.getExecutionRequest().getEngineExecutionListener().executionStarted(this);
+        testInstance = executorContext.getTestInstance();
+        stateMachine.signal(State.BEFORE_BEFORE_EACH);
+
+        flush();
     }
 
     /**
@@ -217,7 +216,21 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "beforeBeforeEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
+        throwableCollector.add(
+                Invoker.invoke(
+                        () -> {
+                            List<Extension> extensions =
+                                    TestEngineUtils.singleton()
+                                            .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+
+                            for (Extension extension : extensions) {
+                                extension.beforeBeforeEach(testInstance, testArgument);
+                            }
+                        }));
+
         stateMachine.signal(State.BEFORE_EACH);
+
+        flush();
     }
 
     /**
@@ -230,38 +243,32 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "beforeEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
-        Optional<Throwable> optionalThrowable =
-                InvocationUtils.run(
+        LockProcessor lockProcessor = LockProcessor.singleton();
+
+        throwableCollector.add(
+                Invoker.invoke(
                         () -> {
                             List<Method> methods =
-                                    TestEngineReflectionUtils.singleton()
-                                            .getBeforeEachMethods(testClass);
+                                    TestEngineUtils.singleton().getBeforeEachMethods(testClass);
+
                             for (Method method : methods) {
                                 try {
-                                    LockAnnotationUtils.singleton().processLockAnnotations(method);
-                                    if (TestEngineReflectionUtils.singleton()
+                                    lockProcessor.processLocks(method);
+                                    if (TestEngineUtils.singleton()
                                             .acceptsArgument(method, testArgument)) {
                                         method.invoke(testInstance, testArgument);
                                     } else {
                                         method.invoke(testInstance, NO_OBJECT_ARGS);
                                     }
                                 } finally {
-                                    LockAnnotationUtils.singleton()
-                                            .processUnlockAnnotations(method);
-                                    System.out.flush();
+                                    lockProcessor.processUnlocks(method);
                                 }
                             }
-                        });
-
-        optionalThrowable.ifPresent(
-                throwable -> {
-                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
-                    throwables.add(prunedThrowable);
-                    printStackTrace(System.out, prunedThrowable);
-                });
+                        }));
 
         stateMachine.signal(State.AFTER_BEFORE_EACH);
-        System.out.flush();
+
+        flush();
     }
 
     /**
@@ -274,11 +281,25 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "afterBeforeEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
-        if (throwables.isEmpty()) {
+        throwableCollector.add(
+                Invoker.invoke(
+                        () -> {
+                            List<Extension> extensions =
+                                    TestEngineUtils.singleton()
+                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+
+                            for (Extension extension : extensions) {
+                                extension.afterBeforeEach(testInstance, testArgument);
+                            }
+                        }));
+
+        if (throwableCollector.isEmpty()) {
             stateMachine.signal(State.BEFORE_TEST);
         } else {
             stateMachine.signal(State.BEFORE_AFTER_EACH);
         }
+
+        flush();
     }
 
     /**
@@ -291,7 +312,25 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "beforeTest uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
-        stateMachine.signal(State.TEST);
+        throwableCollector.add(
+                Invoker.invoke(
+                        () -> {
+                            List<Extension> extensions =
+                                    TestEngineUtils.singleton()
+                                            .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+
+                            for (Extension extension : extensions) {
+                                extension.beforeTest(testInstance, testArgument);
+                            }
+                        }));
+
+        if (throwableCollector.isEmpty()) {
+            stateMachine.signal(State.TEST);
+        } else {
+            stateMachine.signal(State.AFTER_TEST);
+        }
+
+        flush();
     }
 
     /**
@@ -304,33 +343,27 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "test uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
-        Optional<Throwable> optionalThrowable =
-                InvocationUtils.run(
+        LockProcessor lockProcessor = LockProcessor.singleton();
+
+        throwableCollector.add(
+                Invoker.invoke(
                         () -> {
                             try {
-                                LockAnnotationUtils.singleton().processLockAnnotations(testMethod);
-                                if (TestEngineReflectionUtils.singleton()
+                                lockProcessor.processLocks(testMethod);
+                                if (TestEngineUtils.singleton()
                                         .acceptsArgument(testMethod, testArgument)) {
                                     testMethod.invoke(testInstance, testArgument);
                                 } else {
                                     testMethod.invoke(testInstance, NO_OBJECT_ARGS);
                                 }
                             } finally {
-                                LockAnnotationUtils.singleton()
-                                        .processUnlockAnnotations(testMethod);
-                                System.out.flush();
+                                lockProcessor.processUnlocks(testMethod);
                             }
-                        });
-
-        optionalThrowable.ifPresent(
-                throwable -> {
-                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
-                    throwables.add(prunedThrowable);
-                    printStackTrace(System.out, prunedThrowable);
-                });
+                        }));
 
         stateMachine.signal(State.AFTER_TEST);
-        System.out.flush();
+
+        flush();
     }
 
     /**
@@ -343,7 +376,21 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "afterTest uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
+        throwableCollector.add(
+                Invoker.invoke(
+                        () -> {
+                            List<Extension> extensions =
+                                    TestEngineUtils.singleton()
+                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+
+                            for (Extension extension : extensions) {
+                                extension.afterTest(testInstance, testArgument);
+                            }
+                        }));
+
         stateMachine.signal(State.BEFORE_AFTER_EACH);
+
+        flush();
     }
 
     /**
@@ -356,7 +403,21 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "beforeAfterEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
+        throwableCollector.add(
+                Invoker.invoke(
+                        () -> {
+                            List<Extension> extensions =
+                                    TestEngineUtils.singleton()
+                                            .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+
+                            for (Extension extension : extensions) {
+                                extension.beforeAfterEach(testInstance, testArgument);
+                            }
+                        }));
+
         stateMachine.signal(State.AFTER_EACH);
+
+        flush();
     }
 
     /**
@@ -369,42 +430,61 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "afterEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
-        Optional<Throwable> optionalThrowable =
-                InvocationUtils.run(
-                        () -> {
-                            List<Method> methods =
-                                    TestEngineReflectionUtils.singleton()
-                                            .getAfterEachMethods(testClass);
-                            for (Method method : methods) {
-                                try {
-                                    LockAnnotationUtils.singleton().processLockAnnotations(method);
-                                    if (TestEngineReflectionUtils.singleton()
-                                            .acceptsArgument(method, testArgument)) {
-                                        method.invoke(testInstance, testArgument);
-                                    } else {
-                                        method.invoke(testInstance, NO_OBJECT_ARGS);
-                                    }
-                                } catch (Throwable t) {
-                                    Throwable prunedThrowable = ThrowableUtils.prune(t, testClass);
-                                    throwables.add(prunedThrowable);
-                                    printStackTrace(System.out, prunedThrowable);
-                                } finally {
-                                    LockAnnotationUtils.singleton()
-                                            .processUnlockAnnotations(method);
-                                    System.out.flush();
-                                }
-                            }
-                        });
+        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
+        LockProcessor lockProcessor = LockProcessor.singleton();
+        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
 
-        optionalThrowable.ifPresent(
-                throwable -> {
-                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
-                    throwables.add(prunedThrowable);
-                    printStackTrace(System.out, prunedThrowable);
+        Invoker.invoke(
+                () -> {
+                    List<Method> methods = testEngineUtils.getAfterEachMethods(testClass);
+
+                    for (Method method : methods) {
+                        try {
+                            lockProcessor.processLocks(method);
+                            if (TestEngineUtils.singleton().acceptsArgument(method, testArgument)) {
+                                method.invoke(testInstance, testArgument);
+                            } else {
+                                method.invoke(testInstance, NO_OBJECT_ARGS);
+                            }
+                        } catch (Throwable t) {
+                            throwableCollector.add(t);
+                        } finally {
+                            lockProcessor.processUnlocks(method);
+                        }
+                    }
+                });
+
+        Invoker.invoke(
+                () -> {
+                    try {
+                        List<Field> fields =
+                                testEngineUtils.getAnnotatedFields(testClass).stream()
+                                        .filter(
+                                                field -> {
+                                                    TestEngine.AutoClose annotation =
+                                                            field.getAnnotation(
+                                                                    TestEngine.AutoClose.class);
+                                                    return annotation != null
+                                                            && "@TestEngine.AfterEach"
+                                                                    .equals(annotation.lifecycle());
+                                                })
+                                        .collect(Collectors.toList());
+
+                        for (Field field : fields) {
+                            try {
+                                autoCloseProcessor.close(testInstance, field);
+                            } catch (Throwable t) {
+                                throwableCollector.add(t);
+                            }
+                        }
+                    } catch (Throwable t) {
+                        throwableCollector.add(t);
+                    }
                 });
 
         stateMachine.signal(State.AFTER_AFTER_EACH);
-        System.out.flush();
+
+        flush();
     }
 
     /**
@@ -417,7 +497,21 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "afterAfterEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
+        throwableCollector.add(
+                Invoker.invoke(
+                        () -> {
+                            List<Extension> extensions =
+                                    TestEngineUtils.singleton()
+                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+
+                            for (Extension extension : extensions) {
+                                extension.afterAfterEach(testInstance, testArgument);
+                            }
+                        }));
+
         stateMachine.signal(State.END);
+
+        flush();
     }
 
     /**
@@ -430,12 +524,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "end uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
-        AutoCloseAnnotationUtils.singleton()
-                .processAutoCloseAnnotatedFields(testInstance, "@TestEngine.AfterEach", throwables);
-
         getStopWatch().stop();
 
-        if (throwables.isEmpty()) {
+        if (throwableCollector.isEmpty()) {
             executorContext
                     .getExecutionRequest()
                     .getEngineExecutionListener()
@@ -444,10 +535,12 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
             executorContext
                     .getExecutionRequest()
                     .getEngineExecutionListener()
-                    .executionFinished(this, TestExecutionResult.failed(throwables.get(0)));
+                    .executionFinished(
+                            this, TestExecutionResult.failed(throwableCollector.first()));
         }
 
         stateMachine.stop();
-        System.out.flush();
+
+        flush();
     }
 }

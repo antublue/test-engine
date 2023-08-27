@@ -48,7 +48,7 @@ public class DirectoryTest1 {
     public void prepare() throws IOException {
         System.out.println("prepare()");
         directory = Directory.create(UUID.randomUUID().toString(), RELATIVE);
-        System.out.format("directory [%s]", directory).println();
+        System.out.println(String.format("directory [%s]", directory));
     }
 
     @TestEngine.BeforeAll

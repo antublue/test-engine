@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package example.store;
+package org.antublue.test.engine.testing.autoclose;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Key;
-import org.antublue.test.engine.api.Store;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class StoreExampleTest3 {
-
-    private static final String TEST_OBJECT_KEY = Key.of(StoreExampleTest3.class, "testObject");
-
-    private Store store;
+public class AutoCloseTest2 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -46,22 +39,38 @@ public class StoreExampleTest3 {
         return collection.stream();
     }
 
+    @TestEngine.ExtensionSupplier
+    public static Stream<Extension> extensions() {
+        Collection<Extension> collection = new ArrayList<>();
+        collection.add(new TestExtension());
+        return collection.stream();
+    }
+
+    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterEach", method = "destroy")
+    public TestObject afterEachTestObject;
+
+    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll", method = "destroy")
+    public TestObject afterAllTestObject;
+
+    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude", method = "destroy")
+    public TestObject afterConcludeTestObject;
+
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        System.out.println(String.format("key [%s]", TEST_OBJECT_KEY));
-        store = new Store();
-        store.put(TEST_OBJECT_KEY, new TestObject());
+        afterConcludeTestObject = new TestObject("afterConcludeTestObject");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + stringArgument + ")");
+        afterAllTestObject = new TestObject("afterAllTestObject");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + stringArgument + ")");
+        afterEachTestObject = new TestObject("afterEachTestObject");
     }
 
     @TestEngine.Test
@@ -87,20 +96,42 @@ public class StoreExampleTest3 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        Optional<TestObject> optional = store.get(TEST_OBJECT_KEY, o -> (TestObject) o);
-        assertThat(optional).isPresent();
-        store.remove(TEST_OBJECT_KEY, (Consumer<TestObject>) testObject -> testObject.close());
-        assertThat(store.get(TEST_OBJECT_KEY)).isNotPresent();
     }
 
     private static class TestObject {
 
-        public TestObject() {
-            // DO NOTHING
+        private final String name;
+        private boolean isDestroyed;
+
+        public TestObject(String name) {
+            this.name = name;
         }
 
-        public void close() {
-            System.out.println(getClass().getName() + ".close()");
+        public void destroy() {
+            System.out.println(name + ".destroy()");
+            isDestroyed = true;
+        }
+
+        public boolean isDestroyed() {
+            return isDestroyed;
+        }
+    }
+
+    public static class TestExtension implements Extension {
+
+        public void afterAfterEach(Object testInstance) {
+            AutoCloseTest2 autoCloseExampleTest2 = (AutoCloseTest2) testInstance;
+            assertThat(autoCloseExampleTest2.afterEachTestObject.isDestroyed()).isTrue();
+        }
+
+        public void afterAfterAll(Object testInstance) {
+            AutoCloseTest2 autoCloseExampleTest2 = (AutoCloseTest2) testInstance;
+            assertThat(autoCloseExampleTest2.afterAllTestObject.isDestroyed()).isTrue();
+        }
+
+        public void afterConclude(Object testInstance) {
+            AutoCloseTest2 autoCloseExampleTest2 = (AutoCloseTest2) testInstance;
+            assertThat(autoCloseExampleTest2.afterConcludeTestObject.isDestroyed()).isTrue();
         }
     }
 }

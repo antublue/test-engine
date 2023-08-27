@@ -280,14 +280,14 @@ public class Resolver {
     private void resolveClasspathRootSelectors() {
         LOGGER.trace("resolveClasspathRootSelectors");
 
-        TestEngineReflectionUtils testEngineReflectionUtils = TestEngineReflectionUtils.singleton();
+        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClasspathRootSelector.class)
                 .forEach(
                         classpathRootSelector -> {
                             LOGGER.trace("ClasspathRootSelector.class");
-                            testEngineReflectionUtils
+                            testEngineUtils
                                     .findAllTestClasses(classpathRootSelector.getClasspathRoot())
                                     .forEach(
                                             clazz -> {
@@ -296,9 +296,8 @@ public class Resolver {
                                                     classMethodSetMap.put(
                                                             clazz,
                                                             new LinkedHashSet<>(
-                                                                    testEngineReflectionUtils
-                                                                            .getTestMethods(
-                                                                                    clazz)));
+                                                                    testEngineUtils.getTestMethods(
+                                                                            clazz)));
                                                 }
                                             });
                         });
@@ -308,14 +307,14 @@ public class Resolver {
     private void resolvePackageSelectors() {
         LOGGER.trace("resolvePackageSelectors");
 
-        TestEngineReflectionUtils testEngineReflectionUtils = TestEngineReflectionUtils.singleton();
+        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
 
         engineDiscoveryRequest
                 .getSelectorsByType(PackageSelector.class)
                 .forEach(
                         packageSelector -> {
                             LOGGER.trace("PackageSelector.class");
-                            testEngineReflectionUtils
+                            testEngineUtils
                                     .findAllTestClasses(packageSelector.getPackageName())
                                     .forEach(
                                             clazz -> {
@@ -324,9 +323,8 @@ public class Resolver {
                                                     classMethodSetMap.put(
                                                             clazz,
                                                             new LinkedHashSet<>(
-                                                                    testEngineReflectionUtils
-                                                                            .getTestMethods(
-                                                                                    clazz)));
+                                                                    testEngineUtils.getTestMethods(
+                                                                            clazz)));
                                                 }
                                             });
                         });
@@ -336,7 +334,7 @@ public class Resolver {
     private void resolveClassSelectors() {
         LOGGER.trace("resolveClassSelectors");
 
-        TestEngineReflectionUtils testEngineReflectionUtils = TestEngineReflectionUtils.singleton();
+        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClassSelector.class)
@@ -346,11 +344,10 @@ public class Resolver {
                             Class<?> clazz = classSelector.getJavaClass();
                             if (packageNameFiltersPredicate.test(clazz)
                                     && classNameFiltersPredicate.test(clazz)
-                                    && testEngineReflectionUtils.isTestClass(clazz)) {
+                                    && testEngineUtils.isTestClass(clazz)) {
                                 classMethodSetMap.put(
                                         clazz,
-                                        new LinkedHashSet<>(
-                                                testEngineReflectionUtils.getTestMethods(clazz)));
+                                        new LinkedHashSet<>(testEngineUtils.getTestMethods(clazz)));
                             }
                         });
     }
@@ -367,7 +364,7 @@ public class Resolver {
                             Class<?> clazz = methodSelector.getJavaClass();
                             if (packageNameFiltersPredicate.test(clazz)
                                     && classNameFiltersPredicate.test(clazz)
-                                    && TestEngineReflectionUtils.singleton()
+                                    && TestEngineUtils.singleton()
                                             .isTestMethod(methodSelector.getJavaMethod())) {
                                 Set<Method> methods =
                                         classMethodSetMap.getOrDefault(
@@ -382,7 +379,7 @@ public class Resolver {
     private void resolveUniqueIdSelectors() {
         LOGGER.trace("resolveUniqueIdSelectors");
 
-        TestEngineReflectionUtils testEngineReflectionUtils = TestEngineReflectionUtils.singleton();
+        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
 
         engineDiscoveryRequest
                 .getSelectorsByType(UniqueIdSelector.class)
@@ -397,12 +394,11 @@ public class Resolver {
                                     Class<?> clazz = Class.forName(className);
                                     if (packageNameFiltersPredicate.test(clazz)
                                             && classNameFiltersPredicate.test(clazz)
-                                            && testEngineReflectionUtils.isTestClass(clazz)) {
+                                            && testEngineUtils.isTestClass(clazz)) {
                                         Set<Method> methods =
                                                 classMethodSetMap.getOrDefault(
                                                         clazz, new LinkedHashSet<>());
-                                        methods.addAll(
-                                                testEngineReflectionUtils.getTestMethods(clazz));
+                                        methods.addAll(testEngineUtils.getTestMethods(clazz));
                                         classMethodSetMap.put(clazz, methods);
                                     }
                                 } catch (ClassNotFoundException e) {
@@ -421,12 +417,11 @@ public class Resolver {
                                     Class<?> clazz = Class.forName(className);
                                     if (packageNameFiltersPredicate.test(clazz)
                                             && classNameFiltersPredicate.test(clazz)
-                                            && testEngineReflectionUtils.isTestClass(clazz)) {
+                                            && testEngineUtils.isTestClass(clazz)) {
                                         Set<Method> methods =
                                                 classMethodSetMap.getOrDefault(
                                                         clazz, new LinkedHashSet<>());
-                                        methods.addAll(
-                                                testEngineReflectionUtils.getTestMethods(clazz));
+                                        methods.addAll(testEngineUtils.getTestMethods(clazz));
                                         classMethodSetMap.put(clazz, methods);
                                     }
                                 } catch (ClassNotFoundException e) {
@@ -567,8 +562,7 @@ public class Resolver {
 
             engineDescriptor.addChild(classTestDescriptor);
 
-            List<Argument> arguments =
-                    TestEngineReflectionUtils.singleton().getArgumentsList(clazz);
+            List<Argument> arguments = TestEngineUtils.singleton().getArguments(clazz);
             for (Argument argument : arguments) {
                 UniqueId argumentUniqueId =
                         classTestDescritporUniqueId.append("argument", argument.name());

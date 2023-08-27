@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package example.autoclose;
+package org.antublue.test.engine.testing.autoclose;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class AutoCloseExampleTest1 {
+public class AutoCloseTest1 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -36,19 +39,26 @@ public class AutoCloseExampleTest1 {
         return collection.stream();
     }
 
+    @TestEngine.ExtensionSupplier
+    public static Stream<Extension> extensions() {
+        Collection<Extension> collection = new ArrayList<>();
+        collection.add(new TestExtension());
+        return collection.stream();
+    }
+
     @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterEach")
-    private AutoCloseable afterEachAutoClosable;
+    private TestAutoCloseable afterEachAutoClosable;
 
     @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll")
-    private AutoCloseable afterAllAutoClosable;
+    private TestAutoCloseable afterAllAutoClosable;
 
     @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude")
-    private AutoCloseable concludeAutoCloseable;
+    private TestAutoCloseable afterConcludeAutoCloseable;
 
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        concludeAutoCloseable = new TestAutoCloseable("concludeAutoCloseable");
+        afterConcludeAutoCloseable = new TestAutoCloseable("afterConcludeAutoCloseable");
     }
 
     @TestEngine.BeforeAll
@@ -91,6 +101,7 @@ public class AutoCloseExampleTest1 {
     private static class TestAutoCloseable implements AutoCloseable {
 
         private final String name;
+        private boolean isClosed;
 
         public TestAutoCloseable(String name) {
             this.name = name;
@@ -98,6 +109,29 @@ public class AutoCloseExampleTest1 {
 
         public void close() {
             System.out.println(name + ".close()");
+            isClosed = true;
+        }
+
+        public boolean isClosed() {
+            return isClosed;
+        }
+    }
+
+    public static class TestExtension implements Extension {
+
+        public void afterAfterEach(Object testInstance) {
+            AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
+            assertThat(autoCloseExampleTest1.afterEachAutoClosable.isClosed()).isTrue();
+        }
+
+        public void afterAfterAll(Object testInstance) {
+            AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
+            assertThat(autoCloseExampleTest1.afterAllAutoClosable.isClosed()).isTrue();
+        }
+
+        public void afterConclude(Object testInstance) {
+            AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
+            assertThat(autoCloseExampleTest1.afterConcludeAutoCloseable.isClosed()).isTrue();
         }
     }
 }

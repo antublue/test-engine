@@ -33,12 +33,12 @@ public final class TestClassTagPredicate extends RegexPredicate<Class<?>> {
     /**
      * Method to test the Predicate
      *
-     * @param clazz the input argument
+     * @param testClass the input argument
      * @return whether to accept the Class
      */
     @Override
-    public synchronized boolean test(Class<?> clazz) {
-        TestEngine.Tag annotation = clazz.getAnnotation(TestEngine.Tag.class);
+    public synchronized boolean test(Class<?> testClass) {
+        TestEngine.Tag annotation = testClass.getAnnotation(TestEngine.Tag.class);
         if (annotation == null) {
             return false;
         }

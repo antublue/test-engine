@@ -80,11 +80,11 @@ public final class ExtendedEngineDescriptor extends EngineDescriptor {
     /**
      * Method to get a List of children cast as a specific class
      *
-     * @param clazz clazz
+     * @param testClass testClass
      * @return the return value
      * @param <T> the return type
      */
-    public <T> List<T> getChildren(Class<T> clazz) {
+    public <T> List<T> getChildren(Class<T> testClass) {
         final List<T> list = new ArrayList<>();
         getChildren().forEach(testDescriptor -> list.add((T) testDescriptor));
         return list;

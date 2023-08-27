@@ -19,23 +19,23 @@ package org.antublue.test.engine.internal.util;
 import java.util.Optional;
 
 /** Class to implement an Invocation */
-public class InvocationUtils {
+public class Invoker {
 
     /** Constructor */
-    private InvocationUtils() {
+    private Invoker() {
         // DO NOTHING
     }
 
     /**
      * Method to invoke a Runnable
      *
-     * @param runnable runnable
+     * @param invocation runnable
      * @return an Optional that contains a Throwable if an exception occurred, or else an empty
      *     Optional
      */
-    public static Optional<Throwable> run(Runnable runnable) {
+    public static Optional<Throwable> invoke(Invocation invocation) {
         try {
-            runnable.run();
+            invocation.run();
             return Optional.empty();
         } catch (Throwable t) {
             return Optional.of(t);
@@ -43,7 +43,7 @@ public class InvocationUtils {
     }
 
     /** Interface to implement an Invocation */
-    public interface Runnable {
+    public interface Invocation {
 
         /**
          * Method to invoke the Invocation

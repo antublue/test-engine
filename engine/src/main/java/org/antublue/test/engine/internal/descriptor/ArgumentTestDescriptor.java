@@ -18,20 +18,23 @@ package org.antublue.test.engine.internal.descriptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.internal.AutoCloseAnnotationUtils;
+import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.ExecutorContext;
-import org.antublue.test.engine.internal.FieldAnnotationUtils;
-import org.antublue.test.engine.internal.LockAnnotationUtils;
-import org.antublue.test.engine.internal.TestEngineReflectionUtils;
+import org.antublue.test.engine.internal.TestEngineUtils;
+import org.antublue.test.engine.internal.descriptor.util.ArgumentFieldInjector;
+import org.antublue.test.engine.internal.descriptor.util.AutoCloseProcessor;
+import org.antublue.test.engine.internal.descriptor.util.LockProcessor;
+import org.antublue.test.engine.internal.descriptor.util.RandomFieldInjector;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
-import org.antublue.test.engine.internal.util.InvocationUtils;
-import org.antublue.test.engine.internal.util.ThrowableUtils;
+import org.antublue.test.engine.internal.util.Invoker;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -45,8 +48,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
     private final Class<?> testClass;
     private final Argument testArgument;
-    private final List<Throwable> throwables;
     private final StateMachine<State> stateMachine;
+    private final ThrowableCollector throwableCollector;
     private ExecutorContext executorContext;
     private Object testInstance;
 
@@ -77,7 +80,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testArgument = testArgument;
-        this.throwables = new ArrayList<>();
+
         this.stateMachine =
                 new StateMachine<State>(getClass().getName())
                         .addTransition(State.BEGIN, this::begin)
@@ -91,6 +94,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                         .addTransition(State.AFTER_ALL, this::afterAll)
                         .addTransition(State.AFTER_AFTER_ALL, this::afterAfterAll)
                         .addTransition(State.END, this::end);
+
+        this.throwableCollector = new ThrowableCollector();
     }
 
     /**
@@ -102,8 +107,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
     public Optional<TestSource> getSource() {
         return Optional.of(
                 MethodSource.from(
-                        TestEngineReflectionUtils.singleton()
-                                .getArgumentSupplierMethod(testClass)));
+                        TestEngineUtils.singleton().getArgumentSupplierMethod(testClass)));
     }
 
     /**
@@ -182,41 +186,37 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "begin uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        Optional<Throwable> optionalThrowable =
-                InvocationUtils.run(
-                        () -> {
-                            getStopWatch().start();
+        Invoker.invoke(
+                () -> {
+                    getStopWatch().start();
 
-                            executorContext
-                                    .getExecutionRequest()
-                                    .getEngineExecutionListener()
-                                    .executionStarted(this);
+                    executorContext
+                            .getExecutionRequest()
+                            .getEngineExecutionListener()
+                            .executionStarted(this);
 
-                            testInstance = executorContext.getTestInstance();
+                    testInstance = executorContext.getTestInstance();
 
-                            List<Field> fields =
-                                    TestEngineReflectionUtils.singleton()
-                                            .getArgumentFields(testClass);
+                    List<Field> fields = TestEngineUtils.singleton().getAnnotatedFields(testClass);
 
-                            for (Field field : fields) {
-                                LOGGER.trace("injecting test argument");
-                                field.set(testInstance, testArgument);
-                            }
+                    ArgumentFieldInjector argumentFieldInjector = ArgumentFieldInjector.singleton();
+                    for (Field field : fields) {
+                        argumentFieldInjector.inject(testInstance, testArgument, field);
+                    }
 
-                            FieldAnnotationUtils.singleton()
-                                    .processAnnotatedFields(testInstance, throwables);
-                        });
-
-        optionalThrowable.ifPresent(
-                throwable -> {
-                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
-                    throwables.add(prunedThrowable);
-                    printStackTrace(System.out, prunedThrowable);
-                    stateMachine.signal(State.SKIP);
+                    RandomFieldInjector randomFieldInjector = RandomFieldInjector.singleton();
+                    for (Field field : fields) {
+                        randomFieldInjector.inject(testInstance, field);
+                    }
                 });
 
-        stateMachine.signal(State.BEFORE_BEFORE_ALL);
-        System.out.flush();
+        if (throwableCollector.isEmpty()) {
+            stateMachine.signal(State.BEFORE_BEFORE_ALL);
+        } else {
+            stateMachine.signal(State.SKIP);
+        }
+
+        flush();
     }
 
     /**
@@ -228,7 +228,22 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         LOGGER.trace(
                 "beforeBeforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
+
+        throwableCollector.add(
+                Invoker.invoke(
+                        () -> {
+                            List<Extension> extensions =
+                                    TestEngineUtils.singleton()
+                                            .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+
+                            for (Extension extension : extensions) {
+                                extension.beforeBeforeAll(testInstance, testArgument);
+                            }
+                        }));
+
         stateMachine.signal(State.BEFORE_ALL);
+
+        flush();
     }
 
     /**
@@ -241,38 +256,32 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "beforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        Optional<Throwable> optionalThrowable =
-                InvocationUtils.run(
+        LockProcessor lockProcessor = LockProcessor.singleton();
+
+        throwableCollector.add(
+                Invoker.invoke(
                         () -> {
                             List<Method> methods =
-                                    TestEngineReflectionUtils.singleton()
-                                            .getBeforeAllMethods(testClass);
+                                    TestEngineUtils.singleton().getBeforeAllMethods(testClass);
+
                             for (Method method : methods) {
                                 try {
-                                    LockAnnotationUtils.singleton().processLockAnnotations(method);
-                                    if (TestEngineReflectionUtils.singleton()
+                                    lockProcessor.processLocks(method);
+                                    if (TestEngineUtils.singleton()
                                             .acceptsArgument(method, testArgument)) {
                                         method.invoke(testInstance, testArgument);
                                     } else {
                                         method.invoke(testInstance, NO_OBJECT_ARGS);
                                     }
                                 } finally {
-                                    LockAnnotationUtils.singleton()
-                                            .processUnlockAnnotations(method);
-                                    System.out.flush();
+                                    lockProcessor.processUnlocks(method);
                                 }
                             }
-                        });
-
-        optionalThrowable.ifPresent(
-                throwable -> {
-                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
-                    throwables.add(prunedThrowable);
-                    printStackTrace(System.out, prunedThrowable);
-                });
+                        }));
 
         stateMachine.signal(State.AFTER_BEFORE_ALL);
-        System.out.flush();
+
+        flush();
     }
 
     /**
@@ -285,11 +294,25 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "afterBeforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        if (throwables.isEmpty()) {
+        throwableCollector.add(
+                Invoker.invoke(
+                        () -> {
+                            List<Extension> extensions =
+                                    TestEngineUtils.singleton()
+                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+
+                            for (Extension extension : extensions) {
+                                extension.afterBeforeAll(testInstance, testArgument);
+                            }
+                        }));
+
+        if (throwableCollector.isEmpty()) {
             stateMachine.signal(State.EXECUTE);
         } else {
             stateMachine.signal(State.SKIP);
         }
+
+        flush();
     }
 
     /**
@@ -302,26 +325,21 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "execute uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        Optional<Throwable> optionalThrowable =
-                InvocationUtils.run(
+        throwableCollector.add(
+                Invoker.invoke(
                         () -> {
                             List<MethodTestDescriptor> methodTestDescriptors =
                                     getChildren(MethodTestDescriptor.class);
+
                             for (MethodTestDescriptor methodTestDescriptor :
                                     methodTestDescriptors) {
                                 methodTestDescriptor.execute(executorContext);
                             }
-                        });
-
-        optionalThrowable.ifPresent(
-                throwable -> {
-                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
-                    throwables.add(prunedThrowable);
-                    printStackTrace(System.out, prunedThrowable);
-                });
+                        }));
 
         stateMachine.signal(State.BEFORE_AFTER_ALL);
-        System.out.flush();
+
+        flush();
     }
 
     /**
@@ -334,26 +352,21 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "skip uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        Optional<Throwable> optionalThrowable =
-                InvocationUtils.run(
+        throwableCollector.add(
+                Invoker.invoke(
                         () -> {
                             List<MethodTestDescriptor> methodTestDescriptors =
                                     getChildren(MethodTestDescriptor.class);
+
                             for (MethodTestDescriptor methodTestDescriptor :
                                     methodTestDescriptors) {
                                 methodTestDescriptor.skip(executorContext);
                             }
-                        });
-
-        optionalThrowable.ifPresent(
-                throwable -> {
-                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
-                    throwables.add(prunedThrowable);
-                    printStackTrace(System.out, prunedThrowable);
-                });
+                        }));
 
         stateMachine.signal(State.BEFORE_AFTER_ALL);
-        System.out.flush();
+
+        flush();
     }
 
     /**
@@ -366,26 +379,21 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "skipEnd uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        Optional<Throwable> optionalThrowable =
-                InvocationUtils.run(
+        throwableCollector.add(
+                Invoker.invoke(
                         () -> {
                             List<MethodTestDescriptor> methodTestDescriptors =
                                     getChildren(MethodTestDescriptor.class);
+
                             for (MethodTestDescriptor methodTestDescriptor :
                                     methodTestDescriptors) {
                                 methodTestDescriptor.skip(executorContext);
                             }
-                        });
-
-        optionalThrowable.ifPresent(
-                throwable -> {
-                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
-                    throwables.add(prunedThrowable);
-                    printStackTrace(System.out, prunedThrowable);
-                });
+                        }));
 
         stateMachine.signal(State.END);
-        System.out.flush();
+
+        flush();
     }
 
     /**
@@ -397,7 +405,22 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         LOGGER.trace(
                 "beforeAfterAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
+
+        throwableCollector.add(
+                Invoker.invoke(
+                        () -> {
+                            List<Extension> extensions =
+                                    TestEngineUtils.singleton()
+                                            .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+
+                            for (Extension extension : extensions) {
+                                extension.beforeAfterAll(testInstance, testArgument);
+                            }
+                        }));
+
         stateMachine.signal(State.AFTER_ALL);
+
+        flush();
     }
 
     /**
@@ -410,42 +433,61 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "afterAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        Optional<Throwable> optionalThrowable =
-                InvocationUtils.run(
-                        () -> {
-                            List<Method> methods =
-                                    TestEngineReflectionUtils.singleton()
-                                            .getAfterAllMethods(testClass);
-                            for (Method method : methods) {
-                                try {
-                                    LockAnnotationUtils.singleton().processLockAnnotations(method);
-                                    if (TestEngineReflectionUtils.singleton()
-                                            .acceptsArgument(method, testArgument)) {
-                                        method.invoke(testInstance, testArgument);
-                                    } else {
-                                        method.invoke(testInstance, NO_OBJECT_ARGS);
-                                    }
-                                } catch (Throwable t) {
-                                    Throwable prunedThrowable = ThrowableUtils.prune(t, testClass);
-                                    throwables.add(prunedThrowable);
-                                    printStackTrace(System.out, prunedThrowable);
-                                } finally {
-                                    LockAnnotationUtils.singleton()
-                                            .processUnlockAnnotations(method);
-                                    System.out.flush();
-                                }
-                            }
-                        });
+        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
+        LockProcessor lockProcessor = LockProcessor.singleton();
+        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
 
-        optionalThrowable.ifPresent(
-                throwable -> {
-                    Throwable prunedThrowable = ThrowableUtils.prune(throwable, testClass);
-                    throwables.add(prunedThrowable);
-                    printStackTrace(System.out, prunedThrowable);
+        Invoker.invoke(
+                () -> {
+                    List<Method> methods = testEngineUtils.getAfterAllMethods(testClass);
+
+                    for (Method method : methods) {
+                        try {
+                            lockProcessor.processLocks(method);
+                            if (testEngineUtils.acceptsArgument(method, testArgument)) {
+                                method.invoke(testInstance, testArgument);
+                            } else {
+                                method.invoke(testInstance, NO_OBJECT_ARGS);
+                            }
+                        } catch (Throwable t) {
+                            throwableCollector.add(t);
+                        } finally {
+                            lockProcessor.processUnlocks(method);
+                        }
+                    }
+                });
+
+        Invoker.invoke(
+                () -> {
+                    try {
+                        List<Field> fields =
+                                testEngineUtils.getAnnotatedFields(testClass).stream()
+                                        .filter(
+                                                field -> {
+                                                    TestEngine.AutoClose annotation =
+                                                            field.getAnnotation(
+                                                                    TestEngine.AutoClose.class);
+                                                    return annotation != null
+                                                            && "@TestEngine.AfterAll"
+                                                                    .equals(annotation.lifecycle());
+                                                })
+                                        .collect(Collectors.toList());
+
+                        for (Field field : fields) {
+                            try {
+                                autoCloseProcessor.close(testInstance, field);
+                            } catch (Throwable t) {
+                                throwableCollector.add(t);
+                            }
+                        }
+                    } catch (Throwable t) {
+                        throwableCollector.add(t);
+                    }
                 });
 
         stateMachine.signal(State.AFTER_AFTER_ALL);
-        System.out.flush();
+
+        flush();
     }
 
     /**
@@ -458,7 +500,21 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "afterAfterAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
+        throwableCollector.add(
+                Invoker.invoke(
+                        () -> {
+                            List<Extension> extensions =
+                                    TestEngineUtils.singleton()
+                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+
+                            for (Extension extension : extensions) {
+                                extension.afterAfterAll(testInstance, testArgument);
+                            }
+                        }));
+
         stateMachine.signal(State.END);
+
+        flush();
     }
 
     /**
@@ -471,35 +527,33 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "end uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        try {
-            List<Field> fields = TestEngineReflectionUtils.singleton().getArgumentFields(testClass);
-            for (Field field : fields) {
-                LOGGER.trace("removing test argument");
-                field.set(testInstance, null);
-            }
-        } catch (Throwable t) {
-            // DO NOTHING
-        } finally {
-            AutoCloseAnnotationUtils.singleton()
-                    .processAutoCloseAnnotatedFields(
-                            testInstance, "@TestEngine.AfterAll", throwables);
+        Invoker.invoke(
+                () -> {
+                    List<Field> fields = TestEngineUtils.singleton().getAnnotatedFields(testClass);
 
-            getStopWatch().stop();
+                    ArgumentFieldInjector argumentFieldInjector = ArgumentFieldInjector.singleton();
+                    for (Field field : fields) {
+                        argumentFieldInjector.inject(testInstance, null, field);
+                    }
+                });
 
-            if (throwables.isEmpty()) {
-                executorContext
-                        .getExecutionRequest()
-                        .getEngineExecutionListener()
-                        .executionFinished(this, TestExecutionResult.successful());
-            } else {
-                executorContext
-                        .getExecutionRequest()
-                        .getEngineExecutionListener()
-                        .executionFinished(this, TestExecutionResult.failed(throwables.get(0)));
-            }
+        getStopWatch().stop();
 
-            stateMachine.stop();
-            System.out.flush();
+        if (throwableCollector.isEmpty()) {
+            executorContext
+                    .getExecutionRequest()
+                    .getEngineExecutionListener()
+                    .executionFinished(this, TestExecutionResult.successful());
+        } else {
+            executorContext
+                    .getExecutionRequest()
+                    .getEngineExecutionListener()
+                    .executionFinished(
+                            this, TestExecutionResult.failed(throwableCollector.first()));
         }
+
+        stateMachine.stop();
+
+        flush();
     }
 }

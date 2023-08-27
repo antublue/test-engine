@@ -74,9 +74,7 @@ public final class ReflectionUtils {
      * @return the return value
      */
     public List<Class<?>> findAllClasses(URI uri) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("findAllClasses uri [%s]", uri.toASCIIString());
-        }
+        LOGGER.trace("findAllClasses uri [%s]", uri.toASCIIString());
 
         List<Class<?>> classes =
                 org.junit.platform.commons.util.ReflectionUtils.findAllClassesInClasspathRoot(
@@ -108,12 +106,10 @@ public final class ReflectionUtils {
      *
      * @param clazz clazz to inspect
      * @param order order
-     * @return a List representing the Class hierarchy based on order
+     * @return a list representing the class hierarchy based on order
      */
     private List<Class<?>> buildClassHierarchy(Class<?> clazz, Order order) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.info("getClassHierarchy class [%s] order [%s]", clazz.getName(), order);
-        }
+        LOGGER.trace("buildClassHierarchy class [%s] order [%s]", clazz.getName(), order);
 
         Set<Class<?>> classSet = new LinkedHashSet<>();
         resolveClasses(clazz, classSet);
@@ -144,15 +140,13 @@ public final class ReflectionUtils {
     }
 
     /**
-     * Method to get a List of all fields (superclass first)
+     * Method to get a list of all fields (superclass first)
      *
      * @param clazz class to inspect
      * @return list of Fields
      */
     public List<Field> getFields(Class<?> clazz) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("getFields class [%s] ", clazz.getName());
-        }
+        LOGGER.trace("getFields class [%s] ", clazz.getName());
 
         List<Field> fields;
         Set<Field> uniqueFields = new HashSet<>();
@@ -180,16 +174,14 @@ public final class ReflectionUtils {
     }
 
     /**
-     * Method to get a List of all methods
+     * Method to get a list of all methods
      *
      * @param clazz class to inspect
      * @param order order to resolve
      * @return list of Methods
      */
     public List<Method> getMethods(Class<?> clazz, Order order) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("getMethods class [%s] order [%s]", clazz.getName(), order);
-        }
+        LOGGER.trace("getMethods class [%s] order [%s]", clazz.getName(), order);
 
         List<Method> methods;
 

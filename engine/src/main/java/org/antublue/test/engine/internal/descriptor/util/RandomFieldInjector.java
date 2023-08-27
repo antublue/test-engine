@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal;
+package org.antublue.test.engine.internal.descriptor.util;
 
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.UUID;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -26,14 +25,14 @@ import org.antublue.test.engine.internal.util.RandomUtils;
 
 /** Class to process @TestEngine.RandomX annotations */
 @SuppressWarnings("PMD.NPathComplexity")
-public class FieldAnnotationUtils {
+public class RandomFieldInjector {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FieldAnnotationUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RandomFieldInjector.class);
 
-    private static final FieldAnnotationUtils SINGLETON = new FieldAnnotationUtils();
+    private static final RandomFieldInjector SINGLETON = new RandomFieldInjector();
 
     /** Constructor */
-    private FieldAnnotationUtils() {
+    private RandomFieldInjector() {
         // DO NOTHING
     }
 
@@ -42,7 +41,7 @@ public class FieldAnnotationUtils {
      *
      * @return the singleton
      */
-    public static FieldAnnotationUtils singleton() {
+    public static RandomFieldInjector singleton() {
         return SINGLETON;
     }
 
@@ -50,33 +49,12 @@ public class FieldAnnotationUtils {
      * Method to process @TestEngine.RandomX annotated fields
      *
      * @param object object
-     * @param throwables throwables
-     */
-    public void processAnnotatedFields(Object object, List<Throwable> throwables) {
-        LOGGER.trace("processRandomAnnotatedFields class [%s]", object.getClass().getName());
-
-        TestEngineReflectionUtils.singleton()
-                .getAnnotatedFields(object.getClass())
-                .forEach(
-                        field -> {
-                            try {
-                                processAnnotatedFields(object, field);
-                            } catch (Throwable t) {
-                                throwables.add(t);
-                            }
-                        });
-    }
-
-    /**
-     * Method to set a field
-     *
-     * @param object object
      * @param field field
      * @throws Throwable Throwable
      */
-    private void processAnnotatedFields(Object object, Field field) throws Throwable {
+    public void inject(Object object, Field field) throws Throwable {
         LOGGER.trace(
-                "processAnnotatedFields class [%s] field [%s] type [%s]",
+                "inject class [%s] field [%s] field type [%s]",
                 object.getClass().getName(), field.getName(), field.getType().getName());
 
         if (field.isAnnotationPresent(TestEngine.RandomBoolean.class)) {
