@@ -32,6 +32,7 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
 import org.antublue.test.engine.internal.util.Invoker;
+import org.antublue.test.engine.internal.util.ReflectionUtils;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -243,6 +244,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "beforeEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
+        ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
         LockProcessor lockProcessor = LockProcessor.singleton();
 
         throwableCollector.add(
@@ -254,8 +256,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                             for (Method method : methods) {
                                 try {
                                     lockProcessor.processLocks(method);
-                                    if (TestEngineUtils.singleton()
-                                            .acceptsArgument(method, testArgument)) {
+                                    if (reflectionUtils.acceptsParameters(method, Argument.class)) {
                                         method.invoke(testInstance, testArgument);
                                     } else {
                                         method.invoke(testInstance, NO_OBJECT_ARGS);
@@ -343,6 +344,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "test uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
+        ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
         LockProcessor lockProcessor = LockProcessor.singleton();
 
         throwableCollector.add(
@@ -350,8 +352,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                         () -> {
                             try {
                                 lockProcessor.processLocks(testMethod);
-                                if (TestEngineUtils.singleton()
-                                        .acceptsArgument(testMethod, testArgument)) {
+                                if (reflectionUtils.acceptsParameters(testMethod, Argument.class)) {
                                     testMethod.invoke(testInstance, testArgument);
                                 } else {
                                     testMethod.invoke(testInstance, NO_OBJECT_ARGS);
@@ -430,6 +431,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "afterEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
+        ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
         TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
         LockProcessor lockProcessor = LockProcessor.singleton();
         AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
@@ -441,7 +443,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     for (Method method : methods) {
                         try {
                             lockProcessor.processLocks(method);
-                            if (TestEngineUtils.singleton().acceptsArgument(method, testArgument)) {
+                            if (reflectionUtils.acceptsParameters(method, Argument.class)) {
                                 method.invoke(testInstance, testArgument);
                             } else {
                                 method.invoke(testInstance, NO_OBJECT_ARGS);

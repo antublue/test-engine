@@ -34,6 +34,7 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
 import org.antublue.test.engine.internal.util.Invoker;
+import org.antublue.test.engine.internal.util.ReflectionUtils;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -256,6 +257,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "beforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
+        ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
         LockProcessor lockProcessor = LockProcessor.singleton();
 
         throwableCollector.add(
@@ -267,8 +269,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                             for (Method method : methods) {
                                 try {
                                     lockProcessor.processLocks(method);
-                                    if (TestEngineUtils.singleton()
-                                            .acceptsArgument(method, testArgument)) {
+                                    if (reflectionUtils.acceptsParameters(method, Argument.class)) {
                                         method.invoke(testInstance, testArgument);
                                     } else {
                                         method.invoke(testInstance, NO_OBJECT_ARGS);
@@ -433,6 +434,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "afterAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
+        ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
         TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
         LockProcessor lockProcessor = LockProcessor.singleton();
         AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
@@ -444,7 +446,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     for (Method method : methods) {
                         try {
                             lockProcessor.processLocks(method);
-                            if (testEngineUtils.acceptsArgument(method, testArgument)) {
+                            if (reflectionUtils.acceptsParameters(method, Argument.class)) {
                                 method.invoke(testInstance, testArgument);
                             } else {
                                 method.invoke(testInstance, NO_OBJECT_ARGS);

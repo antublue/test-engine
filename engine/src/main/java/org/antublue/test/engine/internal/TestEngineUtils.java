@@ -1213,17 +1213,4 @@ public final class TestEngineUtils {
             }
         }
     }
-
-    /**
-     * Method to return if a Method accepts an Argument
-     *
-     * @param method method
-     * @param argument argument
-     * @return the return value
-     */
-    public boolean acceptsArgument(Method method, Argument argument) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-        return parameterTypes.length == 1
-                && parameterTypes[0].isAssignableFrom(argument.getClass());
-    }
 }
