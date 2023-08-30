@@ -16,13 +16,13 @@
 
 package org.antublue.test.engine.maven.plugin.listener;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.List;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ExtendedAbstractTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
@@ -65,41 +65,12 @@ public class SummaryEngineExecutionListener
                     .append(" ")
                     .toString();
 
-    private final Set<Class<?>> testClasses;
-    private final AtomicLong testClassesFoundCount;
-    private final AtomicLong testClassesSuccessCount;
-    private final AtomicLong testClassesFailedCount;
-    private final AtomicLong testClassesSkippedCount;
-
-    private final AtomicLong testArgumentsFoundCount;
-    private final AtomicLong testArgumentsSuccessCount;
-    private final AtomicLong testArgumentsFailedCount;
-    private final AtomicLong argumentsSkippedCount;
-
-    private final AtomicLong testMethodFoundCount;
-    private final AtomicLong methodsSuccess;
-    private final AtomicLong testMethodFailedCount;
-    private final AtomicLong testMethodsSkippedCount;
+    private final List<TestDescriptor> testDescriptors;
 
     private final StopWatch stopWatch;
 
     public SummaryEngineExecutionListener() {
-        testClasses = Collections.synchronizedSet(new HashSet<>());
-
-        testClassesFoundCount = new AtomicLong();
-        testClassesSuccessCount = new AtomicLong();
-        testClassesFailedCount = new AtomicLong();
-        testClassesSkippedCount = new AtomicLong();
-
-        testArgumentsFoundCount = new AtomicLong();
-        testArgumentsSuccessCount = new AtomicLong();
-        testArgumentsFailedCount = new AtomicLong();
-        argumentsSkippedCount = new AtomicLong();
-
-        testMethodFoundCount = new AtomicLong();
-        methodsSuccess = new AtomicLong();
-        testMethodFailedCount = new AtomicLong();
-        testMethodsSkippedCount = new AtomicLong();
+        testDescriptors = Collections.synchronizedList(new ArrayList<>());
 
         stopWatch = new StopWatch();
     }
@@ -112,174 +83,228 @@ public class SummaryEngineExecutionListener
         println(INFO + SEPARATOR);
     }
 
-    public long getTestClassCount() {
-        return testClassesFoundCount.get();
-    }
-
-    public long getTestClassesSucceededCount() {
-        return testClassesSuccessCount.get();
-    }
-
-    public long getTestClassesFailedCount() {
-        return testClassesFailedCount.get();
-    }
-
-    public long getTestClassesSkippedCount() {
-        return testClassesSkippedCount.get();
-    }
-
-    public long getTestArgumentsFoundCount() {
-        return testArgumentsFoundCount.get();
-    }
-
-    public long getTestArgumentsSucceededCount() {
-        return testArgumentsSuccessCount.get();
-    }
-
-    public long getTestArgumentsFailedCount() {
-        return testArgumentsFailedCount.get();
-    }
-
-    public long getTestArgumentsSkippedCount() {
-        return argumentsSkippedCount.get();
-    }
-
-    public long getTestsMethodsFoundCount() {
-        return testMethodFoundCount.get();
-    }
-
-    public long getTestsSucceededCount() {
-        return methodsSuccess.get();
-    }
-
-    public long getTestMethodsFailedCount() {
-        return testMethodFailedCount.get();
-    }
-
-    public long getTestMethodsSkippedCount() {
-        return testMethodsSkippedCount.get();
-    }
-
-    public void executionStarted(TestDescriptor testDescriptor) {
-        if (testDescriptor instanceof ClassTestDescriptor) {
-            testClasses.add(((ClassTestDescriptor) testDescriptor).getTestClass());
-            testClassesFoundCount.set(testClasses.size());
-            return;
-        }
-
-        if (testDescriptor instanceof ArgumentTestDescriptor) {
-            testArgumentsFoundCount.incrementAndGet();
-            return;
-        }
-
-        if (testDescriptor instanceof MethodTestDescriptor) {
-            testMethodFoundCount.incrementAndGet();
-        }
-    }
-
+    @Override
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-        if (testDescriptor instanceof ArgumentTestDescriptor) {
-            testArgumentsFoundCount.incrementAndGet();
-            argumentsSkippedCount.incrementAndGet();
-            return;
-        }
-
-        if (testDescriptor instanceof MethodTestDescriptor) {
-            testMethodFoundCount.incrementAndGet();
-            testMethodsSkippedCount.incrementAndGet();
+        if (testDescriptor instanceof ExtendedAbstractTestDescriptor) {
+            testDescriptors.add(testDescriptor);
         }
     }
 
+    @Override
     public void executionFinished(
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-        if (testDescriptor instanceof ClassTestDescriptor) {
-            TestExecutionResult.Status status = testExecutionResult.getStatus();
-            switch (status) {
-                case SUCCESSFUL:
-                    {
-                        testClassesSuccessCount.incrementAndGet();
-                        break;
-                    }
-                case FAILED:
-                    {
-                        testClassesFailedCount.incrementAndGet();
-                        break;
-                    }
-                case ABORTED:
-                    {
-                        testClassesSkippedCount.incrementAndGet();
-                        break;
-                    }
-                default:
-                    {
-                        // DO NOTHING
-                        break;
-                    }
-            }
-
-            return;
-        }
-
-        if (testDescriptor instanceof ArgumentTestDescriptor) {
-            TestExecutionResult.Status status = testExecutionResult.getStatus();
-            switch (status) {
-                case SUCCESSFUL:
-                    {
-                        testArgumentsSuccessCount.incrementAndGet();
-                        break;
-                    }
-                case FAILED:
-                    {
-                        testArgumentsFailedCount.incrementAndGet();
-                        break;
-                    }
-                case ABORTED:
-                    {
-                        argumentsSkippedCount.incrementAndGet();
-                        break;
-                    }
-                default:
-                    {
-                        // DO NOTHING
-                        break;
-                    }
-            }
-        }
-
-        if (testDescriptor instanceof MethodTestDescriptor) {
-            TestExecutionResult.Status status = testExecutionResult.getStatus();
-            switch (status) {
-                case SUCCESSFUL:
-                    {
-                        methodsSuccess.incrementAndGet();
-                        break;
-                    }
-                case FAILED:
-                    {
-                        testMethodFailedCount.incrementAndGet();
-                        break;
-                    }
-                case ABORTED:
-                    {
-                        testMethodsSkippedCount.incrementAndGet();
-                        break;
-                    }
-                default:
-                    {
-                        // DO NOTHING
-                        break;
-                    }
-            }
+        if (testDescriptor instanceof ExtendedAbstractTestDescriptor) {
+            testDescriptors.add(testDescriptor);
         }
     }
 
     public void end(String message) {
         stopWatch.stop();
 
+        long testClassDescriptorFound = 0;
+        long testClassDescriptorSuccess = 0;
+        long testClassDescriptorFailure = 0;
+        long testClassDescriptorSkipped = 0;
+
+        long testArgumentDescriptorFound = 0;
+        long testArgumentDescriptorSuccess = 0;
+        long testArgumentDescriptorFailure = 0;
+        long testArgumentDescriptorSkipped = 0;
+
+        long testMethodDescriptorFound = 0;
+        long testMethodDescriptorSuccess = 0;
+        long testMethodDescriptorFailure = 0;
+        long testMethodDescriptorSkipped = 0;
+
+        for (TestDescriptor testDescriptor : testDescriptors) {
+            ExtendedAbstractTestDescriptor extendedAbstractTestDescriptor =
+                    (ExtendedAbstractTestDescriptor) testDescriptor;
+            ExtendedAbstractTestDescriptor.Status status =
+                    extendedAbstractTestDescriptor.getStatus();
+
+            if (extendedAbstractTestDescriptor instanceof ClassTestDescriptor) {
+                testClassDescriptorFound++;
+
+                switch (status) {
+                    case PASS:
+                        {
+                            testClassDescriptorSuccess++;
+                            break;
+                        }
+                    case FAIL:
+                        {
+                            testClassDescriptorFailure++;
+                            break;
+                        }
+                    case SKIPPED:
+                        {
+                            testClassDescriptorSkipped++;
+                            break;
+                        }
+                    default:
+                        {
+                            // DO NOTHING
+                        }
+                }
+            } else if (extendedAbstractTestDescriptor instanceof ArgumentTestDescriptor) {
+                testArgumentDescriptorFound++;
+
+                switch (status) {
+                    case PASS:
+                        {
+                            testArgumentDescriptorSuccess++;
+                            break;
+                        }
+                    case FAIL:
+                        {
+                            testArgumentDescriptorFailure++;
+                            break;
+                        }
+                    case SKIPPED:
+                        {
+                            testArgumentDescriptorSkipped++;
+                            break;
+                        }
+                    default:
+                        {
+                            // DO NOTHING
+                        }
+                }
+            } else if (extendedAbstractTestDescriptor instanceof MethodTestDescriptor) {
+                testMethodDescriptorFound++;
+
+                switch (status) {
+                    case PASS:
+                        {
+                            testMethodDescriptorSuccess++;
+                            break;
+                        }
+                    case FAIL:
+                        {
+                            testMethodDescriptorFailure++;
+                            break;
+                        }
+                    case SKIPPED:
+                        {
+                            testMethodDescriptorSkipped++;
+                            break;
+                        }
+                    default:
+                        {
+                            // DO NOTHING
+                        }
+                }
+            }
+        }
+
+        int columnWidthFound =
+                getColumnWith(
+                        testClassDescriptorFound,
+                        testArgumentDescriptorFound,
+                        testMethodDescriptorFound);
+        int columnWidthSuccess =
+                getColumnWith(
+                        testClassDescriptorSuccess,
+                        testArgumentDescriptorSuccess,
+                        testMethodDescriptorSuccess);
+        int columnWidthFailure =
+                getColumnWith(
+                        testClassDescriptorFailure,
+                        testArgumentDescriptorFailure,
+                        testMethodDescriptorFailure);
+        int columnWidthSkipped =
+                getColumnWith(
+                        testClassDescriptorSkipped,
+                        testArgumentDescriptorSkipped,
+                        testMethodDescriptorSkipped);
+
         println(INFO + SEPARATOR);
         println(INFO + SUMMARY_BANNER);
         println(INFO + SEPARATOR);
         println(INFO + message);
+        println(INFO + SEPARATOR);
+        // TODO use AnsiStringBuilder for formatting
+        println(
+                new AnsiColorStringBuilder()
+                        .append(INFO)
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append("Classes")
+                        .append("   : ")
+                        .append(pad(testClassDescriptorFound, columnWidthFound))
+                        .append(", ")
+                        .color(AnsiColor.GREEN_BRIGHT)
+                        .append("PASS")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(testClassDescriptorSuccess, columnWidthSuccess))
+                        .append(", ")
+                        .color(AnsiColor.RED_BRIGHT)
+                        .append("FAIL")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(testClassDescriptorFailure, columnWidthFailure))
+                        .append(", ")
+                        .color(AnsiColor.YELLOW_BRIGHT)
+                        .append("SKIPPED")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(testClassDescriptorSkipped, columnWidthSkipped))
+                        .append(AnsiColor.TEXT_RESET));
+
+        println(
+                new AnsiColorStringBuilder()
+                        .append(INFO)
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append("Arguments")
+                        .append(" : ")
+                        .append(pad(testArgumentDescriptorFound, columnWidthFound))
+                        .append(", ")
+                        .color(AnsiColor.GREEN_BRIGHT)
+                        .append("PASS")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(testArgumentDescriptorSuccess, columnWidthSuccess))
+                        .append(", ")
+                        .color(AnsiColor.RED_BRIGHT)
+                        .append("FAIL")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(testArgumentDescriptorFailure, columnWidthFailure))
+                        .append(", ")
+                        .color(AnsiColor.YELLOW_BRIGHT)
+                        .append("SKIPPED")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(testArgumentDescriptorSkipped, columnWidthSkipped))
+                        .append(AnsiColor.TEXT_RESET));
+
+        println(
+                new AnsiColorStringBuilder()
+                        .append(INFO)
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append("Methods")
+                        .append("   : ")
+                        .append(pad(testMethodDescriptorFound, columnWidthFound))
+                        .append(", ")
+                        .color(AnsiColor.GREEN_BRIGHT)
+                        .append("PASS")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(testMethodDescriptorSuccess, columnWidthSuccess))
+                        .append(", ")
+                        .color(AnsiColor.RED_BRIGHT)
+                        .append("FAIL")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(testMethodDescriptorFailure, columnWidthFailure))
+                        .append(", ")
+                        .color(AnsiColor.YELLOW_BRIGHT)
+                        .append("SKIPPED")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(testMethodDescriptorSkipped, columnWidthSkipped))
+                        .append(AnsiColor.TEXT_RESET));
+
         println(INFO + SEPARATOR);
 
         long elapsedTime = stopWatch.elapsedTime();
@@ -317,13 +342,7 @@ public class SummaryEngineExecutionListener
      * @return the failure count
      */
     public long getFailureCount() {
-        if (getTestClassCount() == 0) {
-            return 0;
-        }
-
-        return getTestClassesFailedCount()
-                + getTestArgumentsFailedCount()
-                + getTestMethodsFailedCount();
+        return 0;
     }
 
     /**
@@ -334,5 +353,39 @@ public class SummaryEngineExecutionListener
     private static void println(Object object) {
         System.out.println(object);
         System.out.flush();
+    }
+
+    /**
+     * Method to column width of long values as Strings
+     *
+     * @param values values
+     * @return the return value
+     */
+    private static int getColumnWith(long... values) {
+        int width = 0;
+
+        for (long value : values) {
+            width = Math.max(String.valueOf(value).length(), width);
+        }
+
+        return width;
+    }
+
+    /**
+     * Method to get a String that is the value passed to a specific width
+     *
+     * @param value value
+     * @param width width
+     * @return the return value
+     */
+    private static String pad(long value, long width) {
+        String stringValue = String.valueOf(value);
+
+        StringBuilder paddingStringBuilder = new StringBuilder();
+        while ((paddingStringBuilder.length() + stringValue.length()) < width) {
+            paddingStringBuilder.append(" ");
+        }
+
+        return paddingStringBuilder.append(stringValue).toString();
     }
 }

@@ -159,6 +159,18 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         return testArgument;
     }
 
+    @Override
+    public void setStatus(Status status) {
+        this.status = status;
+
+        if (status == Status.FAIL) {
+            getParent()
+                    .ifPresent(
+                            testDescriptor ->
+                                    ((ClassTestDescriptor) testDescriptor).setStatus(status));
+        }
+    }
+
     /**
      * Method to execute the test descriptor
      *
@@ -172,9 +184,14 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         this.executorContext = executorContext;
 
-        stateMachine
-                .run(State.BEGIN)
-                .ifPresent(throwable -> printStackTrace(System.out, throwable));
+        Optional<Throwable> optional = stateMachine.run(State.BEGIN);
+
+        if (optional.isPresent()) {
+            setStatus(Status.FAIL);
+            printStackTrace(System.out, optional.get());
+        }
+
+        flush();
     }
 
     /**

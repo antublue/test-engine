@@ -170,6 +170,18 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         return testMethod;
     }
 
+    @Override
+    public void setStatus(Status status) {
+        this.status = status;
+
+        if (status == Status.FAIL) {
+            getParent()
+                    .ifPresent(
+                            testDescriptor ->
+                                    ((ArgumentTestDescriptor) testDescriptor).setStatus(status));
+        }
+    }
+
     /**
      * Method to execute the test descriptor
      *
@@ -183,9 +195,12 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         this.executorContext = executorContext;
 
-        stateMachine
-                .run(State.BEGIN)
-                .ifPresent(throwable -> printStackTrace(System.out, throwable));
+        Optional<Throwable> optional = stateMachine.run(State.BEGIN);
+
+        if (optional.isPresent()) {
+            setStatus(Status.FAIL);
+            printStackTrace(System.out, optional.get());
+        }
     }
 
     /**
@@ -296,8 +311,6 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         if (throwableCollector.isEmpty()) {
             stateMachine.signal(State.BEFORE_TEST);
-        } else {
-            stateMachine.signal(State.BEFORE_AFTER_EACH);
         }
 
         flush();
@@ -529,11 +542,15 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         getStopWatch().stop();
 
         if (throwableCollector.isEmpty()) {
+            setStatus(Status.PASS);
+
             executorContext
                     .getExecutionRequest()
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
+            setStatus(Status.FAIL);
+
             executorContext
                     .getExecutionRequest()
                     .getEngineExecutionListener()

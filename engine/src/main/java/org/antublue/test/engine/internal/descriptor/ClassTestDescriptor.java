@@ -139,6 +139,11 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         return testClass;
     }
 
+    @Override
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     /**
      * Method to execute the test descriptor
      *
@@ -150,9 +155,12 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         this.executorContext = executorContext;
 
-        stateMachine
-                .run(State.BEGIN)
-                .ifPresent(throwable -> printStackTrace(System.out, throwable));
+        Optional<Throwable> optional = stateMachine.run(State.BEGIN);
+
+        if (optional.isPresent()) {
+            status = Status.FAIL;
+            printStackTrace(System.out, optional.get());
+        }
 
         flush();
     }

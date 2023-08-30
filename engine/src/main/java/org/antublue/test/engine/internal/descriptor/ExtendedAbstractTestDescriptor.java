@@ -41,7 +41,16 @@ public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescrip
     protected static final boolean EXECUTED_VIA_MAVEN_PLUGIN =
             TestEngineConstants.TRUE.equals(System.getProperty(TestEngineConstants.MAVEN_PLUGIN));
 
+    protected Status status = Status.UNDEFINED;
+
     private final StopWatch stopWatch;
+
+    public enum Status {
+        UNDEFINED,
+        PASS,
+        FAIL,
+        SKIPPED
+    }
 
     /**
      * Constructor
@@ -78,6 +87,12 @@ public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescrip
         return stopWatch;
     }
 
+    public abstract void setStatus(Status status);
+
+    public Status getStatus() {
+        return status;
+    }
+
     /**
      * Method to execute the TestDescriptor
      *
@@ -91,6 +106,8 @@ public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescrip
      * @param executorContext testEngineExecutorContext
      */
     public void skip(ExecutorContext executorContext) {
+        setStatus(Status.SKIPPED);
+
         for (ExtendedAbstractTestDescriptor testDescriptor :
                 getChildren(ExtendedAbstractTestDescriptor.class)) {
             testDescriptor.skip(executorContext);
