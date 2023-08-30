@@ -41,12 +41,11 @@ public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescrip
     protected static final boolean EXECUTED_VIA_MAVEN_PLUGIN =
             TestEngineConstants.TRUE.equals(System.getProperty(TestEngineConstants.MAVEN_PLUGIN));
 
-    protected Status status = Status.UNDEFINED;
+    protected Status status = Status.PASS;
 
     private final StopWatch stopWatch;
 
     public enum Status {
-        UNDEFINED,
         PASS,
         FAIL,
         SKIPPED

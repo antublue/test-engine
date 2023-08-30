@@ -161,7 +161,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
     @Override
     public void setStatus(Status status) {
-        this.status = status;
+        if (this.status != Status.FAIL) {
+            this.status = status;
+        }
 
         if (status == Status.FAIL) {
             getParent()

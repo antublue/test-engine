@@ -54,7 +54,6 @@ public class SimpleTest {
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + stringArgument + ")");
-        throw new RuntimeException("X");
     }
 
     @TestEngine.Test
