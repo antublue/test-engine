@@ -500,6 +500,8 @@ public final class TestEngineUtils {
                 }
 
                 allExtensions = new ArrayList<>();
+                allExtensions.addAll(ExtensionManager.singleton().getExtensions());
+
                 List<Method> methods = getExtensionSupplierMethods(testClass);
                 for (Method method : methods) {
                     Object object = method.invoke(null, NO_OBJECT_ARGS);

@@ -17,7 +17,7 @@
 package org.antublue.test.engine;
 
 /** Class that contains Test Engine configuration constants */
-public final class Constants {
+public final class TestEngineConstants {
 
     /** Configuration constant */
     public static final String TRUE = "true";
@@ -30,6 +30,9 @@ public final class Constants {
 
     /** Configuration constant */
     public static final String THREAD_COUNT = PREFIX + ".thread.count";
+
+    /** Configuration constant */
+    public static final String EXTENSIONS = PREFIX + ".extensions";
 
     /** Configuration constant */
     public static final String STACK_TRACE_PRUNE = PREFIX + ".stack.trace.pruning";
@@ -47,23 +50,22 @@ public final class Constants {
     public static final String LOG_LEVEL = PREFIX + ".log.level";
 
     /** Configuration constant */
-    public static final String CONSOLE = PREFIX + ".console";
+    public static final String CONSOLE_LOG = PREFIX + ".console.log";
 
     /** Configuration constant */
-    public static final String LOG_TIMING = CONSOLE + ".log.timing";
+    public static final String CONSOLE_LOG_TIMING = CONSOLE_LOG + ".timing";
 
     /** Configuration constant */
-    public static final String LOG_TIMING_UNITS = LOG_TIMING + ".units";
+    public static final String CONSOLE_LOG_TIMING_UNITS = CONSOLE_LOG_TIMING + ".units";
 
     /** Configuration constant */
-    public static final String LOG_TEST_MESSAGES = CONSOLE + ".log.test.messages";
+    public static final String CONSOLE_LOG_TEST_MESSAGES = CONSOLE_LOG + ".test.messages";
 
     /** Configuration constant */
-    public static final String LOG_PASS_MESSAGES =
-            PREFIX + EXPERIMENTAL + ".console.log.pass.messages";
+    public static final String CONSOLE_LOG_PASS_MESSAGES = CONSOLE_LOG + ".pass.messages";
 
     /** Configuration constant */
-    public static final String LOG_SKIP_MESSAGES = PREFIX + EXPERIMENTAL + ".log.skip.messages";
+    public static final String CONSOLE_LOG_SKIP_MESSAGES = CONSOLE_LOG + ".skip.messages";
 
     /** Configuration constant */
     public static final String TEST_CLASS_SHUFFLE = PREFIX + ".test.class.shuffle";
@@ -92,8 +94,20 @@ public final class Constants {
     /** Configuration constant */
     public static final String TEST_METHOD_TAG_EXCLUDE = PREFIX + ".test.method.tag.exclude";
 
+    /** Configuration constant */
+    public static final String MAVEN_PLUGIN = PREFIX + ".maven.plugin";
+
+    /** Configuration constant */
+    public static final String MAVEN_PLUGIN_MODE = PREFIX + ".maven.plugin.mode";
+
+    /** Configuration constant */
+    public static final String MAVEN_PLUGIN_INTERACTIVE = PREFIX + ".maven.plugin.interactive";
+
+    /** Configuration constant */
+    public static final String MAVEN_PLUGIN_BATCH = PREFIX + ".maven.plugin.batch";
+
     /** Constructor */
-    private Constants() {
+    private TestEngineConstants() {
         // DO NOTHING
     }
 }

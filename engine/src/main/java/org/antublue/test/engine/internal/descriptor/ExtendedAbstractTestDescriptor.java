@@ -16,13 +16,11 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN;
-
 import java.io.PrintStream;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.internal.ExecutorContext;
 import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.engine.TestDescriptor;
@@ -40,8 +38,8 @@ public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescrip
     protected static final Object[] NO_OBJECT_ARGS = null;
 
     /** Constant to determine we are being executed via the Maven Test Engine plugin */
-    protected static final boolean EXECUTED_VIA_ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN =
-            Constants.TRUE.equals(System.getProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN));
+    protected static final boolean EXECUTED_VIA_MAVEN_PLUGIN =
+            TestEngineConstants.TRUE.equals(System.getProperty(TestEngineConstants.MAVEN_PLUGIN));
 
     private final StopWatch stopWatch;
 
@@ -117,7 +115,7 @@ public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescrip
      * @param throwable throwable
      */
     protected void printStackTrace(PrintStream printStream, Throwable throwable) {
-        if (EXECUTED_VIA_ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN) {
+        if (EXECUTED_VIA_MAVEN_PLUGIN) {
             throwable.printStackTrace(printStream);
             printStream.flush();
         }

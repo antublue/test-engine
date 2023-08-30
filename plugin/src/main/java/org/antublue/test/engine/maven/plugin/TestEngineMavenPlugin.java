@@ -16,8 +16,6 @@
 
 package org.antublue.test.engine.maven.plugin;
 
-import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE;
-import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN;
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
 import java.io.File;
@@ -25,56 +23,48 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.internal.ConfigurationParameters;
-import org.antublue.test.engine.internal.ConsoleTestExecutionListener;
 import org.antublue.test.engine.internal.util.AnsiColor;
-import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
+import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;
+import org.antublue.test.engine.maven.plugin.listener.SummaryEngineExecutionListener;
+import org.antublue.test.engine.maven.plugin.listener.TestStatusEngineExecutionListener;
+import org.antublue.test.engine.maven.plugin.logger.Logger;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.junit.platform.commons.JUnitException;
+import org.junit.platform.engine.ExecutionRequest;
+import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
-import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
-import org.junit.platform.launcher.LauncherSession;
 import org.junit.platform.launcher.core.LauncherConfig;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
-import org.junit.platform.launcher.core.LauncherFactory;
 
-/** Class to implement a Maven plugin to run the AntuBLUE Test Engine */
+/** Class to implement TestEngineMavenPlugin */
 @SuppressWarnings({"unused", "deprecation"})
-@Mojo(name = "test", threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST)
+@org.apache.maven.plugins.annotations.Mojo(
+        name = "test",
+        threadSafe = true,
+        requiresDependencyResolution = ResolutionScope.TEST)
 public class TestEngineMavenPlugin extends AbstractMojo {
 
     private static final String GROUP_ID = "org.antublue";
+
     private static final String ARTIFACT_ID = "test-engine-maven-plugin";
-    private static final String VERSION = Information.getVersion();
 
-    private static final String BANNER =
-            new AnsiColorStringBuilder()
-                    .color(AnsiColor.WHITE_BRIGHT)
-                    .append("Antu")
-                    .color(AnsiColor.BLUE_BOLD_BRIGHT)
-                    .append("BLUE")
-                    .color(AnsiColor.WHITE_BRIGHT)
-                    .append(" Test Engine Maven Plugin ")
-                    .append(VERSION)
-                    .color(AnsiColor.RESET)
-                    .toString();
-
-    private static final String SEPARATOR =
-            AnsiColor.WHITE_BRIGHT.apply(
-                    "------------------------------------------------------------------------");
+    private static final String VERSION = TestEngineMavenPluginInformation.getVersion();
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
@@ -85,105 +75,132 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     @Parameter(property = "properties")
     private Map<String, String> properties;
 
-    private Log log;
-
     /**
      * Method to execute the plugin
      *
      * @throws MojoExecutionException execution exception
      */
-    public void execute() throws MojoExecutionException {
-        debug(SEPARATOR);
-        debug(BANNER);
-        debug(SEPARATOR);
+    public void execute() throws MojoFailureException, MojoExecutionException {
+        Logger logger = Logger.from(getLog());
 
         try {
-            System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN, Constants.TRUE);
-            debug(
-                    "system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN + "] = [%s]",
-                    Constants.TRUE);
+            System.setProperty(TestEngineConstants.MAVEN_PLUGIN, TestEngineConstants.TRUE);
+            logger.debug(
+                    "property [%s] = [%s]",
+                    TestEngineConstants.MAVEN_PLUGIN, TestEngineConstants.TRUE);
 
-            if (!mavenSession.getRequest().isInteractiveMode()) {
-                System.setProperty(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE, "true");
-                debug(
-                        "system property [" + ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE + "] = [%s]",
-                        "true");
+            if (mavenSession.getRequest().isInteractiveMode()) {
+                System.setProperty(
+                        TestEngineConstants.MAVEN_PLUGIN_MODE,
+                        TestEngineConstants.MAVEN_PLUGIN_INTERACTIVE);
+                logger.debug(
+                        "property [%s] = [%s]",
+                        TestEngineConstants.MAVEN_PLUGIN_MODE,
+                        TestEngineConstants.MAVEN_PLUGIN_INTERACTIVE);
+            } else {
+                System.setProperty(
+                        TestEngineConstants.MAVEN_PLUGIN_MODE,
+                        TestEngineConstants.MAVEN_PLUGIN_BATCH);
+                logger.debug(
+                        "property [%s] = [%s]",
+                        TestEngineConstants.MAVEN_PLUGIN_MODE,
+                        TestEngineConstants.MAVEN_PLUGIN_MODE);
             }
 
-            Optional.ofNullable(properties)
-                    .ifPresent(
-                            map ->
-                                    map.forEach(
-                                            (key, value) -> {
-                                                if (key != null && value != null) {
-                                                    System.setProperty(key, value);
-                                                    debug(
-                                                            "system property [%s] = [%s]",
-                                                            key, value);
-                                                }
-                                            }));
+            if (properties != null) {
+                for (Map.Entry<String, String> entry : properties.entrySet()) {
+                    if (entry.getKey() != null && entry.getValue() != null) {
+                        System.setProperty(entry.getKey(), entry.getValue());
+                        logger.debug("property [%s] = [%s]", entry.getKey(), entry.getValue());
+                    }
+                }
+            }
 
             Set<Path> artifactPaths = new LinkedHashSet<>();
 
-            Optional.ofNullable(mavenProject.getCompileClasspathElements())
-                    .ifPresent(
-                            strings ->
-                                    strings.forEach(
-                                            string ->
-                                                    artifactPaths.add(new File(string).toPath())));
-
-            Optional.ofNullable(mavenProject.getRuntimeClasspathElements())
-                    .ifPresent(
-                            strings ->
-                                    strings.forEach(
-                                            string ->
-                                                    artifactPaths.add(new File(string).toPath())));
-
-            Optional.ofNullable(mavenProject.getTestClasspathElements())
-                    .ifPresent(
-                            strings ->
-                                    strings.forEach(
-                                            string ->
-                                                    artifactPaths.add(new File(string).toPath())));
-
-            Optional.ofNullable(mavenProject.getArtifact())
-                    .ifPresent(artifact -> artifactPaths.add(artifact.getFile().toPath()));
-
-            Optional.ofNullable(mavenProject.getDependencyArtifacts())
-                    .ifPresent(
-                            artifacts ->
-                                    artifacts.forEach(
-                                            artifact ->
-                                                    artifactPaths.add(
-                                                            artifact.getFile().toPath())));
-
-            Optional.ofNullable(mavenProject.getAttachedArtifacts())
-                    .ifPresent(
-                            artifacts ->
-                                    artifacts.forEach(
-                                            artifact ->
-                                                    artifactPaths.add(
-                                                            artifact.getFile().toPath())));
-
-            Set<URL> urls = new LinkedHashSet<>();
-            for (Path path : artifactPaths) {
-                URL url = path.toUri().toURL();
-                urls.add(url);
-                debug("classpath entry [%s]", url);
+            List<String> classpathElements = mavenProject.getCompileClasspathElements();
+            if (classpathElements != null) {
+                for (String classpathElement : classpathElements) {
+                    Path path = new File(classpathElement).toPath();
+                    artifactPaths.add(path);
+                    logger.debug("classpathElement [%s]", path);
+                }
             }
 
-            // Build a classloader for subsequent calls
+            classpathElements = mavenProject.getCompileClasspathElements();
+            if (classpathElements != null) {
+                for (String classpathElement : classpathElements) {
+                    Path path = new File(classpathElement).toPath();
+                    artifactPaths.add(path);
+                    logger.debug("classpathElement [%s]", path);
+                }
+            }
+
+            classpathElements = mavenProject.getRuntimeClasspathElements();
+            if (classpathElements != null) {
+                for (String classpathElement : classpathElements) {
+                    Path path = new File(classpathElement).toPath();
+                    artifactPaths.add(path);
+                    logger.debug("classpathElement [%s]", path);
+                }
+            }
+
+            classpathElements = mavenProject.getTestClasspathElements();
+            if (classpathElements != null) {
+                for (String classpathElement : classpathElements) {
+                    Path path = new File(classpathElement).toPath();
+                    artifactPaths.add(path);
+                    logger.debug("classpathElement [%s]", path);
+                }
+            }
+
+            Artifact artifact = mavenProject.getArtifact();
+            if (artifact != null) {
+                Path path = artifact.getFile().toPath();
+                artifactPaths.add(path);
+                logger.debug("classpathElement [%s]", path);
+            }
+
+            Set<Artifact> artifactSet = mavenProject.getDependencyArtifacts();
+            if (artifactSet != null) {
+                for (Artifact a : artifactSet) {
+                    Path path = a.getFile().toPath();
+                    artifactPaths.add(path);
+                    logger.debug("classpathElement [%s]", path);
+                }
+            }
+
+            List<Artifact> artifactList = mavenProject.getAttachedArtifacts();
+            if (artifactList != null) {
+                for (Artifact a : artifactList) {
+                    Path path = a.getFile().toPath();
+                    artifactPaths.add(path);
+                    logger.debug("classpathElement [%s]", path);
+                }
+            }
+
+            Map<String, URL> urls = new LinkedHashMap<>();
+            for (Path path : artifactPaths) {
+                URL url = path.toUri().toURL();
+                urls.putIfAbsent(url.getPath(), url);
+            }
+
             ClassLoader classLoader =
                     new URLClassLoader(
-                            urls.toArray(new URL[urls.size()]),
+                            urls.values().toArray(new URL[0]),
                             Thread.currentThread().getContextClassLoader());
 
             Thread.currentThread().setContextClassLoader(classLoader);
 
-            ConfigurationParameters configurationParameters = ConfigurationParameters.singleton();
+            SummaryEngineExecutionListener summaryEngineExecutionListener =
+                    new SummaryEngineExecutionListener();
 
-            ConsoleTestExecutionListener consoleTestExecutionListener =
-                    new ConsoleTestExecutionListener(configurationParameters);
+            String summaryMessage = null;
+
+            DelegatingEngineExecutionListener delegatingEngineExecutionListener =
+                    DelegatingEngineExecutionListener.of(
+                            summaryEngineExecutionListener,
+                            new TestStatusEngineExecutionListener());
 
             LauncherConfig launcherConfig = LauncherConfig.builder().build();
 
@@ -194,116 +211,54 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             .configurationParameters(Collections.emptyMap())
                             .build();
 
-            try (LauncherSession launcherSession = LauncherFactory.openSession(launcherConfig)) {
-                Launcher launcher = launcherSession.getLauncher();
-                launcher.registerTestExecutionListeners(consoleTestExecutionListener);
-                launcher.execute(launcherDiscoveryRequest);
+            TestEngine testEngine = new TestEngine();
+
+            TestDescriptor testDescriptor = null;
+
+            try {
+                summaryEngineExecutionListener.begin();
+
+                testDescriptor =
+                        testEngine.discover(
+                                launcherDiscoveryRequest, UniqueId.forEngine(TestEngine.ENGINE_ID));
+            } catch (Throwable t) {
+                summaryMessage = AnsiColor.RED_BOLD_BRIGHT.wrap("EXCEPTION DURING DISCOVERY");
+
+                t.printStackTrace();
+                System.err.flush();
             }
 
-            if (consoleTestExecutionListener.hasFailures()) {
-                throw new SuppressedStackTraceException("Test failures");
+            if (testDescriptor != null) {
+                try {
+                    ExecutionRequest executionRequest =
+                            new ExecutionRequest(
+                                    testDescriptor,
+                                    delegatingEngineExecutionListener,
+                                    ConfigurationParameters.singleton());
+
+                    testEngine.execute(executionRequest);
+
+                    if (summaryEngineExecutionListener.getFailureCount() == 0) {
+                        summaryMessage = AnsiColor.GREEN_BOLD.wrap("TEST SUCCESS");
+                    } else {
+                        summaryMessage = AnsiColor.RED_BOLD.wrap("TEST FAILURE");
+                    }
+                } catch (Throwable t) {
+                    summaryMessage = AnsiColor.RED_BOLD.wrap("EXCEPTION DURING EXECUTION");
+                    t.printStackTrace();
+                    System.err.flush();
+                }
             }
-        } catch (SuppressedStackTraceException e) {
-            e.printStackTrace();
-            System.err.flush();
+
+            summaryEngineExecutionListener.end(summaryMessage);
+
+            if (summaryEngineExecutionListener.getFailureCount() != 0) {
+                throw new MojoFailureException("");
+            }
+        } catch (MojoFailureException e) {
             throw e;
-        } catch (JUnitException e) {
-            String message = e.getMessage();
-
-            if (e.getCause() != null) {
-                message = e.getCause().getMessage();
-            }
-
-            StringBuilder stringBuilder =
-                    new StringBuilder()
-                            .append(System.lineSeparator())
-                            .append(System.lineSeparator())
-                            .append(message)
-                            .append(System.lineSeparator());
-
-            e.printStackTrace();
-            System.err.flush();
-            throw new SuppressedStackTraceException(stringBuilder.toString());
         } catch (Throwable t) {
-            t.printStackTrace(System.err);
-            System.err.flush();
-            throw new MojoExecutionException("General AntuBLUE Test Engine Exception", t);
+            throw new MojoExecutionException(t);
         }
-    }
-
-    /**
-     * Method to set the plugin Log
-     *
-     * @param log log
-     */
-    public void setLog(Log log) {
-        this.log = log;
-    }
-
-    /**
-     * Method to log a DEBUG message
-     *
-     * @param format format
-     * @param object object
-     */
-    private void debug(String format, Object object) {
-        if (log.isDebugEnabled()) {
-            debug(format, new Object[] {object});
-        }
-    }
-
-    /**
-     * Method to log a DEBUG message
-     *
-     * @param format format
-     * @param objects objects
-     */
-    private void debug(String format, Object... objects) {
-        if (log.isDebugEnabled()) {
-            debug(String.format(format, objects));
-        }
-    }
-
-    /**
-     * Method to log a DEBUG message
-     *
-     * @param message message
-     */
-    private void debug(String message) {
-        if (log.isDebugEnabled()) {
-            log.debug(message);
-        }
-    }
-
-    /** Method to log an empty INFO message */
-    private void info() {
-        info("");
-    }
-
-    /**
-     * Method to log an INFO message
-     *
-     * @param format format
-     * @param objects objects
-     */
-    private void info(String format, Object... objects) {
-        info(String.format(format, objects));
-    }
-
-    /**
-     * Method to log an INFO message
-     *
-     * @param message message
-     */
-    private void info(String message) {
-        System.out.println(
-                new AnsiColorStringBuilder()
-                        .append("[")
-                        .color(AnsiColor.BLUE_BOLD)
-                        .append("INFO")
-                        .color(AnsiColor.RESET)
-                        .append("] ")
-                        .append(message)
-                        .color(AnsiColor.RESET));
     }
 }

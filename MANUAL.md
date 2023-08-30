@@ -307,7 +307,7 @@ The properties filename is resolved using the following in order:
 
 ## Test Engine Summary
 
-When running via Maven in a Linux console, the test engine will report a summary.
+When running via Maven in a Linux console, the test engine will report a summaryEngineExecutionListener.
 
 Example
 

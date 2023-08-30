@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -56,7 +56,7 @@ public class Executor {
 
         int threadCount =
                 configurationParameters
-                        .get(Constants.THREAD_COUNT)
+                        .get(TestEngineConstants.THREAD_COUNT)
                         .map(
                                 value -> {
                                     int intValue;
@@ -77,7 +77,7 @@ public class Executor {
                                 })
                         .orElse(Runtime.getRuntime().availableProcessors());
 
-        LOGGER.trace("[%s] = [%d]", Constants.THREAD_COUNT, threadCount);
+        LOGGER.trace("[%s] = [%d]", TestEngineConstants.THREAD_COUNT, threadCount);
 
         executorService =
                 new ThreadPoolExecutor(
@@ -101,10 +101,10 @@ public class Executor {
                 extendedEngineDescriptor.getChildren(ClassTestDescriptor.class);
 
         configurationParameters
-                .get(Constants.TEST_CLASS_SHUFFLE)
+                .get(TestEngineConstants.TEST_CLASS_SHUFFLE)
                 .ifPresent(
                         value -> {
-                            if (value.equalsIgnoreCase(Constants.TRUE)) {
+                            if (value.equalsIgnoreCase(TestEngineConstants.TRUE)) {
                                 Collections.shuffle(classTestDescriptors, new SecureRandom());
                             }
                         });

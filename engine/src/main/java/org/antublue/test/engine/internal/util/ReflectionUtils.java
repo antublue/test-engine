@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.internal.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -41,6 +42,9 @@ public final class ReflectionUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
 
     private static final ReflectionUtils SINGLETON = new ReflectionUtils();
+
+    private static final Class<?>[] NO_CLASS_ARGS = null;
+    private static final Object[] NO_OBJECT_ARGS = null;
 
     private final Map<Class<?>, List<Field>> fieldCache = new HashMap<>();
     private final Map<ClassOrderKey, List<Method>> methodCache = new HashMap<>();
@@ -99,6 +103,19 @@ public final class ReflectionUtils {
         classes = new ArrayList<>(classes);
 
         return classes;
+    }
+
+    /**
+     * Method to create a new instance of a class
+     *
+     * @param className className
+     * @return object object
+     * @throws Throwable Throwable
+     */
+    public Object newInstance(String className) throws Throwable {
+        Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
+        Constructor<?> constructor = clazz.getDeclaredConstructor(NO_CLASS_ARGS);
+        return constructor.newInstance(NO_OBJECT_ARGS);
     }
 
     /**

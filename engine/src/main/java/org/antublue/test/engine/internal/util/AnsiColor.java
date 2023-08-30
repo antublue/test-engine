@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.internal.util;
 
-import static org.antublue.test.engine.TestEngine.ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE;
+import org.antublue.test.engine.TestEngineConstants;
 
 /** Class to implement ANSI colors */
 public class AnsiColor {
@@ -24,10 +24,9 @@ public class AnsiColor {
     private static final String NO_COLOR = "NO_COLOR";
     private static final String EMPTY_STRING = "";
     private static final String ONE = "1";
-    private static final String TRUE = "true";
 
     /** AnsiColor constant */
-    public static final AnsiColor RESET = new AnsiColor("\033[0m"); // Text Reset
+    public static final AnsiColor TEXT_RESET = new AnsiColor("\033[0m"); // Text Reset
 
     // Regular Colors
 
@@ -220,7 +219,8 @@ public class AnsiColor {
             ANSI_COLOR_SUPPORTED = false;
         }
 
-        if (TRUE.equals(System.getenv(ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE))) {
+        if (TestEngineConstants.MAVEN_PLUGIN_BATCH.equals(
+                System.getenv(TestEngineConstants.MAVEN_PLUGIN_MODE))) {
             ANSI_COLOR_SUPPORTED = false;
         }
     }
@@ -243,9 +243,9 @@ public class AnsiColor {
      * @param object object
      * @return the return value
      */
-    public String apply(Object object) {
+    public String wrap(Object object) {
         if (ANSI_COLOR_SUPPORTED) {
-            return escapeSequence + object + AnsiColor.RESET;
+            return escapeSequence + object + AnsiColor.TEXT_RESET;
         } else {
             return String.valueOf(object);
         }

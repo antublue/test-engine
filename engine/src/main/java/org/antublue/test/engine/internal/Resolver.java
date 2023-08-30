@@ -23,7 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
@@ -113,10 +113,12 @@ public class Resolver {
 
         includeTestClassPredicate =
                 configurationParameters
-                        .get(Constants.TEST_CLASS_INCLUDE)
+                        .get(TestEngineConstants.TEST_CLASS_INCLUDE)
                         .map(
                                 value -> {
-                                    LOGGER.trace("%s [%s]", Constants.TEST_CLASS_INCLUDE, value);
+                                    LOGGER.trace(
+                                            "%s [%s]",
+                                            TestEngineConstants.TEST_CLASS_INCLUDE, value);
                                     return value;
                                 })
                         .map(TestClassPredicate::of)
@@ -129,10 +131,12 @@ public class Resolver {
 
         excludeTestClassPredicate =
                 configurationParameters
-                        .get(Constants.TEST_CLASS_EXCLUDE)
+                        .get(TestEngineConstants.TEST_CLASS_EXCLUDE)
                         .map(
                                 value -> {
-                                    LOGGER.trace("%s [%s]", Constants.TEST_CLASS_EXCLUDE, value);
+                                    LOGGER.trace(
+                                            "%s [%s]",
+                                            TestEngineConstants.TEST_CLASS_EXCLUDE, value);
                                     return value;
                                 })
                         .map(TestClassPredicate::of)
@@ -145,10 +149,12 @@ public class Resolver {
 
         includeTestMethodPredicate =
                 configurationParameters
-                        .get(Constants.TEST_METHOD_INCLUDE)
+                        .get(TestEngineConstants.TEST_METHOD_INCLUDE)
                         .map(
                                 value -> {
-                                    LOGGER.trace("%s [%s]", Constants.TEST_METHOD_INCLUDE, value);
+                                    LOGGER.trace(
+                                            "%s [%s]",
+                                            TestEngineConstants.TEST_METHOD_INCLUDE, value);
                                     return value;
                                 })
                         .map(TestMethodPredicate::of)
@@ -161,10 +167,12 @@ public class Resolver {
 
         excludeTestMethodPredicate =
                 configurationParameters
-                        .get(Constants.TEST_METHOD_EXCLUDE)
+                        .get(TestEngineConstants.TEST_METHOD_EXCLUDE)
                         .map(
                                 value -> {
-                                    LOGGER.trace("%s [%s]", Constants.TEST_METHOD_EXCLUDE, value);
+                                    LOGGER.trace(
+                                            "%s [%s]",
+                                            TestEngineConstants.TEST_METHOD_EXCLUDE, value);
                                     return value;
                                 })
                         .map(TestMethodPredicate::of)
@@ -177,11 +185,12 @@ public class Resolver {
 
         includeTestClassTagPredicate =
                 configurationParameters
-                        .get(Constants.TEST_CLASS_TAG_INCLUDE)
+                        .get(TestEngineConstants.TEST_CLASS_TAG_INCLUDE)
                         .map(
                                 value -> {
                                     LOGGER.trace(
-                                            "%s [%s]", Constants.TEST_CLASS_TAG_INCLUDE, value);
+                                            "%s [%s]",
+                                            TestEngineConstants.TEST_CLASS_TAG_INCLUDE, value);
                                     return value;
                                 })
                         .map(TestClassTagPredicate::of)
@@ -194,11 +203,12 @@ public class Resolver {
 
         excludeTestClassTagPredicate =
                 configurationParameters
-                        .get(Constants.TEST_CLASS_TAG_EXCLUDE)
+                        .get(TestEngineConstants.TEST_CLASS_TAG_EXCLUDE)
                         .map(
                                 value -> {
                                     LOGGER.trace(
-                                            "%s [%s]", Constants.TEST_CLASS_TAG_EXCLUDE, value);
+                                            "%s [%s]",
+                                            TestEngineConstants.TEST_CLASS_TAG_EXCLUDE, value);
                                     return value;
                                 })
                         .map(TestClassTagPredicate::of)
@@ -211,11 +221,12 @@ public class Resolver {
 
         includeTestMethodTagPredicate =
                 configurationParameters
-                        .get(Constants.TEST_METHOD_TAG_INCLUDE)
+                        .get(TestEngineConstants.TEST_METHOD_TAG_INCLUDE)
                         .map(
                                 value -> {
                                     LOGGER.trace(
-                                            "%s [%s]", Constants.TEST_METHOD_TAG_INCLUDE, value);
+                                            "%s [%s]",
+                                            TestEngineConstants.TEST_METHOD_TAG_INCLUDE, value);
                                     return value;
                                 })
                         .map(TestMethodTagPredicate::of)
@@ -228,11 +239,12 @@ public class Resolver {
 
         excludeTestMethodTagPredicate =
                 configurationParameters
-                        .get(Constants.TEST_METHOD_TAG_EXCLUDE)
+                        .get(TestEngineConstants.TEST_METHOD_TAG_EXCLUDE)
                         .map(
                                 value -> {
                                     LOGGER.trace(
-                                            "%s [%s]", Constants.TEST_METHOD_TAG_EXCLUDE, value);
+                                            "%s [%s]",
+                                            TestEngineConstants.TEST_METHOD_TAG_EXCLUDE, value);
                                     return value;
                                 })
                         .map(TestMethodTagPredicate::of)

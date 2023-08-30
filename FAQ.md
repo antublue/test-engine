@@ -12,7 +12,7 @@ Currently, JUnit 5 does not support parameterized testing at the test class leve
 - It doesn't provide annotations to run methods before / after all test methods and before / after each test argument. (2023-04-18)
 
 
-- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
+- It doesn't provide the detailed information during testing or summaryEngineExecutionListener information typically wanted for parameterized integration testing.
 
 ---
 
@@ -28,7 +28,7 @@ c  - The latest release was on February 13, 2021.
 - It doesn't provide annotations to run methods before / after all test methods and before / after each test argument.
 
 
-- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
+- It doesn't provide the detailed information during testing or summaryEngineExecutionListener information typically wanted for parameterized integration testing.
 
 ---
 

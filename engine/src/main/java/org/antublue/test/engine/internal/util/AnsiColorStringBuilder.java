@@ -54,7 +54,7 @@ public class AnsiColorStringBuilder {
      */
     public AnsiColorStringBuilder color(AnsiColor ansiColor) {
         if (ansiColor == null) {
-            stringBuilder.append(AnsiColor.RESET);
+            stringBuilder.append(AnsiColor.TEXT_RESET);
         } else {
             stringBuilder.append(ansiColor);
         }

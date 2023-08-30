@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal;
+package org.antublue.test.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +22,7 @@ import java.util.Properties;
 
 /** Class to get TestEngine information */
 @SuppressWarnings("PMD.EmptyCatchBlock")
-public class InformationUtils {
+public class TestEngineInformation {
 
     private static final String RESOURCE_PATH = "/test-engine.properties";
     private static final String VERSION = "version";
@@ -47,7 +47,8 @@ public class InformationUtils {
     private static String getProperty(String key, String defaultValue) {
         String value = defaultValue;
 
-        try (InputStream inputStream = InformationUtils.class.getResourceAsStream(RESOURCE_PATH)) {
+        try (InputStream inputStream =
+                TestEngineInformation.class.getResourceAsStream(RESOURCE_PATH)) {
             if (inputStream != null) {
                 Properties properties = new Properties();
                 properties.load(inputStream);

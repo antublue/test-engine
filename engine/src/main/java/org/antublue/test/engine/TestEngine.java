@@ -19,7 +19,7 @@ package org.antublue.test.engine;
 import java.util.Optional;
 import org.antublue.test.engine.internal.ConfigurationParameters;
 import org.antublue.test.engine.internal.Executor;
-import org.antublue.test.engine.internal.InformationUtils;
+import org.antublue.test.engine.internal.ExtensionManager;
 import org.antublue.test.engine.internal.Resolver;
 import org.antublue.test.engine.internal.TestClassConfigurationException;
 import org.antublue.test.engine.internal.TestDescriptorStore;
@@ -51,15 +51,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static final String ARTIFACT_ID = "test-engine";
 
     /** Configuration constant */
-    public static final String VERSION = InformationUtils.getVersion();
-
-    /** Configuration constant */
-    public static final String ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN =
-            "__ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN__";
-
-    /** Configuration constant */
-    public static final String ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE =
-            "__ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE__";
+    public static final String VERSION = TestEngineInformation.getVersion();
 
     /**
      * Method to get the test engine id
@@ -114,8 +106,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("discover()");
 
         try {
-            EngineDescriptor engineDescriptor =
-                    new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
+            EngineDescriptor engineDescriptor = new ExtendedEngineDescriptor(uniqueId, getId());
 
             new Resolver()
                     .resolve(engineDiscoveryRequest, CONFIGURATION_PARAMETERS, engineDescriptor);
@@ -125,7 +116,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             return engineDescriptor;
         } catch (TestClassConfigurationException | TestEngineException t) {
-            if ("true".equals(System.getProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN))) {
+            if (TestEngineConstants.TRUE.equals(
+                    System.getProperty(TestEngineConstants.MAVEN_PLUGIN))) {
                 throw t;
             }
 
@@ -146,6 +138,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     @Override
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute()");
+
+        try {
+            ExtensionManager.singleton().initialize();
+        } catch (Throwable t) {
+            throw new TestEngineException("Exception loading extensions", t);
+        }
 
         new Executor()
                 .execute(
