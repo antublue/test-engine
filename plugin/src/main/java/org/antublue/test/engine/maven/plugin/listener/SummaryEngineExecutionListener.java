@@ -221,9 +221,7 @@ public class SummaryEngineExecutionListener
         println(INFO + SEPARATOR);
         println(INFO + SUMMARY_BANNER);
         println(INFO + SEPARATOR);
-        println(INFO + message);
-        println(INFO + SEPARATOR);
-        // TODO use AnsiStringBuilder for formatting
+
         println(
                 new AnsiColorStringBuilder()
                         .append(INFO)
@@ -302,6 +300,9 @@ public class SummaryEngineExecutionListener
                         .append(pad(testMethodDescriptorSkipped, columnWidthSkipped))
                         .append(AnsiColor.TEXT_RESET));
 
+        println(INFO + SEPARATOR);
+
+        println(INFO + message);
         println(INFO + SEPARATOR);
 
         long elapsedTime = stopWatch.elapsedTime();
