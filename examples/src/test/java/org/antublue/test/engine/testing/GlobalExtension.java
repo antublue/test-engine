@@ -26,11 +26,12 @@ public class GlobalExtension implements Extension {
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
+    @Override
     public void beforePrepare(Object testInstance) throws Throwable {
         System.out.println(
                 String.format(
                         "%s.beforePrepare %s",
-                        getClass().getName(), testInstance.getClass().getName()));
+                        getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     /**
@@ -39,10 +40,11 @@ public class GlobalExtension implements Extension {
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
+    @Override
     public void afterConcludeCallback(Object testInstance) throws Throwable {
         System.out.println(
                 String.format(
                         "%s.afterConcludeCallback %s",
-                        getClass().getName(), testInstance.getClass().getName()));
+                        getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 }

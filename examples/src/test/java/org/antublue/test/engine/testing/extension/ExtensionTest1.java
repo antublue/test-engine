@@ -94,7 +94,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforePrepare(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -102,7 +102,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.prepareCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -110,7 +110,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeBeforeAll(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -118,7 +118,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeAllCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -126,7 +126,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeBeforeEach(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -134,7 +134,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeEachCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -142,7 +142,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeTest(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -150,7 +150,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.testCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -158,7 +158,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeAfterEach(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -166,7 +166,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.afterEachCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -174,7 +174,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeAfterAll(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -182,7 +182,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.afterAllCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -190,7 +190,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeConclude(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -198,7 +198,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.afterConcludeCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
     }
 
@@ -209,7 +209,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforePrepare(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -217,7 +217,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.prepareCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -225,7 +225,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeBeforeAll(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -233,7 +233,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeAllCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -241,7 +241,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeBeforeEach(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -249,7 +249,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeEachCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -257,7 +257,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeTest(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -265,7 +265,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.testCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -273,7 +273,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeAfterEach(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -281,7 +281,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.afterEachCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -289,7 +289,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeAfterAll(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -297,7 +297,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.afterAllCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -305,7 +305,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.beforeConclude(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
         @Override
@@ -313,7 +313,7 @@ public class ExtensionTest1 {
             System.out.println(
                     String.format(
                             "%s.afterConcludeCallback(class [%s])",
-                            this.getClass().getSimpleName(), testInstance.getClass().getName()));
+                            getClass().getSimpleName(), testInstance.getClass().getName()));
         }
     }
 }
