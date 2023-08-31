@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine;
+package org.antublue.test.engine.extension;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.configuration.Configuration;
+import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.util.ReflectionUtils;

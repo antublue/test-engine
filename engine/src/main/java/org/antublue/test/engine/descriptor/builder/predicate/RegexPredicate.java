@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.discovery.predicate;
+package org.antublue.test.engine.descriptor.builder.predicate;
 
 import java.util.function.Predicate;
 import java.util.regex.Matcher;

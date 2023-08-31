@@ -18,9 +18,9 @@ package org.antublue.test.engine.descriptor;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import org.antublue.test.engine.TestClassConfigurationException;
-import org.antublue.test.engine.TestEngineUtils;
+import org.antublue.test.engine.TestEngineReflectionUtils;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.exception.TestClassConfigurationException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.util.Switch;
@@ -33,7 +33,8 @@ public final class TestDescriptorUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptorUtils.class);
 
-    private static final TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
+    private static final TestEngineReflectionUtils TEST_ENGINE_REFLECTION_UTILS =
+            TestEngineReflectionUtils.singleton();
 
     /** Constructor */
     private TestDescriptorUtils() {
@@ -52,7 +53,7 @@ public final class TestDescriptorUtils {
         validateTestClass(testClass);
 
         return new ClassTestDescriptor(
-                uniqueId, testEngineUtils.getDisplayName(testClass), testClass);
+                uniqueId, TEST_ENGINE_REFLECTION_UTILS.getDisplayName(testClass), testClass);
     }
 
     /**
@@ -84,7 +85,11 @@ public final class TestDescriptorUtils {
         validateTestClass(testClass);
 
         return new MethodTestDescriptor(
-                uniqueId, testEngineUtils.getDisplayName(method), testClass, method, argument);
+                uniqueId,
+                TEST_ENGINE_REFLECTION_UTILS.getDisplayName(method),
+                testClass,
+                method,
+                argument);
     }
 
     /**
@@ -147,7 +152,7 @@ public final class TestDescriptorUtils {
 
     private static void validateTestClass(Class<?> testClass) {
         // Validate we have a @TestEngine.ArgumentSupplier method
-        List<Method> methods = testEngineUtils.getArgumentSupplierMethods(testClass);
+        List<Method> methods = TEST_ENGINE_REFLECTION_UTILS.getArgumentSupplierMethods(testClass);
         if (methods.size() != 1) {
             throw new TestClassConfigurationException(
                     String.format(
@@ -157,7 +162,7 @@ public final class TestDescriptorUtils {
         }
 
         // Validate we have a @TestEngine.Test method
-        if (testEngineUtils.getTestMethods(testClass).isEmpty()) {
+        if (TEST_ENGINE_REFLECTION_UTILS.getTestMethods(testClass).isEmpty()) {
             throw new TestClassConfigurationException(
                     String.format(
                             "Test class [%s] must declare at least one @TestEngine.Test method",
@@ -166,11 +171,11 @@ public final class TestDescriptorUtils {
 
         // Get other method optional annotated methods
         // which will check for duplicate @TestEngine.Order values
-        testEngineUtils.getPrepareMethods(testClass);
-        testEngineUtils.getBeforeAllMethods(testClass);
-        testEngineUtils.getBeforeEachMethods(testClass);
-        testEngineUtils.getAfterEachMethods(testClass);
-        testEngineUtils.getAfterAllMethods(testClass);
-        testEngineUtils.getConcludeMethods(testClass);
+        TEST_ENGINE_REFLECTION_UTILS.getPrepareMethods(testClass);
+        TEST_ENGINE_REFLECTION_UTILS.getBeforeAllMethods(testClass);
+        TEST_ENGINE_REFLECTION_UTILS.getBeforeEachMethods(testClass);
+        TEST_ENGINE_REFLECTION_UTILS.getAfterEachMethods(testClass);
+        TEST_ENGINE_REFLECTION_UTILS.getAfterAllMethods(testClass);
+        TEST_ENGINE_REFLECTION_UTILS.getConcludeMethods(testClass);
     }
 }

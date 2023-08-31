@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine;
+package org.antublue.test.engine.configuration;
 
 import java.io.File;
 import java.io.FileReader;

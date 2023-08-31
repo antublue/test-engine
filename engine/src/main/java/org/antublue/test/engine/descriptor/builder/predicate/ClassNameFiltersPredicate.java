@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.discovery.resolver;
+package org.antublue.test.engine.descriptor.builder.predicate;
 
 import java.util.List;
 import java.util.function.Predicate;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.junit.platform.engine.FilterResult;
-import org.junit.platform.engine.discovery.PackageNameFilter;
+import org.junit.platform.engine.discovery.ClassNameFilter;
 
-/** Class to implement to filter a Class based on a List of PackageNameFilter */
-public class PackageNameFiltersPredicate implements Predicate<Class<?>> {
+/** Class to implement a Predicate to filter a Class based on a List of ClassNameFilters */
+public class ClassNameFiltersPredicate implements Predicate<Class<?>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PackageNameFiltersPredicate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassNameFiltersPredicate.class);
 
-    private final List<PackageNameFilter> packageNameFilters;
+    private final List<ClassNameFilter> classNameFilters;
 
     /**
      * Constructor
      *
-     * @param packageNameFilters packageNameFilters
+     * @param classNameFilters classNameFilters
      */
-    public PackageNameFiltersPredicate(List<PackageNameFilter> packageNameFilters) {
-        this.packageNameFilters = packageNameFilters;
+    public ClassNameFiltersPredicate(List<ClassNameFilter> classNameFilters) {
+        this.classNameFilters = classNameFilters;
     }
 
     /**
@@ -47,22 +47,20 @@ public class PackageNameFiltersPredicate implements Predicate<Class<?>> {
      */
     @Override
     public boolean test(Class<?> clazz) {
-        String packageName = clazz.getPackage().getName();
-
-        if (packageNameFilters == null || packageNameFilters.isEmpty()) {
-            LOGGER.trace("package [%s] included", packageName);
+        if (classNameFilters == null || classNameFilters.isEmpty()) {
+            LOGGER.trace("class [%s] included", clazz.getName());
             return true;
         }
 
-        for (PackageNameFilter packageNameFilter : packageNameFilters) {
-            FilterResult filterResult = packageNameFilter.apply(clazz.getName());
+        for (ClassNameFilter classNameFilter : classNameFilters) {
+            FilterResult filterResult = classNameFilter.apply(clazz.getName());
             if (filterResult.excluded()) {
-                LOGGER.trace("package [%s] excluded", packageName);
+                LOGGER.trace("class [%s] excluded", clazz.getName());
                 return false;
             }
         }
 
-        LOGGER.trace("package [%s] included", packageName);
+        LOGGER.trace("class [%s] included", clazz.getName());
 
         return true;
     }

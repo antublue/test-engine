@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.discovery.predicate;
+package org.antublue.test.engine.descriptor.builder.predicate;
 
-/** Class to implement a Predicate that matches a classname */
-public final class TestClassPredicate extends RegexPredicate<Class<?>> {
+import org.antublue.test.engine.api.TestEngine;
+
+/** Class to implement a test class tag Predicate */
+public final class TestClassTagPredicate extends RegexPredicate<Class<?>> {
 
     /**
      * Constructor
      *
      * @param regex regex
      */
-    private TestClassPredicate(String regex) {
+    private TestClassTagPredicate(String regex) {
         super(regex);
     }
 
@@ -36,16 +38,22 @@ public final class TestClassPredicate extends RegexPredicate<Class<?>> {
      */
     @Override
     public synchronized boolean test(Class<?> testClass) {
-        return matcher.reset(testClass.getName()).find();
+        TestEngine.Tag annotation = testClass.getAnnotation(TestEngine.Tag.class);
+        if (annotation == null) {
+            return false;
+        }
+
+        String value = annotation.tag();
+        return matcher.reset(value).find();
     }
 
     /**
-     * Method to create an instance of a TestClassPredicate
+     * Method to create an instance of a TestClassTagPredicate
      *
      * @param regex regex
      * @return the return value
      */
-    public static TestClassPredicate of(String regex) {
-        return new TestClassPredicate(regex);
+    public static TestClassTagPredicate of(String regex) {
+        return new TestClassTagPredicate(regex);
     }
 }

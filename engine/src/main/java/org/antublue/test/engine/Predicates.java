@@ -27,7 +27,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.util.ReflectionUtils;
 
-public class Filter {
+public class Predicates {
 
     private static final ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
@@ -338,7 +338,7 @@ public class Filter {
                 return true;
             };
 
-    private Filter() {
+    private Predicates() {
         // DO NOTHING
     }
 }

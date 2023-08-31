@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine;
+package org.antublue.test.engine.exception;
 
-/** Class to implement a generic TestEngineException */
-public class TestEngineException extends RuntimeException {
+/** Class to implement a test class configuration exception */
+public class TestClassConfigurationException extends RuntimeException {
 
     /**
      * Constructor
      *
      * @param message message
      */
-    public TestEngineException(String message) {
+    public TestClassConfigurationException(String message) {
         super(message);
     }
 
@@ -34,16 +34,7 @@ public class TestEngineException extends RuntimeException {
      * @param message message
      * @param throwable throwable
      */
-    public TestEngineException(String message, Throwable throwable) {
+    public TestClassConfigurationException(String message, Throwable throwable) {
         super(message, throwable);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param throwable throwable
-     */
-    public TestEngineException(Throwable throwable) {
-        super(throwable);
     }
 }

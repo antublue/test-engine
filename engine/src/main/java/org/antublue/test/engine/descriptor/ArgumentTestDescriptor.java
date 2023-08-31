@@ -23,13 +23,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.antublue.test.engine.ExecutorContext;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.descriptor.util.ArgumentFieldInjector;
 import org.antublue.test.engine.descriptor.util.LockProcessor;
 import org.antublue.test.engine.descriptor.util.RandomFieldInjector;
+import org.antublue.test.engine.executor.ExecutorContext;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.statemachine.StateMachine;
@@ -107,7 +107,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
     @Override
     public Optional<TestSource> getSource() {
         return Optional.of(
-                MethodSource.from(testEngineUtils.getArgumentSupplierMethods(testClass).get(0)));
+                MethodSource.from(
+                        TEST_ENGINE_REFLECTION_UTILS.getArgumentSupplierMethods(testClass).get(0)));
     }
 
     /**
@@ -216,7 +217,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
                     testInstance = executorContext.getTestInstance();
 
-                    List<Field> fields = testEngineUtils.getAnnotatedFields(testClass);
+                    List<Field> fields = TEST_ENGINE_REFLECTION_UTILS.getAnnotatedFields(testClass);
 
                     ArgumentFieldInjector argumentFieldInjector = ArgumentFieldInjector.singleton();
                     for (Field field : fields) {
@@ -251,7 +252,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Extension> extensions = testEngineUtils.getExtensions(testClass);
+                            List<Extension> extensions =
+                                    TEST_ENGINE_REFLECTION_UTILS.getExtensions(testClass);
 
                             for (Extension extension : extensions) {
                                 extension.beforeBeforeAll(testInstance, testArgument);
@@ -279,7 +281,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Method> methods = testEngineUtils.getBeforeAllMethods(testClass);
+                            List<Method> methods =
+                                    TEST_ENGINE_REFLECTION_UTILS.getBeforeAllMethods(testClass);
 
                             for (Method method : methods) {
                                 try {
@@ -314,7 +317,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                                    new ArrayList<>(
+                                            TEST_ENGINE_REFLECTION_UTILS.getExtensions(testClass));
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
@@ -425,7 +429,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Extension> extensions = testEngineUtils.getExtensions(testClass);
+                            List<Extension> extensions =
+                                    TEST_ENGINE_REFLECTION_UTILS.getExtensions(testClass);
 
                             for (Extension extension : extensions) {
                                 extension.beforeAfterAll(testInstance, testArgument);
@@ -449,12 +454,14 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         Invoker.invoke(
                 () -> {
-                    List<Method> methods = testEngineUtils.getAfterAllMethods(testClass);
+                    List<Method> methods =
+                            TEST_ENGINE_REFLECTION_UTILS.getAfterAllMethods(testClass);
 
                     for (Method method : methods) {
                         try {
-                            lockProcessor.processLocks(method);
-                            if (testEngineUtils.acceptsParameterTypes(method, Argument.class)) {
+                            LOCK_PROCESSOR.processLocks(method);
+                            if (TEST_ENGINE_REFLECTION_UTILS.acceptsParameterTypes(
+                                    method, Argument.class)) {
                                 method.invoke(testInstance, testArgument);
                             } else {
                                 method.invoke(testInstance, NO_OBJECT_ARGS);
@@ -462,7 +469,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                         } catch (Throwable t) {
                             throwableCollector.add(t);
                         } finally {
-                            lockProcessor.processUnlocks(method);
+                            LOCK_PROCESSOR.processUnlocks(method);
                         }
                     }
                 });
@@ -471,7 +478,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 () -> {
                     try {
                         List<Field> fields =
-                                testEngineUtils.getAnnotatedFields(testClass).stream()
+                                TEST_ENGINE_REFLECTION_UTILS.getAnnotatedFields(testClass).stream()
                                         .filter(
                                                 field -> {
                                                     TestEngine.AutoClose annotation =
@@ -485,7 +492,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
                         for (Field field : fields) {
                             try {
-                                autoCloseProcessor.close(testInstance, field);
+                                AUTO_CLOSE_FIELD_PROCESSOR.close(testInstance, field);
                             } catch (Throwable t) {
                                 throwableCollector.add(t);
                             }
@@ -514,7 +521,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                                    new ArrayList<>(
+                                            TEST_ENGINE_REFLECTION_UTILS.getExtensions(testClass));
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
@@ -539,7 +547,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         Invoker.invoke(
                 () -> {
-                    List<Field> fields = testEngineUtils.getAnnotatedFields(testClass);
+                    List<Field> fields = TEST_ENGINE_REFLECTION_UTILS.getAnnotatedFields(testClass);
 
                     ArgumentFieldInjector argumentFieldInjector = ArgumentFieldInjector.singleton();
                     for (Field field : fields) {

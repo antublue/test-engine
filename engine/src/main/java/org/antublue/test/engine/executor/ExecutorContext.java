@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine;
+package org.antublue.test.engine.executor;
 
 import java.util.concurrent.CountDownLatch;
 import org.antublue.test.engine.logger.Logger;

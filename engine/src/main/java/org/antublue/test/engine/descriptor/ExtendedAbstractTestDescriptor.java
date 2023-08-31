@@ -20,11 +20,11 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.antublue.test.engine.Constants;
-import org.antublue.test.engine.ExecutorContext;
-import org.antublue.test.engine.TestEngineUtils;
+import org.antublue.test.engine.TestEngineReflectionUtils;
+import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.descriptor.util.LockProcessor;
+import org.antublue.test.engine.executor.ExecutorContext;
 import org.antublue.test.engine.util.StopWatch;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
@@ -34,11 +34,13 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 @SuppressWarnings("unchecked")
 public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
 
-    protected static final TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
+    protected static final TestEngineReflectionUtils TEST_ENGINE_REFLECTION_UTILS =
+            TestEngineReflectionUtils.singleton();
 
-    protected static final LockProcessor lockProcessor = LockProcessor.singleton();
+    protected static final LockProcessor LOCK_PROCESSOR = LockProcessor.singleton();
 
-    protected static final AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
+    protected static final AutoCloseProcessor AUTO_CLOSE_FIELD_PROCESSOR =
+            AutoCloseProcessor.singleton();
 
     /** Constant to represent no class arguments */
     protected static final Class<?>[] NO_CLASS_ARGS = null;

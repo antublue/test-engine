@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine;
+package org.antublue.test.engine.descriptor.builder;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -23,17 +23,20 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.antublue.test.engine.TestEngineReflectionUtils;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.descriptor.TestDescriptorUtils;
-import org.antublue.test.engine.discovery.predicate.TestClassPredicate;
-import org.antublue.test.engine.discovery.predicate.TestClassTagPredicate;
-import org.antublue.test.engine.discovery.predicate.TestMethodPredicate;
-import org.antublue.test.engine.discovery.predicate.TestMethodTagPredicate;
-import org.antublue.test.engine.discovery.resolver.ClassNameFiltersPredicate;
-import org.antublue.test.engine.discovery.resolver.PackageNameFiltersPredicate;
+import org.antublue.test.engine.descriptor.builder.predicate.ClassNameFiltersPredicate;
+import org.antublue.test.engine.descriptor.builder.predicate.PackageNameFiltersPredicate;
+import org.antublue.test.engine.descriptor.builder.predicate.TestClassPredicate;
+import org.antublue.test.engine.descriptor.builder.predicate.TestClassTagPredicate;
+import org.antublue.test.engine.descriptor.builder.predicate.TestMethodPredicate;
+import org.antublue.test.engine.descriptor.builder.predicate.TestMethodTagPredicate;
+import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.junit.platform.engine.ConfigurationParameters;
@@ -50,11 +53,12 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a resolver to build the test descriptor tree */
 @SuppressWarnings("PMD.NPathComplexity")
-public class TestDescriptorBuilder {
+public class Builder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptorBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
 
-    private static final TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
+    private static final TestEngineReflectionUtils TEST_ENGINE_REFLECTION_UTILS =
+            TestEngineReflectionUtils.singleton();
 
     private TestClassPredicate includeTestClassPredicate;
     private TestClassPredicate excludeTestClassPredicate;
@@ -285,7 +289,7 @@ public class TestDescriptorBuilder {
                 .getSelectorsByType(ClasspathRootSelector.class)
                 .forEach(
                         classpathRootSelector -> {
-                            testEngineUtils
+                            TEST_ENGINE_REFLECTION_UTILS
                                     .findAllTestClasses(classpathRootSelector.getClasspathRoot())
                                     .forEach(
                                             clazz -> {
@@ -294,8 +298,9 @@ public class TestDescriptorBuilder {
                                                     classMethodSetMap.put(
                                                             clazz,
                                                             new LinkedHashSet<>(
-                                                                    testEngineUtils.getTestMethods(
-                                                                            clazz)));
+                                                                    TEST_ENGINE_REFLECTION_UTILS
+                                                                            .getTestMethods(
+                                                                                    clazz)));
                                                 }
                                             });
                         });
@@ -309,7 +314,7 @@ public class TestDescriptorBuilder {
                 .getSelectorsByType(PackageSelector.class)
                 .forEach(
                         packageSelector -> {
-                            testEngineUtils
+                            TEST_ENGINE_REFLECTION_UTILS
                                     .findAllTestClasses(packageSelector.getPackageName())
                                     .forEach(
                                             clazz -> {
@@ -318,8 +323,9 @@ public class TestDescriptorBuilder {
                                                     classMethodSetMap.put(
                                                             clazz,
                                                             new LinkedHashSet<>(
-                                                                    testEngineUtils.getTestMethods(
-                                                                            clazz)));
+                                                                    TEST_ENGINE_REFLECTION_UTILS
+                                                                            .getTestMethods(
+                                                                                    clazz)));
                                                 }
                                             });
                         });
@@ -336,10 +342,12 @@ public class TestDescriptorBuilder {
                             Class<?> clazz = classSelector.getJavaClass();
                             if (packageNameFiltersPredicate.test(clazz)
                                     && classNameFiltersPredicate.test(clazz)
-                                    && testEngineUtils.isTestClass(clazz)) {
+                                    && TEST_ENGINE_REFLECTION_UTILS.isTestClass(clazz)) {
                                 classMethodSetMap.put(
                                         clazz,
-                                        new LinkedHashSet<>(testEngineUtils.getTestMethods(clazz)));
+                                        new LinkedHashSet<>(
+                                                TEST_ENGINE_REFLECTION_UTILS.getTestMethods(
+                                                        clazz)));
                             }
                         });
     }
@@ -355,7 +363,7 @@ public class TestDescriptorBuilder {
                             Class<?> clazz = methodSelector.getJavaClass();
                             if (packageNameFiltersPredicate.test(clazz)
                                     && classNameFiltersPredicate.test(clazz)
-                                    && testEngineUtils.isTestMethod(
+                                    && TEST_ENGINE_REFLECTION_UTILS.isTestMethod(
                                             methodSelector.getJavaMethod())) {
                                 Set<Method> methods =
                                         classMethodSetMap.getOrDefault(
@@ -382,11 +390,12 @@ public class TestDescriptorBuilder {
                                     Class<?> clazz = Class.forName(className);
                                     if (packageNameFiltersPredicate.test(clazz)
                                             && classNameFiltersPredicate.test(clazz)
-                                            && testEngineUtils.isTestClass(clazz)) {
+                                            && TEST_ENGINE_REFLECTION_UTILS.isTestClass(clazz)) {
                                         Set<Method> methods =
                                                 classMethodSetMap.getOrDefault(
                                                         clazz, new LinkedHashSet<>());
-                                        methods.addAll(testEngineUtils.getTestMethods(clazz));
+                                        methods.addAll(
+                                                TEST_ENGINE_REFLECTION_UTILS.getTestMethods(clazz));
                                         classMethodSetMap.put(clazz, methods);
                                     }
                                 } catch (ClassNotFoundException e) {
@@ -405,11 +414,12 @@ public class TestDescriptorBuilder {
                                     Class<?> clazz = Class.forName(className);
                                     if (packageNameFiltersPredicate.test(clazz)
                                             && classNameFiltersPredicate.test(clazz)
-                                            && testEngineUtils.isTestClass(clazz)) {
+                                            && TEST_ENGINE_REFLECTION_UTILS.isTestClass(clazz)) {
                                         Set<Method> methods =
                                                 classMethodSetMap.getOrDefault(
                                                         clazz, new LinkedHashSet<>());
-                                        methods.addAll(testEngineUtils.getTestMethods(clazz));
+                                        methods.addAll(
+                                                TEST_ENGINE_REFLECTION_UTILS.getTestMethods(clazz));
                                         classMethodSetMap.put(clazz, methods);
                                     }
                                 } catch (ClassNotFoundException e) {
@@ -550,7 +560,7 @@ public class TestDescriptorBuilder {
 
             engineDescriptor.addChild(classTestDescriptor);
 
-            List<Argument> arguments = testEngineUtils.getArguments(clazz);
+            List<Argument> arguments = TEST_ENGINE_REFLECTION_UTILS.getArguments(clazz);
             for (Argument argument : arguments) {
                 UniqueId argumentUniqueId =
                         classTestDescritporUniqueId.append("argument", argument.name());

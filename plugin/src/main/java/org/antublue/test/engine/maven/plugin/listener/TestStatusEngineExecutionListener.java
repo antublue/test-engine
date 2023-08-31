@@ -17,9 +17,9 @@
 package org.antublue.test.engine.maven.plugin.listener;
 
 import java.lang.reflect.Method;
-import org.antublue.test.engine.Configuration;
-import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.configuration.Configuration;
+import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.descriptor.ExtendedAbstractTestDescriptor;

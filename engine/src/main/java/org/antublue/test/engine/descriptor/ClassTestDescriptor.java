@@ -23,11 +23,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.antublue.test.engine.ExecutorContext;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.descriptor.util.LockProcessor;
+import org.antublue.test.engine.executor.ExecutorContext;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.statemachine.StateMachine;
@@ -193,7 +193,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
                             executorContext.setTestInstance(testInstance);
 
-                            testEngineUtils.getExtensions(testClass);
+                            TEST_ENGINE_REFLECTION_UTILS.getExtensions(testClass);
                         }));
 
         if (throwableCollector.isEmpty()) {
@@ -217,7 +217,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Extension> extensions = testEngineUtils.getExtensions(testClass);
+                            List<Extension> extensions =
+                                    TEST_ENGINE_REFLECTION_UTILS.getExtensions(testClass);
 
                             for (Extension extension : extensions) {
                                 extension.beforePrepare(testInstance);
@@ -246,7 +247,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Method> methods = testEngineUtils.getPrepareMethods(testClass);
+                            List<Method> methods =
+                                    TEST_ENGINE_REFLECTION_UTILS.getPrepareMethods(testClass);
 
                             for (Method method : methods) {
                                 try {
@@ -276,7 +278,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                                    new ArrayList<>(
+                                            TEST_ENGINE_REFLECTION_UTILS.getExtensions(testClass));
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
@@ -381,7 +384,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                                    new ArrayList<>(
+                                            TEST_ENGINE_REFLECTION_UTILS.getExtensions(testClass));
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
@@ -406,7 +410,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         Invoker.invoke(
                 () -> {
-                    List<Method> methods = testEngineUtils.getConcludeMethods(testClass);
+                    List<Method> methods =
+                            TEST_ENGINE_REFLECTION_UTILS.getConcludeMethods(testClass);
 
                     for (Method method : methods) {
                         try {
@@ -427,7 +432,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 () -> {
                     try {
                         List<Field> fields =
-                                testEngineUtils.getAnnotatedFields(testClass).stream()
+                                TEST_ENGINE_REFLECTION_UTILS.getAnnotatedFields(testClass).stream()
                                         .filter(
                                                 field -> {
                                                     TestEngine.AutoClose annotation =
@@ -469,7 +474,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                                    new ArrayList<>(
+                                            TEST_ENGINE_REFLECTION_UTILS.getExtensions(testClass));
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {

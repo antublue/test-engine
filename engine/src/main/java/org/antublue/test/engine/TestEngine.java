@@ -17,7 +17,13 @@
 package org.antublue.test.engine;
 
 import java.util.Optional;
+import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.descriptor.ExtendedEngineDescriptor;
+import org.antublue.test.engine.descriptor.builder.Builder;
+import org.antublue.test.engine.exception.TestClassConfigurationException;
+import org.antublue.test.engine.exception.TestEngineException;
+import org.antublue.test.engine.executor.Executor;
+import org.antublue.test.engine.extension.ExtensionManager;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -101,8 +107,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             EngineDescriptor engineDescriptor = new ExtendedEngineDescriptor(uniqueId, getId());
 
-            new TestDescriptorBuilder()
-                    .build(engineDiscoveryRequest, CONFIGURATION_PARAMETERS, engineDescriptor);
+            new Builder().build(engineDiscoveryRequest, CONFIGURATION_PARAMETERS, engineDescriptor);
 
             return engineDescriptor;
         } catch (TestClassConfigurationException | TestEngineException t) {

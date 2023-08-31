@@ -18,7 +18,7 @@ package org.antublue.test.engine.logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.antublue.test.engine.Configuration;
+import org.antublue.test.engine.configuration.Configuration;
 
 /** Class to implement a LoggerFactory */
 @SuppressWarnings("PMD.EmptyCatchBlock")

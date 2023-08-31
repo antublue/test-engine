@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
-import org.antublue.test.engine.TestClassConfigurationException;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.exception.TestClassConfigurationException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 

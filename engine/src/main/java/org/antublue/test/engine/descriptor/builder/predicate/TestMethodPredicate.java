@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.discovery.predicate;
+package org.antublue.test.engine.descriptor.builder.predicate;
 
 import java.lang.reflect.Method;
-import org.antublue.test.engine.api.TestEngine;
 
-/** Class to implement a test method tag predicate */
-public final class TestMethodTagPredicate extends RegexPredicate<Method> {
+/** Class to implement a test method predicate */
+public final class TestMethodPredicate extends RegexPredicate<Method> {
 
     /**
      * Constructor
      *
      * @param regex regex
      */
-    private TestMethodTagPredicate(String regex) {
+    private TestMethodPredicate(String regex) {
         super(regex);
     }
 
@@ -35,26 +34,20 @@ public final class TestMethodTagPredicate extends RegexPredicate<Method> {
      * Method to test the Predicate
      *
      * @param method the input argument
-     * @return whether to accept the method
+     * @return whether to accept the Method
      */
     @Override
     public synchronized boolean test(Method method) {
-        TestEngine.Tag annotation = method.getAnnotation(TestEngine.Tag.class);
-        if (annotation == null) {
-            return false;
-        }
-
-        String value = annotation.tag();
-        return matcher.reset(value).find();
+        return matcher.reset(method.getName()).find();
     }
 
     /**
-     * Method to create an instance of a TestMethodTagPredicate
+     * Method to create an instance of a TestMethodPredicate
      *
      * @param regex regex
      * @return the return value
      */
-    public static TestMethodTagPredicate of(String regex) {
-        return new TestMethodTagPredicate(regex);
+    public static TestMethodPredicate of(String regex) {
+        return new TestMethodPredicate(regex);
     }
 }
