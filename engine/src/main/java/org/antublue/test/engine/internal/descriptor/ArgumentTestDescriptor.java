@@ -18,6 +18,8 @@ package org.antublue.test.engine.internal.descriptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,9 +27,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.ExecutorContext;
-import org.antublue.test.engine.internal.TestEngineUtils;
 import org.antublue.test.engine.internal.descriptor.util.ArgumentFieldInjector;
-import org.antublue.test.engine.internal.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.internal.descriptor.util.LockProcessor;
 import org.antublue.test.engine.internal.descriptor.util.RandomFieldInjector;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -107,8 +107,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
     @Override
     public Optional<TestSource> getSource() {
         return Optional.of(
-                MethodSource.from(
-                        TestEngineUtils.singleton().getArgumentSupplierMethod(testClass)));
+                MethodSource.from(testEngineUtils.getArgumentSupplierMethods(testClass).get(0)));
     }
 
     /**
@@ -217,7 +216,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
                     testInstance = executorContext.getTestInstance();
 
-                    List<Field> fields = TestEngineUtils.singleton().getAnnotatedFields(testClass);
+                    List<Field> fields = testEngineUtils.getAnnotatedFields(testClass);
 
                     ArgumentFieldInjector argumentFieldInjector = ArgumentFieldInjector.singleton();
                     for (Field field : fields) {
@@ -252,9 +251,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+                            List<Extension> extensions = testEngineUtils.getExtensions(testClass);
 
                             for (Extension extension : extensions) {
                                 extension.beforeBeforeAll(testInstance, testArgument);
@@ -282,8 +279,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Method> methods =
-                                    TestEngineUtils.singleton().getBeforeAllMethods(testClass);
+                            List<Method> methods = testEngineUtils.getBeforeAllMethods(testClass);
 
                             for (Method method : methods) {
                                 try {
@@ -318,8 +314,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                            Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
                                 extension.afterBeforeAll(testInstance, testArgument);
@@ -429,9 +425,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+                            List<Extension> extensions = testEngineUtils.getExtensions(testClass);
 
                             for (Extension extension : extensions) {
                                 extension.beforeAfterAll(testInstance, testArgument);
@@ -453,11 +447,6 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 "afterAll uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
-        ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
-        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
-        LockProcessor lockProcessor = LockProcessor.singleton();
-        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
-
         Invoker.invoke(
                 () -> {
                     List<Method> methods = testEngineUtils.getAfterAllMethods(testClass);
@@ -465,7 +454,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                     for (Method method : methods) {
                         try {
                             lockProcessor.processLocks(method);
-                            if (reflectionUtils.acceptsParameters(method, Argument.class)) {
+                            if (testEngineUtils.acceptsParameterTypes(method, Argument.class)) {
                                 method.invoke(testInstance, testArgument);
                             } else {
                                 method.invoke(testInstance, NO_OBJECT_ARGS);
@@ -525,8 +514,8 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                            Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
                                 extension.afterAfterAll(testInstance, testArgument);
@@ -550,7 +539,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
 
         Invoker.invoke(
                 () -> {
-                    List<Field> fields = TestEngineUtils.singleton().getAnnotatedFields(testClass);
+                    List<Field> fields = testEngineUtils.getAnnotatedFields(testClass);
 
                     ArgumentFieldInjector argumentFieldInjector = ArgumentFieldInjector.singleton();
                     for (Field field : fields) {

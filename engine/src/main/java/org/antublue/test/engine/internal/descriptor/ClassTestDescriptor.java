@@ -18,13 +18,14 @@ package org.antublue.test.engine.internal.descriptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.ExecutorContext;
-import org.antublue.test.engine.internal.TestEngineUtils;
 import org.antublue.test.engine.internal.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.internal.descriptor.util.LockProcessor;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -192,8 +193,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
                             executorContext.setTestInstance(testInstance);
 
-                            TestEngineUtils.singleton()
-                                    .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+                            testEngineUtils.getExtensions(testClass);
                         }));
 
         if (throwableCollector.isEmpty()) {
@@ -217,9 +217,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+                            List<Extension> extensions = testEngineUtils.getExtensions(testClass);
 
                             for (Extension extension : extensions) {
                                 extension.beforePrepare(testInstance);
@@ -248,8 +246,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Method> methods =
-                                    TestEngineUtils.singleton().getPrepareMethods(testClass);
+                            List<Method> methods = testEngineUtils.getPrepareMethods(testClass);
 
                             for (Method method : methods) {
                                 try {
@@ -279,8 +276,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                            Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
                                 extension.afterPrepare(testInstance);
@@ -384,8 +381,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                            Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
                                 extension.beforeConclude(testInstance);
@@ -409,8 +406,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
 
         Invoker.invoke(
                 () -> {
-                    List<Method> methods =
-                            TestEngineUtils.singleton().getConcludeMethods(testClass);
+                    List<Method> methods = testEngineUtils.getConcludeMethods(testClass);
 
                     for (Method method : methods) {
                         try {
@@ -430,7 +426,6 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
         Invoker.invoke(
                 () -> {
                     try {
-                        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
                         List<Field> fields =
                                 testEngineUtils.getAnnotatedFields(testClass).stream()
                                         .filter(
@@ -474,8 +469,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                            Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
                                 extension.afterConclude(testInstance);

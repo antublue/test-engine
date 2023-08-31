@@ -18,6 +18,8 @@ package org.antublue.test.engine.internal.descriptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,14 +27,10 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.ExecutorContext;
-import org.antublue.test.engine.internal.TestEngineUtils;
-import org.antublue.test.engine.internal.descriptor.util.AutoCloseProcessor;
-import org.antublue.test.engine.internal.descriptor.util.LockProcessor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.statemachine.StateMachine;
 import org.antublue.test.engine.internal.util.Invoker;
-import org.antublue.test.engine.internal.util.ReflectionUtils;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -235,9 +233,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+                            List<Extension> extensions = testEngineUtils.getExtensions(testClass);
 
                             for (Extension extension : extensions) {
                                 extension.beforeBeforeEach(testInstance, testArgument);
@@ -259,19 +255,18 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "beforeEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
-        ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
-        LockProcessor lockProcessor = LockProcessor.singleton();
-
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
                             List<Method> methods =
-                                    TestEngineUtils.singleton().getBeforeEachMethods(testClass);
+                                    new ArrayList<>(
+                                            testEngineUtils.getBeforeEachMethods(testClass));
 
                             for (Method method : methods) {
                                 try {
                                     lockProcessor.processLocks(method);
-                                    if (reflectionUtils.acceptsParameters(method, Argument.class)) {
+                                    if (testEngineUtils.acceptsParameterTypes(
+                                            method, Argument.class)) {
                                         method.invoke(testInstance, testArgument);
                                     } else {
                                         method.invoke(testInstance, NO_OBJECT_ARGS);
@@ -301,8 +296,8 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                            Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
                                 extension.afterBeforeEach(testInstance, testArgument);
@@ -329,9 +324,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+                            List<Extension> extensions = testEngineUtils.getExtensions(testClass);
 
                             for (Extension extension : extensions) {
                                 extension.beforeTest(testInstance, testArgument);
@@ -357,15 +350,13 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "test uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
-        ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
-        LockProcessor lockProcessor = LockProcessor.singleton();
-
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
                             try {
                                 lockProcessor.processLocks(testMethod);
-                                if (reflectionUtils.acceptsParameters(testMethod, Argument.class)) {
+                                if (testEngineUtils.acceptsParameterTypes(
+                                        testMethod, Argument.class)) {
                                     testMethod.invoke(testInstance, testArgument);
                                 } else {
                                     testMethod.invoke(testInstance, NO_OBJECT_ARGS);
@@ -394,8 +385,8 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                            Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
                                 extension.afterTest(testInstance, testArgument);
@@ -420,9 +411,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
         throwableCollector.add(
                 Invoker.invoke(
                         () -> {
-                            List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.NORMAL);
+                            List<Extension> extensions = testEngineUtils.getExtensions(testClass);
 
                             for (Extension extension : extensions) {
                                 extension.beforeAfterEach(testInstance, testArgument);
@@ -444,11 +433,6 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 "afterEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
-        ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
-        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
-        LockProcessor lockProcessor = LockProcessor.singleton();
-        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
-
         Invoker.invoke(
                 () -> {
                     List<Method> methods = testEngineUtils.getAfterEachMethods(testClass);
@@ -456,7 +440,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                     for (Method method : methods) {
                         try {
                             lockProcessor.processLocks(method);
-                            if (reflectionUtils.acceptsParameters(method, Argument.class)) {
+                            if (testEngineUtils.acceptsParameterTypes(method, Argument.class)) {
                                 method.invoke(testInstance, testArgument);
                             } else {
                                 method.invoke(testInstance, NO_OBJECT_ARGS);
@@ -516,8 +500,8 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                 Invoker.invoke(
                         () -> {
                             List<Extension> extensions =
-                                    TestEngineUtils.singleton()
-                                            .getExtensions(testClass, TestEngineUtils.Sort.REVERSE);
+                                    new ArrayList<>(testEngineUtils.getExtensions(testClass));
+                            Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
                                 extension.afterAfterEach(testInstance, testArgument);

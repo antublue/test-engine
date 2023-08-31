@@ -23,14 +23,14 @@ import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -44,10 +44,8 @@ public final class ReflectionUtils {
     private static final ReflectionUtils SINGLETON = new ReflectionUtils();
 
     private static final Class<?>[] NO_CLASS_ARGS = null;
-    private static final Object[] NO_OBJECT_ARGS = null;
 
-    private final Map<Class<?>, List<Field>> fieldCache = new HashMap<>();
-    private final Map<ClassOrderKey, List<Method>> methodCache = new HashMap<>();
+    private static final Object[] NO_OBJECT_ARGS = null;
 
     /** Enum to represent hierarchy order */
     public enum Order {
@@ -56,6 +54,19 @@ public final class ReflectionUtils {
         /** class first */
         CLASS_FIRST
     }
+
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    private static final Predicate<Class<?>> ALL_CLASSES_FILTER = clazz -> clazz != Object.class;
+
+    private static final Predicate<Field> ALL_FIELDS_FILTER =
+            field -> field.getDeclaringClass() != Object.class;
+
+    private static final Predicate<Method> ALL_METHODS_FILTER =
+            method -> method.getDeclaringClass() != Object.class;
 
     /** Constructor */
     private ReflectionUtils() {
@@ -75,38 +86,140 @@ public final class ReflectionUtils {
      * Method to find all classes for a URI
      *
      * @param uri uri
-     * @return the return value
+     * @return a List of Classes
      */
-    public List<Class<?>> findAllClasses(URI uri) {
-        LOGGER.trace("findAllClasses uri [%s]", uri.toASCIIString());
+    public Stream<Class<?>> findAllClasses(URI uri) {
+        return findAllClasses(uri, ALL_CLASSES_FILTER);
+    }
 
-        List<Class<?>> classes =
-                org.junit.platform.commons.util.ReflectionUtils.findAllClassesInClasspathRoot(
-                        uri, classFilter -> true, classNameFilter -> true);
-
-        return new ArrayList<>(classes);
+    /**
+     * Method to find all class for a URI
+     *
+     * @param uri uri
+     * @param classFilter classFilter
+     * @return a List of Classes
+     */
+    public Stream<Class<?>> findAllClasses(URI uri, Predicate<Class<?>> classFilter) {
+        return ReflectionSupport.findAllClassesInClasspathRoot(
+                uri, classFilter, classNameFilter -> true)
+                .stream();
     }
 
     /**
      * Method to find all classes with a package name
      *
      * @param packageName packageName
-     * @return the return value
+     * @return a List of Classes
      */
-    public List<Class<?>> findAllClasses(String packageName) {
-        LOGGER.trace("findAllClasses package name [%s]", packageName);
-
-        List<Class<?>> classes =
-                ReflectionSupport.findAllClassesInPackage(
-                        packageName, classFilter -> true, classNameFilter -> true);
-
-        classes = new ArrayList<>(classes);
-
-        return classes;
+    public Stream<Class<?>> findAllClasses(String packageName) {
+        return findAllClasses(packageName, ALL_CLASSES_FILTER);
     }
 
     /**
-     * Method to create a new instance of a class
+     * Method to find all classes with a package name
+     *
+     * @param packageName packageName
+     * @param classFilter classFilter
+     * @return a List of Classes
+     */
+    public Stream<Class<?>> findAllClasses(String packageName, Predicate<Class<?>> classFilter) {
+        return ReflectionSupport.findAllClassesInPackage(
+                packageName, classFilter, classNameFilter -> true)
+                .stream();
+    }
+
+    /**
+     * Method to find all fields of a Class and superclasses
+     *
+     * @param clazz class to inspect
+     * @return a List of Fields
+     */
+    public Stream<Field> findFields(Class<?> clazz) {
+        return findFields(clazz, ALL_FIELDS_FILTER);
+    }
+
+    /**
+     * Method to find all fields of a Class and superclasses
+     *
+     * @param clazz class to inspect
+     * @param fieldFilter fieldFilter
+     * @return a List of Fields
+     */
+    public Stream<Field> findFields(Class<?> clazz, Predicate<Field> fieldFilter) {
+        List<Field> fields = new ArrayList<>();
+
+        List<Class<?>> classes = buildClassHierarchy(clazz);
+        for (Class<?> c : classes) {
+            fields.addAll(
+                    Arrays.stream(c.getDeclaredFields())
+                            .filter(fieldFilter)
+                            .peek(field -> field.setAccessible(true))
+                            .collect(Collectors.toList()));
+        }
+
+        return fields.stream();
+    }
+
+    /**
+     * Method find all methods of a Class and superclasses
+     *
+     * @param clazz class to inspect
+     * @return the return value
+     */
+    public Stream<Method> findMethods(Class<?> clazz) {
+        return findMethods(clazz, ALL_METHODS_FILTER);
+    }
+
+    /**
+     * Method find all methods of a Class
+     *
+     * @param clazz class to inspect
+     * @param methodFilter methodFilter
+     * @return the return value
+     */
+    public Stream<Method> findMethods(Class<?> clazz, Predicate<Method> methodFilter) {
+        try {
+            return buildClassHierarchy(clazz).stream()
+                    .flatMap(
+                            (Function<Class<?>, Stream<Method>>)
+                                    c -> Stream.of(c.getDeclaredMethods()))
+                    .filter(methodFilter)
+                    .filter(
+                            distinctByKey(
+                                    (Function<Method, String>)
+                                            method -> {
+                                                StringBuilder stringBuilder =
+                                                        new StringBuilder()
+                                                                .append(
+                                                                        isStatic(method)
+                                                                                ? "static "
+                                                                                : "")
+                                                                .append(
+                                                                        method.getReturnType()
+                                                                                .getName())
+                                                                .append(" ")
+                                                                .append(method.getName());
+
+                                                Class<?>[] parameterTypes =
+                                                        method.getParameterTypes();
+                                                if (parameterTypes != null
+                                                        && parameterTypes.length > 0) {
+                                                    for (Class<?> parameterType : parameterTypes) {
+                                                        stringBuilder
+                                                                .append(" ")
+                                                                .append(parameterType.getName());
+                                                    }
+                                                }
+                                                return stringBuilder.toString();
+                                            }))
+                    .peek(method -> method.setAccessible(true));
+        } catch (NoClassDefFoundError e) {
+            return Stream.empty();
+        }
+    }
+
+    /**
+     * Method to create a new instance of a Class
      *
      * @param className className
      * @return object object
@@ -119,120 +232,13 @@ public final class ReflectionUtils {
     }
 
     /**
-     * Method to get a Class hierarchy
+     * Method to determine if a Method is abstract
      *
-     * @param clazz clazz to inspect
-     * @param order order
-     * @return a list representing the class hierarchy based on order
+     * @param method method
+     * @return true if the Method is abstract, otherwise false
      */
-    private List<Class<?>> buildClassHierarchy(Class<?> clazz, Order order) {
-        LOGGER.trace("buildClassHierarchy class [%s] order [%s]", clazz.getName(), order);
-
-        Set<Class<?>> classSet = new LinkedHashSet<>();
-        resolveClasses(clazz, classSet);
-
-        List<Class<?>> classes = new ArrayList<>(classSet);
-
-        if (order == Order.CLASS_FIRST) {
-            Collections.reverse(classes);
-        }
-
-        return classes;
-    }
-
-    /**
-     * Method to recursively resolve a Class hierarchy (superclass first)
-     *
-     * @param clazz clazz
-     * @param classSet classSet
-     */
-    private void resolveClasses(Class<?> clazz, Set<Class<?>> classSet) {
-        if (clazz == Object.class) {
-            return;
-        }
-
-        Class<?> superClass = clazz.getSuperclass();
-        resolveClasses(superClass, classSet);
-        classSet.add(clazz);
-    }
-
-    /**
-     * Method to get a list of all fields (superclass first)
-     *
-     * @param clazz class to inspect
-     * @return list of Fields
-     */
-    public List<Field> getFields(Class<?> clazz) {
-        LOGGER.trace("getFields class [%s] ", clazz.getName());
-
-        List<Field> fields;
-        Set<Field> uniqueFields = new HashSet<>();
-
-        synchronized (fieldCache) {
-            fields = fieldCache.get(clazz);
-            if (fields == null) {
-                fields = new ArrayList<>();
-                List<Class<?>> classes = buildClassHierarchy(clazz, Order.CLASS_FIRST);
-                for (Class<?> c : classes) {
-                    Field[] declaredFields = c.getDeclaredFields();
-                    for (Field field : declaredFields) {
-                        if (uniqueFields.contains(field)) {
-                            continue;
-                        }
-                        uniqueFields.add(field);
-                        fields.add(field);
-                    }
-                }
-                fieldCache.put(clazz, fields);
-            }
-        }
-
-        return fields;
-    }
-
-    /**
-     * Method to get a list of all methods
-     *
-     * @param clazz class to inspect
-     * @param order order to resolve
-     * @return list of Methods
-     */
-    public List<Method> getMethods(Class<?> clazz, Order order) {
-        LOGGER.trace("getMethods class [%s] order [%s]", clazz.getName(), order);
-
-        List<Method> methods;
-
-        ClassOrderKey classOrderKey = ClassOrderKey.of(clazz, order);
-        Set<MethodKey> uniqueMethodKeys = new HashSet<>();
-
-        synchronized (methodCache) {
-            methods = methodCache.get(classOrderKey);
-            if (methods == null) {
-                methods = new ArrayList<>();
-                List<Class<?>> classes = buildClassHierarchy(clazz, order);
-                for (Class<?> c : classes) {
-                    try {
-                        Method[] declaredMethods = c.getDeclaredMethods();
-                        for (Method method : declaredMethods) {
-                            MethodKey methodKey = MethodKey.of(method);
-                            if (uniqueMethodKeys.contains(methodKey)) {
-                                continue;
-                            }
-                            uniqueMethodKeys.add(methodKey);
-                            methods.add(method);
-                        }
-                    } catch (NoClassDefFoundError e) {
-                        // DO NOTHING
-                        //
-                        // Occurs when discover finds a class in tests that the test engine can't
-                        // resolve
-                    }
-                }
-                methodCache.put(classOrderKey, methods);
-            }
-        }
-
-        return methods;
+    public boolean isAbstract(Method method) {
+        return Modifier.isAbstract(method.getModifiers());
     }
 
     /**
@@ -313,79 +319,30 @@ public final class ReflectionUtils {
         return clazz.isAssignableFrom(method.getReturnType());
     }
 
-    private static class MethodKey {
-
-        private final boolean protectedOrPublic;
-        private final Class<?> returnType;
-        private final String name;
-        private final Class<?>[] parameterTypes;
-
-        private MethodKey(
-                int modifiers, Class<?> returnType, String name, Class<?>[] parameterTypes) {
-            this.protectedOrPublic =
-                    Modifier.isProtected(modifiers) || Modifier.isPublic(modifiers);
-            this.returnType = returnType;
-            this.name = name;
-            this.parameterTypes = parameterTypes;
-        }
-
-        @Override
-        public boolean equals(Object object) {
-            if (this == object) return true;
-            if (object == null || getClass() != object.getClass()) return false;
-            MethodKey methodKey = (MethodKey) object;
-            return protectedOrPublic == methodKey.protectedOrPublic
-                    && Objects.equals(returnType, methodKey.returnType)
-                    && Objects.equals(name, methodKey.name)
-                    && Arrays.equals(parameterTypes, methodKey.parameterTypes);
-        }
-
-        @Override
-        public int hashCode() {
-            int result = Objects.hash(protectedOrPublic, returnType, name);
-            result = 31 * result + Arrays.hashCode(parameterTypes);
-            return result;
-        }
-
-        @Override
-        public String toString() {
-            return protectedOrPublic + " / " + returnType + " / " + name + " / " + parameterTypes;
-        }
-
-        public static MethodKey of(Method method) {
-            return new MethodKey(
-                    method.getModifiers(),
-                    method.getReturnType(),
-                    method.getName(),
-                    method.getParameterTypes());
-        }
+    /**
+     * Method to get a class hierarchy bottom up
+     *
+     * @param clazz clazz to inspect
+     * @return a list representing the class hierarchy based on order
+     */
+    private static List<Class<?>> buildClassHierarchy(Class<?> clazz) {
+        Set<Class<?>> classSet = new LinkedHashSet<>();
+        resolveClasses(clazz, classSet);
+        return new ArrayList<>(classSet);
     }
 
-    private static class ClassOrderKey {
-
-        private final Class<?> clazz;
-        private final Order order;
-
-        private ClassOrderKey(Class<?> clazz, Order order) {
-            this.clazz = clazz;
-            this.order = order;
+    /**
+     * Method to recursively resolve a Class hierarchy top down
+     *
+     * @param clazz clazz
+     * @param classSet classSet
+     */
+    private static void resolveClasses(Class<?> clazz, Set<Class<?>> classSet) {
+        if (clazz == Object.class) {
+            return;
         }
-
-        @Override
-        public boolean equals(Object object) {
-            if (this == object) return true;
-            if (object == null || getClass() != object.getClass()) return false;
-            ClassOrderKey that = (ClassOrderKey) object;
-            return Objects.equals(clazz, that.clazz) && order == that.order;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(clazz, order);
-        }
-
-        public static ClassOrderKey of(Class<?> clazz, Order order) {
-            return new ClassOrderKey(clazz, order);
-        }
+        classSet.add(clazz);
+        Class<?> superClass = clazz.getSuperclass();
+        resolveClasses(superClass, classSet);
     }
 }

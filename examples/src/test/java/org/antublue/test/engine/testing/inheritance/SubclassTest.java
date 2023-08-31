@@ -38,7 +38,7 @@ public class SubclassTest extends BaseTest {
     }
 
     @TestEngine.BeforeEach
-    public void beforeEac2h() {
+    public void beforeEach2() {
         System.out.println("beforeEach2(" + integerArgument + ")");
         assertThat(integerArgument).isNotNull();
         actual.add("beforeEach2(" + integerArgument + ")");

@@ -55,6 +55,8 @@ public class Resolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Resolver.class);
 
+    private static final TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
+
     private TestClassPredicate includeTestClassPredicate;
     private TestClassPredicate excludeTestClassPredicate;
     private TestMethodPredicate includeTestMethodPredicate;
@@ -292,8 +294,6 @@ public class Resolver {
     private void resolveClasspathRootSelectors() {
         LOGGER.trace("resolveClasspathRootSelectors");
 
-        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
-
         engineDiscoveryRequest
                 .getSelectorsByType(ClasspathRootSelector.class)
                 .forEach(
@@ -319,8 +319,6 @@ public class Resolver {
     private void resolvePackageSelectors() {
         LOGGER.trace("resolvePackageSelectors");
 
-        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
-
         engineDiscoveryRequest
                 .getSelectorsByType(PackageSelector.class)
                 .forEach(
@@ -345,8 +343,6 @@ public class Resolver {
     /** Method to resolve ClassSelectors */
     private void resolveClassSelectors() {
         LOGGER.trace("resolveClassSelectors");
-
-        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClassSelector.class)
@@ -376,8 +372,8 @@ public class Resolver {
                             Class<?> clazz = methodSelector.getJavaClass();
                             if (packageNameFiltersPredicate.test(clazz)
                                     && classNameFiltersPredicate.test(clazz)
-                                    && TestEngineUtils.singleton()
-                                            .isTestMethod(methodSelector.getJavaMethod())) {
+                                    && testEngineUtils.isTestMethod(
+                                            methodSelector.getJavaMethod())) {
                                 Set<Method> methods =
                                         classMethodSetMap.getOrDefault(
                                                 clazz, new LinkedHashSet<>());
@@ -390,8 +386,6 @@ public class Resolver {
     /** Method to resolve UniqueIdSelectors */
     private void resolveUniqueIdSelectors() {
         LOGGER.trace("resolveUniqueIdSelectors");
-
-        TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
 
         engineDiscoveryRequest
                 .getSelectorsByType(UniqueIdSelector.class)
@@ -574,7 +568,7 @@ public class Resolver {
 
             engineDescriptor.addChild(classTestDescriptor);
 
-            List<Argument> arguments = TestEngineUtils.singleton().getArguments(clazz);
+            List<Argument> arguments = testEngineUtils.getArguments(clazz);
             for (Argument argument : arguments) {
                 UniqueId argumentUniqueId =
                         classTestDescritporUniqueId.append("argument", argument.name());

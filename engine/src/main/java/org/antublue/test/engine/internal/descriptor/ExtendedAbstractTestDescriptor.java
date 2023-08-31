@@ -22,6 +22,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.internal.ExecutorContext;
+import org.antublue.test.engine.internal.TestEngineUtils;
+import org.antublue.test.engine.internal.descriptor.util.AutoCloseProcessor;
+import org.antublue.test.engine.internal.descriptor.util.LockProcessor;
 import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
@@ -30,6 +33,12 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 /** Class to implement an extended AbstractTestDescriptor */
 @SuppressWarnings("unchecked")
 public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
+
+    protected static final TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
+
+    protected static final LockProcessor lockProcessor = LockProcessor.singleton();
+
+    protected static final AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
 
     /** Constant to represent no class arguments */
     protected static final Class<?>[] NO_CLASS_ARGS = null;

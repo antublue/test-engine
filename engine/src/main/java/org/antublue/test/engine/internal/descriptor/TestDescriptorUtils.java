@@ -17,6 +17,7 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.TestClassConfigurationException;
 import org.antublue.test.engine.internal.TestEngineUtils;
@@ -31,6 +32,8 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 public final class TestDescriptorUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptorUtils.class);
+
+    private static final TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
 
     /** Constructor */
     private TestDescriptorUtils() {
@@ -49,7 +52,7 @@ public final class TestDescriptorUtils {
         validateTestClass(testClass);
 
         return new ClassTestDescriptor(
-                uniqueId, TestEngineUtils.singleton().getDisplayName(testClass), testClass);
+                uniqueId, testEngineUtils.getDisplayName(testClass), testClass);
     }
 
     /**
@@ -81,11 +84,7 @@ public final class TestDescriptorUtils {
         validateTestClass(testClass);
 
         return new MethodTestDescriptor(
-                uniqueId,
-                TestEngineUtils.singleton().getDisplayName(method),
-                testClass,
-                method,
-                argument);
+                uniqueId, testEngineUtils.getDisplayName(method), testClass, method, argument);
     }
 
     /**
@@ -148,29 +147,30 @@ public final class TestDescriptorUtils {
 
     private static void validateTestClass(Class<?> testClass) {
         // Validate we have a @TestEngine.ArgumentSupplier method
-        if (TestEngineUtils.singleton().getArgumentSupplierMethod(testClass) == null) {
+        List<Method> methods = testEngineUtils.getArgumentSupplierMethods(testClass);
+        if (methods.size() != 1) {
             throw new TestClassConfigurationException(
                     String.format(
-                            "Test class [%s] must declare a static @TestEngine.ArgumentSupplier"
-                                    + " method",
+                            "Test class [%s] must declare a single static"
+                                    + " @TestEngine.ArgumentSupplier method",
                             testClass.getName()));
         }
 
         // Validate we have a @TestEngine.Test method
-        if (TestEngineUtils.singleton().getTestMethods(testClass).isEmpty()) {
+        if (testEngineUtils.getTestMethods(testClass).isEmpty()) {
             throw new TestClassConfigurationException(
                     String.format(
-                            "Test class [%s] must declare a @TestEngine.Test method",
+                            "Test class [%s] must declare at least one @TestEngine.Test method",
                             testClass.getName()));
         }
 
         // Get other method optional annotated methods
         // which will check for duplicate @TestEngine.Order values
-        TestEngineUtils.singleton().getPrepareMethods(testClass);
-        TestEngineUtils.singleton().getBeforeAllMethods(testClass);
-        TestEngineUtils.singleton().getBeforeEachMethods(testClass);
-        TestEngineUtils.singleton().getAfterEachMethods(testClass);
-        TestEngineUtils.singleton().getAfterAllMethods(testClass);
-        TestEngineUtils.singleton().getConcludeMethods(testClass);
+        testEngineUtils.getPrepareMethods(testClass);
+        testEngineUtils.getBeforeAllMethods(testClass);
+        testEngineUtils.getBeforeEachMethods(testClass);
+        testEngineUtils.getAfterEachMethods(testClass);
+        testEngineUtils.getAfterAllMethods(testClass);
+        testEngineUtils.getConcludeMethods(testClass);
     }
 }

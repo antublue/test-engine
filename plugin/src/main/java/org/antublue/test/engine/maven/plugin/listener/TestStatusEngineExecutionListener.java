@@ -17,13 +17,12 @@
 package org.antublue.test.engine.maven.plugin.listener;
 
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.Configuration;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ExtendedAbstractTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -34,6 +33,7 @@ import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
+import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a TestStatusEngineExecutionListener */
 public class TestStatusEngineExecutionListener implements EngineExecutionListener {
@@ -73,8 +73,6 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
-    private final Map<Object, StopWatch> stopWatchMap;
-
     private final boolean logTiming;
 
     private final boolean logTestMessages;
@@ -87,8 +85,6 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
 
     /** Constructor */
     public TestStatusEngineExecutionListener() {
-        stopWatchMap = new ConcurrentHashMap<>();
-
         logTiming =
                 Configuration.singleton()
                         .get(TestEngineConstants.CONSOLE_LOG_TIMING)
@@ -169,8 +165,6 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
 
     @Override
     public void executionStarted(TestDescriptor testDescriptor) {
-        stopWatchMap.put(testDescriptor, new StopWatch().start());
-
         if (logTestMessages) {
             boolean print = false;
 
@@ -239,8 +233,11 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
 
     @Override
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-        StopWatch stopWatch = stopWatchMap.remove(testDescriptor);
-        stopWatch.stop();
+        if (testDescriptor instanceof EngineDescriptor) {
+            return;
+        }
+
+        StopWatch stopWatch = ((ExtendedAbstractTestDescriptor) testDescriptor).getStopWatch();
 
         if (logSkipMessages) {
             boolean print = false;
@@ -324,8 +321,11 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
     @Override
     public void executionFinished(
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-        StopWatch stopWatch = stopWatchMap.remove(testDescriptor);
-        stopWatch.stop();
+        if (testDescriptor instanceof EngineDescriptor) {
+            return;
+        }
+
+        StopWatch stopWatch = ((ExtendedAbstractTestDescriptor) testDescriptor).getStopWatch();
 
         if (logPassMessages
                 || testExecutionResult.getStatus() == TestExecutionResult.Status.FAILED) {
