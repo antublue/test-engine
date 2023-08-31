@@ -23,7 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.antublue.test.engine.TestEngineReflectionUtils;
+import org.antublue.test.engine.TestEngineUtils;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.descriptor.ArgumentTestDescriptor;
@@ -57,8 +57,8 @@ public class Builder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
 
-    private static final TestEngineReflectionUtils TEST_ENGINE_REFLECTION_UTILS =
-            TestEngineReflectionUtils.singleton();
+    private static final TestEngineUtils TEST_ENGINE_REFLECTION_UTILS =
+            TestEngineUtils.singleton();
 
     private TestClassPredicate includeTestClassPredicate;
     private TestClassPredicate excludeTestClassPredicate;

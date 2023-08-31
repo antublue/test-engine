@@ -35,7 +35,7 @@ public interface Extension {
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
-    default void afterPrepare(Object testInstance) throws Throwable {
+    default void prepareCallback(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -57,7 +57,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void afterBeforeAll(Object testInstance, Argument testArgument) throws Throwable {
+    default void beforeAllCallback(Object testInstance, Argument testArgument) throws Throwable {
         // DO NOTHING
     }
 
@@ -79,7 +79,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void afterBeforeEach(Object testInstance, Argument testArgument) throws Throwable {
+    default void beforeEachCallback(Object testInstance, Argument testArgument) throws Throwable {
         // DO NOTHING
     }
 
@@ -101,7 +101,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void afterTest(Object testInstance, Argument testArgument) throws Throwable {
+    default void testCallback(Object testInstance, Argument testArgument) throws Throwable {
         // DO NOTHING
     }
 
@@ -123,7 +123,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void afterAfterEach(Object testInstance, Argument testArgument) throws Throwable {
+    default void afterEachCallback(Object testInstance, Argument testArgument) throws Throwable {
         // DO NOTHING
     }
 
@@ -144,7 +144,7 @@ public interface Extension {
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
-    default void afterAfterAll(Object testInstance, Argument testArgument) throws Throwable {
+    default void afterAllCallback(Object testInstance, Argument testArgument) throws Throwable {
         // DO NOTHING
     }
 
@@ -164,7 +164,7 @@ public interface Extension {
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
-    default void afterConclude(Object testInstance) throws Throwable {
+    default void afterConcludeCallback(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 }

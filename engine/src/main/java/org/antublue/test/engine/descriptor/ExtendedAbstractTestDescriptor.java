@@ -20,7 +20,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.antublue.test.engine.TestEngineReflectionUtils;
+import org.antublue.test.engine.TestEngineUtils;
 import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.descriptor.util.LockProcessor;
@@ -34,8 +34,8 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 @SuppressWarnings("unchecked")
 public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescriptor {
 
-    protected static final TestEngineReflectionUtils TEST_ENGINE_REFLECTION_UTILS =
-            TestEngineReflectionUtils.singleton();
+    protected static final TestEngineUtils TEST_ENGINE_REFLECTION_UTILS =
+            TestEngineUtils.singleton();
 
     protected static final LockProcessor LOCK_PROCESSOR = LockProcessor.singleton();
 

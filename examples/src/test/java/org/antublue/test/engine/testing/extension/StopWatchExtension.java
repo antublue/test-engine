@@ -40,7 +40,7 @@ public class StopWatchExtension implements Extension {
         stopWatchMap.put(testInstance.getClass(), new StopWatch().start());
     }
 
-    public void afterConclude(Object testInstance) {
+    public void afterConcludeCallback(Object testInstance) {
         StopWatch stopWatch = stopWatchMap.remove(testInstance.getClass()).stop();
         System.out.println(
                 String.format(

@@ -79,13 +79,13 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                         .addTransition(State.BEGIN, this::begin)
                         .addTransition(State.BEFORE_PREPARE, this::beforePrepare)
                         .addTransition(State.PREPARE, this::prepare)
-                        .addTransition(State.AFTER_PREPARE, this::afterPrepare)
+                        .addTransition(State.AFTER_PREPARE, this::prepareCallback)
                         .addTransition(State.EXECUTE, this::execute)
                         .addTransition(State.SKIP, this::skip)
                         .addTransition(State.SKIP_END, this::skipEnd)
                         .addTransition(State.BEFORE_CONCLUDE, this::beforeConclude)
                         .addTransition(State.CONCLUDE, this::conclude)
-                        .addTransition(State.AFTER_CONCLUDE, this::afterConclude)
+                        .addTransition(State.AFTER_CONCLUDE, this::concludeCallback)
                         .addTransition(State.END, this::end);
 
         this.throwableCollector = new ThrowableCollector();
@@ -270,9 +270,9 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void afterPrepare(StateMachine<State> stateMachine) {
+    private void prepareCallback(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "afterPrepare uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+                "prepareCallback uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
         throwableCollector.add(
                 Invoker.invoke(
@@ -283,7 +283,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
-                                extension.afterPrepare(testInstance);
+                                extension.prepareCallback(testInstance);
                             }
                         }));
 
@@ -466,9 +466,9 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void afterConclude(StateMachine<State> stateMachine) {
+    private void concludeCallback(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "afterConclude uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+                "concludeCallback uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
 
         throwableCollector.add(
                 Invoker.invoke(
@@ -479,7 +479,7 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
-                                extension.afterConclude(testInstance);
+                                extension.afterConcludeCallback(testInstance);
                             }
                         }));
 

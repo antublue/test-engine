@@ -89,13 +89,13 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                         .addTransition(State.BEGIN, this::begin)
                         .addTransition(State.BEFORE_BEFORE_EACH, this::beforeBeforeEach)
                         .addTransition(State.BEFORE_EACH, this::beforeEach)
-                        .addTransition(State.AFTER_BEFORE_EACH, this::afterBeforeEach)
+                        .addTransition(State.AFTER_BEFORE_EACH, this::beforeEachCallback)
                         .addTransition(State.BEFORE_TEST, this::beforeTest)
                         .addTransition(State.TEST, this::test)
-                        .addTransition(State.AFTER_TEST, this::afterTest)
+                        .addTransition(State.AFTER_TEST, this::testCallback)
                         .addTransition(State.BEFORE_AFTER_EACH, this::beforeAfterEach)
                         .addTransition(State.AFTER_EACH, this::afterEach)
-                        .addTransition(State.AFTER_AFTER_EACH, this::afterAfterEach)
+                        .addTransition(State.AFTER_AFTER_EACH, this::afterEachCallback)
                         .addTransition(State.END, this::end);
 
         this.throwableCollector = new ThrowableCollector();
@@ -289,9 +289,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void afterBeforeEach(StateMachine<State> stateMachine) {
+    private void beforeEachCallback(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "afterBeforeEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
+                "beforeEachCallback uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
         throwableCollector.add(
@@ -303,7 +303,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
-                                extension.afterBeforeEach(testInstance, testArgument);
+                                extension.beforeEachCallback(testInstance, testArgument);
                             }
                         }));
 
@@ -380,9 +380,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void afterTest(StateMachine<State> stateMachine) {
+    private void testCallback(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "afterTest uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
+                "testCallback uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
         throwableCollector.add(
@@ -394,7 +394,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
-                                extension.afterTest(testInstance, testArgument);
+                                extension.testCallback(testInstance, testArgument);
                             }
                         }));
 
@@ -499,9 +499,9 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
      *
      * @param stateMachine stateMachine
      */
-    private void afterAfterEach(StateMachine<State> stateMachine) {
+    private void afterEachCallback(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "afterAfterEach uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
+                "afterEachCallback uniqueId [%s] testClass [%s] testMethod [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testMethod.getName(), testArgument.name());
 
         throwableCollector.add(
@@ -513,7 +513,7 @@ public final class MethodTestDescriptor extends ExtendedAbstractTestDescriptor {
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
-                                extension.afterAfterEach(testInstance, testArgument);
+                                extension.afterEachCallback(testInstance, testArgument);
                             }
                         }));
 

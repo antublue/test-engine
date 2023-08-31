@@ -129,7 +129,7 @@ public class AutoCloseTest2 {
             assertThat(autoCloseExampleTest2.afterAllTestObject.isDestroyed()).isTrue();
         }
 
-        public void afterConclude(Object testInstance) {
+        public void afterConcludeCallback(Object testInstance) {
             AutoCloseTest2 autoCloseExampleTest2 = (AutoCloseTest2) testInstance;
             assertThat(autoCloseExampleTest2.afterConcludeTestObject.isDestroyed()).isTrue();
         }

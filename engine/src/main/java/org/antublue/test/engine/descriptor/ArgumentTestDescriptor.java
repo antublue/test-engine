@@ -87,13 +87,13 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                         .addTransition(State.BEGIN, this::begin)
                         .addTransition(State.BEFORE_BEFORE_ALL, this::beforeBeforeAll)
                         .addTransition(State.BEFORE_ALL, this::beforeAll)
-                        .addTransition(State.AFTER_BEFORE_ALL, this::afterBeforeAll)
+                        .addTransition(State.AFTER_BEFORE_ALL, this::beforeAllCallback)
                         .addTransition(State.EXECUTE, this::execute)
                         .addTransition(State.SKIP, this::skip)
                         .addTransition(State.SKIP_END, this::skipEnd)
                         .addTransition(State.BEFORE_AFTER_ALL, this::beforeAfterAll)
                         .addTransition(State.AFTER_ALL, this::afterAll)
-                        .addTransition(State.AFTER_AFTER_ALL, this::afterAfterAll)
+                        .addTransition(State.AFTER_AFTER_ALL, this::afterAllCallback)
                         .addTransition(State.END, this::end);
 
         this.throwableCollector = new ThrowableCollector();
@@ -308,9 +308,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      *
      * @param stateMachine stateMachine
      */
-    private void afterBeforeAll(StateMachine<State> stateMachine) {
+    private void beforeAllCallback(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "afterBeforeAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                "beforeAllCallback uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         throwableCollector.add(
@@ -322,7 +322,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
-                                extension.afterBeforeAll(testInstance, testArgument);
+                                extension.beforeAllCallback(testInstance, testArgument);
                             }
                         }));
 
@@ -512,9 +512,9 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
      *
      * @param stateMachine stateMachine
      */
-    private void afterAfterAll(StateMachine<State> stateMachine) {
+    private void afterAllCallback(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "afterAfterAll uniqueId [%s] testClass [%s] testArgument [%s]",
+                "afterAllCallback uniqueId [%s] testClass [%s] testArgument [%s]",
                 getUniqueId(), testClass.getName(), testArgument.name());
 
         throwableCollector.add(
@@ -526,7 +526,7 @@ public final class ArgumentTestDescriptor extends ExtendedAbstractTestDescriptor
                             Collections.reverse(extensions);
 
                             for (Extension extension : extensions) {
-                                extension.afterAfterAll(testInstance, testArgument);
+                                extension.afterAllCallback(testInstance, testArgument);
                             }
                         }));
 

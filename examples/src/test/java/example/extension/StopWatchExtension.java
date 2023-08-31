@@ -49,7 +49,7 @@ public class StopWatchExtension implements Extension {
     }
 
     @Override
-    public void afterConclude(Object testInstance) {
+    public void afterConcludeCallback(Object testInstance) {
         StopWatch stopWatch = stopWatchMap.remove(testInstance.getClass()).stop();
         synchronized (System.out) {
             System.out.println(

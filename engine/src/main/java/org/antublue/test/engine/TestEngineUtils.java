@@ -34,6 +34,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassConfigurationException;
+import org.antublue.test.engine.extension.ExtensionManager;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.util.ReflectionUtils;
@@ -46,11 +47,11 @@ import org.antublue.test.engine.util.ReflectionUtils;
     "PMD.EmptyCatchBlock",
     "PMD.UnusedPrivateMethod"
 })
-public final class TestEngineReflectionUtils {
+public final class TestEngineUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineReflectionUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngineUtils.class);
 
-    private static final TestEngineReflectionUtils SINGLETON = new TestEngineReflectionUtils();
+    private static final TestEngineUtils SINGLETON = new TestEngineUtils();
 
     private static final ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
@@ -62,7 +63,7 @@ public final class TestEngineReflectionUtils {
     }
 
     /** Constructor */
-    private TestEngineReflectionUtils() {
+    private TestEngineUtils() {
         // DO NOTHING
     }
 
@@ -71,7 +72,7 @@ public final class TestEngineReflectionUtils {
      *
      * @return the singleton instance
      */
-    public static TestEngineReflectionUtils singleton() {
+    public static TestEngineUtils singleton() {
         return SINGLETON;
     }
 
@@ -194,27 +195,28 @@ public final class TestEngineReflectionUtils {
         LOGGER.trace("getExtensions class [%s]", clazz);
 
         try {
+            List<Extension> extensions = ExtensionManager.singleton().getExtensions();
             Optional<Method> optional =
                     reflectionUtils
                             .findMethods(clazz, Predicates.EXTENSION_SUPPLIER_METHOD)
                             .findFirst();
-            if (!optional.isPresent()) {
-                return new ArrayList<>();
+            if (optional.isPresent()) {
+                Object object = optional.get().invoke(null, NO_OBJECT_ARGS);
+                if (object instanceof Stream) {
+                    ((Stream<Extension>) object).forEach(extensions::add);
+                    return extensions;
+                } else if (object instanceof Iterable) {
+                    ((Iterable<Extension>) object).forEach(extensions::add);
+                    return extensions;
+                } else {
+                    throw new TestClassConfigurationException(
+                            String.format(
+                                    "Test class [%s] @TestEngine.ExtensionSupplier method must return"
+                                            + " Stream<Extension> or Iterable<Extension>",
+                                    clazz.getName()));
+                }
             }
-            Object object = optional.get().invoke(null, NO_OBJECT_ARGS);
-            if (object instanceof Stream) {
-                return ((Stream<Extension>) object).collect(Collectors.toList());
-            } else if (object instanceof Iterable) {
-                List<Extension> extensions = new ArrayList<>();
-                ((Iterable<Extension>) object).forEach(extensions::add);
-                return extensions;
-            } else {
-                throw new TestClassConfigurationException(
-                        String.format(
-                                "Test class [%s] @TestEngine.ExtensionSupplier method must return"
-                                        + " Stream<Extension> or Iterable<Extension>",
-                                clazz.getName()));
-            }
+            return extensions;
         } catch (TestClassConfigurationException e) {
             throw e;
         } catch (Throwable t) {
@@ -297,7 +299,7 @@ public final class TestEngineReflectionUtils {
 
         List<Method> methods =
                 reflectionUtils
-                        .findMethods(clazz, Predicates.TEST_METHODS)
+                        .findMethods(clazz, Predicates.TEST_METHOD)
                         .collect(Collectors.toList());
         sortMethods(methods, Sort.NORMAL);
         validateDistinctOrder(clazz, methods);
@@ -424,7 +426,7 @@ public final class TestEngineReflectionUtils {
     }
 
     public boolean isTestMethod(Method method) {
-        boolean isTestMethod = Predicates.TEST_METHODS.test(method);
+        boolean isTestMethod = Predicates.TEST_METHOD.test(method);
         LOGGER.trace("isTestMethod method [%s] result [%b]", method.getName(), isTestMethod);
         return isTestMethod;
     }

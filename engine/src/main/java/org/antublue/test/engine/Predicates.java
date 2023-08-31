@@ -31,15 +31,6 @@ public class Predicates {
 
     private static final ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
-    public static final Predicate<Field> ARGUMENT_FIELD =
-            field -> {
-                if (!field.isAnnotationPresent(TestEngine.Argument.class)) {
-                    return false;
-                }
-
-                return Argument.class.isAssignableFrom(field.getType());
-            };
-
     public static final Predicate<Method> ARGUMENT_SUPPLIER_METHOD =
             method -> {
                 if (!method.isAnnotationPresent(TestEngine.ArgumentSupplier.class)) {
@@ -227,7 +218,7 @@ public class Predicates {
                 return true;
             };
 
-    public static final Predicate<Method> TEST_METHODS =
+    public static final Predicate<Method> TEST_METHOD =
             method -> {
                 if (!method.isAnnotationPresent(TestEngine.Test.class)) {
                     return false;

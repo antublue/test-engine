@@ -98,10 +98,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterPrepare(Object testInstance) throws Throwable {
+        public void prepareCallback(Object testInstance) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterPrepare(class [%s])",
+                            "%s.prepareCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -114,10 +114,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterBeforeAll(Object testInstance, Argument testArgument) throws Throwable {
+        public void beforeAllCallback(Object testInstance, Argument testArgument) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterBeforeAll(class [%s])",
+                            "%s.beforeAllCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -130,10 +130,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterBeforeEach(Object testInstance, Argument testArgument) throws Throwable {
+        public void beforeEachCallback(Object testInstance, Argument testArgument) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterBeforeEach(class [%s])",
+                            "%s.beforeEachCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -146,10 +146,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterTest(Object testInstance, Argument testArgument) throws Throwable {
+        public void testCallback(Object testInstance, Argument testArgument) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterTest(class [%s])",
+                            "%s.testCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -162,10 +162,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterAfterEach(Object testInstance, Argument testArgument) throws Throwable {
+        public void afterEachCallback(Object testInstance, Argument testArgument) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterAfterEach(class [%s])",
+                            "%s.afterEachCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -178,10 +178,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterAfterAll(Object testInstance, Argument testArgument) throws Throwable {
+        public void afterAllCallback(Object testInstance, Argument testArgument) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterAfterAll(class [%s])",
+                            "%s.afterAllCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -194,10 +194,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterConclude(Object testInstance) throws Throwable {
+        public void afterConcludeCallback(Object testInstance) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterConclude(class [%s])",
+                            "%s.afterConcludeCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
     }
@@ -213,10 +213,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterPrepare(Object testInstance) throws Throwable {
+        public void prepareCallback(Object testInstance) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterPrepare(class [%s])",
+                            "%s.prepareCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -229,10 +229,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterBeforeAll(Object testInstance, Argument testArgument) throws Throwable {
+        public void beforeAllCallback(Object testInstance, Argument testArgument) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterBeforeAll(class [%s])",
+                            "%s.beforeAllCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -245,10 +245,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterBeforeEach(Object testInstance, Argument testArgument) throws Throwable {
+        public void beforeEachCallback(Object testInstance, Argument testArgument) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterBeforeEach(class [%s])",
+                            "%s.beforeEachCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -261,10 +261,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterTest(Object testInstance, Argument testArgument) throws Throwable {
+        public void testCallback(Object testInstance, Argument testArgument) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterTest(class [%s])",
+                            "%s.testCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -277,10 +277,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterAfterEach(Object testInstance, Argument testArgument) throws Throwable {
+        public void afterEachCallback(Object testInstance, Argument testArgument) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterAfterEach(class [%s])",
+                            "%s.afterEachCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -293,10 +293,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterAfterAll(Object testInstance, Argument testArgument) throws Throwable {
+        public void afterAllCallback(Object testInstance, Argument testArgument) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterAfterAll(class [%s])",
+                            "%s.afterAllCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
 
@@ -309,10 +309,10 @@ public class ExtensionTest1 {
         }
 
         @Override
-        public void afterConclude(Object testInstance) throws Throwable {
+        public void afterConcludeCallback(Object testInstance) throws Throwable {
             System.out.println(
                     String.format(
-                            "%s.afterConclude(class [%s])",
+                            "%s.afterConcludeCallback(class [%s])",
                             this.getClass().getSimpleName(), testInstance.getClass().getName()));
         }
     }

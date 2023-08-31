@@ -18,7 +18,7 @@ package org.antublue.test.engine.descriptor;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import org.antublue.test.engine.TestEngineReflectionUtils;
+import org.antublue.test.engine.TestEngineUtils;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.exception.TestClassConfigurationException;
 import org.antublue.test.engine.logger.Logger;
@@ -33,8 +33,8 @@ public final class TestDescriptorUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptorUtils.class);
 
-    private static final TestEngineReflectionUtils TEST_ENGINE_REFLECTION_UTILS =
-            TestEngineReflectionUtils.singleton();
+    private static final TestEngineUtils TEST_ENGINE_REFLECTION_UTILS =
+            TestEngineUtils.singleton();
 
     /** Constructor */
     private TestDescriptorUtils() {

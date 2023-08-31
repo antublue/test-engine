@@ -31,7 +31,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void afterPrepare(Object testInstance) throws Throwable {
+    public void prepareCallback(Object testInstance) throws Throwable {
         System.out.println(
                 String.format(
                         "%s afterPrepare(class [%s])",
@@ -47,7 +47,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void afterBeforeAll(Object testInstance, Argument testArgument) throws Throwable {
+    public void beforeAllCallback(Object testInstance, Argument testArgument) throws Throwable {
         System.out.println(
                 String.format(
                         "%s afterBeforeAll(class [%s])",
@@ -63,7 +63,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void afterBeforeEach(Object testInstance, Argument testArgument) throws Throwable {
+    public void beforeEachCallback(Object testInstance, Argument testArgument) throws Throwable {
         System.out.println(
                 String.format(
                         "%s afterBeforeEach(class [%s])",
@@ -79,7 +79,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void afterTest(Object testInstance, Argument testArgument) throws Throwable {
+    public void testCallback(Object testInstance, Argument testArgument) throws Throwable {
         System.out.println(
                 String.format(
                         "%s afterTest(class [%s])",
@@ -95,7 +95,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void afterAfterEach(Object testInstance, Argument testArgument) throws Throwable {
+    public void afterEachCallback(Object testInstance, Argument testArgument) throws Throwable {
         System.out.println(
                 String.format(
                         "%s afterAfterEach(class [%s])",
@@ -111,7 +111,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void afterAfterAll(Object testInstance, Argument testArgument) throws Throwable {
+    public void afterAllCallback(Object testInstance, Argument testArgument) throws Throwable {
         System.out.println(
                 String.format(
                         "%s afterAfterAll(class [%s])",
@@ -127,7 +127,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void afterConclude(Object testInstance) throws Throwable {
+    public void afterConcludeCallback(Object testInstance) throws Throwable {
         System.out.println(
                 String.format(
                         "%s afterConclude(class [%s])",
