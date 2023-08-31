@@ -40,14 +40,8 @@ public final class Constants {
     /** Configuration constant */
     public static final String LOGGER_REGEX = PREFIX + ".logger.regex";
 
-    /** Configuration constant - DEPRECATED */
-    public static final String LOG_LEVEL_REGEX = PREFIX + ".log.level.regex";
-
     /** Configuration constant */
     public static final String LOGGER_LEVEL = PREFIX + ".logger.level";
-
-    /** Configuration constant - DEPRECATED */
-    public static final String LOG_LEVEL = PREFIX + ".log.level";
 
     /** Configuration constant */
     public static final String CONSOLE_LOG = PREFIX + ".console.log";

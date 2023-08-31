@@ -51,18 +51,9 @@ public class Logger {
 
         Level derivedLevel = Level.INFO;
 
-        Optional<String> optionalLevel = configuration.get(Constants.LOG_LEVEL);
-
-        if (!optionalLevel.isPresent()) {
-            optionalLevel =
-                    configuration.getOrDefault(Constants.LOGGER_LEVEL, Level.INFO.toString());
-        }
-
-        Optional<String> optionalRegex = configuration.get(Constants.LOG_LEVEL_REGEX);
-
-        if (!optionalRegex.isPresent()) {
-            optionalRegex = configuration.getOrDefault(Constants.LOGGER_REGEX, ".*");
-        }
+        Optional<String> optionalLevel =
+                configuration.getOrDefault(Constants.LOGGER_LEVEL, Level.INFO.toString());
+        Optional<String> optionalRegex = configuration.getOrDefault(Constants.LOGGER_REGEX, ".*");
 
         try {
             Pattern pattern = Pattern.compile(optionalRegex.get());
