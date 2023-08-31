@@ -211,8 +211,8 @@ public final class TestEngineUtils {
                 } else {
                     throw new TestClassConfigurationException(
                             String.format(
-                                    "Test class [%s] @TestEngine.ExtensionSupplier method must return"
-                                            + " Stream<Extension> or Iterable<Extension>",
+                                    "Test class [%s] @TestEngine.ExtensionSupplier method must"
+                                            + " return Stream<Extension> or Iterable<Extension>",
                                     clazz.getName()));
                 }
             }

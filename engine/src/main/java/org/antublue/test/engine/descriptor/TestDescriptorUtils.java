@@ -33,8 +33,7 @@ public final class TestDescriptorUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptorUtils.class);
 
-    private static final TestEngineUtils TEST_ENGINE_REFLECTION_UTILS =
-            TestEngineUtils.singleton();
+    private static final TestEngineUtils TEST_ENGINE_REFLECTION_UTILS = TestEngineUtils.singleton();
 
     /** Constructor */
     private TestDescriptorUtils() {

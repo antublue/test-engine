@@ -468,7 +468,8 @@ public final class ClassTestDescriptor extends ExtendedAbstractTestDescriptor {
      */
     private void concludeCallback(StateMachine<State> stateMachine) {
         LOGGER.trace(
-                "concludeCallback uniqueId [%s] testClass [%s]", getUniqueId(), testClass.getName());
+                "concludeCallback uniqueId [%s] testClass [%s]",
+                getUniqueId(), testClass.getName());
 
         throwableCollector.add(
                 Invoker.invoke(

@@ -130,7 +130,8 @@ public class ExtensionTest2 {
         }
 
         @Override
-        public void beforeEachCallback(Object testInstance, Argument testArgument) throws Throwable {
+        public void beforeEachCallback(Object testInstance, Argument testArgument)
+                throws Throwable {
             System.out.println(
                     String.format(
                             "%s.beforeEachCallback(class [%s])",
@@ -245,7 +246,8 @@ public class ExtensionTest2 {
         }
 
         @Override
-        public void beforeEachCallback(Object testInstance, Argument testArgument) throws Throwable {
+        public void beforeEachCallback(Object testInstance, Argument testArgument)
+                throws Throwable {
             System.out.println(
                     String.format(
                             "%s.beforeEachCallback(class [%s])",

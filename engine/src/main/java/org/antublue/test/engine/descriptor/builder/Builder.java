@@ -57,8 +57,7 @@ public class Builder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
 
-    private static final TestEngineUtils TEST_ENGINE_REFLECTION_UTILS =
-            TestEngineUtils.singleton();
+    private static final TestEngineUtils TEST_ENGINE_REFLECTION_UTILS = TestEngineUtils.singleton();
 
     private TestClassPredicate includeTestClassPredicate;
     private TestClassPredicate excludeTestClassPredicate;
