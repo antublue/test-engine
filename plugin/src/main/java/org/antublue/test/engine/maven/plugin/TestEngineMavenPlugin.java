@@ -28,14 +28,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.antublue.test.engine.ConfigurationParameters;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.TestEngineConstants;
-import org.antublue.test.engine.internal.ConfigurationParameters;
-import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.SummaryEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.TestStatusEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.logger.Logger;
+import org.antublue.test.engine.util.AnsiColor;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -64,7 +64,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
     private static final String ARTIFACT_ID = "test-engine-maven-plugin";
 
-    private static final String VERSION = TestEngineMavenPluginInformation.getVersion();
+    private static final String VERSION = Information.getVersion();
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;

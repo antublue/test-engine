@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import org.antublue.test.engine.api.Extension;
-import org.antublue.test.engine.internal.util.StopWatch;
+import org.antublue.test.engine.util.StopWatch;
 
 public class StopWatchExtension implements Extension {
 

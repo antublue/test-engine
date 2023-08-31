@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.internal.util.ReflectionUtils;
+import org.antublue.test.engine.util.ReflectionUtils;
 
 public class Filter {
 
