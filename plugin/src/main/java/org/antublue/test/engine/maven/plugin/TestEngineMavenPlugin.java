@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.antublue.test.engine.ConfigurationParameters;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.SummaryEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.TestStatusEngineExecutionListener;
@@ -84,27 +84,19 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         Logger logger = Logger.from(getLog());
 
         try {
-            System.setProperty(TestEngineConstants.MAVEN_PLUGIN, TestEngineConstants.TRUE);
-            logger.debug(
-                    "property [%s] = [%s]",
-                    TestEngineConstants.MAVEN_PLUGIN, TestEngineConstants.TRUE);
+            System.setProperty(Constants.MAVEN_PLUGIN, Constants.TRUE);
+            logger.debug("property [%s] = [%s]", Constants.MAVEN_PLUGIN, Constants.TRUE);
 
             if (mavenSession.getRequest().isInteractiveMode()) {
-                System.setProperty(
-                        TestEngineConstants.MAVEN_PLUGIN_MODE,
-                        TestEngineConstants.MAVEN_PLUGIN_INTERACTIVE);
+                System.setProperty(Constants.MAVEN_PLUGIN_MODE, Constants.MAVEN_PLUGIN_INTERACTIVE);
                 logger.debug(
                         "property [%s] = [%s]",
-                        TestEngineConstants.MAVEN_PLUGIN_MODE,
-                        TestEngineConstants.MAVEN_PLUGIN_INTERACTIVE);
+                        Constants.MAVEN_PLUGIN_MODE, Constants.MAVEN_PLUGIN_INTERACTIVE);
             } else {
-                System.setProperty(
-                        TestEngineConstants.MAVEN_PLUGIN_MODE,
-                        TestEngineConstants.MAVEN_PLUGIN_BATCH);
+                System.setProperty(Constants.MAVEN_PLUGIN_MODE, Constants.MAVEN_PLUGIN_BATCH);
                 logger.debug(
                         "property [%s] = [%s]",
-                        TestEngineConstants.MAVEN_PLUGIN_MODE,
-                        TestEngineConstants.MAVEN_PLUGIN_MODE);
+                        Constants.MAVEN_PLUGIN_MODE, Constants.MAVEN_PLUGIN_MODE);
             }
 
             if (properties != null) {

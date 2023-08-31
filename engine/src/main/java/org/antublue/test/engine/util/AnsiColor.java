@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.util;
 
-import org.antublue.test.engine.TestEngineConstants;
+import org.antublue.test.engine.Constants;
 
 /** Class to implement ANSI colors */
 public class AnsiColor {
@@ -219,8 +219,7 @@ public class AnsiColor {
             ANSI_COLOR_SUPPORTED = false;
         }
 
-        if (TestEngineConstants.MAVEN_PLUGIN_BATCH.equals(
-                System.getenv(TestEngineConstants.MAVEN_PLUGIN_MODE))) {
+        if (Constants.MAVEN_PLUGIN_BATCH.equals(System.getenv(Constants.MAVEN_PLUGIN_MODE))) {
             ANSI_COLOR_SUPPORTED = false;
         }
     }

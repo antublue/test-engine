@@ -17,7 +17,7 @@
 package org.antublue.test.engine;
 
 /** Class that contains Test Engine configuration constants */
-public final class TestEngineConstants {
+public final class Constants {
 
     /** Configuration constant */
     public static final String TRUE = "true";
@@ -107,7 +107,7 @@ public final class TestEngineConstants {
     public static final String MAVEN_PLUGIN_BATCH = PREFIX + ".maven.plugin.batch";
 
     /** Constructor */
-    private TestEngineConstants() {
+    private Constants() {
         // DO NOTHING
     }
 }

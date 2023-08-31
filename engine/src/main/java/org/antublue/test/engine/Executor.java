@@ -55,7 +55,7 @@ public class Executor {
 
         int threadCount =
                 configurationParameters
-                        .get(TestEngineConstants.THREAD_COUNT)
+                        .get(Constants.THREAD_COUNT)
                         .map(
                                 value -> {
                                     int intValue;
@@ -76,7 +76,7 @@ public class Executor {
                                 })
                         .orElse(Runtime.getRuntime().availableProcessors());
 
-        LOGGER.trace("[%s] = [%d]", TestEngineConstants.THREAD_COUNT, threadCount);
+        LOGGER.trace("[%s] = [%d]", Constants.THREAD_COUNT, threadCount);
 
         executorService =
                 new ThreadPoolExecutor(
@@ -100,10 +100,10 @@ public class Executor {
                 extendedEngineDescriptor.getChildren(ClassTestDescriptor.class);
 
         configurationParameters
-                .get(TestEngineConstants.TEST_CLASS_SHUFFLE)
+                .get(Constants.TEST_CLASS_SHUFFLE)
                 .ifPresent(
                         value -> {
-                            if (value.equalsIgnoreCase(TestEngineConstants.TRUE)) {
+                            if (value.equalsIgnoreCase(Constants.TRUE)) {
                                 Collections.shuffle(classTestDescriptors, new SecureRandom());
                             }
                         });

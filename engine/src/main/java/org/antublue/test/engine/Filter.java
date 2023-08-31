@@ -118,8 +118,8 @@ public class Filter {
                                     .findMethods(clazz)
                                     .collect(Collectors.toList());
 
-                    boolean hasTest = false;
-                    boolean hasArgumentSupplier = false;
+                    int testCount = 0;
+                    int argumentSupplierCount = 0;
 
                     for (Method method : methods) {
                         if (method.isAnnotationPresent(TestEngine.Test.class)
@@ -127,17 +127,17 @@ public class Filter {
                                 && (reflectionUtils.isProtected(method)
                                         || reflectionUtils.isPublic(method))
                                 && !reflectionUtils.isAbstract(method)) {
-                            hasTest = true;
+                            testCount++;
                         } else if (method.isAnnotationPresent(TestEngine.ArgumentSupplier.class)
                                 && reflectionUtils.isStatic(method)
                                 && (reflectionUtils.isProtected(method)
                                         || reflectionUtils.isPublic(method))
                                 && !reflectionUtils.isAbstract(method)) {
-                            hasArgumentSupplier = true;
+                            argumentSupplierCount++;
                         }
                     }
 
-                    isTestClass = hasTest && hasArgumentSupplier;
+                    isTestClass = testCount > 0 && argumentSupplierCount == 1;
                 }
 
                 return isTestClass;

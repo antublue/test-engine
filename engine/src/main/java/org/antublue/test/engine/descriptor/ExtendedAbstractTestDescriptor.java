@@ -20,8 +20,8 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.ExecutorContext;
-import org.antublue.test.engine.TestEngineConstants;
 import org.antublue.test.engine.TestEngineUtils;
 import org.antublue.test.engine.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.descriptor.util.LockProcessor;
@@ -48,7 +48,7 @@ public abstract class ExtendedAbstractTestDescriptor extends AbstractTestDescrip
 
     /** Constant to determine we are being executed via the Maven Test Engine plugin */
     protected static final boolean EXECUTED_VIA_MAVEN_PLUGIN =
-            TestEngineConstants.TRUE.equals(System.getProperty(TestEngineConstants.MAVEN_PLUGIN));
+            Constants.TRUE.equals(System.getProperty(Constants.MAVEN_PLUGIN));
 
     protected Status status = Status.PASS;
 

@@ -101,16 +101,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             EngineDescriptor engineDescriptor = new ExtendedEngineDescriptor(uniqueId, getId());
 
-            new Resolver()
-                    .resolve(engineDiscoveryRequest, CONFIGURATION_PARAMETERS, engineDescriptor);
-
-            // Store the test descriptors for use in the test execution listener
-            TestDescriptorStore.singleton().store(engineDescriptor);
+            new TestDescriptorBuilder()
+                    .build(engineDiscoveryRequest, CONFIGURATION_PARAMETERS, engineDescriptor);
 
             return engineDescriptor;
         } catch (TestClassConfigurationException | TestEngineException t) {
-            if (TestEngineConstants.TRUE.equals(
-                    System.getProperty(TestEngineConstants.MAVEN_PLUGIN))) {
+            if (Constants.TRUE.equals(System.getProperty(Constants.MAVEN_PLUGIN))) {
                 throw t;
             }
 

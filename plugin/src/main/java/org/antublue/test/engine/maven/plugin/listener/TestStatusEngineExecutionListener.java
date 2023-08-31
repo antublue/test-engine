@@ -18,7 +18,7 @@ package org.antublue.test.engine.maven.plugin.listener;
 
 import java.lang.reflect.Method;
 import org.antublue.test.engine.Configuration;
-import org.antublue.test.engine.TestEngineConstants;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.descriptor.ClassTestDescriptor;
@@ -87,7 +87,7 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
     public TestStatusEngineExecutionListener() {
         logTiming =
                 Configuration.singleton()
-                        .get(TestEngineConstants.CONSOLE_LOG_TIMING)
+                        .get(Constants.CONSOLE_LOG_TIMING)
                         .map(
                                 value -> {
                                     try {
@@ -98,22 +98,21 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
                                 })
                         .orElse(true);
 
-        LOGGER.trace(
-                "configuration [%s] = [%b]", TestEngineConstants.CONSOLE_LOG_TIMING, logTiming);
+        LOGGER.trace("configuration [%s] = [%b]", Constants.CONSOLE_LOG_TIMING, logTiming);
 
         nanosecondsConverter =
                 Configuration.singleton()
-                        .get(TestEngineConstants.CONSOLE_LOG_TIMING_UNITS)
+                        .get(Constants.CONSOLE_LOG_TIMING_UNITS)
                         .map(NanosecondsConverter::decode)
                         .orElse(NanosecondsConverter.MILLISECONDS);
 
         LOGGER.trace(
                 "configuration [%s] = [%s]",
-                TestEngineConstants.CONSOLE_LOG_TIMING_UNITS, nanosecondsConverter);
+                Constants.CONSOLE_LOG_TIMING_UNITS, nanosecondsConverter);
 
         logTestMessages =
                 Configuration.singleton()
-                        .get(TestEngineConstants.CONSOLE_LOG_TEST_MESSAGES)
+                        .get(Constants.CONSOLE_LOG_TEST_MESSAGES)
                         .map(
                                 value -> {
                                     try {
@@ -125,12 +124,11 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
                         .orElse(true);
 
         LOGGER.trace(
-                "configuration [%s] = [%b]",
-                TestEngineConstants.CONSOLE_LOG_TEST_MESSAGES, logTestMessages);
+                "configuration [%s] = [%b]", Constants.CONSOLE_LOG_TEST_MESSAGES, logTestMessages);
 
         logPassMessages =
                 Configuration.singleton()
-                        .get(TestEngineConstants.CONSOLE_LOG_PASS_MESSAGES)
+                        .get(Constants.CONSOLE_LOG_PASS_MESSAGES)
                         .map(
                                 value -> {
                                     try {
@@ -142,12 +140,11 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
                         .orElse(true);
 
         LOGGER.trace(
-                "configuration [%s] = [%b]",
-                TestEngineConstants.CONSOLE_LOG_PASS_MESSAGES, logPassMessages);
+                "configuration [%s] = [%b]", Constants.CONSOLE_LOG_PASS_MESSAGES, logPassMessages);
 
         logSkipMessages =
                 Configuration.singleton()
-                        .get(TestEngineConstants.CONSOLE_LOG_SKIP_MESSAGES)
+                        .get(Constants.CONSOLE_LOG_SKIP_MESSAGES)
                         .map(
                                 value -> {
                                     try {
@@ -159,8 +156,7 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
                         .orElse(true);
 
         LOGGER.trace(
-                "configuration [%s] = [%b]",
-                TestEngineConstants.CONSOLE_LOG_SKIP_MESSAGES, logSkipMessages);
+                "configuration [%s] = [%b]", Constants.CONSOLE_LOG_SKIP_MESSAGES, logSkipMessages);
     }
 
     @Override

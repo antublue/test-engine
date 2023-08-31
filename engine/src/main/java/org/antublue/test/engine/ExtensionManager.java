@@ -50,7 +50,7 @@ public class ExtensionManager {
 
         ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
 
-        Optional<String> optional = Configuration.singleton().get(TestEngineConstants.EXTENSIONS);
+        Optional<String> optional = Configuration.singleton().get(Constants.EXTENSIONS);
         if (optional.isPresent() && !optional.get().trim().isEmpty()) {
             String[] classNames = optional.get().split("\\s+");
             for (String className : classNames) {

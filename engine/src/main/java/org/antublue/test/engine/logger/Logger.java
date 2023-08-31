@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.antublue.test.engine.Configuration;
-import org.antublue.test.engine.TestEngineConstants;
+import org.antublue.test.engine.Constants;
 
 /** Class to implement a Logger */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -51,18 +51,17 @@ public class Logger {
 
         Level derivedLevel = Level.INFO;
 
-        Optional<String> optionalLevel = configuration.get(TestEngineConstants.LOG_LEVEL);
+        Optional<String> optionalLevel = configuration.get(Constants.LOG_LEVEL);
 
         if (!optionalLevel.isPresent()) {
             optionalLevel =
-                    configuration.getOrDefault(
-                            TestEngineConstants.LOGGER_LEVEL, Level.INFO.toString());
+                    configuration.getOrDefault(Constants.LOGGER_LEVEL, Level.INFO.toString());
         }
 
-        Optional<String> optionalRegex = configuration.get(TestEngineConstants.LOG_LEVEL_REGEX);
+        Optional<String> optionalRegex = configuration.get(Constants.LOG_LEVEL_REGEX);
 
         if (!optionalRegex.isPresent()) {
-            optionalRegex = configuration.getOrDefault(TestEngineConstants.LOGGER_REGEX, ".*");
+            optionalRegex = configuration.getOrDefault(Constants.LOGGER_REGEX, ".*");
         }
 
         try {

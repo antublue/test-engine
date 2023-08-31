@@ -50,9 +50,9 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a resolver to build the test descriptor tree */
 @SuppressWarnings("PMD.NPathComplexity")
-public class Resolver {
+public class TestDescriptorBuilder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Resolver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestDescriptorBuilder.class);
 
     private static final TestEngineUtils testEngineUtils = TestEngineUtils.singleton();
 
@@ -73,13 +73,13 @@ public class Resolver {
     private EngineDescriptor engineDescriptor;
 
     /**
-     * Method to resolve test classes / test methods
+     * Method to process test classes / test methods
      *
      * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param configurationParameters configurationParameters
      * @param engineDescriptor engineDescriptor
      */
-    public void resolve(
+    public void build(
             EngineDiscoveryRequest engineDiscoveryRequest,
             ConfigurationParameters configurationParameters,
             EngineDescriptor engineDescriptor) {
@@ -88,7 +88,7 @@ public class Resolver {
         this.engineDescriptor = engineDescriptor;
 
         configure();
-        resolve();
+        build();
         filter();
     }
 
@@ -114,12 +114,10 @@ public class Resolver {
 
         includeTestClassPredicate =
                 configurationParameters
-                        .get(TestEngineConstants.TEST_CLASS_INCLUDE)
+                        .get(Constants.TEST_CLASS_INCLUDE)
                         .map(
                                 value -> {
-                                    LOGGER.trace(
-                                            "%s [%s]",
-                                            TestEngineConstants.TEST_CLASS_INCLUDE, value);
+                                    LOGGER.trace("%s [%s]", Constants.TEST_CLASS_INCLUDE, value);
                                     return value;
                                 })
                         .map(TestClassPredicate::of)
@@ -132,12 +130,10 @@ public class Resolver {
 
         excludeTestClassPredicate =
                 configurationParameters
-                        .get(TestEngineConstants.TEST_CLASS_EXCLUDE)
+                        .get(Constants.TEST_CLASS_EXCLUDE)
                         .map(
                                 value -> {
-                                    LOGGER.trace(
-                                            "%s [%s]",
-                                            TestEngineConstants.TEST_CLASS_EXCLUDE, value);
+                                    LOGGER.trace("%s [%s]", Constants.TEST_CLASS_EXCLUDE, value);
                                     return value;
                                 })
                         .map(TestClassPredicate::of)
@@ -150,12 +146,10 @@ public class Resolver {
 
         includeTestMethodPredicate =
                 configurationParameters
-                        .get(TestEngineConstants.TEST_METHOD_INCLUDE)
+                        .get(Constants.TEST_METHOD_INCLUDE)
                         .map(
                                 value -> {
-                                    LOGGER.trace(
-                                            "%s [%s]",
-                                            TestEngineConstants.TEST_METHOD_INCLUDE, value);
+                                    LOGGER.trace("%s [%s]", Constants.TEST_METHOD_INCLUDE, value);
                                     return value;
                                 })
                         .map(TestMethodPredicate::of)
@@ -168,12 +162,10 @@ public class Resolver {
 
         excludeTestMethodPredicate =
                 configurationParameters
-                        .get(TestEngineConstants.TEST_METHOD_EXCLUDE)
+                        .get(Constants.TEST_METHOD_EXCLUDE)
                         .map(
                                 value -> {
-                                    LOGGER.trace(
-                                            "%s [%s]",
-                                            TestEngineConstants.TEST_METHOD_EXCLUDE, value);
+                                    LOGGER.trace("%s [%s]", Constants.TEST_METHOD_EXCLUDE, value);
                                     return value;
                                 })
                         .map(TestMethodPredicate::of)
@@ -186,12 +178,11 @@ public class Resolver {
 
         includeTestClassTagPredicate =
                 configurationParameters
-                        .get(TestEngineConstants.TEST_CLASS_TAG_INCLUDE)
+                        .get(Constants.TEST_CLASS_TAG_INCLUDE)
                         .map(
                                 value -> {
                                     LOGGER.trace(
-                                            "%s [%s]",
-                                            TestEngineConstants.TEST_CLASS_TAG_INCLUDE, value);
+                                            "%s [%s]", Constants.TEST_CLASS_TAG_INCLUDE, value);
                                     return value;
                                 })
                         .map(TestClassTagPredicate::of)
@@ -204,12 +195,11 @@ public class Resolver {
 
         excludeTestClassTagPredicate =
                 configurationParameters
-                        .get(TestEngineConstants.TEST_CLASS_TAG_EXCLUDE)
+                        .get(Constants.TEST_CLASS_TAG_EXCLUDE)
                         .map(
                                 value -> {
                                     LOGGER.trace(
-                                            "%s [%s]",
-                                            TestEngineConstants.TEST_CLASS_TAG_EXCLUDE, value);
+                                            "%s [%s]", Constants.TEST_CLASS_TAG_EXCLUDE, value);
                                     return value;
                                 })
                         .map(TestClassTagPredicate::of)
@@ -222,12 +212,11 @@ public class Resolver {
 
         includeTestMethodTagPredicate =
                 configurationParameters
-                        .get(TestEngineConstants.TEST_METHOD_TAG_INCLUDE)
+                        .get(Constants.TEST_METHOD_TAG_INCLUDE)
                         .map(
                                 value -> {
                                     LOGGER.trace(
-                                            "%s [%s]",
-                                            TestEngineConstants.TEST_METHOD_TAG_INCLUDE, value);
+                                            "%s [%s]", Constants.TEST_METHOD_TAG_INCLUDE, value);
                                     return value;
                                 })
                         .map(TestMethodTagPredicate::of)
@@ -240,12 +229,11 @@ public class Resolver {
 
         excludeTestMethodTagPredicate =
                 configurationParameters
-                        .get(TestEngineConstants.TEST_METHOD_TAG_EXCLUDE)
+                        .get(Constants.TEST_METHOD_TAG_EXCLUDE)
                         .map(
                                 value -> {
                                     LOGGER.trace(
-                                            "%s [%s]",
-                                            TestEngineConstants.TEST_METHOD_TAG_EXCLUDE, value);
+                                            "%s [%s]", Constants.TEST_METHOD_TAG_EXCLUDE, value);
                                     return value;
                                 })
                         .map(TestMethodTagPredicate::of)
@@ -276,28 +264,27 @@ public class Resolver {
         packageNameFiltersPredicate = new PackageNameFiltersPredicate(packageNameFilters);
     }
 
-    /** Method to resolve selectors */
-    private void resolve() {
-        LOGGER.trace("resolve");
+    /** Method to process selectors */
+    private void build() {
+        LOGGER.trace("process");
 
         classMethodSetMap = new LinkedHashMap<>();
 
-        resolveClasspathRootSelectors();
-        resolvePackageSelectors();
-        resolveClassSelectors();
-        resolveMethodSelectors();
-        resolveUniqueIdSelectors();
+        processClasspathRootSelectors();
+        processPackageSelectors();
+        processClassSelectors();
+        processMethodSelectors();
+        processUniqueIdSelectors();
     }
 
-    /** Method to resolve ClasspathRootSelectors */
-    private void resolveClasspathRootSelectors() {
-        LOGGER.trace("resolveClasspathRootSelectors");
+    /** Method to process ClasspathRootSelectors */
+    private void processClasspathRootSelectors() {
+        LOGGER.trace("processClasspathRootSelectors");
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClasspathRootSelector.class)
                 .forEach(
                         classpathRootSelector -> {
-                            LOGGER.trace("ClasspathRootSelector.class");
                             testEngineUtils
                                     .findAllTestClasses(classpathRootSelector.getClasspathRoot())
                                     .forEach(
@@ -314,15 +301,14 @@ public class Resolver {
                         });
     }
 
-    /** Method to resolve PackageSelector */
-    private void resolvePackageSelectors() {
-        LOGGER.trace("resolvePackageSelectors");
+    /** Method to process PackageSelector */
+    private void processPackageSelectors() {
+        LOGGER.trace("processPackageSelectors");
 
         engineDiscoveryRequest
                 .getSelectorsByType(PackageSelector.class)
                 .forEach(
                         packageSelector -> {
-                            LOGGER.trace("PackageSelector.class");
                             testEngineUtils
                                     .findAllTestClasses(packageSelector.getPackageName())
                                     .forEach(
@@ -339,15 +325,14 @@ public class Resolver {
                         });
     }
 
-    /** Method to resolve ClassSelectors */
-    private void resolveClassSelectors() {
-        LOGGER.trace("resolveClassSelectors");
+    /** Method to process ClassSelectors */
+    private void processClassSelectors() {
+        LOGGER.trace("processClassSelectors");
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClassSelector.class)
                 .forEach(
                         classSelector -> {
-                            LOGGER.trace("ClassSelector.class");
                             Class<?> clazz = classSelector.getJavaClass();
                             if (packageNameFiltersPredicate.test(clazz)
                                     && classNameFiltersPredicate.test(clazz)
@@ -359,15 +344,14 @@ public class Resolver {
                         });
     }
 
-    /** Method to resolve MethodSelectors */
-    private void resolveMethodSelectors() {
-        LOGGER.trace("resolveMethodSelectors");
+    /** Method to process MethodSelectors */
+    private void processMethodSelectors() {
+        LOGGER.trace("processMethodSelectors");
 
         engineDiscoveryRequest
                 .getSelectorsByType(MethodSelector.class)
                 .forEach(
                         methodSelector -> {
-                            LOGGER.trace("MethodSelector.class");
                             Class<?> clazz = methodSelector.getJavaClass();
                             if (packageNameFiltersPredicate.test(clazz)
                                     && classNameFiltersPredicate.test(clazz)
@@ -382,15 +366,14 @@ public class Resolver {
                         });
     }
 
-    /** Method to resolve UniqueIdSelectors */
-    private void resolveUniqueIdSelectors() {
-        LOGGER.trace("resolveUniqueIdSelectors");
+    /** Method to process UniqueIdSelectors */
+    private void processUniqueIdSelectors() {
+        LOGGER.trace("processUniqueIdSelectors");
 
         engineDiscoveryRequest
                 .getSelectorsByType(UniqueIdSelector.class)
                 .forEach(
                         uniqueIdSelector -> {
-                            LOGGER.trace("UniqueIdSelector.class");
                             UniqueId.Segment segment =
                                     uniqueIdSelector.getUniqueId().getLastSegment();
                             if ("class".equals(segment.getType())) {
@@ -438,7 +421,7 @@ public class Resolver {
                         });
     }
 
-    /** Method to filter selectors */
+    /** Method to filters */
     private void filter() {
         LOGGER.trace("filter");
 

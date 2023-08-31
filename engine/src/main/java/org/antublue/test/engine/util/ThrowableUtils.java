@@ -22,15 +22,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import org.antublue.test.engine.Configuration;
-import org.antublue.test.engine.TestEngineConstants;
+import org.antublue.test.engine.Constants;
 
 /** Class to implement ThrowableUtils */
 public class ThrowableUtils {
 
     private static final boolean STACK_TRACE_PRUNING =
-            Configuration.singleton()
-                    .getBooleanOrDefault(TestEngineConstants.STACK_TRACE_PRUNE, true)
-                    .get();
+            Configuration.singleton().getBooleanOrDefault(Constants.STACK_TRACE_PRUNE, true).get();
 
     private static final Predicate<String> EXCLUDE =
             s -> s.startsWith("org.antublue.test.engine.internal.") || s.startsWith("java.base/");
