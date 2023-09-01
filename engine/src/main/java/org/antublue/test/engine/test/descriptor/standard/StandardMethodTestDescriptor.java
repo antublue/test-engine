@@ -85,11 +85,6 @@ public class StandardMethodTestDescriptor
     }
 
     @Override
-    public StopWatch getStopWatch() {
-        return stopWatch;
-    }
-
-    @Override
     public void execute(ExecutionRequest executionRequest) {
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();

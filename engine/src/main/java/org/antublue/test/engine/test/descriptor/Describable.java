@@ -16,15 +16,9 @@
 
 package org.antublue.test.engine.test.descriptor;
 
-import org.junit.platform.engine.ExecutionRequest;
+import java.util.Map;
 
-/** Interface to implement an ExecutableTestDescriptor */
-public interface ExecutableTestDescriptor {
+public interface Describable {
 
-    /**
-     * Method to execute the test descriptor
-     *
-     * @param executionRequest executionRequest
-     */
-    void execute(ExecutionRequest executionRequest);
+    Map<String, String> getDescription();
 }

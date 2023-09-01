@@ -49,7 +49,7 @@ public class LockProcessor {
      *
      * @return the singleton instance
      */
-    public static LockProcessor singleton() {
+    public static LockProcessor getSingleton() {
         return SINGLETON;
     }
 

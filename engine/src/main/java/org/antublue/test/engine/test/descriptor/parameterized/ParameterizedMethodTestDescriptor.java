@@ -18,14 +18,18 @@ package org.antublue.test.engine.test.descriptor.parameterized;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.test.descriptor.Describable;
 import org.antublue.test.engine.test.descriptor.ExecutableContext;
 import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.descriptor.util.Filters;
+import org.antublue.test.engine.test.descriptor.util.LockProcessor;
 import org.antublue.test.engine.test.descriptor.util.MethodInvoker;
 import org.antublue.test.engine.test.descriptor.util.TestDescriptorUtils;
 import org.antublue.test.engine.util.ReflectionUtils;
@@ -42,16 +46,20 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /** Class to implement a ParameterMethodTestDescriptor */
 public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
-        implements ExecutableTestDescriptor {
+        implements ExecutableTestDescriptor, Describable {
 
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
+
     private static final TestDescriptorUtils TEST_DESCRIPTOR_UTILS =
             TestDescriptorUtils.getSingleton();
+
+    private static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
 
     private final ExecutableContext executableContext;
     private final Method testMethod;
     private final Argument testArgument;
     private final StopWatch stopWatch;
+    private final Map<String, String> properties;
 
     /** Constructor */
     public ParameterizedMethodTestDescriptor(
@@ -69,8 +77,7 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
         this.testMethod = testMethod;
         this.testArgument = testArgument;
         this.stopWatch = new StopWatch();
-
-        initialize(engineDiscoveryRequest);
+        this.properties = new LinkedHashMap<>();
     }
 
     @Override
@@ -83,27 +90,24 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
         return Optional.of(MethodSource.from(testMethod));
     }
 
-    /**
-     * Method to initialize the test descriptor
-     *
-     * @param engineDiscoveryRequest engineDiscoveryRequest
-     */
-    private void initialize(EngineDiscoveryRequest engineDiscoveryRequest) {
-        // DO NOTHING
-    }
-
     @Override
-    public StopWatch getStopWatch() {
-        return stopWatch;
+    public Map<String, String> getDescription() {
+        return properties;
     }
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
+        properties.put("testClass", executableContext.testClass.getName());
+        properties.put("testArgument", testArgument.name());
+        properties.put("testMethod", testMethod.getName());
+
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();
         engineExecutionListener.executionStarted(this);
 
         try {
+            stopWatch.start();
+
             Class<?> testClass = executableContext.testClass;
             Object testInstance = executableContext.testInstance;
 
@@ -113,10 +117,20 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
                             testInstance.getClass(), Filters.BEFORE_EACH_METHOD);
             TEST_DESCRIPTOR_UTILS.sortMethods(beforeEachMethods, TestDescriptorUtils.Sort.FORWARD);
             for (Method method : beforeEachMethods) {
-                MethodInvoker.invoke(method, testInstance, testArgument);
+                try {
+                    LOCK_PROCESSOR.processLocks(method);
+                    MethodInvoker.invoke(method, testInstance, testArgument);
+                } finally {
+                    LOCK_PROCESSOR.processUnlocks(method);
+                }
             }
 
-            MethodInvoker.invoke(testMethod, testInstance, testArgument);
+            try {
+                LOCK_PROCESSOR.processLocks(testMethod);
+                MethodInvoker.invoke(testMethod, testInstance, testArgument);
+            } finally {
+                LOCK_PROCESSOR.processUnlocks(testMethod);
+            }
 
             // Find @TestEngine.AfterEach Methods and invoke them
             List<Method> afterEachMethods =
@@ -124,7 +138,12 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
                             testInstance.getClass(), Filters.AFTER_EACH_METHOD);
             TEST_DESCRIPTOR_UTILS.sortMethods(afterEachMethods, TestDescriptorUtils.Sort.REVERSE);
             for (Method method : afterEachMethods) {
-                MethodInvoker.invoke(method, testInstance, testArgument);
+                try {
+                    LOCK_PROCESSOR.processLocks(method);
+                    MethodInvoker.invoke(method, testInstance, testArgument);
+                } finally {
+                    LOCK_PROCESSOR.processUnlocks(method);
+                }
             }
 
             // Fine @TestEngine.AutoClose Fields and close them
@@ -136,8 +155,16 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
                 }
             }
 
+            stopWatch.stop();
+            properties.put("elapsedTime", String.valueOf(stopWatch.elapsedTime()));
+            properties.put("status", "PASS");
+
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
         } catch (Throwable t) {
+            stopWatch.stop();
+            properties.put("elapsedTime", String.valueOf(stopWatch.elapsedTime()));
+            properties.put("status", "FAIL");
+
             engineExecutionListener.executionFinished(this, TestExecutionResult.aborted(t));
         }
 

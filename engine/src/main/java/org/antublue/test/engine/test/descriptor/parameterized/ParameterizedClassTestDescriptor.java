@@ -19,14 +19,18 @@ package org.antublue.test.engine.test.descriptor.parameterized;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.test.descriptor.Describable;
 import org.antublue.test.engine.test.descriptor.ExecutableContext;
 import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.descriptor.util.Filters;
+import org.antublue.test.engine.test.descriptor.util.LockProcessor;
 import org.antublue.test.engine.test.descriptor.util.MethodInvoker;
 import org.antublue.test.engine.test.descriptor.util.TestDescriptorUtils;
 import org.antublue.test.engine.util.ReflectionUtils;
@@ -43,18 +47,22 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /** Class to implement a ParameterClassTestDescriptor */
-@SuppressWarnings("unchecked")
 public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
-        implements ExecutableTestDescriptor {
+        implements ExecutableTestDescriptor, Describable {
 
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
+
     private static final TestDescriptorUtils TEST_DESCRIPTOR_UTILS =
             TestDescriptorUtils.getSingleton();
+
     private static final ParameterizedUtils PARAMETERIZED_UTILS = ParameterizedUtils.getSingleton();
+
+    private static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
 
     private final Class<?> testClass;
     private final ExecutableContext executableContext;
     private final StopWatch stopWatch;
+    private final Map<String, String> properties;
 
     /**
      * Constructor
@@ -76,6 +84,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
         this.executableContext = executableContext;
         this.testClass = testClass;
         this.stopWatch = new StopWatch();
+        this.properties = new LinkedHashMap<>();
 
         initialize(engineDiscoveryRequest);
     }
@@ -90,6 +99,11 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
         return Type.CONTAINER_AND_TEST;
     }
 
+    @Override
+    public Map<String, String> getDescription() {
+        return properties;
+    }
+
     /**
      * Method to initialize the test descriptor
      *
@@ -102,7 +116,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
             executableContext.argumentSupplierMethod =
                     ParameterizedUtils.getSingleton().getArumentSupplierMethod(testClass);
 
-            ParameterizedUtils.getSingleton()
+            PARAMETERIZED_UTILS
                     .getArguments(testClass)
                     .forEach(
                             testArgument ->
@@ -120,17 +134,16 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public StopWatch getStopWatch() {
-        return stopWatch;
-    }
-
-    @Override
     public void execute(ExecutionRequest executionRequest) {
+        properties.put("testClass", testClass.getName());
+
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();
         engineExecutionListener.executionStarted(this);
 
         try {
+            stopWatch.start();
+
             Constructor<?> constructor = testClass.getDeclaredConstructor((Class<?>[]) null);
             Object testInstance = constructor.newInstance((Object[]) null);
             executableContext.testInstance = testInstance;
@@ -139,7 +152,12 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                     REFLECTION_UTILS.findMethods(testClass, Filters.PREPARE_METHOD);
             TEST_DESCRIPTOR_UTILS.sortMethods(prepareMethods, TestDescriptorUtils.Sort.FORWARD);
             for (Method method : prepareMethods) {
-                MethodInvoker.invoke(method, testInstance, null);
+                try {
+                    LOCK_PROCESSOR.processLocks(method);
+                    MethodInvoker.invoke(method, testInstance, null);
+                } finally {
+                    LOCK_PROCESSOR.processUnlocks(method);
+                }
             }
 
             getChildren()
@@ -156,7 +174,12 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                     REFLECTION_UTILS.findMethods(testClass, Filters.CONCLUDE_METHOD);
             TEST_DESCRIPTOR_UTILS.sortMethods(concludeMethods, TestDescriptorUtils.Sort.REVERSE);
             for (Method method : concludeMethods) {
-                MethodInvoker.invoke(method, testInstance, null);
+                try {
+                    LOCK_PROCESSOR.processLocks(method);
+                    MethodInvoker.invoke(method, testInstance, null);
+                } finally {
+                    LOCK_PROCESSOR.processUnlocks(method);
+                }
             }
 
             // Fine @TestEngine.AutoClose Fields and close them
@@ -168,8 +191,16 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                 }
             }
 
+            stopWatch.stop();
+            properties.put("elapsedTime", String.valueOf(stopWatch.elapsedTime()));
+            properties.put("status", "PASS");
+
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
         } catch (Throwable t) {
+            stopWatch.stop();
+            properties.put("elapsedTime", String.valueOf(stopWatch.elapsedTime()));
+            properties.put("status", "FAIL");
+
             engineExecutionListener.executionFinished(this, TestExecutionResult.aborted(t));
         } finally {
             executableContext.testInstance = null;

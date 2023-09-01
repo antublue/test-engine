@@ -110,11 +110,6 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public StopWatch getStopWatch() {
-        return stopWatch;
-    }
-
-    @Override
     public void execute(ExecutionRequest executionRequest) {
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();
