@@ -99,7 +99,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public Map<String, String> getMetadata() {
+    public Map<String, String> getMetadataMap() {
         return properties;
     }
 
@@ -134,6 +134,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
+        properties.put("testDescriptorClassName", getClass().getName());
         properties.put("testClass", executableContext.testClass.getName());
         properties.put("testArgument", testArgument.name());
 

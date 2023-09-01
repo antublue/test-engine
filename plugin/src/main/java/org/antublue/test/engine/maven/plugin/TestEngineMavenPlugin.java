@@ -33,7 +33,7 @@ import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.TestDescriptorExecutionListener;
-import org.antublue.test.engine.maven.plugin.listener.SummaryEngineExecutionListener;
+import org.antublue.test.engine.maven.plugin.listener.TestDescriptorSummaryEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.logger.Logger;
 import org.antublue.test.engine.util.AnsiColor;
 import org.apache.maven.artifact.Artifact;
@@ -184,14 +184,15 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
             Thread.currentThread().setContextClassLoader(classLoader);
 
-            SummaryEngineExecutionListener summaryEngineExecutionListener =
-                    new SummaryEngineExecutionListener();
+            TestDescriptorSummaryEngineExecutionListener
+                    testDescriptorSummaryEngineExecutionListener =
+                            new TestDescriptorSummaryEngineExecutionListener();
 
             String summaryMessage = null;
 
             DelegatingEngineExecutionListener delegatingEngineExecutionListener =
                     DelegatingEngineExecutionListener.of(
-                            summaryEngineExecutionListener,
+                            testDescriptorSummaryEngineExecutionListener,
                             new TestDescriptorExecutionListener());
 
             LauncherConfig launcherConfig = LauncherConfig.builder().build();
@@ -208,7 +209,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             TestDescriptor testDescriptor = null;
 
             try {
-                summaryEngineExecutionListener.begin();
+                testDescriptorSummaryEngineExecutionListener.begin();
 
                 testDescriptor =
                         testEngine.discover(
@@ -230,7 +231,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
                     testEngine.execute(executionRequest);
 
-                    if (summaryEngineExecutionListener.getFailureCount() == 0) {
+                    if (testDescriptorSummaryEngineExecutionListener.getFailureCount() == 0) {
                         summaryMessage = AnsiColor.GREEN_BOLD.wrap("TEST SUCCESS");
                     } else {
                         summaryMessage = AnsiColor.RED_BOLD.wrap("TEST FAILURE");
@@ -242,9 +243,9 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                 }
             }
 
-            summaryEngineExecutionListener.end(summaryMessage);
+            testDescriptorSummaryEngineExecutionListener.end(summaryMessage);
 
-            if (summaryEngineExecutionListener.getFailureCount() != 0) {
+            if (testDescriptorSummaryEngineExecutionListener.getFailureCount() != 0) {
                 throw new MojoFailureException("");
             }
         } catch (MojoFailureException e) {

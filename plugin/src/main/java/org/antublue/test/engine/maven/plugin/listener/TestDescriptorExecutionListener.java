@@ -157,7 +157,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
     public void executionStarted(TestDescriptor testDescriptor) {
         if (logTestMessages && testDescriptor instanceof Metadata) {
             Metadata metadata = (Metadata) testDescriptor;
-            Map<String, String> metadataMap = metadata.getMetadata();
+            Map<String, String> metadataMap = metadata.getMetadataMap();
             String testClass = metadataMap.get("testClass");
             String testArgument = metadataMap.get("testArgument");
             String testMethod = metadataMap.get("testMethod");
@@ -195,7 +195,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
         if (logTestMessages && testDescriptor instanceof Metadata) {
             Metadata metadata = (Metadata) testDescriptor;
-            Map<String, String> metadataMap = metadata.getMetadata();
+            Map<String, String> metadataMap = metadata.getMetadataMap();
             String testClass = metadataMap.get("testClass");
             String testArgument = metadataMap.get("testArgument");
             String testMethod = metadataMap.get("testMethod");
@@ -243,7 +243,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
         if (logTestMessages && testDescriptor instanceof Metadata) {
             Metadata metadata = (Metadata) testDescriptor;
-            Map<String, String> metadataMap = metadata.getMetadata();
+            Map<String, String> metadataMap = metadata.getMetadataMap();
             String testClass = metadataMap.get("testClass");
             String testArgument = metadataMap.get("testArgument");
             String testMethod = metadataMap.get("testMethod");

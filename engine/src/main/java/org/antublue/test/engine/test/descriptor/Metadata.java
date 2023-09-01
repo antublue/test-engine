@@ -20,5 +20,5 @@ import java.util.Map;
 
 public interface Metadata {
 
-    Map<String, String> getMetadata();
+    Map<String, String> getMetadataMap();
 }

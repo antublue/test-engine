@@ -19,7 +19,9 @@ package org.antublue.test.engine.maven.plugin.listener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.test.descriptor.Metadata;
 import org.antublue.test.engine.util.AnsiColor;
 import org.antublue.test.engine.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.util.HumanReadableTime;
@@ -28,7 +30,7 @@ import org.antublue.test.engine.util.StopWatch;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 
-public class SummaryEngineExecutionListener
+public class TestDescriptorSummaryEngineExecutionListener
         implements org.junit.platform.engine.EngineExecutionListener {
 
     private static final String BANNER =
@@ -65,7 +67,7 @@ public class SummaryEngineExecutionListener
 
     private final StopWatch stopWatch;
 
-    public SummaryEngineExecutionListener() {
+    public TestDescriptorSummaryEngineExecutionListener() {
         testDescriptors = Collections.synchronizedList(new ArrayList<>());
 
         stopWatch = new StopWatch();
@@ -108,83 +110,103 @@ public class SummaryEngineExecutionListener
         long testMethodDescriptorFailure = 0;
         long testMethodDescriptorSkipped = 0;
 
-        /*
         for (TestDescriptor testDescriptor : testDescriptors) {
-            ExtendedAbstractTestDescriptor extendedAbstractTestDescriptor =
-                    (ExtendedAbstractTestDescriptor) testDescriptor;
-            ExtendedAbstractTestDescriptor.Status status =
-                    extendedAbstractTestDescriptor.getStatus();
+            if (testDescriptor instanceof Metadata) {
+                Metadata metadata = (Metadata) testDescriptor;
+                Map<String, String> metadataMap = metadata.getMetadataMap();
+                String testDescriptorClassName = metadataMap.get("testDescriptorClassName");
+                String testClass = metadataMap.get("testClass");
+                String testArgument = metadataMap.get("testArgument");
+                String testMethod = metadataMap.get("testMethod");
+                String elapsedTime = metadataMap.get("elapsedTime");
+                String status = metadataMap.get("status");
 
-            if (extendedAbstractTestDescriptor instanceof ClassTestDescriptor) {
-                testClassDescriptorFound++;
-
-                switch (status) {
-                    case PASS:
+                switch (testDescriptorClassName) {
+                    case "org.antublue.test.engine.test.descriptor.parameterized.ParameterizedMethodTestDescriptor":
                         {
-                            testClassDescriptorSuccess++;
+                            testMethodDescriptorFound++;
+                            switch (status) {
+                                case "PASS":
+                                    {
+                                        testMethodDescriptorSuccess++;
+                                        break;
+                                    }
+                                case "FAIL":
+                                    {
+                                        testMethodDescriptorFailure++;
+                                        break;
+                                    }
+                                case "SKIP":
+                                    {
+                                        testMethodDescriptorSkipped++;
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        // DO NOTHING
+                                        break;
+                                    }
+                            }
                             break;
                         }
-                    case FAIL:
+                    case "org.antublue.test.engine.test.descriptor.parameterized.ParameterizedClassTestDescriptor":
                         {
-                            testClassDescriptorFailure++;
+                            testClassDescriptorFound++;
+                            switch (status) {
+                                case "PASS":
+                                    {
+                                        testClassDescriptorSuccess++;
+                                        break;
+                                    }
+                                case "FAIL":
+                                    {
+                                        testClassDescriptorFailure++;
+                                        break;
+                                    }
+                                case "SKIP":
+                                    {
+                                        testClassDescriptorSkipped++;
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        // DO NOTHING
+                                        break;
+                                    }
+                            }
                             break;
                         }
-                    case SKIPPED:
+                    case "org.antublue.test.engine.test.descriptor.parameterized.ParameterizedArgumentTestDescriptor":
                         {
-                            testClassDescriptorSkipped++;
+                            testArgumentDescriptorFound++;
+                            switch (status) {
+                                case "PASS":
+                                    {
+                                        testArgumentDescriptorSuccess++;
+                                        break;
+                                    }
+                                case "FAIL":
+                                    {
+                                        testArgumentDescriptorFailure++;
+                                        break;
+                                    }
+                                case "SKIP":
+                                    {
+                                        testArgumentDescriptorSkipped++;
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        // DO NOTHING
+                                        break;
+                                    }
+                            }
                             break;
                         }
                     default:
                         {
                             // DO NOTHING
-                        }
-                }
-            } else if (extendedAbstractTestDescriptor instanceof ArgumentTestDescriptor) {
-                testArgumentDescriptorFound++;
-
-                switch (status) {
-                    case PASS:
-                        {
-                            testArgumentDescriptorSuccess++;
                             break;
-                        }
-                    case FAIL:
-                        {
-                            testArgumentDescriptorFailure++;
-                            break;
-                        }
-                    case SKIPPED:
-                        {
-                            testArgumentDescriptorSkipped++;
-                            break;
-                        }
-                    default:
-                        {
-                            // DO NOTHING
-                        }
-                }
-            } else if (extendedAbstractTestDescriptor instanceof MethodTestDescriptor) {
-                testMethodDescriptorFound++;
-
-                switch (status) {
-                    case PASS:
-                        {
-                            testMethodDescriptorSuccess++;
-                            break;
-                        }
-                    case FAIL:
-                        {
-                            testMethodDescriptorFailure++;
-                            break;
-                        }
-                    case SKIPPED:
-                        {
-                            testMethodDescriptorSkipped++;
-                            break;
-                        }
-                    default:
-                        {
-                            // DO NOTHING
                         }
                 }
             }
@@ -210,12 +232,11 @@ public class SummaryEngineExecutionListener
                         testClassDescriptorSkipped,
                         testArgumentDescriptorSkipped,
                         testMethodDescriptorSkipped);
-        */
+
         println(INFO + SEPARATOR);
         println(INFO + SUMMARY_BANNER);
         println(INFO + SEPARATOR);
 
-        /*
         println(
                 new AnsiColorStringBuilder()
                         .append(INFO)
@@ -295,11 +316,8 @@ public class SummaryEngineExecutionListener
                         .append(AnsiColor.TEXT_RESET));
 
         println(INFO + SEPARATOR);
-         */
-        /*
         println(INFO + message);
         println(INFO + SEPARATOR);
-        */
 
         long elapsedTime = stopWatch.elapsedTime();
 

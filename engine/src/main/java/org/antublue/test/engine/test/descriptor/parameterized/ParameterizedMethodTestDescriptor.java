@@ -91,12 +91,13 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public Map<String, String> getMetadata() {
+    public Map<String, String> getMetadataMap() {
         return properties;
     }
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
+        properties.put("testDescriptorClassName", getClass().getName());
         properties.put("testClass", executableContext.testClass.getName());
         properties.put("testArgument", testArgument.name());
         properties.put("testMethod", testMethod.getName());
