@@ -21,7 +21,7 @@ import org.antublue.test.engine.configuration.Configuration;
 import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
-import org.antublue.test.engine.test.descriptor.Describable;
+import org.antublue.test.engine.test.descriptor.Metadata;
 import org.antublue.test.engine.util.AnsiColor;
 import org.antublue.test.engine.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.util.NanosecondsConverter;
@@ -30,10 +30,10 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 
 /** Class to implement a TestStatusEngineExecutionListener */
-public class TestStatusEngineExecutionListener implements EngineExecutionListener {
+public class TestDescriptorExecutionListener implements EngineExecutionListener {
 
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(TestStatusEngineExecutionListener.class);
+            LoggerFactory.getLogger(TestDescriptorExecutionListener.class);
 
     private static final String INFO =
             new AnsiColorStringBuilder()
@@ -78,7 +78,7 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
     private final NanosecondsConverter nanosecondsConverter;
 
     /** Constructor */
-    public TestStatusEngineExecutionListener() {
+    public TestDescriptorExecutionListener() {
         logTiming =
                 Configuration.singleton()
                         .get(Constants.CONSOLE_LOG_TIMING)
@@ -155,167 +155,143 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
 
     @Override
     public void executionStarted(TestDescriptor testDescriptor) {
-        if (logTestMessages) {
-            boolean print = false;
+        if (logTestMessages && testDescriptor instanceof Metadata) {
+            Metadata metadata = (Metadata) testDescriptor;
+            Map<String, String> metadataMap = metadata.getMetadata();
+            String testClass = metadataMap.get("testClass");
+            String testArgument = metadataMap.get("testArgument");
+            String testMethod = metadataMap.get("testMethod");
 
-            if (testDescriptor instanceof Describable) {
-                Describable describable = (Describable) testDescriptor;
-                Map<String, String> description = describable.getDescription();
-                String testClass = description.get("testClass");
-                String testArgument = description.get("testArgument");
-                String testMethod = description.get("testMethod");
+            AnsiColorStringBuilder ansiColorStringBuilder =
+                    new AnsiColorStringBuilder()
+                            .append(INFO)
+                            .append(" ")
+                            .append(Thread.currentThread().getName())
+                            .append(" | ")
+                            .append(AnsiColor.WHITE_BRIGHT)
+                            .append("TEST")
+                            .color(AnsiColor.TEXT_RESET);
 
-                AnsiColorStringBuilder ansiColorStringBuilder =
-                        new AnsiColorStringBuilder()
-                                .append(INFO)
-                                .append(" ")
-                                .append(Thread.currentThread().getName())
-                                .append(" | ")
-                                .append(AnsiColor.WHITE_BRIGHT)
-                                .append("TEST")
-                                .color(AnsiColor.TEXT_RESET);
-
-                if (testArgument != null) {
-                    ansiColorStringBuilder.append(" | ").append(testArgument);
-                }
-
-                if (testClass != null) {
-                    ansiColorStringBuilder.append(" | ").append(testClass);
-                }
-
-                if (testMethod != null) {
-                    ansiColorStringBuilder.append(" | ").append(testMethod).append("()");
-                }
-
-                ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
-
-                print = true;
-
-                if (print) {
-                    System.out.println(ansiColorStringBuilder);
-                    System.out.flush();
-                }
+            if (testArgument != null) {
+                ansiColorStringBuilder.append(" | ").append(testArgument);
             }
+
+            if (testClass != null) {
+                ansiColorStringBuilder.append(" | ").append(testClass);
+            }
+
+            if (testMethod != null) {
+                ansiColorStringBuilder.append(" | ").append(testMethod).append("()");
+            }
+
+            ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
+
+            System.out.println(ansiColorStringBuilder);
+            System.out.flush();
         }
     }
 
     @Override
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-        if (logTestMessages) {
-            boolean print = false;
+        if (logTestMessages && testDescriptor instanceof Metadata) {
+            Metadata metadata = (Metadata) testDescriptor;
+            Map<String, String> metadataMap = metadata.getMetadata();
+            String testClass = metadataMap.get("testClass");
+            String testArgument = metadataMap.get("testArgument");
+            String testMethod = metadataMap.get("testMethod");
+            String elapsedTime = metadataMap.get("elapsedTime");
 
-            if (testDescriptor instanceof Describable) {
-                Describable describable = (Describable) testDescriptor;
-                Map<String, String> description = describable.getDescription();
-                String testClass = description.get("testClass");
-                String testArgument = description.get("testArgument");
-                String testMethod = description.get("testMethod");
-                String elapsedTime = description.get("elapsedTime");
-
-                AnsiColorStringBuilder ansiColorStringBuilder =
-                        new AnsiColorStringBuilder()
-                                .append(INFO)
-                                .append(" ")
-                                .append(Thread.currentThread().getName())
-                                .append(" | ")
-                                .append(AnsiColor.WHITE_BRIGHT)
-                                .append("SKIP")
-                                .color(AnsiColor.TEXT_RESET);
-
-                if (testArgument != null) {
-                    ansiColorStringBuilder.append(" | ").append(testArgument);
-                }
-
-                if (testClass != null) {
-                    ansiColorStringBuilder.append(" | ").append(testClass);
-                }
-
-                if (testMethod != null) {
-                    ansiColorStringBuilder.append(" | ").append(testMethod).append("()");
-                }
-
-                if (elapsedTime != null) {
-                    ansiColorStringBuilder
+            AnsiColorStringBuilder ansiColorStringBuilder =
+                    new AnsiColorStringBuilder()
+                            .append(INFO)
                             .append(" ")
-                            .append(
-                                    NanosecondsConverter.MILLISECONDS.toString(
-                                            Long.parseLong(elapsedTime)));
-                }
+                            .append(Thread.currentThread().getName())
+                            .append(" | ")
+                            .append(AnsiColor.WHITE_BRIGHT)
+                            .append("SKIP")
+                            .color(AnsiColor.TEXT_RESET);
 
-                ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
-
-                print = true;
-
-                if (print) {
-                    System.out.println(ansiColorStringBuilder);
-                    System.out.flush();
-                }
+            if (testArgument != null) {
+                ansiColorStringBuilder.append(" | ").append(testArgument);
             }
+
+            if (testClass != null) {
+                ansiColorStringBuilder.append(" | ").append(testClass);
+            }
+
+            if (testMethod != null) {
+                ansiColorStringBuilder.append(" | ").append(testMethod).append("()");
+            }
+
+            if (elapsedTime != null) {
+                ansiColorStringBuilder
+                        .append(" ")
+                        .append(
+                                NanosecondsConverter.MILLISECONDS.toString(
+                                        Long.parseLong(elapsedTime)));
+            }
+
+            ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
+
+            System.out.println(ansiColorStringBuilder);
+            System.out.flush();
         }
     }
 
     @Override
     public void executionFinished(
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-        if (logTestMessages) {
-            boolean print = false;
+        if (logTestMessages && testDescriptor instanceof Metadata) {
+            Metadata metadata = (Metadata) testDescriptor;
+            Map<String, String> metadataMap = metadata.getMetadata();
+            String testClass = metadataMap.get("testClass");
+            String testArgument = metadataMap.get("testArgument");
+            String testMethod = metadataMap.get("testMethod");
+            String elapsedTime = metadataMap.get("elapsedTime");
+            String status = metadataMap.get("status");
 
-            if (testDescriptor instanceof Describable) {
-                Describable describable = (Describable) testDescriptor;
-                Map<String, String> description = describable.getDescription();
-                String testClass = description.get("testClass");
-                String testArgument = description.get("testArgument");
-                String testMethod = description.get("testMethod");
-                String elapsedTime = description.get("elapsedTime");
-                String status = description.get("status");
-
-                AnsiColorStringBuilder ansiColorStringBuilder =
-                        new AnsiColorStringBuilder()
-                                .append(INFO)
-                                .append(" ")
-                                .append(Thread.currentThread().getName())
-                                .append(" | ")
-                                .append(AnsiColor.WHITE_BRIGHT);
-
-                if (status.equals("PASS")) {
-                    ansiColorStringBuilder.append(PASS);
-                } else if (status.equals("FAIL")) {
-                    ansiColorStringBuilder.append(FAIL);
-                } else {
-                    ansiColorStringBuilder.append(AnsiColor.CYAN_BOLD.wrap("????"));
-                }
-
-                ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
-
-                if (testArgument != null) {
-                    ansiColorStringBuilder.append(" | ").append(testArgument);
-                }
-
-                if (testClass != null) {
-                    ansiColorStringBuilder.append(" | ").append(testClass);
-                }
-
-                if (testMethod != null) {
-                    ansiColorStringBuilder.append(" | ").append(testMethod).append("()");
-                }
-
-                if (elapsedTime != null) {
-                    ansiColorStringBuilder
+            AnsiColorStringBuilder ansiColorStringBuilder =
+                    new AnsiColorStringBuilder()
+                            .append(INFO)
                             .append(" ")
-                            .append(
-                                    NanosecondsConverter.MILLISECONDS.toString(
-                                            Long.parseLong(elapsedTime)));
-                }
+                            .append(Thread.currentThread().getName())
+                            .append(" | ")
+                            .append(AnsiColor.WHITE_BRIGHT);
 
-                ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
-
-                print = true;
-
-                if (print) {
-                    System.out.println(ansiColorStringBuilder);
-                    System.out.flush();
-                }
+            if (status.equals("PASS")) {
+                ansiColorStringBuilder.append(PASS);
+            } else if (status.equals("FAIL")) {
+                ansiColorStringBuilder.append(FAIL);
+            } else {
+                ansiColorStringBuilder.append(AnsiColor.CYAN_BOLD.wrap("????"));
             }
+
+            ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
+
+            if (testArgument != null) {
+                ansiColorStringBuilder.append(" | ").append(testArgument);
+            }
+
+            if (testClass != null) {
+                ansiColorStringBuilder.append(" | ").append(testClass);
+            }
+
+            if (testMethod != null) {
+                ansiColorStringBuilder.append(" | ").append(testMethod).append("()");
+            }
+
+            if (elapsedTime != null) {
+                ansiColorStringBuilder
+                        .append(" ")
+                        .append(
+                                NanosecondsConverter.MILLISECONDS.toString(
+                                        Long.parseLong(elapsedTime)));
+            }
+
+            ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
+
+            System.out.println(ansiColorStringBuilder);
+            System.out.flush();
         }
     }
 }

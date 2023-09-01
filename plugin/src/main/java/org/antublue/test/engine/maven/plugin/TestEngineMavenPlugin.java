@@ -32,8 +32,8 @@ import org.antublue.test.engine.ConfigurationParameters;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;
+import org.antublue.test.engine.maven.plugin.listener.TestDescriptorExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.SummaryEngineExecutionListener;
-import org.antublue.test.engine.maven.plugin.listener.TestStatusEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.logger.Logger;
 import org.antublue.test.engine.util.AnsiColor;
 import org.apache.maven.artifact.Artifact;
@@ -192,7 +192,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             DelegatingEngineExecutionListener delegatingEngineExecutionListener =
                     DelegatingEngineExecutionListener.of(
                             summaryEngineExecutionListener,
-                            new TestStatusEngineExecutionListener());
+                            new TestDescriptorExecutionListener());
 
             LauncherConfig launcherConfig = LauncherConfig.builder().build();
 

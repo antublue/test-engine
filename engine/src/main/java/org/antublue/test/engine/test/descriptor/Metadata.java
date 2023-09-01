@@ -18,7 +18,7 @@ package org.antublue.test.engine.test.descriptor;
 
 import java.util.Map;
 
-public interface Describable {
+public interface Metadata {
 
-    Map<String, String> getDescription();
+    Map<String, String> getMetadata();
 }

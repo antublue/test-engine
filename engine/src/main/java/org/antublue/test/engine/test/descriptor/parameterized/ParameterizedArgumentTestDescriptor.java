@@ -25,9 +25,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.test.descriptor.Describable;
 import org.antublue.test.engine.test.descriptor.ExecutableContext;
 import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
+import org.antublue.test.engine.test.descriptor.Metadata;
 import org.antublue.test.engine.test.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.descriptor.util.Filters;
 import org.antublue.test.engine.test.descriptor.util.LockProcessor;
@@ -49,7 +49,7 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /** Class to implement a ParameterArgumentTestDescriptor */
 public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
-        implements ExecutableTestDescriptor, Describable {
+        implements ExecutableTestDescriptor, Metadata {
 
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
@@ -99,7 +99,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public Map<String, String> getDescription() {
+    public Map<String, String> getMetadata() {
         return properties;
     }
 
