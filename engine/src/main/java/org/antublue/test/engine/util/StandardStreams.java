@@ -16,31 +16,14 @@
 
 package org.antublue.test.engine.util;
 
-import java.util.Optional;
-import java.util.function.Consumer;
+public class StandardStreams {
 
-/** Class to implement OptionalUtils */
-public class OptionalUtils {
-
-    /** Constructor */
-    private OptionalUtils() {
+    private StandardStreams() {
         // DO NOTHING
     }
 
-    /**
-     * Method consume the Optional if a value is present, else run a Runnable
-     *
-     * @param optional optional
-     * @param consumer consumer
-     * @param runnable runnable
-     * @param <T> the optional type
-     */
-    public static <T> void ifPresentOrElse(
-            Optional<T> optional, Consumer<T> consumer, Runnable runnable) {
-        if (optional.isPresent()) {
-            consumer.accept(optional.get());
-        } else {
-            runnable.run();
-        }
+    public static void flush() {
+        System.out.flush();
+        System.err.flush();
     }
 }

@@ -16,24 +16,16 @@
 
 package org.antublue.test.engine.maven.plugin.listener;
 
-import java.lang.reflect.Method;
-import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.configuration.Configuration;
 import org.antublue.test.engine.configuration.Constants;
-import org.antublue.test.engine.descriptor.ArgumentTestDescriptor;
-import org.antublue.test.engine.descriptor.ClassTestDescriptor;
-import org.antublue.test.engine.descriptor.ExtendedAbstractTestDescriptor;
-import org.antublue.test.engine.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.util.AnsiColor;
 import org.antublue.test.engine.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.util.NanosecondsConverter;
-import org.antublue.test.engine.util.StopWatch;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
-import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a TestStatusEngineExecutionListener */
 public class TestStatusEngineExecutionListener implements EngineExecutionListener {
@@ -161,6 +153,7 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
 
     @Override
     public void executionStarted(TestDescriptor testDescriptor) {
+        /*
         if (logTestMessages) {
             boolean print = false;
 
@@ -225,10 +218,12 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
                 System.out.flush();
             }
         }
+        */
     }
 
     @Override
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
+        /*
         if (testDescriptor instanceof EngineDescriptor) {
             return;
         }
@@ -312,11 +307,13 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
                 System.out.flush();
             }
         }
+        */
     }
 
     @Override
     public void executionFinished(
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
+        /*
         if (testDescriptor instanceof EngineDescriptor) {
             return;
         }
@@ -412,6 +409,7 @@ public class TestStatusEngineExecutionListener implements EngineExecutionListene
                 System.out.flush();
             }
         }
+        */
     }
 
     /**

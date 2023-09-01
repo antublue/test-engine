@@ -20,10 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.descriptor.ArgumentTestDescriptor;
-import org.antublue.test.engine.descriptor.ClassTestDescriptor;
-import org.antublue.test.engine.descriptor.ExtendedAbstractTestDescriptor;
-import org.antublue.test.engine.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.util.AnsiColor;
 import org.antublue.test.engine.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.util.HumanReadableTime;
@@ -85,17 +81,13 @@ public class SummaryEngineExecutionListener
 
     @Override
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-        if (testDescriptor instanceof ExtendedAbstractTestDescriptor) {
-            testDescriptors.add(testDescriptor);
-        }
+        testDescriptors.add(testDescriptor);
     }
 
     @Override
     public void executionFinished(
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-        if (testDescriptor instanceof ExtendedAbstractTestDescriptor) {
-            testDescriptors.add(testDescriptor);
-        }
+        testDescriptors.add(testDescriptor);
     }
 
     public void end(String message) {
@@ -116,6 +108,7 @@ public class SummaryEngineExecutionListener
         long testMethodDescriptorFailure = 0;
         long testMethodDescriptorSkipped = 0;
 
+        /*
         for (TestDescriptor testDescriptor : testDescriptors) {
             ExtendedAbstractTestDescriptor extendedAbstractTestDescriptor =
                     (ExtendedAbstractTestDescriptor) testDescriptor;
@@ -217,11 +210,12 @@ public class SummaryEngineExecutionListener
                         testClassDescriptorSkipped,
                         testArgumentDescriptorSkipped,
                         testMethodDescriptorSkipped);
-
+        */
         println(INFO + SEPARATOR);
         println(INFO + SUMMARY_BANNER);
         println(INFO + SEPARATOR);
 
+        /*
         println(
                 new AnsiColorStringBuilder()
                         .append(INFO)
@@ -301,9 +295,11 @@ public class SummaryEngineExecutionListener
                         .append(AnsiColor.TEXT_RESET));
 
         println(INFO + SEPARATOR);
-
+         */
+        /*
         println(INFO + message);
         println(INFO + SEPARATOR);
+        */
 
         long elapsedTime = stopWatch.elapsedTime();
 

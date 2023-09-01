@@ -31,29 +31,17 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.antublue.test.engine.logger.Logger;
-import org.antublue.test.engine.logger.LoggerFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to implement ReflectionUtils */
 @SuppressWarnings({"PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock"})
 public final class ReflectionUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectionUtils.class);
-
     private static final ReflectionUtils SINGLETON = new ReflectionUtils();
 
     private static final Class<?>[] NO_CLASS_ARGS = null;
 
     private static final Object[] NO_OBJECT_ARGS = null;
-
-    /** Enum to represent hierarchy order */
-    public enum Order {
-        /** superclass first */
-        SUPERCLASS_FIRST,
-        /** class first */
-        CLASS_FIRST
-    }
 
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
@@ -78,7 +66,7 @@ public final class ReflectionUtils {
      *
      * @return the singleton instance
      */
-    public static ReflectionUtils singleton() {
+    public static ReflectionUtils getSingleton() {
         return SINGLETON;
     }
 
@@ -88,7 +76,7 @@ public final class ReflectionUtils {
      * @param uri uri
      * @return a List of Classes
      */
-    public Stream<Class<?>> findAllClasses(URI uri) {
+    public List<Class<?>> findAllClasses(URI uri) {
         return findAllClasses(uri, ALL_CLASSES_FILTER);
     }
 
@@ -99,10 +87,9 @@ public final class ReflectionUtils {
      * @param classFilter classFilter
      * @return a List of Classes
      */
-    public Stream<Class<?>> findAllClasses(URI uri, Predicate<Class<?>> classFilter) {
+    public List<Class<?>> findAllClasses(URI uri, Predicate<Class<?>> classFilter) {
         return ReflectionSupport.findAllClassesInClasspathRoot(
-                uri, classFilter, classNameFilter -> true)
-                .stream();
+                uri, classFilter, classNameFilter -> true);
     }
 
     /**
@@ -111,7 +98,7 @@ public final class ReflectionUtils {
      * @param packageName packageName
      * @return a List of Classes
      */
-    public Stream<Class<?>> findAllClasses(String packageName) {
+    public List<Class<?>> findAllClasses(String packageName) {
         return findAllClasses(packageName, ALL_CLASSES_FILTER);
     }
 
@@ -122,10 +109,9 @@ public final class ReflectionUtils {
      * @param classFilter classFilter
      * @return a List of Classes
      */
-    public Stream<Class<?>> findAllClasses(String packageName, Predicate<Class<?>> classFilter) {
+    public List<Class<?>> findAllClasses(String packageName, Predicate<Class<?>> classFilter) {
         return ReflectionSupport.findAllClassesInPackage(
-                packageName, classFilter, classNameFilter -> true)
-                .stream();
+                packageName, classFilter, classNameFilter -> true);
     }
 
     /**
@@ -134,7 +120,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return a List of Fields
      */
-    public Stream<Field> findFields(Class<?> clazz) {
+    public List<Field> findFields(Class<?> clazz) {
         return findFields(clazz, ALL_FIELDS_FILTER);
     }
 
@@ -145,7 +131,7 @@ public final class ReflectionUtils {
      * @param fieldFilter fieldFilter
      * @return a List of Fields
      */
-    public Stream<Field> findFields(Class<?> clazz, Predicate<Field> fieldFilter) {
+    public List<Field> findFields(Class<?> clazz, Predicate<Field> fieldFilter) {
         List<Field> fields = new ArrayList<>();
 
         List<Class<?>> classes = buildClassHierarchy(clazz);
@@ -157,16 +143,16 @@ public final class ReflectionUtils {
                             .collect(Collectors.toList()));
         }
 
-        return fields.stream();
+        return fields;
     }
 
     /**
      * Method find all methods of a Class and superclasses
      *
      * @param clazz class to inspect
-     * @return the return value
+     * @return a List of Methods
      */
-    public Stream<Method> findMethods(Class<?> clazz) {
+    public List<Method> findMethods(Class<?> clazz) {
         return findMethods(clazz, ALL_METHODS_FILTER);
     }
 
@@ -175,9 +161,9 @@ public final class ReflectionUtils {
      *
      * @param clazz class to inspect
      * @param methodFilter methodFilter
-     * @return the return value
+     * @return a List of Methods
      */
-    public Stream<Method> findMethods(Class<?> clazz, Predicate<Method> methodFilter) {
+    public List<Method> findMethods(Class<?> clazz, Predicate<Method> methodFilter) {
         try {
             return buildClassHierarchy(clazz).stream()
                     .flatMap(
@@ -202,19 +188,17 @@ public final class ReflectionUtils {
 
                                                 Class<?>[] parameterTypes =
                                                         method.getParameterTypes();
-                                                if (parameterTypes != null
-                                                        && parameterTypes.length > 0) {
-                                                    for (Class<?> parameterType : parameterTypes) {
-                                                        stringBuilder
-                                                                .append(" ")
-                                                                .append(parameterType.getName());
-                                                    }
+                                                for (Class<?> parameterType : parameterTypes) {
+                                                    stringBuilder
+                                                            .append(" ")
+                                                            .append(parameterType.getName());
                                                 }
                                                 return stringBuilder.toString();
                                             }))
-                    .peek(method -> method.setAccessible(true));
+                    .peek(method -> method.setAccessible(true))
+                    .collect(Collectors.toList());
         } catch (NoClassDefFoundError e) {
-            return Stream.empty();
+            return new ArrayList<>();
         }
     }
 
@@ -289,7 +273,7 @@ public final class ReflectionUtils {
      * @param parameterTypes parameterTypes
      * @return true if the Method accepts the specified parameters, otherwise false
      */
-    public boolean acceptsParameters(Method method, Class<?>... parameterTypes) {
+    public boolean acceptsArguments(Method method, Class<?>... parameterTypes) {
         Class<?>[] methodParameterTypes = method.getParameterTypes();
         if (methodParameterTypes.length != parameterTypes.length) {
             return false;

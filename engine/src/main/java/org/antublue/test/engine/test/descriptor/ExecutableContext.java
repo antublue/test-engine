@@ -14,27 +14,19 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.statemachine;
+package org.antublue.test.engine.test.descriptor;
 
-/** Class to implement a StateMachineException */
-public class StateMachineException extends RuntimeException {
+import java.lang.reflect.Method;
 
-    /**
-     * Constructor
-     *
-     * @param message message
-     */
-    public StateMachineException(String message) {
-        super(message);
+public class ExecutableContext {
+
+    public ExecutableContext() {
+        // DO NOTHING
     }
 
-    /**
-     * Constructor
-     *
-     * @param message message
-     * @param throwable throwable
-     */
-    public StateMachineException(String message, Throwable throwable) {
-        super(message, throwable);
-    }
+    public Class<?> testClass;
+
+    public Method argumentSupplierMethod;
+
+    public Object testInstance;
 }

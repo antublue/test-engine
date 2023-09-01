@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.statemachine;
+package org.antublue.test.engine.test.descriptor;
 
-/** Interface to implement a Transition */
-public interface Transition<S> {
+import org.antublue.test.engine.util.StopWatch;
+import org.junit.platform.engine.ExecutionRequest;
+
+/** Interface to implement an ExecutableTestDescriptor */
+public interface ExecutableTestDescriptor {
+
+    StopWatch getStopWatch();
 
     /**
-     * Method to execute the transition
+     * Method to execute the test descriptor
      *
-     * @param stateMachine stateMachine
-     * @throws Throwable throwable
+     * @param executionRequest executionRequest
      */
-    void execute(StateMachine<S> stateMachine) throws Throwable;
+    void execute(ExecutionRequest executionRequest);
 }

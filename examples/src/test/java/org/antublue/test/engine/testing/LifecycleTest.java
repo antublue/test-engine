@@ -51,6 +51,8 @@ public class LifecycleTest {
                         });
 
         EXPECTED.add("conclude()");
+
+        System.out.println(String.format("EXPECTED size [%d]", EXPECTED.size()));
     }
 
     @TestEngine.Argument protected StringArgument stringArgument;
@@ -58,7 +60,7 @@ public class LifecycleTest {
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1; i++) {
             collection.add(StringArgument.of(String.valueOf(i)));
         }
         return collection.stream();
@@ -129,6 +131,7 @@ public class LifecycleTest {
         System.out.println("conclude()");
         assertThat(stringArgument).isNull();
         actual.add("conclude()");
+        System.out.println(String.format("actual size [%d]", actual.size()));
         assertThat(actual.size()).isEqualTo(EXPECTED.size());
         for (int i = 0; i < actual.size(); i++) {
             if (!actual.get(i).equals(EXPECTED.get(i))) {

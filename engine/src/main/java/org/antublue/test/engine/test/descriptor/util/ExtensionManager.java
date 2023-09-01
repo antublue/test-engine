@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.extension;
+package org.antublue.test.engine.test.descriptor.util;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -50,7 +50,7 @@ public class ExtensionManager {
     public void initialize() throws Throwable {
         LOGGER.trace("initialize()");
 
-        ReflectionUtils reflectionUtils = ReflectionUtils.singleton();
+        ReflectionUtils reflectionUtils = ReflectionUtils.getSingleton();
 
         Optional<String> optional = Configuration.singleton().get(Constants.EXTENSIONS);
         if (optional.isPresent() && !optional.get().trim().isEmpty()) {
