@@ -78,7 +78,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     /**
      * Method to execute the plugin
      *
-     * @throws MojoExecutionException execution exception
+     * @throws MojoExecutionException MojoExecutionException
      */
     public void execute() throws MojoFailureException, MojoExecutionException {
         Logger logger = Logger.from(getLog());

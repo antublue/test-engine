@@ -17,8 +17,53 @@
 package org.antublue.test.engine.test.descriptor;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-public interface Metadata {
+@SuppressWarnings("unchecked")
+public class Metadata {
 
-    Map<String, String> getMetadataMap();
+    private final Map<String, Object> map;
+
+    public Metadata() {
+        map = new ConcurrentHashMap<>();
+    }
+
+    public void put(String key, Object value) {
+        map.put(key, value);
+    }
+
+    public <T> T get(String key) {
+        return (T) map.get(key);
+    }
+
+    public <T> T getOrDefault(String key, T defaultValue) {
+        return (T) map.getOrDefault(key, defaultValue);
+    }
+
+    public void remove(String key) {
+        map.remove(key);
+    }
+
+    public Set<String> keySet() {
+        return map.keySet();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (stringBuilder.length() > 0) {
+                stringBuilder.append(" ");
+            }
+            Object value = entry.getValue();
+            stringBuilder
+                    .append("[")
+                    .append(entry.getKey())
+                    .append("] = [")
+                    .append(value != null ? value.toString() : "null")
+                    .append("]");
+        }
+        return stringBuilder.toString();
+    }
 }

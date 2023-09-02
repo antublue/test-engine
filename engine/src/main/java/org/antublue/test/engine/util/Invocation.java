@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.testing;
+package org.antublue.test.engine.util;
 
-import org.antublue.test.engine.api.TestEngine;
+/** Class to implement an Invocation */
+public class Invocation {
 
-public class ConcreteTest {
-
-    @TestEngine.Test
-    public void test1() {
-        System.out.println("test1()");
+    /** Constructor */
+    private Invocation() {
+        // DO NOTHING
     }
 
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2()");
-    }
-
-    @TestEngine.Test
-    public void test3() {
-        System.out.println("test3()");
+    /**
+     * Method to invoke an Invocation
+     *
+     * @param runnable runnable
+     */
+    public static void execute(Runnable runnable) {
+        runnable.run();
     }
 }

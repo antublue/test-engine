@@ -19,9 +19,10 @@ package org.antublue.test.engine.maven.plugin.listener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.test.descriptor.Metadata;
+import org.antublue.test.engine.test.descriptor.MetadataConstants;
+import org.antublue.test.engine.test.descriptor.MetadataSupport;
 import org.antublue.test.engine.util.AnsiColor;
 import org.antublue.test.engine.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.util.HumanReadableTime;
@@ -95,50 +96,48 @@ public class TestDescriptorSummaryEngineExecutionListener
     public void end(String message) {
         stopWatch.stop();
 
-        long testClassDescriptorFound = 0;
-        long testClassDescriptorSuccess = 0;
-        long testClassDescriptorFailure = 0;
-        long testClassDescriptorSkipped = 0;
+        long classTestDescriptorFound = 0;
+        long classTestDescriptorSuccess = 0;
+        long classTestDescriptorFailure = 0;
+        long classTestDescriptorSkipped = 0;
 
-        long testArgumentDescriptorFound = 0;
-        long testArgumentDescriptorSuccess = 0;
-        long testArgumentDescriptorFailure = 0;
-        long testArgumentDescriptorSkipped = 0;
+        long argumentTestDescriptorFound = 0;
+        long argumentTestDescriptorSuccess = 0;
+        long argumentTestDescriptorFailure = 0;
+        long argumentTestDescriptorSkipped = 0;
 
-        long testMethodDescriptorFound = 0;
-        long testMethodDescriptorSuccess = 0;
-        long testMethodDescriptorFailure = 0;
-        long testMethodDescriptorSkipped = 0;
+        long methodTestDescriptorFound = 0;
+        long methodTestDescriptorSuccess = 0;
+        long methodTestDescriptorFailure = 0;
+        long methodTestDescriptorSkipped = 0;
 
         for (TestDescriptor testDescriptor : testDescriptors) {
-            if (testDescriptor instanceof Metadata) {
-                Metadata metadata = (Metadata) testDescriptor;
-                Map<String, String> metadataMap = metadata.getMetadataMap();
-                String testDescriptorClassName = metadataMap.get("testDescriptorClassName");
-                String testClass = metadataMap.get("testClass");
-                String testArgument = metadataMap.get("testArgument");
-                String testMethod = metadataMap.get("testMethod");
-                String elapsedTime = metadataMap.get("elapsedTime");
-                String status = metadataMap.get("status");
+            if (testDescriptor instanceof MetadataSupport) {
+                MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
+                Metadata metadata = metadataSupport.getMetadata();
+                String testDescriptorStatus =
+                        metadata.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
+                String testDescriptorClassName = testDescriptor.getClass().getName();
 
                 switch (testDescriptorClassName) {
+                    case "org.antublue.test.engine.test.descriptor.standard.StandardMethodTestDescriptor":
                     case "org.antublue.test.engine.test.descriptor.parameterized.ParameterizedMethodTestDescriptor":
                         {
-                            testMethodDescriptorFound++;
-                            switch (status) {
+                            methodTestDescriptorFound++;
+                            switch (testDescriptorStatus) {
                                 case "PASS":
                                     {
-                                        testMethodDescriptorSuccess++;
+                                        methodTestDescriptorSuccess++;
                                         break;
                                     }
                                 case "FAIL":
                                     {
-                                        testMethodDescriptorFailure++;
+                                        methodTestDescriptorFailure++;
                                         break;
                                     }
                                 case "SKIP":
                                     {
-                                        testMethodDescriptorSkipped++;
+                                        methodTestDescriptorSkipped++;
                                         break;
                                     }
                                 default:
@@ -149,23 +148,24 @@ public class TestDescriptorSummaryEngineExecutionListener
                             }
                             break;
                         }
+                    case "org.antublue.test.engine.test.descriptor.standard.StandardCLassTestDescriptor":
                     case "org.antublue.test.engine.test.descriptor.parameterized.ParameterizedClassTestDescriptor":
                         {
-                            testClassDescriptorFound++;
-                            switch (status) {
+                            classTestDescriptorFound++;
+                            switch (testDescriptorStatus) {
                                 case "PASS":
                                     {
-                                        testClassDescriptorSuccess++;
+                                        classTestDescriptorSuccess++;
                                         break;
                                     }
                                 case "FAIL":
                                     {
-                                        testClassDescriptorFailure++;
+                                        classTestDescriptorFailure++;
                                         break;
                                     }
                                 case "SKIP":
                                     {
-                                        testClassDescriptorSkipped++;
+                                        classTestDescriptorSkipped++;
                                         break;
                                     }
                                 default:
@@ -178,21 +178,21 @@ public class TestDescriptorSummaryEngineExecutionListener
                         }
                     case "org.antublue.test.engine.test.descriptor.parameterized.ParameterizedArgumentTestDescriptor":
                         {
-                            testArgumentDescriptorFound++;
-                            switch (status) {
+                            argumentTestDescriptorFound++;
+                            switch (testDescriptorStatus) {
                                 case "PASS":
                                     {
-                                        testArgumentDescriptorSuccess++;
+                                        argumentTestDescriptorSuccess++;
                                         break;
                                     }
                                 case "FAIL":
                                     {
-                                        testArgumentDescriptorFailure++;
+                                        argumentTestDescriptorFailure++;
                                         break;
                                     }
                                 case "SKIP":
                                     {
-                                        testArgumentDescriptorSkipped++;
+                                        argumentTestDescriptorSkipped++;
                                         break;
                                     }
                                 default:
@@ -214,24 +214,24 @@ public class TestDescriptorSummaryEngineExecutionListener
 
         int columnWidthFound =
                 getColumnWith(
-                        testClassDescriptorFound,
-                        testArgumentDescriptorFound,
-                        testMethodDescriptorFound);
+                        classTestDescriptorFound,
+                        argumentTestDescriptorFound,
+                        methodTestDescriptorFound);
         int columnWidthSuccess =
                 getColumnWith(
-                        testClassDescriptorSuccess,
-                        testArgumentDescriptorSuccess,
-                        testMethodDescriptorSuccess);
+                        classTestDescriptorSuccess,
+                        argumentTestDescriptorSuccess,
+                        methodTestDescriptorSuccess);
         int columnWidthFailure =
                 getColumnWith(
-                        testClassDescriptorFailure,
-                        testArgumentDescriptorFailure,
-                        testMethodDescriptorFailure);
+                        classTestDescriptorFailure,
+                        argumentTestDescriptorFailure,
+                        methodTestDescriptorFailure);
         int columnWidthSkipped =
                 getColumnWith(
-                        testClassDescriptorSkipped,
-                        testArgumentDescriptorSkipped,
-                        testMethodDescriptorSkipped);
+                        classTestDescriptorSkipped,
+                        argumentTestDescriptorSkipped,
+                        methodTestDescriptorSkipped);
 
         println(INFO + SEPARATOR);
         println(INFO + SUMMARY_BANNER);
@@ -242,77 +242,79 @@ public class TestDescriptorSummaryEngineExecutionListener
                         .append(INFO)
                         .color(AnsiColor.WHITE_BRIGHT)
                         .append("Test Classes   : ")
-                        .append(pad(testClassDescriptorFound, columnWidthFound))
+                        .append(pad(classTestDescriptorFound, columnWidthFound))
                         .append(", ")
                         .color(AnsiColor.GREEN_BRIGHT)
                         .append("PASSED")
                         .color(AnsiColor.WHITE_BRIGHT)
                         .append(" : ")
-                        .append(pad(testClassDescriptorSuccess, columnWidthSuccess))
+                        .append(pad(classTestDescriptorSuccess, columnWidthSuccess))
                         .append(", ")
                         .color(AnsiColor.RED_BRIGHT)
                         .append("FAILED")
                         .color(AnsiColor.WHITE_BRIGHT)
                         .append(" : ")
-                        .append(pad(testClassDescriptorFailure, columnWidthFailure))
+                        .append(pad(classTestDescriptorFailure, columnWidthFailure))
                         .append(", ")
                         .color(AnsiColor.YELLOW_BRIGHT)
                         .append("SKIPPED")
                         .color(AnsiColor.WHITE_BRIGHT)
                         .append(" : ")
-                        .append(pad(testClassDescriptorSkipped, columnWidthSkipped))
+                        .append(pad(classTestDescriptorSkipped, columnWidthSkipped))
                         .append(AnsiColor.TEXT_RESET));
 
-        println(
-                new AnsiColorStringBuilder()
-                        .append(INFO)
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append("Test Arguments : ")
-                        .append(pad(testArgumentDescriptorFound, columnWidthFound))
-                        .append(", ")
-                        .color(AnsiColor.GREEN_BRIGHT)
-                        .append("PASSED")
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append(" : ")
-                        .append(pad(testArgumentDescriptorSuccess, columnWidthSuccess))
-                        .append(", ")
-                        .color(AnsiColor.RED_BRIGHT)
-                        .append("FAILED")
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append(" : ")
-                        .append(pad(testArgumentDescriptorFailure, columnWidthFailure))
-                        .append(", ")
-                        .color(AnsiColor.YELLOW_BRIGHT)
-                        .append("SKIPPED")
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append(" : ")
-                        .append(pad(testArgumentDescriptorSkipped, columnWidthSkipped))
-                        .append(AnsiColor.TEXT_RESET));
+        if (argumentTestDescriptorFound > 0) {
+            println(
+                    new AnsiColorStringBuilder()
+                            .append(INFO)
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append("Test Arguments : ")
+                            .append(pad(argumentTestDescriptorFound, columnWidthFound))
+                            .append(", ")
+                            .color(AnsiColor.GREEN_BRIGHT)
+                            .append("PASSED")
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append(" : ")
+                            .append(pad(argumentTestDescriptorSuccess, columnWidthSuccess))
+                            .append(", ")
+                            .color(AnsiColor.RED_BRIGHT)
+                            .append("FAILED")
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append(" : ")
+                            .append(pad(argumentTestDescriptorFailure, columnWidthFailure))
+                            .append(", ")
+                            .color(AnsiColor.YELLOW_BRIGHT)
+                            .append("SKIPPED")
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append(" : ")
+                            .append(pad(argumentTestDescriptorSkipped, columnWidthSkipped))
+                            .append(AnsiColor.TEXT_RESET));
+        }
 
         println(
                 new AnsiColorStringBuilder()
                         .append(INFO)
                         .color(AnsiColor.WHITE_BRIGHT)
                         .append("Test Methods   : ")
-                        .append(pad(testMethodDescriptorFound, columnWidthFound))
+                        .append(pad(methodTestDescriptorFound, columnWidthFound))
                         .append(", ")
                         .color(AnsiColor.GREEN_BRIGHT)
                         .append("PASSED")
                         .color(AnsiColor.WHITE_BRIGHT)
                         .append(" : ")
-                        .append(pad(testMethodDescriptorSuccess, columnWidthSuccess))
+                        .append(pad(methodTestDescriptorSuccess, columnWidthSuccess))
                         .append(", ")
                         .color(AnsiColor.RED_BRIGHT)
                         .append("FAILED")
                         .color(AnsiColor.WHITE_BRIGHT)
                         .append(" : ")
-                        .append(pad(testMethodDescriptorFailure, columnWidthFailure))
+                        .append(pad(methodTestDescriptorFailure, columnWidthFailure))
                         .append(", ")
                         .color(AnsiColor.YELLOW_BRIGHT)
                         .append("SKIPPED")
                         .color(AnsiColor.WHITE_BRIGHT)
                         .append(" : ")
-                        .append(pad(testMethodDescriptorSkipped, columnWidthSkipped))
+                        .append(pad(methodTestDescriptorSkipped, columnWidthSkipped))
                         .append(AnsiColor.TEXT_RESET));
 
         println(INFO + SEPARATOR);

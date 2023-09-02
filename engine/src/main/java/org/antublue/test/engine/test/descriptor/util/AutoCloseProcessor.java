@@ -28,20 +28,9 @@ public class AutoCloseProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoCloseProcessor.class);
 
-    private static final AutoCloseProcessor SINGLETON = new AutoCloseProcessor();
-
     /** Constructor */
     private AutoCloseProcessor() {
         // DO NOTHING
-    }
-
-    /**
-     * Method to get the singleton
-     *
-     * @return the singleton
-     */
-    public static AutoCloseProcessor singleton() {
-        return SINGLETON;
     }
 
     /**
@@ -51,7 +40,7 @@ public class AutoCloseProcessor {
      * @param field field
      * @throws Throwable Throwable
      */
-    public void close(Object object, Field field) throws Throwable {
+    public static void close(Object object, Field field) throws Throwable {
         LOGGER.trace("close class [%s] field [%s]", object.getClass().getName(), field.getName());
 
         TestEngine.AutoClose annotation = field.getAnnotation(TestEngine.AutoClose.class);

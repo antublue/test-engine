@@ -20,12 +20,19 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.antublue.test.engine.test.descriptor.ExecutableContext;
 import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
+import org.antublue.test.engine.test.descriptor.Metadata;
+import org.antublue.test.engine.test.descriptor.MetadataConstants;
+import org.antublue.test.engine.test.descriptor.MetadataSupport;
+import org.antublue.test.engine.test.descriptor.parameterized.ParameterizedExecutableConstants;
 import org.antublue.test.engine.test.descriptor.util.Filters;
 import org.antublue.test.engine.test.descriptor.util.MethodInvoker;
 import org.antublue.test.engine.test.descriptor.util.TestDescriptorUtils;
+import org.antublue.test.engine.util.Invariant;
+import org.antublue.test.engine.util.Invocation;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
@@ -40,17 +47,16 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /** Class to implement a ParameterClassTestDescriptor */
-@SuppressWarnings("unchecked")
 public class StandardClassTestDescriptor extends AbstractTestDescriptor
-        implements ExecutableTestDescriptor {
+        implements ExecutableTestDescriptor, MetadataSupport {
 
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
     private static final TestDescriptorUtils TEST_DESCRIPTOR_UTILS =
             TestDescriptorUtils.getSingleton();
 
-    private final ExecutableContext executableContext;
     private final Class<?> testClass;
     private final StopWatch stopWatch;
+    private final Metadata metadata;
 
     /**
      * Constructor
@@ -61,18 +67,15 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
      */
     public StandardClassTestDescriptor(
             EngineDiscoveryRequest engineDiscoveryRequest,
-            ExecutableContext executableContext,
             UniqueId parentUniqueId,
             Class<?> testClass) {
         super(
                 parentUniqueId.append(
                         StandardClassTestDescriptor.class.getSimpleName(), testClass.getName()),
                 testClass.getSimpleName());
-        this.executableContext = executableContext;
         this.testClass = testClass;
         this.stopWatch = new StopWatch();
-
-        initialize(engineDiscoveryRequest);
+        this.metadata = new Metadata();
     }
 
     @Override
@@ -85,23 +88,27 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
         return Type.CONTAINER_AND_TEST;
     }
 
-    /**
-     * Method to initialize the test descriptor
-     *
-     * @param engineDiscoveryRequest engineDiscoveryRequest
-     */
-    private void initialize(EngineDiscoveryRequest engineDiscoveryRequest) {
+    @Override
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    @Override
+    public void build(
+            EngineDiscoveryRequest engineDiscoveryRequest, ExecutableContext executableContext) {
         try {
             ReflectionUtils.getSingleton()
                     .findMethods(testClass, Filters.STANDARD_TEST_METHOD)
                     .forEach(
-                            testMethod ->
-                                    addChild(
-                                            new StandardMethodTestDescriptor(
-                                                    engineDiscoveryRequest,
-                                                    executableContext,
-                                                    getUniqueId(),
-                                                    testMethod)));
+                            testMethod -> {
+                                ExecutableTestDescriptor executableTestDescriptor =
+                                        new StandardMethodTestDescriptor(
+                                                engineDiscoveryRequest, getUniqueId(), testMethod);
+
+                                executableTestDescriptor.build(
+                                        engineDiscoveryRequest, executableContext);
+                                addChild(executableTestDescriptor);
+                            });
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable t) {
@@ -109,48 +116,119 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
         }
     }
 
+    private enum State {
+        RUN_PREPARE_METHODS,
+        END,
+        RUN_CONCLUDE_METHODS,
+        RUN_EXECUTE
+    }
+
     @Override
-    public void execute(ExecutionRequest executionRequest) {
+    public void execute(ExecutionRequest executionRequest, ExecutableContext executableContext) {
+        stopWatch.start();
+
+        metadata.put("testDescriptor", this);
+        metadata.put("testClass", testClass);
+
+        executableContext.put(StandardExecutableConstants.TEST_CLASS, testClass);
+
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();
+
         engineExecutionListener.executionStarted(this);
 
-        try {
-            executableContext.testClass = testClass;
-            Constructor<?> constructor = testClass.getDeclaredConstructor((Class<?>[]) null);
-            Object testInstance = constructor.newInstance((Object[]) null);
-            executableContext.testInstance = testInstance;
+        AtomicReference<State> state = new AtomicReference<>();
 
-            List<Method> prepareMethods =
-                    REFLECTION_UTILS.findMethods(testClass, Filters.PREPARE_METHOD);
-            TEST_DESCRIPTOR_UTILS.sortMethods(prepareMethods, TestDescriptorUtils.Sort.FORWARD);
-            for (Method method : prepareMethods) {
-                MethodInvoker.invoke(method, testInstance, null);
-            }
+        Invocation.execute(
+                () -> {
+                    try {
+                        Constructor<?> constructor =
+                                testClass.getDeclaredConstructor((Class<?>[]) null);
+                        Object testInstance = constructor.newInstance((Object[]) null);
+                        executableContext.put(
+                                StandardExecutableConstants.TEST_INSTANCE, testInstance);
+                        state.set(State.RUN_PREPARE_METHODS);
+                    } catch (Throwable t) {
+                        executableContext.addAndProcessThrowable(testClass, t);
+                        state.set(State.RUN_EXECUTE);
+                    } finally {
+                        StandardStreams.flush();
+                    }
+                });
 
+        Object testInstance = executableContext.get(StandardExecutableConstants.TEST_INSTANCE);
+
+        if (state.get() == State.RUN_PREPARE_METHODS) {
+            Invariant.check(testInstance != null);
+            Invocation.execute(
+                    () -> {
+                        try {
+                            List<Method> prepareMethods =
+                                    REFLECTION_UTILS.findMethods(testClass, Filters.PREPARE_METHOD);
+                            TEST_DESCRIPTOR_UTILS.sortMethods(
+                                    prepareMethods, TestDescriptorUtils.Sort.FORWARD);
+                            for (Method method : prepareMethods) {
+                                MethodInvoker.invoke(method, testInstance, null);
+                            }
+                        } catch (Throwable t) {
+                            executableContext.addAndProcessThrowable(testClass, t);
+                        } finally {
+                            StandardStreams.flush();
+                            state.set(State.RUN_EXECUTE);
+                        }
+                    });
+        }
+
+        if (state.get() == State.RUN_EXECUTE) {
             getChildren()
                     .forEach(
                             (Consumer<TestDescriptor>)
                                     testDescriptor -> {
                                         if (testDescriptor instanceof ExecutableTestDescriptor) {
                                             ((ExecutableTestDescriptor) testDescriptor)
-                                                    .execute(executionRequest);
+                                                    .execute(executionRequest, executableContext);
                                         }
                                     });
 
-            List<Method> concludeMethods =
-                    REFLECTION_UTILS.findMethods(testClass, Filters.CONCLUDE_METHOD);
-            TEST_DESCRIPTOR_UTILS.sortMethods(concludeMethods, TestDescriptorUtils.Sort.REVERSE);
-            for (Method method : concludeMethods) {
-                MethodInvoker.invoke(method, testInstance, null);
+            if (testInstance != null) {
+                state.set(State.RUN_CONCLUDE_METHODS);
+            } else {
+                state.set(State.END);
             }
-
-            engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
-        } catch (Throwable t) {
-            engineExecutionListener.executionFinished(this, TestExecutionResult.aborted(t));
-        } finally {
-            executableContext.testInstance = null;
         }
+
+        if (state.get() == State.RUN_CONCLUDE_METHODS) {
+            Invariant.check(testInstance != null);
+            Invocation.execute(
+                    () -> {
+                        List<Method> concludeMethods =
+                                REFLECTION_UTILS.findMethods(testClass, Filters.CONCLUDE_METHOD);
+                        TEST_DESCRIPTOR_UTILS.sortMethods(
+                                concludeMethods, TestDescriptorUtils.Sort.REVERSE);
+                        for (Method method : concludeMethods)
+                            try {
+                                MethodInvoker.invoke(method, testInstance, null);
+                            } catch (Throwable t) {
+                                executableContext.addAndProcessThrowable(testClass, t);
+                            } finally {
+                                StandardStreams.flush();
+                            }
+                    });
+        }
+
+        stopWatch.stop();
+        metadata.put(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, stopWatch.elapsedTime());
+
+        if (executableContext.hasThrowables()) {
+            metadata.put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
+            engineExecutionListener.executionFinished(
+                    this, TestExecutionResult.failed(executableContext.getThrowables().get(0)));
+        } else {
+            metadata.put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
+            engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
+        }
+
+        executableContext.remove(ParameterizedExecutableConstants.TEST_INSTANCE);
 
         StandardStreams.flush();
     }

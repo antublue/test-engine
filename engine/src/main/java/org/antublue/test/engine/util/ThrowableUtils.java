@@ -31,7 +31,11 @@ public class ThrowableUtils {
             Configuration.singleton().getBooleanOrDefault(Constants.STACK_TRACE_PRUNE, true).get();
 
     private static final Predicate<String> EXCLUDE =
-            s -> s.startsWith("org.antublue.test.engine.internal.") || s.startsWith("java.base/");
+            s ->
+                    s.startsWith("org.antublue.test.engine.test.descriptor.")
+                            || s.startsWith("org.antublue.test.engine.util.Invocation.")
+                            || s.startsWith("org.antublue.test.engine.Executor")
+                            || s.startsWith("java.base/");
 
     /** Constructor */
     private ThrowableUtils() {
@@ -41,11 +45,11 @@ public class ThrowableUtils {
     /**
      * Method to prune a Throwable
      *
-     * @param throwable throwable
      * @param clazz clazz
+     * @param throwable throwable
      * @return a pruned Throwable
      */
-    public static Throwable prune(Throwable throwable, Class<?> clazz) {
+    public static Throwable prune(Class<?> clazz, Throwable throwable) {
         if (!STACK_TRACE_PRUNING) {
             return throwable;
         }

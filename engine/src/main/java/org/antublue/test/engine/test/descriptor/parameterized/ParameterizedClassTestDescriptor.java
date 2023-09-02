@@ -19,27 +19,28 @@ package org.antublue.test.engine.test.descriptor.parameterized;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicReference;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.test.descriptor.ExecutableContext;
 import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.descriptor.Metadata;
+import org.antublue.test.engine.test.descriptor.MetadataConstants;
+import org.antublue.test.engine.test.descriptor.MetadataSupport;
 import org.antublue.test.engine.test.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.descriptor.util.Filters;
 import org.antublue.test.engine.test.descriptor.util.LockProcessor;
 import org.antublue.test.engine.test.descriptor.util.MethodInvoker;
 import org.antublue.test.engine.test.descriptor.util.TestDescriptorUtils;
+import org.antublue.test.engine.util.Invariant;
+import org.antublue.test.engine.util.Invocation;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
-import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -47,8 +48,9 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /** Class to implement a ParameterClassTestDescriptor */
+@SuppressWarnings("unchecked")
 public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
-        implements ExecutableTestDescriptor, Metadata {
+        implements ExecutableTestDescriptor, MetadataSupport {
 
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
@@ -60,9 +62,8 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
     private static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
 
     private final Class<?> testClass;
-    private final ExecutableContext executableContext;
     private final StopWatch stopWatch;
-    private final Map<String, String> properties;
+    private final Metadata metadata;
 
     /**
      * Constructor
@@ -73,7 +74,6 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
      */
     public ParameterizedClassTestDescriptor(
             EngineDiscoveryRequest engineDiscoveryRequest,
-            ExecutableContext executableContext,
             UniqueId parentUniqueId,
             Class<?> testClass) {
         super(
@@ -81,12 +81,10 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                         ParameterizedClassTestDescriptor.class.getSimpleName(),
                         testClass.getName()),
                 TEST_DESCRIPTOR_UTILS.getDisplayName(testClass));
-        this.executableContext = executableContext;
         this.testClass = testClass;
-        this.stopWatch = new StopWatch();
-        this.properties = new LinkedHashMap<>();
 
-        initialize(engineDiscoveryRequest);
+        this.stopWatch = new StopWatch();
+        this.metadata = new Metadata();
     }
 
     @Override
@@ -100,32 +98,46 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public Map<String, String> getMetadataMap() {
-        return properties;
+    public Metadata getMetadata() {
+        return metadata;
     }
 
-    /**
-     * Method to initialize the test descriptor
-     *
-     * @param engineDiscoveryRequest engineDiscoveryRequest
-     */
-    private void initialize(EngineDiscoveryRequest engineDiscoveryRequest) {
-        try {
-            executableContext.testClass = testClass;
+    private enum State {
+        RUN_INSTANTIATE,
+        RUN_PREPARE_METHODS,
+        RUN_EXECUTE,
+        RUN_CONCLUDE_METHODS,
+        RUN_AUTO_CLOSE_FIELDS,
+        END
+    }
 
-            executableContext.argumentSupplierMethod =
-                    ParameterizedUtils.getSingleton().getArumentSupplierMethod(testClass);
+    @Override
+    public void build(
+            EngineDiscoveryRequest engineDiscoveryRequest, ExecutableContext executableContext) {
+        try {
+            executableContext.put(ParameterizedExecutableConstants.TEST_CLASS, testClass);
+            executableContext.put(
+                    ParameterizedExecutableConstants.TEST_CLASS_ARGUMENT_SUPPLIER_METHOD,
+                    PARAMETERIZED_UTILS.getArumentSupplierMethod(testClass));
 
             PARAMETERIZED_UTILS
                     .getArguments(testClass)
                     .forEach(
-                            testArgument ->
-                                    addChild(
-                                            new ParameterizedArgumentTestDescriptor(
-                                                    engineDiscoveryRequest,
-                                                    executableContext,
-                                                    getUniqueId(),
-                                                    testArgument)));
+                            testArgument -> {
+                                ExecutableTestDescriptor executableTestDescriptor =
+                                        new ParameterizedArgumentTestDescriptor(
+                                                engineDiscoveryRequest,
+                                                getUniqueId(),
+                                                testArgument);
+
+                                executableTestDescriptor.build(
+                                        engineDiscoveryRequest, executableContext);
+                                addChild(executableTestDescriptor);
+
+                                executableContext.put(
+                                        ParameterizedExecutableConstants.TEST_ARGUMENT,
+                                        testArgument);
+                            });
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable t) {
@@ -134,78 +146,141 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public void execute(ExecutionRequest executionRequest) {
-        properties.put("testDescriptorClassName", getClass().getName());
-        properties.put("testClass", testClass.getName());
+    public void execute(ExecutionRequest executionRequest, ExecutableContext executableContext) {
+        stopWatch.start();
+
+        executableContext.put(ParameterizedExecutableConstants.TEST_CLASS, testClass);
+
+        metadata.put(MetadataConstants.TEST_CLASS, testClass);
 
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();
         engineExecutionListener.executionStarted(this);
 
-        try {
-            stopWatch.start();
+        AtomicReference<State> state = new AtomicReference<>(State.RUN_INSTANTIATE);
 
-            Constructor<?> constructor = testClass.getDeclaredConstructor((Class<?>[]) null);
-            Object testInstance = constructor.newInstance((Object[]) null);
-            executableContext.testInstance = testInstance;
+        if (state.get() == State.RUN_INSTANTIATE) {
+            Invocation.execute(
+                    () -> {
+                        try {
+                            Constructor<?> constructor =
+                                    testClass.getDeclaredConstructor((Class<?>[]) null);
+                            Object testInstance = constructor.newInstance((Object[]) null);
+                            executableContext.put(
+                                    ParameterizedExecutableConstants.TEST_INSTANCE, testInstance);
+                            state.set(State.RUN_PREPARE_METHODS);
+                        } catch (Throwable t) {
+                            executableContext.addAndProcessThrowable(testClass, t);
+                            state.set(State.RUN_EXECUTE);
+                        } finally {
+                            StandardStreams.flush();
+                        }
+                    });
+        }
 
-            List<Method> prepareMethods =
-                    REFLECTION_UTILS.findMethods(testClass, Filters.PREPARE_METHOD);
-            TEST_DESCRIPTOR_UTILS.sortMethods(prepareMethods, TestDescriptorUtils.Sort.FORWARD);
-            for (Method method : prepareMethods) {
-                try {
-                    LOCK_PROCESSOR.processLocks(method);
-                    MethodInvoker.invoke(method, testInstance, null);
-                } finally {
-                    LOCK_PROCESSOR.processUnlocks(method);
-                }
-            }
+        Object testInstance = executableContext.get(ParameterizedExecutableConstants.TEST_INSTANCE);
 
+        if (state.get() == State.RUN_PREPARE_METHODS) {
+            Invariant.check(testInstance != null);
+            Invocation.execute(
+                    () -> {
+                        try {
+                            List<Method> prepareMethods =
+                                    REFLECTION_UTILS.findMethods(testClass, Filters.PREPARE_METHOD);
+                            TEST_DESCRIPTOR_UTILS.sortMethods(
+                                    prepareMethods, TestDescriptorUtils.Sort.FORWARD);
+                            for (Method method : prepareMethods) {
+                                try {
+                                    LOCK_PROCESSOR.processLocks(method);
+                                    MethodInvoker.invoke(method, testInstance, null);
+                                } finally {
+                                    LOCK_PROCESSOR.processUnlocks(method);
+                                    StandardStreams.flush();
+                                }
+                            }
+                        } catch (Throwable t) {
+                            executableContext.addAndProcessThrowable(testClass, t);
+                        } finally {
+                            StandardStreams.flush();
+                            state.set(State.RUN_EXECUTE);
+                        }
+                    });
+        }
+
+        if (state.get() == State.RUN_EXECUTE) {
             getChildren()
                     .forEach(
-                            (Consumer<TestDescriptor>)
-                                    testDescriptor -> {
-                                        if (testDescriptor instanceof ExecutableTestDescriptor) {
-                                            ((ExecutableTestDescriptor) testDescriptor)
-                                                    .execute(executionRequest);
-                                        }
-                                    });
-
-            List<Method> concludeMethods =
-                    REFLECTION_UTILS.findMethods(testClass, Filters.CONCLUDE_METHOD);
-            TEST_DESCRIPTOR_UTILS.sortMethods(concludeMethods, TestDescriptorUtils.Sort.REVERSE);
-            for (Method method : concludeMethods) {
-                try {
-                    LOCK_PROCESSOR.processLocks(method);
-                    MethodInvoker.invoke(method, testInstance, null);
-                } finally {
-                    LOCK_PROCESSOR.processUnlocks(method);
-                }
+                            testDescriptor -> {
+                                if (testDescriptor instanceof ExecutableTestDescriptor) {
+                                    ((ExecutableTestDescriptor) testDescriptor)
+                                            .execute(executionRequest, executableContext);
+                                }
+                            });
+            if (testInstance != null) {
+                state.set(State.RUN_CONCLUDE_METHODS);
+            } else {
+                state.set(State.END);
             }
-
-            // Fine @TestEngine.AutoClose Fields and close them
-            List<Field> fields = REFLECTION_UTILS.findFields(testClass, Filters.AUTO_CLOSE_FIELDS);
-            for (Field field : fields) {
-                TestEngine.AutoClose annotation = field.getAnnotation(TestEngine.AutoClose.class);
-                if ("@TestEngine.Conclude".equals(annotation.lifecycle())) {
-                    AutoCloseProcessor.singleton().close(testInstance, field);
-                }
-            }
-
-            stopWatch.stop();
-            properties.put("elapsedTime", String.valueOf(stopWatch.elapsedTime()));
-            properties.put("status", "PASS");
-
-            engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
-        } catch (Throwable t) {
-            stopWatch.stop();
-            properties.put("elapsedTime", String.valueOf(stopWatch.elapsedTime()));
-            properties.put("status", "FAIL");
-
-            engineExecutionListener.executionFinished(this, TestExecutionResult.aborted(t));
-        } finally {
-            executableContext.testInstance = null;
         }
+
+        if (state.get() == State.RUN_CONCLUDE_METHODS) {
+            Invariant.check(testInstance != null);
+            Invocation.execute(
+                    () -> {
+                        List<Method> concludeMethods =
+                                REFLECTION_UTILS.findMethods(testClass, Filters.CONCLUDE_METHOD);
+                        TEST_DESCRIPTOR_UTILS.sortMethods(
+                                concludeMethods, TestDescriptorUtils.Sort.REVERSE);
+                        for (Method method : concludeMethods) {
+                            try {
+                                LOCK_PROCESSOR.processLocks(method);
+                                MethodInvoker.invoke(method, testInstance, null);
+                            } catch (Throwable t) {
+                                executableContext.addAndProcessThrowable(testClass, t);
+                            } finally {
+                                LOCK_PROCESSOR.processUnlocks(method);
+                                StandardStreams.flush();
+                            }
+                        }
+                        state.set(State.RUN_AUTO_CLOSE_FIELDS);
+                    });
+        }
+
+        if (state.get() == State.RUN_AUTO_CLOSE_FIELDS) {
+            Invariant.check(testInstance != null);
+            Invocation.execute(
+                    () -> {
+                        List<Field> fields =
+                                REFLECTION_UTILS.findFields(testClass, Filters.AUTO_CLOSE_FIELDS);
+                        for (Field field : fields) {
+                            TestEngine.AutoClose annotation =
+                                    field.getAnnotation(TestEngine.AutoClose.class);
+                            if ("@TestEngine.Conclude".equals(annotation.lifecycle())) {
+                                try {
+                                    AutoCloseProcessor.close(testInstance, field);
+                                } catch (Throwable t) {
+                                    executableContext.addAndProcessThrowable(testClass, t);
+                                } finally {
+                                    StandardStreams.flush();
+                                }
+                            }
+                        }
+                    });
+        }
+
+        stopWatch.stop();
+        metadata.put(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, stopWatch.elapsedTime());
+
+        if (executableContext.hasThrowables()) {
+            metadata.put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
+            engineExecutionListener.executionFinished(
+                    this, TestExecutionResult.failed(executableContext.getThrowables().get(0)));
+        } else {
+            metadata.put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
+            engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
+        }
+
+        executableContext.remove(ParameterizedExecutableConstants.TEST_INSTANCE);
 
         StandardStreams.flush();
     }

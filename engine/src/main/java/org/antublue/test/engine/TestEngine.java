@@ -29,6 +29,7 @@ import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.test.descriptor.ExecutableContext;
+import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.descriptor.parameterized.ParameterizedClassTestDescriptor;
 import org.antublue.test.engine.test.descriptor.standard.StandardClassTestDescriptor;
 import org.antublue.test.engine.test.descriptor.standard.StandardMethodTestDescriptor;
@@ -137,7 +138,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                                             engineDescriptor.addChild(
                                                                     new StandardClassTestDescriptor(
                                                                             engineDiscoveryRequest,
-                                                                            new ExecutableContext(),
                                                                             engineDescriptor
                                                                                     .getUniqueId(),
                                                                             c))));
@@ -156,7 +156,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                                             engineDescriptor.addChild(
                                                                     new StandardClassTestDescriptor(
                                                                             engineDiscoveryRequest,
-                                                                            new ExecutableContext(),
                                                                             engineDescriptor
                                                                                     .getUniqueId(),
                                                                             c));
@@ -172,7 +171,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                     engineDescriptor.addChild(
                                             new StandardClassTestDescriptor(
                                                     engineDiscoveryRequest,
-                                                    new ExecutableContext(),
                                                     engineDescriptor.getUniqueId(),
                                                     c));
                                 }
@@ -189,7 +187,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                     engineDescriptor.addChild(
                                             new StandardMethodTestDescriptor(
                                                     engineDiscoveryRequest,
-                                                    new ExecutableContext(),
                                                     engineDescriptor.getUniqueId(),
                                                     m));
                                 }
@@ -208,7 +205,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                                             engineDescriptor.addChild(
                                                                     new ParameterizedClassTestDescriptor(
                                                                             engineDiscoveryRequest,
-                                                                            new ExecutableContext(),
                                                                             engineDescriptor
                                                                                     .getUniqueId(),
                                                                             c))));
@@ -228,7 +224,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                                             engineDescriptor.addChild(
                                                                     new ParameterizedClassTestDescriptor(
                                                                             engineDiscoveryRequest,
-                                                                            new ExecutableContext(),
                                                                             engineDescriptor
                                                                                     .getUniqueId(),
                                                                             c));
@@ -244,13 +239,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                     engineDescriptor.addChild(
                                             new ParameterizedClassTestDescriptor(
                                                     engineDiscoveryRequest,
-                                                    new ExecutableContext(),
                                                     engineDescriptor.getUniqueId(),
                                                     c));
                                 }
                             });
 
-            // Remote test descriptors
+            // Remove test descriptors
             List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
             for (TestDescriptor testDescriptor : testDescriptors) {
                 engineDescriptor.removeChild(testDescriptor);
@@ -268,6 +262,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             // Add test descriptors
             for (TestDescriptor testDescriptor : testDescriptors) {
                 engineDescriptor.addChild(testDescriptor);
+                ((ExecutableTestDescriptor) testDescriptor)
+                        .build(engineDiscoveryRequest, new ExecutableContext());
             }
 
             return engineDescriptor;

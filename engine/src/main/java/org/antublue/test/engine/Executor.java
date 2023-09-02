@@ -28,8 +28,10 @@ import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
+import org.antublue.test.engine.test.descriptor.ExecutableContext;
 import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.util.NamedThreadFactory;
+import org.antublue.test.engine.util.StandardStreams;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
@@ -112,7 +114,11 @@ public class Executor {
                     executorService.submit(
                             () -> {
                                 try {
-                                    executableTestDescriptor.execute(executionRequest);
+                                    executableTestDescriptor.execute(
+                                            executionRequest, new ExecutableContext());
+                                } catch (Throwable t) {
+                                    t.printStackTrace();
+                                    StandardStreams.flush();
                                 } finally {
                                     countDownLatch.get().countDown();
                                 }
