@@ -54,7 +54,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
     private static final ConfigurationParameters CONFIGURATION_PARAMETERS =
-            ConfigurationParameters.singleton();
+            ConfigurationParameters.getSingleton();
 
     /** Configuration constant */
     public static final String ENGINE_ID = "antublue-test-engine";
@@ -252,7 +252,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             // Shuffle or sort test descriptors
             Optional<String> optionalShuffle =
-                    Configuration.singleton().get(Constants.TEST_CLASS_SHUFFLE);
+                    Configuration.getSingleton().get(Constants.TEST_CLASS_SHUFFLE);
             if (optionalShuffle.isPresent() && Constants.TRUE.equals(optionalShuffle.get())) {
                 Collections.shuffle(testDescriptors);
             } else {
@@ -291,7 +291,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("execute()");
 
         try {
-            ExtensionManager.singleton().initialize();
+            ExtensionManager.getSingleton().initialize();
         } catch (Throwable t) {
             throw new TestEngineException("Exception loading extensions", t);
         }

@@ -28,7 +28,7 @@ import org.antublue.test.engine.util.ReflectionUtils;
 
 public class Filters {
 
-    private static final ReflectionUtils reflectionUtils = ReflectionUtils.getSingleton();
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
     public static final Predicate<Field> ARGUMENT_FIELD =
             field -> {
@@ -64,20 +64,20 @@ public class Filters {
                     return false;
                 }
 
-                if (!reflectionUtils.isStatic(method)) {
+                if (!REFLECTION_UTILS.isStatic(method)) {
                     return false;
                 }
 
-                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                if (!(REFLECTION_UTILS.isPublic(method) || REFLECTION_UTILS.isProtected(method))) {
                     return false;
                 }
 
-                if (!reflectionUtils.hasParameterCount(method, 0)) {
+                if (!REFLECTION_UTILS.hasParameterCount(method, 0)) {
                     return false;
                 }
 
-                return reflectionUtils.hasReturnType(method, Iterable.class)
-                        || reflectionUtils.hasReturnType(method, Stream.class);
+                return REFLECTION_UTILS.hasReturnType(method, Iterable.class)
+                        || REFLECTION_UTILS.hasReturnType(method, Stream.class);
             };
 
     /*
@@ -112,23 +112,23 @@ public class Filters {
                                 && !Modifier.isAbstract(clazz.getModifiers());
 
                 if (isSimpleTestClass) {
-                    List<Method> methods = ReflectionUtils.getSingleton().findMethods(clazz);
+                    List<Method> methods = REFLECTION_UTILS.findMethods(clazz);
 
                     int testCount = 0;
                     int argumentSupplierCount = 0;
 
                     for (Method method : methods) {
                         if (method.isAnnotationPresent(TestEngine.Test.class)
-                                && !reflectionUtils.isStatic(method)
-                                && (reflectionUtils.isProtected(method)
-                                        || reflectionUtils.isPublic(method))
-                                && !reflectionUtils.isAbstract(method)) {
+                                && !REFLECTION_UTILS.isStatic(method)
+                                && (REFLECTION_UTILS.isProtected(method)
+                                        || REFLECTION_UTILS.isPublic(method))
+                                && !REFLECTION_UTILS.isAbstract(method)) {
                             testCount++;
                         } else if (method.isAnnotationPresent(TestEngine.ArgumentSupplier.class)
-                                && reflectionUtils.isStatic(method)
-                                && (reflectionUtils.isProtected(method)
-                                        || reflectionUtils.isPublic(method))
-                                && !reflectionUtils.isAbstract(method)) {
+                                && REFLECTION_UTILS.isStatic(method)
+                                && (REFLECTION_UTILS.isProtected(method)
+                                        || REFLECTION_UTILS.isPublic(method))
+                                && !REFLECTION_UTILS.isAbstract(method)) {
                             argumentSupplierCount++;
                         }
                     }
@@ -148,17 +148,17 @@ public class Filters {
                     return false;
                 }
 
-                if (reflectionUtils.isStatic(method)) {
+                if (REFLECTION_UTILS.isStatic(method)) {
                     return false;
                 }
-                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                if (!(REFLECTION_UTILS.isPublic(method) || REFLECTION_UTILS.isProtected(method))) {
                     return false;
                 }
-                if (!(reflectionUtils.hasParameterCount(method, 0)
-                        || reflectionUtils.acceptsArguments(method, Argument.class))) {
+                if (!(REFLECTION_UTILS.hasParameterCount(method, 0)
+                        || REFLECTION_UTILS.acceptsArguments(method, Argument.class))) {
                     return false;
                 }
-                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                if (!REFLECTION_UTILS.hasReturnType(method, Void.class)) {
                     return false;
                 }
                 method.setAccessible(true);
@@ -174,17 +174,17 @@ public class Filters {
                     return false;
                 }
 
-                if (reflectionUtils.isStatic(method)) {
+                if (REFLECTION_UTILS.isStatic(method)) {
                     return false;
                 }
-                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                if (!(REFLECTION_UTILS.isPublic(method) || REFLECTION_UTILS.isProtected(method))) {
                     return false;
                 }
-                if (!(reflectionUtils.hasParameterCount(method, 0)
-                        || reflectionUtils.acceptsArguments(method, Argument.class))) {
+                if (!(REFLECTION_UTILS.hasParameterCount(method, 0)
+                        || REFLECTION_UTILS.acceptsArguments(method, Argument.class))) {
                     return false;
                 }
-                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                if (!REFLECTION_UTILS.hasReturnType(method, Void.class)) {
                     return false;
                 }
                 method.setAccessible(true);
@@ -201,20 +201,20 @@ public class Filters {
                     return false;
                 }
 
-                if (reflectionUtils.isStatic(method)) {
+                if (REFLECTION_UTILS.isStatic(method)) {
                     return false;
                 }
 
-                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                if (!(REFLECTION_UTILS.isPublic(method) || REFLECTION_UTILS.isProtected(method))) {
                     return false;
                 }
 
-                if (!(reflectionUtils.hasParameterCount(method, 0)
-                        || reflectionUtils.acceptsArguments(method, Argument.class))) {
+                if (!(REFLECTION_UTILS.hasParameterCount(method, 0)
+                        || REFLECTION_UTILS.acceptsArguments(method, Argument.class))) {
                     return false;
                 }
 
-                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                if (!REFLECTION_UTILS.hasReturnType(method, Void.class)) {
                     return false;
                 }
 
@@ -231,17 +231,17 @@ public class Filters {
                 if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
                     return false;
                 }
-                if (reflectionUtils.isStatic(method)) {
+                if (REFLECTION_UTILS.isStatic(method)) {
                     return false;
                 }
-                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                if (!(REFLECTION_UTILS.isPublic(method) || REFLECTION_UTILS.isProtected(method))) {
                     return false;
                 }
-                if (!(reflectionUtils.hasParameterCount(method, 0)
-                        || reflectionUtils.acceptsArguments(method, Argument.class))) {
+                if (!(REFLECTION_UTILS.hasParameterCount(method, 0)
+                        || REFLECTION_UTILS.acceptsArguments(method, Argument.class))) {
                     return false;
                 }
-                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                if (!REFLECTION_UTILS.hasReturnType(method, Void.class)) {
                     return false;
                 }
 
@@ -259,17 +259,17 @@ public class Filters {
                     return false;
                 }
 
-                if (reflectionUtils.isStatic(method)) {
+                if (REFLECTION_UTILS.isStatic(method)) {
                     return false;
                 }
-                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                if (!(REFLECTION_UTILS.isPublic(method) || REFLECTION_UTILS.isProtected(method))) {
                     return false;
                 }
-                if (!(reflectionUtils.hasParameterCount(method, 0)
-                        || reflectionUtils.acceptsArguments(method, Argument.class))) {
+                if (!(REFLECTION_UTILS.hasParameterCount(method, 0)
+                        || REFLECTION_UTILS.acceptsArguments(method, Argument.class))) {
                     return false;
                 }
-                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                if (!REFLECTION_UTILS.hasReturnType(method, Void.class)) {
                     return false;
                 }
 
@@ -287,17 +287,17 @@ public class Filters {
                     return false;
                 }
 
-                if (reflectionUtils.isStatic(method)) {
+                if (REFLECTION_UTILS.isStatic(method)) {
                     return false;
                 }
-                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                if (!(REFLECTION_UTILS.isPublic(method) || REFLECTION_UTILS.isProtected(method))) {
                     return false;
                 }
-                if (!(reflectionUtils.hasParameterCount(method, 0)
-                        || reflectionUtils.acceptsArguments(method, Argument.class))) {
+                if (!(REFLECTION_UTILS.hasParameterCount(method, 0)
+                        || REFLECTION_UTILS.acceptsArguments(method, Argument.class))) {
                     return false;
                 }
-                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                if (!REFLECTION_UTILS.hasReturnType(method, Void.class)) {
                     return false;
                 }
 
@@ -315,17 +315,17 @@ public class Filters {
                     return false;
                 }
 
-                if (reflectionUtils.isStatic(method)) {
+                if (REFLECTION_UTILS.isStatic(method)) {
                     return false;
                 }
-                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                if (!(REFLECTION_UTILS.isPublic(method) || REFLECTION_UTILS.isProtected(method))) {
                     return false;
                 }
-                if (!(reflectionUtils.hasParameterCount(method, 0)
-                        || reflectionUtils.acceptsArguments(method, Argument.class))) {
+                if (!(REFLECTION_UTILS.hasParameterCount(method, 0)
+                        || REFLECTION_UTILS.acceptsArguments(method, Argument.class))) {
                     return false;
                 }
-                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                if (!REFLECTION_UTILS.hasReturnType(method, Void.class)) {
                     return false;
                 }
 
@@ -342,23 +342,23 @@ public class Filters {
                                 && !Modifier.isAbstract(clazz.getModifiers());
 
                 if (isParameterizedTestClass) {
-                    List<Method> methods = ReflectionUtils.getSingleton().findMethods(clazz);
+                    List<Method> methods = REFLECTION_UTILS.findMethods(clazz);
 
                     int testCount = 0;
                     int argumentSupplierCount = 0;
 
                     for (Method method : methods) {
                         if (method.isAnnotationPresent(TestEngine.Test.class)
-                                && !reflectionUtils.isStatic(method)
-                                && (reflectionUtils.isProtected(method)
-                                        || reflectionUtils.isPublic(method))
-                                && !reflectionUtils.isAbstract(method)) {
+                                && !REFLECTION_UTILS.isStatic(method)
+                                && (REFLECTION_UTILS.isProtected(method)
+                                        || REFLECTION_UTILS.isPublic(method))
+                                && !REFLECTION_UTILS.isAbstract(method)) {
                             testCount++;
                         } else if (method.isAnnotationPresent(TestEngine.ArgumentSupplier.class)
-                                && reflectionUtils.isStatic(method)
-                                && (reflectionUtils.isProtected(method)
-                                        || reflectionUtils.isPublic(method))
-                                && !reflectionUtils.isAbstract(method)) {
+                                && REFLECTION_UTILS.isStatic(method)
+                                && (REFLECTION_UTILS.isProtected(method)
+                                        || REFLECTION_UTILS.isPublic(method))
+                                && !REFLECTION_UTILS.isAbstract(method)) {
                             argumentSupplierCount++;
                         }
                     }
@@ -377,22 +377,22 @@ public class Filters {
                 if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
                     return false;
                 }
-                if (reflectionUtils.isStatic(method)) {
+                if (REFLECTION_UTILS.isStatic(method)) {
                     return false;
                 }
-                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
+                if (!(REFLECTION_UTILS.isPublic(method) || REFLECTION_UTILS.isProtected(method))) {
                     return false;
                 }
-                if (reflectionUtils.acceptsArguments(method, Argument.class)) {
-                    if (reflectionUtils
+                if (REFLECTION_UTILS.acceptsArguments(method, Argument.class)) {
+                    if (REFLECTION_UTILS
                             .findFields(method.getDeclaringClass(), ARGUMENT_FIELD)
                             .isEmpty()) {
                         return false;
                     }
-                } else if (!reflectionUtils.hasParameterCount(method, 0)) {
+                } else if (!REFLECTION_UTILS.hasParameterCount(method, 0)) {
                     return false;
                 }
-                if (!reflectionUtils.hasReturnType(method, Void.class)) {
+                if (!REFLECTION_UTILS.hasReturnType(method, Void.class)) {
                     return false;
                 }
 

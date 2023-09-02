@@ -47,7 +47,7 @@ public class Logger {
     public Logger(String name) {
         this.name = name;
 
-        Configuration configuration = Configuration.singleton();
+        Configuration configuration = Configuration.getSingleton();
 
         Level derivedLevel = Level.INFO;
 

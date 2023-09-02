@@ -108,7 +108,7 @@ public class Configuration {
      *
      * @return the singleton
      */
-    public static synchronized Configuration singleton() {
+    public static synchronized Configuration getSingleton() {
         if (SINGLETON == null) {
             SINGLETON = new Configuration();
         }

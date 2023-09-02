@@ -29,20 +29,9 @@ public class RandomFieldInjector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomFieldInjector.class);
 
-    private static final RandomFieldInjector SINGLETON = new RandomFieldInjector();
-
     /** Constructor */
     private RandomFieldInjector() {
         // DO NOTHING
-    }
-
-    /**
-     * Method to get the singleton
-     *
-     * @return the singleton
-     */
-    public static RandomFieldInjector singleton() {
-        return SINGLETON;
     }
 
     /**
@@ -52,7 +41,7 @@ public class RandomFieldInjector {
      * @param field field
      * @throws Throwable Throwable
      */
-    public void inject(Object object, Field field) throws Throwable {
+    public static void inject(Object object, Field field) throws Throwable {
         LOGGER.trace(
                 "inject class [%s] field [%s] field type [%s]",
                 object.getClass().getName(), field.getName(), field.getType().getName());
@@ -120,7 +109,7 @@ public class RandomFieldInjector {
      * @param field field
      * @throws Throwable Throwable
      */
-    private void setBoolean(Object object, Field field) throws Throwable {
+    private static void setBoolean(Object object, Field field) throws Throwable {
         LOGGER.trace(
                 "injecting random boolean class [%s] field [%s]",
                 object.getClass().getName(), field.getName());
@@ -137,7 +126,8 @@ public class RandomFieldInjector {
      * @param maximum maximum
      * @throws Throwable Throwable
      */
-    private void setInteger(Object object, Field field, int minimum, int maximum) throws Throwable {
+    private static void setInteger(Object object, Field field, int minimum, int maximum)
+            throws Throwable {
         LOGGER.trace(
                 "injecting random integer class [%s] field [%s] minimum [%s] maximum [%s]",
                 object.getClass().getName(), field.getName(), minimum, maximum);
@@ -154,7 +144,8 @@ public class RandomFieldInjector {
      * @param maximum maximum
      * @throws Throwable Throwable
      */
-    private void setLong(Object object, Field field, long minimum, long maximum) throws Throwable {
+    private static void setLong(Object object, Field field, long minimum, long maximum)
+            throws Throwable {
         LOGGER.trace(
                 "injecting random long class [%s] field [%s] minimum [%s] maximum [%s]",
                 object.getClass().getName(), field.getName(), minimum, maximum);
@@ -171,7 +162,7 @@ public class RandomFieldInjector {
      * @param maximum maximum
      * @throws Throwable Throwable
      */
-    private void setFloat(Object object, Field field, float minimum, float maximum)
+    private static void setFloat(Object object, Field field, float minimum, float maximum)
             throws Throwable {
         LOGGER.trace(
                 "injecting random float class [%s] field [%s] minimum [%s] maximum [%s]",
@@ -189,7 +180,7 @@ public class RandomFieldInjector {
      * @param maximum maximum
      * @throws Throwable Throwable
      */
-    private void setDouble(Object object, Field field, double minimum, double maximum)
+    private static void setDouble(Object object, Field field, double minimum, double maximum)
             throws Throwable {
         LOGGER.trace(
                 "injecting random double class [%s] field [%s] minimum [%s] maximum [%s]",
@@ -207,7 +198,7 @@ public class RandomFieldInjector {
      * @param maximum maximum
      * @throws Throwable Throwable
      */
-    private void setBigInteger(Object object, Field field, String minimum, String maximum)
+    private static void setBigInteger(Object object, Field field, String minimum, String maximum)
             throws Throwable {
         LOGGER.trace(
                 "injecting random BigInteger class [%s] field [%s] minimum [%s] maximum [%s]",
@@ -225,7 +216,7 @@ public class RandomFieldInjector {
      * @param maximum maximum
      * @throws Throwable Throwable
      */
-    private void setBigDecimal(Object object, Field field, String minimum, String maximum)
+    private static void setBigDecimal(Object object, Field field, String minimum, String maximum)
             throws Throwable {
         LOGGER.trace(
                 "injecting random BigDecimal class [%s] field [%s] minimum [%s] maximum [%s]",

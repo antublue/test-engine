@@ -26,7 +26,7 @@ public final class LoggerFactory {
 
     private static LoggerFactory SINGLETON;
 
-    private static final Configuration CONFIGURATION = Configuration.singleton();
+    private static final Configuration CONFIGURATION = Configuration.getSingleton();
 
     private final Map<String, Logger> loggerMap = new HashMap<>();
 

@@ -25,14 +25,13 @@ import org.antublue.test.engine.configuration.Configuration;
 @SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
-    private static final ConfigurationParameters CONFIGURATION_PARAMETERS =
-            new ConfigurationParameters();
+    private static final ConfigurationParameters SINGLETON = new ConfigurationParameters();
 
-    private Configuration configuration;
+    private static final Configuration CONFIGURATION = Configuration.getSingleton();
 
     /** Constructor */
     private ConfigurationParameters() {
-        configuration = Configuration.singleton();
+        // DO NOTHING
     }
 
     /**
@@ -40,23 +39,23 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
      *
      * @return the singleton instance
      */
-    public static ConfigurationParameters singleton() {
-        return CONFIGURATION_PARAMETERS;
+    public static ConfigurationParameters getSingleton() {
+        return SINGLETON;
     }
 
     @Override
     public Optional<String> get(String key) {
-        return configuration.get(key);
+        return CONFIGURATION.get(key);
     }
 
     @Override
     public Optional<Boolean> getBoolean(String key) {
-        return configuration.getBoolean(key);
+        return CONFIGURATION.getBoolean(key);
     }
 
     @Override
     public <T> Optional<T> get(String key, Function<String, T> transformer) {
-        Optional<String> value = configuration.get(key);
+        Optional<String> value = CONFIGURATION.get(key);
         if (value.isPresent()) {
             return Optional.ofNullable(transformer.apply(value.get()));
         } else {

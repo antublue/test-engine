@@ -227,7 +227,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             new ExecutionRequest(
                                     testDescriptor,
                                     delegatingEngineExecutionListener,
-                                    ConfigurationParameters.singleton());
+                                    ConfigurationParameters.getSingleton());
 
                     testEngine.execute(executionRequest);
 

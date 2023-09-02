@@ -38,6 +38,8 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(TestDescriptorExecutionListener.class);
 
+    private static final Configuration CONFIGURATION = Configuration.getSingleton();
+
     private static final String INFO =
             new AnsiColorStringBuilder()
                     .color(AnsiColor.WHITE)
@@ -83,7 +85,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
     /** Constructor */
     public TestDescriptorExecutionListener() {
         logTiming =
-                Configuration.singleton()
+                CONFIGURATION
                         .get(Constants.CONSOLE_LOG_TIMING)
                         .map(
                                 value -> {
@@ -98,7 +100,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
         LOGGER.trace("configuration [%s] = [%b]", Constants.CONSOLE_LOG_TIMING, logTiming);
 
         nanosecondsConverter =
-                Configuration.singleton()
+                CONFIGURATION
                         .get(Constants.CONSOLE_LOG_TIMING_UNITS)
                         .map(NanosecondsConverter::decode)
                         .orElse(NanosecondsConverter.MILLISECONDS);
@@ -108,7 +110,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
                 Constants.CONSOLE_LOG_TIMING_UNITS, nanosecondsConverter);
 
         logTestMessages =
-                Configuration.singleton()
+                CONFIGURATION
                         .get(Constants.CONSOLE_LOG_TEST_MESSAGES)
                         .map(
                                 value -> {
@@ -124,7 +126,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
                 "configuration [%s] = [%b]", Constants.CONSOLE_LOG_TEST_MESSAGES, logTestMessages);
 
         logPassMessages =
-                Configuration.singleton()
+                CONFIGURATION
                         .get(Constants.CONSOLE_LOG_PASS_MESSAGES)
                         .map(
                                 value -> {
@@ -140,7 +142,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
                 "configuration [%s] = [%b]", Constants.CONSOLE_LOG_PASS_MESSAGES, logPassMessages);
 
         logSkipMessages =
-                Configuration.singleton()
+                CONFIGURATION
                         .get(Constants.CONSOLE_LOG_SKIP_MESSAGES)
                         .map(
                                 value -> {

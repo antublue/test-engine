@@ -218,7 +218,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
                             List<Field> fields =
                                     REFLECTION_UTILS.findFields(testClass, Filters.RANDOM_FIELD);
                             for (Field field : fields) {
-                                RandomFieldInjector.singleton().inject(testInstance, field);
+                                RandomFieldInjector.inject(testInstance, field);
                             }
                             state.set(State.RUN_BEFORE_ALL_METHODS);
                         } catch (Throwable t) {

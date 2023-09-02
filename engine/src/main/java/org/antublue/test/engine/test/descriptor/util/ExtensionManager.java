@@ -43,6 +43,15 @@ public class ExtensionManager {
     }
 
     /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static ExtensionManager getSingleton() {
+        return SINGLETON;
+    }
+
+    /**
      * Method to load configured global extensions
      *
      * @throws Throwable Throwable
@@ -52,7 +61,7 @@ public class ExtensionManager {
 
         ReflectionUtils reflectionUtils = ReflectionUtils.getSingleton();
 
-        Optional<String> optional = Configuration.singleton().get(Constants.EXTENSIONS);
+        Optional<String> optional = Configuration.getSingleton().get(Constants.EXTENSIONS);
         if (optional.isPresent() && !optional.get().trim().isEmpty()) {
             String[] classNames = optional.get().split("\\s+");
             for (String className : classNames) {
@@ -76,14 +85,5 @@ public class ExtensionManager {
      */
     public List<Extension> getExtensions() {
         return new ArrayList<>(extensionMap.values());
-    }
-
-    /**
-     * Method to get the singleton instance
-     *
-     * @return the singleton instance
-     */
-    public static ExtensionManager singleton() {
-        return SINGLETON;
     }
 }
