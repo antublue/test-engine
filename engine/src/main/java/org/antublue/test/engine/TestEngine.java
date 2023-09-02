@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,23 +29,15 @@ import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.test.descriptor.ExecutableContext;
 import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
-import org.antublue.test.engine.test.descriptor.parameterized.ParameterizedClassTestDescriptor;
-import org.antublue.test.engine.test.descriptor.parameterized.ParameterizedFilters;
-import org.antublue.test.engine.test.descriptor.standard.StandardClassTestDescriptor;
-import org.antublue.test.engine.test.descriptor.standard.StandardFilters;
-import org.antublue.test.engine.test.descriptor.standard.StandardMethodTestDescriptor;
+import org.antublue.test.engine.test.descriptor.parameterized.ParameterizedTestDescriptorFactory;
+import org.antublue.test.engine.test.descriptor.standard.StandardTestDescriptorFactory;
 import org.antublue.test.engine.test.descriptor.util.ExtensionManager;
-import org.antublue.test.engine.util.ReflectionUtils;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.discovery.ClassSelector;
-import org.junit.platform.engine.discovery.ClasspathRootSelector;
-import org.junit.platform.engine.discovery.MethodSelector;
-import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement the AntuBLUE Test Engine */
@@ -124,128 +115,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
-            ReflectionUtils reflectionUtils = ReflectionUtils.getSingleton();
-
-            engineDiscoveryRequest
-                    .getSelectorsByType(ClasspathRootSelector.class)
-                    .forEach(
-                            classpathRootSelector ->
-                                    reflectionUtils
-                                            .findAllClasses(
-                                                    classpathRootSelector.getClasspathRoot(),
-                                                    StandardFilters.TEST_CLASS)
-                                            .forEach(
-                                                    c ->
-                                                            engineDescriptor.addChild(
-                                                                    new StandardClassTestDescriptor(
-                                                                            engineDiscoveryRequest,
-                                                                            engineDescriptor
-                                                                                    .getUniqueId(),
-                                                                            c))));
-
-            engineDiscoveryRequest
-                    .getSelectorsByType(PackageSelector.class)
-                    .forEach(
-                            packageSelector ->
-                                    ReflectionUtils.getSingleton()
-                                            .findAllClasses(
-                                                    packageSelector.getPackageName(),
-                                                    StandardFilters.TEST_CLASS)
-                                            .forEach(
-                                                    c -> {
-                                                        if (StandardFilters.TEST_CLASS.test(c)) {
-                                                            engineDescriptor.addChild(
-                                                                    new StandardClassTestDescriptor(
-                                                                            engineDiscoveryRequest,
-                                                                            engineDescriptor
-                                                                                    .getUniqueId(),
-                                                                            c));
-                                                        }
-                                                    }));
-
-            engineDiscoveryRequest
-                    .getSelectorsByType(ClassSelector.class)
-                    .forEach(
-                            classSelector -> {
-                                Class<?> c = classSelector.getJavaClass();
-                                if (StandardFilters.TEST_CLASS.test(c)) {
-                                    engineDescriptor.addChild(
-                                            new StandardClassTestDescriptor(
-                                                    engineDiscoveryRequest,
-                                                    engineDescriptor.getUniqueId(),
-                                                    c));
-                                }
-                            });
-
-            engineDiscoveryRequest
-                    .getSelectorsByType(MethodSelector.class)
-                    .forEach(
-                            methodSelector -> {
-                                Class<?> c = methodSelector.getJavaClass();
-                                Method m = methodSelector.getJavaMethod();
-                                if (StandardFilters.TEST_CLASS.test(c)
-                                        && StandardFilters.TEST_METHOD.test(m)) {
-                                    engineDescriptor.addChild(
-                                            new StandardMethodTestDescriptor(
-                                                    engineDiscoveryRequest,
-                                                    engineDescriptor.getUniqueId(),
-                                                    m));
-                                }
-                            });
-
-            engineDiscoveryRequest
-                    .getSelectorsByType(ClasspathRootSelector.class)
-                    .forEach(
-                            classpathRootSelector ->
-                                    reflectionUtils
-                                            .findAllClasses(
-                                                    classpathRootSelector.getClasspathRoot(),
-                                                    ParameterizedFilters.TEST_CLASS)
-                                            .forEach(
-                                                    c ->
-                                                            engineDescriptor.addChild(
-                                                                    new ParameterizedClassTestDescriptor(
-                                                                            engineDiscoveryRequest,
-                                                                            engineDescriptor
-                                                                                    .getUniqueId(),
-                                                                            c))));
-
-            engineDiscoveryRequest
-                    .getSelectorsByType(PackageSelector.class)
-                    .forEach(
-                            packageSelector ->
-                                    ReflectionUtils.getSingleton()
-                                            .findAllClasses(
-                                                    packageSelector.getPackageName(),
-                                                    ParameterizedFilters.TEST_CLASS)
-                                            .forEach(
-                                                    c -> {
-                                                        if (ParameterizedFilters.TEST_CLASS.test(
-                                                                c)) {
-                                                            engineDescriptor.addChild(
-                                                                    new ParameterizedClassTestDescriptor(
-                                                                            engineDiscoveryRequest,
-                                                                            engineDescriptor
-                                                                                    .getUniqueId(),
-                                                                            c));
-                                                        }
-                                                    }));
-
-            engineDiscoveryRequest
-                    .getSelectorsByType(ClassSelector.class)
-                    .forEach(
-                            classSelector -> {
-                                Class<?> c = classSelector.getJavaClass();
-                                if (ParameterizedFilters.TEST_CLASS.test(c)) {
-                                    engineDescriptor.addChild(
-                                            new ParameterizedClassTestDescriptor(
-                                                    engineDiscoveryRequest,
-                                                    engineDescriptor.getUniqueId(),
-                                                    c));
-                                }
-                            });
-
-            // TODO add support for ParameterizedMethodTestDescriptor
+            StandardTestDescriptorFactory.discover(engineDiscoveryRequest, engineDescriptor);
+            ParameterizedTestDescriptorFactory.discover(engineDiscoveryRequest, engineDescriptor);
 
             // Remove test descriptors
             List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
