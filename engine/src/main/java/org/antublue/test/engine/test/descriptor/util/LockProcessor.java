@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.exception.TestClassConfigurationException;
+import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 
@@ -183,7 +183,7 @@ public class LockProcessor {
                         name.trim(), mode, method.getDeclaringClass().getName(), method.getName());
 
             } else {
-                throw new TestClassConfigurationException(
+                throw new TestClassDefinitionException(
                         String.format(
                                 "@TestEngine.Unlock without @TestEngine.Lock, name [%s] mode [%s]"
                                         + " class [%s] method [%s]",

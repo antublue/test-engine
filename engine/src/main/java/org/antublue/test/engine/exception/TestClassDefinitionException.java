@@ -17,24 +17,15 @@
 package org.antublue.test.engine.exception;
 
 /** Class to implement a test class configuration exception */
-public class TestClassConfigurationException extends RuntimeException {
+public class TestClassDefinitionException extends RuntimeException {
 
     /**
      * Constructor
      *
      * @param message message
      */
-    public TestClassConfigurationException(String message) {
+    public TestClassDefinitionException(String message) {
         super(message);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param message message
-     * @param throwable throwable
-     */
-    public TestClassConfigurationException(String message, Throwable throwable) {
-        super(message, throwable);
+        setStackTrace(new StackTraceElement[0]);
     }
 }

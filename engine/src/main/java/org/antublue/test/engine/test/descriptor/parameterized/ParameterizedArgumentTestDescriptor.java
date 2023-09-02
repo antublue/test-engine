@@ -30,7 +30,6 @@ import org.antublue.test.engine.test.descriptor.Metadata;
 import org.antublue.test.engine.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.test.descriptor.MetadataSupport;
 import org.antublue.test.engine.test.descriptor.util.AutoCloseProcessor;
-import org.antublue.test.engine.test.descriptor.util.Filters;
 import org.antublue.test.engine.test.descriptor.util.LockProcessor;
 import org.antublue.test.engine.test.descriptor.util.MethodInvoker;
 import org.antublue.test.engine.test.descriptor.util.RandomFieldInjector;
@@ -122,7 +121,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
             Invariant.check(testArgumentSupplierMethod != null);
 
             List<Method> methods =
-                    REFLECTION_UTILS.findMethods(testClass, Filters.PARAMETERIZED_TEST_METHOD);
+                    REFLECTION_UTILS.findMethods(testClass, ParameterizedFilters.TEST_METHOD);
 
             TEST_DESCRIPTOR_UTILS.sortMethods(methods, TestDescriptorUtils.Sort.FORWARD);
 
@@ -197,7 +196,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
                     () -> {
                         try {
                             List<Field> fields =
-                                    REFLECTION_UTILS.findFields(testClass, Filters.ARGUMENT_FIELD);
+                                    REFLECTION_UTILS.findFields(testClass, ParameterizedFilters.ARGUMENT_FIELD);
                             for (Field field : fields) {
                                 field.set(testInstance, testArgument);
                             }
@@ -216,7 +215,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
                     () -> {
                         try {
                             List<Field> fields =
-                                    REFLECTION_UTILS.findFields(testClass, Filters.RANDOM_FIELD);
+                                    REFLECTION_UTILS.findFields(testClass, ParameterizedFilters.RANDOM_FIELD);
                             for (Field field : fields) {
                                 RandomFieldInjector.inject(testInstance, field);
                             }
@@ -236,7 +235,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
                         try {
                             List<Method> beforeAllMethods =
                                     REFLECTION_UTILS.findMethods(
-                                            testClass, Filters.BEFORE_ALL_METHOD);
+                                            testClass, ParameterizedFilters.BEFORE_ALL_METHOD);
                             TEST_DESCRIPTOR_UTILS.sortMethods(
                                     beforeAllMethods, TestDescriptorUtils.Sort.FORWARD);
                             for (Method method : beforeAllMethods) {
@@ -276,7 +275,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
             Invocation.execute(
                     () -> {
                         List<Method> afterAllMethods =
-                                REFLECTION_UTILS.findMethods(testClass, Filters.AFTER_ALL_METHOD);
+                                REFLECTION_UTILS.findMethods(testClass, ParameterizedFilters.AFTER_ALL_METHOD);
                         TEST_DESCRIPTOR_UTILS.sortMethods(
                                 afterAllMethods, TestDescriptorUtils.Sort.REVERSE);
                         for (Method method : afterAllMethods) {
@@ -298,7 +297,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
             Invocation.execute(
                     () -> {
                         List<Field> fields =
-                                REFLECTION_UTILS.findFields(testClass, Filters.AUTO_CLOSE_FIELDS);
+                                REFLECTION_UTILS.findFields(testClass, ParameterizedFilters.AUTO_CLOSE_FIELDS);
                         for (Field field : fields) {
                             TestEngine.AutoClose annotation =
                                     field.getAnnotation(TestEngine.AutoClose.class);
@@ -320,7 +319,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
             Invocation.execute(
                     () -> {
                         List<Field> fields =
-                                REFLECTION_UTILS.findFields(testClass, Filters.ARGUMENT_FIELD);
+                                REFLECTION_UTILS.findFields(testClass, ParameterizedFilters.ARGUMENT_FIELD);
                         for (Field field : fields) {
                             try {
                                 field.set(testInstance, null);

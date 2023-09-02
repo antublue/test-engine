@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.configuration.Configuration;
 import org.antublue.test.engine.configuration.Constants;
-import org.antublue.test.engine.exception.TestClassConfigurationException;
+import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
@@ -32,9 +32,10 @@ import org.antublue.test.engine.test.descriptor.ExecutableContext;
 import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.descriptor.parameterized.ParameterizedClassTestDescriptor;
 import org.antublue.test.engine.test.descriptor.standard.StandardClassTestDescriptor;
+import org.antublue.test.engine.test.descriptor.standard.StandardFilters;
 import org.antublue.test.engine.test.descriptor.standard.StandardMethodTestDescriptor;
 import org.antublue.test.engine.test.descriptor.util.ExtensionManager;
-import org.antublue.test.engine.test.descriptor.util.Filters;
+import org.antublue.test.engine.test.descriptor.parameterized.ParameterizedFilters;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
@@ -132,7 +133,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                     reflectionUtils
                                             .findAllClasses(
                                                     classpathRootSelector.getClasspathRoot(),
-                                                    Filters.STANDARD_TEST_CLASS)
+                                                    StandardFilters.TEST_CLASS)
                                             .forEach(
                                                     c ->
                                                             engineDescriptor.addChild(
@@ -149,10 +150,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                     ReflectionUtils.getSingleton()
                                             .findAllClasses(
                                                     packageSelector.getPackageName(),
-                                                    Filters.STANDARD_TEST_CLASS)
+                                                    StandardFilters.TEST_CLASS)
                                             .forEach(
                                                     c -> {
-                                                        if (Filters.STANDARD_TEST_CLASS.test(c)) {
+                                                        if (StandardFilters.TEST_CLASS.test(c)) {
                                                             engineDescriptor.addChild(
                                                                     new StandardClassTestDescriptor(
                                                                             engineDiscoveryRequest,
@@ -167,7 +168,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     .forEach(
                             classSelector -> {
                                 Class<?> c = classSelector.getJavaClass();
-                                if (Filters.STANDARD_TEST_CLASS.test(c)) {
+                                if (StandardFilters.TEST_CLASS.test(c)) {
                                     engineDescriptor.addChild(
                                             new StandardClassTestDescriptor(
                                                     engineDiscoveryRequest,
@@ -182,8 +183,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                             methodSelector -> {
                                 Class<?> c = methodSelector.getJavaClass();
                                 Method m = methodSelector.getJavaMethod();
-                                if (Filters.STANDARD_TEST_CLASS.test(c)
-                                        && Filters.STANDARD_TEST_METHOD.test(m)) {
+                                if (StandardFilters.TEST_CLASS.test(c)
+                                        && StandardFilters.TEST_METHOD.test(m)) {
                                     engineDescriptor.addChild(
                                             new StandardMethodTestDescriptor(
                                                     engineDiscoveryRequest,
@@ -199,7 +200,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                     reflectionUtils
                                             .findAllClasses(
                                                     classpathRootSelector.getClasspathRoot(),
-                                                    Filters.PARAMETERIZED_TEST_CLASS)
+                                                    ParameterizedFilters.TEST_CLASS)
                                             .forEach(
                                                     c ->
                                                             engineDescriptor.addChild(
@@ -216,10 +217,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                     ReflectionUtils.getSingleton()
                                             .findAllClasses(
                                                     packageSelector.getPackageName(),
-                                                    Filters.PARAMETERIZED_TEST_CLASS)
+                                                    ParameterizedFilters.TEST_CLASS)
                                             .forEach(
                                                     c -> {
-                                                        if (Filters.PARAMETERIZED_TEST_CLASS.test(
+                                                        if (ParameterizedFilters.TEST_CLASS.test(
                                                                 c)) {
                                                             engineDescriptor.addChild(
                                                                     new ParameterizedClassTestDescriptor(
@@ -235,7 +236,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     .forEach(
                             classSelector -> {
                                 Class<?> c = classSelector.getJavaClass();
-                                if (Filters.PARAMETERIZED_TEST_CLASS.test(c)) {
+                                if (ParameterizedFilters.TEST_CLASS.test(c)) {
                                     engineDescriptor.addChild(
                                             new ParameterizedClassTestDescriptor(
                                                     engineDiscoveryRequest,
@@ -243,6 +244,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                                     c));
                                 }
                             });
+
+            // TODO add support for ParameterizedMethodTestDescriptor
 
             // Remove test descriptors
             List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
@@ -267,7 +270,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             }
 
             return engineDescriptor;
-        } catch (TestClassConfigurationException | TestEngineException t) {
+        } catch (TestClassDefinitionException | TestEngineException t) {
             if (Constants.TRUE.equals(System.getProperty(Constants.MAVEN_PLUGIN))) {
                 throw t;
             }

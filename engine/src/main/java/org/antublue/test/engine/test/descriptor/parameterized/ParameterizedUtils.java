@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.test.descriptor.util.Filters;
 import org.antublue.test.engine.test.descriptor.util.TestDescriptorUtils;
 import org.antublue.test.engine.util.ReflectionUtils;
 
@@ -43,10 +42,7 @@ public class ParameterizedUtils {
     }
 
     public Method getArumentSupplierMethod(Class<?> testClass) {
-        List<Method> methods =
-                REFLECTION_UTILS.findMethods(testClass, Filters.ARGUMENT_SUPPLIER_METHOD);
-
-        return methods.get(0);
+        return REFLECTION_UTILS.findMethods(testClass, ParameterizedFilters.ARGUMENT_SUPPLIER_METHOD).get(0);
     }
 
     public List<Argument> getArguments(Class<?> testClass) throws Throwable {

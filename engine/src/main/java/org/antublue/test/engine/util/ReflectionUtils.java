@@ -280,7 +280,7 @@ public final class ReflectionUtils {
         }
 
         for (int i = 0; i < parameterTypes.length; i++) {
-            if (methodParameterTypes[i].isAssignableFrom(parameterTypes[i])) {
+            if (!parameterTypes[i].isAssignableFrom(methodParameterTypes[i])) {
                 return false;
             }
         }

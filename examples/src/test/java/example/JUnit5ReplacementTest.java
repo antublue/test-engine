@@ -21,6 +21,10 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class JUnit5ReplacementTest {
 
+    public JUnit5ReplacementTest() {
+        // DO NOTHING
+    }
+
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
