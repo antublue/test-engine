@@ -16,28 +16,14 @@
 
 package example;
 
-import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
 public class JUnit5ReplacementTest {
 
-    // The stringArgument is required by the test engine, but is not actually used in test methods
-    @TestEngine.Argument protected StringArgument stringArgument;
-
-    // The stringArgument provides a node in the hierarchy, but is not actually used in test methods
-    @TestEngine.ArgumentSupplier
-    protected static Stream<StringArgument> arguments() {
-        return Stream.of(StringArgument.of("----"));
-    }
-
-    // For a single Argument, a @TestEngine.Prepare method is equivalent to a @TestEngine.BeforeAll
-    // method
-
-    @TestEngine.BeforeAll
-    public void beforeAll() {
-        System.out.println("beforeAll()");
+    @TestEngine.Prepare
+    public void prepare() {
+        System.out.println("prepare()");
     }
 
     @TestEngine.BeforeEach
@@ -60,11 +46,8 @@ public class JUnit5ReplacementTest {
         System.out.println("afterEach()");
     }
 
-    @TestEngine.AfterAll
-    public void afterAll() {
-        System.out.println("afterAll()");
+    @TestEngine.Conclude
+    public void conclude() {
+        System.out.println("conclude()");
     }
-
-    // For a single Argument, a @TestEngine.Conclude method is equivalent to a @TestEngine.AfterAll
-    // method
 }
