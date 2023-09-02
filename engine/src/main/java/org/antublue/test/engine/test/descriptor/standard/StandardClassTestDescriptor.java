@@ -251,6 +251,9 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                 REFLECTION_UTILS.findMethods(
                         testClass, method -> method.isAnnotationPresent(TestEngine.Prepare.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!StandardFilters.PREPARE_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
@@ -265,6 +268,9 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                         testClass,
                         method -> method.isAnnotationPresent(TestEngine.BeforeEach.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!StandardFilters.BEFORE_EACH_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
@@ -278,6 +284,9 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                 REFLECTION_UTILS.findMethods(
                         testClass, method -> method.isAnnotationPresent(TestEngine.Test.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!StandardFilters.TEST_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
@@ -292,6 +301,9 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                         testClass,
                         method -> method.isAnnotationPresent(TestEngine.AfterEach.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!StandardFilters.AFTER_EACH_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
@@ -305,6 +317,9 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                 REFLECTION_UTILS.findMethods(
                         testClass, method -> method.isAnnotationPresent(TestEngine.Conclude.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!StandardFilters.CONCLUDE_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(

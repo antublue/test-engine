@@ -324,6 +324,9 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                 REFLECTION_UTILS.findMethods(
                         testClass, method -> method.isAnnotationPresent(TestEngine.Prepare.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!ParameterizedFilters.PREPARE_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
@@ -338,6 +341,9 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                         testClass,
                         method -> method.isAnnotationPresent(TestEngine.BeforeAll.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!ParameterizedFilters.BEFORE_ALL_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
@@ -352,6 +358,9 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                         testClass,
                         method -> method.isAnnotationPresent(TestEngine.BeforeEach.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!ParameterizedFilters.BEFORE_EACH_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
@@ -365,6 +374,9 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                 REFLECTION_UTILS.findMethods(
                         testClass, method -> method.isAnnotationPresent(TestEngine.Test.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!ParameterizedFilters.TEST_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
@@ -379,6 +391,9 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                         testClass,
                         method -> method.isAnnotationPresent(TestEngine.AfterEach.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!ParameterizedFilters.AFTER_EACH_METHOD.test(method)) {
                 TestClassDefinitionException testClassDefinitionException =
                         new TestClassDefinitionException(
@@ -395,6 +410,9 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                 REFLECTION_UTILS.findMethods(
                         testClass, method -> method.isAnnotationPresent(TestEngine.AfterAll.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!ParameterizedFilters.AFTER_ALL_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
@@ -408,6 +426,9 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                 REFLECTION_UTILS.findMethods(
                         testClass, method -> method.isAnnotationPresent(TestEngine.Conclude.class));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
+                continue;
+            }
             if (!ParameterizedFilters.CONCLUDE_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
