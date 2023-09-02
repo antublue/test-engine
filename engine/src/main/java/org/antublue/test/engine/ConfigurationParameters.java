@@ -66,11 +66,11 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
     @SuppressWarnings("deprecation")
     @Override
     public int size() {
-        throw new UnsupportedOperationException();
+        return CONFIGURATION.size();
     }
 
     @Override
     public Set<String> keySet() {
-        throw new UnsupportedOperationException();
+        return CONFIGURATION.keySet();
     }
 }

@@ -20,8 +20,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 /** Class to implement Configuration */
@@ -50,6 +54,8 @@ public class Configuration {
 
     private final Properties properties;
 
+    private Set<String> keySet;
+
     /** Constructor */
     private Configuration() {
         properties = new Properties();
@@ -77,7 +83,7 @@ public class Configuration {
 
         if (propertiesFilename == null) {
             AtomicReference<String> atomicReference = new AtomicReference<>();
-            recuresivleFindTestEnginePropertiesFile(
+            recursivelyFindTestEnginePropertiesFile(
                     new File(".").getAbsoluteFile(), atomicReference);
             propertiesFilename = atomicReference.get();
         }
@@ -96,10 +102,21 @@ public class Configuration {
 
             try (Reader reader = new FileReader(propertiesFilename)) {
                 properties.load(reader);
+
+                Map<String, Boolean> map = new TreeMap<>();
+                for (Object key : properties.keySet()) {
+                    map.put((String) key, true);
+                }
+                keySet = map.keySet();
+
                 trace("properties loaded filename [%s]", propertiesFilename);
             } catch (IOException e) {
                 // TODO ?
             }
+        }
+
+        if (keySet == null) {
+            keySet = new HashSet<>();
         }
     }
 
@@ -179,7 +196,25 @@ public class Configuration {
         }
     }
 
-    private void recuresivleFindTestEnginePropertiesFile(
+    /**
+     * Method to get the number of configuration properties
+     *
+     * @return the number of configuration properties
+     */
+    public int size() {
+        return properties.size();
+    }
+
+    /**
+     * Method to get a Set of configuration keys
+     *
+     * @return a Set of configuration keys
+     */
+    public Set<String> keySet() {
+        return keySet;
+    }
+
+    private void recursivelyFindTestEnginePropertiesFile(
             File directory, AtomicReference<String> atomicReference) {
         File[] files = directory.listFiles();
         if (files != null) {
@@ -196,7 +231,7 @@ public class Configuration {
         }
 
         if (directory.getParentFile() != null) {
-            recuresivleFindTestEnginePropertiesFile(directory.getParentFile(), atomicReference);
+            recursivelyFindTestEnginePropertiesFile(directory.getParentFile(), atomicReference);
         }
     }
 
