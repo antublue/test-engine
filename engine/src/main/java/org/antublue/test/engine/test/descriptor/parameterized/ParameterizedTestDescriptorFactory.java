@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.test.descriptor.parameterized;
 
+import org.antublue.test.engine.test.descriptor.TestDescriptorFactory;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.discovery.ClassSelector;
@@ -24,45 +25,25 @@ import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a ParameterizedTestDescriptorFactory */
-public class ParameterizedTestDescriptorFactory {
+public class ParameterizedTestDescriptorFactory implements TestDescriptorFactory {
 
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
-    /** Constructor */
-    private ParameterizedTestDescriptorFactory() {
-        // DO NOTHING
-    }
-
-    /**
-     * Method to process an EngineDiscoveryRequest
-     *
-     * @param engineDiscoveryRequest engineDiscoveryRequest
-     * @param engineDescriptor engineDescriptor
-     */
-    public static void discover(
+    @Override
+    public void discover(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         engineDiscoveryRequest
                 .getSelectorsByType(ClasspathRootSelector.class)
                 .forEach(
-                        classpathRootSelector ->
-                                ParameterizedTestDescriptorFactory.discover(
-                                        classpathRootSelector,
-                                        engineDiscoveryRequest,
-                                        engineDescriptor));
+                        classpathRootSelector -> discover(classpathRootSelector, engineDescriptor));
 
         engineDiscoveryRequest
                 .getSelectorsByType(PackageSelector.class)
-                .forEach(
-                        packageSelector ->
-                                ParameterizedTestDescriptorFactory.discover(
-                                        packageSelector, engineDiscoveryRequest, engineDescriptor));
+                .forEach(packageSelector -> discover(packageSelector, engineDescriptor));
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClassSelector.class)
-                .forEach(
-                        classSelector ->
-                                ParameterizedTestDescriptorFactory.discover(
-                                        classSelector, engineDiscoveryRequest, engineDescriptor));
+                .forEach(classSelector -> discover(classSelector, engineDescriptor));
 
         // TODO add support for ParameterizedMethodTestDescriptor
     }
@@ -71,13 +52,10 @@ public class ParameterizedTestDescriptorFactory {
      * Method to process a ClasspathRootSelector
      *
      * @param classpathRootSelector classpathRootSelector
-     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param engineDescriptor engineDescriptor
      */
-    private static void discover(
-            ClasspathRootSelector classpathRootSelector,
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            EngineDescriptor engineDescriptor) {
+    private void discover(
+            ClasspathRootSelector classpathRootSelector, EngineDescriptor engineDescriptor) {
         REFLECTION_UTILS
                 .findAllClasses(
                         classpathRootSelector.getClasspathRoot(), ParameterizedFilters.TEST_CLASS)
@@ -85,22 +63,16 @@ public class ParameterizedTestDescriptorFactory {
                         c ->
                                 engineDescriptor.addChild(
                                         new ParameterizedClassTestDescriptor(
-                                                engineDiscoveryRequest,
-                                                engineDescriptor.getUniqueId(),
-                                                c)));
+                                                engineDescriptor.getUniqueId(), c)));
     }
 
     /**
      * Method to process a PackageSelector
      *
      * @param packageSelector packageSelector
-     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param engineDescriptor engineDescriptor
      */
-    private static void discover(
-            PackageSelector packageSelector,
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            EngineDescriptor engineDescriptor) {
+    private void discover(PackageSelector packageSelector, EngineDescriptor engineDescriptor) {
         REFLECTION_UTILS
                 .findAllClasses(packageSelector.getPackageName(), ParameterizedFilters.TEST_CLASS)
                 .forEach(
@@ -108,9 +80,7 @@ public class ParameterizedTestDescriptorFactory {
                             if (ParameterizedFilters.TEST_CLASS.test(c)) {
                                 engineDescriptor.addChild(
                                         new ParameterizedClassTestDescriptor(
-                                                engineDiscoveryRequest,
-                                                engineDescriptor.getUniqueId(),
-                                                c));
+                                                engineDescriptor.getUniqueId(), c));
                             }
                         });
     }
@@ -119,18 +89,13 @@ public class ParameterizedTestDescriptorFactory {
      * Method to process a ClassSelector
      *
      * @param classSelector classSelector
-     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param engineDescriptor engineDescriptor
      */
-    private static void discover(
-            ClassSelector classSelector,
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            EngineDescriptor engineDescriptor) {
+    private void discover(ClassSelector classSelector, EngineDescriptor engineDescriptor) {
         Class<?> clazz = classSelector.getJavaClass();
         if (ParameterizedFilters.TEST_CLASS.test(clazz)) {
             engineDescriptor.addChild(
-                    new ParameterizedClassTestDescriptor(
-                            engineDiscoveryRequest, engineDescriptor.getUniqueId(), clazz));
+                    new ParameterizedClassTestDescriptor(engineDescriptor.getUniqueId(), clazz));
         }
     }
 }

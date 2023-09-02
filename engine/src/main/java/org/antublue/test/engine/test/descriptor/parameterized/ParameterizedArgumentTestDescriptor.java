@@ -50,7 +50,6 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /** Class to implement a ParameterArgumentTestDescriptor */
-@SuppressWarnings("unchecked")
 public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         implements ExecutableTestDescriptor, MetadataSupport {
 
@@ -70,14 +69,10 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
     /**
      * Constructor
      *
-     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param parentUniqueId parentUniqueId
      * @param testArgument testArgument
      */
-    public ParameterizedArgumentTestDescriptor(
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            UniqueId parentUniqueId,
-            Argument testArgument) {
+    public ParameterizedArgumentTestDescriptor(UniqueId parentUniqueId, Argument testArgument) {
         super(
                 parentUniqueId.append(
                         ParameterizedArgumentTestDescriptor.class.getSimpleName(),
@@ -129,10 +124,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
                     testMethod ->
                             addChild(
                                     new ParameterizedMethodTestDescriptor(
-                                            engineDiscoveryRequest,
-                                            getUniqueId(),
-                                            testMethod,
-                                            testArgument)));
+                                            getUniqueId(), testMethod, testArgument)));
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable t) {

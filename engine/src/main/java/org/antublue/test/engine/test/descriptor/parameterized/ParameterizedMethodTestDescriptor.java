@@ -64,10 +64,7 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
 
     /** Constructor */
     public ParameterizedMethodTestDescriptor(
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            UniqueId parentUniqueId,
-            Method testMethod,
-            Argument testArgument) {
+            UniqueId parentUniqueId, Method testMethod, Argument testArgument) {
         super(
                 parentUniqueId.append(
                         ParameterizedMethodTestDescriptor.class.getSimpleName(),

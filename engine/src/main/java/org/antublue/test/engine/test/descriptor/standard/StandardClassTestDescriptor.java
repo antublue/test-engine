@@ -17,6 +17,7 @@
 package org.antublue.test.engine.test.descriptor.standard;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +31,10 @@ import org.antublue.test.engine.test.descriptor.Metadata;
 import org.antublue.test.engine.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.test.descriptor.MetadataSupport;
 import org.antublue.test.engine.test.descriptor.parameterized.ParameterizedExecutableConstants;
+import org.antublue.test.engine.test.descriptor.parameterized.ParameterizedFilters;
+import org.antublue.test.engine.test.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.descriptor.util.MethodInvoker;
+import org.antublue.test.engine.test.descriptor.util.RandomFieldInjector;
 import org.antublue.test.engine.test.descriptor.util.TestDescriptorUtils;
 import org.antublue.test.engine.util.Invariant;
 import org.antublue.test.engine.util.Invocation;
@@ -62,14 +66,10 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
     /**
      * Constructor
      *
-     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param parentUniqueId parentUniqueId
      * @param testClass testClass
      */
-    public StandardClassTestDescriptor(
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            UniqueId parentUniqueId,
-            Class<?> testClass) {
+    public StandardClassTestDescriptor(UniqueId parentUniqueId, Class<?> testClass) {
         super(
                 parentUniqueId.append(
                         StandardClassTestDescriptor.class.getSimpleName(), testClass.getName()),
@@ -103,8 +103,7 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                     .forEach(
                             testMethod -> {
                                 ExecutableTestDescriptor executableTestDescriptor =
-                                        new StandardMethodTestDescriptor(
-                                                engineDiscoveryRequest, getUniqueId(), testMethod);
+                                        new StandardMethodTestDescriptor(getUniqueId(), testMethod);
 
                                 executableTestDescriptor.build(
                                         engineDiscoveryRequest, executableContext);
@@ -119,9 +118,11 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
 
     private enum State {
         RUN_PREPARE_METHODS,
-        END,
+        RUN_SET_RANDOM_FIELDS,
+        RUN_EXECUTE,
         RUN_CONCLUDE_METHODS,
-        RUN_EXECUTE
+        RUN_AUTO_CLOSE_FIELDS,
+        END,
     }
 
     @Override
@@ -149,7 +150,7 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                         Object testInstance = constructor.newInstance((Object[]) null);
                         executableContext.put(
                                 StandardExecutableConstants.TEST_INSTANCE, testInstance);
-                        state.set(State.RUN_PREPARE_METHODS);
+                        state.set(State.RUN_SET_RANDOM_FIELDS);
                     } catch (Throwable t) {
                         executableContext.addAndProcessThrowable(testClass, t);
                         state.set(State.RUN_EXECUTE);
@@ -159,6 +160,26 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                 });
 
         Object testInstance = executableContext.get(StandardExecutableConstants.TEST_INSTANCE);
+
+        if (state.get() == State.RUN_SET_RANDOM_FIELDS) {
+            Invocation.execute(
+                    () -> {
+                        try {
+                            List<Field> fields =
+                                    REFLECTION_UTILS.findFields(
+                                            testClass, ParameterizedFilters.RANDOM_FIELD);
+                            for (Field field : fields) {
+                                RandomFieldInjector.inject(testInstance, field);
+                            }
+                            state.set(State.RUN_PREPARE_METHODS);
+                        } catch (Throwable t) {
+                            executableContext.addAndProcessThrowable(testClass, t);
+                            state.set(State.RUN_EXECUTE);
+                        } finally {
+                            StandardStreams.flush();
+                        }
+                    });
+        }
 
         if (state.get() == State.RUN_PREPARE_METHODS) {
             Invariant.check(testInstance != null);
@@ -209,7 +230,7 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                                         testClass, StandardFilters.CONCLUDE_METHOD);
                         TEST_DESCRIPTOR_UTILS.sortMethods(
                                 concludeMethods, TestDescriptorUtils.Sort.REVERSE);
-                        for (Method method : concludeMethods)
+                        for (Method method : concludeMethods) {
                             try {
                                 MethodInvoker.invoke(method, testInstance, null);
                             } catch (Throwable t) {
@@ -217,6 +238,31 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                             } finally {
                                 StandardStreams.flush();
                             }
+                        }
+                        state.set(State.RUN_AUTO_CLOSE_FIELDS);
+                    });
+        }
+
+        if (state.get() == State.RUN_AUTO_CLOSE_FIELDS) {
+            Invariant.check(testInstance != null);
+            Invocation.execute(
+                    () -> {
+                        List<Field> fields =
+                                REFLECTION_UTILS.findFields(
+                                        testClass, StandardFilters.AUTO_CLOSE_FIELDS);
+                        for (Field field : fields) {
+                            TestEngine.AutoClose annotation =
+                                    field.getAnnotation(TestEngine.AutoClose.class);
+                            if ("@TestEngine.Conclude".equals(annotation.lifecycle())) {
+                                try {
+                                    AutoCloseProcessor.close(testInstance, field);
+                                } catch (Throwable t) {
+                                    executableContext.addAndProcessThrowable(testClass, t);
+                                } finally {
+                                    StandardStreams.flush();
+                                }
+                            }
+                        }
                     });
         }
 

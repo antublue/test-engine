@@ -68,14 +68,10 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
     /**
      * Constructor
      *
-     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param parentUniqueId parentUniqueId
      * @param testClass testClass
      */
-    public ParameterizedClassTestDescriptor(
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            UniqueId parentUniqueId,
-            Class<?> testClass) {
+    public ParameterizedClassTestDescriptor(UniqueId parentUniqueId, Class<?> testClass) {
         super(
                 parentUniqueId.append(
                         ParameterizedClassTestDescriptor.class.getSimpleName(),
@@ -128,9 +124,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                             testArgument -> {
                                 ExecutableTestDescriptor executableTestDescriptor =
                                         new ParameterizedArgumentTestDescriptor(
-                                                engineDiscoveryRequest,
-                                                getUniqueId(),
-                                                testArgument);
+                                                getUniqueId(), testArgument);
 
                                 executableTestDescriptor.build(
                                         engineDiscoveryRequest, executableContext);

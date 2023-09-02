@@ -115,8 +115,9 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
-            StandardTestDescriptorFactory.discover(engineDiscoveryRequest, engineDescriptor);
-            ParameterizedTestDescriptorFactory.discover(engineDiscoveryRequest, engineDescriptor);
+            new StandardTestDescriptorFactory().discover(engineDiscoveryRequest, engineDescriptor);
+            new ParameterizedTestDescriptorFactory()
+                    .discover(engineDiscoveryRequest, engineDescriptor);
 
             // Remove test descriptors
             List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
@@ -188,22 +189,5 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             engineExecutionListener.executionFinished(
                     executionRequest.getRootTestDescriptor(), TestExecutionResult.successful());
         }
-    }
-
-    /**
-     * Method to log the test descriptor tree hierarchy
-     *
-     * @param testDescriptor testDescriptor
-     * @param indent indent
-     */
-    private static void printTestDescriptorTree(TestDescriptor testDescriptor, int indent) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < indent; i++) {
-            stringBuilder.append(" ");
-        }
-
-        System.out.println(stringBuilder.append(testDescriptor.getUniqueId()));
-
-        testDescriptor.getChildren().forEach(t -> printTestDescriptorTree(t, indent + 2));
     }
 }

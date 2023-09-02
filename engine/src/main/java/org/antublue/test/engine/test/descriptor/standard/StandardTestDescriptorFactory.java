@@ -17,6 +17,7 @@
 package org.antublue.test.engine.test.descriptor.standard;
 
 import java.lang.reflect.Method;
+import org.antublue.test.engine.test.descriptor.TestDescriptorFactory;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.discovery.ClassSelector;
@@ -26,63 +27,39 @@ import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a StandardTestDescriptorFactory */
-public class StandardTestDescriptorFactory {
+public class StandardTestDescriptorFactory implements TestDescriptorFactory {
 
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
-    /** Constructor */
-    private StandardTestDescriptorFactory() {
-        // DO NOTHING
-    }
-
-    /**
-     * Method to process an EngineDiscoveryRequest
-     *
-     * @param engineDiscoveryRequest engineDiscoveryRequest
-     * @param engineDescriptor engineDescriptor
-     */
-    public static void discover(
+    @Override
+    public void discover(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         engineDiscoveryRequest
                 .getSelectorsByType(ClasspathRootSelector.class)
                 .forEach(
-                        classpathRootSelector ->
-                                discover(
-                                        classpathRootSelector,
-                                        engineDiscoveryRequest,
-                                        engineDescriptor));
+                        classpathRootSelector -> discover(classpathRootSelector, engineDescriptor));
 
         engineDiscoveryRequest
                 .getSelectorsByType(PackageSelector.class)
-                .forEach(
-                        packageSelector ->
-                                discover(
-                                        packageSelector, engineDiscoveryRequest, engineDescriptor));
+                .forEach(packageSelector -> discover(packageSelector, engineDescriptor));
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClassSelector.class)
-                .forEach(
-                        classSelector ->
-                                discover(classSelector, engineDiscoveryRequest, engineDescriptor));
+                .forEach(classSelector -> discover(classSelector, engineDescriptor));
 
         engineDiscoveryRequest
                 .getSelectorsByType(MethodSelector.class)
-                .forEach(
-                        methodSelector ->
-                                discover(methodSelector, engineDiscoveryRequest, engineDescriptor));
+                .forEach(methodSelector -> discover(methodSelector, engineDescriptor));
     }
 
     /**
      * Method to process a ClasspathRootSelector
      *
      * @param classpathRootSelector classpathRootSelector
-     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param engineDescriptor engineDescriptor
      */
-    private static void discover(
-            ClasspathRootSelector classpathRootSelector,
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            EngineDescriptor engineDescriptor) {
+    private void discover(
+            ClasspathRootSelector classpathRootSelector, EngineDescriptor engineDescriptor) {
         REFLECTION_UTILS
                 .findAllClasses(
                         classpathRootSelector.getClasspathRoot(), StandardFilters.TEST_CLASS)
@@ -90,22 +67,17 @@ public class StandardTestDescriptorFactory {
                         c ->
                                 engineDescriptor.addChild(
                                         new StandardClassTestDescriptor(
-                                                engineDiscoveryRequest,
-                                                engineDescriptor.getUniqueId(),
-                                                c)));
+                                                engineDescriptor.getUniqueId(), c)));
     }
 
     /**
      * Method to process a PackageSelector
      *
      * @param packageSelector packageSelector
-     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param engineDescriptor engineDescriptor
      */
     private static void discover(
-            PackageSelector packageSelector,
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            EngineDescriptor engineDescriptor) {
+            PackageSelector packageSelector, EngineDescriptor engineDescriptor) {
         REFLECTION_UTILS
                 .findAllClasses(packageSelector.getPackageName(), StandardFilters.TEST_CLASS)
                 .forEach(
@@ -113,9 +85,7 @@ public class StandardTestDescriptorFactory {
                             if (StandardFilters.TEST_CLASS.test(c)) {
                                 engineDescriptor.addChild(
                                         new StandardClassTestDescriptor(
-                                                engineDiscoveryRequest,
-                                                engineDescriptor.getUniqueId(),
-                                                c));
+                                                engineDescriptor.getUniqueId(), c));
                             }
                         });
     }
@@ -124,18 +94,13 @@ public class StandardTestDescriptorFactory {
      * Method to process a ClassSelector
      *
      * @param classSelector classSelector
-     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param engineDescriptor engineDescriptor
      */
-    private static void discover(
-            ClassSelector classSelector,
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            EngineDescriptor engineDescriptor) {
+    private static void discover(ClassSelector classSelector, EngineDescriptor engineDescriptor) {
         Class<?> clazz = classSelector.getJavaClass();
         if (StandardFilters.TEST_CLASS.test(clazz)) {
             engineDescriptor.addChild(
-                    new StandardClassTestDescriptor(
-                            engineDiscoveryRequest, engineDescriptor.getUniqueId(), clazz));
+                    new StandardClassTestDescriptor(engineDescriptor.getUniqueId(), clazz));
         }
     }
 
@@ -143,19 +108,14 @@ public class StandardTestDescriptorFactory {
      * Method to process a MethodSelector
      *
      * @param methodSelector methodSelector
-     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param engineDescriptor engineDescriptor
      */
-    private static void discover(
-            MethodSelector methodSelector,
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            EngineDescriptor engineDescriptor) {
+    private static void discover(MethodSelector methodSelector, EngineDescriptor engineDescriptor) {
         Class<?> clazz = methodSelector.getJavaClass();
         Method method = methodSelector.getJavaMethod();
         if (StandardFilters.TEST_CLASS.test(clazz) && StandardFilters.TEST_METHOD.test(method)) {
             engineDescriptor.addChild(
-                    new StandardMethodTestDescriptor(
-                            engineDiscoveryRequest, engineDescriptor.getUniqueId(), method));
+                    new StandardMethodTestDescriptor(engineDescriptor.getUniqueId(), method));
         }
     }
 }

@@ -46,7 +46,6 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /** Class to implement a ParameterMethodTestDescriptor */
-@SuppressWarnings("unchecked")
 public class StandardMethodTestDescriptor
         extends org.junit.platform.engine.support.descriptor.AbstractTestDescriptor
         implements ExecutableTestDescriptor, MetadataSupport {
@@ -63,10 +62,7 @@ public class StandardMethodTestDescriptor
     private final Metadata metadata;
 
     /** Constructor */
-    public StandardMethodTestDescriptor(
-            EngineDiscoveryRequest engineDiscoveryRequest,
-            UniqueId parentUniqueId,
-            Method testMethod) {
+    public StandardMethodTestDescriptor(UniqueId parentUniqueId, Method testMethod) {
         super(
                 parentUniqueId.append(
                         StandardMethodTestDescriptor.class.getSimpleName(), testMethod.getName()),
