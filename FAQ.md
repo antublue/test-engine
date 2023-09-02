@@ -89,14 +89,15 @@ Using a `ReentrantLock` prevents the scenario.
 
 ### I want to use the Test Engine in place of JUnit 5
 
-You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
+You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes or need to mix testing of parameterized classes and standard classes 
 
-- It's not a "drop in" replacement.
-- Reference the [Design](/MANUAL.md#design) for the state machine flow.
+- **It's not a "drop in" replacement.**
+- **Most JUnit 5 features are missing (by design.)**
+- **Reference the [Design](/MANUAL.md#design) for the state machine flow.**
 
 Example:
 
-- [Junit5ReplacementTest.java](/examples/src/test/java/example/Junit5ReplacementTest.java)
+- [Junit5LikeTest.java](/examples/src/test/java/example/Junit5LikeTest.java)
 
 ---
 

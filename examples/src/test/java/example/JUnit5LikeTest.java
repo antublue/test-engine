@@ -14,31 +14,21 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.testing.autoclose;
+package example;
 
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class JUnit5ReplacementAutoCloseTest1 {
-
-    @TestEngine.RandomInteger private Integer randomInteger;
-
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterEach")
-    private TestAutoCloseable afterEachAutoCloseable;
-
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude")
-    private TestAutoCloseable afterConcludeAutoCloseable;
+public class JUnit5LikeTest {
 
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        afterConcludeAutoCloseable = new TestAutoCloseable("afterConclude");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println("beforeEach(" + randomInteger + ")");
-        afterEachAutoCloseable = new TestAutoCloseable("afterEach");
+        System.out.println("beforeEach()");
     }
 
     @TestEngine.Test
@@ -59,24 +49,5 @@ public class JUnit5ReplacementAutoCloseTest1 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-    }
-
-    private static class TestAutoCloseable implements AutoCloseable {
-
-        private final String name;
-        private boolean isClosed;
-
-        public TestAutoCloseable(String name) {
-            this.name = name;
-        }
-
-        public void close() {
-            System.out.println(name + ".close()");
-            isClosed = true;
-        }
-
-        public boolean isClosed() {
-            return isClosed;
-        }
     }
 }

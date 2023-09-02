@@ -19,7 +19,7 @@ package org.antublue.test.engine.testing.autoclose;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class JUnit5ReplacementAutoCloseTest2 {
+public class JUnit5LikeAutoCloseTest2 {
 
     @TestEngine.RandomInteger private Integer randomInteger;
 
