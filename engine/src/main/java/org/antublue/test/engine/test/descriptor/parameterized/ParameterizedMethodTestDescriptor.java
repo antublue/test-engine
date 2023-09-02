@@ -143,7 +143,8 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
                         try {
                             List<Method> beforeEachMethods =
                                     REFLECTION_UTILS.findMethods(
-                                            testInstance.getClass(), ParameterizedFilters.BEFORE_EACH_METHOD);
+                                            testInstance.getClass(),
+                                            ParameterizedFilters.BEFORE_EACH_METHOD);
                             TEST_DESCRIPTOR_UTILS.sortMethods(
                                     beforeEachMethods, TestDescriptorUtils.Sort.FORWARD);
                             for (Method method : beforeEachMethods) {
@@ -182,7 +183,8 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
                     () -> {
                         List<Method> afterEachMethods =
                                 REFLECTION_UTILS.findMethods(
-                                        testInstance.getClass(), ParameterizedFilters.AFTER_EACH_METHOD);
+                                        testInstance.getClass(),
+                                        ParameterizedFilters.AFTER_EACH_METHOD);
                         TEST_DESCRIPTOR_UTILS.sortMethods(
                                 afterEachMethods, TestDescriptorUtils.Sort.REVERSE);
                         for (Method method : afterEachMethods) {
@@ -204,7 +206,8 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
             Invocation.execute(
                     () -> {
                         List<Field> fields =
-                                REFLECTION_UTILS.findFields(testClass, ParameterizedFilters.AUTO_CLOSE_FIELDS);
+                                REFLECTION_UTILS.findFields(
+                                        testClass, ParameterizedFilters.AUTO_CLOSE_FIELDS);
                         for (Field field : fields) {
                             TestEngine.AutoClose annotation =
                                     field.getAnnotation(TestEngine.AutoClose.class);

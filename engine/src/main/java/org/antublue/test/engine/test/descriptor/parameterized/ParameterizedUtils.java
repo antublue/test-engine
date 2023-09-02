@@ -42,7 +42,9 @@ public class ParameterizedUtils {
     }
 
     public Method getArumentSupplierMethod(Class<?> testClass) {
-        return REFLECTION_UTILS.findMethods(testClass, ParameterizedFilters.ARGUMENT_SUPPLIER_METHOD).get(0);
+        return REFLECTION_UTILS
+                .findMethods(testClass, ParameterizedFilters.ARGUMENT_SUPPLIER_METHOD)
+                .get(0);
     }
 
     public List<Argument> getArguments(Class<?> testClass) throws Throwable {

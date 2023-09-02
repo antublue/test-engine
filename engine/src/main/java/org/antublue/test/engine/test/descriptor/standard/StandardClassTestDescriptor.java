@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.test.descriptor.ExecutableContext;
@@ -167,7 +166,8 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                     () -> {
                         try {
                             List<Method> prepareMethods =
-                                    REFLECTION_UTILS.findMethods(testClass, StandardFilters.PREPARE_METHOD);
+                                    REFLECTION_UTILS.findMethods(
+                                            testClass, StandardFilters.PREPARE_METHOD);
                             TEST_DESCRIPTOR_UTILS.sortMethods(
                                     prepareMethods, TestDescriptorUtils.Sort.FORWARD);
                             for (Method method : prepareMethods) {
@@ -205,7 +205,8 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
             Invocation.execute(
                     () -> {
                         List<Method> concludeMethods =
-                                REFLECTION_UTILS.findMethods(testClass, StandardFilters.CONCLUDE_METHOD);
+                                REFLECTION_UTILS.findMethods(
+                                        testClass, StandardFilters.CONCLUDE_METHOD);
                         TEST_DESCRIPTOR_UTILS.sortMethods(
                                 concludeMethods, TestDescriptorUtils.Sort.REVERSE);
                         for (Method method : concludeMethods)
@@ -241,46 +242,75 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
             testClass.getDeclaredConstructor((Class<?>[]) null);
         } catch (Throwable t) {
             throw new TestClassDefinitionException(
-                    String.format("Test class [%s] must have a no-argument constructor", testClass.getName()));
+                    String.format(
+                            "Test class [%s] must have a no-argument constructor",
+                            testClass.getName()));
         }
 
-        List<Method> methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.Prepare.class));
+        List<Method> methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass, method -> method.isAnnotationPresent(TestEngine.Prepare.class));
         for (Method method : methods) {
             if (!StandardFilters.PREPARE_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.Prepare method [%s] definition is invalid", testClass.getName(), method.getName()));
+                        String.format(
+                                "Test class [%s] @TestEngine.Prepare method [%s] definition is"
+                                        + " invalid",
+                                testClass.getName(), method.getName()));
             }
         }
 
-        methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.BeforeEach.class));
+        methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass,
+                        method -> method.isAnnotationPresent(TestEngine.BeforeEach.class));
         for (Method method : methods) {
             if (!StandardFilters.BEFORE_EACH_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.BeforeEach method [%s] definition is invalid", testClass.getName(), method.getName()));
+                        String.format(
+                                "Test class [%s] @TestEngine.BeforeEach method [%s] definition is"
+                                        + " invalid",
+                                testClass.getName(), method.getName()));
             }
         }
 
-        methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.Test.class));
+        methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass, method -> method.isAnnotationPresent(TestEngine.Test.class));
         for (Method method : methods) {
             if (!StandardFilters.TEST_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.Test method [%s] definition is invalid", testClass.getName(), method.getName()));
+                        String.format(
+                                "Test class [%s] @TestEngine.Test method [%s] definition is"
+                                        + " invalid",
+                                testClass.getName(), method.getName()));
             }
         }
 
-        methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.AfterEach.class));
+        methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass,
+                        method -> method.isAnnotationPresent(TestEngine.AfterEach.class));
         for (Method method : methods) {
             if (!StandardFilters.AFTER_EACH_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.AfterEach method [%s] definition is invalid", testClass.getName(), method.getName()));
+                        String.format(
+                                "Test class [%s] @TestEngine.AfterEach method [%s] definition is"
+                                        + " invalid",
+                                testClass.getName(), method.getName()));
             }
         }
 
-        methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.Conclude.class));
+        methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass, method -> method.isAnnotationPresent(TestEngine.Conclude.class));
         for (Method method : methods) {
             if (!StandardFilters.CONCLUDE_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.Conclude method [%s] definition is invalid", testClass.getName(), method.getName()));
+                        String.format(
+                                "Test class [%s] @TestEngine.Conclude method [%s] definition is"
+                                        + " invalid",
+                                testClass.getName(), method.getName()));
             }
         }
     }

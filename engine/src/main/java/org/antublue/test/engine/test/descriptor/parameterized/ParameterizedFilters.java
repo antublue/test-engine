@@ -121,13 +121,13 @@ public class ParameterizedFilters {
                         if (method.isAnnotationPresent(TestEngine.Test.class)
                                 && !REFLECTION_UTILS.isStatic(method)
                                 && (REFLECTION_UTILS.isProtected(method)
-                                || REFLECTION_UTILS.isPublic(method))
+                                        || REFLECTION_UTILS.isPublic(method))
                                 && !REFLECTION_UTILS.isAbstract(method)) {
                             testCount++;
                         } else if (method.isAnnotationPresent(TestEngine.ArgumentSupplier.class)
                                 && REFLECTION_UTILS.isStatic(method)
                                 && (REFLECTION_UTILS.isProtected(method)
-                                || REFLECTION_UTILS.isPublic(method))
+                                        || REFLECTION_UTILS.isPublic(method))
                                 && !REFLECTION_UTILS.isAbstract(method)) {
                             argumentSupplierCount++;
                         }

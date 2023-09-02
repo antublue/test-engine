@@ -16,15 +16,13 @@
 
 package org.antublue.test.engine.test.descriptor.standard;
 
-import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.util.ReflectionUtils;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.function.Predicate;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.util.ReflectionUtils;
 
 public class StandardFilters {
 
@@ -49,7 +47,7 @@ public class StandardFilters {
     public static final Predicate<Field> AUTO_CLOSE_FIELDS =
             field -> field.isAnnotationPresent(TestEngine.AutoClose.class);
 
-       /*
+    /*
     public static final Predicate<Method> EXTENSION_SUPPLIER_METHOD =
             method -> {
                 if (!method.isAnnotationPresent(TestEngine.ExtensionSupplier.class)) {

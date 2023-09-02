@@ -29,7 +29,6 @@ import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.descriptor.Metadata;
 import org.antublue.test.engine.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.test.descriptor.MetadataSupport;
-import org.antublue.test.engine.test.descriptor.standard.StandardFilters;
 import org.antublue.test.engine.test.descriptor.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.descriptor.util.LockProcessor;
 import org.antublue.test.engine.test.descriptor.util.MethodInvoker;
@@ -189,7 +188,8 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                     () -> {
                         try {
                             List<Method> prepareMethods =
-                                    REFLECTION_UTILS.findMethods(testClass, ParameterizedFilters.PREPARE_METHOD);
+                                    REFLECTION_UTILS.findMethods(
+                                            testClass, ParameterizedFilters.PREPARE_METHOD);
                             TEST_DESCRIPTOR_UTILS.sortMethods(
                                     prepareMethods, TestDescriptorUtils.Sort.FORWARD);
                             for (Method method : prepareMethods) {
@@ -231,7 +231,8 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
             Invocation.execute(
                     () -> {
                         List<Method> concludeMethods =
-                                REFLECTION_UTILS.findMethods(testClass, ParameterizedFilters.CONCLUDE_METHOD);
+                                REFLECTION_UTILS.findMethods(
+                                        testClass, ParameterizedFilters.CONCLUDE_METHOD);
                         TEST_DESCRIPTOR_UTILS.sortMethods(
                                 concludeMethods, TestDescriptorUtils.Sort.REVERSE);
                         for (Method method : concludeMethods) {
@@ -254,7 +255,8 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
             Invocation.execute(
                     () -> {
                         List<Field> fields =
-                                REFLECTION_UTILS.findFields(testClass, ParameterizedFilters.AUTO_CLOSE_FIELDS);
+                                REFLECTION_UTILS.findFields(
+                                        testClass, ParameterizedFilters.AUTO_CLOSE_FIELDS);
                         for (Field field : fields) {
                             TestEngine.AutoClose annotation =
                                     field.getAnnotation(TestEngine.AutoClose.class);
@@ -293,75 +295,125 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
             testClass.getDeclaredConstructor((Class<?>[]) null);
         } catch (Throwable t) {
             throw new TestClassDefinitionException(
-                    String.format("Test class [%s] must have a no-argument constructor", testClass.getName()));
+                    String.format(
+                            "Test class [%s] must have a no-argument constructor",
+                            testClass.getName()));
         }
 
-        List<Method> methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.ArgumentSupplier.class));
+        List<Method> methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass,
+                        method -> method.isAnnotationPresent(TestEngine.ArgumentSupplier.class));
         if (methods.size() != 1) {
             throw new TestClassDefinitionException(
-                    String.format("Test class [%s] must defined exactly one @TestEngine.ArgumentSupplier method, %d found", testClass.getName(), methods.size()));
+                    String.format(
+                            "Test class [%s] must defined exactly one @TestEngine.ArgumentSupplier"
+                                    + " method, %d found",
+                            testClass.getName(), methods.size()));
         }
 
         if (!ParameterizedFilters.ARGUMENT_SUPPLIER_METHOD.test(methods.get(0))) {
             throw new TestClassDefinitionException(
-                    String.format("Test class [%s] @TestEngine.ArgumentSupplier method [%s] definition is invalid", testClass.getName(), methods.get(0).getName()));
+                    String.format(
+                            "Test class [%s] @TestEngine.ArgumentSupplier method [%s] definition is"
+                                    + " invalid",
+                            testClass.getName(), methods.get(0).getName()));
         }
 
-        methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.Prepare.class));
+        methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass, method -> method.isAnnotationPresent(TestEngine.Prepare.class));
         for (Method method : methods) {
             if (!ParameterizedFilters.PREPARE_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.Prepare method [%s] definition is invalid", testClass.getName(), method.getName()));
+                        String.format(
+                                "Test class [%s] @TestEngine.Prepare method [%s] definition is"
+                                        + " invalid",
+                                testClass.getName(), method.getName()));
             }
         }
 
-        methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.BeforeAll.class));
+        methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass,
+                        method -> method.isAnnotationPresent(TestEngine.BeforeAll.class));
         for (Method method : methods) {
             if (!ParameterizedFilters.BEFORE_ALL_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.BeforeAll method [%s] definition is invalid", testClass.getName(), method.getName()));
+                        String.format(
+                                "Test class [%s] @TestEngine.BeforeAll method [%s] definition is"
+                                        + " invalid",
+                                testClass.getName(), method.getName()));
             }
         }
 
-        methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.BeforeEach.class));
+        methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass,
+                        method -> method.isAnnotationPresent(TestEngine.BeforeEach.class));
         for (Method method : methods) {
             if (!ParameterizedFilters.BEFORE_EACH_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.BeforeEach method [%s] definition is invalid", testClass.getName(), method.getName()));
+                        String.format(
+                                "Test class [%s] @TestEngine.BeforeEach method [%s] definition is"
+                                        + " invalid",
+                                testClass.getName(), method.getName()));
             }
         }
 
-        methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.Test.class));
+        methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass, method -> method.isAnnotationPresent(TestEngine.Test.class));
         for (Method method : methods) {
             if (!ParameterizedFilters.TEST_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.Test method [%s] definition is invalid", testClass.getName(), method.getName()));
+                        String.format(
+                                "Test class [%s] @TestEngine.Test method [%s] definition is"
+                                        + " invalid",
+                                testClass.getName(), method.getName()));
             }
         }
 
-        methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.AfterEach.class));
+        methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass,
+                        method -> method.isAnnotationPresent(TestEngine.AfterEach.class));
         for (Method method : methods) {
             if (!ParameterizedFilters.AFTER_EACH_METHOD.test(method)) {
-                TestClassDefinitionException testClassDefinitionException = new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.AfterEach method [%s] definition is invalid", testClass.getName(), method.getName()));
+                TestClassDefinitionException testClassDefinitionException =
+                        new TestClassDefinitionException(
+                                String.format(
+                                        "Test class [%s] @TestEngine.AfterEach method [%s]"
+                                                + " definition is invalid",
+                                        testClass.getName(), method.getName()));
                 testClassDefinitionException.setStackTrace(new StackTraceElement[0]);
                 throw testClassDefinitionException;
             }
         }
 
-        methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.AfterAll.class));
+        methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass, method -> method.isAnnotationPresent(TestEngine.AfterAll.class));
         for (Method method : methods) {
             if (!ParameterizedFilters.AFTER_ALL_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.BeforeAll method [%s] definition is invalid", testClass.getName(), method.getName()));
+                        String.format(
+                                "Test class [%s] @TestEngine.BeforeAll method [%s] definition is"
+                                        + " invalid",
+                                testClass.getName(), method.getName()));
             }
         }
 
-        methods = REFLECTION_UTILS.findMethods(testClass, method -> method.isAnnotationPresent(TestEngine.Conclude.class));
+        methods =
+                REFLECTION_UTILS.findMethods(
+                        testClass, method -> method.isAnnotationPresent(TestEngine.Conclude.class));
         for (Method method : methods) {
             if (!ParameterizedFilters.CONCLUDE_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
-                        String.format("Test class [%s] @TestEngine.Conclude method [%s] definition is invalid", testClass.getName(), method.getName()));
+                        String.format(
+                                "Test class [%s] @TestEngine.Conclude method [%s] definition is"
+                                        + " invalid",
+                                testClass.getName(), method.getName()));
             }
         }
     }

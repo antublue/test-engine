@@ -141,7 +141,8 @@ public class StandardMethodTestDescriptor
                         try {
                             List<Method> beforeEachMethods =
                                     REFLECTION_UTILS.findMethods(
-                                            testInstance.getClass(), StandardFilters.BEFORE_EACH_METHOD);
+                                            testInstance.getClass(),
+                                            StandardFilters.BEFORE_EACH_METHOD);
                             TEST_DESCRIPTOR_UTILS.sortMethods(
                                     beforeEachMethods, TestDescriptorUtils.Sort.FORWARD);
                             for (Method method : beforeEachMethods) {
@@ -202,7 +203,8 @@ public class StandardMethodTestDescriptor
             Invocation.execute(
                     () -> {
                         List<Field> fields =
-                                REFLECTION_UTILS.findFields(testClass, StandardFilters.AUTO_CLOSE_FIELDS);
+                                REFLECTION_UTILS.findFields(
+                                        testClass, StandardFilters.AUTO_CLOSE_FIELDS);
                         for (Field field : fields) {
                             TestEngine.AutoClose annotation =
                                     field.getAnnotation(TestEngine.AutoClose.class);
