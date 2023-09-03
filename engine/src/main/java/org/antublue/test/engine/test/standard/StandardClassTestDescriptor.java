@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor.parameterized;
+package org.antublue.test.engine.test.standard;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -22,18 +22,20 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import org.antublue.test.engine.api.Argument;
+import java.util.function.Consumer;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
-import org.antublue.test.engine.test.descriptor.ExecutableContext;
-import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
-import org.antublue.test.engine.test.descriptor.Metadata;
-import org.antublue.test.engine.test.descriptor.MetadataConstants;
-import org.antublue.test.engine.test.descriptor.MetadataSupport;
-import org.antublue.test.engine.test.descriptor.util.AutoCloseProcessor;
-import org.antublue.test.engine.test.descriptor.util.LockProcessor;
-import org.antublue.test.engine.test.descriptor.util.MethodInvoker;
-import org.antublue.test.engine.test.descriptor.util.TestDescriptorUtils;
+import org.antublue.test.engine.test.ExecutableContext;
+import org.antublue.test.engine.test.ExecutableMetadata;
+import org.antublue.test.engine.test.ExecutableMetadataConstants;
+import org.antublue.test.engine.test.ExecutableMetadataSupport;
+import org.antublue.test.engine.test.ExecutableTestDescriptor;
+import org.antublue.test.engine.test.parameterized.ParameterizedExecutableConstants;
+import org.antublue.test.engine.test.parameterized.ParameterizedFilters;
+import org.antublue.test.engine.test.util.AutoCloseProcessor;
+import org.antublue.test.engine.test.util.MethodInvoker;
+import org.antublue.test.engine.test.util.RandomFieldInjector;
+import org.antublue.test.engine.test.util.TestDescriptorUtils;
 import org.antublue.test.engine.util.Invariant;
 import org.antublue.test.engine.util.Invocation;
 import org.antublue.test.engine.util.ReflectionUtils;
@@ -49,33 +51,31 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /** Class to implement a ParameterClassTestDescriptor */
-public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
-        implements ExecutableTestDescriptor, MetadataSupport {
+public class StandardClassTestDescriptor extends AbstractTestDescriptor
+        implements ExecutableTestDescriptor, ExecutableMetadataSupport {
 
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
-
     private static final TestDescriptorUtils TEST_DESCRIPTOR_UTILS =
             TestDescriptorUtils.getSingleton();
 
-    private static final ParameterizedUtils PARAMETERIZED_UTILS = ParameterizedUtils.getSingleton();
-
-    private static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
-
     private final Class<?> testClass;
     private final StopWatch stopWatch;
-    private final Metadata metadata;
+    private final ExecutableMetadata executableMetadata;
 
     /**
      * Constructor
      *
-     * @param uniqueId uniqueId
+     * @param parentUniqueId parentUniqueId
      * @param testClass testClass
      */
-    private ParameterizedClassTestDescriptor(UniqueId uniqueId, Class<?> testClass) {
-        super(uniqueId, TEST_DESCRIPTOR_UTILS.getDisplayName(testClass));
+    public StandardClassTestDescriptor(UniqueId parentUniqueId, Class<?> testClass) {
+        super(
+                parentUniqueId.append(
+                        StandardClassTestDescriptor.class.getSimpleName(), testClass.getName()),
+                testClass.getSimpleName());
         this.testClass = testClass;
         this.stopWatch = new StopWatch();
-        this.metadata = new Metadata();
+        this.executableMetadata = new ExecutableMetadata();
     }
 
     @Override
@@ -89,38 +89,61 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public Metadata getMetadata() {
-        return metadata;
+    public ExecutableMetadata getExecutableMetadata() {
+        return executableMetadata;
     }
 
     private enum State {
-        RUN_INSTANTIATE,
         RUN_PREPARE_METHODS,
+        RUN_SET_RANDOM_FIELDS,
         RUN_EXECUTE,
         RUN_CONCLUDE_METHODS,
         RUN_AUTO_CLOSE_FIELDS,
-        END
+        END,
     }
 
     @Override
     public void execute(ExecutionRequest executionRequest, ExecutableContext executableContext) {
+        validate();
+
         stopWatch.start();
 
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();
+
         engineExecutionListener.executionStarted(this);
 
-        AtomicReference<State> state = new AtomicReference<>(State.RUN_INSTANTIATE);
+        AtomicReference<State> state = new AtomicReference<>();
 
-        if (state.get() == State.RUN_INSTANTIATE) {
+        Invocation.execute(
+                () -> {
+                    try {
+                        Constructor<?> constructor =
+                                testClass.getDeclaredConstructor((Class<?>[]) null);
+                        Object testInstance = constructor.newInstance((Object[]) null);
+                        executableContext.put(
+                                StandardExecutableConstants.TEST_INSTANCE, testInstance);
+                        state.set(State.RUN_SET_RANDOM_FIELDS);
+                    } catch (Throwable t) {
+                        executableContext.addAndProcessThrowable(testClass, t);
+                        state.set(State.RUN_EXECUTE);
+                    } finally {
+                        StandardStreams.flush();
+                    }
+                });
+
+        Object testInstance = executableContext.get(StandardExecutableConstants.TEST_INSTANCE);
+
+        if (state.get() == State.RUN_SET_RANDOM_FIELDS) {
             Invocation.execute(
                     () -> {
                         try {
-                            Constructor<?> constructor =
-                                    testClass.getDeclaredConstructor((Class<?>[]) null);
-                            Object testInstance = constructor.newInstance((Object[]) null);
-                            executableContext.put(
-                                    ParameterizedExecutableConstants.TEST_INSTANCE, testInstance);
+                            List<Field> fields =
+                                    REFLECTION_UTILS.findFields(
+                                            testClass, ParameterizedFilters.RANDOM_FIELD);
+                            for (Field field : fields) {
+                                RandomFieldInjector.inject(testInstance, field);
+                            }
                             state.set(State.RUN_PREPARE_METHODS);
                         } catch (Throwable t) {
                             executableContext.addAndProcessThrowable(testClass, t);
@@ -131,8 +154,6 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                     });
         }
 
-        Object testInstance = executableContext.get(ParameterizedExecutableConstants.TEST_INSTANCE);
-
         if (state.get() == State.RUN_PREPARE_METHODS) {
             Invariant.check(testInstance != null);
             Invocation.execute(
@@ -140,17 +161,11 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                         try {
                             List<Method> prepareMethods =
                                     REFLECTION_UTILS.findMethods(
-                                            testClass, ParameterizedFilters.PREPARE_METHOD);
+                                            testClass, StandardFilters.PREPARE_METHOD);
                             TEST_DESCRIPTOR_UTILS.sortMethods(
                                     prepareMethods, TestDescriptorUtils.Sort.FORWARD);
                             for (Method method : prepareMethods) {
-                                try {
-                                    LOCK_PROCESSOR.processLocks(method);
-                                    MethodInvoker.invoke(method, testInstance, null);
-                                } finally {
-                                    LOCK_PROCESSOR.processUnlocks(method);
-                                    StandardStreams.flush();
-                                }
+                                MethodInvoker.invoke(method, testInstance, null);
                             }
                         } catch (Throwable t) {
                             executableContext.addAndProcessThrowable(testClass, t);
@@ -164,12 +179,14 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
         if (state.get() == State.RUN_EXECUTE) {
             getChildren()
                     .forEach(
-                            testDescriptor -> {
-                                if (testDescriptor instanceof ExecutableTestDescriptor) {
-                                    ((ExecutableTestDescriptor) testDescriptor)
-                                            .execute(executionRequest, executableContext);
-                                }
-                            });
+                            (Consumer<TestDescriptor>)
+                                    testDescriptor -> {
+                                        if (testDescriptor instanceof ExecutableTestDescriptor) {
+                                            ((ExecutableTestDescriptor) testDescriptor)
+                                                    .execute(executionRequest, executableContext);
+                                        }
+                                    });
+
             if (testInstance != null) {
                 state.set(State.RUN_CONCLUDE_METHODS);
             } else {
@@ -183,17 +200,15 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                     () -> {
                         List<Method> concludeMethods =
                                 REFLECTION_UTILS.findMethods(
-                                        testClass, ParameterizedFilters.CONCLUDE_METHOD);
+                                        testClass, StandardFilters.CONCLUDE_METHOD);
                         TEST_DESCRIPTOR_UTILS.sortMethods(
                                 concludeMethods, TestDescriptorUtils.Sort.REVERSE);
                         for (Method method : concludeMethods) {
                             try {
-                                LOCK_PROCESSOR.processLocks(method);
                                 MethodInvoker.invoke(method, testInstance, null);
                             } catch (Throwable t) {
                                 executableContext.addAndProcessThrowable(testClass, t);
                             } finally {
-                                LOCK_PROCESSOR.processUnlocks(method);
                                 StandardStreams.flush();
                             }
                         }
@@ -207,7 +222,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                     () -> {
                         List<Field> fields =
                                 REFLECTION_UTILS.findFields(
-                                        testClass, ParameterizedFilters.AUTO_CLOSE_FIELDS);
+                                        testClass, StandardFilters.AUTO_CLOSE_FIELDS);
                         for (Field field : fields) {
                             TestEngine.AutoClose annotation =
                                     field.getAnnotation(TestEngine.AutoClose.class);
@@ -225,14 +240,19 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
         }
 
         stopWatch.stop();
-        metadata.put(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, stopWatch.elapsedTime());
+        executableMetadata.put(
+                ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, stopWatch.elapsedTime());
 
         if (executableContext.hasThrowables()) {
-            metadata.put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
+            executableMetadata.put(
+                    ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
+                    ExecutableMetadataConstants.FAIL);
             engineExecutionListener.executionFinished(
                     this, TestExecutionResult.failed(executableContext.getThrowables().get(0)));
         } else {
-            metadata.put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
+            executableMetadata.put(
+                    ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
+                    ExecutableMetadataConstants.PASS);
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
         }
 
@@ -253,52 +273,15 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
 
         List<Method> methods =
                 REFLECTION_UTILS.findMethods(
-                        testClass,
-                        method -> method.isAnnotationPresent(TestEngine.ArgumentSupplier.class));
-        if (methods.size() != 1) {
-            throw new TestClassDefinitionException(
-                    String.format(
-                            "Test class [%s] must defined exactly one @TestEngine.ArgumentSupplier"
-                                    + " method, %d found",
-                            testClass.getName(), methods.size()));
-        }
-
-        if (!ParameterizedFilters.ARGUMENT_SUPPLIER_METHOD.test(methods.get(0))) {
-            throw new TestClassDefinitionException(
-                    String.format(
-                            "Test class [%s] @TestEngine.ArgumentSupplier method [%s] definition is"
-                                    + " invalid",
-                            testClass.getName(), methods.get(0).getName()));
-        }
-
-        methods =
-                REFLECTION_UTILS.findMethods(
                         testClass, method -> method.isAnnotationPresent(TestEngine.Prepare.class));
         for (Method method : methods) {
             if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
                 continue;
             }
-            if (!ParameterizedFilters.PREPARE_METHOD.test(method)) {
+            if (!StandardFilters.PREPARE_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
                                 "Test class [%s] @TestEngine.Prepare method [%s] definition is"
-                                        + " invalid",
-                                testClass.getName(), method.getName()));
-            }
-        }
-
-        methods =
-                REFLECTION_UTILS.findMethods(
-                        testClass,
-                        method -> method.isAnnotationPresent(TestEngine.BeforeAll.class));
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
-                continue;
-            }
-            if (!ParameterizedFilters.BEFORE_ALL_METHOD.test(method)) {
-                throw new TestClassDefinitionException(
-                        String.format(
-                                "Test class [%s] @TestEngine.BeforeAll method [%s] definition is"
                                         + " invalid",
                                 testClass.getName(), method.getName()));
             }
@@ -312,7 +295,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
             if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
                 continue;
             }
-            if (!ParameterizedFilters.BEFORE_EACH_METHOD.test(method)) {
+            if (!StandardFilters.BEFORE_EACH_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
                                 "Test class [%s] @TestEngine.BeforeEach method [%s] definition is"
@@ -328,7 +311,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
             if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
                 continue;
             }
-            if (!ParameterizedFilters.TEST_METHOD.test(method)) {
+            if (!StandardFilters.TEST_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
                                 "Test class [%s] @TestEngine.Test method [%s] definition is"
@@ -345,29 +328,10 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
             if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
                 continue;
             }
-            if (!ParameterizedFilters.AFTER_EACH_METHOD.test(method)) {
-                TestClassDefinitionException testClassDefinitionException =
-                        new TestClassDefinitionException(
-                                String.format(
-                                        "Test class [%s] @TestEngine.AfterEach method [%s]"
-                                                + " definition is invalid",
-                                        testClass.getName(), method.getName()));
-                testClassDefinitionException.setStackTrace(new StackTraceElement[0]);
-                throw testClassDefinitionException;
-            }
-        }
-
-        methods =
-                REFLECTION_UTILS.findMethods(
-                        testClass, method -> method.isAnnotationPresent(TestEngine.AfterAll.class));
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
-                continue;
-            }
-            if (!ParameterizedFilters.AFTER_ALL_METHOD.test(method)) {
+            if (!StandardFilters.AFTER_EACH_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
-                                "Test class [%s] @TestEngine.BeforeAll method [%s] definition is"
+                                "Test class [%s] @TestEngine.AfterEach method [%s] definition is"
                                         + " invalid",
                                 testClass.getName(), method.getName()));
             }
@@ -380,7 +344,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
             if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
                 continue;
             }
-            if (!ParameterizedFilters.CONCLUDE_METHOD.test(method)) {
+            if (!StandardFilters.CONCLUDE_METHOD.test(method)) {
                 throw new TestClassDefinitionException(
                         String.format(
                                 "Test class [%s] @TestEngine.Conclude method [%s] definition is"
@@ -405,31 +369,30 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
             return this;
         }
 
-        public void build() {
+        public TestDescriptor build() {
             try {
                 UniqueId testDescriptorUniqueId =
                         parentTestDescriptor
                                 .getUniqueId()
                                 .append(
-                                        ParameterizedClassTestDescriptor.class.getName(),
+                                        StandardClassTestDescriptor.class.getName(),
                                         testClass.getName());
                 TestDescriptor testDescriptor =
-                        new ParameterizedClassTestDescriptor(testDescriptorUniqueId, testClass);
+                        new StandardClassTestDescriptor(testDescriptorUniqueId, testClass);
                 parentTestDescriptor.addChild(testDescriptor);
 
-                Method testArgumentSupplierMethod =
-                        PARAMETERIZED_UTILS.getArumentSupplierMethod(testClass);
-
-                List<Argument> testArguments = PARAMETERIZED_UTILS.getArguments(testClass);
-                for (Argument testArgument : testArguments) {
-                    testDescriptor.addChild(
-                            new ParameterizedArgumentTestDescriptor.Builder()
-                                    .withParentTestDescriptor(testDescriptor)
-                                    .withTestClass(testClass)
-                                    .withTestArgumentSupplierMethod(testArgumentSupplierMethod)
-                                    .withTestArgument(testArgument)
-                                    .build());
+                List<Method> testMethods =
+                        REFLECTION_UTILS.findMethods(testClass, StandardFilters.TEST_METHOD);
+                TEST_DESCRIPTOR_UTILS.sortMethods(testMethods, TestDescriptorUtils.Sort.FORWARD);
+                for (Method testMethod : testMethods) {
+                    new StandardMethodTestDescriptor.Builder()
+                            .withParentTestDescriptor(testDescriptor)
+                            .withTestClass(testClass)
+                            .withTestMethod(testMethod)
+                            .build();
                 }
+
+                return testDescriptor;
             } catch (RuntimeException e) {
                 throw e;
             } catch (Throwable t) {

@@ -14,12 +14,24 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor;
+package org.antublue.test.engine.test.util;
 
-import org.junit.platform.engine.EngineDiscoveryRequest;
-import org.junit.platform.engine.support.descriptor.EngineDescriptor;
+import java.lang.reflect.Method;
+import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.util.ReflectionUtils;
 
-public interface TestDescriptorFactory {
+public class MethodInvoker {
 
-    void discover(EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor);
+    private MethodInvoker() {
+        // DO NOTHING
+    }
+
+    public static void invoke(Method method, Object testInstance, Object testArgument)
+            throws Throwable {
+        if (ReflectionUtils.getSingleton().acceptsArguments(method, Argument.class)) {
+            method.invoke(testInstance, testArgument);
+        } else {
+            method.invoke(testInstance, (Object[]) null);
+        }
+    }
 }

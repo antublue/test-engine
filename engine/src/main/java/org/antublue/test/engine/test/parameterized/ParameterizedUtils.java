@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor.parameterized;
+package org.antublue.test.engine.test.parameterized;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.test.descriptor.util.TestDescriptorUtils;
+import org.antublue.test.engine.test.util.TestDescriptorUtils;
 import org.antublue.test.engine.util.ReflectionUtils;
 
 @SuppressWarnings("unchecked")

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor.util;
+package org.antublue.test.engine.test.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

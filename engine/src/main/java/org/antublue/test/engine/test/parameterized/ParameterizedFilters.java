@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor.parameterized;
+package org.antublue.test.engine.test.parameterized;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

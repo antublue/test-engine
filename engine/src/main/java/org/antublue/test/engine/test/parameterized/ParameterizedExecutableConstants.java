@@ -14,27 +14,18 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor;
+package org.antublue.test.engine.test.parameterized;
 
-public class MetadataConstants {
-
-    public static String PASS = "PASS";
-
-    public static String FAIL = "FAIL";
-
-    public static String SKIP = "SKIP";
+public class ParameterizedExecutableConstants {
 
     public static final String TEST_CLASS = "testClass";
 
+    public static final String TEST_CLASS_ARGUMENT_SUPPLIER_METHOD =
+            "testClassArgumentSupplierMethod";
+
     public static final String TEST_ARGUMENT = "testArgument";
 
-    public static final String TEST_METHOD = "testMethod";
+    public static final String TEST_INSTANCE = "testInstance";
 
-    public static final String TEST_DESCRIPTOR_STATUS = "testDescriptorStatus";
-
-    public static final String TEST_DESCRIPTOR_ELAPSED_TIME = "testDescriptorElapsedTime";
-
-    private MetadataConstants() {
-        // DO NOTHING
-    }
+    public static final String TEST_THROWABLES = "testThrowables";
 }

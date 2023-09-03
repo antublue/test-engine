@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor.parameterized;
+package org.antublue.test.engine.test.standard;
 
-public class ParameterizedExecutableConstants {
+public class StandardExecutableConstants {
 
     public static final String TEST_CLASS = "testClass";
 
-    public static final String TEST_CLASS_ARGUMENT_SUPPLIER_METHOD =
-            "testClassArgumentSupplierMethod";
-
-    public static final String TEST_ARGUMENT = "testArgument";
-
     public static final String TEST_INSTANCE = "testInstance";
 
-    public static final String TEST_THROWABLES = "testThrowables";
+    public static final String TEST_METHOD = "testMethod";
 }

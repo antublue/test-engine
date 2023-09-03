@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor;
+package org.antublue.test.engine.test;
 
-public interface MetadataSupport {
+public interface ExecutableMetadataSupport {
 
-    Metadata getMetadata();
+    ExecutableMetadata getExecutableMetadata();
 }

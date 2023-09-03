@@ -14,47 +14,19 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor;
+package org.antublue.test.engine.test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.antublue.test.engine.configuration.Constants;
-import org.antublue.test.engine.util.StandardStreams;
-import org.antublue.test.engine.util.ThrowableUtils;
 
-/** Class to implement a ExecutableContext */
 @SuppressWarnings("unchecked")
-public class ExecutableContext {
-
-    private static final boolean PRINT_STACKTRACE =
-            Constants.TRUE.equals(System.getProperty(Constants.MAVEN_PLUGIN));
+public class ExecutableMetadata {
 
     private final Map<String, Object> map;
-    private final List<Throwable> throwables;
 
-    public ExecutableContext() {
+    public ExecutableMetadata() {
         map = new ConcurrentHashMap<>();
-        throwables = new ArrayList<>();
-    }
-
-    public void addAndProcessThrowable(Class<?> clazz, Throwable throwable) {
-        Throwable prunedThrowable = ThrowableUtils.prune(clazz, throwable);
-        if (PRINT_STACKTRACE) {
-            prunedThrowable.printStackTrace();
-            StandardStreams.flush();
-        }
-        throwables.add(prunedThrowable);
-    }
-
-    public boolean hasThrowables() {
-        return !throwables.isEmpty();
-    }
-
-    public List<Throwable> getThrowables() {
-        return throwables;
     }
 
     public void put(String key, Object value) {
@@ -75,5 +47,23 @@ public class ExecutableContext {
 
     public Set<String> keySet() {
         return map.keySet();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            if (stringBuilder.length() > 0) {
+                stringBuilder.append(" ");
+            }
+            Object value = entry.getValue();
+            stringBuilder
+                    .append("[")
+                    .append(entry.getKey())
+                    .append("] = [")
+                    .append(value != null ? value.toString() : "null")
+                    .append("]");
+        }
+        return stringBuilder.toString();
     }
 }

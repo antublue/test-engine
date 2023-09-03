@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor.standard;
+package org.antublue.test.engine.test.standard;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

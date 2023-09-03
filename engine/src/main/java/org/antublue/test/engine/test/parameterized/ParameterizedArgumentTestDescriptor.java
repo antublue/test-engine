@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor.parameterized;
+package org.antublue.test.engine.test.parameterized;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -24,16 +24,16 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.test.descriptor.ExecutableContext;
-import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
-import org.antublue.test.engine.test.descriptor.Metadata;
-import org.antublue.test.engine.test.descriptor.MetadataConstants;
-import org.antublue.test.engine.test.descriptor.MetadataSupport;
-import org.antublue.test.engine.test.descriptor.util.AutoCloseProcessor;
-import org.antublue.test.engine.test.descriptor.util.LockProcessor;
-import org.antublue.test.engine.test.descriptor.util.MethodInvoker;
-import org.antublue.test.engine.test.descriptor.util.RandomFieldInjector;
-import org.antublue.test.engine.test.descriptor.util.TestDescriptorUtils;
+import org.antublue.test.engine.test.ExecutableContext;
+import org.antublue.test.engine.test.ExecutableMetadata;
+import org.antublue.test.engine.test.ExecutableMetadataConstants;
+import org.antublue.test.engine.test.ExecutableMetadataSupport;
+import org.antublue.test.engine.test.ExecutableTestDescriptor;
+import org.antublue.test.engine.test.util.AutoCloseProcessor;
+import org.antublue.test.engine.test.util.LockProcessor;
+import org.antublue.test.engine.test.util.MethodInvoker;
+import org.antublue.test.engine.test.util.RandomFieldInjector;
+import org.antublue.test.engine.test.util.TestDescriptorUtils;
 import org.antublue.test.engine.util.Invariant;
 import org.antublue.test.engine.util.Invocation;
 import org.antublue.test.engine.util.ReflectionUtils;
@@ -50,7 +50,7 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /** Class to implement a ParameterArgumentTestDescriptor */
 public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
-        implements ExecutableTestDescriptor, MetadataSupport {
+        implements ExecutableTestDescriptor, ExecutableMetadataSupport {
 
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
@@ -65,7 +65,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
     private final Method testArgumentSupplierMethod;
     private final Argument testArgument;
     private final StopWatch stopWatch;
-    private final Metadata metadata;
+    private final ExecutableMetadata executableMetadata;
 
     /**
      * Constructor
@@ -85,7 +85,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         this.testArgumentSupplierMethod = testArgumentSupplierMethod;
         this.testArgument = testArgument;
         this.stopWatch = new StopWatch();
-        this.metadata = new Metadata();
+        this.executableMetadata = new ExecutableMetadata();
     }
 
     @Override
@@ -99,8 +99,8 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public Metadata getMetadata() {
-        return metadata;
+    public ExecutableMetadata getExecutableMetadata() {
+        return executableMetadata;
     }
 
     private enum State {
@@ -121,8 +121,8 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         Object testInstance = executableContext.get(ParameterizedExecutableConstants.TEST_INSTANCE);
         Invariant.check(testInstance != null);
 
-        metadata.put(MetadataConstants.TEST_CLASS, testClass);
-        metadata.put(MetadataConstants.TEST_ARGUMENT, testArgument);
+        executableMetadata.put(ExecutableMetadataConstants.TEST_CLASS, testClass);
+        executableMetadata.put(ExecutableMetadataConstants.TEST_ARGUMENT, testArgument);
 
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();
@@ -139,8 +139,12 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
                                     });
 
             stopWatch.stop();
-            metadata.put(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, stopWatch.elapsedTime());
-            metadata.put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
+            executableMetadata.put(
+                    ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
+                    stopWatch.elapsedTime());
+            executableMetadata.put(
+                    ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
+                    ExecutableMetadataConstants.SKIP);
             engineExecutionListener.executionSkipped(this, "");
             return;
         }
@@ -296,14 +300,19 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         }
 
         stopWatch.stop();
-        metadata.put(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, stopWatch.elapsedTime());
+        executableMetadata.put(
+                ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, stopWatch.elapsedTime());
 
         if (executableContext.hasThrowables()) {
-            metadata.put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
+            executableMetadata.put(
+                    ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
+                    ExecutableMetadataConstants.FAIL);
             engineExecutionListener.executionFinished(
                     this, TestExecutionResult.failed(executableContext.getThrowables().get(0)));
         } else {
-            metadata.put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
+            executableMetadata.put(
+                    ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
+                    ExecutableMetadataConstants.PASS);
             engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
         }
 

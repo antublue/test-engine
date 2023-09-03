@@ -14,13 +14,27 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor.standard;
+package org.antublue.test.engine.test;
 
-public class StandardExecutableConstants {
+public class ExecutableMetadataConstants {
+
+    public static String PASS = "PASS";
+
+    public static String FAIL = "FAIL";
+
+    public static String SKIP = "SKIP";
 
     public static final String TEST_CLASS = "testClass";
 
-    public static final String TEST_INSTANCE = "testInstance";
+    public static final String TEST_ARGUMENT = "testArgument";
 
     public static final String TEST_METHOD = "testMethod";
+
+    public static final String TEST_DESCRIPTOR_STATUS = "testDescriptorStatus";
+
+    public static final String TEST_DESCRIPTOR_ELAPSED_TIME = "testDescriptorElapsedTime";
+
+    private ExecutableMetadataConstants() {
+        // DO NOTHING
+    }
 }

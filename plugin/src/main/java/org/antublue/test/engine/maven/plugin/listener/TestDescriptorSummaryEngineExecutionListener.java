@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.test.descriptor.Metadata;
-import org.antublue.test.engine.test.descriptor.MetadataConstants;
-import org.antublue.test.engine.test.descriptor.MetadataSupport;
+import org.antublue.test.engine.test.ExecutableMetadata;
+import org.antublue.test.engine.test.ExecutableMetadataConstants;
+import org.antublue.test.engine.test.ExecutableMetadataSupport;
 import org.antublue.test.engine.util.AnsiColor;
 import org.antublue.test.engine.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.util.HumanReadableTime;
@@ -112,16 +112,18 @@ public class TestDescriptorSummaryEngineExecutionListener
         long methodTestDescriptorSkipped = 0;
 
         for (TestDescriptor testDescriptor : testDescriptors) {
-            if (testDescriptor instanceof MetadataSupport) {
-                MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
-                Metadata metadata = metadataSupport.getMetadata();
+            if (testDescriptor instanceof ExecutableMetadataSupport) {
+                ExecutableMetadataSupport executableMetadataSupport =
+                        (ExecutableMetadataSupport) testDescriptor;
+                ExecutableMetadata executableMetadata =
+                        executableMetadataSupport.getExecutableMetadata();
                 String testDescriptorStatus =
-                        metadata.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
+                        executableMetadata.get(ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS);
                 String testDescriptorClassName = testDescriptor.getClass().getName();
 
                 switch (testDescriptorClassName) {
-                    case "org.antublue.test.engine.test.descriptor.standard.StandardMethodTestDescriptor":
-                    case "org.antublue.test.engine.test.descriptor.parameterized.ParameterizedMethodTestDescriptor":
+                    case "org.antublue.test.engine.test.standard.StandardMethodTestDescriptor":
+                    case "org.antublue.test.engine.test.parameterized.ParameterizedMethodTestDescriptor":
                         {
                             methodTestDescriptorFound++;
                             switch (testDescriptorStatus) {
@@ -148,8 +150,8 @@ public class TestDescriptorSummaryEngineExecutionListener
                             }
                             break;
                         }
-                    case "org.antublue.test.engine.test.descriptor.standard.StandardCLassTestDescriptor":
-                    case "org.antublue.test.engine.test.descriptor.parameterized.ParameterizedClassTestDescriptor":
+                    case "org.antublue.test.engine.test.standard.StandardCLassTestDescriptor":
+                    case "org.antublue.test.engine.test.parameterized.ParameterizedClassTestDescriptor":
                         {
                             classTestDescriptorFound++;
                             switch (testDescriptorStatus) {
@@ -176,7 +178,7 @@ public class TestDescriptorSummaryEngineExecutionListener
                             }
                             break;
                         }
-                    case "org.antublue.test.engine.test.descriptor.parameterized.ParameterizedArgumentTestDescriptor":
+                    case "org.antublue.test.engine.test.parameterized.ParameterizedArgumentTestDescriptor":
                         {
                             argumentTestDescriptorFound++;
                             switch (testDescriptorStatus) {
