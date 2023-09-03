@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test.descriptor.standard;
+package org.antublue.test.engine.test.descriptor.parameterized;
 
-import java.lang.reflect.Method;
 import org.antublue.test.engine.test.descriptor.TestDescriptorFactory;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
-import org.junit.platform.engine.discovery.MethodSelector;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
-/** Class to implement a StandardTestDescriptorFactory */
-public class StandardTestDescriptorFactory implements TestDescriptorFactory {
+/** Class to implement a ParameterizedTestDescriptorFactory */
+public class ParameterizedTestFactory implements TestDescriptorFactory {
 
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
@@ -47,9 +45,7 @@ public class StandardTestDescriptorFactory implements TestDescriptorFactory {
                 .getSelectorsByType(ClassSelector.class)
                 .forEach(classSelector -> discover(classSelector, engineDescriptor));
 
-        engineDiscoveryRequest
-                .getSelectorsByType(MethodSelector.class)
-                .forEach(methodSelector -> discover(methodSelector, engineDescriptor));
+        // TODO add support for ParameterizedMethodTestDescriptor
     }
 
     /**
@@ -62,12 +58,13 @@ public class StandardTestDescriptorFactory implements TestDescriptorFactory {
             ClasspathRootSelector classpathRootSelector, EngineDescriptor engineDescriptor) {
         REFLECTION_UTILS
                 .findAllClasses(
-                        classpathRootSelector.getClasspathRoot(), StandardFilters.TEST_CLASS)
+                        classpathRootSelector.getClasspathRoot(), ParameterizedFilters.TEST_CLASS)
                 .forEach(
-                        c ->
-                                engineDescriptor.addChild(
-                                        new StandardClassTestDescriptor(
-                                                engineDescriptor.getUniqueId(), c)));
+                        testclass ->
+                                new ParameterizedClassTestDescriptor.Builder()
+                                        .withParentTestDescriptor(engineDescriptor)
+                                        .withTestClass(testclass)
+                                        .build());
     }
 
     /**
@@ -76,16 +73,16 @@ public class StandardTestDescriptorFactory implements TestDescriptorFactory {
      * @param packageSelector packageSelector
      * @param engineDescriptor engineDescriptor
      */
-    private static void discover(
-            PackageSelector packageSelector, EngineDescriptor engineDescriptor) {
+    private void discover(PackageSelector packageSelector, EngineDescriptor engineDescriptor) {
         REFLECTION_UTILS
-                .findAllClasses(packageSelector.getPackageName(), StandardFilters.TEST_CLASS)
+                .findAllClasses(packageSelector.getPackageName(), ParameterizedFilters.TEST_CLASS)
                 .forEach(
-                        c -> {
-                            if (StandardFilters.TEST_CLASS.test(c)) {
-                                engineDescriptor.addChild(
-                                        new StandardClassTestDescriptor(
-                                                engineDescriptor.getUniqueId(), c));
+                        testclass -> {
+                            if (ParameterizedFilters.TEST_CLASS.test(testclass)) {
+                                new ParameterizedClassTestDescriptor.Builder()
+                                        .withParentTestDescriptor(engineDescriptor)
+                                        .withTestClass(testclass)
+                                        .build();
                             }
                         });
     }
@@ -96,26 +93,13 @@ public class StandardTestDescriptorFactory implements TestDescriptorFactory {
      * @param classSelector classSelector
      * @param engineDescriptor engineDescriptor
      */
-    private static void discover(ClassSelector classSelector, EngineDescriptor engineDescriptor) {
-        Class<?> clazz = classSelector.getJavaClass();
-        if (StandardFilters.TEST_CLASS.test(clazz)) {
-            engineDescriptor.addChild(
-                    new StandardClassTestDescriptor(engineDescriptor.getUniqueId(), clazz));
-        }
-    }
-
-    /**
-     * Method to process a MethodSelector
-     *
-     * @param methodSelector methodSelector
-     * @param engineDescriptor engineDescriptor
-     */
-    private static void discover(MethodSelector methodSelector, EngineDescriptor engineDescriptor) {
-        Class<?> clazz = methodSelector.getJavaClass();
-        Method method = methodSelector.getJavaMethod();
-        if (StandardFilters.TEST_CLASS.test(clazz) && StandardFilters.TEST_METHOD.test(method)) {
-            engineDescriptor.addChild(
-                    new StandardMethodTestDescriptor(engineDescriptor.getUniqueId(), method));
+    private void discover(ClassSelector classSelector, EngineDescriptor engineDescriptor) {
+        Class<?> testClass = classSelector.getJavaClass();
+        if (ParameterizedFilters.TEST_CLASS.test(testClass)) {
+            new ParameterizedClassTestDescriptor.Builder()
+                    .withParentTestDescriptor(engineDescriptor)
+                    .withTestClass(testClass)
+                    .build();
         }
     }
 }

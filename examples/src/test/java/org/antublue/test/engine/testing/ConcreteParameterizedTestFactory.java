@@ -23,7 +23,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
-public class ConcreteParameterizedTest {
+public class ConcreteParameterizedTestFactory {
 
     @TestEngine.Argument private IntegerArgument integerArgument;
 

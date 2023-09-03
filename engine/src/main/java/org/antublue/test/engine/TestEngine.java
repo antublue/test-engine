@@ -27,10 +27,8 @@ import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
-import org.antublue.test.engine.test.descriptor.ExecutableContext;
-import org.antublue.test.engine.test.descriptor.ExecutableTestDescriptor;
-import org.antublue.test.engine.test.descriptor.parameterized.ParameterizedTestDescriptorFactory;
-import org.antublue.test.engine.test.descriptor.standard.StandardTestDescriptorFactory;
+import org.antublue.test.engine.test.descriptor.parameterized.ParameterizedTestFactory;
+import org.antublue.test.engine.test.descriptor.standard.StandardTestFactory;
 import org.antublue.test.engine.test.descriptor.util.ExtensionManager;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
@@ -115,9 +113,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
-            new StandardTestDescriptorFactory().discover(engineDiscoveryRequest, engineDescriptor);
-            new ParameterizedTestDescriptorFactory()
-                    .discover(engineDiscoveryRequest, engineDescriptor);
+            new StandardTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
+            new ParameterizedTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
 
             // Remove test descriptors
             List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
@@ -134,11 +131,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 testDescriptors.sort(Comparator.comparing(TestDescriptor::getDisplayName));
             }
 
-            // Add test descriptors
             for (TestDescriptor testDescriptor : testDescriptors) {
                 engineDescriptor.addChild(testDescriptor);
-                ((ExecutableTestDescriptor) testDescriptor)
-                        .build(engineDiscoveryRequest, new ExecutableContext());
             }
 
             return engineDescriptor;

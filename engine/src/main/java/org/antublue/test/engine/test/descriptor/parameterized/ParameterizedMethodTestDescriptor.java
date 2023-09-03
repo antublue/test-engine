@@ -37,9 +37,9 @@ import org.antublue.test.engine.util.Invocation;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
-import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
+import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -57,21 +57,23 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
 
     private static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
 
-    private final Method testMethod;
+    private final Class<?> testClass;
     private final Argument testArgument;
+    private final Method testMethod;
     private final StopWatch stopWatch;
     private final Metadata metadata;
 
     /** Constructor */
-    public ParameterizedMethodTestDescriptor(
-            UniqueId parentUniqueId, Method testMethod, Argument testArgument) {
+    private ParameterizedMethodTestDescriptor(
+            UniqueId parentUniqueId, Class<?> testClass, Argument testArgument, Method testMethod) {
         super(
                 parentUniqueId.append(
                         ParameterizedMethodTestDescriptor.class.getSimpleName(),
                         testMethod.getName()),
                 TEST_DESCRIPTOR_UTILS.getDisplayName(testMethod));
-        this.testMethod = testMethod;
+        this.testClass = testClass;
         this.testArgument = testArgument;
+        this.testMethod = testMethod;
         this.stopWatch = new StopWatch();
         this.metadata = new Metadata();
     }
@@ -99,20 +101,10 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public void build(
-            EngineDiscoveryRequest engineDiscoveryRequest, ExecutableContext executableContext) {
-        // DO NOTHING
-    }
-
-    @Override
     public void execute(ExecutionRequest executionRequest, ExecutableContext executableContext) {
         stopWatch.start();
 
-        Class<?> testClass = executableContext.get(ParameterizedExecutableConstants.TEST_CLASS);
         Object testInstance = executableContext.get(ParameterizedExecutableConstants.TEST_INSTANCE);
-
-        Invariant.check(testClass != null);
-        Invariant.check(testArgument != null);
         Invariant.check(testInstance != null);
 
         metadata.put(MetadataConstants.TEST_CLASS, testClass);
@@ -234,5 +226,55 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
         }
 
         StandardStreams.flush();
+    }
+
+    public static class Builder {
+
+        private TestDescriptor parentTestDescriptor;
+        private Class<?> testClass;
+        private Argument testArgument;
+        private Method testMethod;
+
+        public Builder withParentTestDescriptor(TestDescriptor parentTestDescriptor) {
+            this.parentTestDescriptor = parentTestDescriptor;
+            return this;
+        }
+
+        public Builder withTestClass(Class<?> testClass) {
+            this.testClass = testClass;
+            return this;
+        }
+
+        public Builder withTestArgument(Argument testArgument) {
+            this.testArgument = testArgument;
+            return this;
+        }
+
+        public Builder withTestMethod(Method testMethod) {
+            this.testMethod = testMethod;
+            return this;
+        }
+
+        public TestDescriptor build() {
+            try {
+                UniqueId testDescriptorUniqueId =
+                        parentTestDescriptor
+                                .getUniqueId()
+                                .append(
+                                        ParameterizedMethodTestDescriptor.class.getName(),
+                                        testArgument.name());
+                TestDescriptor testDescriptor =
+                        new ParameterizedMethodTestDescriptor(
+                                testDescriptorUniqueId, testClass, testArgument, testMethod);
+
+                parentTestDescriptor.addChild(testDescriptor);
+
+                return testDescriptor;
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
     }
 }

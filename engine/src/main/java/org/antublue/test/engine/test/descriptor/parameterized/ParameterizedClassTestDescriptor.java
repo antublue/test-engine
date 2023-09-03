@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.test.descriptor.ExecutableContext;
@@ -38,9 +39,9 @@ import org.antublue.test.engine.util.Invocation;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
-import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
+import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -48,7 +49,6 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /** Class to implement a ParameterClassTestDescriptor */
-@SuppressWarnings("unchecked")
 public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
         implements ExecutableTestDescriptor, MetadataSupport {
 
@@ -68,17 +68,12 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
     /**
      * Constructor
      *
-     * @param parentUniqueId parentUniqueId
+     * @param uniqueId uniqueId
      * @param testClass testClass
      */
-    public ParameterizedClassTestDescriptor(UniqueId parentUniqueId, Class<?> testClass) {
-        super(
-                parentUniqueId.append(
-                        ParameterizedClassTestDescriptor.class.getSimpleName(),
-                        testClass.getName()),
-                TEST_DESCRIPTOR_UTILS.getDisplayName(testClass));
+    private ParameterizedClassTestDescriptor(UniqueId uniqueId, Class<?> testClass) {
+        super(uniqueId, TEST_DESCRIPTOR_UTILS.getDisplayName(testClass));
         this.testClass = testClass;
-
         this.stopWatch = new StopWatch();
         this.metadata = new Metadata();
     }
@@ -108,46 +103,8 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public void build(
-            EngineDiscoveryRequest engineDiscoveryRequest, ExecutableContext executableContext) {
-        validate();
-
-        try {
-            executableContext.put(ParameterizedExecutableConstants.TEST_CLASS, testClass);
-            executableContext.put(
-                    ParameterizedExecutableConstants.TEST_CLASS_ARGUMENT_SUPPLIER_METHOD,
-                    PARAMETERIZED_UTILS.getArumentSupplierMethod(testClass));
-
-            PARAMETERIZED_UTILS
-                    .getArguments(testClass)
-                    .forEach(
-                            testArgument -> {
-                                ExecutableTestDescriptor executableTestDescriptor =
-                                        new ParameterizedArgumentTestDescriptor(
-                                                getUniqueId(), testArgument);
-
-                                executableTestDescriptor.build(
-                                        engineDiscoveryRequest, executableContext);
-                                addChild(executableTestDescriptor);
-
-                                executableContext.put(
-                                        ParameterizedExecutableConstants.TEST_ARGUMENT,
-                                        testArgument);
-                            });
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
-    }
-
-    @Override
     public void execute(ExecutionRequest executionRequest, ExecutableContext executableContext) {
         stopWatch.start();
-
-        executableContext.put(ParameterizedExecutableConstants.TEST_CLASS, testClass);
-
-        metadata.put(MetadataConstants.TEST_CLASS, testClass);
 
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();
@@ -429,6 +386,54 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                                 "Test class [%s] @TestEngine.Conclude method [%s] definition is"
                                         + " invalid",
                                 testClass.getName(), method.getName()));
+            }
+        }
+    }
+
+    public static class Builder {
+
+        private TestDescriptor parentTestDescriptor;
+        private Class<?> testClass;
+
+        public Builder withParentTestDescriptor(TestDescriptor parentTestDescriptor) {
+            this.parentTestDescriptor = parentTestDescriptor;
+            return this;
+        }
+
+        public Builder withTestClass(Class<?> testClass) {
+            this.testClass = testClass;
+            return this;
+        }
+
+        public void build() {
+            try {
+                UniqueId testDescriptorUniqueId =
+                        parentTestDescriptor
+                                .getUniqueId()
+                                .append(
+                                        ParameterizedClassTestDescriptor.class.getName(),
+                                        testClass.getName());
+                TestDescriptor testDescriptor =
+                        new ParameterizedClassTestDescriptor(testDescriptorUniqueId, testClass);
+                parentTestDescriptor.addChild(testDescriptor);
+
+                Method testArgumentSupplierMethod =
+                        PARAMETERIZED_UTILS.getArumentSupplierMethod(testClass);
+
+                List<Argument> testArguments = PARAMETERIZED_UTILS.getArguments(testClass);
+                for (Argument testArgument : testArguments) {
+                    testDescriptor.addChild(
+                            new ParameterizedArgumentTestDescriptor.Builder()
+                                    .withParentTestDescriptor(testDescriptor)
+                                    .withTestClass(testClass)
+                                    .withTestArgumentSupplierMethod(testArgumentSupplierMethod)
+                                    .withTestArgument(testArgument)
+                                    .build());
+                }
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
             }
         }
     }

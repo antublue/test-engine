@@ -39,7 +39,6 @@ import org.antublue.test.engine.util.Invocation;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
-import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -58,26 +57,32 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
     private static final TestDescriptorUtils TEST_DESCRIPTOR_UTILS =
             TestDescriptorUtils.getSingleton();
 
+    private static final ParameterizedUtils PARAMETERIZED_UTILS = ParameterizedUtils.getSingleton();
+
     private static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
 
+    private final Class<?> testClass;
+    private final Method testArgumentSupplierMethod;
     private final Argument testArgument;
     private final StopWatch stopWatch;
     private final Metadata metadata;
 
-    private Method testArgumentSupplierMethod;
-
     /**
      * Constructor
      *
-     * @param parentUniqueId parentUniqueId
+     * @param uniqueId uniqueId
+     * @param testClass testClass
+     * @param testArgumentSupplierMethod testArgumentSupplierMethod
      * @param testArgument testArgument
      */
-    public ParameterizedArgumentTestDescriptor(UniqueId parentUniqueId, Argument testArgument) {
-        super(
-                parentUniqueId.append(
-                        ParameterizedArgumentTestDescriptor.class.getSimpleName(),
-                        testArgument.name()),
-                testArgument.name());
+    private ParameterizedArgumentTestDescriptor(
+            UniqueId uniqueId,
+            Class<?> testClass,
+            Method testArgumentSupplierMethod,
+            Argument testArgument) {
+        super(uniqueId, testArgument.name());
+        this.testClass = testClass;
+        this.testArgumentSupplierMethod = testArgumentSupplierMethod;
         this.testArgument = testArgument;
         this.stopWatch = new StopWatch();
         this.metadata = new Metadata();
@@ -98,40 +103,6 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         return metadata;
     }
 
-    /**
-     * Method to build the test descriptor
-     *
-     * @param engineDiscoveryRequest engineDiscoveryRequest
-     * @param executableContext buildContext
-     */
-    public void build(
-            EngineDiscoveryRequest engineDiscoveryRequest, ExecutableContext executableContext) {
-        try {
-            testArgumentSupplierMethod =
-                    executableContext.get(
-                            ParameterizedExecutableConstants.TEST_CLASS_ARGUMENT_SUPPLIER_METHOD);
-            Class<?> testClass = executableContext.get(ParameterizedExecutableConstants.TEST_CLASS);
-
-            Invariant.check(testClass != null);
-            Invariant.check(testArgumentSupplierMethod != null);
-
-            List<Method> methods =
-                    REFLECTION_UTILS.findMethods(testClass, ParameterizedFilters.TEST_METHOD);
-
-            TEST_DESCRIPTOR_UTILS.sortMethods(methods, TestDescriptorUtils.Sort.FORWARD);
-
-            methods.forEach(
-                    testMethod ->
-                            addChild(
-                                    new ParameterizedMethodTestDescriptor(
-                                            getUniqueId(), testMethod, testArgument)));
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
-    }
-
     private enum State {
         RUN_SET_ARGUMENT_FIELDS,
         RUN_SET_RANDOM_FIELDS,
@@ -147,12 +118,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
     public void execute(ExecutionRequest executionRequest, ExecutableContext executableContext) {
         stopWatch.start();
 
-        executableContext.put(ParameterizedExecutableConstants.TEST_ARGUMENT, testArgument);
-
-        Class<?> testClass = executableContext.get(ParameterizedExecutableConstants.TEST_CLASS);
         Object testInstance = executableContext.get(ParameterizedExecutableConstants.TEST_INSTANCE);
-
-        Invariant.check(testClass != null);
         Invariant.check(testInstance != null);
 
         metadata.put(MetadataConstants.TEST_CLASS, testClass);
@@ -342,5 +308,70 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         }
 
         StandardStreams.flush();
+    }
+
+    public static class Builder {
+
+        private TestDescriptor parentTestDescriptor;
+        private Class<?> testClass;
+        private Method testArgumentSupplierMethod;
+        private Argument testArgument;
+
+        public Builder withParentTestDescriptor(TestDescriptor parentTestDescriptor) {
+            this.parentTestDescriptor = parentTestDescriptor;
+            return this;
+        }
+
+        public Builder withTestClass(Class<?> testClass) {
+            this.testClass = testClass;
+            return this;
+        }
+
+        public Builder withTestArgumentSupplierMethod(Method testArgumentSupplierMethod) {
+            this.testArgumentSupplierMethod = testArgumentSupplierMethod;
+            return this;
+        }
+
+        public Builder withTestArgument(Argument testArgument) {
+            this.testArgument = testArgument;
+            return this;
+        }
+
+        public TestDescriptor build() {
+            try {
+                UniqueId testDescriptorUniqueId =
+                        parentTestDescriptor
+                                .getUniqueId()
+                                .append(
+                                        ParameterizedArgumentTestDescriptor.class.getName(),
+                                        testArgument.name());
+                TestDescriptor testDescriptor =
+                        new ParameterizedArgumentTestDescriptor(
+                                testDescriptorUniqueId,
+                                testClass,
+                                testArgumentSupplierMethod,
+                                testArgument);
+                parentTestDescriptor.addChild(testDescriptor);
+
+                List<Method> testMethods =
+                        REFLECTION_UTILS.findMethods(testClass, ParameterizedFilters.TEST_METHOD);
+                TEST_DESCRIPTOR_UTILS.sortMethods(testMethods, TestDescriptorUtils.Sort.FORWARD);
+                for (Method testMethod : testMethods) {
+                    testDescriptor.addChild(
+                            new ParameterizedMethodTestDescriptor.Builder()
+                                    .withParentTestDescriptor(testDescriptor)
+                                    .withTestClass(testClass)
+                                    .withTestArgument(testArgument)
+                                    .withTestMethod(testMethod)
+                                    .build());
+                }
+
+                return testDescriptor;
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
     }
 }

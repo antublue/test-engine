@@ -51,8 +51,6 @@ public class LifecycleTest {
                         });
 
         EXPECTED.add("conclude()");
-
-        System.out.println(String.format("EXPECTED size [%d]", EXPECTED.size()));
     }
 
     @TestEngine.Argument protected StringArgument stringArgument;

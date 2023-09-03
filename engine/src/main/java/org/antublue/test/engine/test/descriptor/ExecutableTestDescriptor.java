@@ -16,20 +16,11 @@
 
 package org.antublue.test.engine.test.descriptor;
 
-import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 
 /** Interface to implement an ExecutableTestDescriptor */
 public interface ExecutableTestDescriptor extends TestDescriptor {
-
-    /**
-     * Method to build the test descriptor
-     *
-     * @param engineDiscoveryRequest engineDiscoveryRequest
-     * @param executableContext buildContext
-     */
-    void build(EngineDiscoveryRequest engineDiscoveryRequest, ExecutableContext executableContext);
 
     /**
      * Method to execute the test descriptor

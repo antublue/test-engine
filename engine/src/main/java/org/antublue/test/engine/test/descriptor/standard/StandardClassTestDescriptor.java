@@ -41,7 +41,6 @@ import org.antublue.test.engine.util.Invocation;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
-import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -94,28 +93,6 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
         return metadata;
     }
 
-    @Override
-    public void build(
-            EngineDiscoveryRequest engineDiscoveryRequest, ExecutableContext executableContext) {
-        try {
-            ReflectionUtils.getSingleton()
-                    .findMethods(testClass, StandardFilters.TEST_METHOD)
-                    .forEach(
-                            testMethod -> {
-                                ExecutableTestDescriptor executableTestDescriptor =
-                                        new StandardMethodTestDescriptor(getUniqueId(), testMethod);
-
-                                executableTestDescriptor.build(
-                                        engineDiscoveryRequest, executableContext);
-                                addChild(executableTestDescriptor);
-                            });
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
-    }
-
     private enum State {
         RUN_PREPARE_METHODS,
         RUN_SET_RANDOM_FIELDS,
@@ -130,10 +107,6 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
         validate();
 
         stopWatch.start();
-
-        metadata.put(MetadataConstants.TEST_CLASS, testClass);
-
-        executableContext.put(StandardExecutableConstants.TEST_CLASS, testClass);
 
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();
@@ -372,6 +345,53 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                                 "Test class [%s] @TestEngine.Conclude method [%s] definition is"
                                         + " invalid",
                                 testClass.getName(), method.getName()));
+            }
+        }
+    }
+
+    public static class Builder {
+
+        private TestDescriptor parentTestDescriptor;
+        private Class<?> testClass;
+
+        public Builder withParentTestDescriptor(TestDescriptor parentTestDescriptor) {
+            this.parentTestDescriptor = parentTestDescriptor;
+            return this;
+        }
+
+        public Builder withTestClass(Class<?> testClass) {
+            this.testClass = testClass;
+            return this;
+        }
+
+        public TestDescriptor build() {
+            try {
+                UniqueId testDescriptorUniqueId =
+                        parentTestDescriptor
+                                .getUniqueId()
+                                .append(
+                                        StandardClassTestDescriptor.class.getName(),
+                                        testClass.getName());
+                TestDescriptor testDescriptor =
+                        new StandardClassTestDescriptor(testDescriptorUniqueId, testClass);
+                parentTestDescriptor.addChild(testDescriptor);
+
+                List<Method> testMethods =
+                        REFLECTION_UTILS.findMethods(testClass, StandardFilters.TEST_METHOD);
+                TEST_DESCRIPTOR_UTILS.sortMethods(testMethods, TestDescriptorUtils.Sort.FORWARD);
+                for (Method testMethod : testMethods) {
+                    new StandardMethodTestDescriptor.Builder()
+                            .withParentTestDescriptor(testDescriptor)
+                            .withTestClass(testClass)
+                            .withTestMethod(testMethod)
+                            .build();
+                }
+
+                return testDescriptor;
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
             }
         }
     }

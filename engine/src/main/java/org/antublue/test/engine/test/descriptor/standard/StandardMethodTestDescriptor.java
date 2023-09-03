@@ -37,9 +37,9 @@ import org.antublue.test.engine.util.Invocation;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
-import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
+import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -57,16 +57,19 @@ public class StandardMethodTestDescriptor
 
     private static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
 
+    private final Class<?> testClass;
     private final Method testMethod;
     private final StopWatch stopWatch;
     private final Metadata metadata;
 
     /** Constructor */
-    public StandardMethodTestDescriptor(UniqueId parentUniqueId, Method testMethod) {
+    public StandardMethodTestDescriptor(
+            UniqueId parentUniqueId, Class<?> testClass, Method testMethod) {
         super(
                 parentUniqueId.append(
                         StandardMethodTestDescriptor.class.getSimpleName(), testMethod.getName()),
                 testMethod.getName());
+        this.testClass = testClass;
         this.testMethod = testMethod;
         this.stopWatch = new StopWatch();
         this.metadata = new Metadata();
@@ -87,12 +90,6 @@ public class StandardMethodTestDescriptor
         return metadata;
     }
 
-    @Override
-    public void build(
-            EngineDiscoveryRequest engineDiscoveryRequest, ExecutableContext executableContext) {
-        // DO NOTHING
-    }
-
     private enum State {
         RUN_BEFORE_EACH_METHODS,
         RUN_TEST_METHOD,
@@ -104,14 +101,8 @@ public class StandardMethodTestDescriptor
     public void execute(ExecutionRequest executionRequest, ExecutableContext executableContext) {
         stopWatch.start();
 
-        executableContext.put(StandardExecutableConstants.TEST_METHOD, testMethod);
-
-        Class<?> testClass = executableContext.get(ParameterizedExecutableConstants.TEST_CLASS);
         Object testInstance = executableContext.get(ParameterizedExecutableConstants.TEST_INSTANCE);
-
-        Invariant.check(testClass != null);
         Invariant.check(testInstance != null);
-        Invariant.check(testMethod != null);
 
         metadata.put(MetadataConstants.TEST_CLASS, testClass);
         metadata.put(MetadataConstants.TEST_METHOD, testMethod);
@@ -230,5 +221,47 @@ public class StandardMethodTestDescriptor
         }
 
         StandardStreams.flush();
+    }
+
+    public static class Builder {
+
+        private TestDescriptor parentTestDescriptor;
+        private Class<?> testClass;
+        private Method testMethod;
+
+        public Builder withParentTestDescriptor(TestDescriptor parentTestDescriptor) {
+            this.parentTestDescriptor = parentTestDescriptor;
+            return this;
+        }
+
+        public Builder withTestClass(Class<?> testClass) {
+            this.testClass = testClass;
+            return this;
+        }
+
+        public Builder withTestMethod(Method testMethod) {
+            this.testMethod = testMethod;
+            return this;
+        }
+
+        public void build() {
+            try {
+                UniqueId testDescriptorUniqueId =
+                        parentTestDescriptor
+                                .getUniqueId()
+                                .append(
+                                        StandardMethodTestDescriptor.class.getName(),
+                                        testMethod.getName());
+                TestDescriptor testDescriptor =
+                        new StandardMethodTestDescriptor(
+                                testDescriptorUniqueId, testClass, testMethod);
+
+                parentTestDescriptor.addChild(testDescriptor);
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
     }
 }
