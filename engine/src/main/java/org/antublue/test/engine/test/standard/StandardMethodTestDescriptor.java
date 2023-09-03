@@ -142,6 +142,7 @@ public class StandardMethodTestDescriptor
                                     MethodInvoker.invoke(method, testInstance, null);
                                 } finally {
                                     LOCK_PROCESSOR.processUnlocks(method);
+                                    StandardStreams.flush();
                                 }
                             }
                             state.set(State.RUN_TEST_METHOD);

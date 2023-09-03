@@ -213,6 +213,7 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                             }
                         }
                         state.set(State.RUN_AUTO_CLOSE_FIELDS);
+                        StandardStreams.flush();
                     });
         }
 
