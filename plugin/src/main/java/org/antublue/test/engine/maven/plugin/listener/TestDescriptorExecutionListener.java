@@ -302,7 +302,6 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
             if (testArgument != null) {
                 ansiColorStringBuilder.append(" | ").append(testArgument.name());
             }
-            ;
 
             if (testClass != null) {
                 ansiColorStringBuilder.append(" | ").append(testClass.getName());

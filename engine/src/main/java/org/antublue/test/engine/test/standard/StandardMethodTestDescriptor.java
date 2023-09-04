@@ -33,7 +33,6 @@ import org.antublue.test.engine.test.util.LockProcessor;
 import org.antublue.test.engine.test.util.MethodInvoker;
 import org.antublue.test.engine.test.util.TestDescriptorUtils;
 import org.antublue.test.engine.util.Invariant;
-import org.antublue.test.engine.util.Invocation;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
@@ -127,32 +126,28 @@ public class StandardMethodTestDescriptor
         AtomicReference<State> state = new AtomicReference<>(State.RUN_BEFORE_EACH_METHODS);
 
         if (state.get() == State.RUN_BEFORE_EACH_METHODS) {
-            Invocation.execute(
-                    () -> {
-                        try {
-                            List<Method> beforeEachMethods =
-                                    REFLECTION_UTILS.findMethods(
-                                            testInstance.getClass(),
-                                            StandardFilters.BEFORE_EACH_METHOD);
-                            TEST_DESCRIPTOR_UTILS.sortMethods(
-                                    beforeEachMethods, TestDescriptorUtils.Sort.FORWARD);
-                            for (Method method : beforeEachMethods) {
-                                try {
-                                    LOCK_PROCESSOR.processLocks(method);
-                                    MethodInvoker.invoke(method, testInstance, null);
-                                } finally {
-                                    LOCK_PROCESSOR.processUnlocks(method);
-                                    StandardStreams.flush();
-                                }
-                            }
-                            state.set(State.RUN_TEST_METHOD);
-                        } catch (Throwable t) {
-                            executableContext.addAndProcessThrowable(testClass, t);
-                            state.set(State.RUN_AFTER_EACH_METHODS);
-                        } finally {
-                            StandardStreams.flush();
-                        }
-                    });
+            try {
+                List<Method> beforeEachMethods =
+                        REFLECTION_UTILS.findMethods(
+                                testInstance.getClass(), StandardFilters.BEFORE_EACH_METHOD);
+                TEST_DESCRIPTOR_UTILS.sortMethods(
+                        beforeEachMethods, TestDescriptorUtils.Sort.FORWARD);
+                for (Method method : beforeEachMethods) {
+                    try {
+                        LOCK_PROCESSOR.processLocks(method);
+                        MethodInvoker.invoke(method, testInstance, null);
+                    } finally {
+                        LOCK_PROCESSOR.processUnlocks(method);
+                        StandardStreams.flush();
+                    }
+                }
+                state.set(State.RUN_TEST_METHOD);
+            } catch (Throwable t) {
+                executableContext.addAndProcessThrowable(testClass, t);
+                state.set(State.RUN_AFTER_EACH_METHODS);
+            } finally {
+                StandardStreams.flush();
+            }
         }
 
         if (state.get() == State.RUN_TEST_METHOD) {
@@ -169,48 +164,39 @@ public class StandardMethodTestDescriptor
         }
 
         if (state.get() == State.RUN_AFTER_EACH_METHODS) {
-            Invocation.execute(
-                    () -> {
-                        List<Method> afterEachMethods =
-                                REFLECTION_UTILS.findMethods(
-                                        testInstance.getClass(), StandardFilters.AFTER_EACH_METHOD);
-                        TEST_DESCRIPTOR_UTILS.sortMethods(
-                                afterEachMethods, TestDescriptorUtils.Sort.REVERSE);
-                        for (Method method : afterEachMethods) {
-                            try {
-                                LOCK_PROCESSOR.processLocks(method);
-                                MethodInvoker.invoke(method, testInstance, null);
-                            } catch (Throwable t) {
-                                executableContext.addAndProcessThrowable(testClass, t);
-                            } finally {
-                                LOCK_PROCESSOR.processUnlocks(method);
-                                StandardStreams.flush();
-                            }
-                        }
-                        state.set(State.RUN_AUTO_CLOSE_FIELDS);
-                    });
+            List<Method> afterEachMethods =
+                    REFLECTION_UTILS.findMethods(
+                            testInstance.getClass(), StandardFilters.AFTER_EACH_METHOD);
+            TEST_DESCRIPTOR_UTILS.sortMethods(afterEachMethods, TestDescriptorUtils.Sort.REVERSE);
+            for (Method method : afterEachMethods) {
+                try {
+                    LOCK_PROCESSOR.processLocks(method);
+                    MethodInvoker.invoke(method, testInstance, null);
+                } catch (Throwable t) {
+                    executableContext.addAndProcessThrowable(testClass, t);
+                } finally {
+                    LOCK_PROCESSOR.processUnlocks(method);
+                    StandardStreams.flush();
+                }
+            }
+            state.set(State.RUN_AUTO_CLOSE_FIELDS);
         }
 
         if (state.get() == State.RUN_AUTO_CLOSE_FIELDS) {
-            Invocation.execute(
-                    () -> {
-                        List<Field> fields =
-                                REFLECTION_UTILS.findFields(
-                                        testClass, StandardFilters.AUTO_CLOSE_FIELDS);
-                        for (Field field : fields) {
-                            TestEngine.AutoClose annotation =
-                                    field.getAnnotation(TestEngine.AutoClose.class);
-                            if ("@TestEngine.AfterEach".equals(annotation.lifecycle())) {
-                                try {
-                                    AutoCloseProcessor.close(testInstance, field);
-                                } catch (Throwable t) {
-                                    executableContext.addAndProcessThrowable(testClass, t);
-                                } finally {
-                                    StandardStreams.flush();
-                                }
-                            }
-                        }
-                    });
+            List<Field> fields =
+                    REFLECTION_UTILS.findFields(testClass, StandardFilters.AUTO_CLOSE_FIELDS);
+            for (Field field : fields) {
+                TestEngine.AutoClose annotation = field.getAnnotation(TestEngine.AutoClose.class);
+                if ("@TestEngine.AfterEach".equals(annotation.lifecycle())) {
+                    try {
+                        AutoCloseProcessor.close(testInstance, field);
+                    } catch (Throwable t) {
+                        executableContext.addAndProcessThrowable(testClass, t);
+                    } finally {
+                        StandardStreams.flush();
+                    }
+                }
+            }
         }
 
         stopWatch.stop();

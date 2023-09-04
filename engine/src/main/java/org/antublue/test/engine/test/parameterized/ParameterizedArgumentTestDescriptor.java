@@ -35,7 +35,6 @@ import org.antublue.test.engine.test.util.MethodInvoker;
 import org.antublue.test.engine.test.util.RandomFieldInjector;
 import org.antublue.test.engine.test.util.TestDescriptorUtils;
 import org.antublue.test.engine.util.Invariant;
-import org.antublue.test.engine.util.Invocation;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
@@ -56,8 +55,6 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
 
     private static final TestDescriptorUtils TEST_DESCRIPTOR_UTILS =
             TestDescriptorUtils.getSingleton();
-
-    private static final ParameterizedUtils PARAMETERIZED_UTILS = ParameterizedUtils.getSingleton();
 
     private static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
 
@@ -154,70 +151,59 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         AtomicReference<State> state = new AtomicReference<>(State.RUN_SET_ARGUMENT_FIELDS);
 
         if (state.get() == State.RUN_SET_ARGUMENT_FIELDS) {
-            Invocation.execute(
-                    () -> {
-                        try {
-                            List<Field> fields =
-                                    REFLECTION_UTILS.findFields(
-                                            testClass, ParameterizedFilters.ARGUMENT_FIELD);
-                            for (Field field : fields) {
-                                field.set(testInstance, testArgument);
-                            }
-                            state.set(State.RUN_SET_RANDOM_FIELDS);
-                        } catch (Throwable t) {
-                            executableContext.addAndProcessThrowable(testClass, t);
-                            state.set(State.RUN_SKIP);
-                        } finally {
-                            StandardStreams.flush();
-                        }
-                    });
+            try {
+                List<Field> fields =
+                        REFLECTION_UTILS.findFields(testClass, ParameterizedFilters.ARGUMENT_FIELD);
+                for (Field field : fields) {
+                    field.set(testInstance, testArgument);
+                }
+                state.set(State.RUN_SET_RANDOM_FIELDS);
+            } catch (Throwable t) {
+                executableContext.addAndProcessThrowable(testClass, t);
+                state.set(State.RUN_SKIP);
+            } finally {
+                StandardStreams.flush();
+            }
         }
 
         if (state.get() == State.RUN_SET_RANDOM_FIELDS) {
-            Invocation.execute(
-                    () -> {
-                        try {
-                            List<Field> fields =
-                                    REFLECTION_UTILS.findFields(
-                                            testClass, ParameterizedFilters.RANDOM_FIELD);
-                            for (Field field : fields) {
-                                RandomFieldInjector.inject(testInstance, field);
-                            }
-                            state.set(State.RUN_BEFORE_ALL_METHODS);
-                        } catch (Throwable t) {
-                            executableContext.addAndProcessThrowable(testClass, t);
-                            state.set(State.RUN_SKIP);
-                        } finally {
-                            StandardStreams.flush();
-                        }
-                    });
+            try {
+                List<Field> fields =
+                        REFLECTION_UTILS.findFields(testClass, ParameterizedFilters.RANDOM_FIELD);
+                for (Field field : fields) {
+                    RandomFieldInjector.inject(testInstance, field);
+                }
+                state.set(State.RUN_BEFORE_ALL_METHODS);
+            } catch (Throwable t) {
+                executableContext.addAndProcessThrowable(testClass, t);
+                state.set(State.RUN_SKIP);
+            } finally {
+                StandardStreams.flush();
+            }
         }
 
         if (state.get() == State.RUN_BEFORE_ALL_METHODS) {
-            Invocation.execute(
-                    () -> {
-                        try {
-                            List<Method> beforeAllMethods =
-                                    REFLECTION_UTILS.findMethods(
-                                            testClass, ParameterizedFilters.BEFORE_ALL_METHOD);
-                            TEST_DESCRIPTOR_UTILS.sortMethods(
-                                    beforeAllMethods, TestDescriptorUtils.Sort.FORWARD);
-                            for (Method method : beforeAllMethods) {
-                                try {
-                                    LOCK_PROCESSOR.processLocks(method);
-                                    MethodInvoker.invoke(method, testInstance, testArgument);
-                                } finally {
-                                    LOCK_PROCESSOR.processUnlocks(method);
-                                }
-                            }
-                            state.set(State.RUN_EXECUTE);
-                        } catch (Throwable t) {
-                            executableContext.addAndProcessThrowable(testClass, t);
-                            state.set(State.RUN_EXECUTE);
-                        } finally {
-                            StandardStreams.flush();
-                        }
-                    });
+            try {
+                List<Method> beforeAllMethods =
+                        REFLECTION_UTILS.findMethods(
+                                testClass, ParameterizedFilters.BEFORE_ALL_METHOD);
+                TEST_DESCRIPTOR_UTILS.sortMethods(
+                        beforeAllMethods, TestDescriptorUtils.Sort.FORWARD);
+                for (Method method : beforeAllMethods) {
+                    try {
+                        LOCK_PROCESSOR.processLocks(method);
+                        MethodInvoker.invoke(method, testInstance, testArgument);
+                    } finally {
+                        LOCK_PROCESSOR.processUnlocks(method);
+                    }
+                }
+                state.set(State.RUN_EXECUTE);
+            } catch (Throwable t) {
+                executableContext.addAndProcessThrowable(testClass, t);
+                state.set(State.RUN_EXECUTE);
+            } finally {
+                StandardStreams.flush();
+            }
         }
 
         if (state.get() == State.RUN_EXECUTE) {
@@ -236,67 +222,53 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         }
 
         if (state.get() == State.RUN_AFTER_ALL_METHODS) {
-            Invocation.execute(
-                    () -> {
-                        List<Method> afterAllMethods =
-                                REFLECTION_UTILS.findMethods(
-                                        testClass, ParameterizedFilters.AFTER_ALL_METHOD);
-                        TEST_DESCRIPTOR_UTILS.sortMethods(
-                                afterAllMethods, TestDescriptorUtils.Sort.REVERSE);
-                        for (Method method : afterAllMethods) {
-                            try {
-                                LOCK_PROCESSOR.processLocks(method);
-                                MethodInvoker.invoke(method, testInstance, testArgument);
-                            } catch (Throwable t) {
-                                executableContext.addAndProcessThrowable(testClass, t);
-                            } finally {
-                                LOCK_PROCESSOR.processUnlocks(method);
-                                StandardStreams.flush();
-                            }
-                        }
-                        state.set(State.RUN_AUTO_CLOSE_FIELDS);
-                    });
+            List<Method> afterAllMethods =
+                    REFLECTION_UTILS.findMethods(testClass, ParameterizedFilters.AFTER_ALL_METHOD);
+            TEST_DESCRIPTOR_UTILS.sortMethods(afterAllMethods, TestDescriptorUtils.Sort.REVERSE);
+            for (Method method : afterAllMethods) {
+                try {
+                    LOCK_PROCESSOR.processLocks(method);
+                    MethodInvoker.invoke(method, testInstance, testArgument);
+                } catch (Throwable t) {
+                    executableContext.addAndProcessThrowable(testClass, t);
+                } finally {
+                    LOCK_PROCESSOR.processUnlocks(method);
+                    StandardStreams.flush();
+                }
+            }
+            state.set(State.RUN_AUTO_CLOSE_FIELDS);
         }
 
         if (state.get() == State.RUN_AUTO_CLOSE_FIELDS) {
-            Invocation.execute(
-                    () -> {
-                        List<Field> fields =
-                                REFLECTION_UTILS.findFields(
-                                        testClass, ParameterizedFilters.AUTO_CLOSE_FIELDS);
-                        for (Field field : fields) {
-                            TestEngine.AutoClose annotation =
-                                    field.getAnnotation(TestEngine.AutoClose.class);
-                            if ("@TestEngine.AfterAll".equals(annotation.lifecycle())) {
-                                try {
-                                    AutoCloseProcessor.close(testInstance, field);
-                                } catch (Throwable t) {
-                                    executableContext.addAndProcessThrowable(testClass, t);
-                                } finally {
-                                    StandardStreams.flush();
-                                }
-                            }
-                        }
-                        state.set(State.RUN_SET_ARGUMENT_FIELDS_NULL);
-                    });
+            List<Field> fields =
+                    REFLECTION_UTILS.findFields(testClass, ParameterizedFilters.AUTO_CLOSE_FIELDS);
+            for (Field field : fields) {
+                TestEngine.AutoClose annotation = field.getAnnotation(TestEngine.AutoClose.class);
+                if ("@TestEngine.AfterAll".equals(annotation.lifecycle())) {
+                    try {
+                        AutoCloseProcessor.close(testInstance, field);
+                    } catch (Throwable t) {
+                        executableContext.addAndProcessThrowable(testClass, t);
+                    } finally {
+                        StandardStreams.flush();
+                    }
+                }
+            }
+            state.set(State.RUN_SET_ARGUMENT_FIELDS_NULL);
         }
 
         if (state.get() == State.RUN_SET_ARGUMENT_FIELDS_NULL) {
-            Invocation.execute(
-                    () -> {
-                        List<Field> fields =
-                                REFLECTION_UTILS.findFields(
-                                        testClass, ParameterizedFilters.ARGUMENT_FIELD);
-                        for (Field field : fields) {
-                            try {
-                                field.set(testInstance, null);
-                            } catch (Throwable t) {
-                                executableContext.addAndProcessThrowable(testClass, t);
-                            } finally {
-                                StandardStreams.flush();
-                            }
-                        }
-                    });
+            List<Field> fields =
+                    REFLECTION_UTILS.findFields(testClass, ParameterizedFilters.ARGUMENT_FIELD);
+            for (Field field : fields) {
+                try {
+                    field.set(testInstance, null);
+                } catch (Throwable t) {
+                    executableContext.addAndProcessThrowable(testClass, t);
+                } finally {
+                    StandardStreams.flush();
+                }
+            }
         }
 
         stopWatch.stop();
