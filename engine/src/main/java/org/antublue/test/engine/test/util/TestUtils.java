@@ -18,23 +18,35 @@ package org.antublue.test.engine.test.util;
 
 import java.lang.reflect.Method;
 import java.util.List;
+
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.test.ThrowableContext;
+import org.antublue.test.engine.util.ReflectionUtils;
+import org.antublue.test.engine.util.Singleton;
+import org.antublue.test.engine.util.StandardStreams;
 
-public class TestDescriptorUtils {
+public class TestUtils {
 
-    private static final TestDescriptorUtils SINGLETON = new TestDescriptorUtils();
+    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
 
     public enum Sort {
         FORWARD,
         REVERSE,
     }
 
-    private TestDescriptorUtils() {
-        // DO NOTHING
-    }
-
-    public static TestDescriptorUtils getSingleton() {
-        return SINGLETON;
+    public void invoke(Method method, Object testInstance, Object testArgument, ThrowableContext throwableContext) {
+        try {
+            if (REFLECTION_UTILS.acceptsArguments(method, Argument.class)) {
+                method.invoke(testInstance, testArgument);
+            } else {
+                method.invoke(testInstance, (Object[]) null);
+            }
+        } catch (Throwable t) {
+            throwableContext.add(testInstance.getClass(), t);
+        } finally {
+            StandardStreams.flush();
+        }
     }
 
     /**

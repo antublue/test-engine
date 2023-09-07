@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.configuration;
+package org.antublue.test.engine;
 
 /** Class that contains Test Engine configuration constants */
 public final class Constants {

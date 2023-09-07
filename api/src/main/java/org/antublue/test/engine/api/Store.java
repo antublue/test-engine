@@ -85,7 +85,7 @@ public final class Store {
     }
 
     /**
-     * Method to put an value into the Store. Accepts a null value
+     * Method to put a value into the Store. Accepts a null value
      *
      * @param key key
      * @param value value
@@ -104,7 +104,7 @@ public final class Store {
     }
 
     /**
-     * Method to put an value into the store. If a value doesn't exist, execute the function to
+     * Method to put a value into the store. If a value doesn't exist, execute the function to
      * create a value and add it
      *
      * @param key key
@@ -163,7 +163,7 @@ public final class Store {
     }
 
     /**
-     * Method to get an value from the store, casting it to a specific type
+     * Method to get a value from the store, casting it to a specific type
      *
      * @param key key
      * @param clazz clazz

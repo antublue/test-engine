@@ -37,8 +37,6 @@ import org.junit.platform.commons.support.ReflectionSupport;
 @SuppressWarnings({"PMD.AvoidAccessibilityAlteration", "PMD.EmptyCatchBlock"})
 public final class ReflectionUtils {
 
-    private static final ReflectionUtils SINGLETON = new ReflectionUtils();
-
     private static final Class<?>[] NO_CLASS_ARGS = null;
 
     private static final Object[] NO_OBJECT_ARGS = null;
@@ -55,20 +53,6 @@ public final class ReflectionUtils {
 
     private static final Predicate<Method> ALL_METHODS_FILTER =
             method -> method.getDeclaringClass() != Object.class;
-
-    /** Constructor */
-    private ReflectionUtils() {
-        // DO NOTHING
-    }
-
-    /**
-     * Method to get the singleton instance
-     *
-     * @return the singleton instance
-     */
-    public static ReflectionUtils getSingleton() {
-        return SINGLETON;
-    }
 
     /**
      * Method to find all classes for a URI
@@ -185,7 +169,6 @@ public final class ReflectionUtils {
                                                                                 .getName())
                                                                 .append(" ")
                                                                 .append(method.getName());
-
                                                 Class<?>[] parameterTypes =
                                                         method.getParameterTypes();
                                                 for (Class<?> parameterType : parameterTypes) {

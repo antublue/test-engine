@@ -17,9 +17,9 @@
 package org.antublue.test.engine.maven.plugin.listener;
 
 import java.lang.reflect.Method;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.configuration.Configuration;
-import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.test.ExecutableMetadata;
@@ -28,6 +28,7 @@ import org.antublue.test.engine.test.ExecutableMetadataSupport;
 import org.antublue.test.engine.util.AnsiColor;
 import org.antublue.test.engine.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.util.NanosecondsConverter;
+import org.antublue.test.engine.util.Singleton;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -38,7 +39,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(TestDescriptorExecutionListener.class);
 
-    private static final Configuration CONFIGURATION = Configuration.getSingleton();
+    private static final Configuration CONFIGURATION = Singleton.get(Configuration.class);
 
     private static final String INFO =
             new AnsiColorStringBuilder()

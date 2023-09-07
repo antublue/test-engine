@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api;
+package org.antublue.test.engine.api.extension;
+
+import java.lang.reflect.Method;
+import org.antublue.test.engine.api.Argument;
 
 /** Interface to implement an Extension */
 public interface Extension {
 
     /**
-     * Method to execute before all @TestEngine.Prepare methods
+     * Method to call after a test class is instantiated
      *
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
-    default void beforePrepare(Object testInstance) throws Throwable {
+    default void instantiatedCallback(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
     /**
-     * Method to execute after all @TestEngine.Prepare methods
+     * Method to call after all @TestEngine.Prepare methods
      *
      * @param testInstance testInstance
      * @throws Throwable Throwable
@@ -40,18 +43,7 @@ public interface Extension {
     }
 
     /**
-     * Method to execute before all @TestEngine.BeforeAll methods
-     *
-     * @param testInstance testInstance
-     * @param testArgument testArgument
-     * @throws Throwable Throwable
-     */
-    default void beforeBeforeAll(Object testInstance, Argument testArgument) throws Throwable {
-        // DO NOTHING
-    }
-
-    /**
-     * Method to execute after all @TestEngine.BeforeAll methods
+     * Method to call after all @TestEngine.BeforeAll methods
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
@@ -62,18 +54,7 @@ public interface Extension {
     }
 
     /**
-     * Method to execute before all @TestEngine.BeforeEach methods
-     *
-     * @param testInstance testInstance
-     * @param testArgument testArgument
-     * @throws Throwable Throwable
-     */
-    default void beforeBeforeEach(Object testInstance, Argument testArgument) throws Throwable {
-        // DO NOTHING
-    }
-
-    /**
-     * Method to execute after all @TestEngine.BeforeEach methods
+     * Method to call after all @TestEngine.BeforeEach methods
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
@@ -88,9 +69,11 @@ public interface Extension {
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
+     * @param testMethod testMethod
      * @throws Throwable Throwable
      */
-    default void beforeTest(Object testInstance, Argument testArgument) throws Throwable {
+    default void beforeTestCallback(Object testInstance, Argument testArgument, Method testMethod)
+            throws Throwable {
         // DO NOTHING
     }
 
@@ -99,20 +82,11 @@ public interface Extension {
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
+     * @param testMethod testMethod
      * @throws Throwable Throwable
      */
-    default void testCallback(Object testInstance, Argument testArgument) throws Throwable {
-        // DO NOTHING
-    }
-
-    /**
-     * Method to execute before all @TestEngine.AfterEach methods
-     *
-     * @param testInstance testInstance
-     * @param testArgument testArgument
-     * @throws Throwable Throwable
-     */
-    default void beforeAfterEach(Object testInstance, Argument testArgument) throws Throwable {
+    default void afterTestCallback(Object testInstance, Argument testArgument, Method testMethod)
+            throws Throwable {
         // DO NOTHING
     }
 
@@ -128,17 +102,6 @@ public interface Extension {
     }
 
     /**
-     * Method to execute before all @TestEngine.AfterAll methods
-     *
-     * @param testInstance testInstance
-     * @param testArgument testArgument
-     * @throws Throwable Throwable
-     */
-    default void beforeAfterAll(Object testInstance, Argument testArgument) throws Throwable {
-        // DO NOTHING
-    }
-
-    /**
      * Method to execute after all @TestEngine.AfterAll methods
      *
      * @param testInstance testInstance
@@ -149,22 +112,12 @@ public interface Extension {
     }
 
     /**
-     * Method to execute before all @TestEngine.Conclude methods
-     *
-     * @param testInstance testInstance
-     * @throws Throwable Throwable
-     */
-    default void beforeConclude(Object testInstance) throws Throwable {
-        // DO NOTHING
-    }
-
-    /**
      * Method to execute after all @TestEngine.Conclude methods
      *
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
-    default void afterConcludeCallback(Object testInstance) throws Throwable {
+    default void concludeCallback(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 }

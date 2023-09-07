@@ -23,9 +23,7 @@ import org.antublue.test.engine.api.argument.AbstractArgument;
 /** Example test */
 public class ComplexArgumentTest {
 
-    @TestEngine.Argument
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll")
-    protected ComplexArgument complexArgument;
+    @TestEngine.Argument @TestEngine.AutoClose.AfterAll protected ComplexArgument complexArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<ComplexArgument> arguments() {

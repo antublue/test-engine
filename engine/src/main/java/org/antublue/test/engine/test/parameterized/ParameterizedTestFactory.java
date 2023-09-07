@@ -16,72 +16,110 @@
 
 package org.antublue.test.engine.test.parameterized;
 
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.function.Predicate;
 import org.antublue.test.engine.test.TestDescriptorFactory;
 import org.antublue.test.engine.util.ReflectionUtils;
+import org.antublue.test.engine.util.Singleton;
 import org.junit.platform.engine.EngineDiscoveryRequest;
+import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
+import org.junit.platform.engine.discovery.MethodSelector;
+import org.junit.platform.engine.discovery.PackageNameFilter;
 import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a ParameterizedTestDescriptorFactory */
 public class ParameterizedTestFactory implements TestDescriptorFactory {
 
-    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
+    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
+
+    public ParameterizedTestFactory() {
+        Singleton.register(ParameterizedTestUtils.class, clazz -> new ParameterizedTestUtils());
+    }
 
     @Override
     public void discover(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
+
         engineDiscoveryRequest
                 .getSelectorsByType(ClasspathRootSelector.class)
                 .forEach(
-                        classpathRootSelector -> discover(classpathRootSelector, engineDescriptor));
+                        classpathRootSelector ->
+                                discover(
+                                        engineDiscoveryRequest,
+                                        classpathRootSelector,
+                                        engineDescriptor));
 
         engineDiscoveryRequest
                 .getSelectorsByType(PackageSelector.class)
-                .forEach(packageSelector -> discover(packageSelector, engineDescriptor));
+                .forEach(
+                        packageSelector ->
+                                discover(
+                                        engineDiscoveryRequest, packageSelector, engineDescriptor));
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClassSelector.class)
-                .forEach(classSelector -> discover(classSelector, engineDescriptor));
+                .forEach(
+                        classSelector ->
+                                discover(engineDiscoveryRequest, classSelector, engineDescriptor));
 
-        // TODO add support for ParameterizedMethodTestDescriptor
+        engineDiscoveryRequest
+                .getSelectorsByType(MethodSelector.class)
+                .forEach(
+                        classSelector ->
+                                discover(engineDiscoveryRequest, classSelector, engineDescriptor));
     }
 
     /**
      * Method to process a ClasspathRootSelector
      *
+     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param classpathRootSelector classpathRootSelector
      * @param engineDescriptor engineDescriptor
      */
     private void discover(
-            ClasspathRootSelector classpathRootSelector, EngineDescriptor engineDescriptor) {
+            EngineDiscoveryRequest engineDiscoveryRequest,
+            ClasspathRootSelector classpathRootSelector,
+            EngineDescriptor engineDescriptor) {
         REFLECTION_UTILS
                 .findAllClasses(
-                        classpathRootSelector.getClasspathRoot(), ParameterizedFilters.TEST_CLASS)
+                        classpathRootSelector.getClasspathRoot(),
+                        ParameterizedTestFilters.TEST_CLASS)
                 .forEach(
-                        testclass ->
+                        testClass -> {
+                            if (accept(engineDiscoveryRequest, testClass)) {
                                 new ParameterizedClassTestDescriptor.Builder()
                                         .withParentTestDescriptor(engineDescriptor)
-                                        .withTestClass(testclass)
-                                        .build());
+                                        .withTestClass(testClass)
+                                        .build();
+                            }
+                        });
     }
 
     /**
      * Method to process a PackageSelector
      *
+     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param packageSelector packageSelector
      * @param engineDescriptor engineDescriptor
      */
-    private void discover(PackageSelector packageSelector, EngineDescriptor engineDescriptor) {
+    private void discover(
+            EngineDiscoveryRequest engineDiscoveryRequest,
+            PackageSelector packageSelector,
+            EngineDescriptor engineDescriptor) {
         REFLECTION_UTILS
-                .findAllClasses(packageSelector.getPackageName(), ParameterizedFilters.TEST_CLASS)
+                .findAllClasses(
+                        packageSelector.getPackageName(), ParameterizedTestFilters.TEST_CLASS)
                 .forEach(
-                        testclass -> {
-                            if (ParameterizedFilters.TEST_CLASS.test(testclass)) {
+                        testClass -> {
+                            if (ParameterizedTestFilters.TEST_CLASS.test(testClass)
+                                    && accept(engineDiscoveryRequest, testClass)) {
                                 new ParameterizedClassTestDescriptor.Builder()
                                         .withParentTestDescriptor(engineDescriptor)
-                                        .withTestClass(testclass)
+                                        .withTestClass(testClass)
                                         .build();
                             }
                         });
@@ -90,16 +128,84 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
     /**
      * Method to process a ClassSelector
      *
+     * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param classSelector classSelector
      * @param engineDescriptor engineDescriptor
      */
-    private void discover(ClassSelector classSelector, EngineDescriptor engineDescriptor) {
+    private void discover(
+            EngineDiscoveryRequest engineDiscoveryRequest,
+            ClassSelector classSelector,
+            EngineDescriptor engineDescriptor) {
         Class<?> testClass = classSelector.getJavaClass();
-        if (ParameterizedFilters.TEST_CLASS.test(testClass)) {
+        if (ParameterizedTestFilters.TEST_CLASS.test(testClass)
+                && accept(engineDiscoveryRequest, testClass)) {
             new ParameterizedClassTestDescriptor.Builder()
                     .withParentTestDescriptor(engineDescriptor)
                     .withTestClass(testClass)
                     .build();
+        }
+    }
+
+    /**
+     * Method to process engine discovery request filters
+     *
+     * @param engineDiscoveryRequest engineDiscoveryRequest
+     * @param clazz class
+     * @return true if the class should be accepted, else false
+     */
+    public static boolean accept(EngineDiscoveryRequest engineDiscoveryRequest, Class<?> clazz) {
+        List<PackageNameFilter> packageNameFilters =
+                engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
+        for (PackageNameFilter packageNameFilter : packageNameFilters) {
+            FilterResult filterResult = packageNameFilter.apply(clazz.getPackage().getName());
+            if (filterResult.excluded()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Method to process a MethodSelector
+     *
+     * @param engineDiscoveryRequest engineDiscoveryRequest
+     * @param methodSelector methodSelector
+     * @param engineDescriptor engineDescriptor
+     */
+    private static void discover(
+            EngineDiscoveryRequest engineDiscoveryRequest,
+            MethodSelector methodSelector,
+            EngineDescriptor engineDescriptor) {
+        Class<?> testClass = methodSelector.getJavaClass();
+        Method testMethod = methodSelector.getJavaMethod();
+        if (ParameterizedTestFilters.TEST_CLASS.test(testClass)
+                && ParameterizedTestFilters.TEST_METHOD.test(testMethod)
+                && accept(engineDiscoveryRequest, testClass)) {
+            new ParameterizedClassTestDescriptor.Builder()
+                    .withParentTestDescriptor(engineDescriptor)
+                    .withTestClass(testClass)
+                    .withTestMethodFilter(new TestMethodFilter(testMethod))
+                    .build();
+        }
+    }
+
+    /** Class to implement a TestMethodFilter */
+    private static class TestMethodFilter implements Predicate<Method> {
+
+        private final Method testMethod;
+
+        /**
+         * Constructor
+         *
+         * @param testMethod testMethod
+         */
+        public TestMethodFilter(Method testMethod) {
+            this.testMethod = testMethod;
+        }
+
+        @Override
+        public boolean test(Method testMethod) {
+            return this.testMethod.equals(testMethod);
         }
     }
 }

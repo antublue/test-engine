@@ -20,28 +20,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import org.antublue.test.engine.configuration.Configuration;
+import org.antublue.test.engine.util.Singleton;
 
 /** Class to implement ConfigurationParameters */
 @SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
-    private static final ConfigurationParameters SINGLETON = new ConfigurationParameters();
-
-    private static final Configuration CONFIGURATION = Configuration.getSingleton();
-
-    /** Constructor */
-    private ConfigurationParameters() {
-        // DO NOTHING
-    }
-
-    /**
-     * Method to get the singleton instance
-     *
-     * @return the singleton instance
-     */
-    public static ConfigurationParameters getSingleton() {
-        return SINGLETON;
-    }
+    private static final Configuration CONFIGURATION = Singleton.get(Configuration.class);
 
     @Override
     public Optional<String> get(String key) {

@@ -18,15 +18,15 @@ package org.antublue.test.engine.logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import org.antublue.test.engine.configuration.Configuration;
+import org.antublue.test.engine.util.Singleton;
 
 /** Class to implement a LoggerFactory */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public final class LoggerFactory {
 
     private static LoggerFactory SINGLETON;
-
-    private static final Configuration CONFIGURATION = Configuration.getSingleton();
 
     private final Map<String, Logger> loggerMap = new HashMap<>();
 
@@ -69,7 +69,18 @@ public final class LoggerFactory {
      * @return the return value
      */
     public static Logger getLogger(String name) {
-        synchronized (CONFIGURATION) {
+        Singleton.register(
+                Configuration.class,
+                new Function<Class<?>, Object>() {
+                    @Override
+                    public Object apply(Class<?> clazz) {
+                        return new Configuration();
+                    }
+                });
+
+        Configuration configuration = Singleton.get(Configuration.class);
+
+        synchronized (configuration) {
             if (SINGLETON == null) {
                 SINGLETON = new LoggerFactory();
             }

@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.testing;
 
-import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.extension.Extension;
 
 public class GlobalExtension implements Extension {
 
@@ -27,7 +27,7 @@ public class GlobalExtension implements Extension {
      * @throws Throwable Throwable
      */
     @Override
-    public void beforePrepare(Object testInstance) throws Throwable {
+    public void instantiatedCallback(Object testInstance) throws Throwable {
         System.out.println(
                 String.format(
                         "%s.beforePrepare %s",
@@ -41,7 +41,7 @@ public class GlobalExtension implements Extension {
      * @throws Throwable Throwable
      */
     @Override
-    public void afterConcludeCallback(Object testInstance) throws Throwable {
+    public void concludeCallback(Object testInstance) throws Throwable {
         System.out.println(
                 String.format(
                         "%s.afterConcludeCallback %s",

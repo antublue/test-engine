@@ -38,13 +38,13 @@ public class AutoCloseTest2 {
         return collection.stream();
     }
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterEach", method = "destroy")
+    @TestEngine.AutoClose.AfterEach(method = "destroy")
     private TestObject afterEachTestObject;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll", method = "destroy")
+    @TestEngine.AutoClose.AfterAll(method = "destroy")
     private TestObject afterAllTestObject;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude", method = "destroy")
+    @TestEngine.AutoClose.Conclude(method = "destroy")
     private TestObject afterConcludeTestObject;
 
     @TestEngine.Prepare
@@ -90,6 +90,7 @@ public class AutoCloseTest2 {
     public void conclude() {
         System.out.println("conclude()");
         assertThat(afterAllTestObject.isDestroyed()).isTrue();
+        assertThat(afterConcludeTestObject.isDestroyed()).isFalse();
     }
 
     private static class TestObject {

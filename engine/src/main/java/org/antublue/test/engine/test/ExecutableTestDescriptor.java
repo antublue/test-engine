@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.test;
 
-import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 
 /** Interface to implement an ExecutableTestDescriptor */
@@ -25,8 +24,7 @@ public interface ExecutableTestDescriptor extends TestDescriptor {
     /**
      * Method to execute the test descriptor
      *
-     * @param executionRequest executionRequest
      * @param executableContext executionContext
      */
-    void execute(ExecutionRequest executionRequest, ExecutableContext executableContext);
+    void execute(ExecutableContext executableContext);
 }

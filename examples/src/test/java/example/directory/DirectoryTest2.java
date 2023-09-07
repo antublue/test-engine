@@ -30,8 +30,7 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class DirectoryTest2 {
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll")
-    private Directory directory;
+    @TestEngine.AutoClose.AfterAll private Directory directory;
 
     @TestEngine.Argument protected StringArgument stringArgument;
 

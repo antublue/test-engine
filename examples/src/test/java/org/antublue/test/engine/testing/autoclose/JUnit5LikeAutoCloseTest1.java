@@ -23,11 +23,9 @@ public class JUnit5LikeAutoCloseTest1 {
 
     @TestEngine.RandomInteger private Integer randomInteger;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterEach")
-    private TestAutoCloseable afterEachAutoCloseable;
+    @TestEngine.AutoClose.AfterEach private TestAutoCloseable afterEachAutoCloseable;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude")
-    private TestAutoCloseable afterConcludeAutoCloseable;
+    @TestEngine.AutoClose.Conclude private TestAutoCloseable afterConcludeAutoCloseable;
 
     @TestEngine.Prepare
     public void prepare() {

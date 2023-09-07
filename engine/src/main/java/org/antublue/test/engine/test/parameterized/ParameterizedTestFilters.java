@@ -25,10 +25,11 @@ import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.util.ReflectionUtils;
+import org.antublue.test.engine.util.Singleton;
 
-public class ParameterizedFilters {
+public class ParameterizedTestFilters {
 
-    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
+    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
 
     public static final Predicate<Field> ARGUMENT_FIELD =
             field -> {
@@ -56,7 +57,10 @@ public class ParameterizedFilters {
             };
 
     public static final Predicate<Field> AUTO_CLOSE_FIELDS =
-            field -> field.isAnnotationPresent(TestEngine.AutoClose.class);
+            field ->
+                    field.isAnnotationPresent(TestEngine.AutoClose.AfterEach.class)
+                            || field.isAnnotationPresent(TestEngine.AutoClose.AfterAll.class)
+                            || field.isAnnotationPresent(TestEngine.AutoClose.Conclude.class);
 
     public static final Predicate<Method> ARGUMENT_SUPPLIER_METHOD =
             method -> {
@@ -332,7 +336,7 @@ public class ParameterizedFilters {
                 return true;
             };
 
-    private ParameterizedFilters() {
+    private ParameterizedTestFilters() {
         // DO NOTHING
     }
 }

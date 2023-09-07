@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
+import org.antublue.test.engine.test.ThrowableContext;
 
 /** Class to implement FieldInjector */
 @SuppressWarnings("PMD.NPathComplexity")
@@ -29,7 +30,7 @@ public class AutoCloseProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoCloseProcessor.class);
 
     /** Constructor */
-    private AutoCloseProcessor() {
+    public AutoCloseProcessor() {
         // DO NOTHING
     }
 
@@ -38,32 +39,51 @@ public class AutoCloseProcessor {
      *
      * @param object object
      * @param field field
-     * @throws Throwable Throwable
+     * @param throwableContext throwableContext
      */
-    public static void close(Object object, Field field) throws Throwable {
+    public void close(Object object, Field field, ThrowableContext throwableContext) {
         LOGGER.trace("close class [%s] field [%s]", object.getClass().getName(), field.getName());
 
-        TestEngine.AutoClose annotation = field.getAnnotation(TestEngine.AutoClose.class);
+        try {
+            String methodName = null;
 
-        if (annotation == null) {
-            return;
-        }
+            TestEngine.AutoClose.AfterEach autoCloseAfterEachAnnotation =
+                    field.getAnnotation(TestEngine.AutoClose.AfterEach.class);
+            TestEngine.AutoClose.AfterAll autoCloseAfterAllAnnotation =
+                    field.getAnnotation(TestEngine.AutoClose.AfterAll.class);
+            TestEngine.AutoClose.Conclude autoCloseConcludeAnnotation =
+                    field.getAnnotation(TestEngine.AutoClose.Conclude.class);
 
-        Object o = field.get(object);
-        if (o == null) {
-            return;
-        }
-
-        String methodName = annotation.method();
-
-        if (methodName == null || methodName.trim().isEmpty()) {
-            if (o instanceof AutoCloseable) {
-                ((AutoCloseable) o).close();
+            if (autoCloseAfterEachAnnotation == null
+                    && autoCloseAfterAllAnnotation == null
+                    && autoCloseConcludeAnnotation == null) {
+                return;
             }
-        } else if (!methodName.trim().isEmpty()) {
-            Method method = o.getClass().getMethod(methodName.trim(), (Class<?>[]) null);
-            method.setAccessible(true);
-            method.invoke(o, (Object[]) null);
+
+            if (autoCloseAfterEachAnnotation != null) {
+                methodName = autoCloseAfterEachAnnotation.method();
+            } else if (autoCloseAfterAllAnnotation != null) {
+                methodName = autoCloseAfterAllAnnotation.method();
+            } else if (autoCloseConcludeAnnotation != null) {
+                methodName = autoCloseConcludeAnnotation.method();
+            }
+
+            Object o = field.get(object);
+            if (o == null) {
+                return;
+            }
+
+            if (methodName == null || methodName.trim().isEmpty()) {
+                if (o instanceof AutoCloseable) {
+                    ((AutoCloseable) o).close();
+                }
+            } else if (!methodName.trim().isEmpty()) {
+                Method method = o.getClass().getMethod(methodName.trim(), (Class<?>[]) null);
+                method.setAccessible(true);
+                method.invoke(o, (Object[]) null);
+            }
+        } catch (Throwable t) {
+            throwableContext.add(object.getClass(), t);
         }
     }
 }

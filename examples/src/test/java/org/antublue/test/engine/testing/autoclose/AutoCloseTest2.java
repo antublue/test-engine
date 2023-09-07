@@ -21,9 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.extension.Extension;
 
 /** Example test */
 public class AutoCloseTest2 {
@@ -46,13 +47,13 @@ public class AutoCloseTest2 {
         return collection.stream();
     }
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterEach", method = "destroy")
+    @TestEngine.AutoClose.AfterEach(method = "destroy")
     public TestObject afterEachTestObject;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll", method = "destroy")
+    @TestEngine.AutoClose.AfterAll(method = "destroy")
     public TestObject afterAllTestObject;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude", method = "destroy")
+    @TestEngine.AutoClose.Conclude(method = "destroy")
     public TestObject afterConcludeTestObject;
 
     @TestEngine.Prepare
@@ -119,19 +120,22 @@ public class AutoCloseTest2 {
 
     public static class TestExtension implements Extension {
 
-        public void afterAfterEach(Object testInstance) {
+        @Override
+        public void afterEachCallback(Object testInstance, Argument testArgument) {
             AutoCloseTest2 autoCloseExampleTest2 = (AutoCloseTest2) testInstance;
-            assertThat(autoCloseExampleTest2.afterEachTestObject.isDestroyed()).isTrue();
+            assertThat(autoCloseExampleTest2.afterEachTestObject.isDestroyed()).isFalse();
         }
 
-        public void afterAfterAll(Object testInstance) {
+        @Override
+        public void afterAllCallback(Object testInstance, Argument testArgument) {
             AutoCloseTest2 autoCloseExampleTest2 = (AutoCloseTest2) testInstance;
-            assertThat(autoCloseExampleTest2.afterAllTestObject.isDestroyed()).isTrue();
+            assertThat(autoCloseExampleTest2.afterAllTestObject.isDestroyed()).isFalse();
         }
 
-        public void afterConcludeCallback(Object testInstance) {
+        public void concludeCallback(Object testInstance) {
+            System.out.println("afterConcludeCallback()");
             AutoCloseTest2 autoCloseExampleTest2 = (AutoCloseTest2) testInstance;
-            assertThat(autoCloseExampleTest2.afterConcludeTestObject.isDestroyed()).isTrue();
+            assertThat(autoCloseExampleTest2.afterConcludeTestObject.isDestroyed()).isFalse();
         }
     }
 }

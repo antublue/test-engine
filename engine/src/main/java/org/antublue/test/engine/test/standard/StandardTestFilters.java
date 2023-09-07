@@ -23,10 +23,11 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.util.ReflectionUtils;
+import org.antublue.test.engine.util.Singleton;
 
-public class StandardFilters {
+public class StandardTestFilters {
 
-    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
+    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
 
     public static final Predicate<Field> RANDOM_FIELD =
             field -> {
@@ -45,7 +46,10 @@ public class StandardFilters {
             };
 
     public static final Predicate<Field> AUTO_CLOSE_FIELDS =
-            field -> field.isAnnotationPresent(TestEngine.AutoClose.class);
+            field ->
+                    field.isAnnotationPresent(TestEngine.AutoClose.AfterEach.class)
+                            || field.isAnnotationPresent(TestEngine.AutoClose.AfterAll.class)
+                            || field.isAnnotationPresent(TestEngine.AutoClose.Conclude.class);
 
     /*
     public static final Predicate<Method> EXTENSION_SUPPLIER_METHOD =
@@ -242,7 +246,7 @@ public class StandardFilters {
                 return true;
             };
 
-    private StandardFilters() {
+    private StandardTestFilters() {
         // DO NOTHING
     }
 }

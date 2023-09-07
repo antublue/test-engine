@@ -21,9 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.extension.Extension;
 
 /** Example test */
 public class AutoCloseTest1 {
@@ -46,14 +47,11 @@ public class AutoCloseTest1 {
         return collection.stream();
     }
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterEach")
-    private TestAutoCloseable afterEachAutoClosable;
+    @TestEngine.AutoClose.AfterEach private TestAutoCloseable afterEachAutoClosable;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll")
-    private TestAutoCloseable afterAllAutoClosable;
+    @TestEngine.AutoClose.AfterAll private TestAutoCloseable afterAllAutoClosable;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude")
-    private TestAutoCloseable afterConcludeAutoCloseable;
+    @TestEngine.AutoClose.Conclude private TestAutoCloseable afterConcludeAutoCloseable;
 
     @TestEngine.Prepare
     public void prepare() {
@@ -119,19 +117,24 @@ public class AutoCloseTest1 {
 
     public static class TestExtension implements Extension {
 
-        public void afterAfterEach(Object testInstance) {
+        @Override
+        public void afterEachCallback(Object testInstance, Argument testArgument) {
+            AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
+            assertThat(autoCloseExampleTest1.afterEachAutoClosable.isClosed()).isFalse();
+        }
+
+        @Override
+        public void afterAllCallback(Object testInstance, Argument testArgument) {
             AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
             assertThat(autoCloseExampleTest1.afterEachAutoClosable.isClosed()).isTrue();
+            assertThat(autoCloseExampleTest1.afterAllAutoClosable.isClosed()).isFalse();
         }
 
-        public void afterAfterAll(Object testInstance) {
+        @Override
+        public void concludeCallback(Object testInstance) {
             AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
             assertThat(autoCloseExampleTest1.afterAllAutoClosable.isClosed()).isTrue();
-        }
-
-        public void afterConcludeCallback(Object testInstance) {
-            AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
-            assertThat(autoCloseExampleTest1.afterConcludeAutoCloseable.isClosed()).isTrue();
+            assertThat(autoCloseExampleTest1.afterConcludeAutoCloseable.isClosed()).isFalse();
         }
     }
 }

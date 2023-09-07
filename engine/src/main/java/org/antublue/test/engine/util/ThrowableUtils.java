@@ -21,21 +21,22 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.configuration.Configuration;
-import org.antublue.test.engine.configuration.Constants;
 
 /** Class to implement ThrowableUtils */
 public class ThrowableUtils {
 
     private static final boolean STACK_TRACE_PRUNING =
-            Configuration.getSingleton()
+            Singleton.get(Configuration.class)
                     .getBooleanOrDefault(Constants.STACK_TRACE_PRUNE, true)
                     .get();
 
     private static final Predicate<String> EXCLUDE =
             s ->
-                    s.startsWith("org.antublue.test.engine.test.descriptor.")
-                            || s.startsWith("org.antublue.test.engine.util.Invocation.")
+                    s.startsWith("org.antublue.test.engine.test.standard.")
+                            || s.startsWith("org.antublue.test.engine.test.parameterized.")
+                            || s.startsWith("org.antublue.test.engine.test.extension.")
                             || s.startsWith("org.antublue.test.engine.Executor")
                             || s.startsWith("java.base/");
 

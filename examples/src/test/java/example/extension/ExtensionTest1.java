@@ -19,12 +19,12 @@ package example.extension;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.extension.Extension;
 
 /** Example test */
-public class ExtensionTest {
+public class ExtensionTest1 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -39,9 +39,11 @@ public class ExtensionTest {
 
     @TestEngine.ExtensionSupplier
     public static Stream<Extension> extensions() {
+        System.out.println("extensions()");
+
         Collection<Extension> collection = new ArrayList<>();
 
-        // Add a global extension instance
+        // Add a singleton extension instance
         collection.add(StopWatchExtension.singleton());
 
         // Add a test class specific extension instance

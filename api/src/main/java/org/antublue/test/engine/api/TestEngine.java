@@ -131,19 +131,44 @@ public @interface TestEngine {
     @Retention(RetentionPolicy.RUNTIME)
     @interface AutoClose {
 
-        /**
-         * Lifecycle value
-         *
-         * @return the lifecycle value
-         */
-        String lifecycle();
+        /** AfterEach annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface AfterEach {
 
-        /**
-         * Method value
-         *
-         * @return the method name
-         */
-        String method() default "";
+            /**
+             * Method value
+             *
+             * @return the method name
+             */
+            String method() default "";
+        }
+
+        /** AfterAll annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface AfterAll {
+
+            /**
+             * Method value
+             *
+             * @return the method name
+             */
+            String method() default "";
+        }
+
+        /** AfterAll annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Conclude {
+
+            /**
+             * Method value
+             *
+             * @return the method name
+             */
+            String method() default "";
+        }
     }
 
     /** RandomBoolean annotation */

@@ -24,7 +24,6 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
@@ -115,7 +114,7 @@ public class Executor {
                             () -> {
                                 try {
                                     executableTestDescriptor.execute(
-                                            executionRequest, new ExecutableContext());
+                                            new ExecutableContext(executionRequest));
                                 } catch (Throwable t) {
                                     t.printStackTrace();
                                     StandardStreams.flush();

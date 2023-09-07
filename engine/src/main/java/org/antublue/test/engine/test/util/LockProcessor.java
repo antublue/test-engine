@@ -35,23 +35,7 @@ public class LockProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LockProcessor.class);
 
-    private static final LockProcessor SINGLETON = new LockProcessor();
-
     private final Map<String, ReentrantReadWriteLock> LOCK_MAP = new ConcurrentHashMap<>();
-
-    /** Constructor */
-    private LockProcessor() {
-        // DO NOTHING
-    }
-
-    /**
-     * Method to get the singleton instance
-     *
-     * @return the singleton instance
-     */
-    public static LockProcessor getSingleton() {
-        return SINGLETON;
-    }
 
     /**
      * Method to process locking/unlocking on a Method, if annotated

@@ -16,45 +16,40 @@
 
 package org.antublue.test.engine.test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.antublue.test.engine.configuration.Constants;
-import org.antublue.test.engine.util.StandardStreams;
-import org.antublue.test.engine.util.ThrowableUtils;
+import org.junit.platform.engine.ExecutionRequest;
 
 /** Class to implement a ExecutableContext */
 @SuppressWarnings("unchecked")
 public class ExecutableContext {
 
-    private static final boolean PRINT_STACKTRACE =
-            Constants.TRUE.equals(System.getProperty(Constants.MAVEN_PLUGIN));
-
+    private final ExecutionRequest executionRequest;
     private final Map<String, Object> map;
-    private final List<Throwable> throwables;
+    private final ThrowableContext throwableContext;
+    private Object testInstance;
 
-    public ExecutableContext() {
+    public ExecutableContext(ExecutionRequest executionRequest) {
+        this.executionRequest = executionRequest;
         map = new ConcurrentHashMap<>();
-        throwables = new ArrayList<>();
+        throwableContext = new ThrowableContext();
     }
 
-    public void addAndProcessThrowable(Class<?> clazz, Throwable throwable) {
-        Throwable prunedThrowable = ThrowableUtils.prune(clazz, throwable);
-        if (PRINT_STACKTRACE) {
-            prunedThrowable.printStackTrace();
-            StandardStreams.flush();
-        }
-        throwables.add(prunedThrowable);
+    public ExecutionRequest getExecutionRequest() {
+        return executionRequest;
     }
 
-    public boolean hasThrowables() {
-        return !throwables.isEmpty();
+    public ThrowableContext getThrowableContext() {
+        return throwableContext;
     }
 
-    public List<Throwable> getThrowables() {
-        return throwables;
+    public void setTestInstance(Object testInstance) {
+        this.testInstance = testInstance;
+    }
+
+    public Object getTestInstance() {
+        return testInstance;
     }
 
     public void put(String key, Object value) {

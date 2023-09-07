@@ -22,14 +22,18 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.configuration.Configuration;
-import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
+import org.antublue.test.engine.test.extension.ExtensionProcessor;
 import org.antublue.test.engine.test.parameterized.ParameterizedTestFactory;
 import org.antublue.test.engine.test.standard.StandardTestFactory;
-import org.antublue.test.engine.test.util.ExtensionManager;
+import org.antublue.test.engine.test.util.AutoCloseProcessor;
+import org.antublue.test.engine.test.util.LockProcessor;
+import org.antublue.test.engine.test.util.TestUtils;
+import org.antublue.test.engine.util.ReflectionUtils;
+import org.antublue.test.engine.util.Singleton;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
@@ -42,9 +46,6 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
-
-    private static final ConfigurationParameters CONFIGURATION_PARAMETERS =
-            ConfigurationParameters.getSingleton();
 
     /** Configuration constant */
     public static final String ENGINE_ID = "antublue-test-engine";
@@ -111,29 +112,24 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("discover()");
 
         try {
+            Singleton.register(Configuration.class, clazz -> new Configuration());
+            Singleton.register(
+                    ConfigurationParameters.class, clazz -> new ConfigurationParameters());
+            Singleton.register(ReflectionUtils.class, clazz -> new ReflectionUtils());
+            Singleton.register(TestUtils.class, clazz -> new TestUtils());
+            Singleton.register(LockProcessor.class, clazz -> new LockProcessor());
+            Singleton.register(AutoCloseProcessor.class, clazz -> new AutoCloseProcessor());
+            Singleton.register(ExtensionProcessor.class, clazz -> new ExtensionProcessor());
+
+            // Create an engine descriptor to build the list of test descriptors
             EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
+            // Use the test factories to find tests build the test descriptor tree
             new StandardTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
             new ParameterizedTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
 
-            // Remove test descriptors
-            List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
-            for (TestDescriptor testDescriptor : testDescriptors) {
-                engineDescriptor.removeChild(testDescriptor);
-            }
-
-            // Shuffle or sort test descriptors
-            Optional<String> optionalShuffle =
-                    Configuration.getSingleton().get(Constants.TEST_CLASS_SHUFFLE);
-            if (optionalShuffle.isPresent() && Constants.TRUE.equals(optionalShuffle.get())) {
-                Collections.shuffle(testDescriptors);
-            } else {
-                testDescriptors.sort(Comparator.comparing(TestDescriptor::getDisplayName));
-            }
-
-            for (TestDescriptor testDescriptor : testDescriptors) {
-                engineDescriptor.addChild(testDescriptor);
-            }
+            // Shuffle or sort then engine descriptor's children
+            shuffleOrSortTestDescriptors(engineDescriptor);
 
             return engineDescriptor;
         } catch (TestClassDefinitionException | TestEngineException t) {
@@ -151,6 +147,34 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     }
 
     /**
+     * Method to shuffle or sort an engine descriptor's children
+     *
+     * <p>Workaround for the fact that the engine descriptor returns an unmodifiable Set which can't
+     * be sorted
+     *
+     * @param engineDescriptor engineDescriptor
+     */
+    private void shuffleOrSortTestDescriptors(EngineDescriptor engineDescriptor) {
+        Configuration configuration = Singleton.get(Configuration.class);
+
+        // Get the test descriptors and remove them from the engine descriptor
+        List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
+        testDescriptors.forEach(testDescriptor -> engineDescriptor.removeChild(testDescriptor));
+
+        // Shuffle or sort the test descriptor list based on configuration
+        Optional<String> optionalShuffle = configuration.get(Constants.TEST_CLASS_SHUFFLE);
+
+        if (optionalShuffle.isPresent() && Constants.TRUE.equals(optionalShuffle.get())) {
+            Collections.shuffle(testDescriptors);
+        } else {
+            testDescriptors.sort(Comparator.comparing(TestDescriptor::getDisplayName));
+        }
+
+        // Add the shuffled or sorted test descriptors to the engine descriptor
+        testDescriptors.forEach(testDescriptor -> engineDescriptor.addChild(testDescriptor));
+    }
+
+    /**
      * Method to execute an ExecutionRequest
      *
      * @param executionRequest executionRequest
@@ -160,7 +184,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("execute()");
 
         try {
-            ExtensionManager.getSingleton().initialize();
+            Singleton.get(ExtensionProcessor.class).initialize();
         } catch (Throwable t) {
             throw new TestEngineException("Exception loading extensions", t);
         }
@@ -173,12 +197,15 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
 
+            ConfigurationParameters configurationParameters =
+                    Singleton.get(ConfigurationParameters.class);
+
             new Executor()
                     .execute(
                             ExecutionRequest.create(
                                     executionRequest.getRootTestDescriptor(),
                                     executionRequest.getEngineExecutionListener(),
-                                    CONFIGURATION_PARAMETERS));
+                                    configurationParameters));
         } finally {
             engineExecutionListener.executionFinished(
                     executionRequest.getRootTestDescriptor(), TestExecutionResult.successful());

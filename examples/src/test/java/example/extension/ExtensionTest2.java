@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package example.directory;
+package example.extension;
 
-import static org.antublue.test.engine.api.Directory.PathType.ABSOLUTE;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.UUID;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Directory;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.extension.Extension;
 
 /** Example test */
-public class DirectoryTest3 {
-
-    @TestEngine.AutoClose.Conclude private Directory directory1;
-
-    @TestEngine.AutoClose.AfterAll private Directory directory2;
+public class ExtensionTest2 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -45,18 +37,29 @@ public class DirectoryTest3 {
         return collection.stream();
     }
 
+    @TestEngine.ExtensionSupplier
+    public static Stream<Extension> extensions() {
+        System.out.println("extensions()");
+
+        Collection<Extension> collection = new ArrayList<>();
+
+        // Add a singleton extension instance
+        collection.add(StopWatchExtension.singleton());
+
+        // Add a test class specific extension instance
+        collection.add(new ExampleExtension());
+
+        return collection.stream();
+    }
+
     @TestEngine.Prepare
-    public void prepare() throws IOException {
+    public void prepare() {
         System.out.println("prepare()");
-        directory1 = Directory.create("/tmp/directory-" + UUID.randomUUID(), ABSOLUTE);
-        System.out.format(String.format("directory1 [%s]", directory1));
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll() throws IOException {
+    public void beforeAll() {
         System.out.println("beforeAll(" + stringArgument + ")");
-        directory2 = Directory.create("/tmp/directory-" + UUID.randomUUID(), ABSOLUTE);
-        System.out.println(String.format("directory2 [%s]", directory2));
     }
 
     @TestEngine.BeforeEach

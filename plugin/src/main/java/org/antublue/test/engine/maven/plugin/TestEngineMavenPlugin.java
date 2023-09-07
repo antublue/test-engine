@@ -29,13 +29,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.antublue.test.engine.ConfigurationParameters;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.configuration.Constants;
 import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.TestDescriptorExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.TestDescriptorSummaryEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.logger.Logger;
 import org.antublue.test.engine.util.AnsiColor;
+import org.antublue.test.engine.util.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -227,7 +228,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             new ExecutionRequest(
                                     testDescriptor,
                                     delegatingEngineExecutionListener,
-                                    ConfigurationParameters.getSingleton());
+                                    Singleton.get(ConfigurationParameters.class));
 
                     testEngine.execute(executionRequest);
 

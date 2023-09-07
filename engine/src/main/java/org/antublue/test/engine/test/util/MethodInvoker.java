@@ -18,9 +18,14 @@ package org.antublue.test.engine.test.util;
 
 import java.lang.reflect.Method;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.test.ThrowableContext;
 import org.antublue.test.engine.util.ReflectionUtils;
+import org.antublue.test.engine.util.Singleton;
+import org.antublue.test.engine.util.StandardStreams;
 
 public class MethodInvoker {
+
+    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
 
     private MethodInvoker() {
         // DO NOTHING
@@ -28,7 +33,7 @@ public class MethodInvoker {
 
     public static void invoke(Method method, Object testInstance, Object testArgument)
             throws Throwable {
-        if (ReflectionUtils.getSingleton().acceptsArguments(method, Argument.class)) {
+        if (REFLECTION_UTILS.acceptsArguments(method, Argument.class)) {
             method.invoke(testInstance, testArgument);
         } else {
             method.invoke(testInstance, (Object[]) null);

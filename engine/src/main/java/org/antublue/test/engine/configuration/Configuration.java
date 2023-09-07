@@ -48,8 +48,6 @@ public class Configuration {
     private static final boolean TRACE =
             "true".equals(System.getenv(ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE));
 
-    private static Configuration SINGLETON;
-
     private static final String USER_HOME = System.getProperty("user.home");
 
     private final Properties properties;
@@ -57,7 +55,7 @@ public class Configuration {
     private Set<String> keySet;
 
     /** Constructor */
-    private Configuration() {
+    public Configuration() {
         properties = new Properties();
 
         String propertiesFilename = null;
@@ -118,18 +116,6 @@ public class Configuration {
         if (keySet == null) {
             keySet = new HashSet<>();
         }
-    }
-
-    /**
-     * Method to get the singleton
-     *
-     * @return the singleton
-     */
-    public static synchronized Configuration getSingleton() {
-        if (SINGLETON == null) {
-            SINGLETON = new Configuration();
-        }
-        return SINGLETON;
     }
 
     /**

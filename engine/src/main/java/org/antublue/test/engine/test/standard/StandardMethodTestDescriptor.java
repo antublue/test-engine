@@ -20,24 +20,23 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.test.ExecutableContext;
 import org.antublue.test.engine.test.ExecutableMetadata;
 import org.antublue.test.engine.test.ExecutableMetadataConstants;
 import org.antublue.test.engine.test.ExecutableMetadataSupport;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
-import org.antublue.test.engine.test.parameterized.ParameterizedExecutableConstants;
+import org.antublue.test.engine.test.ThrowableContext;
+import org.antublue.test.engine.test.extension.ExtensionProcessor;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.LockProcessor;
 import org.antublue.test.engine.test.util.MethodInvoker;
-import org.antublue.test.engine.test.util.TestDescriptorUtils;
+import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.Invariant;
 import org.antublue.test.engine.util.ReflectionUtils;
+import org.antublue.test.engine.util.Singleton;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
-import org.junit.platform.engine.EngineExecutionListener;
-import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -49,12 +48,14 @@ public class StandardMethodTestDescriptor
         extends org.junit.platform.engine.support.descriptor.AbstractTestDescriptor
         implements ExecutableTestDescriptor, ExecutableMetadataSupport {
 
-    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
+    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
 
-    private static final TestDescriptorUtils TEST_DESCRIPTOR_UTILS =
-            TestDescriptorUtils.getSingleton();
+    private static final TestUtils TEST_DESCRIPTOR_UTILS = Singleton.get(TestUtils.class);
 
-    private static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
+    private static final ExtensionProcessor EXTENSION_PROCESSOR =
+            Singleton.get(ExtensionProcessor.class);
+
+    private static final LockProcessor LOCK_PROCESSOR = Singleton.get(LockProcessor.class);
 
     private final Class<?> testClass;
     private final Method testMethod;
@@ -90,26 +91,29 @@ public class StandardMethodTestDescriptor
     }
 
     private enum State {
-        RUN_BEFORE_EACH_METHODS,
-        RUN_TEST_METHOD,
-        RUN_AFTER_EACH_METHODS,
-        RUN_AUTO_CLOSE_FIELDS
+        BEGIN,
+        BEFORE_EACH_METHODS,
+        BEFORE_EACH_CALLBACK_METHODS,
+        BEFORE_TEST_CALLBACK_METHODS,
+        TEST_METHOD,
+        AFTER_TEST_CALLBACK_METHODS,
+        AFTER_EACH_METHODS,
+        CLOSE_AUTO_CLOSE_FIELDS,
+        AFTER_EACH_CALLBACK_METHODS,
+        END
     }
 
     @Override
-    public void execute(ExecutionRequest executionRequest, ExecutableContext executableContext) {
+    public void execute(ExecutableContext executableContext) {
         stopWatch.start();
 
-        Object testInstance = executableContext.get(ParameterizedExecutableConstants.TEST_INSTANCE);
+        Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
 
         executableMetadata.put(ExecutableMetadataConstants.TEST_CLASS, testClass);
         executableMetadata.put(ExecutableMetadataConstants.TEST_METHOD, testMethod);
 
-        EngineExecutionListener engineExecutionListener =
-                executionRequest.getEngineExecutionListener();
-
-        if (executableContext.hasThrowables()) {
+        if (!executableContext.getThrowableContext().isEmpty()) {
             stopWatch.stop();
             executableMetadata.put(
                     ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
@@ -117,85 +121,67 @@ public class StandardMethodTestDescriptor
             executableMetadata.put(
                     ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
                     ExecutableMetadataConstants.SKIP);
-            engineExecutionListener.executionSkipped(this, "");
+            executableContext
+                    .getExecutionRequest()
+                    .getEngineExecutionListener()
+                    .executionSkipped(this, "");
             return;
         }
 
-        engineExecutionListener.executionStarted(this);
+        executableContext.getExecutionRequest().getEngineExecutionListener().executionStarted(this);
 
-        AtomicReference<State> state = new AtomicReference<>(State.RUN_BEFORE_EACH_METHODS);
-
-        if (state.get() == State.RUN_BEFORE_EACH_METHODS) {
-            try {
-                List<Method> beforeEachMethods =
-                        REFLECTION_UTILS.findMethods(
-                                testInstance.getClass(), StandardFilters.BEFORE_EACH_METHOD);
-                TEST_DESCRIPTOR_UTILS.sortMethods(
-                        beforeEachMethods, TestDescriptorUtils.Sort.FORWARD);
-                for (Method method : beforeEachMethods) {
-                    try {
-                        LOCK_PROCESSOR.processLocks(method);
-                        MethodInvoker.invoke(method, testInstance, null);
-                    } finally {
-                        LOCK_PROCESSOR.processUnlocks(method);
-                        StandardStreams.flush();
+        State state = State.BEGIN;
+        while (state != null && state != State.END) {
+            switch (state) {
+                case BEGIN:
+                    {
+                        state = State.BEFORE_EACH_METHODS;
+                        break;
                     }
-                }
-                state.set(State.RUN_TEST_METHOD);
-            } catch (Throwable t) {
-                executableContext.addAndProcessThrowable(testClass, t);
-                state.set(State.RUN_AFTER_EACH_METHODS);
-            } finally {
-                StandardStreams.flush();
-            }
-        }
-
-        if (state.get() == State.RUN_TEST_METHOD) {
-            try {
-                LOCK_PROCESSOR.processLocks(testMethod);
-                MethodInvoker.invoke(testMethod, testInstance, null);
-            } catch (Throwable t) {
-                executableContext.addAndProcessThrowable(testClass, t);
-            } finally {
-                LOCK_PROCESSOR.processUnlocks(testMethod);
-                state.set(State.RUN_AFTER_EACH_METHODS);
-                StandardStreams.flush();
-            }
-        }
-
-        if (state.get() == State.RUN_AFTER_EACH_METHODS) {
-            List<Method> afterEachMethods =
-                    REFLECTION_UTILS.findMethods(
-                            testInstance.getClass(), StandardFilters.AFTER_EACH_METHOD);
-            TEST_DESCRIPTOR_UTILS.sortMethods(afterEachMethods, TestDescriptorUtils.Sort.REVERSE);
-            for (Method method : afterEachMethods) {
-                try {
-                    LOCK_PROCESSOR.processLocks(method);
-                    MethodInvoker.invoke(method, testInstance, null);
-                } catch (Throwable t) {
-                    executableContext.addAndProcessThrowable(testClass, t);
-                } finally {
-                    LOCK_PROCESSOR.processUnlocks(method);
-                    StandardStreams.flush();
-                }
-            }
-            state.set(State.RUN_AUTO_CLOSE_FIELDS);
-        }
-
-        if (state.get() == State.RUN_AUTO_CLOSE_FIELDS) {
-            List<Field> fields =
-                    REFLECTION_UTILS.findFields(testClass, StandardFilters.AUTO_CLOSE_FIELDS);
-            for (Field field : fields) {
-                TestEngine.AutoClose annotation = field.getAnnotation(TestEngine.AutoClose.class);
-                if ("@TestEngine.AfterEach".equals(annotation.lifecycle())) {
-                    try {
-                        AutoCloseProcessor.close(testInstance, field);
-                    } catch (Throwable t) {
-                        executableContext.addAndProcessThrowable(testClass, t);
-                    } finally {
-                        StandardStreams.flush();
+                case BEFORE_EACH_METHODS:
+                    {
+                        state = beforeEachMethods(executableContext);
+                        break;
                     }
-                }
+                case BEFORE_EACH_CALLBACK_METHODS:
+                    {
+                        state = beforeEachCallbackMethods(executableContext);
+                        break;
+                    }
+                case BEFORE_TEST_CALLBACK_METHODS:
+                    {
+                        state = beforeTestCallbackMethods(executableContext);
+                        break;
+                    }
+                case TEST_METHOD:
+                    {
+                        state = testMethod(executableContext);
+                        break;
+                    }
+                case AFTER_TEST_CALLBACK_METHODS:
+                    {
+                        state = afterTestCallbackMethods(executableContext);
+                        break;
+                    }
+                case AFTER_EACH_METHODS:
+                    {
+                        state = afterEachMethods(executableContext);
+                        break;
+                    }
+                case AFTER_EACH_CALLBACK_METHODS:
+                    {
+                        state = afterEachCallbackMethods(executableContext);
+                        break;
+                    }
+                case CLOSE_AUTO_CLOSE_FIELDS:
+                    {
+                        state = closeAutoCloseFields(executableContext);
+                        break;
+                    }
+                default:
+                    {
+                        state = null;
+                    }
             }
         }
 
@@ -203,20 +189,170 @@ public class StandardMethodTestDescriptor
         executableMetadata.put(
                 ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, stopWatch.elapsedTime());
 
-        if (executableContext.hasThrowables()) {
-            executableMetadata.put(
-                    ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                    ExecutableMetadataConstants.FAIL);
-            engineExecutionListener.executionFinished(
-                    this, TestExecutionResult.failed(executableContext.getThrowables().get(0)));
-        } else {
+        if (executableContext.getThrowableContext().isEmpty()) {
             executableMetadata.put(
                     ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
                     ExecutableMetadataConstants.PASS);
-            engineExecutionListener.executionFinished(this, TestExecutionResult.successful());
+            executableContext
+                    .getExecutionRequest()
+                    .getEngineExecutionListener()
+                    .executionFinished(this, TestExecutionResult.successful());
+        } else {
+            executableMetadata.put(
+                    ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
+                    ExecutableMetadataConstants.FAIL);
+            executableContext
+                    .getExecutionRequest()
+                    .getEngineExecutionListener()
+                    .executionFinished(
+                            this,
+                            TestExecutionResult.failed(
+                                    executableContext
+                                            .getThrowableContext()
+                                            .getThrowables()
+                                            .get(0)));
         }
 
         StandardStreams.flush();
+    }
+
+    private State beforeEachMethods(ExecutableContext executableContext) {
+        Object testInstance = executableContext.getTestInstance();
+        Invariant.check(testInstance != null);
+        ThrowableContext throwableContext = executableContext.getThrowableContext();
+
+        try {
+            List<Method> beforeEachMethods =
+                    REFLECTION_UTILS.findMethods(
+                            testInstance.getClass(), StandardTestFilters.BEFORE_EACH_METHOD);
+            TEST_DESCRIPTOR_UTILS.sortMethods(beforeEachMethods, TestUtils.Sort.FORWARD);
+            for (Method method : beforeEachMethods) {
+                try {
+                    LOCK_PROCESSOR.processLocks(method);
+                    MethodInvoker.invoke(method, testInstance, null);
+                } finally {
+                    LOCK_PROCESSOR.processUnlocks(method);
+                    StandardStreams.flush();
+                }
+            }
+        } catch (Throwable t) {
+            throwableContext.add(testClass, t);
+        } finally {
+            StandardStreams.flush();
+        }
+        return State.BEFORE_EACH_CALLBACK_METHODS;
+    }
+
+    private State beforeEachCallbackMethods(ExecutableContext executableContext) {
+        Object testInstance = executableContext.getTestInstance();
+        Invariant.check(testInstance != null);
+
+        EXTENSION_PROCESSOR.beforeEachCallbackMethods(
+                testClass, null, testInstance, executableContext.getThrowableContext());
+
+        if (executableContext.getThrowableContext().isEmpty()) {
+            return State.BEFORE_TEST_CALLBACK_METHODS;
+        } else {
+            return State.AFTER_EACH_METHODS;
+        }
+    }
+
+    private State beforeTestCallbackMethods(ExecutableContext executableContext) {
+        Object testInstance = executableContext.getTestInstance();
+        Invariant.check(testInstance != null);
+        ThrowableContext throwableContext = executableContext.getThrowableContext();
+
+        EXTENSION_PROCESSOR.beforeTestCallbacks(
+                testClass, null, testMethod, testInstance, throwableContext);
+
+        if (throwableContext.isEmpty()) {
+            return State.TEST_METHOD;
+        } else {
+            return State.AFTER_TEST_CALLBACK_METHODS;
+        }
+    }
+
+    private State testMethod(ExecutableContext executableContext) {
+        Object testInstance = executableContext.getTestInstance();
+        Invariant.check(testInstance != null);
+        ThrowableContext throwableContext = executableContext.getThrowableContext();
+
+        try {
+            LOCK_PROCESSOR.processLocks(testMethod);
+            MethodInvoker.invoke(testMethod, testInstance, null);
+        } catch (Throwable t) {
+            throwableContext.add(testClass, t);
+        } finally {
+            LOCK_PROCESSOR.processUnlocks(testMethod);
+            StandardStreams.flush();
+        }
+
+        return State.AFTER_TEST_CALLBACK_METHODS;
+    }
+
+    private State afterTestCallbackMethods(ExecutableContext executableContext) {
+        Object testInstance = executableContext.getTestInstance();
+        Invariant.check(testInstance != null);
+        ThrowableContext throwableContext = executableContext.getThrowableContext();
+
+        EXTENSION_PROCESSOR.afterTestCallbacks(
+                testClass, null, testMethod, testInstance, throwableContext);
+
+        return State.AFTER_EACH_METHODS;
+    }
+
+    private State afterEachMethods(ExecutableContext executableContext) {
+        Object testInstance = executableContext.getTestInstance();
+        Invariant.check(testInstance != null);
+        ThrowableContext throwableContext = executableContext.getThrowableContext();
+
+        List<Method> afterEachMethods =
+                REFLECTION_UTILS.findMethods(
+                        testInstance.getClass(), StandardTestFilters.AFTER_EACH_METHOD);
+        TEST_DESCRIPTOR_UTILS.sortMethods(afterEachMethods, TestUtils.Sort.REVERSE);
+
+        for (Method method : afterEachMethods) {
+            try {
+                LOCK_PROCESSOR.processLocks(method);
+                MethodInvoker.invoke(method, testInstance, null);
+            } catch (Throwable t) {
+                throwableContext.add(testClass, t);
+            } finally {
+                LOCK_PROCESSOR.processUnlocks(method);
+                StandardStreams.flush();
+            }
+        }
+
+        return State.AFTER_EACH_CALLBACK_METHODS;
+    }
+
+    private State afterEachCallbackMethods(ExecutableContext executableContext) {
+        Object testInstance = executableContext.getTestInstance();
+        Invariant.check(testInstance != null);
+        ThrowableContext throwableContext = executableContext.getThrowableContext();
+
+        EXTENSION_PROCESSOR.afterEachCallbacks(testClass, null, testInstance, throwableContext);
+
+        return State.CLOSE_AUTO_CLOSE_FIELDS;
+    }
+
+    private State closeAutoCloseFields(ExecutableContext executableContext) {
+        Object testInstance = executableContext.getTestInstance();
+        Invariant.check(testInstance != null);
+        ThrowableContext throwableContext = executableContext.getThrowableContext();
+        AutoCloseProcessor autoCloseProcessor = Singleton.get(AutoCloseProcessor.class);
+
+        List<Field> testFields =
+                REFLECTION_UTILS.findFields(testClass, StandardTestFilters.AUTO_CLOSE_FIELDS);
+
+        for (Field testField : testFields) {
+            if (testField.isAnnotationPresent(TestEngine.AutoClose.AfterEach.class)) {
+                autoCloseProcessor.close(testInstance, testField, throwableContext);
+                StandardStreams.flush();
+            }
+        }
+
+        return State.END;
     }
 
     public static class Builder {
@@ -225,17 +361,17 @@ public class StandardMethodTestDescriptor
         private Class<?> testClass;
         private Method testMethod;
 
-        public Builder withParentTestDescriptor(TestDescriptor parentTestDescriptor) {
+        public Builder setParentTestDescriptor(TestDescriptor parentTestDescriptor) {
             this.parentTestDescriptor = parentTestDescriptor;
             return this;
         }
 
-        public Builder withTestClass(Class<?> testClass) {
+        public Builder setTestClass(Class<?> testClass) {
             this.testClass = testClass;
             return this;
         }
 
-        public Builder withTestMethod(Method testMethod) {
+        public Builder setTestMethod(Method testMethod) {
             this.testMethod = testMethod;
             return this;
         }

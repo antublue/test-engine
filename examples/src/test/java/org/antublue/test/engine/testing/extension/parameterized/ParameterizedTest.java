@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package example.directory;
+package org.antublue.test.engine.testing.extension.parameterized;
 
-import static org.antublue.test.engine.api.Directory.PathType.ABSOLUTE;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.UUID;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Directory;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.extension.Extension;
+import org.antublue.test.engine.util.Singleton;
 
 /** Example test */
-public class DirectoryTest3 {
+@SuppressWarnings("unchecked")
+public class ParameterizedTest {
 
-    @TestEngine.AutoClose.Conclude private Directory directory1;
-
-    @TestEngine.AutoClose.AfterAll private Directory directory2;
+    static {
+        Singleton.register("2468.lifecycle.list", s -> new ArrayList<>());
+    }
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -45,47 +43,64 @@ public class DirectoryTest3 {
         return collection.stream();
     }
 
+    @TestEngine.ExtensionSupplier
+    public static Stream<Extension> extensions() {
+        Collection<Extension> collection = new ArrayList<>();
+        collection.add(new ParameterizedTestExtension());
+        return collection.stream();
+    }
+
     @TestEngine.Prepare
-    public void prepare() throws IOException {
+    public void prepare() {
         System.out.println("prepare()");
-        directory1 = Directory.create("/tmp/directory-" + UUID.randomUUID(), ABSOLUTE);
-        System.out.format(String.format("directory1 [%s]", directory1));
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("prepare()");
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll() throws IOException {
+    public void beforeAll() {
         System.out.println("beforeAll(" + stringArgument + ")");
-        directory2 = Directory.create("/tmp/directory-" + UUID.randomUUID(), ABSOLUTE);
-        System.out.println(String.format("directory2 [%s]", directory2));
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
+                .add("beforeAll(" + stringArgument + ")");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + stringArgument + ")");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
+                .add("beforeEach(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + stringArgument + ")");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
+                .add("test1(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + stringArgument + ")");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
+                .add("test2(" + stringArgument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach(" + stringArgument + ")");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
+                .add("afterEach(" + stringArgument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + stringArgument + ")");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
+                .add("afterAll(" + stringArgument + ")");
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("conclude()");
     }
 }

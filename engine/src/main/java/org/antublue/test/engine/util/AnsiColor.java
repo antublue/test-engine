@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.util;
 
-import org.antublue.test.engine.configuration.Constants;
+import org.antublue.test.engine.Constants;
 
 /** Class to implement ANSI colors */
 public class AnsiColor {

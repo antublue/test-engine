@@ -21,29 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.test.util.TestDescriptorUtils;
 import org.antublue.test.engine.util.ReflectionUtils;
+import org.antublue.test.engine.util.Singleton;
 
 @SuppressWarnings("unchecked")
-public class ParameterizedUtils {
+public class ParameterizedTestUtils {
 
-    public static final ParameterizedUtils SINGLETON = new ParameterizedUtils();
-
-    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
-    private static final TestDescriptorUtils TEST_DESCRIPTOR_UTILS =
-            TestDescriptorUtils.getSingleton();
-
-    private ParameterizedUtils() {
-        // DO NOTHING
-    }
-
-    public static ParameterizedUtils getSingleton() {
-        return SINGLETON;
-    }
+    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
 
     public Method getArumentSupplierMethod(Class<?> testClass) {
         return REFLECTION_UTILS
-                .findMethods(testClass, ParameterizedFilters.ARGUMENT_SUPPLIER_METHOD)
+                .findMethods(testClass, ParameterizedTestFilters.ARGUMENT_SUPPLIER_METHOD)
                 .get(0);
     }
 

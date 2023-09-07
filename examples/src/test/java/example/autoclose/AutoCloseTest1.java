@@ -38,14 +38,11 @@ public class AutoCloseTest1 {
         return collection.stream();
     }
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterEach")
-    private TestAutoCloseable afterEachAutoClosable;
+    @TestEngine.AutoClose.AfterEach private TestAutoCloseable afterEachAutoClosable;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll")
-    private TestAutoCloseable afterAllAutoClosable;
+    @TestEngine.AutoClose.AfterAll private TestAutoCloseable afterAllAutoClosable;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude")
-    private TestAutoCloseable afterConcludeAutoCloseable;
+    @TestEngine.AutoClose.Conclude private TestAutoCloseable afterConcludeAutoCloseable;
 
     @TestEngine.Prepare
     public void prepare() {
@@ -90,6 +87,7 @@ public class AutoCloseTest1 {
     public void conclude() {
         System.out.println("conclude()");
         assertThat(afterAllAutoClosable.isClosed()).isTrue();
+        assertThat(afterConcludeAutoCloseable.isClosed()).isFalse();
     }
 
     private static class TestAutoCloseable implements AutoCloseable {

@@ -21,4 +21,8 @@ public class InvariantException extends RuntimeException {
     public InvariantException() {
         super();
     }
+
+    public InvariantException(String message) {
+        super(message);
+    }
 }
