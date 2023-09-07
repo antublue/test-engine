@@ -291,7 +291,8 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
 
         try {
             List<Method> concludeMethods =
-                    REFLECTION_UTILS.findMethods(testClass, ParameterizedTestFilters.CONCLUDE_METHOD);
+                    REFLECTION_UTILS.findMethods(
+                            testClass, ParameterizedTestFilters.CONCLUDE_METHOD);
             TEST_DESCRIPTOR_UTILS.sortMethods(concludeMethods, TestUtils.Sort.REVERSE);
 
             for (Method method : concludeMethods) {

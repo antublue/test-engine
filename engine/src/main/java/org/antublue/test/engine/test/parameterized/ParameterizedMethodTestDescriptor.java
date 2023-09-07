@@ -249,8 +249,6 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
             state.set(State.AFTER_EACH_CALLBACK_METHODS);
         }
 
-
-
         stopWatch.stop();
         executableMetadata.put(
                 ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, stopWatch.elapsedTime());

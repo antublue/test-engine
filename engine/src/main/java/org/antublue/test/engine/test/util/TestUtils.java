@@ -18,7 +18,6 @@ package org.antublue.test.engine.test.util;
 
 import java.lang.reflect.Method;
 import java.util.List;
-
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.test.ThrowableContext;
@@ -35,7 +34,11 @@ public class TestUtils {
         REVERSE,
     }
 
-    public void invoke(Method method, Object testInstance, Object testArgument, ThrowableContext throwableContext) {
+    public void invoke(
+            Method method,
+            Object testInstance,
+            Object testArgument,
+            ThrowableContext throwableContext) {
         try {
             if (REFLECTION_UTILS.acceptsArguments(method, Argument.class)) {
                 method.invoke(testInstance, testArgument);

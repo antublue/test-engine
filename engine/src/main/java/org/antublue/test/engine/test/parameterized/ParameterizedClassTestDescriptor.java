@@ -73,7 +73,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
     /**
      * Constructor
      *
-     * @param uniqueId  uniqueId
+     * @param uniqueId uniqueId
      * @param testClass testClass
      */
     private ParameterizedClassTestDescriptor(UniqueId uniqueId, Class<?> testClass) {
@@ -121,41 +121,50 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
         State state = State.BEGIN;
         while (state != null && state != State.END) {
             switch (state) {
-                case BEGIN: {
-                    state = State.INSTANTIATE;
-                    break;
-                }
-                case INSTANTIATE: {
-                    state = instantiate(executableContext);
-                    break;
-                }
-                case PREPARE_METHODS: {
-                    state = prepareMethods(executableContext);
-                    break;
-                }
-                case PREPARE_CALLBACK_METHODS: {
-                    state = prepareCallbacks(executableContext);
-                    break;
-                }
-                case EXECUTE_OR_SKIP: {
-                    state = executeOrSkip(executableContext);
-                    break;
-                }
-                case CONCLUDE_METHODS: {
-                    state = concludeMethods(executableContext);
-                    break;
-                }
-                case CONCLUDE_CALLBACK_METHODS: {
-                    state = concludeCallbackMethods(executableContext);
-                    break;
-                }
-                case CLOSE_AUTO_CLOSE_FIELDS: {
-                    state = closeAutoCloseFields(executableContext);
-                    break;
-                }
-                default: {
-                    state = null;
-                }
+                case BEGIN:
+                    {
+                        state = State.INSTANTIATE;
+                        break;
+                    }
+                case INSTANTIATE:
+                    {
+                        state = instantiate(executableContext);
+                        break;
+                    }
+                case PREPARE_METHODS:
+                    {
+                        state = prepareMethods(executableContext);
+                        break;
+                    }
+                case PREPARE_CALLBACK_METHODS:
+                    {
+                        state = prepareCallbacks(executableContext);
+                        break;
+                    }
+                case EXECUTE_OR_SKIP:
+                    {
+                        state = executeOrSkip(executableContext);
+                        break;
+                    }
+                case CONCLUDE_METHODS:
+                    {
+                        state = concludeMethods(executableContext);
+                        break;
+                    }
+                case CONCLUDE_CALLBACK_METHODS:
+                    {
+                        state = concludeCallbackMethods(executableContext);
+                        break;
+                    }
+                case CLOSE_AUTO_CLOSE_FIELDS:
+                    {
+                        state = closeAutoCloseFields(executableContext);
+                        break;
+                    }
+                default:
+                    {
+                        state = null;
+                    }
             }
         }
 
@@ -216,7 +225,8 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
 
         try {
             List<Method> prepareMethods =
-                    REFLECTION_UTILS.findMethods(testClass, ParameterizedTestFilters.PREPARE_METHOD);
+                    REFLECTION_UTILS.findMethods(
+                            testClass, ParameterizedTestFilters.PREPARE_METHOD);
             TEST_DESCRIPTOR_UTILS.sortMethods(prepareMethods, TestUtils.Sort.FORWARD);
 
             for (Method method : prepareMethods) {
@@ -263,8 +273,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
         ThrowableContext throwableContext = executableContext.getThrowableContext();
 
         List<Method> concludeMethods =
-                REFLECTION_UTILS.findMethods(
-                        testClass, ParameterizedTestFilters.CONCLUDE_METHOD);
+                REFLECTION_UTILS.findMethods(testClass, ParameterizedTestFilters.CONCLUDE_METHOD);
         TEST_DESCRIPTOR_UTILS.sortMethods(concludeMethods, TestUtils.Sort.REVERSE);
 
         for (Method method : concludeMethods) {
