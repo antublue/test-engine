@@ -121,7 +121,8 @@ public class ExtensionProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
-    public void postCreateTestInstance(Class<?> testClass, Object testInstance, ThrowableContext throwableContext) {
+    public void postCreateTestInstance(
+            Class<?> testClass, Object testInstance, ThrowableContext throwableContext) {
         for (Extension testExtensions : getTestExtensions(testClass)) {
             try {
                 testExtensions.postCreateTestInstance(testInstance);

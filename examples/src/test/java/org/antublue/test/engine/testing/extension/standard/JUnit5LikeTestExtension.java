@@ -50,7 +50,7 @@ public class JUnit5LikeTestExtension implements Extension {
     }
 
     @Override
-    public void postCreateTestInstance(Object testInstance)  {
+    public void postCreateTestInstance(Object testInstance) {
         System.out.println(
                 String.format(
                         "%s postCreateTestInstance(class [%s])",
@@ -59,7 +59,7 @@ public class JUnit5LikeTestExtension implements Extension {
     }
 
     @Override
-    public void postPrepare(Object testInstance)  {
+    public void postPrepare(Object testInstance) {
         System.out.println(
                 String.format(
                         "%s postPrepare(class [%s])",
@@ -68,7 +68,7 @@ public class JUnit5LikeTestExtension implements Extension {
     }
 
     @Override
-    public void postBeforeAll(Object testInstance, Argument testArgument)  {
+    public void postBeforeAll(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
                         "%s postBeforeAll(class [%s])",
@@ -77,7 +77,7 @@ public class JUnit5LikeTestExtension implements Extension {
     }
 
     @Override
-    public void postBeforeEach(Object testInstance, Argument testArgument)  {
+    public void postBeforeEach(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
                         "%s postBeforeEach(class [%s])",
@@ -86,8 +86,7 @@ public class JUnit5LikeTestExtension implements Extension {
     }
 
     @Override
-    public void preTest(Object testInstance, Argument testArgument, Method testMethod)
-            {
+    public void preTest(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
                         "%s preTest(class [%s])",
@@ -96,8 +95,7 @@ public class JUnit5LikeTestExtension implements Extension {
     }
 
     @Override
-    public void postTest(Object testInstance, Argument testArgument, Method testMethod)
-            {
+    public void postTest(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
                         "%s postTest(class [%s])",

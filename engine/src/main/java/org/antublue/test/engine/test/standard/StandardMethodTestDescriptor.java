@@ -257,8 +257,7 @@ public class StandardMethodTestDescriptor
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.preTest(
-                testClass, null, testMethod, testInstance, throwableContext);
+        EXTENSION_PROCESSOR.preTest(testClass, null, testMethod, testInstance, throwableContext);
         if (throwableContext.isEmpty()) {
             return State.TEST;
         } else {
@@ -281,8 +280,7 @@ public class StandardMethodTestDescriptor
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.postTest(
-                testClass, null, testMethod, testInstance, throwableContext);
+        EXTENSION_PROCESSOR.postTest(testClass, null, testMethod, testInstance, throwableContext);
         return State.AFTER_EACH;
     }
 

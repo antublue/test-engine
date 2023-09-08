@@ -69,10 +69,10 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
     /**
      * Constructor
      *
-     * @param uniqueId                   uniqueId
-     * @param testClass                  testClass
+     * @param uniqueId uniqueId
+     * @param testClass testClass
      * @param testArgumentSupplierMethod testArgumentSupplierMethod
-     * @param testArgument               testArgument
+     * @param testArgument testArgument
      */
     private ParameterizedArgumentTestDescriptor(
             UniqueId uniqueId,
@@ -156,49 +156,60 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         State state = State.BEGIN;
         while (state != null && state != State.END) {
             switch (state) {
-                case BEGIN: {
-                    state = State.SET_ARGUMENT_FIELDS;
-                    break;
-                }
-                case SET_ARGUMENT_FIELDS: {
-                    state = setArgumentFields(executableContext);
-                    break;
-                }
-                case SET_RANDOM_FIELDS: {
-                    state = setRandomFields(executableContext);
-                    break;
-                }
-                case BEFORE_ALL: {
-                    state = beforeAllMethods(executableContext);
-                    break;
-                }
-                case POST_BEFORE_ALL: {
-                    state = postBeforeAll(executableContext);
-                    break;
-                }
-                case EXECUTE_OR_SKIP: {
-                    state = executeOrSkip(executableContext);
-                    break;
-                }
-                case AFTER_ALL: {
-                    state = afterAll(executableContext);
-                    break;
-                }
-                case POST_AFTER_ALL: {
-                    state = postAfterAll(executableContext);
-                    break;
-                }
-                case SET_ARGUMENT_FIELDS_NULL: {
-                    state = setArgumentFieldsNull(executableContext);
-                    break;
-                }
-                case CLOSE_AUTO_CLOSE_FIELDS: {
-                    state = closeAutoCloseFields(executableContext);
-                    break;
-                }
-                default: {
-                    state = null;
-                }
+                case BEGIN:
+                    {
+                        state = State.SET_ARGUMENT_FIELDS;
+                        break;
+                    }
+                case SET_ARGUMENT_FIELDS:
+                    {
+                        state = setArgumentFields(executableContext);
+                        break;
+                    }
+                case SET_RANDOM_FIELDS:
+                    {
+                        state = setRandomFields(executableContext);
+                        break;
+                    }
+                case BEFORE_ALL:
+                    {
+                        state = beforeAllMethods(executableContext);
+                        break;
+                    }
+                case POST_BEFORE_ALL:
+                    {
+                        state = postBeforeAll(executableContext);
+                        break;
+                    }
+                case EXECUTE_OR_SKIP:
+                    {
+                        state = executeOrSkip(executableContext);
+                        break;
+                    }
+                case AFTER_ALL:
+                    {
+                        state = afterAll(executableContext);
+                        break;
+                    }
+                case POST_AFTER_ALL:
+                    {
+                        state = postAfterAll(executableContext);
+                        break;
+                    }
+                case SET_ARGUMENT_FIELDS_NULL:
+                    {
+                        state = setArgumentFieldsNull(executableContext);
+                        break;
+                    }
+                case CLOSE_AUTO_CLOSE_FIELDS:
+                    {
+                        state = closeAutoCloseFields(executableContext);
+                        break;
+                    }
+                default:
+                    {
+                        state = null;
+                    }
             }
         }
 
@@ -239,8 +250,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         ThrowableContext throwableContext = executableContext.getThrowableContext();
         try {
             List<Field> fields =
-                    REFLECTION_UTILS.findFields(
-                            testClass, ParameterizedTestFilters.ARGUMENT_FIELD);
+                    REFLECTION_UTILS.findFields(testClass, ParameterizedTestFilters.ARGUMENT_FIELD);
             for (Field field : fields) {
                 field.set(testInstance, testArgument);
             }
@@ -259,8 +269,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         ThrowableContext throwableContext = executableContext.getThrowableContext();
         try {
             List<Field> fields =
-                    REFLECTION_UTILS.findFields(
-                            testClass, ParameterizedTestFilters.RANDOM_FIELD);
+                    REFLECTION_UTILS.findFields(testClass, ParameterizedTestFilters.RANDOM_FIELD);
             for (Field field : fields) {
                 RandomFieldInjector.inject(testInstance, field);
             }
@@ -303,8 +312,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.postBeforeAll(
-                testClass, testArgument, testInstance, throwableContext);
+        EXTENSION_PROCESSOR.postBeforeAll(testClass, testArgument, testInstance, throwableContext);
 
         return State.EXECUTE_OR_SKIP;
     }
@@ -330,8 +338,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
         List<Method> afterAllMethods =
-                REFLECTION_UTILS.findMethods(
-                        testClass, ParameterizedTestFilters.AFTER_ALL_METHOD);
+                REFLECTION_UTILS.findMethods(testClass, ParameterizedTestFilters.AFTER_ALL_METHOD);
         TEST_UTILS.sortMethods(afterAllMethods, TestUtils.Sort.REVERSE);
         for (Method method : afterAllMethods) {
             LOCK_PROCESSOR.processLocks(method);
@@ -375,8 +382,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         ThrowableContext throwableContext = executableContext.getThrowableContext();
         AutoCloseProcessor autoCloseProcessor = Singleton.get(AutoCloseProcessor.class);
         List<Field> testFields =
-                REFLECTION_UTILS.findFields(
-                        testClass, ParameterizedTestFilters.AUTO_CLOSE_FIELDS);
+                REFLECTION_UTILS.findFields(testClass, ParameterizedTestFilters.AUTO_CLOSE_FIELDS);
         for (Field testField : testFields) {
             if (testField.isAnnotationPresent(TestEngine.AutoClose.AfterAll.class)) {
                 autoCloseProcessor.close(testInstance, testField, throwableContext);

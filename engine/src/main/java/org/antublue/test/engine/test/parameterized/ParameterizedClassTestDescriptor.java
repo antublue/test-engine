@@ -225,13 +225,13 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                             testClass, ParameterizedTestFilters.PREPARE_METHOD);
             TEST_DESCRIPTOR_UTILS.sortMethods(prepareMethods, TestUtils.Sort.FORWARD);
             for (Method method : prepareMethods) {
-               LOCK_PROCESSOR.processLocks(method);
-               TEST_UTILS.invoke(method, testInstance, null, throwableContext);
-               LOCK_PROCESSOR.processUnlocks(method);
-               StandardStreams.flush();
-               if (!throwableContext.isEmpty()) {
-                   break;
-               }
+                LOCK_PROCESSOR.processLocks(method);
+                TEST_UTILS.invoke(method, testInstance, null, throwableContext);
+                LOCK_PROCESSOR.processUnlocks(method);
+                StandardStreams.flush();
+                if (!throwableContext.isEmpty()) {
+                    break;
+                }
             }
         } catch (Throwable t) {
             throwableContext.add(testClass, t);

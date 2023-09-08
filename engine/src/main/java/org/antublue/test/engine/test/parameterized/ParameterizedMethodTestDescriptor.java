@@ -139,52 +139,62 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
         State state = State.BEGIN;
         while (state != null && state != State.END) {
             switch (state) {
-                case BEGIN: {
-                    state = State.BEFORE_EACH;
-                    break;
-                }
-                case BEFORE_EACH: {
-                    state = beforeEach(executableContext);
-                    break;
-                }
-                case POST_BEFORE_EACH: {
-                    state = postBeforeEach(executableContext);
-                    break;
-                }
-                case PRE_TEST: {
-                    state = preTest(executableContext);
-                    break;
-                }
-                case TEST: {
-                    state = test(executableContext);
-                    break;
-                }
-                case POST_TEST: {
-                    state = postTest(executableContext);
-                    break;
-                }
-                case AFTER_EACH: {
-                    state = afterEach(executableContext);
-                    break;
-                }
-                case POST_AFTER_EACH: {
-                    state = postAfterEach(executableContext);
-                    break;
-                }
-                case CLOSE_AUTO_CLOSE_FIELDS: {
-                    state = closeAutoCloseFields(executableContext);
-                    break;
-                }
-                default: {
-                    state = null;
-                }
+                case BEGIN:
+                    {
+                        state = State.BEFORE_EACH;
+                        break;
+                    }
+                case BEFORE_EACH:
+                    {
+                        state = beforeEach(executableContext);
+                        break;
+                    }
+                case POST_BEFORE_EACH:
+                    {
+                        state = postBeforeEach(executableContext);
+                        break;
+                    }
+                case PRE_TEST:
+                    {
+                        state = preTest(executableContext);
+                        break;
+                    }
+                case TEST:
+                    {
+                        state = test(executableContext);
+                        break;
+                    }
+                case POST_TEST:
+                    {
+                        state = postTest(executableContext);
+                        break;
+                    }
+                case AFTER_EACH:
+                    {
+                        state = afterEach(executableContext);
+                        break;
+                    }
+                case POST_AFTER_EACH:
+                    {
+                        state = postAfterEach(executableContext);
+                        break;
+                    }
+                case CLOSE_AUTO_CLOSE_FIELDS:
+                    {
+                        state = closeAutoCloseFields(executableContext);
+                        break;
+                    }
+                default:
+                    {
+                        state = null;
+                    }
             }
         }
 
         stopWatch.stop();
         executableMetadata.put(
                 ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, stopWatch.elapsedTime());
-        
+
         if (executableContext.getThrowableContext().isEmpty()) {
             executableMetadata.put(
                     ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
@@ -210,6 +220,7 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
         }
         StandardStreams.flush();
     }
+
     private State beforeEach(ExecutableContext executableContext) {
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
@@ -252,8 +263,7 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.preTest(
-                testClass, null, testMethod, testInstance, throwableContext);
+        EXTENSION_PROCESSOR.preTest(testClass, null, testMethod, testInstance, throwableContext);
         if (throwableContext.isEmpty()) {
             return State.TEST;
         } else {
