@@ -139,4 +139,11 @@ public class JUnit5LikeTestExtension implements Extension {
             }
         }
     }
+
+    public void VALIDATE(Class<?> testClass, Object testInstance) {
+        System.out.println(
+                String.format(
+                        "%s VALIDATE(class [%s])",
+                        this.getClass().getSimpleName(), testInstance.getClass().getName()));
+    }
 }

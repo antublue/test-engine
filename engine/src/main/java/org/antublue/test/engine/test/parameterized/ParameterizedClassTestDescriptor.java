@@ -118,7 +118,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
         validate();
 
         State state = State.BEGIN;
-        while (state != null && state != State.END) {
+        while (state != null) {
             switch (state) {
                 case BEGIN:
                     {
@@ -160,6 +160,13 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                         state = closeAutoCloseFields(executableContext);
                         break;
                     }
+                case END:
+                    {
+                        EXTENSION_PROCESSOR.VALIDATE(
+                                testClass, executableContext.getTestInstance());
+                        state = null;
+                        break;
+                    }
                 default:
                     {
                         state = null;
@@ -194,6 +201,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                                             .getThrowables()
                                             .get(0)));
         }
+
         executableContext.setTestInstance(null);
         StandardStreams.flush();
     }

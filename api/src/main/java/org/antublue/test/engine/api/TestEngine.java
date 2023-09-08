@@ -127,8 +127,6 @@ public @interface TestEngine {
     }
 
     /** AutoClose annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
     @interface AutoClose {
 
         /** AfterEach annotation */
@@ -172,8 +170,6 @@ public @interface TestEngine {
     }
 
     /** Random annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
     @interface Random {
 
         /** Boolean annotation */
@@ -185,6 +181,7 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface Integer {
+
             /**
              * Minimum value
              *
@@ -204,6 +201,7 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface Long {
+
             /**
              * Minimum value
              *
@@ -223,6 +221,7 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface Float {
+
             /**
              * Minimum value
              *
@@ -242,6 +241,7 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface Double {
+
             /**
              * Minimum value
              *
@@ -261,6 +261,7 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface BigInteger {
+
             /**
              * Minimum value
              *
@@ -280,6 +281,7 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface BigDecimal {
+
             /**
              * Minimum value
              *

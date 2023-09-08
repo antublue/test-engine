@@ -118,7 +118,7 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
         executableContext.getExecutionRequest().getEngineExecutionListener().executionStarted(this);
 
         State state = State.BEGIN;
-        while (state != null && state != State.END) {
+        while (state != null) {
             switch (state) {
                 case BEGIN:
                     {
@@ -158,6 +158,13 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                 case CLOSE_AUTO_CLOSE_FIELDS:
                     {
                         state = closeAutoCloseFields(executableContext);
+                        break;
+                    }
+                case END:
+                    {
+                        EXTENSION_PROCESSOR.VALIDATE(
+                                testClass, executableContext.getTestInstance());
+                        state = null;
                         break;
                     }
                 default:

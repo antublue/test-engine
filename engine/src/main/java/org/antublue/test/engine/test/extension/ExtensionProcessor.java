@@ -35,6 +35,7 @@ import org.antublue.test.engine.test.ThrowableContext;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.Singleton;
 import org.antublue.test.engine.util.StandardStreams;
+import org.antublue.test.engine.util.ThrowableUtils;
 
 /** Class to implement an ExtensionProcessor */
 @SuppressWarnings({"unchecked", "PMD.UnusedPrivateMethod"})
@@ -115,7 +116,7 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process postCreateTestInstance
+     * Method to run postCreateTestInstance extension methods
      *
      * @param testClass testClass
      * @param testInstance testInstance
@@ -123,9 +124,9 @@ public class ExtensionProcessor {
      */
     public void postCreateTestInstance(
             Class<?> testClass, Object testInstance, ThrowableContext throwableContext) {
-        for (Extension testExtensions : getTestExtensions(testClass)) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
             try {
-                testExtensions.postCreateTestInstance(testInstance);
+                testExtension.postCreateTestInstance(testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -135,7 +136,7 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process postPrepare methods
+     * Method to run postPrepare extension methods
      *
      * @param testClass testClass
      * @param testInstance testInstance
@@ -143,9 +144,9 @@ public class ExtensionProcessor {
      */
     public void postPrepare(
             Class<?> testClass, Object testInstance, ThrowableContext throwableContext) {
-        for (Extension testExtensions : getTestExtensions(testClass)) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
             try {
-                testExtensions.postPrepare(testInstance);
+                testExtension.postPrepare(testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -155,7 +156,7 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process postBeforeAll methods
+     * Method to run postBeforeAll extension methods
      *
      * @param testClass testClass
      * @param testArgument testArgument
@@ -167,9 +168,9 @@ public class ExtensionProcessor {
             Argument testArgument,
             Object testInstance,
             ThrowableContext throwableContext) {
-        for (Extension testExtensions : getTestExtensions(testClass)) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
             try {
-                testExtensions.postBeforeAll(testInstance, testArgument);
+                testExtension.postBeforeAll(testInstance, testArgument);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -179,7 +180,7 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process postBeforeEach methods
+     * Method to run postBeforeEach extension methods
      *
      * @param testClass testClass
      * @param testArgument testArgument
@@ -191,9 +192,9 @@ public class ExtensionProcessor {
             Argument testArgument,
             Object testInstance,
             ThrowableContext throwableContext) {
-        for (Extension testExtensions : getTestExtensions(testClass)) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
             try {
-                testExtensions.postBeforeEach(testInstance, testArgument);
+                testExtension.postBeforeEach(testInstance, testArgument);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -203,7 +204,7 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process preTest methods
+     * Method to run preTest extension methods
      *
      * @param testClass testClass
      * @param testArgument testArgument
@@ -217,9 +218,9 @@ public class ExtensionProcessor {
             Method testMethod,
             Object testInstance,
             ThrowableContext throwableContext) {
-        for (Extension testExtensions : getTestExtensions(testClass)) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
             try {
-                testExtensions.preTest(testInstance, testArgument, testMethod);
+                testExtension.preTest(testInstance, testArgument, testMethod);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -229,7 +230,7 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process postTest methods
+     * Method to run postTest extension methods
      *
      * @param testClass testClass
      * @param testArgument testArgument
@@ -243,9 +244,9 @@ public class ExtensionProcessor {
             Method testMethod,
             Object testInstance,
             ThrowableContext throwableContext) {
-        for (Extension testExtensions : getTestExtensions(testClass)) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
             try {
-                testExtensions.postTest(testInstance, testArgument, testMethod);
+                testExtension.postTest(testInstance, testArgument, testMethod);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -255,7 +256,7 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process postAfterEach methods
+     * Method to run postAfterEach extension methods
      *
      * @param testClass testClass
      * @param testArgument testArgument
@@ -267,9 +268,9 @@ public class ExtensionProcessor {
             Argument testArgument,
             Object testInstance,
             ThrowableContext throwableContext) {
-        for (Extension testExtensions : getTestExtensions(testClass)) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
             try {
-                testExtensions.postAfterEach(testInstance, testArgument);
+                testExtension.postAfterEach(testInstance, testArgument);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -279,7 +280,7 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process postAfterAll methods
+     * Method to run postAfterAll extensions
      *
      * @param testClass testClass
      * @param testArgument testArgument
@@ -291,9 +292,9 @@ public class ExtensionProcessor {
             Argument testArgument,
             Object testInstance,
             ThrowableContext throwableContext) {
-        for (Extension testExtensions : getTestExtensions(testClass)) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
             try {
-                testExtensions.postAfterAll(testInstance, testArgument);
+                testExtension.postAfterAll(testInstance, testArgument);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -303,7 +304,7 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process postConclude methods
+     * Method to run postConclude extension methods
      *
      * @param testClass testClass
      * @param testInstance testInstance
@@ -311,11 +312,48 @@ public class ExtensionProcessor {
      */
     public void postConclude(
             Class<?> testClass, Object testInstance, ThrowableContext throwableContext) {
-        for (Extension testExtensions : getTestExtensions(testClass)) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
             try {
-                testExtensions.postConclude(testInstance);
+                testExtension.postConclude(testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
+            } finally {
+                StandardStreams.flush();
+            }
+        }
+    }
+
+    /**
+     * Method to run VALIDATE extension methods
+     *
+     * @param testClass testClass
+     * @param testInstance testInstance
+     */
+    public void VALIDATE(Class<?> testClass, Object testInstance) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
+            try {
+                List<Method> methods =
+                        REFLECTION_UTILS.findMethods(
+                                testExtension.getClass(),
+                                method ->
+                                        REFLECTION_UTILS.hasReturnType(method, Void.class)
+                                                && !REFLECTION_UTILS.isStatic(method)
+                                                && (REFLECTION_UTILS.isProtected(method)
+                                                        || REFLECTION_UTILS.isPublic(method))
+                                                && method.getName().equals("VALIDATE")
+                                                && REFLECTION_UTILS.acceptsArguments(
+                                                        method, Class.class, Object.class));
+                for (Method method : methods) {
+                    try {
+                        method.invoke(testExtension, testClass, testInstance);
+                    } catch (Throwable t) {
+                        Throwable prunedThrowable = ThrowableUtils.prune(testClass, t);
+                        prunedThrowable.printStackTrace();
+                    }
+                }
+            } catch (Throwable t) {
+                Throwable prunedThrowable = ThrowableUtils.prune(testClass, t);
+                prunedThrowable.printStackTrace();
             } finally {
                 StandardStreams.flush();
             }
