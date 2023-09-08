@@ -33,109 +33,97 @@ public class ParameterizedTestExtension implements Extension {
     private static final List<String> EXPECTED = new ArrayList<>();
 
     static {
-        EXPECTED.add("instantiatedCallback()");
         EXPECTED.add("prepare()");
-        EXPECTED.add("prepareCallback()");
-
+        EXPECTED.add("postPrepare()");
         for (int i = 0; i < 2; i++) {
             EXPECTED.add("beforeAll(StringArgument " + i + ")");
-            EXPECTED.add("beforeAllCallback()");
+            EXPECTED.add("postBeforeAll()");
             for (int j = 0; j < 2; j++) {
                 EXPECTED.add("beforeEach(StringArgument " + i + ")");
-                EXPECTED.add("beforeEachCallback()");
-                EXPECTED.add("beforeTestCallback()");
+                EXPECTED.add("postBeforeEach()");
+                EXPECTED.add("preTest()");
                 EXPECTED.add("test" + (j + 1) + "(StringArgument " + i + ")");
-                EXPECTED.add("afterTestCallback()");
+                EXPECTED.add("postTest()");
                 EXPECTED.add("afterEach(StringArgument " + i + ")");
-                EXPECTED.add("afterEachCallback()");
+                EXPECTED.add("postAfterEach()");
             }
             EXPECTED.add("afterAll(StringArgument " + i + ")");
-            EXPECTED.add("afterAllCallback()");
+            EXPECTED.add("postAfterAll()");
         }
-
         EXPECTED.add("conclude()");
-        EXPECTED.add("concludeCallback()");
+        EXPECTED.add("postConclude()");
     }
 
     @Override
-    public void instantiatedCallback(Object testInstance) {
+    public void postPrepare(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s instantiateCallback(class [%s])",
+                        "%s postPrepare(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("instantiatedCallback()");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postPrepare()");
     }
 
     @Override
-    public void prepareCallback(Object testInstance) {
+    public void postBeforeAll(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s prepareCallback(class [%s])",
+                        "%s postBeforeAll(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("prepareCallback()");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postBeforeAll()");
     }
 
     @Override
-    public void beforeAllCallback(Object testInstance, Argument testArgument) {
+    public void postBeforeEach(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s beforeAllCallback(class [%s])",
+                        "%s postBeforeEach(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("beforeAllCallback()");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postBeforeEach()");
     }
 
     @Override
-    public void beforeEachCallback(Object testInstance, Argument testArgument) {
+    public void preTest(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
-                        "%s beforeEachCallback(class [%s])",
+                        "%s preTest(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("beforeEachCallback()");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("preTest()");
     }
 
     @Override
-    public void beforeTestCallback(Object testInstance, Argument testArgument, Method testMethod) {
+    public void postTest(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
-                        "%s beforeTestCallback(class [%s])",
+                        "%s postTest(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("beforeTestCallback()");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postTest()");
     }
 
     @Override
-    public void afterTestCallback(Object testInstance, Argument testArgument, Method testMethod) {
+    public void postAfterEach(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s afterTestCallback(class [%s])",
+                        "%s postAfterEach(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("afterTestCallback()");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postAfterEach()");
     }
 
     @Override
-    public void afterEachCallback(Object testInstance, Argument testArgument) {
+    public void postAfterAll(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s afterEachCallback(class [%s])",
+                        "%s postAfterAll(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("afterEachCallback()");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postAfterAll()");
     }
 
     @Override
-    public void afterAllCallback(Object testInstance, Argument testArgument) {
+    public void postConclude(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s afterAllCallback(class [%s])",
+                        "%s postConclude(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("afterAllCallback()");
-    }
-
-    @Override
-    public void concludeCallback(Object testInstance) {
-        System.out.println(
-                String.format(
-                        "%s concludeCallback(class [%s])",
-                        this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("concludeCallback()");
+        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postConclude()");
         ArrayList<String> actual = Singleton.get("2468.lifecycle.list");
         assertThat(actual.size()).isEqualTo(EXPECTED.size());
         assertThat(actual).isEqualTo(EXPECTED);

@@ -118,20 +118,20 @@ public class AutoCloseTest1 {
     public static class TestExtension implements Extension {
 
         @Override
-        public void afterEachCallback(Object testInstance, Argument testArgument) {
+        public void postAfterEach(Object testInstance, Argument testArgument) {
             AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
             assertThat(autoCloseExampleTest1.afterEachAutoClosable.isClosed()).isFalse();
         }
 
         @Override
-        public void afterAllCallback(Object testInstance, Argument testArgument) {
+        public void postAfterAll(Object testInstance, Argument testArgument) {
             AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
             assertThat(autoCloseExampleTest1.afterEachAutoClosable.isClosed()).isTrue();
             assertThat(autoCloseExampleTest1.afterAllAutoClosable.isClosed()).isFalse();
         }
 
         @Override
-        public void concludeCallback(Object testInstance) {
+        public void postConclude(Object testInstance) {
             AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
             assertThat(autoCloseExampleTest1.afterAllAutoClosable.isClosed()).isTrue();
             assertThat(autoCloseExampleTest1.afterConcludeAutoCloseable.isClosed()).isFalse();

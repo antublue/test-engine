@@ -37,7 +37,7 @@ import org.antublue.test.engine.util.Singleton;
 import org.antublue.test.engine.util.StandardStreams;
 
 /** Class to implement an ExtensionProcessor */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "PMD.UnusedPrivateMethod"})
 public class ExtensionProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionProcessor.class);
@@ -115,17 +115,16 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process instantiatedCallback methods
+     * Method to process postCreateTestInstance
      *
      * @param testClass testClass
      * @param testInstance testInstance
-     * @param throwableContext throwableCollector
+     * @param throwableContext throwableContext
      */
-    public void instantiateCallbacks(
-            Class<?> testClass, Object testInstance, ThrowableContext throwableContext) {
+    public void postCreateTestInstance(Class<?> testClass, Object testInstance, ThrowableContext throwableContext) {
         for (Extension testExtensions : getTestExtensions(testClass)) {
             try {
-                testExtensions.instantiatedCallback(testInstance);
+                testExtensions.postCreateTestInstance(testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -135,17 +134,17 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process prepareCallback methods
+     * Method to process postPrepare methods
      *
      * @param testClass testClass
      * @param testInstance testInstance
      * @param throwableContext throwableCollector
      */
-    public void prepareCallbacks(
+    public void postPrepare(
             Class<?> testClass, Object testInstance, ThrowableContext throwableContext) {
         for (Extension testExtensions : getTestExtensions(testClass)) {
             try {
-                testExtensions.prepareCallback(testInstance);
+                testExtensions.postPrepare(testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -155,21 +154,21 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process beforeAllCallback methods
+     * Method to process postBeforeAll methods
      *
      * @param testClass testClass
      * @param testArgument testArgument
      * @param testInstance testInstance
      * @param throwableContext throwableCollector
      */
-    public void beforeAllCallbacks(
+    public void postBeforeAll(
             Class<?> testClass,
             Argument testArgument,
             Object testInstance,
             ThrowableContext throwableContext) {
         for (Extension testExtensions : getTestExtensions(testClass)) {
             try {
-                testExtensions.beforeAllCallback(testInstance, testArgument);
+                testExtensions.postBeforeAll(testInstance, testArgument);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -179,21 +178,21 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process beforeEachCallback methods
+     * Method to process postBeforeEach methods
      *
      * @param testClass testClass
      * @param testArgument testArgument
      * @param testInstance testInstance
      * @param throwableContext throwableCollector
      */
-    public void beforeEachCallbackMethods(
+    public void postBeforeEach(
             Class<?> testClass,
             Argument testArgument,
             Object testInstance,
             ThrowableContext throwableContext) {
         for (Extension testExtensions : getTestExtensions(testClass)) {
             try {
-                testExtensions.beforeEachCallback(testInstance, testArgument);
+                testExtensions.postBeforeEach(testInstance, testArgument);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -203,7 +202,7 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process beforeTestCallback methods
+     * Method to process preTest methods
      *
      * @param testClass testClass
      * @param testArgument testArgument
@@ -211,7 +210,7 @@ public class ExtensionProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableCollector
      */
-    public void beforeTestCallbacks(
+    public void preTest(
             Class<?> testClass,
             Argument testArgument,
             Method testMethod,
@@ -219,7 +218,7 @@ public class ExtensionProcessor {
             ThrowableContext throwableContext) {
         for (Extension testExtensions : getTestExtensions(testClass)) {
             try {
-                testExtensions.beforeTestCallback(testInstance, testArgument, testMethod);
+                testExtensions.preTest(testInstance, testArgument, testMethod);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -229,7 +228,7 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process afterTestCallback methods
+     * Method to process postTest methods
      *
      * @param testClass testClass
      * @param testArgument testArgument
@@ -237,7 +236,7 @@ public class ExtensionProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableCollector
      */
-    public void afterTestCallbacks(
+    public void postTest(
             Class<?> testClass,
             Argument testArgument,
             Method testMethod,
@@ -245,7 +244,7 @@ public class ExtensionProcessor {
             ThrowableContext throwableContext) {
         for (Extension testExtensions : getTestExtensions(testClass)) {
             try {
-                testExtensions.afterTestCallback(testInstance, testArgument, testMethod);
+                testExtensions.postTest(testInstance, testArgument, testMethod);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -255,21 +254,21 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process afterEachCallback methods
+     * Method to process postAfterEach methods
      *
      * @param testClass testClass
      * @param testArgument testArgument
      * @param testInstance testInstance
      * @param throwableContext throwableCollector
      */
-    public void afterEachCallbacks(
+    public void postAfterEach(
             Class<?> testClass,
             Argument testArgument,
             Object testInstance,
             ThrowableContext throwableContext) {
         for (Extension testExtensions : getTestExtensions(testClass)) {
             try {
-                testExtensions.afterEachCallback(testInstance, testArgument);
+                testExtensions.postAfterEach(testInstance, testArgument);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -279,21 +278,21 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process afterAllCallback methods
+     * Method to process postAfterAll methods
      *
      * @param testClass testClass
      * @param testArgument testArgument
      * @param testInstance testInstance
      * @param throwableContext throwableCollector
      */
-    public void afterAllCallbacks(
+    public void postAfterAll(
             Class<?> testClass,
             Argument testArgument,
             Object testInstance,
             ThrowableContext throwableContext) {
         for (Extension testExtensions : getTestExtensions(testClass)) {
             try {
-                testExtensions.afterAllCallback(testInstance, testArgument);
+                testExtensions.postAfterAll(testInstance, testArgument);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {
@@ -303,17 +302,17 @@ public class ExtensionProcessor {
     }
 
     /**
-     * Method to process afterAllCallback methods
+     * Method to process postConclude methods
      *
      * @param testClass testClass
      * @param testInstance testInstance
      * @param throwableContext throwableCollector
      */
-    public void concludeCallbacks(
+    public void postConclude(
             Class<?> testClass, Object testInstance, ThrowableContext throwableContext) {
         for (Extension testExtensions : getTestExtensions(testClass)) {
             try {
-                testExtensions.concludeCallback(testInstance);
+                testExtensions.postConclude(testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             } finally {

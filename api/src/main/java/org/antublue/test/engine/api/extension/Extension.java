@@ -23,12 +23,12 @@ import org.antublue.test.engine.api.Argument;
 public interface Extension {
 
     /**
-     * Method to call after a test class is instantiated
+     * Method to call after test object creation
      *
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
-    default void instantiatedCallback(Object testInstance) throws Throwable {
+    default void postCreateTestInstance(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -38,7 +38,7 @@ public interface Extension {
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
-    default void prepareCallback(Object testInstance) throws Throwable {
+    default void postPrepare(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -49,7 +49,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void beforeAllCallback(Object testInstance, Argument testArgument) throws Throwable {
+    default void postBeforeAll(Object testInstance, Argument testArgument) throws Throwable {
         // DO NOTHING
     }
 
@@ -60,7 +60,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void beforeEachCallback(Object testInstance, Argument testArgument) throws Throwable {
+    default void postBeforeEach(Object testInstance, Argument testArgument) throws Throwable {
         // DO NOTHING
     }
 
@@ -72,7 +72,7 @@ public interface Extension {
      * @param testMethod testMethod
      * @throws Throwable Throwable
      */
-    default void beforeTestCallback(Object testInstance, Argument testArgument, Method testMethod)
+    default void preTest(Object testInstance, Argument testArgument, Method testMethod)
             throws Throwable {
         // DO NOTHING
     }
@@ -85,7 +85,7 @@ public interface Extension {
      * @param testMethod testMethod
      * @throws Throwable Throwable
      */
-    default void afterTestCallback(Object testInstance, Argument testArgument, Method testMethod)
+    default void postTest(Object testInstance, Argument testArgument, Method testMethod)
             throws Throwable {
         // DO NOTHING
     }
@@ -97,7 +97,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void afterEachCallback(Object testInstance, Argument testArgument) throws Throwable {
+    default void postAfterEach(Object testInstance, Argument testArgument) throws Throwable {
         // DO NOTHING
     }
 
@@ -107,7 +107,7 @@ public interface Extension {
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
-    default void afterAllCallback(Object testInstance, Argument testArgument) throws Throwable {
+    default void postAfterAll(Object testInstance, Argument testArgument) throws Throwable {
         // DO NOTHING
     }
 
@@ -117,7 +117,7 @@ public interface Extension {
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
-    default void concludeCallback(Object testInstance) throws Throwable {
+    default void postConclude(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 }

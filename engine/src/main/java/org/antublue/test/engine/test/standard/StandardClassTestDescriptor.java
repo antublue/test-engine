@@ -34,7 +34,7 @@ import org.antublue.test.engine.test.ThrowableContext;
 import org.antublue.test.engine.test.extension.ExtensionProcessor;
 import org.antublue.test.engine.test.parameterized.ParameterizedTestFilters;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
-import org.antublue.test.engine.test.util.MethodInvoker;
+import org.antublue.test.engine.test.util.LockProcessor;
 import org.antublue.test.engine.test.util.RandomFieldInjector;
 import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.Invariant;
@@ -59,6 +59,8 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
 
     private static final ExtensionProcessor EXTENSION_PROCESSOR =
             Singleton.get(ExtensionProcessor.class);
+
+    private static final LockProcessor LOCK_PROCESSOR = Singleton.get(LockProcessor.class);
 
     private final Class<?> testClass;
     private final StopWatch stopWatch;
@@ -135,7 +137,7 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                     }
                 case PREPARE_CALLBACK_METHODS:
                     {
-                        state = prepareCallbacks(executableContext);
+                        state = postPrepare(executableContext);
                         break;
                     }
                 case EXECUTE_OR_SKIP:
@@ -150,7 +152,7 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                     }
                 case CONCLUDE_CALLBACK_METHODS:
                     {
-                        state = concludeCallbackMethods(executableContext);
+                        state = postConclude(executableContext);
                         break;
                     }
                 case CLOSE_AUTO_CLOSE_FIELDS:
@@ -206,7 +208,7 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
             Object testInstance = constructor.newInstance((Object[]) null);
             executableContext.setTestInstance(testInstance);
             EXTENSION_PROCESSOR.initialize(testClass);
-            EXTENSION_PROCESSOR.instantiateCallbacks(testClass, testInstance, throwableContext);
+            EXTENSION_PROCESSOR.postCreateTestInstance(testClass, testInstance, throwableContext);
             return State.SET_RANDOM_FIELDS;
         } catch (Throwable t) {
             throwableContext.add(testClass, t);
@@ -246,7 +248,12 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
                     REFLECTION_UTILS.findMethods(testClass, StandardTestFilters.PREPARE_METHOD);
             TEST_DESCRIPTOR_UTILS.sortMethods(prepareMethods, TestUtils.Sort.FORWARD);
             for (Method method : prepareMethods) {
-                MethodInvoker.invoke(method, testInstance, null);
+                LOCK_PROCESSOR.processLocks(method);
+                TEST_DESCRIPTOR_UTILS.invoke(method, testInstance, null, throwableContext);
+                LOCK_PROCESSOR.processUnlocks(method);
+                if (!throwableContext.isEmpty()) {
+                    break;
+                }
             }
         } catch (Throwable t) {
             throwableContext.add(testClass, t);
@@ -257,12 +264,12 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
         return State.PREPARE_CALLBACK_METHODS;
     }
 
-    private State prepareCallbacks(ExecutableContext executableContext) {
+    private State postPrepare(ExecutableContext executableContext) {
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
 
-        EXTENSION_PROCESSOR.prepareCallbacks(testClass, testInstance, throwableContext);
+        EXTENSION_PROCESSOR.postPrepare(testClass, testInstance, throwableContext);
 
         return State.EXECUTE_OR_SKIP;
     }
@@ -288,7 +295,6 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
-
         try {
             List<Method> concludeMethods =
                     REFLECTION_UTILS.findMethods(
@@ -296,28 +302,22 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
             TEST_DESCRIPTOR_UTILS.sortMethods(concludeMethods, TestUtils.Sort.REVERSE);
 
             for (Method method : concludeMethods) {
-                try {
-                    MethodInvoker.invoke(method, testInstance, null);
-                } catch (Throwable t) {
-                    throwableContext.add(testClass, t);
-                } finally {
-                    StandardStreams.flush();
-                }
+                LOCK_PROCESSOR.processLocks(method);
+                TEST_DESCRIPTOR_UTILS.invoke(method, testInstance, null, throwableContext);
+                LOCK_PROCESSOR.processUnlocks(method);
+                StandardStreams.flush();
             }
         } finally {
             StandardStreams.flush();
         }
-
         return State.CONCLUDE_CALLBACK_METHODS;
     }
 
-    private State concludeCallbackMethods(ExecutableContext executableContext) {
+    private State postConclude(ExecutableContext executableContext) {
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
-
-        EXTENSION_PROCESSOR.concludeCallbacks(
+        EXTENSION_PROCESSOR.postConclude(
                 testInstance.getClass(), testInstance, executableContext.getThrowableContext());
-
         return State.CLOSE_AUTO_CLOSE_FIELDS;
     }
 
@@ -326,7 +326,6 @@ public class StandardClassTestDescriptor extends AbstractTestDescriptor
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
         AutoCloseProcessor autoCloseProcessor = Singleton.get(AutoCloseProcessor.class);
-
         List<Field> testFields =
                 REFLECTION_UTILS.findFields(testClass, StandardTestFilters.AUTO_CLOSE_FIELDS);
         for (Field testField : testFields) {

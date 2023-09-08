@@ -21,30 +21,16 @@ import org.antublue.test.engine.api.extension.Extension;
 public class GlobalExtension implements Extension {
 
     /**
-     * Method to execute before all @TestEngine.Prepare methods
-     *
-     * @param testInstance testInstance
-     * @throws Throwable Throwable
-     */
-    @Override
-    public void instantiatedCallback(Object testInstance) throws Throwable {
-        System.out.println(
-                String.format(
-                        "%s.beforePrepare %s",
-                        getClass().getSimpleName(), testInstance.getClass().getName()));
-    }
-
-    /**
      * Method to execute after all @TestEngine.Conclude methods
      *
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
     @Override
-    public void concludeCallback(Object testInstance) throws Throwable {
+    public void postConclude(Object testInstance) throws Throwable {
         System.out.println(
                 String.format(
-                        "%s.afterConcludeCallback %s",
+                        "%s.postConclude %s",
                         getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 }

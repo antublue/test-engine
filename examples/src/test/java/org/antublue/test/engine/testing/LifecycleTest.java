@@ -35,7 +35,6 @@ public class LifecycleTest {
     static {
         EXPECTED.add("prepare2()");
         EXPECTED.add("prepare()");
-
         arguments()
                 .forEach(
                         stringArgument -> {
@@ -49,7 +48,6 @@ public class LifecycleTest {
                             EXPECTED.add("afterAll2(" + stringArgument + ")");
                             EXPECTED.add("afterAll(" + stringArgument + ")");
                         });
-
         EXPECTED.add("conclude()");
     }
 

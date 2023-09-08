@@ -37,6 +37,7 @@ public class ThrowableUtils {
                     s.startsWith("org.antublue.test.engine.test.standard.")
                             || s.startsWith("org.antublue.test.engine.test.parameterized.")
                             || s.startsWith("org.antublue.test.engine.test.extension.")
+                            || s.startsWith("org.antublue.test.engine.test.util.")
                             || s.startsWith("org.antublue.test.engine.Executor")
                             || s.startsWith("java.base/");
 

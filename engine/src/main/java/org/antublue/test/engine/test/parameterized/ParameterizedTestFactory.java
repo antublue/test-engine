@@ -92,8 +92,8 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                         testClass -> {
                             if (accept(engineDiscoveryRequest, testClass)) {
                                 new ParameterizedClassTestDescriptor.Builder()
-                                        .withParentTestDescriptor(engineDescriptor)
-                                        .withTestClass(testClass)
+                                        .setParentTestDescriptor(engineDescriptor)
+                                        .setTestClass(testClass)
                                         .build();
                             }
                         });
@@ -118,8 +118,8 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                             if (ParameterizedTestFilters.TEST_CLASS.test(testClass)
                                     && accept(engineDiscoveryRequest, testClass)) {
                                 new ParameterizedClassTestDescriptor.Builder()
-                                        .withParentTestDescriptor(engineDescriptor)
-                                        .withTestClass(testClass)
+                                        .setParentTestDescriptor(engineDescriptor)
+                                        .setTestClass(testClass)
                                         .build();
                             }
                         });
@@ -140,8 +140,8 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
         if (ParameterizedTestFilters.TEST_CLASS.test(testClass)
                 && accept(engineDiscoveryRequest, testClass)) {
             new ParameterizedClassTestDescriptor.Builder()
-                    .withParentTestDescriptor(engineDescriptor)
-                    .withTestClass(testClass)
+                    .setParentTestDescriptor(engineDescriptor)
+                    .setTestClass(testClass)
                     .build();
         }
     }
@@ -182,9 +182,9 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                 && ParameterizedTestFilters.TEST_METHOD.test(testMethod)
                 && accept(engineDiscoveryRequest, testClass)) {
             new ParameterizedClassTestDescriptor.Builder()
-                    .withParentTestDescriptor(engineDescriptor)
-                    .withTestClass(testClass)
-                    .withTestMethodFilter(new TestMethodFilter(testMethod))
+                    .setParentTestDescriptor(engineDescriptor)
+                    .setTestClass(testClass)
+                    .setTestMethodFilter(new TestMethodFilter(testMethod))
                     .build();
         }
     }
