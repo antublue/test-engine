@@ -110,8 +110,6 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
     public void execute(ExecutableContext executableContext) {
         stopWatch.start();
 
-        ThrowableContext throwableContext = executableContext.getThrowableContext();
-
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
 
