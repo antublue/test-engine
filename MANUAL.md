@@ -44,30 +44,12 @@ Annotated methods ...
 
 - `@TestEngine.Prepare`
 - `@TestEngine.BeforeAll`
-- `@TestEngine.BeforeAll`
 - `@TestEngine.BeforeEach`
+- `@TestEngine.Test`
 - `@TestEngine.AfterEach`
 - `@TestEngine.AfterAll`
 - `@TestEngine.Conclude`
 
-... are execute using a wrapping model.
-
-```
-superclass @TestEngine.Prepare
-  subclass @TestEngine.Prepare
-    superclass @TestEngine.BeforeAll
-      subclass @TestEngine.BeforeAll
-        superclass @TestEngine.BeforeEach
-          subclass @TestEngine.BeforeEach
-            superclass @TestEngine.Test
-            subclass @TestEngine.Test
-          subclass @TestEngine.AfterEach
-        superclass @TestEngine.AfterEach
-      subclass @TestEngine.AfterAll
-    superclass @TestEngine.AfterAll
-  subclass @TestEngine.Conclude
-superclass @TestEngine.Conclude
-```
 
 Reference the [Design](https://github.com/antublue/test-engine#design) for the test engine execution flow.
 
@@ -76,13 +58,13 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - `public` and `protected` methods are supported for `@TestEngine.X` annotations.
 
 
-- By default, methods are executed in alphabetical order based on class/method name, with respect to location (superclass / subclass.)
+- By default, methods are executed in alphabetical order based on method name.
 
 
 - `@TestEngine.Order` can be used to control test class order / test method order of execution.
   - Classes/methods are sorted by the order annotation value first, then alphabetically by the class name/method name.
   - The test method name can be changed by using the `@TestEngine.DisplayName` annotation.
-  - Method order is relative to the class (superclass or subclass) and other methods with the same annotation defined in the class.
+  - Order is relative other methods with the same annotation type defined in the class.
 
 - **Class execution order can't be guaranteed unless the test engine is configured to use a single thread.**
 
