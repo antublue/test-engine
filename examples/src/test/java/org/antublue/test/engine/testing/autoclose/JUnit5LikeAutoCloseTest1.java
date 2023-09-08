@@ -21,7 +21,7 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class JUnit5LikeAutoCloseTest1 {
 
-    @TestEngine.RandomInteger private Integer randomInteger;
+    @TestEngine.Random.Integer private Integer randomInteger;
 
     @TestEngine.AutoClose.AfterEach private TestAutoCloseable afterEachAutoCloseable;
 

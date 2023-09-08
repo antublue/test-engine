@@ -46,50 +46,51 @@ public class RandomFieldInjector {
                 "inject class [%s] field [%s] field type [%s]",
                 object.getClass().getName(), field.getName(), field.getType().getName());
 
-        if (field.isAnnotationPresent(TestEngine.RandomBoolean.class)) {
+        if (field.isAnnotationPresent(TestEngine.Random.Boolean.class)) {
             setBoolean(object, field);
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.RandomInteger.class)) {
-            TestEngine.RandomInteger annotation =
-                    field.getAnnotation(TestEngine.RandomInteger.class);
+        if (field.isAnnotationPresent(TestEngine.Random.Integer.class)) {
+            TestEngine.Random.Integer annotation =
+                    field.getAnnotation(TestEngine.Random.Integer.class);
             setInteger(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.RandomLong.class)) {
-            TestEngine.RandomLong annotation = field.getAnnotation(TestEngine.RandomLong.class);
+        if (field.isAnnotationPresent(TestEngine.Random.Long.class)) {
+            TestEngine.Random.Long annotation = field.getAnnotation(TestEngine.Random.Long.class);
             setLong(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.RandomFloat.class)) {
-            TestEngine.RandomFloat annotation = field.getAnnotation(TestEngine.RandomFloat.class);
+        if (field.isAnnotationPresent(TestEngine.Random.Float.class)) {
+            TestEngine.Random.Float annotation = field.getAnnotation(TestEngine.Random.Float.class);
             setFloat(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.RandomDouble.class)) {
-            TestEngine.RandomDouble annotation = field.getAnnotation(TestEngine.RandomDouble.class);
+        if (field.isAnnotationPresent(TestEngine.Random.Double.class)) {
+            TestEngine.Random.Double annotation =
+                    field.getAnnotation(TestEngine.Random.Double.class);
             setDouble(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.RandomBigInteger.class)) {
-            TestEngine.RandomBigInteger annotation =
-                    field.getAnnotation(TestEngine.RandomBigInteger.class);
+        if (field.isAnnotationPresent(TestEngine.Random.BigInteger.class)) {
+            TestEngine.Random.BigInteger annotation =
+                    field.getAnnotation(TestEngine.Random.BigInteger.class);
             setBigInteger(object, field, annotation.minimum(), annotation.maximum());
             return;
         }
 
-        if (field.isAnnotationPresent(TestEngine.RandomBigDecimal.class)) {
-            TestEngine.RandomBigDecimal annotation =
-                    field.getAnnotation(TestEngine.RandomBigDecimal.class);
+        if (field.isAnnotationPresent(TestEngine.Random.BigDecimal.class)) {
+            TestEngine.Random.BigDecimal annotation =
+                    field.getAnnotation(TestEngine.Random.BigDecimal.class);
             setBigDecimal(object, field, annotation.minimum(), annotation.maximum());
         }
 
-        if (field.isAnnotationPresent(TestEngine.UUID.class)) {
+        if (field.isAnnotationPresent(TestEngine.Random.UUID.class)) {
             LOGGER.trace(
                     "injecting UUID class [%s] field [%s]",
                     object.getClass().getName(), field.getName());

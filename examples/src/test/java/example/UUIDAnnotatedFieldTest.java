@@ -26,9 +26,9 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class UUIDAnnotatedFieldTest {
 
-    @TestEngine.UUID private UUID uuid1;
+    @TestEngine.Random.UUID private UUID uuid1;
 
-    @TestEngine.UUID private String uuid2;
+    @TestEngine.Random.UUID private String uuid2;
 
     @TestEngine.Argument protected StringArgument stringArgument;
 

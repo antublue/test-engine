@@ -42,14 +42,14 @@ public class ParameterizedTestFilters {
 
     public static final Predicate<Field> RANDOM_FIELD =
             field -> {
-                if (field.isAnnotationPresent(TestEngine.RandomBoolean.class)
-                        || field.isAnnotationPresent(TestEngine.RandomInteger.class)
-                        || field.isAnnotationPresent(TestEngine.RandomLong.class)
-                        || field.isAnnotationPresent(TestEngine.RandomFloat.class)
-                        || field.isAnnotationPresent(TestEngine.RandomDouble.class)
-                        || field.isAnnotationPresent(TestEngine.RandomBigInteger.class)
-                        || field.isAnnotationPresent(TestEngine.RandomBigDecimal.class)
-                        || field.isAnnotationPresent(TestEngine.UUID.class)) {
+                if (field.isAnnotationPresent(TestEngine.Random.Boolean.class)
+                        || field.isAnnotationPresent(TestEngine.Random.Integer.class)
+                        || field.isAnnotationPresent(TestEngine.Random.Long.class)
+                        || field.isAnnotationPresent(TestEngine.Random.Float.class)
+                        || field.isAnnotationPresent(TestEngine.Random.Double.class)
+                        || field.isAnnotationPresent(TestEngine.Random.BigInteger.class)
+                        || field.isAnnotationPresent(TestEngine.Random.BigDecimal.class)
+                        || field.isAnnotationPresent(TestEngine.Random.UUID.class)) {
                     field.setAccessible(true);
                     return true;
                 }
