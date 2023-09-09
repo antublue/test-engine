@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
-import org.antublue.test.engine.test.ExecutableContext;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
 import org.antublue.test.engine.util.NamedThreadFactory;
 import org.antublue.test.engine.util.StandardStreams;
@@ -113,8 +112,7 @@ public class Executor {
                     executorService.submit(
                             () -> {
                                 try {
-                                    executableTestDescriptor.execute(
-                                            new ExecutableContext(executionRequest));
+                                    executableTestDescriptor.execute(executionRequest);
                                 } catch (Throwable t) {
                                     t.printStackTrace();
                                     StandardStreams.flush();

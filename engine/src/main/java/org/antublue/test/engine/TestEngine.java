@@ -28,6 +28,7 @@ import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.test.extension.ExtensionManager;
 import org.antublue.test.engine.test.parameterized.ParameterizedTestFactory;
+import org.antublue.test.engine.test.parameterized.ParameterizedTestUtils;
 import org.antublue.test.engine.test.standard.StandardTestFactory;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.LockProcessor;
@@ -117,6 +118,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     ConfigurationParameters.class, clazz -> new ConfigurationParameters());
             Singleton.register(ReflectionUtils.class, clazz -> new ReflectionUtils());
             Singleton.register(TestUtils.class, clazz -> new TestUtils());
+            Singleton.register(ParameterizedTestUtils.class, clazz -> new ParameterizedTestUtils());
             Singleton.register(LockProcessor.class, clazz -> new LockProcessor());
             Singleton.register(AutoCloseProcessor.class, clazz -> new AutoCloseProcessor());
             Singleton.register(ExtensionManager.class, clazz -> new ExtensionManager());

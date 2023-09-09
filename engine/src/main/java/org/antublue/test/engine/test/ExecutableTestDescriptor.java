@@ -16,15 +16,74 @@
 
 package org.antublue.test.engine.test;
 
+import java.util.Optional;
+import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.test.extension.ExtensionManager;
+import org.antublue.test.engine.test.parameterized.ParameterizedTestUtils;
+import org.antublue.test.engine.test.util.LockProcessor;
+import org.antublue.test.engine.test.util.TestUtils;
+import org.antublue.test.engine.util.Invariant;
+import org.antublue.test.engine.util.ReflectionUtils;
+import org.antublue.test.engine.util.Singleton;
+import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
-/** Interface to implement an ExecutableTestDescriptor */
-public interface ExecutableTestDescriptor extends TestDescriptor {
+/** Abstract class to implement an ExecutableTestDescriptor */
+public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
+        implements ExecutableMetadataSupport {
+
+    protected static final Argument NULL_TEST_ARGUMENT = null;
+
+    protected static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
+
+    protected static final TestUtils TEST_UTILS = Singleton.get(TestUtils.class);
+
+    protected static final ParameterizedTestUtils PARAMETERIZED_UTILS =
+            Singleton.get(ParameterizedTestUtils.class);
+
+    protected static final ExtensionManager EXTENSION_MANAGER =
+            Singleton.get(ExtensionManager.class);
+
+    protected static final LockProcessor LOCK_PROCESSOR = Singleton.get(LockProcessor.class);
+
+    private final ThrowableContext throwableContext;
+    private final ExecutableMetadata executableMetadata;
+    private Object testInstance;
+
+    public ExecutableTestDescriptor(UniqueId uniqueId, String displayName) {
+        super(uniqueId, displayName);
+        throwableContext = new ThrowableContext();
+        executableMetadata = new ExecutableMetadata();
+    }
+
+    public <T> T getParent(Class<T> clazz) {
+        Optional<TestDescriptor> optional = getParent();
+        Invariant.check(optional.isPresent());
+        return clazz.cast(optional.get());
+    }
+
+    public void setTestInstance(Object testInstance) {
+        this.testInstance = testInstance;
+    }
+
+    public Object getTestInstance() {
+        return testInstance;
+    }
+
+    public ThrowableContext getThrowableContext() {
+        return throwableContext;
+    }
+
+    public ExecutableMetadata getExecutableMetadata() {
+        return executableMetadata;
+    }
 
     /**
      * Method to execute the test descriptor
      *
-     * @param executableContext executionContext
+     * @param executionRequest executionRequest
      */
-    void execute(ExecutableContext executableContext);
+    public abstract void execute(ExecutionRequest executionRequest);
 }

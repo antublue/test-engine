@@ -20,23 +20,19 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
-import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.test.ExecutableContext;
+import org.antublue.test.engine.exception.TestClassFailedException;
 import org.antublue.test.engine.test.ExecutableMetadata;
 import org.antublue.test.engine.test.ExecutableMetadataConstants;
-import org.antublue.test.engine.test.ExecutableMetadataSupport;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.ThrowableContext;
-import org.antublue.test.engine.test.extension.ExtensionManager;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
-import org.antublue.test.engine.test.util.LockProcessor;
 import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.Invariant;
-import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.Singleton;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
+import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -44,19 +40,7 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /** Class to implement a ParameterMethodTestDescriptor */
-public class StandardMethodTestDescriptor
-        extends org.junit.platform.engine.support.descriptor.AbstractTestDescriptor
-        implements ExecutableTestDescriptor, ExecutableMetadataSupport {
-
-    private static final Argument NULL_TEST_ARGUMENT = null;
-
-    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
-
-    private static final TestUtils TEST_UTILS = Singleton.get(TestUtils.class);
-
-    private static final ExtensionManager EXTENSION_MANAGER = Singleton.get(ExtensionManager.class);
-
-    private static final LockProcessor LOCK_PROCESSOR = Singleton.get(LockProcessor.class);
+public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
 
     private final Class<?> testClass;
     private final Method testMethod;
@@ -101,31 +85,31 @@ public class StandardMethodTestDescriptor
     }
 
     @Override
-    public void execute(ExecutableContext executableContext) {
+    public void execute(ExecutionRequest executionRequest) {
         stopWatch.start();
 
-        Object testInstance = executableContext.getTestInstance();
+        Object testInstance = getParent(ExecutableTestDescriptor.class).getTestInstance();
         Invariant.check(testInstance != null);
+        setTestInstance(testInstance);
 
-        executableMetadata.put(ExecutableMetadataConstants.TEST_CLASS, testClass);
-        executableMetadata.put(ExecutableMetadataConstants.TEST_METHOD, testMethod);
+        getExecutableMetadata().put(ExecutableMetadataConstants.TEST_CLASS, testClass);
+        getExecutableMetadata().put(ExecutableMetadataConstants.TEST_METHOD, testMethod);
 
-        if (!executableContext.getThrowableContext().isEmpty()) {
+        if (!getThrowableContext().isEmpty()) {
             stopWatch.stop();
-            executableMetadata.put(
-                    ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                    stopWatch.elapsedTime());
-            executableMetadata.put(
-                    ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                    ExecutableMetadataConstants.SKIP);
-            executableContext
-                    .getExecutionRequest()
-                    .getEngineExecutionListener()
-                    .executionSkipped(this, "");
+            getExecutableMetadata()
+                    .put(
+                            ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
+                            stopWatch.elapsedTime());
+            getExecutableMetadata()
+                    .put(
+                            ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
+                            ExecutableMetadataConstants.SKIP);
+            executionRequest.getEngineExecutionListener().executionSkipped(this, "");
             return;
         }
 
-        executableContext.getExecutionRequest().getEngineExecutionListener().executionStarted(this);
+        executionRequest.getEngineExecutionListener().executionStarted(this);
 
         State state = State.BEGIN;
         while (state != null && state != State.END) {
@@ -137,25 +121,24 @@ public class StandardMethodTestDescriptor
                     }
                 case BEFORE_EACH:
                     {
-                        state = beforeEach(executableContext);
+                        state = beforeEach();
                         break;
                     }
                 case TEST:
                     {
-                        state = test(executableContext);
+                        state = test();
                         break;
                     }
                 case AFTER_EACH:
                     {
-                        state = afterEach(executableContext);
+                        state = afterEach();
                         break;
                     }
                 case CLOSE_AUTO_CLOSE_FIELDS:
                     {
-                        state = closeAutoCloseFields(executableContext);
+                        state = closeAutoCloseFields();
                         break;
                     }
-                case END:
                 default:
                     {
                         state = null;
@@ -164,40 +147,47 @@ public class StandardMethodTestDescriptor
         }
 
         stopWatch.stop();
-        executableMetadata.put(
-                ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, stopWatch.elapsedTime());
+        getExecutableMetadata()
+                .put(
+                        ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
+                        stopWatch.elapsedTime());
 
-        if (executableContext.getThrowableContext().isEmpty()) {
-            executableMetadata.put(
-                    ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                    ExecutableMetadataConstants.PASS);
-            executableContext
-                    .getExecutionRequest()
+        if (getThrowableContext().isEmpty()) {
+            getExecutableMetadata()
+                    .put(
+                            ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
+                            ExecutableMetadataConstants.PASS);
+            executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
-            executableMetadata.put(
-                    ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                    ExecutableMetadataConstants.FAIL);
-            executableContext
-                    .getExecutionRequest()
+            getParent(StandardClassTestDescriptor.class)
+                    .getThrowableContext()
+                    .add(
+                            getTestInstance().getClass(),
+                            new TestClassFailedException(
+                                    String.format(
+                                            "Exception testing test class [%s]",
+                                            TEST_UTILS.getDisplayName(testClass))));
+            getExecutableMetadata()
+                    .put(
+                            ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
+                            ExecutableMetadataConstants.FAIL);
+            executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(
                             this,
                             TestExecutionResult.failed(
-                                    executableContext
-                                            .getThrowableContext()
-                                            .getThrowables()
-                                            .get(0)));
+                                    getThrowableContext().getThrowables().get(0)));
         }
 
         StandardStreams.flush();
     }
 
-    private State beforeEach(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
+    private State beforeEach() {
+        Object testInstance = getTestInstance();
         Invariant.check(testInstance != null);
-        ThrowableContext throwableContext = executableContext.getThrowableContext();
+        ThrowableContext throwableContext = getThrowableContext();
         try {
             List<Method> beforeEachMethods =
                     REFLECTION_UTILS.findMethods(
@@ -225,10 +215,10 @@ public class StandardMethodTestDescriptor
         }
     }
 
-    private State test(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
+    private State test() {
+        Object testInstance = getTestInstance();
         Invariant.check(testInstance != null);
-        ThrowableContext throwableContext = executableContext.getThrowableContext();
+        ThrowableContext throwableContext = getThrowableContext();
         EXTENSION_MANAGER.beforeTest(
                 testInstance, NULL_TEST_ARGUMENT, testMethod, throwableContext);
         if (throwableContext.isEmpty()) {
@@ -241,10 +231,10 @@ public class StandardMethodTestDescriptor
         return State.AFTER_EACH;
     }
 
-    private State afterEach(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
+    private State afterEach() {
+        Object testInstance = getTestInstance();
         Invariant.check(testInstance != null);
-        ThrowableContext throwableContext = executableContext.getThrowableContext();
+        ThrowableContext throwableContext = getThrowableContext();
         List<Method> afterEachMethods =
                 REFLECTION_UTILS.findMethods(
                         testInstance.getClass(), StandardTestFilters.AFTER_EACH_METHOD);
@@ -259,10 +249,10 @@ public class StandardMethodTestDescriptor
         return State.CLOSE_AUTO_CLOSE_FIELDS;
     }
 
-    private State closeAutoCloseFields(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
+    private State closeAutoCloseFields() {
+        Object testInstance = getTestInstance();
         Invariant.check(testInstance != null);
-        ThrowableContext throwableContext = executableContext.getThrowableContext();
+        ThrowableContext throwableContext = getThrowableContext();
         AutoCloseProcessor autoCloseProcessor = Singleton.get(AutoCloseProcessor.class);
         List<Field> testFields =
                 REFLECTION_UTILS.findFields(testClass, StandardTestFilters.AUTO_CLOSE_FIELDS);

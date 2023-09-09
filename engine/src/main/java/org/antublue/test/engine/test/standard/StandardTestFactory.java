@@ -20,6 +20,10 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Predicate;
 import org.antublue.test.engine.test.TestDescriptorFactory;
+import org.antublue.test.engine.test.extension.ExtensionManager;
+import org.antublue.test.engine.test.util.AutoCloseProcessor;
+import org.antublue.test.engine.test.util.LockProcessor;
+import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.antublue.test.engine.util.Singleton;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -35,6 +39,14 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 public class StandardTestFactory implements TestDescriptorFactory {
 
     private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
+
+    public StandardTestFactory() {
+        Singleton.register(ReflectionUtils.class, clazz -> new ReflectionUtils());
+        Singleton.register(TestUtils.class, clazz -> new TestUtils());
+        Singleton.register(LockProcessor.class, clazz -> new LockProcessor());
+        Singleton.register(AutoCloseProcessor.class, clazz -> new AutoCloseProcessor());
+        Singleton.register(ExtensionManager.class, clazz -> new ExtensionManager());
+    }
 
     @Override
     public void discover(
@@ -100,7 +112,7 @@ public class StandardTestFactory implements TestDescriptorFactory {
      * @param packageSelector packageSelector
      * @param engineDescriptor engineDescriptor
      */
-    private static void discover(
+    private void discover(
             EngineDiscoveryRequest engineDiscoveryRequest,
             PackageSelector packageSelector,
             EngineDescriptor engineDescriptor) {
@@ -125,7 +137,7 @@ public class StandardTestFactory implements TestDescriptorFactory {
      * @param classSelector classSelector
      * @param engineDescriptor engineDescriptor
      */
-    private static void discover(
+    private void discover(
             EngineDiscoveryRequest engineDiscoveryRequest,
             ClassSelector classSelector,
             EngineDescriptor engineDescriptor) {
@@ -147,7 +159,7 @@ public class StandardTestFactory implements TestDescriptorFactory {
      * @param methodSelector methodSelector
      * @param engineDescriptor engineDescriptor
      */
-    private static void discover(
+    private void discover(
             EngineDiscoveryRequest engineDiscoveryRequest,
             MethodSelector methodSelector,
             EngineDescriptor engineDescriptor) {
@@ -171,7 +183,7 @@ public class StandardTestFactory implements TestDescriptorFactory {
      * @param clazz class
      * @return true if the class should be accepted, else false
      */
-    public static boolean accept(EngineDiscoveryRequest engineDiscoveryRequest, Class<?> clazz) {
+    public boolean accept(EngineDiscoveryRequest engineDiscoveryRequest, Class<?> clazz) {
         List<PackageNameFilter> packageNameFilters =
                 engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
         for (PackageNameFilter packageNameFilter : packageNameFilters) {

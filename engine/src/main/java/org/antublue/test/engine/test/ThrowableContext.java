@@ -46,9 +46,8 @@ public class ThrowableContext {
         return throwables.isEmpty();
     }
 
-    @Deprecated
-    public boolean hasThrowables() {
-        return !throwables.isEmpty();
+    public Throwable getFirst() {
+        return throwables.get(0);
     }
 
     public List<Throwable> getThrowables() {
