@@ -32,7 +32,7 @@ public class MethodLockingTest2 {
     public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
-        Store.singleton().putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
+        Store.getSingleton().putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
     @TestEngine.Argument public IntegerArgument integerArgument;
@@ -64,7 +64,7 @@ public class MethodLockingTest2 {
         System.out.println("test1()");
 
         AtomicInteger atomicInteger =
-                Store.singleton().get(COUNTER_NAME, AtomicInteger.class).get();
+                Store.getSingleton().get(COUNTER_NAME, AtomicInteger.class).get();
 
         int count = atomicInteger.incrementAndGet();
         if (count != 1) {

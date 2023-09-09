@@ -44,7 +44,7 @@ public class ExtensionTest1 {
         Collection<Extension> collection = new ArrayList<>();
 
         // Add a singleton extension instance
-        collection.add(StopWatchExtension.singleton());
+        collection.add(StopWatchExtension.getSingleton());
 
         // Add a test class specific extension instance
         collection.add(new ExampleExtension());

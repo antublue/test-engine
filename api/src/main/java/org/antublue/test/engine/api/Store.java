@@ -51,7 +51,7 @@ public final class Store {
      *
      * @return the singleton instance
      */
-    public static Store singleton() {
+    public static Store getSingleton() {
         return SINGLETON;
     }
 
