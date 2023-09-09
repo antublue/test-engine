@@ -23,11 +23,10 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.util.ReflectionUtils;
-import org.antublue.test.engine.util.Singleton;
 
 public class StandardTestFilters {
 
-    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
     public static final Predicate<Field> RANDOM_FIELD =
             field -> {

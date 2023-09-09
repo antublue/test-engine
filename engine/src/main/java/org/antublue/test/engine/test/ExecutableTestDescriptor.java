@@ -24,7 +24,6 @@ import org.antublue.test.engine.test.util.LockProcessor;
 import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.Invariant;
 import org.antublue.test.engine.util.ReflectionUtils;
-import org.antublue.test.engine.util.Singleton;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
@@ -36,17 +35,16 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
 
     protected static final Argument NULL_TEST_ARGUMENT = null;
 
-    protected static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
+    protected static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
-    protected static final TestUtils TEST_UTILS = Singleton.get(TestUtils.class);
+    protected static final TestUtils TEST_UTILS = TestUtils.getSingleton();
 
     protected static final ParameterizedTestUtils PARAMETERIZED_UTILS =
-            Singleton.get(ParameterizedTestUtils.class);
+            ParameterizedTestUtils.getSingleton();
 
-    protected static final ExtensionManager EXTENSION_MANAGER =
-            Singleton.get(ExtensionManager.class);
+    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
 
-    protected static final LockProcessor LOCK_PROCESSOR = Singleton.get(LockProcessor.class);
+    protected static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
 
     private final ThrowableContext throwableContext;
     private final ExecutableMetadata executableMetadata;

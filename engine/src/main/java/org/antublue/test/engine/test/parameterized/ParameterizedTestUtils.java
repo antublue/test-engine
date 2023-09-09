@@ -22,12 +22,21 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.util.ReflectionUtils;
-import org.antublue.test.engine.util.Singleton;
 
 @SuppressWarnings("unchecked")
 public class ParameterizedTestUtils {
 
-    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
+    private static final ParameterizedTestUtils SINGLETON = new ParameterizedTestUtils();
+
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
+
+    private ParameterizedTestUtils() {
+        // DO NOTHING
+    }
+
+    public static ParameterizedTestUtils getSingleton() {
+        return SINGLETON;
+    }
 
     public Method getArumentSupplierMethod(Class<?> testClass) {
         return REFLECTION_UTILS

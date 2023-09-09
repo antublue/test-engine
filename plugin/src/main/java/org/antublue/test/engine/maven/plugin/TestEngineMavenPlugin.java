@@ -35,10 +35,7 @@ import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionL
 import org.antublue.test.engine.maven.plugin.listener.TestDescriptorExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.TestDescriptorSummaryEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.logger.Logger;
-import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.AnsiColor;
-import org.antublue.test.engine.util.ReflectionUtils;
-import org.antublue.test.engine.util.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -87,9 +84,6 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         Logger logger = Logger.from(getLog());
 
         try {
-            Singleton.register(ReflectionUtils.class, clazz -> new ReflectionUtils());
-            Singleton.register(TestUtils.class, clazz -> new TestUtils());
-
             System.setProperty(Constants.MAVEN_PLUGIN, Constants.TRUE);
             logger.debug("property [%s] = [%s]", Constants.MAVEN_PLUGIN, Constants.TRUE);
 
@@ -233,7 +227,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             new ExecutionRequest(
                                     testDescriptor,
                                     delegatingEngineExecutionListener,
-                                    Singleton.get(ConfigurationParameters.class));
+                                    ConfigurationParameters.getSingleton());
 
                     testEngine.execute(executionRequest);
 

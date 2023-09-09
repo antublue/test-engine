@@ -29,7 +29,6 @@ import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.AnsiColor;
 import org.antublue.test.engine.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.util.NanosecondsConverter;
-import org.antublue.test.engine.util.Singleton;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -40,9 +39,9 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(TestDescriptorExecutionListener.class);
 
-    private static final Configuration CONFIGURATION = Singleton.get(Configuration.class);
+    private static final Configuration CONFIGURATION = Configuration.getSingleton();
 
-    private static final TestUtils TEST_UTILS = Singleton.get(TestUtils.class);
+    private static final TestUtils TEST_UTILS = TestUtils.getSingleton();
 
     private static final String INFO =
             new AnsiColorStringBuilder()

@@ -30,7 +30,6 @@ import org.antublue.test.engine.test.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.Invariant;
-import org.antublue.test.engine.util.Singleton;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
 import org.junit.platform.engine.ExecutionRequest;
@@ -235,7 +234,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     private State closeAutoCloseFields() {
         Object testInstance = getTestInstance();
         Invariant.check(testInstance != null);
-        AutoCloseProcessor autoCloseProcessor = Singleton.get(AutoCloseProcessor.class);
+        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.getSingleton();
         List<Field> testFields =
                 REFLECTION_UTILS.findFields(
                         testInstance.getClass(), ParameterizedTestFilters.AUTO_CLOSE_FIELDS);

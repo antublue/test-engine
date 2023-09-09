@@ -33,9 +33,19 @@ import org.antublue.test.engine.logger.LoggerFactory;
 /** Class to process @TestEngine.Lock, @TestEngine.Unlock, @TestEngine.ResourceLock annotations */
 public class LockProcessor {
 
+    private static final LockProcessor SINGLETON = new LockProcessor();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LockProcessor.class);
 
     private final Map<String, ReentrantReadWriteLock> LOCK_MAP = new ConcurrentHashMap<>();
+
+    private LockProcessor() {
+        // DO NOTHING
+    }
+
+    public static LockProcessor getSingleton() {
+        return SINGLETON;
+    }
 
     /**
      * Method to process locking/unlocking on a Method, if annotated

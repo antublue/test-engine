@@ -29,7 +29,6 @@ import org.antublue.test.engine.test.ThrowableContext;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.Invariant;
-import org.antublue.test.engine.util.Singleton;
 import org.antublue.test.engine.util.StandardStreams;
 import org.antublue.test.engine.util.StopWatch;
 import org.junit.platform.engine.ExecutionRequest;
@@ -256,7 +255,7 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
         Object testInstance = getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = getThrowableContext();
-        AutoCloseProcessor autoCloseProcessor = Singleton.get(AutoCloseProcessor.class);
+        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.getSingleton();
         List<Field> testFields =
                 REFLECTION_UTILS.findFields(testClass, StandardTestFilters.AUTO_CLOSE_FIELDS);
         for (Field testField : testFields) {

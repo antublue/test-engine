@@ -21,11 +21,10 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.util.ReflectionUtils;
-import org.antublue.test.engine.util.Singleton;
 
 public class ExtensionFilters {
 
-    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
     public static final Predicate<Method> EXTENSION_SUPPLIER_METHOD =
             method ->

@@ -32,6 +32,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Configuration {
 
+    private static final Configuration SINGLETON = new Configuration();
+
     /** Configuration constant */
     public static final String ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE =
             "ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE";
@@ -116,6 +118,10 @@ public class Configuration {
         if (keySet == null) {
             keySet = new HashSet<>();
         }
+    }
+
+    public static Configuration getSingleton() {
+        return SINGLETON;
     }
 
     /**

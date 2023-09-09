@@ -20,12 +20,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Predicate;
 import org.antublue.test.engine.test.TestDescriptorFactory;
-import org.antublue.test.engine.test.extension.ExtensionManager;
-import org.antublue.test.engine.test.util.AutoCloseProcessor;
-import org.antublue.test.engine.test.util.LockProcessor;
-import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.ReflectionUtils;
-import org.antublue.test.engine.util.Singleton;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.discovery.ClassSelector;
@@ -38,15 +33,7 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 /** Class to implement a StandardTestDescriptorFactory */
 public class StandardTestFactory implements TestDescriptorFactory {
 
-    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
-
-    public StandardTestFactory() {
-        Singleton.register(ReflectionUtils.class, clazz -> new ReflectionUtils());
-        Singleton.register(TestUtils.class, clazz -> new TestUtils());
-        Singleton.register(LockProcessor.class, clazz -> new LockProcessor());
-        Singleton.register(AutoCloseProcessor.class, clazz -> new AutoCloseProcessor());
-        Singleton.register(ExtensionManager.class, clazz -> new ExtensionManager());
-    }
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
     @Override
     public void discover(

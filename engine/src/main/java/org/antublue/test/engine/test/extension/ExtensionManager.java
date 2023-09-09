@@ -33,18 +33,19 @@ import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.test.ThrowableContext;
 import org.antublue.test.engine.util.ReflectionUtils;
-import org.antublue.test.engine.util.Singleton;
 import org.antublue.test.engine.util.StandardStreams;
 
 /** Class to implement an ExtensionProcessor */
 @SuppressWarnings({"unchecked", "PMD.UnusedPrivateMethod"})
 public class ExtensionManager {
 
+    private static final ExtensionManager SINGLETON = new ExtensionManager();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionManager.class);
 
-    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
-    private static final Configuration CONFIGURATION = Singleton.get(Configuration.class);
+    private static final Configuration CONFIGURATION = Configuration.getSingleton();
 
     private static final List<Extension> EMPT_EXTENSION_LIST = new ArrayList<>();
 
@@ -55,11 +56,15 @@ public class ExtensionManager {
     private final Map<Class<?>, List<Extension>> testExtensionsReversedMap;
 
     /** Constructor */
-    public ExtensionManager() {
+    private ExtensionManager() {
         globalExtensions = new ArrayList<>();
         globalExtensionsReversed = new ArrayList<>();
         testExtensionsMap = new HashMap<>();
         testExtensionsReversedMap = new HashMap<>();
+    }
+
+    public static ExtensionManager getSingleton() {
+        return SINGLETON;
     }
 
     /**

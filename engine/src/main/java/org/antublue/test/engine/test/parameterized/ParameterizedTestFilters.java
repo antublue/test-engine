@@ -25,11 +25,10 @@ import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.util.ReflectionUtils;
-import org.antublue.test.engine.util.Singleton;
 
 public class ParameterizedTestFilters {
 
-    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
     public static final Predicate<Field> ARGUMENT_FIELD =
             field -> {

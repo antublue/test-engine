@@ -28,7 +28,7 @@ import org.antublue.test.engine.configuration.Configuration;
 public class ThrowableUtils {
 
     private static final boolean STACK_TRACE_PRUNING =
-            Singleton.get(Configuration.class)
+            Configuration.getSingleton()
                     .getBooleanOrDefault(Constants.STACK_TRACE_PRUNE, true)
                     .get();
 

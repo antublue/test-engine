@@ -18,9 +18,7 @@ package org.antublue.test.engine.logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 import org.antublue.test.engine.configuration.Configuration;
-import org.antublue.test.engine.util.Singleton;
 
 /** Class to implement a LoggerFactory */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -69,16 +67,7 @@ public final class LoggerFactory {
      * @return the return value
      */
     public static Logger getLogger(String name) {
-        Singleton.register(
-                Configuration.class,
-                new Function<Class<?>, Object>() {
-                    @Override
-                    public Object apply(Class<?> clazz) {
-                        return new Configuration();
-                    }
-                });
-
-        Configuration configuration = Singleton.get(Configuration.class);
+        Configuration configuration = Configuration.getSingleton();
 
         synchronized (configuration) {
             if (SINGLETON == null) {

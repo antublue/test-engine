@@ -28,13 +28,7 @@ import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.test.extension.ExtensionManager;
 import org.antublue.test.engine.test.parameterized.ParameterizedTestFactory;
-import org.antublue.test.engine.test.parameterized.ParameterizedTestUtils;
 import org.antublue.test.engine.test.standard.StandardTestFactory;
-import org.antublue.test.engine.test.util.AutoCloseProcessor;
-import org.antublue.test.engine.test.util.LockProcessor;
-import org.antublue.test.engine.test.util.TestUtils;
-import org.antublue.test.engine.util.ReflectionUtils;
-import org.antublue.test.engine.util.Singleton;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
@@ -113,16 +107,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("discover()");
 
         try {
-            Singleton.register(Configuration.class, clazz -> new Configuration());
-            Singleton.register(
-                    ConfigurationParameters.class, clazz -> new ConfigurationParameters());
-            Singleton.register(ReflectionUtils.class, clazz -> new ReflectionUtils());
-            Singleton.register(TestUtils.class, clazz -> new TestUtils());
-            Singleton.register(ParameterizedTestUtils.class, clazz -> new ParameterizedTestUtils());
-            Singleton.register(LockProcessor.class, clazz -> new LockProcessor());
-            Singleton.register(AutoCloseProcessor.class, clazz -> new AutoCloseProcessor());
-            Singleton.register(ExtensionManager.class, clazz -> new ExtensionManager());
-
             // Create an engine descriptor to build the list of test descriptors
             EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
@@ -157,7 +141,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      * @param engineDescriptor engineDescriptor
      */
     private void shuffleOrSortTestDescriptors(EngineDescriptor engineDescriptor) {
-        Configuration configuration = Singleton.get(Configuration.class);
+        Configuration configuration = Configuration.getSingleton();
 
         // Get the test descriptors and remove them from the engine descriptor
         List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
@@ -186,7 +170,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("execute()");
 
         try {
-            Singleton.get(ExtensionManager.class).initialize();
+            ExtensionManager.getSingleton().initialize();
         } catch (Throwable t) {
             throw new TestEngineException("Exception loading extensions", t);
         }
@@ -200,7 +184,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
 
             ConfigurationParameters configurationParameters =
-                    Singleton.get(ConfigurationParameters.class);
+                    ConfigurationParameters.getSingleton();
 
             new Executor()
                     .execute(

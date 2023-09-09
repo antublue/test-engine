@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.antublue.test.engine.test.TestDescriptorFactory;
 import org.antublue.test.engine.util.ReflectionUtils;
-import org.antublue.test.engine.util.Singleton;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.discovery.ClassSelector;
@@ -34,11 +33,7 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 /** Class to implement a ParameterizedTestDescriptorFactory */
 public class ParameterizedTestFactory implements TestDescriptorFactory {
 
-    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
-
-    public ParameterizedTestFactory() {
-        Singleton.register(ParameterizedTestUtils.class, clazz -> new ParameterizedTestUtils());
-    }
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
     @Override
     public void discover(

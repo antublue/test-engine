@@ -22,16 +22,25 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.test.ThrowableContext;
 import org.antublue.test.engine.util.ReflectionUtils;
-import org.antublue.test.engine.util.Singleton;
 import org.antublue.test.engine.util.StandardStreams;
 
 public class TestUtils {
 
-    private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
+    private static final TestUtils SINGLETON = new TestUtils();
+
+    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
     public enum Sort {
         FORWARD,
         REVERSE,
+    }
+
+    private TestUtils() {
+        // DO NOTHING
+    }
+
+    public static TestUtils getSingleton() {
+        return SINGLETON;
     }
 
     public void invoke(

@@ -27,11 +27,17 @@ import org.antublue.test.engine.test.ThrowableContext;
 @SuppressWarnings("PMD.NPathComplexity")
 public class AutoCloseProcessor {
 
+    private static final AutoCloseProcessor SINGLETON = new AutoCloseProcessor();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoCloseProcessor.class);
 
     /** Constructor */
-    public AutoCloseProcessor() {
+    private AutoCloseProcessor() {
         // DO NOTHING
+    }
+
+    public static final AutoCloseProcessor getSingleton() {
+        return SINGLETON;
     }
 
     /**

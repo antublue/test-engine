@@ -28,7 +28,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.configuration.Configuration;
-import org.antublue.test.engine.util.Singleton;
 
 /** Class to implement a Logger */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -48,7 +47,7 @@ public class Logger {
     public Logger(String name) {
         this.name = name;
 
-        Configuration configuration = Singleton.get(Configuration.class);
+        Configuration configuration = Configuration.getSingleton();
 
         Level derivedLevel = Level.INFO;
 
