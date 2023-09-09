@@ -20,6 +20,10 @@ import org.antublue.test.engine.api.extension.Extension;
 
 public class GlobalExtension implements Extension {
 
+    public GlobalExtension() {
+        System.out.println(String.format("Extension [%s]", getClass()));
+    }
+
     /**
      * Method to execute after all @TestEngine.Conclude methods
      *
@@ -27,10 +31,10 @@ public class GlobalExtension implements Extension {
      * @throws Throwable Throwable
      */
     @Override
-    public void conclude(Object testInstance) throws Throwable {
+    public void postConcludeCallback(Object testInstance) throws Throwable {
         System.out.println(
                 String.format(
-                        "%s.postConclude %s",
+                        "%s.postConcludeCallback %s",
                         getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 }

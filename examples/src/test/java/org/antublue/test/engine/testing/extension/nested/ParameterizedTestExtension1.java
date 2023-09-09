@@ -14,44 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.testing.extension.parameterized;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package org.antublue.test.engine.testing.extension.nested;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.extension.Extension;
 
 /** Example Extension */
 @SuppressWarnings("unchecked")
-public class ParameterizedTest2Extension implements Extension {
-
-    private static final List<String> EXPECTED = new ArrayList<>();
-
-    static {
-        EXPECTED.add("extension.postInstantiateCallback()");
-        EXPECTED.add("prepare()");
-        EXPECTED.add("extension.postPrepareCallback()");
-        for (int i = 0; i < 2; i++) {
-            EXPECTED.add("beforeAll(StringArgument " + i + ")");
-            EXPECTED.add("extension.postBeforeAllCallback()");
-            for (int j = 0; j < 2; j++) {
-                EXPECTED.add("beforeEach(StringArgument " + i + ")");
-                EXPECTED.add("extension.postBeforeEachCallback()");
-                EXPECTED.add("extension.preTestCallback()");
-                EXPECTED.add("test" + (j + 1) + "(StringArgument " + i + ")");
-                EXPECTED.add("extension.postTestCallback()");
-                EXPECTED.add("afterEach(StringArgument " + i + ")");
-                EXPECTED.add("extension.postAfterEachCallback()");
-            }
-            EXPECTED.add("afterAll(StringArgument " + i + ")");
-            EXPECTED.add("extension.postAfterAllCallback()");
-        }
-        EXPECTED.add("conclude()");
-        EXPECTED.add("extension.postConcludeCallback()");
-    }
+public class ParameterizedTestExtension1 implements Extension {
 
     @Override
     public void postInstantiateCallback(Object testInstance) {
@@ -59,7 +30,6 @@ public class ParameterizedTest2Extension implements Extension {
                 String.format(
                         "%s postInstantiateCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.postInstantiateCallback()");
     }
 
     @Override
@@ -68,7 +38,6 @@ public class ParameterizedTest2Extension implements Extension {
                 String.format(
                         "%s postPrepareCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.postPrepareCallback()");
     }
 
     @Override
@@ -77,7 +46,6 @@ public class ParameterizedTest2Extension implements Extension {
                 String.format(
                         "%s postBeforeAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.postBeforeAllCallback()");
     }
 
     @Override
@@ -86,7 +54,6 @@ public class ParameterizedTest2Extension implements Extension {
                 String.format(
                         "%s postBeforeEachCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.postBeforeEachCallback()");
     }
 
     @Override
@@ -95,7 +62,6 @@ public class ParameterizedTest2Extension implements Extension {
                 String.format(
                         "%s preTestCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.preTestCallback()");
     }
 
     @Override
@@ -104,7 +70,6 @@ public class ParameterizedTest2Extension implements Extension {
                 String.format(
                         "%s postTestCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.postTestCallback()");
     }
 
     @Override
@@ -113,7 +78,6 @@ public class ParameterizedTest2Extension implements Extension {
                 String.format(
                         "%s postAfterEachCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.postAfterEachCallback()");
     }
 
     @Override
@@ -122,7 +86,6 @@ public class ParameterizedTest2Extension implements Extension {
                 String.format(
                         "%s postAfterAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.postAfterAllCallback()");
     }
 
     @Override
@@ -131,8 +94,5 @@ public class ParameterizedTest2Extension implements Extension {
                 String.format(
                         "%s postConcludeCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        List<String> ACTUAL = ((ParameterizedTest2) testInstance).ACTUAL;
-        ACTUAL.add("extension.postConcludeCallback()");
-        assertThat(ACTUAL).isEqualTo(EXPECTED);
     }
 }

@@ -165,7 +165,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
             Object testInstance = constructor.newInstance((Object[]) null);
             setTestInstance(testInstance);
             EXTENSION_MANAGER.initialize(testClass);
-            EXTENSION_MANAGER.postCreateTestInstance(testInstance, getThrowableContext());
+            EXTENSION_MANAGER.postInstantiateCallback(testInstance, getThrowableContext());
             return State.PREPARE;
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
@@ -195,7 +195,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
         } finally {
-            EXTENSION_MANAGER.prepare(testInstance, getThrowableContext());
+            EXTENSION_MANAGER.postPrepareCallback(testInstance, getThrowableContext());
             StandardStreams.flush();
         }
         return State.EXECUTE_OR_SKIP;
@@ -227,7 +227,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
             LOCK_PROCESSOR.processUnlocks(method);
             StandardStreams.flush();
         }
-        EXTENSION_MANAGER.conclude(testInstance, getThrowableContext());
+        EXTENSION_MANAGER.postConcludeCallback(testInstance, getThrowableContext());
         return State.CLOSE_AUTO_CLOSE_FIELDS;
     }
 

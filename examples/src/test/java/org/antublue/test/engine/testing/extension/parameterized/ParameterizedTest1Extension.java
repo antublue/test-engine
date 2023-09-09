@@ -31,108 +31,108 @@ public class ParameterizedTest1Extension implements Extension {
     private static final List<String> EXPECTED = new ArrayList<>();
 
     static {
-        EXPECTED.add("extension.postCreateTestInstance()");
+        EXPECTED.add("extension.postInstantiateCallback()");
         EXPECTED.add("prepare()");
-        EXPECTED.add("extension.prepare()");
+        EXPECTED.add("extension.postPrepareCallback()");
         for (int i = 0; i < 2; i++) {
             EXPECTED.add("beforeAll(StringArgument " + i + ")");
-            EXPECTED.add("extension.beforeAll()");
+            EXPECTED.add("extension.postBeforeAllCallback()");
             for (int j = 0; j < 2; j++) {
                 EXPECTED.add("beforeEach(StringArgument " + i + ")");
-                EXPECTED.add("extension.beforeEach()");
-                EXPECTED.add("extension.beforeTest()");
+                EXPECTED.add("extension.postBeforeEachCallback()");
+                EXPECTED.add("extension.preTestCallback()");
                 EXPECTED.add("test" + (j + 1) + "(StringArgument " + i + ")");
-                EXPECTED.add("extension.afterTest()");
+                EXPECTED.add("extension.postTestCallback()");
                 EXPECTED.add("afterEach(StringArgument " + i + ")");
-                EXPECTED.add("extension.afterEach()");
+                EXPECTED.add("extension.postAfterEachCallback()");
             }
             EXPECTED.add("afterAll(StringArgument " + i + ")");
-            EXPECTED.add("extension.afterAll()");
+            EXPECTED.add("extension.postAfterAllCallback()");
         }
         EXPECTED.add("conclude()");
-        EXPECTED.add("extension.conclude()");
+        EXPECTED.add("extension.postConcludeCallback()");
     }
 
     @Override
-    public void postCreateTestInstance(Object testInstance) {
+    public void postInstantiateCallback(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s postCreateTestInstance(class [%s])",
+                        "%s afterInstantiateCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postCreateTestInstance()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postInstantiateCallback()");
     }
 
     @Override
-    public void prepare(Object testInstance) {
+    public void postPrepareCallback(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s prepare(class [%s])",
+                        "%s postPrepareCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.prepare()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postPrepareCallback()");
     }
 
     @Override
-    public void beforeAll(Object testInstance, Argument testArgument) {
+    public void postBeforeAllCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s beforeAll(class [%s])",
+                        "%s postBeforeAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.beforeAll()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postBeforeAllCallback()");
     }
 
     @Override
-    public void beforeEach(Object testInstance, Argument testArgument) {
+    public void postBeforeEachCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s beforeEach(class [%s])",
+                        "%s postBeforeEachCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.beforeEach()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postBeforeEachCallback()");
     }
 
     @Override
-    public void beforeTest(Object testInstance, Argument testArgument, Method testMethod) {
+    public void preTestCallback(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
-                        "%s beforeTest(class [%s])",
+                        "%s preTestCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.beforeTest()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preTestCallback()");
     }
 
     @Override
-    public void afterTest(Object testInstance, Argument testArgument, Method testMethod) {
+    public void postTestCallback(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
-                        "%s afterTest(class [%s])",
+                        "%s postTestCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.afterTest()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postTestCallback()");
     }
 
     @Override
-    public void afterEach(Object testInstance, Argument testArgument) {
+    public void postAfterEachCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s afterEach(class [%s])",
+                        "%s postAfterEachCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.afterEach()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postAfterEachCallback()");
     }
 
     @Override
-    public void afterAll(Object testInstance, Argument testArgument) {
+    public void postAfterAllCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s afterAll(class [%s])",
+                        "%s postAfterAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.afterAll()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postAfterAllCallback()");
     }
 
     @Override
-    public void conclude(Object testInstance) {
+    public void postConcludeCallback(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s conclude(class [%s])",
+                        "%s postConcludeCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         List<String> ACTUAL = ((ParameterizedTest1) testInstance).ACTUAL;
-        ACTUAL.add("extension.conclude()");
+        ACTUAL.add("extension.postConcludeCallback()");
         assertThat(ACTUAL).isEqualTo(EXPECTED);
     }
 }

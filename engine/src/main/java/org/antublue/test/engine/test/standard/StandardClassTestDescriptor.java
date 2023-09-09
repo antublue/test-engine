@@ -182,7 +182,7 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
             Object testInstance = constructor.newInstance((Object[]) null);
             setTestInstance(testInstance);
             EXTENSION_MANAGER.initialize(testClass);
-            EXTENSION_MANAGER.postCreateTestInstance(testInstance, throwableContext);
+            EXTENSION_MANAGER.postInstantiateCallback(testInstance, throwableContext);
             return State.SET_RANDOM_FIELDS;
         } catch (Throwable t) {
             throwableContext.add(testClass, t);
@@ -227,7 +227,7 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
                 break;
             }
         }
-        EXTENSION_MANAGER.prepare(testInstance, throwableContext);
+        EXTENSION_MANAGER.postPrepareCallback(testInstance, throwableContext);
         return State.EXECUTE_OR_SKIP;
     }
 
@@ -261,7 +261,7 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
             LOCK_PROCESSOR.processUnlocks(method);
             StandardStreams.flush();
         }
-        EXTENSION_MANAGER.conclude(testInstance, throwableContext);
+        EXTENSION_MANAGER.postConcludeCallback(testInstance, throwableContext);
         return State.CLOSE_AUTO_CLOSE_FIELDS;
     }
 

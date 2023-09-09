@@ -24,66 +24,66 @@ import org.antublue.test.engine.api.extension.Extension;
 public class ExampleExtension implements Extension {
 
     @Override
-    public void prepare(Object testInstance) {
+    public void postPrepareCallback(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s afterPrepare(class [%s])",
+                        "%s postPrepareCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void beforeAll(Object testInstance, Argument testArgument) {
+    public void postBeforeAllCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s afterBeforeAll(class [%s])",
+                        "%s postBeforeAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void beforeEach(Object testInstance, Argument testArgument) {
+    public void postBeforeEachCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s afterBeforeEach(class [%s])",
+                        "%s postBeforeEachCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void beforeTest(Object testInstance, Argument testArgument, Method testMethod) {
+    public void preTestCallback(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
-                        "%s preTest(class [%s])",
+                        "%s preTestCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void afterTest(Object testInstance, Argument testArgument, Method testMethod) {
+    public void postTestCallback(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
-                        "%s postTest(class [%s])",
+                        "%s postTestCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void afterEach(Object testInstance, Argument testArgument) {
+    public void postAfterEachCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s postAfterEach(class [%s])",
+                        "%s postAfterEachCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void afterAll(Object testInstance, Argument testArgument) {
+    public void postAfterAllCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s postAfterAll(class [%s])",
+                        "%s postAfterAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void conclude(Object testInstance) {
+    public void postConcludeCallback(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s postConclude(class [%s])",
+                        "%s postConcludeCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 }

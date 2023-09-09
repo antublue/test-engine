@@ -49,11 +49,12 @@ public class ExtensionManager {
 
     private static final List<Extension> EMPT_EXTENSION_LIST = new ArrayList<>();
 
-    private List<Extension> globalExtensions;
-    private List<Extension> globalExtensionsReversed;
-
+    private final List<Extension> globalExtensions;
+    private final List<Extension> globalExtensionsReversed;
     private final Map<Class<?>, List<Extension>> testExtensionsMap;
     private final Map<Class<?>, List<Extension>> testExtensionsReversedMap;
+
+    private boolean initialized;
 
     /** Constructor */
     private ExtensionManager() {
@@ -74,27 +75,28 @@ public class ExtensionManager {
      */
     public void initialize() throws Throwable {
         LOGGER.trace("initialize()");
-
         synchronized (this) {
-            if (globalExtensions == null) {
-                Map<String, Extension> extensionMap = new LinkedHashMap<>();
-                Optional<String> optional = CONFIGURATION.get(Constants.EXTENSIONS);
-                if (optional.isPresent() && !optional.get().trim().isEmpty()) {
-                    String[] classNames = optional.get().split("\\s+");
-                    for (String className : classNames) {
-                        LOGGER.trace("loading extension [%s]", className);
-                        if (!extensionMap.containsKey(className)) {
-                            Object object = REFLECTION_UTILS.newInstance(className);
-                            if (object instanceof Extension) {
-                                extensionMap.put(className, (Extension) object);
-                            }
+            if (initialized) {
+                return;
+            }
+            Map<String, Extension> extensionMap = new LinkedHashMap<>();
+            Optional<String> optional = CONFIGURATION.get(Constants.EXTENSIONS);
+            if (optional.isPresent() && !optional.get().trim().isEmpty()) {
+                String[] classNames = optional.get().split("\\s+");
+                for (String className : classNames) {
+                    LOGGER.trace("loading extension [%s]", className);
+                    if (!extensionMap.containsKey(className)) {
+                        Object object = REFLECTION_UTILS.newInstance(className);
+                        if (object instanceof Extension) {
+                            extensionMap.put(className, (Extension) object);
                         }
                     }
-                    globalExtensions = new ArrayList<>(extensionMap.values());
-                    globalExtensionsReversed = new ArrayList<>(globalExtensions);
-                    Collections.reverse(globalExtensionsReversed);
                 }
+                globalExtensions.addAll(extensionMap.values());
+                globalExtensionsReversed.addAll(globalExtensions);
+                Collections.reverse(globalExtensionsReversed);
             }
+            initialized = true;
         }
     }
 
@@ -106,29 +108,29 @@ public class ExtensionManager {
      */
     public void initialize(Class<?> testClass) throws Throwable {
         LOGGER.trace("initialize() test class [%s]", testClass.getName());
-
         synchronized (this) {
             List<Extension> testExtensions = testExtensionsMap.get(testClass);
             if (testExtensions == null) {
-                testExtensions = buildTestExtensionList(globalExtensions, testClass);
-                testExtensionsMap.put(testClass, testExtensions);
+                testExtensions = new ArrayList<>(globalExtensions);
+                testExtensions.addAll(buildTestExtensionList(testClass));
                 List<Extension> testExtensionReversed = new ArrayList<>(testExtensions);
                 Collections.reverse(testExtensionReversed);
+                testExtensionsMap.put(testClass, testExtensions);
                 testExtensionsReversedMap.put(testClass, testExtensionReversed);
             }
         }
     }
 
     /**
-     * Method to run postCreateTestInstance extension methods
+     * Method to run postInstantiateCallback extension methods
      *
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
-    public void postCreateTestInstance(Object testInstance, ThrowableContext throwableContext) {
+    public void postInstantiateCallback(Object testInstance, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
-                testExtension.postCreateTestInstance(testInstance);
+                testExtension.postInstantiateCallback(testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testInstance.getClass(), t);
             } finally {
@@ -138,15 +140,15 @@ public class ExtensionManager {
     }
 
     /**
-     * Method to run prepare extension methods
+     * Method to run postPrepareCallback extension methods
      *
      * @param testInstance testInstance
      * @param throwableContext throwableCollector
      */
-    public void prepare(Object testInstance, ThrowableContext throwableContext) {
+    public void postPrepareCallback(Object testInstance, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
-                testExtension.prepare(testInstance);
+                testExtension.postPrepareCallback(testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testInstance.getClass(), t);
             } finally {
@@ -156,37 +158,17 @@ public class ExtensionManager {
     }
 
     /**
-     * Method to run beforeAll extension methods
-     *
-     * @param testInstance testInstance
-     * @param testArgument testArgument
-     * @param throwableContext throwableCollector
-     */
-    public void beforeAll(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
-        for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
-            try {
-                testExtension.beforeAll(testInstance, testArgument);
-            } catch (Throwable t) {
-                throwableContext.add(testInstance.getClass(), t);
-            } finally {
-                StandardStreams.flush();
-            }
-        }
-    }
-
-    /**
-     * Method to run beforeEach extension methods
+     * Method to run postBeforeAllCallback extension methods
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
      * @param throwableContext throwableCollector
      */
-    public void beforeEach(
+    public void postBeforeAllCallback(
             Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
-                testExtension.beforeEach(testInstance, testArgument);
+                testExtension.postBeforeAllCallback(testInstance, testArgument);
             } catch (Throwable t) {
                 throwableContext.add(testInstance.getClass(), t);
             } finally {
@@ -196,21 +178,41 @@ public class ExtensionManager {
     }
 
     /**
-     * Method to run beforeTest extension methods
+     * Method to run postBeforeEachCallback extension methods
+     *
+     * @param testInstance testInstance
+     * @param testArgument testArgument
+     * @param throwableContext throwableCollector
+     */
+    public void postBeforeEachCallback(
+            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+        for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
+            try {
+                testExtension.postBeforeEachCallback(testInstance, testArgument);
+            } catch (Throwable t) {
+                throwableContext.add(testInstance.getClass(), t);
+            } finally {
+                StandardStreams.flush();
+            }
+        }
+    }
+
+    /**
+     * Method to run preTestCallback extension methods
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
      * @param testMethod testMethod
      * @param throwableContext throwableCollector
      */
-    public void beforeTest(
+    public void preTestCallback(
             Object testInstance,
             Argument testArgument,
             Method testMethod,
             ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
-                testExtension.beforeTest(testInstance, testArgument, testMethod);
+                testExtension.preTestCallback(testInstance, testArgument, testMethod);
             } catch (Throwable t) {
                 throwableContext.add(testInstance.getClass(), t);
             } finally {
@@ -220,21 +222,21 @@ public class ExtensionManager {
     }
 
     /**
-     * Method to run afterTest extension methods
+     * Method to run postAfterTestCallback extension methods
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
      * @param testMethod testMethod
      * @param throwableContext throwableCollector
      */
-    public void afterTest(
+    public void postAfterTestCallback(
             Object testInstance,
             Argument testArgument,
             Method testMethod,
             ThrowableContext throwableContext) {
-        for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
+        for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
-                testExtension.afterTest(testInstance, testArgument, testMethod);
+                testExtension.postTestCallback(testInstance, testArgument, testMethod);
             } catch (Throwable t) {
                 throwableContext.add(testInstance.getClass(), t);
             } finally {
@@ -244,17 +246,17 @@ public class ExtensionManager {
     }
 
     /**
-     * Method to run afterEach extension methods
+     * Method to run postAfterEachCallback extension methods
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
      * @param throwableContext throwableCollector
      */
-    public void afterEach(
+    public void postAfterEachCallback(
             Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
-                testExtension.afterEach(testInstance, testArgument);
+                testExtension.postAfterEachCallback(testInstance, testArgument);
             } catch (Throwable t) {
                 throwableContext.add(testInstance.getClass(), t);
             } finally {
@@ -270,11 +272,11 @@ public class ExtensionManager {
      * @param testArgument testArgument
      * @param throwableContext throwableCollector
      */
-    public void afterAll(
+    public void postAfterAllCallback(
             Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
-                testExtension.afterAll(testInstance, testArgument);
+                testExtension.postAfterAllCallback(testInstance, testArgument);
             } catch (Throwable t) {
                 throwableContext.add(testInstance.getClass(), t);
             } finally {
@@ -289,10 +291,10 @@ public class ExtensionManager {
      * @param testInstance testInstance
      * @param throwableContext throwableCollector
      */
-    public void conclude(Object testInstance, ThrowableContext throwableContext) {
+    public void postConcludeCallback(Object testInstance, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
-                testExtension.conclude(testInstance);
+                testExtension.postConcludeCallback(testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testInstance.getClass(), t);
             } finally {
@@ -304,16 +306,14 @@ public class ExtensionManager {
     /**
      * Method to build a list of extensions for a test class
      *
-     * @param globalExtensions globalExtensions
      * @param testClass testClass
      * @return a list of extensions
      * @throws Throwable Throwable
      */
-    private List<Extension> buildTestExtensionList(
-            List<Extension> globalExtensions, Class<?> testClass) throws Throwable {
+    private List<Extension> buildTestExtensionList(Class<?> testClass) throws Throwable {
         LOGGER.trace("buildTestExtensionList() testClass [%s]", testClass.getName());
 
-        List<Extension> testExtensions = new ArrayList<>(globalExtensions);
+        List<Extension> testExtensions = new ArrayList<>();
         List<Method> extensionSupplierMethods =
                 REFLECTION_UTILS.findMethods(testClass, ExtensionFilters.EXTENSION_SUPPLIER_METHOD);
         for (Method method : extensionSupplierMethods) {

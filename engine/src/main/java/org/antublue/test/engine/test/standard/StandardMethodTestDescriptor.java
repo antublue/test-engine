@@ -207,7 +207,8 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
         } catch (Throwable t) {
             throwableContext.add(testClass, t);
         } finally {
-            EXTENSION_MANAGER.beforeEach(testInstance, NULL_TEST_ARGUMENT, throwableContext);
+            EXTENSION_MANAGER.postBeforeEachCallback(
+                    testInstance, NULL_TEST_ARGUMENT, throwableContext);
             StandardStreams.flush();
         }
         if (throwableContext.isEmpty()) {
@@ -221,14 +222,15 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
         Object testInstance = getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = getThrowableContext();
-        EXTENSION_MANAGER.beforeTest(
+        EXTENSION_MANAGER.preTestCallback(
                 testInstance, NULL_TEST_ARGUMENT, testMethod, throwableContext);
         if (throwableContext.isEmpty()) {
             LOCK_PROCESSOR.processLocks(testMethod);
             TEST_UTILS.invoke(testMethod, testInstance, null, throwableContext);
             LOCK_PROCESSOR.processUnlocks(testMethod);
         }
-        EXTENSION_MANAGER.afterTest(testInstance, NULL_TEST_ARGUMENT, testMethod, throwableContext);
+        EXTENSION_MANAGER.postAfterTestCallback(
+                testInstance, NULL_TEST_ARGUMENT, testMethod, throwableContext);
         StandardStreams.flush();
         return State.AFTER_EACH;
     }
@@ -247,7 +249,7 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
             LOCK_PROCESSOR.processUnlocks(method);
             StandardStreams.flush();
         }
-        EXTENSION_MANAGER.afterEach(testInstance, NULL_TEST_ARGUMENT, throwableContext);
+        EXTENSION_MANAGER.postAfterEachCallback(testInstance, NULL_TEST_ARGUMENT, throwableContext);
         return State.CLOSE_AUTO_CLOSE_FIELDS;
     }
 

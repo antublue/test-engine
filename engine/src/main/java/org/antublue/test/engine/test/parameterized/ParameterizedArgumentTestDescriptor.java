@@ -276,7 +276,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         } catch (Throwable t) {
             throwableContext.add(testClass, t);
         } finally {
-            EXTENSION_MANAGER.beforeAll(testInstance, testArgument, throwableContext);
+            EXTENSION_MANAGER.postBeforeAllCallback(testInstance, testArgument, throwableContext);
             StandardStreams.flush();
         }
         return State.EXECUTE_OR_SKIP;
@@ -311,7 +311,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
             LOCK_PROCESSOR.processUnlocks(method);
             StandardStreams.flush();
         }
-        EXTENSION_MANAGER.afterAll(testInstance, testArgument, throwableContext);
+        EXTENSION_MANAGER.postAfterAllCallback(testInstance, testArgument, throwableContext);
         return State.SET_ARGUMENT_FIELDS_NULL;
     }
 

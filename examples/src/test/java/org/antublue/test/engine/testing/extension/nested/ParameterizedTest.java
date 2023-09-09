@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.testing.autoclose;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package org.antublue.test.engine.testing.extension.nested;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 import org.antublue.test.engine.api.extension.Extension;
 
 /** Example test */
-public class AutoCloseTest1 {
+@SuppressWarnings("unchecked")
+public class ParameterizedTest {
+
+    public final List<String> ACTUAL = new ArrayList<>();
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -43,32 +44,24 @@ public class AutoCloseTest1 {
     @TestEngine.ExtensionSupplier
     public static Stream<Extension> extensions() {
         Collection<Extension> collection = new ArrayList<>();
-        collection.add(new TestExtension());
+        collection.add(new ParameterizedTestExtension1());
+        collection.add(new ParameterizedTestExtension2());
         return collection.stream();
     }
-
-    @TestEngine.AutoClose.AfterEach private TestAutoCloseable afterEachAutoClosable;
-
-    @TestEngine.AutoClose.AfterAll private TestAutoCloseable afterAllAutoClosable;
-
-    @TestEngine.AutoClose.Conclude private TestAutoCloseable afterConcludeAutoCloseable;
 
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        afterConcludeAutoCloseable = new TestAutoCloseable("afterConcludeAutoCloseable");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + stringArgument + ")");
-        afterAllAutoClosable = new TestAutoCloseable("afterAllAutoCloseable");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + stringArgument + ")");
-        afterEachAutoClosable = new TestAutoCloseable("afterEachAutoCloseable");
     }
 
     @TestEngine.Test
@@ -94,47 +87,5 @@ public class AutoCloseTest1 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-    }
-
-    private static class TestAutoCloseable implements AutoCloseable {
-
-        private final String name;
-        private boolean isClosed;
-
-        public TestAutoCloseable(String name) {
-            this.name = name;
-        }
-
-        public void close() {
-            System.out.println(name + ".close()");
-            isClosed = true;
-        }
-
-        public boolean isClosed() {
-            return isClosed;
-        }
-    }
-
-    public static class TestExtension implements Extension {
-
-        @Override
-        public void postAfterEachCallback(Object testInstance, Argument testArgument) {
-            AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
-            assertThat(autoCloseExampleTest1.afterEachAutoClosable.isClosed()).isFalse();
-        }
-
-        @Override
-        public void postAfterAllCallback(Object testInstance, Argument testArgument) {
-            AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
-            assertThat(autoCloseExampleTest1.afterEachAutoClosable.isClosed()).isTrue();
-            assertThat(autoCloseExampleTest1.afterAllAutoClosable.isClosed()).isFalse();
-        }
-
-        @Override
-        public void postConcludeCallback(Object testInstance) {
-            AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
-            assertThat(autoCloseExampleTest1.afterAllAutoClosable.isClosed()).isTrue();
-            assertThat(autoCloseExampleTest1.afterConcludeAutoCloseable.isClosed()).isFalse();
-        }
     }
 }

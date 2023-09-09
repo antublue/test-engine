@@ -240,7 +240,7 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
     private State postBeforeEach() {
         Object testInstance = getTestInstance();
         Invariant.check(testInstance != null);
-        EXTENSION_MANAGER.beforeEach(testInstance, testArgument, getThrowableContext());
+        EXTENSION_MANAGER.postBeforeEachCallback(testInstance, testArgument, getThrowableContext());
         if (getThrowableContext().isEmpty()) {
             return State.PRE_TEST;
         } else {
@@ -252,7 +252,7 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
         Object testInstance = getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = getThrowableContext();
-        EXTENSION_MANAGER.beforeTest(testInstance, testArgument, testMethod, throwableContext);
+        EXTENSION_MANAGER.preTestCallback(testInstance, testArgument, testMethod, throwableContext);
         if (throwableContext.isEmpty()) {
             return State.TEST;
         } else {
@@ -275,7 +275,8 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
         Object testInstance = getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = getThrowableContext();
-        EXTENSION_MANAGER.afterTest(testInstance, testArgument, testMethod, throwableContext);
+        EXTENSION_MANAGER.postAfterTestCallback(
+                testInstance, testArgument, testMethod, throwableContext);
         return State.AFTER_EACH;
     }
 
@@ -300,7 +301,7 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
         Object testInstance = getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = getThrowableContext();
-        EXTENSION_MANAGER.afterEach(testInstance, testArgument, throwableContext);
+        EXTENSION_MANAGER.postAfterEachCallback(testInstance, testArgument, throwableContext);
         return State.CLOSE_AUTO_CLOSE_FIELDS;
     }
 
