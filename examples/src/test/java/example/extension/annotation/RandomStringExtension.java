@@ -37,7 +37,7 @@ public class RandomStringExtension implements Extension {
      * @throws Throwable Throwable
      */
     @Override
-    public void postBeforeEach(Object testInstance, Argument testArgument) throws Throwable {
+    public void beforeEach(Object testInstance, Argument testArgument) throws Throwable {
         for (Field field : testInstance.getClass().getDeclaredFields()) {
             RandomStringAnnotation.Random.String.AlphaNumeric annotation =
                     field.getAnnotation(RandomStringAnnotation.Random.String.AlphaNumeric.class);

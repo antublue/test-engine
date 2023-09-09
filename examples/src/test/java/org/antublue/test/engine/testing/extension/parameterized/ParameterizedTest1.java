@@ -18,19 +18,17 @@ package org.antublue.test.engine.testing.extension.parameterized;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 import org.antublue.test.engine.api.extension.Extension;
-import org.antublue.test.engine.util.Singleton;
 
 /** Example test */
 @SuppressWarnings("unchecked")
-public class ParameterizedTest {
+public class ParameterizedTest1 {
 
-    static {
-        Singleton.register("2468.lifecycle.list", s -> new ArrayList<>());
-    }
+    public final List<String> ACTUAL = new ArrayList<>();
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -46,61 +44,55 @@ public class ParameterizedTest {
     @TestEngine.ExtensionSupplier
     public static Stream<Extension> extensions() {
         Collection<Extension> collection = new ArrayList<>();
-        collection.add(new ParameterizedTestExtension());
+        collection.add(new ParameterizedTest1Extension());
         return collection.stream();
     }
 
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("prepare()");
+        ACTUAL.add("prepare()");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + stringArgument + ")");
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
-                .add("beforeAll(" + stringArgument + ")");
+        ACTUAL.add("beforeAll(" + stringArgument + ")");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + stringArgument + ")");
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
-                .add("beforeEach(" + stringArgument + ")");
+        ACTUAL.add("beforeEach(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + stringArgument + ")");
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
-                .add("test1(" + stringArgument + ")");
+        ACTUAL.add("test1(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + stringArgument + ")");
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
-                .add("test2(" + stringArgument + ")");
+        ACTUAL.add("test2(" + stringArgument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach(" + stringArgument + ")");
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
-                .add("afterEach(" + stringArgument + ")");
+        ACTUAL.add("afterEach(" + stringArgument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + stringArgument + ")");
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list"))
-                .add("afterAll(" + stringArgument + ")");
+        ACTUAL.add("afterAll(" + stringArgument + ")");
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("conclude()");
+        ACTUAL.add("conclude()");
     }
 }

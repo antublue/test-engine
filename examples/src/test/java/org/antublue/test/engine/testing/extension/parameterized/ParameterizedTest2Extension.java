@@ -17,130 +17,122 @@
 package org.antublue.test.engine.testing.extension.parameterized;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.extension.Extension;
-import org.antublue.test.engine.util.Singleton;
 
 /** Example Extension */
 @SuppressWarnings("unchecked")
-public class ParameterizedTestExtension implements Extension {
+public class ParameterizedTest2Extension implements Extension {
 
     private static final List<String> EXPECTED = new ArrayList<>();
 
     static {
+        EXPECTED.add("extension.postCreateTestInstance()");
         EXPECTED.add("prepare()");
-        EXPECTED.add("postPrepare()");
+        EXPECTED.add("extension.prepare()");
         for (int i = 0; i < 2; i++) {
             EXPECTED.add("beforeAll(StringArgument " + i + ")");
-            EXPECTED.add("postBeforeAll()");
+            EXPECTED.add("extension.beforeAll()");
             for (int j = 0; j < 2; j++) {
                 EXPECTED.add("beforeEach(StringArgument " + i + ")");
-                EXPECTED.add("postBeforeEach()");
-                EXPECTED.add("preTest()");
+                EXPECTED.add("extension.beforeEach()");
+                EXPECTED.add("extension.beforeTest()");
                 EXPECTED.add("test" + (j + 1) + "(StringArgument " + i + ")");
-                EXPECTED.add("postTest()");
+                EXPECTED.add("extension.afterTest()");
                 EXPECTED.add("afterEach(StringArgument " + i + ")");
-                EXPECTED.add("postAfterEach()");
+                EXPECTED.add("extension.afterEach()");
             }
             EXPECTED.add("afterAll(StringArgument " + i + ")");
-            EXPECTED.add("postAfterAll()");
+            EXPECTED.add("extension.afterAll()");
         }
         EXPECTED.add("conclude()");
-        EXPECTED.add("postConclude()");
+        EXPECTED.add("extension.conclude()");
     }
 
     @Override
-    public void postPrepare(Object testInstance) {
+    public void postCreateTestInstance(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s postPrepare(class [%s])",
+                        "%s postCreateTestInstance(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postPrepare()");
+        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.postCreateTestInstance()");
     }
 
     @Override
-    public void postBeforeAll(Object testInstance, Argument testArgument) {
+    public void prepare(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s postBeforeAll(class [%s])",
+                        "%s prepare(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postBeforeAll()");
+        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.prepare()");
     }
 
     @Override
-    public void postBeforeEach(Object testInstance, Argument testArgument) {
+    public void beforeAll(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s postBeforeEach(class [%s])",
+                        "%s beforeAll(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postBeforeEach()");
+        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.beforeAll()");
     }
 
     @Override
-    public void preTest(Object testInstance, Argument testArgument, Method testMethod) {
+    public void beforeEach(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s preTest(class [%s])",
+                        "%s beforeEach(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("preTest()");
+        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.beforeEach()");
     }
 
     @Override
-    public void postTest(Object testInstance, Argument testArgument, Method testMethod) {
+    public void beforeTest(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
-                        "%s postTest(class [%s])",
+                        "%s beforeTest(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postTest()");
+        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.beforeTest()");
     }
 
     @Override
-    public void postAfterEach(Object testInstance, Argument testArgument) {
+    public void afterTest(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
-                        "%s postAfterEach(class [%s])",
+                        "%s afterTest(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postAfterEach()");
+        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.afterTest()");
     }
 
     @Override
-    public void postAfterAll(Object testInstance, Argument testArgument) {
+    public void afterEach(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s postAfterAll(class [%s])",
+                        "%s afterEach(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postAfterAll()");
+        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.afterEach()");
     }
 
     @Override
-    public void postConclude(Object testInstance) {
+    public void afterAll(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s postConclude(class [%s])",
+                        "%s afterAll(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ArrayList<String>) Singleton.get("2468.lifecycle.list")).add("postConclude()");
-        ArrayList<String> actual = Singleton.get("2468.lifecycle.list");
-        assertThat(actual.size()).isEqualTo(EXPECTED.size());
-        assertThat(actual).isEqualTo(EXPECTED);
-        for (int i = 0; i < actual.size(); i++) {
-            if (!actual.get(i).equals(EXPECTED.get(i))) {
-                fail(
-                        String.format(
-                                "index [%d] actual [%s] expected [%s]",
-                                i, actual.get(i), EXPECTED.get(i)));
-            }
-        }
+        ((ParameterizedTest2) testInstance).ACTUAL.add("extension.afterAll()");
     }
 
-    public void VALIDATE(Class<?> testClass, Object testInstance) {
+    @Override
+    public void conclude(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s VALIDATE(class [%s])",
+                        "%s conclude(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
+        List<String> ACTUAL = ((ParameterizedTest2) testInstance).ACTUAL;
+        ACTUAL.add("extension.conclude()");
+        assertThat(ACTUAL).isEqualTo(EXPECTED);
     }
 }

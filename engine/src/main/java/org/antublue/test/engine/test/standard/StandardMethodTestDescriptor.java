@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.test.ExecutableContext;
 import org.antublue.test.engine.test.ExecutableMetadata;
@@ -27,7 +28,7 @@ import org.antublue.test.engine.test.ExecutableMetadataConstants;
 import org.antublue.test.engine.test.ExecutableMetadataSupport;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.ThrowableContext;
-import org.antublue.test.engine.test.extension.ExtensionProcessor;
+import org.antublue.test.engine.test.extension.ExtensionManager;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.LockProcessor;
 import org.antublue.test.engine.test.util.TestUtils;
@@ -47,12 +48,13 @@ public class StandardMethodTestDescriptor
         extends org.junit.platform.engine.support.descriptor.AbstractTestDescriptor
         implements ExecutableTestDescriptor, ExecutableMetadataSupport {
 
+    private static final Argument NULL_TEST_ARGUMENT = null;
+
     private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
 
     private static final TestUtils TEST_UTILS = Singleton.get(TestUtils.class);
 
-    private static final ExtensionProcessor EXTENSION_PROCESSOR =
-            Singleton.get(ExtensionProcessor.class);
+    private static final ExtensionManager EXTENSION_MANAGER = Singleton.get(ExtensionManager.class);
 
     private static final LockProcessor LOCK_PROCESSOR = Singleton.get(LockProcessor.class);
 
@@ -92,12 +94,8 @@ public class StandardMethodTestDescriptor
     private enum State {
         BEGIN,
         BEFORE_EACH,
-        POST_BEFORE_EACH,
-        PRE_TEST,
         TEST,
-        POST_TEST,
         AFTER_EACH,
-        POST_AFTER_EACH,
         CLOSE_AUTO_CLOSE_FIELDS,
         END
     }
@@ -142,24 +140,9 @@ public class StandardMethodTestDescriptor
                         state = beforeEach(executableContext);
                         break;
                     }
-                case POST_BEFORE_EACH:
-                    {
-                        state = postBeforeEach(executableContext);
-                        break;
-                    }
-                case PRE_TEST:
-                    {
-                        state = preTest(executableContext);
-                        break;
-                    }
                 case TEST:
                     {
                         state = test(executableContext);
-                        break;
-                    }
-                case POST_TEST:
-                    {
-                        state = postTest(executableContext);
                         break;
                     }
                 case AFTER_EACH:
@@ -167,16 +150,12 @@ public class StandardMethodTestDescriptor
                         state = afterEach(executableContext);
                         break;
                     }
-                case POST_AFTER_EACH:
-                    {
-                        state = postAfterEach(executableContext);
-                        break;
-                    }
                 case CLOSE_AUTO_CLOSE_FIELDS:
                     {
                         state = closeAutoCloseFields(executableContext);
                         break;
                     }
+                case END:
                 default:
                     {
                         state = null;
@@ -236,32 +215,13 @@ public class StandardMethodTestDescriptor
         } catch (Throwable t) {
             throwableContext.add(testClass, t);
         } finally {
+            EXTENSION_MANAGER.beforeEach(testInstance, NULL_TEST_ARGUMENT, throwableContext);
             StandardStreams.flush();
         }
-        return State.POST_BEFORE_EACH;
-    }
-
-    private State postBeforeEach(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
-        Invariant.check(testInstance != null);
-        EXTENSION_PROCESSOR.postBeforeEach(
-                testClass, null, testInstance, executableContext.getThrowableContext());
-        if (executableContext.getThrowableContext().isEmpty()) {
-            return State.PRE_TEST;
-        } else {
-            return State.AFTER_EACH;
-        }
-    }
-
-    private State preTest(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
-        Invariant.check(testInstance != null);
-        ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.preTest(testClass, null, testMethod, testInstance, throwableContext);
         if (throwableContext.isEmpty()) {
             return State.TEST;
         } else {
-            return State.POST_TEST;
+            return State.AFTER_EACH;
         }
     }
 
@@ -269,18 +229,15 @@ public class StandardMethodTestDescriptor
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
-        LOCK_PROCESSOR.processLocks(testMethod);
-        TEST_UTILS.invoke(testMethod, testInstance, null, throwableContext);
-        LOCK_PROCESSOR.processUnlocks(testMethod);
+        EXTENSION_MANAGER.beforeTest(
+                testInstance, NULL_TEST_ARGUMENT, testMethod, throwableContext);
+        if (throwableContext.isEmpty()) {
+            LOCK_PROCESSOR.processLocks(testMethod);
+            TEST_UTILS.invoke(testMethod, testInstance, null, throwableContext);
+            LOCK_PROCESSOR.processUnlocks(testMethod);
+        }
+        EXTENSION_MANAGER.afterTest(testInstance, NULL_TEST_ARGUMENT, testMethod, throwableContext);
         StandardStreams.flush();
-        return State.POST_TEST;
-    }
-
-    private State postTest(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
-        Invariant.check(testInstance != null);
-        ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.postTest(testClass, null, testMethod, testInstance, throwableContext);
         return State.AFTER_EACH;
     }
 
@@ -298,14 +255,7 @@ public class StandardMethodTestDescriptor
             LOCK_PROCESSOR.processUnlocks(method);
             StandardStreams.flush();
         }
-        return State.POST_AFTER_EACH;
-    }
-
-    private State postAfterEach(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
-        Invariant.check(testInstance != null);
-        ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.postAfterEach(testClass, null, testInstance, throwableContext);
+        EXTENSION_MANAGER.afterEach(testInstance, NULL_TEST_ARGUMENT, throwableContext);
         return State.CLOSE_AUTO_CLOSE_FIELDS;
     }
 

@@ -51,30 +51,6 @@ public class StandardTestFilters {
                             || field.isAnnotationPresent(TestEngine.AutoClose.AfterAll.class)
                             || field.isAnnotationPresent(TestEngine.AutoClose.Conclude.class);
 
-    /*
-    public static final Predicate<Method> EXTENSION_SUPPLIER_METHOD =
-            method -> {
-                if (!method.isAnnotationPresent(TestEngine.ExtensionSupplier.class)) {
-                    return false;
-                }
-
-                if (!reflectionUtils.isStatic(method)) {
-                    return false;
-                }
-
-                if (!(reflectionUtils.isPublic(method) || reflectionUtils.isProtected(method))) {
-                    return false;
-                }
-
-                if (!reflectionUtils.hasParameterCount(method, 0)) {
-                    return false;
-                }
-
-                return reflectionUtils.hasReturnType(method, Iterable.class)
-                        || reflectionUtils.hasReturnType(method, Stream.class);
-            };
-     */
-
     public static final Predicate<Class<?>> TEST_CLASS =
             clazz -> {
                 boolean isSimpleTestClass =

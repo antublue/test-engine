@@ -24,7 +24,7 @@ import org.antublue.test.engine.api.extension.Extension;
 public class ExampleExtension implements Extension {
 
     @Override
-    public void postPrepare(Object testInstance) {
+    public void prepare(Object testInstance) {
         System.out.println(
                 String.format(
                         "%s afterPrepare(class [%s])",
@@ -32,7 +32,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void postBeforeAll(Object testInstance, Argument testArgument) {
+    public void beforeAll(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
                         "%s afterBeforeAll(class [%s])",
@@ -40,7 +40,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void postBeforeEach(Object testInstance, Argument testArgument) {
+    public void beforeEach(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
                         "%s afterBeforeEach(class [%s])",
@@ -48,7 +48,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void preTest(Object testInstance, Argument testArgument, Method testMethod) {
+    public void beforeTest(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
                         "%s preTest(class [%s])",
@@ -56,7 +56,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void postTest(Object testInstance, Argument testArgument, Method testMethod) {
+    public void afterTest(Object testInstance, Argument testArgument, Method testMethod) {
         System.out.println(
                 String.format(
                         "%s postTest(class [%s])",
@@ -64,7 +64,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void postAfterEach(Object testInstance, Argument testArgument) {
+    public void afterEach(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
                         "%s postAfterEach(class [%s])",
@@ -72,7 +72,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void postAfterAll(Object testInstance, Argument testArgument) {
+    public void afterAll(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
                         "%s postAfterAll(class [%s])",
@@ -80,7 +80,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void postConclude(Object testInstance) {
+    public void conclude(Object testInstance) {
         System.out.println(
                 String.format(
                         "%s postConclude(class [%s])",

@@ -30,7 +30,7 @@ import org.antublue.test.engine.test.ExecutableMetadataConstants;
 import org.antublue.test.engine.test.ExecutableMetadataSupport;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.ThrowableContext;
-import org.antublue.test.engine.test.extension.ExtensionProcessor;
+import org.antublue.test.engine.test.extension.ExtensionManager;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.LockProcessor;
 import org.antublue.test.engine.test.util.RandomFieldInjector;
@@ -55,8 +55,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
 
     private static final TestUtils TEST_UTILS = Singleton.get(TestUtils.class);
 
-    private static final ExtensionProcessor EXTENSION_PROCESSOR =
-            Singleton.get(ExtensionProcessor.class);
+    private static final ExtensionManager EXTENSION_MANAGER = Singleton.get(ExtensionManager.class);
 
     private static final LockProcessor LOCK_PROCESSOR = Singleton.get(LockProcessor.class);
 
@@ -107,10 +106,8 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         SET_ARGUMENT_FIELDS,
         SET_RANDOM_FIELDS,
         BEFORE_ALL,
-        POST_BEFORE_ALL,
         EXECUTE_OR_SKIP,
         AFTER_ALL,
-        POST_AFTER_ALL,
         SET_ARGUMENT_FIELDS_NULL,
         CLOSE_AUTO_CLOSE_FIELDS,
         END
@@ -173,12 +170,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
                     }
                 case BEFORE_ALL:
                     {
-                        state = beforeAllMethods(executableContext);
-                        break;
-                    }
-                case POST_BEFORE_ALL:
-                    {
-                        state = postBeforeAll(executableContext);
+                        state = beforeAll(executableContext);
                         break;
                     }
                 case EXECUTE_OR_SKIP:
@@ -189,11 +181,6 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
                 case AFTER_ALL:
                     {
                         state = afterAll(executableContext);
-                        break;
-                    }
-                case POST_AFTER_ALL:
-                    {
-                        state = postAfterAll(executableContext);
                         break;
                     }
                 case SET_ARGUMENT_FIELDS_NULL:
@@ -282,7 +269,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         }
     }
 
-    private State beforeAllMethods(ExecutableContext executableContext) {
+    private State beforeAll(ExecutableContext executableContext) {
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
@@ -303,17 +290,9 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
         } catch (Throwable t) {
             throwableContext.add(testClass, t);
         } finally {
+            EXTENSION_MANAGER.beforeAll(testInstance, testArgument, throwableContext);
             StandardStreams.flush();
         }
-        return State.POST_BEFORE_ALL;
-    }
-
-    private State postBeforeAll(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
-        Invariant.check(testInstance != null);
-        ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.postBeforeAll(testClass, testArgument, testInstance, throwableContext);
-
         return State.EXECUTE_OR_SKIP;
     }
 
@@ -346,15 +325,7 @@ public class ParameterizedArgumentTestDescriptor extends AbstractTestDescriptor
             LOCK_PROCESSOR.processUnlocks(method);
             StandardStreams.flush();
         }
-        return State.POST_AFTER_ALL;
-    }
-
-    private State postAfterAll(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
-        Invariant.check(testInstance != null);
-        EXTENSION_PROCESSOR.postAfterAll(
-                testClass, testArgument, testInstance, executableContext.getThrowableContext());
-
+        EXTENSION_MANAGER.afterAll(testInstance, testArgument, throwableContext);
         return State.SET_ARGUMENT_FIELDS_NULL;
     }
 

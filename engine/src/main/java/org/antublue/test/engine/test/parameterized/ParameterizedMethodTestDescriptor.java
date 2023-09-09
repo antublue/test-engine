@@ -28,7 +28,7 @@ import org.antublue.test.engine.test.ExecutableMetadataConstants;
 import org.antublue.test.engine.test.ExecutableMetadataSupport;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.ThrowableContext;
-import org.antublue.test.engine.test.extension.ExtensionProcessor;
+import org.antublue.test.engine.test.extension.ExtensionManager;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.LockProcessor;
 import org.antublue.test.engine.test.util.TestUtils;
@@ -52,8 +52,7 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
 
     private static final TestUtils TEST_UTILS = Singleton.get(TestUtils.class);
 
-    private static final ExtensionProcessor EXTENSION_PROCESSOR =
-            Singleton.get(ExtensionProcessor.class);
+    private static final ExtensionManager EXTENSION_MANAGER = Singleton.get(ExtensionManager.class);
 
     private static final LockProcessor LOCK_PROCESSOR = Singleton.get(LockProcessor.class);
 
@@ -248,8 +247,8 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
     private State postBeforeEach(ExecutableContext executableContext) {
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
-        EXTENSION_PROCESSOR.postBeforeEach(
-                testClass, testArgument, testInstance, executableContext.getThrowableContext());
+        EXTENSION_MANAGER.beforeEach(
+                testInstance, testArgument, executableContext.getThrowableContext());
         if (executableContext.getThrowableContext().isEmpty()) {
             return State.PRE_TEST;
         } else {
@@ -261,7 +260,7 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.preTest(testClass, null, testMethod, testInstance, throwableContext);
+        EXTENSION_MANAGER.beforeTest(testInstance, testArgument, testMethod, throwableContext);
         if (throwableContext.isEmpty()) {
             return State.TEST;
         } else {
@@ -284,8 +283,7 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.postTest(
-                testClass, testArgument, testMethod, testInstance, throwableContext);
+        EXTENSION_MANAGER.afterTest(testInstance, testArgument, testMethod, throwableContext);
         return State.AFTER_EACH;
     }
 
@@ -310,7 +308,7 @@ public class ParameterizedMethodTestDescriptor extends AbstractTestDescriptor
         Object testInstance = executableContext.getTestInstance();
         Invariant.check(testInstance != null);
         ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.postAfterEach(testClass, testArgument, testInstance, throwableContext);
+        EXTENSION_MANAGER.afterEach(testInstance, testArgument, throwableContext);
         return State.CLOSE_AUTO_CLOSE_FIELDS;
     }
 

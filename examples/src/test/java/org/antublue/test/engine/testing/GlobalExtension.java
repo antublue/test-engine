@@ -27,7 +27,7 @@ public class GlobalExtension implements Extension {
      * @throws Throwable Throwable
      */
     @Override
-    public void postConclude(Object testInstance) throws Throwable {
+    public void conclude(Object testInstance) throws Throwable {
         System.out.println(
                 String.format(
                         "%s.postConclude %s",

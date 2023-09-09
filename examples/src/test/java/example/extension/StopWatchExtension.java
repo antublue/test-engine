@@ -44,12 +44,12 @@ public class StopWatchExtension implements Extension {
     }
 
     @Override
-    public void postPrepare(Object testInstance) {
+    public void prepare(Object testInstance) {
         stopWatchMap.put(testInstance.getClass(), new StopWatch().start());
     }
 
     @Override
-    public void postConclude(Object testInstance) {
+    public void conclude(Object testInstance) {
         StopWatch stopWatch = stopWatchMap.remove(testInstance.getClass()).stop();
         synchronized (System.out) {
             System.out.println(

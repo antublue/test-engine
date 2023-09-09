@@ -26,7 +26,7 @@ import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
-import org.antublue.test.engine.test.extension.ExtensionProcessor;
+import org.antublue.test.engine.test.extension.ExtensionManager;
 import org.antublue.test.engine.test.parameterized.ParameterizedTestFactory;
 import org.antublue.test.engine.test.standard.StandardTestFactory;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
@@ -119,7 +119,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Singleton.register(TestUtils.class, clazz -> new TestUtils());
             Singleton.register(LockProcessor.class, clazz -> new LockProcessor());
             Singleton.register(AutoCloseProcessor.class, clazz -> new AutoCloseProcessor());
-            Singleton.register(ExtensionProcessor.class, clazz -> new ExtensionProcessor());
+            Singleton.register(ExtensionManager.class, clazz -> new ExtensionManager());
 
             // Create an engine descriptor to build the list of test descriptors
             EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
@@ -184,7 +184,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("execute()");
 
         try {
-            Singleton.get(ExtensionProcessor.class).initialize();
+            Singleton.get(ExtensionManager.class).initialize();
         } catch (Throwable t) {
             throw new TestEngineException("Exception loading extensions", t);
         }

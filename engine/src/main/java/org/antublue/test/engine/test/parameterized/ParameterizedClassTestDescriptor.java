@@ -31,7 +31,7 @@ import org.antublue.test.engine.test.ExecutableMetadataConstants;
 import org.antublue.test.engine.test.ExecutableMetadataSupport;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
 import org.antublue.test.engine.test.ThrowableContext;
-import org.antublue.test.engine.test.extension.ExtensionProcessor;
+import org.antublue.test.engine.test.extension.ExtensionManager;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.LockProcessor;
 import org.antublue.test.engine.test.util.TestUtils;
@@ -53,17 +53,14 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
 
     private static final ReflectionUtils REFLECTION_UTILS = Singleton.get(ReflectionUtils.class);
 
-    private static final TestUtils TEST_DESCRIPTOR_UTILS = Singleton.get(TestUtils.class);
+    private static final TestUtils TEST_UTILS = Singleton.get(TestUtils.class);
 
     private static final ParameterizedTestUtils PARAMETERIZED_UTILS =
             Singleton.get(ParameterizedTestUtils.class);
 
-    private static final ExtensionProcessor EXTENSION_PROCESSOR =
-            Singleton.get(ExtensionProcessor.class);
+    private static final ExtensionManager EXTENSION_MANAGER = Singleton.get(ExtensionManager.class);
 
     private static final LockProcessor LOCK_PROCESSOR = Singleton.get(LockProcessor.class);
-
-    private static final TestUtils TEST_UTILS = Singleton.get(TestUtils.class);
 
     private final Class<?> testClass;
     private final StopWatch stopWatch;
@@ -76,7 +73,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
      * @param testClass testClass
      */
     private ParameterizedClassTestDescriptor(UniqueId uniqueId, Class<?> testClass) {
-        super(uniqueId, TEST_DESCRIPTOR_UTILS.getDisplayName(testClass));
+        super(uniqueId, TEST_UTILS.getDisplayName(testClass));
         this.testClass = testClass;
         this.stopWatch = new StopWatch();
         this.executableMetadata = new ExecutableMetadata();
@@ -101,11 +98,9 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
         BEGIN,
         INSTANTIATE,
         PREPARE,
-        POST_PREPARE,
         EXECUTE_OR_SKIP,
         CONCLUDE,
         CLOSE_AUTO_CLOSE_FIELDS,
-        POST_CONCLUDE,
         END
     }
 
@@ -135,11 +130,6 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                         state = prepare(executableContext);
                         break;
                     }
-                case POST_PREPARE:
-                    {
-                        state = postPrepare(executableContext);
-                        break;
-                    }
                 case EXECUTE_OR_SKIP:
                     {
                         state = executeOrSkip(executableContext);
@@ -150,23 +140,12 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
                         state = conclude(executableContext);
                         break;
                     }
-                case POST_CONCLUDE:
-                    {
-                        state = postConclude(executableContext);
-                        break;
-                    }
                 case CLOSE_AUTO_CLOSE_FIELDS:
                     {
                         state = closeAutoCloseFields(executableContext);
                         break;
                     }
                 case END:
-                    {
-                        EXTENSION_PROCESSOR.VALIDATE(
-                                testClass, executableContext.getTestInstance());
-                        state = null;
-                        break;
-                    }
                 default:
                     {
                         state = null;
@@ -212,8 +191,8 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
             Constructor<?> constructor = testClass.getDeclaredConstructor((Class<?>[]) null);
             Object testInstance = constructor.newInstance((Object[]) null);
             executableContext.setTestInstance(testInstance);
-            EXTENSION_PROCESSOR.initialize(testClass);
-            EXTENSION_PROCESSOR.postCreateTestInstance(testClass, testInstance, throwableContext);
+            EXTENSION_MANAGER.initialize(testClass);
+            EXTENSION_MANAGER.postCreateTestInstance(testInstance, throwableContext);
             return State.PREPARE;
         } catch (Throwable t) {
             throwableContext.add(testClass, t);
@@ -231,7 +210,7 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
             List<Method> prepareMethods =
                     REFLECTION_UTILS.findMethods(
                             testClass, ParameterizedTestFilters.PREPARE_METHOD);
-            TEST_DESCRIPTOR_UTILS.sortMethods(prepareMethods, TestUtils.Sort.FORWARD);
+            TEST_UTILS.sortMethods(prepareMethods, TestUtils.Sort.FORWARD);
             for (Method method : prepareMethods) {
                 LOCK_PROCESSOR.processLocks(method);
                 TEST_UTILS.invoke(method, testInstance, null, throwableContext);
@@ -244,16 +223,9 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
         } catch (Throwable t) {
             throwableContext.add(testClass, t);
         } finally {
+            EXTENSION_MANAGER.prepare(testInstance, throwableContext);
             StandardStreams.flush();
         }
-        return State.POST_PREPARE;
-    }
-
-    private State postPrepare(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
-        Invariant.check(testInstance != null);
-        ThrowableContext throwableContext = executableContext.getThrowableContext();
-        EXTENSION_PROCESSOR.postPrepare(testClass, testInstance, throwableContext);
         return State.EXECUTE_OR_SKIP;
     }
 
@@ -277,21 +249,14 @@ public class ParameterizedClassTestDescriptor extends AbstractTestDescriptor
         ThrowableContext throwableContext = executableContext.getThrowableContext();
         List<Method> concludeMethods =
                 REFLECTION_UTILS.findMethods(testClass, ParameterizedTestFilters.CONCLUDE_METHOD);
-        TEST_DESCRIPTOR_UTILS.sortMethods(concludeMethods, TestUtils.Sort.REVERSE);
+        TEST_UTILS.sortMethods(concludeMethods, TestUtils.Sort.REVERSE);
         for (Method method : concludeMethods) {
             LOCK_PROCESSOR.processLocks(method);
             TEST_UTILS.invoke(method, testInstance, null, throwableContext);
             LOCK_PROCESSOR.processUnlocks(method);
             StandardStreams.flush();
         }
-        return State.POST_CONCLUDE;
-    }
-
-    private State postConclude(ExecutableContext executableContext) {
-        Object testInstance = executableContext.getTestInstance();
-        Invariant.check(testInstance != null);
-        EXTENSION_PROCESSOR.postConclude(
-                testInstance.getClass(), testInstance, executableContext.getThrowableContext());
+        EXTENSION_MANAGER.conclude(testInstance, throwableContext);
         return State.CLOSE_AUTO_CLOSE_FIELDS;
     }
 

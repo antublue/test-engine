@@ -18,17 +18,15 @@ package org.antublue.test.engine.testing.extension.standard;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.extension.Extension;
-import org.antublue.test.engine.util.Singleton;
 
 /** Example test */
 @SuppressWarnings("unchecked")
 public class JUnit5LikeTest {
 
-    static {
-        Singleton.register("12345.lifecycle.list", s -> new ArrayList<>());
-    }
+    public final List<String> ACTUAL = new ArrayList<>();
 
     @TestEngine.ExtensionSupplier
     public static Collection<Extension> extensions() {
@@ -40,36 +38,36 @@ public class JUnit5LikeTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        ((ArrayList<String>) Singleton.get("12345.lifecycle.list")).add("prepare()");
+        ACTUAL.add("prepare()");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
-        ((ArrayList<String>) Singleton.get("12345.lifecycle.list")).add("beforeEach()");
+        ACTUAL.add("beforeEach()");
     }
 
     @TestEngine.Test
     public void test1() {
         System.out.println("test1()");
-        ((ArrayList<String>) Singleton.get("12345.lifecycle.list")).add("test1()");
+        ACTUAL.add("test1()");
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2()");
-        ((ArrayList<String>) Singleton.get("12345.lifecycle.list")).add("test2()");
+        ACTUAL.add("test2()");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
-        ((ArrayList<String>) Singleton.get("12345.lifecycle.list")).add("afterEach()");
+        ACTUAL.add("afterEach()");
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        ((ArrayList<String>) Singleton.get("12345.lifecycle.list")).add("conclude()");
+        ACTUAL.add("conclude()");
     }
 }

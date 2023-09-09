@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.testing.extension.standard;
+package org.antublue.test.engine.testing.extension.parameterized;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +26,7 @@ import org.antublue.test.engine.api.extension.Extension;
 
 /** Example Extension */
 @SuppressWarnings("unchecked")
-public class JUnit5LikeTestExtension implements Extension {
+public class ParameterizedTest1Extension implements Extension {
 
     private static final List<String> EXPECTED = new ArrayList<>();
 
@@ -35,13 +35,19 @@ public class JUnit5LikeTestExtension implements Extension {
         EXPECTED.add("prepare()");
         EXPECTED.add("extension.prepare()");
         for (int i = 0; i < 2; i++) {
-            EXPECTED.add("beforeEach()");
-            EXPECTED.add("extension.beforeEach()");
-            EXPECTED.add("extension.beforeTest()");
-            EXPECTED.add("test" + (i + 1) + "()");
-            EXPECTED.add("extension.afterTest()");
-            EXPECTED.add("afterEach()");
-            EXPECTED.add("extension.afterEach()");
+            EXPECTED.add("beforeAll(StringArgument " + i + ")");
+            EXPECTED.add("extension.beforeAll()");
+            for (int j = 0; j < 2; j++) {
+                EXPECTED.add("beforeEach(StringArgument " + i + ")");
+                EXPECTED.add("extension.beforeEach()");
+                EXPECTED.add("extension.beforeTest()");
+                EXPECTED.add("test" + (j + 1) + "(StringArgument " + i + ")");
+                EXPECTED.add("extension.afterTest()");
+                EXPECTED.add("afterEach(StringArgument " + i + ")");
+                EXPECTED.add("extension.afterEach()");
+            }
+            EXPECTED.add("afterAll(StringArgument " + i + ")");
+            EXPECTED.add("extension.afterAll()");
         }
         EXPECTED.add("conclude()");
         EXPECTED.add("extension.conclude()");
@@ -53,7 +59,7 @@ public class JUnit5LikeTestExtension implements Extension {
                 String.format(
                         "%s postCreateTestInstance(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((JUnit5LikeTest) testInstance).ACTUAL.add("extension.postCreateTestInstance()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postCreateTestInstance()");
     }
 
     @Override
@@ -62,12 +68,16 @@ public class JUnit5LikeTestExtension implements Extension {
                 String.format(
                         "%s prepare(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((JUnit5LikeTest) testInstance).ACTUAL.add("extension.prepare()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.prepare()");
     }
 
     @Override
     public void beforeAll(Object testInstance, Argument testArgument) {
-        throw new RuntimeException("Shouldn't run");
+        System.out.println(
+                String.format(
+                        "%s beforeAll(class [%s])",
+                        this.getClass().getSimpleName(), testInstance.getClass().getName()));
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.beforeAll()");
     }
 
     @Override
@@ -76,7 +86,7 @@ public class JUnit5LikeTestExtension implements Extension {
                 String.format(
                         "%s beforeEach(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((JUnit5LikeTest) testInstance).ACTUAL.add("extension.beforeEach()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.beforeEach()");
     }
 
     @Override
@@ -85,7 +95,7 @@ public class JUnit5LikeTestExtension implements Extension {
                 String.format(
                         "%s beforeTest(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((JUnit5LikeTest) testInstance).ACTUAL.add("extension.beforeTest()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.beforeTest()");
     }
 
     @Override
@@ -94,7 +104,7 @@ public class JUnit5LikeTestExtension implements Extension {
                 String.format(
                         "%s afterTest(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((JUnit5LikeTest) testInstance).ACTUAL.add("extension.afterTest()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.afterTest()");
     }
 
     @Override
@@ -103,12 +113,16 @@ public class JUnit5LikeTestExtension implements Extension {
                 String.format(
                         "%s afterEach(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((JUnit5LikeTest) testInstance).ACTUAL.add("extension.afterEach()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.afterEach()");
     }
 
     @Override
     public void afterAll(Object testInstance, Argument testArgument) {
-        throw new RuntimeException("Shouldn't run");
+        System.out.println(
+                String.format(
+                        "%s afterAll(class [%s])",
+                        this.getClass().getSimpleName(), testInstance.getClass().getName()));
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.afterAll()");
     }
 
     @Override
@@ -117,7 +131,7 @@ public class JUnit5LikeTestExtension implements Extension {
                 String.format(
                         "%s conclude(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        List<String> ACTUAL = ((JUnit5LikeTest) testInstance).ACTUAL;
+        List<String> ACTUAL = ((ParameterizedTest1) testInstance).ACTUAL;
         ACTUAL.add("extension.conclude()");
         assertThat(ACTUAL).isEqualTo(EXPECTED);
     }
