@@ -25,6 +25,7 @@ import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.test.ExecutableMetadata;
 import org.antublue.test.engine.test.ExecutableMetadataConstants;
 import org.antublue.test.engine.test.ExecutableMetadataSupport;
+import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.AnsiColor;
 import org.antublue.test.engine.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.util.NanosecondsConverter;
@@ -40,6 +41,8 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
             LoggerFactory.getLogger(TestDescriptorExecutionListener.class);
 
     private static final Configuration CONFIGURATION = Singleton.get(Configuration.class);
+
+    private static final TestUtils TEST_UTILS = Singleton.get(TestUtils.class);
 
     private static final String INFO =
             new AnsiColorStringBuilder()
@@ -186,11 +189,11 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
             }
 
             if (testClass != null) {
-                ansiColorStringBuilder.append(" | ").append(testClass.getName());
+                ansiColorStringBuilder.append(" | ").append(TEST_UTILS.getDisplayName(testClass));
             }
 
             if (testMethod != null) {
-                ansiColorStringBuilder.append(" | ").append(testMethod.getName()).append("()");
+                ansiColorStringBuilder.append(" | ").append(TEST_UTILS.getDisplayName(testMethod));
             }
 
             ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
@@ -230,11 +233,11 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
             }
 
             if (testClass != null) {
-                ansiColorStringBuilder.append(" | ").append(testClass.getName());
+                ansiColorStringBuilder.append(" | ").append(TEST_UTILS.getDisplayName(testClass));
             }
 
             if (testMethod != null) {
-                ansiColorStringBuilder.append(" | ").append(testMethod.getName()).append("()");
+                ansiColorStringBuilder.append(" | ").append(TEST_UTILS.getDisplayName(testMethod));
             }
 
             if (elapsedTime != null) {
@@ -305,11 +308,11 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
             }
 
             if (testClass != null) {
-                ansiColorStringBuilder.append(" | ").append(testClass.getName());
+                ansiColorStringBuilder.append(" | ").append(TEST_UTILS.getDisplayName(testClass));
             }
 
             if (testMethod != null) {
-                ansiColorStringBuilder.append(" | ").append(testMethod.getName()).append("()");
+                ansiColorStringBuilder.append(" | ").append(TEST_UTILS.getDisplayName(testMethod));
             }
 
             if (elapsedTime != null) {

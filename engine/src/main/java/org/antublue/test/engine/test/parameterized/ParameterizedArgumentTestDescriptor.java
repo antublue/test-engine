@@ -180,6 +180,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         }
 
         stopWatch.stop();
+
         getExecutableMetadata()
                 .put(
                         ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,

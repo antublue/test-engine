@@ -82,6 +82,8 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     public void execute(ExecutionRequest executionRequest) {
         stopWatch.start();
 
+        getExecutableMetadata().put(ExecutableMetadataConstants.TEST_CLASS, testClass);
+
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
         validate();
@@ -128,12 +130,14 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         }
 
         stopWatch.stop();
+
         getExecutableMetadata()
                 .put(
                         ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
                         stopWatch.elapsedTime());
 
         if (getThrowableContext().isEmpty()) {
+
             getExecutableMetadata()
                     .put(
                             ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,

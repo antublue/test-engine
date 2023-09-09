@@ -98,6 +98,8 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
 
         validate();
 
+        getExecutableMetadata().put(ExecutableMetadataConstants.TEST_CLASS, testClass);
+
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
         State state = State.BEGIN;
