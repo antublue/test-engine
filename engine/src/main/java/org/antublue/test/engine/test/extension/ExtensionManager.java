@@ -47,7 +47,7 @@ public class ExtensionManager {
 
     private static final Configuration CONFIGURATION = Configuration.getSingleton();
 
-    private static final List<Extension> EMPT_EXTENSION_LIST = new ArrayList<>();
+    private static final List<Extension> EMPTY_EXTENSION_LIST = new ArrayList<>();
 
     private final List<Extension> globalExtensions;
     private final List<Extension> globalExtensionsReversed;
@@ -122,13 +122,31 @@ public class ExtensionManager {
     }
 
     /**
+     * Method to run preInstantiateCallback extension methods
+     *
+     * @param testClass testClass
+     * @param throwableContext throwableContext
+     */
+    public void preInstantiateCallback(Class<?> testClass, ThrowableContext throwableContext) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
+            try {
+                testExtension.preInstantiateCallback(testClass);
+            } catch (Throwable t) {
+                throwableContext.add(testClass, t);
+            } finally {
+                StandardStreams.flush();
+            }
+        }
+    }
+
+    /**
      * Method to run postInstantiateCallback extension methods
      *
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
     public void postInstantiateCallback(Object testInstance, ThrowableContext throwableContext) {
-        for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
+        for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postInstantiateCallback(testInstance);
             } catch (Throwable t) {
@@ -146,7 +164,7 @@ public class ExtensionManager {
      * @param throwableContext throwableCollector
      */
     public void postPrepareCallback(Object testInstance, ThrowableContext throwableContext) {
-        for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
+        for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postPrepareCallback(testInstance);
             } catch (Throwable t) {
@@ -166,7 +184,7 @@ public class ExtensionManager {
      */
     public void postBeforeAllCallback(
             Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
-        for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
+        for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postBeforeAllCallback(testInstance, testArgument);
             } catch (Throwable t) {
@@ -186,7 +204,7 @@ public class ExtensionManager {
      */
     public void postBeforeEachCallback(
             Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
-        for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
+        for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postBeforeEachCallback(testInstance, testArgument);
             } catch (Throwable t) {
@@ -254,7 +272,7 @@ public class ExtensionManager {
      */
     public void postAfterEachCallback(
             Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
-        for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
+        for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postAfterEachCallback(testInstance, testArgument);
             } catch (Throwable t) {
@@ -274,7 +292,7 @@ public class ExtensionManager {
      */
     public void postAfterAllCallback(
             Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
-        for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
+        for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postAfterAllCallback(testInstance, testArgument);
             } catch (Throwable t) {
@@ -292,11 +310,33 @@ public class ExtensionManager {
      * @param throwableContext throwableCollector
      */
     public void postConcludeCallback(Object testInstance, ThrowableContext throwableContext) {
-        for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
+        for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postConcludeCallback(testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testInstance.getClass(), t);
+            } finally {
+                StandardStreams.flush();
+            }
+        }
+    }
+
+    /**
+     * Method to run preDestroy extension methods
+     *
+     * @param testClass testClass
+     * @param optionalTestInstance optionalTestInstance
+     * @param throwableContext throwableContext
+     */
+    public void preDestroyCallback(
+            Class<?> testClass,
+            Optional<Object> optionalTestInstance,
+            ThrowableContext throwableContext) {
+        for (Extension testExtension : getTestExtensionsReversed(testClass)) {
+            try {
+                testExtension.preDestroyCallback(testClass, optionalTestInstance);
+            } catch (Throwable t) {
+                throwableContext.add(testClass, t);
             } finally {
                 StandardStreams.flush();
             }
@@ -334,10 +374,10 @@ public class ExtensionManager {
     }
 
     private List<Extension> getTestExtensions(Class<?> testClass) {
-        return testExtensionsMap.getOrDefault(testClass, EMPT_EXTENSION_LIST);
+        return testExtensionsMap.getOrDefault(testClass, EMPTY_EXTENSION_LIST);
     }
 
     private List<Extension> getTestExtensionsReversed(Class<?> testClass) {
-        return testExtensionsReversedMap.getOrDefault(testClass, EMPT_EXTENSION_LIST);
+        return testExtensionsReversedMap.getOrDefault(testClass, EMPTY_EXTENSION_LIST);
     }
 }

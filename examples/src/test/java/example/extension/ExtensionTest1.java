@@ -39,8 +39,6 @@ public class ExtensionTest1 {
 
     @TestEngine.ExtensionSupplier
     public static Stream<Extension> extensions() {
-        System.out.println("extensions()");
-
         Collection<Extension> collection = new ArrayList<>();
 
         // Add a singleton extension instance

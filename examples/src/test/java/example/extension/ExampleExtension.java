@@ -17,11 +17,20 @@
 package example.extension;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.extension.Extension;
 
 /** Example Extension */
 public class ExampleExtension implements Extension {
+
+    @Override
+    public void preInstantiateCallback(Class<?> testClass) {
+        System.out.println(
+                String.format(
+                        "%s preInstantiateCallback(class [%s])",
+                        this.getClass().getSimpleName(), testClass.getName()));
+    }
 
     @Override
     public void postPrepareCallback(Object testInstance) {
@@ -85,5 +94,12 @@ public class ExampleExtension implements Extension {
                 String.format(
                         "%s postConcludeCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
+    }
+
+    @Override
+    public void preDestroyCallback(Class<?> testClass, Optional<Object> testInstance) {
+        Object value = testInstance.isPresent() ? testInstance.get() : null;
+        System.out.println(
+                String.format("test class [%s] test instance [%s]", testClass.getName(), value));
     }
 }

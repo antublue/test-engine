@@ -25,8 +25,10 @@ import java.util.function.Predicate;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
+import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.test.ExecutableMetadataConstants;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
+import org.antublue.test.engine.test.ThrowableContext;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.Invariant;
@@ -87,6 +89,13 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
         validate();
 
+        try {
+            EXTENSION_MANAGER.initialize(testClass);
+        } catch (Throwable t) {
+            throw new TestEngineException(
+                    String.format("Exception loading extensions for test class [%s]", testClass));
+        }
+
         State state = State.BEGIN;
         while (state != null) {
             switch (state) {
@@ -123,6 +132,10 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                 case END:
                 default:
                     {
+                        EXTENSION_MANAGER.preDestroyCallback(
+                                testClass,
+                                Optional.ofNullable(getTestInstance()),
+                                new ThrowableContext());
                         state = null;
                     }
             }
@@ -161,12 +174,16 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
     private State instantiate() {
         try {
-            Constructor<?> constructor = testClass.getDeclaredConstructor((Class<?>[]) null);
-            Object testInstance = constructor.newInstance((Object[]) null);
-            setTestInstance(testInstance);
-            EXTENSION_MANAGER.initialize(testClass);
-            EXTENSION_MANAGER.postInstantiateCallback(testInstance, getThrowableContext());
-            return State.PREPARE;
+            EXTENSION_MANAGER.preInstantiateCallback(testClass, getThrowableContext());
+            if (getThrowableContext().isEmpty()) {
+                Constructor<?> constructor = testClass.getDeclaredConstructor((Class<?>[]) null);
+                Object testInstance = constructor.newInstance((Object[]) null);
+                setTestInstance(testInstance);
+                EXTENSION_MANAGER.postInstantiateCallback(testInstance, getThrowableContext());
+                return State.PREPARE;
+            } else {
+                return State.END;
+            }
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
             return State.EXECUTE_OR_SKIP;

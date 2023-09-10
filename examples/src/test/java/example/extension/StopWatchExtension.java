@@ -44,7 +44,7 @@ public class StopWatchExtension implements Extension {
     }
 
     @Override
-    public void postPrepareCallback(Object testInstance) {
+    public void postInstantiateCallback(Object testInstance) {
         stopWatchMap.put(testInstance.getClass(), new StopWatch().start());
     }
 
