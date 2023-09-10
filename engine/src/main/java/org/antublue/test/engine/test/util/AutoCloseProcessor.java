@@ -48,7 +48,8 @@ public class AutoCloseProcessor {
      * @param throwableContext throwableContext
      */
     public void close(Object object, Field field, ThrowableContext throwableContext) {
-        LOGGER.trace("close class [%s] field [%s]", object.getClass().getName(), field.getName());
+        LOGGER.trace(
+                "close test class [%s] field [%s]", object.getClass().getName(), field.getName());
 
         try {
             String methodName = null;

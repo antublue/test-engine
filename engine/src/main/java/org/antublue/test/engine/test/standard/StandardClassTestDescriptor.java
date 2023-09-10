@@ -254,6 +254,7 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
             LOCK_PROCESSOR.processLocks(method);
             TEST_UTILS.invoke(method, testInstance, null, throwableContext);
             LOCK_PROCESSOR.processUnlocks(method);
+            // TODO add optional configuration code to test all methods if there is a test failure
             if (!throwableContext.isEmpty()) {
                 break;
             }
@@ -274,7 +275,6 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
                                                 .execute(executionRequest);
                                     }
                                 });
-
         return State.CONCLUDE;
     }
 
