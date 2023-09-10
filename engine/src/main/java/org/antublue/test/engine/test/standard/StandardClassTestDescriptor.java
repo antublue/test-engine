@@ -84,10 +84,11 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
 
     private enum State {
         BEGIN,
+        INSTANTIATE,
         SET_RANDOM_FIELDS,
-        PREPARE_METHODS,
+        PREPARE,
         EXECUTE_OR_SKIP,
-        CONCLUDE_METHODS,
+        CONCLUDE,
         CLOSE_AUTO_CLOSE_FIELDS,
         END
     }
@@ -114,6 +115,11 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
             switch (state) {
                 case BEGIN:
                     {
+                        state = begin();
+                        break;
+                    }
+                case INSTANTIATE:
+                    {
                         state = instantiate();
                         break;
                     }
@@ -122,7 +128,7 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
                         state = injectRandomFields();
                         break;
                     }
-                case PREPARE_METHODS:
+                case PREPARE:
                     {
                         state = prepare();
                         break;
@@ -132,7 +138,7 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
                         state = executeOrSkip(executionRequest);
                         break;
                     }
-                case CONCLUDE_METHODS:
+                case CONCLUDE:
                     {
                         state = conclude();
                         break;
@@ -143,12 +149,12 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
                         break;
                     }
                 case END:
+                    {
+                        state = end();
+                        break;
+                    }
                 default:
                     {
-                        EXTENSION_MANAGER.preDestroyCallback(
-                                testClass,
-                                Optional.ofNullable(getTestInstance()),
-                                new ThrowableContext());
                         state = null;
                     }
             }
@@ -186,16 +192,25 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
         StandardStreams.flush();
     }
 
+    private State begin() {
+        EXTENSION_MANAGER.preInstantiateCallback(testClass, getThrowableContext());
+        StandardStreams.flush();
+        if (getThrowableContext().isEmpty()) {
+            return State.INSTANTIATE;
+        } else {
+            return State.END;
+        }
+    }
+
     private State instantiate() {
         ThrowableContext throwableContext = getThrowableContext();
 
         try {
-            EXTENSION_MANAGER.preInstantiateCallback(testClass, getThrowableContext());
-            if (getThrowableContext().isEmpty()) {
-                Constructor<?> constructor = testClass.getDeclaredConstructor((Class<?>[]) null);
-                Object testInstance = constructor.newInstance((Object[]) null);
-                setTestInstance(testInstance);
-                EXTENSION_MANAGER.postInstantiateCallback(testInstance, throwableContext);
+            Constructor<?> constructor = testClass.getDeclaredConstructor((Class<?>[]) null);
+            Object testInstance = constructor.newInstance((Object[]) null);
+            setTestInstance(testInstance);
+            EXTENSION_MANAGER.postInstantiateCallback(testInstance, throwableContext);
+            if (throwableContext.isEmpty()) {
                 return State.SET_RANDOM_FIELDS;
             } else {
                 return State.END;
@@ -219,7 +234,7 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
             for (Field field : fields) {
                 RandomFieldInjector.inject(testInstance, field);
             }
-            return State.PREPARE_METHODS;
+            return State.PREPARE;
         } catch (Throwable t) {
             throwableContext.add(testClass, t);
             return State.EXECUTE_OR_SKIP;
@@ -260,7 +275,7 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
                                     }
                                 });
 
-        return State.CONCLUDE_METHODS;
+        return State.CONCLUDE;
     }
 
     private State conclude() {
@@ -295,6 +310,12 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
             }
         }
         return State.END;
+    }
+
+    private State end() {
+        EXTENSION_MANAGER.preDestroyCallback(
+                testClass, Optional.ofNullable(getTestInstance()), new ThrowableContext());
+        return null;
     }
 
     private void validate() {

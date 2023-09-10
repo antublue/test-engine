@@ -101,7 +101,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
             switch (state) {
                 case BEGIN:
                     {
-                        state = State.INSTANTIATE;
+                        state = begin();
                         break;
                     }
                 case INSTANTIATE:
@@ -130,12 +130,12 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                         break;
                     }
                 case END:
+                    {
+                        state = end();
+                        break;
+                    }
                 default:
                     {
-                        EXTENSION_MANAGER.preDestroyCallback(
-                                testClass,
-                                Optional.ofNullable(getTestInstance()),
-                                new ThrowableContext());
                         state = null;
                     }
             }
@@ -149,7 +149,6 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                         stopWatch.elapsedTime());
 
         if (getThrowableContext().isEmpty()) {
-
             getExecutableMetadata()
                     .put(
                             ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
@@ -172,18 +171,23 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         StandardStreams.flush();
     }
 
+    private State begin() {
+        EXTENSION_MANAGER.preInstantiateCallback(testClass, getThrowableContext());
+        StandardStreams.flush();
+        if (getThrowableContext().isEmpty()) {
+            return State.INSTANTIATE;
+        } else {
+            return State.END;
+        }
+    }
+
     private State instantiate() {
         try {
-            EXTENSION_MANAGER.preInstantiateCallback(testClass, getThrowableContext());
-            if (getThrowableContext().isEmpty()) {
-                Constructor<?> constructor = testClass.getDeclaredConstructor((Class<?>[]) null);
-                Object testInstance = constructor.newInstance((Object[]) null);
-                setTestInstance(testInstance);
-                EXTENSION_MANAGER.postInstantiateCallback(testInstance, getThrowableContext());
-                return State.PREPARE;
-            } else {
-                return State.END;
-            }
+            Constructor<?> constructor = testClass.getDeclaredConstructor((Class<?>[]) null);
+            Object testInstance = constructor.newInstance((Object[]) null);
+            setTestInstance(testInstance);
+            EXTENSION_MANAGER.postInstantiateCallback(testInstance, getThrowableContext());
+            return State.PREPARE;
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
             return State.EXECUTE_OR_SKIP;
@@ -262,6 +266,12 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
             }
         }
         return State.END;
+    }
+
+    private State end() {
+        EXTENSION_MANAGER.preDestroyCallback(
+                testClass, Optional.ofNullable(getTestInstance()), new ThrowableContext());
+        return null;
     }
 
     private void validate() {
