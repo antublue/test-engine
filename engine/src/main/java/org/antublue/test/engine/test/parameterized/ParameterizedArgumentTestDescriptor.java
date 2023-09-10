@@ -79,6 +79,10 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         return Type.CONTAINER_AND_TEST;
     }
 
+    public Argument getTestArgument() {
+        return testArgument;
+    }
+
     private enum State {
         BEGIN,
         SET_ARGUMENT_FIELDS,

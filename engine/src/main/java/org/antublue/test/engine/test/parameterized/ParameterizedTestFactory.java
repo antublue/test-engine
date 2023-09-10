@@ -17,17 +17,23 @@
 package org.antublue.test.engine.test.parameterized;
 
 import java.lang.reflect.Method;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
+import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.test.TestDescriptorFactory;
 import org.antublue.test.engine.util.ReflectionUtils;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.FilterResult;
+import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
 import org.junit.platform.engine.discovery.MethodSelector;
 import org.junit.platform.engine.discovery.PackageNameFilter;
 import org.junit.platform.engine.discovery.PackageSelector;
+import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a ParameterizedTestDescriptorFactory */
@@ -66,6 +72,10 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                 .forEach(
                         classSelector ->
                                 discover(engineDiscoveryRequest, classSelector, engineDescriptor));
+
+        List<UniqueIdSelector> uniqueIdSelectors =
+                engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class);
+        discover(uniqueIdSelectors, engineDescriptor);
     }
 
     /**
@@ -138,6 +148,64 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                     .setParentTestDescriptor(engineDescriptor)
                     .setTestClass(testClass)
                     .build();
+        }
+    }
+
+    /**
+     * Method to process a List of UniqueId selectors
+     *
+     * @param uniqueIdSelectors uniqueIdSelectors
+     * @param engineDescriptor engineDescriptor
+     */
+    private void discover(
+            List<UniqueIdSelector> uniqueIdSelectors, EngineDescriptor engineDescriptor) {
+        for (UniqueIdSelector uniqueIdSelector : uniqueIdSelectors) {
+            UniqueId uniqueId = uniqueIdSelector.getUniqueId();
+            List<UniqueId.Segment> uniqueIdSegments = uniqueId.getSegments();
+            String testClassName = uniqueIdSegments.get(1).getValue();
+            Class<?> testClass = null;
+
+            try {
+                testClass = Thread.currentThread().getContextClassLoader().loadClass(testClassName);
+            } catch (Throwable t) {
+                throw new TestEngineException(
+                        String.format("Exception loading test class [%s]", testClassName));
+            }
+
+            new ParameterizedClassTestDescriptor.Builder()
+                    .setParentTestDescriptor(engineDescriptor)
+                    .setTestClass(testClass)
+                    .build();
+        }
+
+        Set<UniqueId> uniqueIds = new LinkedHashSet<>();
+        for (UniqueIdSelector uniqueIdSelector : uniqueIdSelectors) {
+            uniqueIds.add(uniqueIdSelector.getUniqueId());
+        }
+
+        if (!uniqueIds.isEmpty()) {
+            filter(uniqueIds, engineDescriptor);
+        }
+    }
+
+    private void filter(Set<UniqueId> uniqueIds, TestDescriptor testDescriptor) {
+        if (testDescriptor instanceof EngineDescriptor) {
+            for (TestDescriptor child : testDescriptor.getChildren()) {
+                filter(uniqueIds, child);
+            }
+            return;
+        }
+
+        if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
+            Set<TestDescriptor> testDescriptorsToRemove = new LinkedHashSet<>();
+            for (TestDescriptor child : testDescriptor.getChildren()) {
+                if (!uniqueIds.contains(child.getUniqueId())) {
+                    testDescriptorsToRemove.add(child);
+                }
+            }
+            for (TestDescriptor testDescriptorToRemove : testDescriptorsToRemove) {
+                testDescriptor.removeChild(testDescriptorToRemove);
+            }
         }
     }
 
