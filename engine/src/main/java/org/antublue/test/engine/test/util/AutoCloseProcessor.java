@@ -24,7 +24,7 @@ import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.test.ThrowableContext;
 
 /** Class to implement FieldInjector */
-@SuppressWarnings("PMD.NPathComplexity")
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class AutoCloseProcessor {
 
     private static final AutoCloseProcessor SINGLETON = new AutoCloseProcessor();

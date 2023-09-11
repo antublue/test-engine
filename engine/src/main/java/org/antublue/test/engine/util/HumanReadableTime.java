@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 /** Class to create a human-readable time from a duration */
 // Suppress PMD.UselessParentheses - PMD has bug around UselessParentheses calculating milliseconds
-@SuppressWarnings({"PMD.NPathComplexity", "PMD.UselessParentheses"})
+@SuppressWarnings("PMD.UselessParentheses")
 public final class HumanReadableTime {
 
     /** Constructor */

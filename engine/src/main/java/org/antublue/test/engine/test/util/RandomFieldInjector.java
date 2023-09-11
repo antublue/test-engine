@@ -23,8 +23,7 @@ import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.util.RandomUtils;
 
-/** Class to process @TestEngine.RandomX annotations */
-@SuppressWarnings("PMD.NPathComplexity")
+/** Class to process @TestEngine.Random.X annotations */
 public class RandomFieldInjector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomFieldInjector.class);

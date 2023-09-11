@@ -23,7 +23,6 @@ import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 
 /** Class to implement FieldInjector */
-@SuppressWarnings("PMD.NPathComplexity")
 public class ArgumentFieldInjector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentFieldInjector.class);
