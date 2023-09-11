@@ -204,7 +204,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
 
     @Override
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-        if (logTestMessages && testDescriptor instanceof ExecutableMetadataSupport) {
+        if (logSkipMessages && testDescriptor instanceof ExecutableMetadataSupport) {
             ExecutableMetadataSupport executableMetadataSupport =
                     (ExecutableMetadataSupport) testDescriptor;
             ExecutableMetadata executableMetadata =
@@ -239,10 +239,10 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
                 ansiColorStringBuilder.append(" | ").append(TEST_UTILS.getDisplayName(testMethod));
             }
 
-            if (elapsedTime != null) {
+            if (logTiming && elapsedTime != null) {
                 ansiColorStringBuilder
                         .append(" ")
-                        .append(NanosecondsConverter.MILLISECONDS.toString(elapsedTime));
+                        .append(nanosecondsConverter.toString(elapsedTime));
             }
 
             ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
@@ -255,7 +255,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
     @Override
     public void executionFinished(
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-        if (logTestMessages && testDescriptor instanceof ExecutableMetadataSupport) {
+        if (logPassMessages && testDescriptor instanceof ExecutableMetadataSupport) {
             ExecutableMetadataSupport executableMetadataSupport =
                     (ExecutableMetadataSupport) testDescriptor;
             ExecutableMetadata executableMetadata =
@@ -314,10 +314,10 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
                 ansiColorStringBuilder.append(" | ").append(TEST_UTILS.getDisplayName(testMethod));
             }
 
-            if (elapsedTime != null) {
+            if (logTiming && elapsedTime != null) {
                 ansiColorStringBuilder
                         .append(" ")
-                        .append(NanosecondsConverter.MILLISECONDS.toString(elapsedTime));
+                        .append(nanosecondsConverter.toString(elapsedTime));
             }
 
             ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);

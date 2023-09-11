@@ -93,10 +93,7 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
         setTestInstance(testInstance);
 
         getExecutableMetadata().put(ExecutableMetadataConstants.TEST_CLASS, testClass);
-        getExecutableMetadata()
-                .put(
-                        ExecutableMetadataConstants.TEST_METHOD,
-                        TEST_UTILS.getDisplayName(testMethod));
+        getExecutableMetadata().put(ExecutableMetadataConstants.TEST_METHOD, testMethod);
 
         if (!getThrowableContext().isEmpty()) {
             stopWatch.stop();
