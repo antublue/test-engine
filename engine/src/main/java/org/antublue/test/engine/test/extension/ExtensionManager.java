@@ -29,6 +29,7 @@ import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.extension.Extension;
 import org.antublue.test.engine.configuration.Configuration;
+import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.test.ThrowableContext;
@@ -364,7 +365,7 @@ public class ExtensionManager {
             } else if (object instanceof Iterable) {
                 ((Iterable<Extension>) object).forEach(testExtensions::add);
             } else {
-                throw new RuntimeException(
+                throw new TestClassDefinitionException(
                         String.format(
                                 "Exception getting extensions for test class [%s]",
                                 testClass.getName()));

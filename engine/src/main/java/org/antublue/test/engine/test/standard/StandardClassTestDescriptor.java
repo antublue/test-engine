@@ -461,7 +461,7 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
             } catch (RuntimeException e) {
                 throw e;
             } catch (Throwable t) {
-                throw new RuntimeException(t);
+                throw new TestEngineException(t);
             }
         }
     }

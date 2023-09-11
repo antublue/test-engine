@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestArgumentFailedException;
+import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.test.ExecutableMetadata;
 import org.antublue.test.engine.test.ExecutableMetadataConstants;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
@@ -366,7 +367,7 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
             } catch (RuntimeException e) {
                 throw e;
             } catch (Throwable t) {
-                throw new RuntimeException(t);
+                throw new TestEngineException(t);
             }
         }
     }

@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.exception.TestClassDefinitionException;
+import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.util.ReflectionUtils;
 
 @SuppressWarnings("unchecked")
@@ -54,7 +56,7 @@ public class ParameterizedTestUtils {
         } else if (object instanceof Iterable) {
             ((Iterable<Argument>) object).forEach(testArguments::add);
         } else {
-            throw new RuntimeException(
+            throw new TestClassDefinitionException(
                     String.format(
                             "Exception getting arguments for test class [%s]",
                             testClass.getName()));
