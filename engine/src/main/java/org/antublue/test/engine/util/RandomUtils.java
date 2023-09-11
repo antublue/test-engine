@@ -62,13 +62,9 @@ public class RandomUtils {
             return minimum;
         }
 
-        if (minimum > maximum) {
-            int tmp = minimum;
-            minimum = maximum;
-            maximum = tmp;
-        }
-
-        int random = ThreadLocalRandom.current().nextInt(minimum, maximum);
+        int realMinimum = Math.min(minimum, maximum);
+        int realMaximum = Math.max(minimum, maximum);
+        int random = ThreadLocalRandom.current().nextInt(realMinimum, realMaximum);
 
         if (ThreadLocalRandom.current().nextBoolean()) {
             random += 1;
@@ -89,13 +85,9 @@ public class RandomUtils {
             return minimum;
         }
 
-        if (minimum > maximum) {
-            long tmp = minimum;
-            minimum = maximum;
-            maximum = tmp;
-        }
-
-        long random = ThreadLocalRandom.current().nextLong(minimum, maximum);
+        long realMinimum = Math.min(minimum, maximum);
+        long realMaximum = Math.max(minimum, maximum);
+        long random = ThreadLocalRandom.current().nextLong(realMinimum, realMaximum);
 
         if (ThreadLocalRandom.current().nextBoolean()) {
             random += 1;
@@ -244,13 +236,16 @@ public class RandomUtils {
             return minimum;
         }
 
-        if (minimum.compareTo(maximum) < 0) {
-            BigDecimal temp = minimum;
-            minimum = maximum;
-            maximum = temp;
+        BigDecimal realMinimum = minimum;
+        BigDecimal realMaximum = maximum;
+
+        if (realMinimum.compareTo(realMaximum) < 0) {
+            BigDecimal temp = realMinimum;
+            realMinimum = realMaximum;
+            realMaximum = temp;
         }
 
-        int digitCount = Math.max(minimum.precision(), maximum.precision()) + 10;
+        int digitCount = Math.max(realMinimum.precision(), realMaximum.precision()) + 10;
         int bitCount = (int) (digitCount / Math.log10(2.0));
 
         // convert Random BigInteger to a BigDecimal between 0 and 1
