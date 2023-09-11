@@ -49,7 +49,7 @@ public class StoreExampleTest3 {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        System.out.format("key [%s]", TEST_OBJECT_KEY).println();
+        System.out.println(String.format("key [%s]", TEST_OBJECT_KEY));
         store = new Store();
         store.put(TEST_OBJECT_KEY, new TestObject());
     }

@@ -72,6 +72,11 @@ public @interface TestEngine {
     @Retention(RetentionPolicy.RUNTIME)
     @interface Conclude {}
 
+    /** Conclude annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface ExtensionSupplier {}
+
     /** Order annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
@@ -122,148 +127,181 @@ public @interface TestEngine {
     }
 
     /** AutoClose annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
     @interface AutoClose {
 
-        /**
-         * Lifecycle value
-         *
-         * @return the lifecycle value
-         */
-        String lifecycle();
+        /** AfterEach annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface AfterEach {
 
-        /**
-         * Method value
-         *
-         * @return the method name
-         */
-        String method() default "";
+            /**
+             * Method value
+             *
+             * @return the method name
+             */
+            String method() default "";
+        }
+
+        /** AfterAll annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface AfterAll {
+
+            /**
+             * Method value
+             *
+             * @return the method name
+             */
+            String method() default "";
+        }
+
+        /** Conclude annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Conclude {
+
+            /**
+             * Method value
+             *
+             * @return the method name
+             */
+            String method() default "";
+        }
     }
 
-    /** RandomBoolean annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface RandomBoolean {}
+    /** Random annotation */
+    @interface Random {
 
-    /** RandomInteger annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface RandomInteger {
-        /**
-         * Minimum value
-         *
-         * @return the minimum value
-         */
-        int minimum() default java.lang.Integer.MIN_VALUE;
+        /** Boolean annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Boolean {}
 
-        /**
-         * Maximum value
-         *
-         * @return the maximum value
-         */
-        int maximum() default java.lang.Integer.MAX_VALUE;
+        /** Integer annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Integer {
+
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
+            int minimum() default java.lang.Integer.MIN_VALUE;
+
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
+            int maximum() default java.lang.Integer.MAX_VALUE;
+        }
+
+        /** Long annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Long {
+
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
+            long minimum() default java.lang.Long.MIN_VALUE;
+
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
+            long maximum() default java.lang.Long.MAX_VALUE;
+        }
+
+        /** Float annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Float {
+
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
+            float minimum() default -java.lang.Float.MAX_VALUE;
+
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
+            float maximum() default java.lang.Float.MAX_VALUE;
+        }
+
+        /** Double annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Double {
+
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
+            double minimum() default -java.lang.Double.MAX_VALUE;
+
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
+            double maximum() default java.lang.Double.MAX_VALUE;
+        }
+
+        /** BigInteger annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface BigInteger {
+
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
+            String minimum();
+
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
+            String maximum();
+        }
+
+        /** BigDecimal annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface BigDecimal {
+
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
+            String minimum();
+
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
+            String maximum();
+        }
+
+        /** UUID annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface UUID {}
     }
-
-    /** RandomLong annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface RandomLong {
-        /**
-         * Minimum value
-         *
-         * @return the minimum value
-         */
-        long minimum() default java.lang.Long.MIN_VALUE;
-
-        /**
-         * Maximum value
-         *
-         * @return the maximum value
-         */
-        long maximum() default java.lang.Long.MAX_VALUE;
-    }
-
-    /** RandomFloat annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface RandomFloat {
-        /**
-         * Minimum value
-         *
-         * @return the minimum value
-         */
-        float minimum() default -java.lang.Float.MAX_VALUE;
-
-        /**
-         * Maximum value
-         *
-         * @return the maximum value
-         */
-        float maximum() default java.lang.Float.MAX_VALUE;
-    }
-
-    /** RandomDouble annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface RandomDouble {
-        /**
-         * Minimum value
-         *
-         * @return the minimum value
-         */
-        double minimum() default -java.lang.Double.MAX_VALUE;
-
-        /**
-         * Maximum value
-         *
-         * @return the maximum value
-         */
-        double maximum() default java.lang.Double.MAX_VALUE;
-    }
-
-    /** RandomBigInteger annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface RandomBigInteger {
-        /**
-         * Minimum value
-         *
-         * @return the minimum value
-         */
-        String minimum();
-
-        /**
-         * Maximum value
-         *
-         * @return the maximum value
-         */
-        String maximum();
-    }
-
-    /** RandomBigDecimal annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface RandomBigDecimal {
-        /**
-         * Minimum value
-         *
-         * @return the minimum value
-         */
-        String minimum();
-
-        /**
-         * Maximum value
-         *
-         * @return the maximum value
-         */
-        String maximum();
-    }
-
-    /** UUID annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface UUID {}
 
     /** Lock annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})

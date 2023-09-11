@@ -29,18 +29,18 @@ public class RandomFieldTest {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.RandomBoolean protected boolean randomBoolean;
-    @TestEngine.RandomInteger protected int randomInteger;
-    @TestEngine.RandomLong protected long randomLong;
-    @TestEngine.RandomFloat protected float randomFloat;
-    @TestEngine.RandomDouble protected double randomDouble;
+    @TestEngine.Random.Boolean protected boolean randomBoolean;
+    @TestEngine.Random.Integer protected int randomInteger;
+    @TestEngine.Random.Long protected long randomLong;
+    @TestEngine.Random.Float protected float randomFloat;
+    @TestEngine.Random.Double protected double randomDouble;
 
-    @TestEngine.RandomBigInteger(
+    @TestEngine.Random.BigInteger(
             minimum = "-10000000000000000000",
             maximum = "10000000000000000000")
     protected BigInteger randomBigInteger;
 
-    @TestEngine.RandomBigDecimal(
+    @TestEngine.Random.BigDecimal(
             minimum = "-10000000000000000000",
             maximum = "10000000000000000000")
     protected BigDecimal randomBigDecimal;

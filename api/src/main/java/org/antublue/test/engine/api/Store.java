@@ -37,12 +37,12 @@ public final class Store {
 
     private static final Store SINGLETON = new Store();
 
-    private final Lock lock;
+    private final ReentrantLock reentrantLock;
     private final Map<String, Object> map;
 
     /** Constructor */
     public Store() {
-        lock = new ReentrantLock(true);
+        reentrantLock = new ReentrantLock(true);
         map = new LinkedHashMap<>();
     }
 
@@ -51,7 +51,7 @@ public final class Store {
      *
      * @return the singleton instance
      */
-    public static Store singleton() {
+    public static Store getSingleton() {
         return SINGLETON;
     }
 
@@ -61,8 +61,8 @@ public final class Store {
      * @return the Lock
      */
     public Lock lock() {
-        lock.lock();
-        return lock;
+        reentrantLock.lock();
+        return reentrantLock;
     }
 
     /**
@@ -71,8 +71,8 @@ public final class Store {
      * @return the Store Lock
      */
     public Lock unlock() {
-        lock.unlock();
-        return lock;
+        reentrantLock.unlock();
+        return reentrantLock;
     }
 
     /**
@@ -81,11 +81,11 @@ public final class Store {
      * @return the Store Lock
      */
     public Lock getLock() {
-        return lock;
+        return reentrantLock;
     }
 
     /**
-     * Method to put an value into the Store. Accepts a null value
+     * Method to put a value into the Store. Accepts a null value
      *
      * @param key key
      * @param value value
@@ -104,7 +104,7 @@ public final class Store {
     }
 
     /**
-     * Method to put an value into the store. If a value doesn't exist, execute the function to
+     * Method to put a value into the store. If a value doesn't exist, execute the function to
      * create a value and add it
      *
      * @param key key
@@ -163,7 +163,7 @@ public final class Store {
     }
 
     /**
-     * Method to get an value from the store, casting it to a specific type
+     * Method to get a value from the store, casting it to a specific type
      *
      * @param key key
      * @param clazz clazz
@@ -254,7 +254,7 @@ public final class Store {
         String validKey = checkKey(key);
 
         try {
-            lock.lock();
+            lock();
             Object object = map.remove(validKey);
             if (object instanceof AutoCloseable) {
                 try {
@@ -268,7 +268,7 @@ public final class Store {
                 }
             }
         } finally {
-            lock.unlock();
+            unlock();
         }
     }
 

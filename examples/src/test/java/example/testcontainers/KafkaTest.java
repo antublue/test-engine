@@ -54,11 +54,9 @@ public class KafkaTest {
 
     private String message;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude")
-    private Network network;
+    @TestEngine.AutoClose.Conclude private Network network;
 
-    @TestEngine.Argument
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll")
+    @TestEngine.Argument @TestEngine.AutoClose.AfterAll
     protected KafkaTestContainer kafkaTestContainer;
 
     @TestEngine.ArgumentSupplier

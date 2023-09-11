@@ -16,20 +16,24 @@
 
 package org.antublue.test.engine;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
-import org.antublue.test.engine.internal.ConfigurationParameters;
-import org.antublue.test.engine.internal.Executor;
-import org.antublue.test.engine.internal.InformationUtils;
-import org.antublue.test.engine.internal.Resolver;
-import org.antublue.test.engine.internal.TestClassConfigurationException;
-import org.antublue.test.engine.internal.TestDescriptorStore;
-import org.antublue.test.engine.internal.TestEngineException;
-import org.antublue.test.engine.internal.descriptor.ExtendedEngineDescriptor;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.configuration.Configuration;
+import org.antublue.test.engine.exception.TestClassDefinitionException;
+import org.antublue.test.engine.exception.TestEngineException;
+import org.antublue.test.engine.logger.Logger;
+import org.antublue.test.engine.logger.LoggerFactory;
+import org.antublue.test.engine.test.extension.ExtensionManager;
+import org.antublue.test.engine.test.parameterized.ParameterizedTestFactory;
+import org.antublue.test.engine.test.standard.StandardTestFactory;
 import org.junit.platform.engine.EngineDiscoveryRequest;
+import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
@@ -37,9 +41,6 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
-
-    private static final ConfigurationParameters CONFIGURATION_PARAMETERS =
-            ConfigurationParameters.singleton();
 
     /** Configuration constant */
     public static final String ENGINE_ID = "antublue-test-engine";
@@ -51,15 +52,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static final String ARTIFACT_ID = "test-engine";
 
     /** Configuration constant */
-    public static final String VERSION = InformationUtils.getVersion();
-
-    /** Configuration constant */
-    public static final String ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN =
-            "__ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN__";
-
-    /** Configuration constant */
-    public static final String ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE =
-            "__ANTUBLUE_TEST_ENGINE_MAVEN_BATCH_MODE__";
+    public static final String VERSION = Information.getVersion();
 
     /**
      * Method to get the test engine id
@@ -114,18 +107,19 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("discover()");
 
         try {
-            EngineDescriptor engineDescriptor =
-                    new ExtendedEngineDescriptor(UniqueId.forEngine(getId()), getId());
+            // Create an engine descriptor to build the list of test descriptors
+            EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
-            new Resolver()
-                    .resolve(engineDiscoveryRequest, CONFIGURATION_PARAMETERS, engineDescriptor);
+            // Use the test factories to find tests build the test descriptor tree
+            new StandardTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
+            new ParameterizedTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
 
-            // Store the test descriptors for use in the test execution listener
-            TestDescriptorStore.singleton().store(engineDescriptor);
+            // Shuffle or sort then engine descriptor's children
+            shuffleOrSortTestDescriptors(engineDescriptor);
 
             return engineDescriptor;
-        } catch (TestClassConfigurationException | TestEngineException t) {
-            if ("true".equals(System.getProperty(ANTUBLUE_TEST_ENGINE_MAVEN_PLUGIN))) {
+        } catch (TestClassDefinitionException | TestEngineException t) {
+            if (Constants.TRUE.equals(System.getProperty(Constants.MAVEN_PLUGIN))) {
                 throw t;
             }
 
@@ -139,6 +133,34 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     }
 
     /**
+     * Method to shuffle or sort an engine descriptor's children
+     *
+     * <p>Workaround for the fact that the engine descriptor returns an unmodifiable Set which can't
+     * be sorted
+     *
+     * @param engineDescriptor engineDescriptor
+     */
+    private void shuffleOrSortTestDescriptors(EngineDescriptor engineDescriptor) {
+        Configuration configuration = Configuration.getSingleton();
+
+        // Get the test descriptors and remove them from the engine descriptor
+        List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
+        testDescriptors.forEach(testDescriptor -> engineDescriptor.removeChild(testDescriptor));
+
+        // Shuffle or sort the test descriptor list based on configuration
+        Optional<String> optionalShuffle = configuration.get(Constants.TEST_CLASS_SHUFFLE);
+
+        if (optionalShuffle.isPresent() && Constants.TRUE.equals(optionalShuffle.get())) {
+            Collections.shuffle(testDescriptors);
+        } else {
+            testDescriptors.sort(Comparator.comparing(TestDescriptor::getDisplayName));
+        }
+
+        // Add the shuffled or sorted test descriptors to the engine descriptor
+        testDescriptors.forEach(testDescriptor -> engineDescriptor.addChild(testDescriptor));
+    }
+
+    /**
      * Method to execute an ExecutionRequest
      *
      * @param executionRequest executionRequest
@@ -147,11 +169,32 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute()");
 
-        new Executor()
-                .execute(
-                        ExecutionRequest.create(
-                                executionRequest.getRootTestDescriptor(),
-                                executionRequest.getEngineExecutionListener(),
-                                CONFIGURATION_PARAMETERS));
+        try {
+            ExtensionManager.getSingleton().initialize();
+        } catch (Throwable t) {
+            throw new TestEngineException("Exception loading extensions", t);
+        }
+
+        // printTestDescriptorTree(executionRequest.getRootTestDescriptor(), 0);
+
+        EngineExecutionListener engineExecutionListener =
+                executionRequest.getEngineExecutionListener();
+
+        try {
+            engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
+
+            ConfigurationParameters configurationParameters =
+                    ConfigurationParameters.getSingleton();
+
+            new Executor()
+                    .execute(
+                            ExecutionRequest.create(
+                                    executionRequest.getRootTestDescriptor(),
+                                    executionRequest.getEngineExecutionListener(),
+                                    configurationParameters));
+        } finally {
+            engineExecutionListener.executionFinished(
+                    executionRequest.getRootTestDescriptor(), TestExecutionResult.successful());
+        }
     }
 }

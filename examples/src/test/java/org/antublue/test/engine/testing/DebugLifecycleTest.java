@@ -28,7 +28,7 @@ import org.antublue.test.engine.api.argument.StringArgument;
 public class DebugLifecycleTest {
 
     // Set exceptionIn to match the method name to simulate an exception
-    private static final String exceptionIn = null;
+    private static final String exceptionIn = "";
 
     @TestEngine.Argument protected StringArgument stringArgument;
 

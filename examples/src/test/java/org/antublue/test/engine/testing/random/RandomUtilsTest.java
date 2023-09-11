@@ -23,7 +23,7 @@ import java.math.BigInteger;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
-import org.antublue.test.engine.internal.util.RandomUtils;
+import org.antublue.test.engine.util.RandomUtils;
 
 @TestEngine.BaseClass
 public class RandomUtilsTest {
@@ -38,20 +38,18 @@ public class RandomUtilsTest {
     protected void testInteger(int minimum, int maximum) {
         System.out.format("testInteger() minimum %s maximum %s", minimum, maximum).println();
         int random = RandomUtils.nextInteger(minimum, maximum);
-        System.out
-                .format(
+        System.out.println(
+                String.format(
                         "testInteger() minimum %s maximum %s -> random %s",
-                        minimum, maximum, random)
-                .println();
+                        minimum, maximum, random));
         assertThat(random).isBetween(minimum, maximum);
     }
 
     protected void testIntegerUntil(int minimum, int maximum, int until, int interations) {
-        System.out
-                .format(
+        System.out.println(
+                String.format(
                         "testIntegerUntil() minimum %s maximum %s until %s iterations %s",
-                        minimum, maximum, until, interations)
-                .println();
+                        minimum, maximum, until, interations));
         for (int i = 0; i < interations; i++) {
             int random;
             do {
@@ -64,18 +62,17 @@ public class RandomUtilsTest {
     protected void testLong(long minimum, long maximum) {
         System.out.format("testLong() minimum %s maximum %s", minimum, maximum).println();
         long random = RandomUtils.nextLong(minimum, maximum);
-        System.out
-                .format("testLong() minimum %s maximum %s -> random %s", minimum, maximum, random)
-                .println();
+        System.out.println(
+                String.format(
+                        "testLong() minimum %s maximum %s -> random %s", minimum, maximum, random));
         assertThat(random).isBetween(minimum, maximum);
     }
 
     protected void testLongUntil(long minimum, long maximum, long until, int iterations) {
-        System.out
-                .format(
+        System.out.println(
+                String.format(
                         "testLongUntil() minimum %s maximum %s until %s iterations %s",
-                        minimum, maximum, until, iterations)
-                .println();
+                        minimum, maximum, until, iterations));
 
         for (int i = 0; i < iterations; i++) {
             long random;
@@ -89,18 +86,18 @@ public class RandomUtilsTest {
     protected void testFloat(float minimum, float maximum) {
         System.out.format("testFloat() minimum %s maximum %s", minimum, maximum).println();
         float random = RandomUtils.nextFloat(minimum, maximum);
-        System.out
-                .format("testFloat() minimum %s maximum %s -> random %s", minimum, maximum, random)
-                .println();
+        System.out.println(
+                String.format(
+                        "testFloat() minimum %s maximum %s -> random %s",
+                        minimum, maximum, random));
         assertThat(random).isBetween(minimum, maximum);
     }
 
     protected void testFloatUntil(float minimum, float maximum, float until, int iterations) {
-        System.out
-                .format(
+        System.out.println(
+                String.format(
                         "testFloatUntil() minimum %s maximum %s until %s iterations %s",
-                        minimum, maximum, until, iterations)
-                .println();
+                        minimum, maximum, until, iterations));
         for (int i = 0; i < iterations; i++) {
             float random;
             do {
@@ -113,18 +110,18 @@ public class RandomUtilsTest {
     protected void testDouble(double minimum, double maximum) {
         System.out.format("testDouble() minimum %s maximum %s", minimum, maximum).println();
         double random = RandomUtils.nextDouble(minimum, maximum);
-        System.out
-                .format("testDouble() minimum %s maximum %s -> random %s", minimum, maximum, random)
-                .println();
+        System.out.println(
+                String.format(
+                        "testDouble() minimum %s maximum %s -> random %s",
+                        minimum, maximum, random));
         assertThat(random).isBetween(minimum, maximum);
     }
 
     protected void testDoubleUntil(double minimum, double maximum, double until, int iterations) {
-        System.out
-                .format(
+        System.out.println(
+                String.format(
                         "testDoubleUntil() minimum %s maximum %s until %s iterations %s",
-                        minimum, maximum, until, iterations)
-                .println();
+                        minimum, maximum, until, iterations));
         for (int i = 0; i < iterations; i++) {
             double random;
             do {
@@ -137,21 +134,19 @@ public class RandomUtilsTest {
     protected void testBigInteger(String minimum, String maximum) {
         System.out.format("testBigInteger() minimum %s maximum %s", minimum, maximum).println();
         BigInteger random = RandomUtils.nextBigInteger(minimum, maximum);
-        System.out
-                .format(
+        System.out.println(
+                String.format(
                         "testBigInteger() minimum %s maximum %s -> random %s",
-                        minimum, maximum, random)
-                .println();
+                        minimum, maximum, random));
         assertThat(random).isBetween(new BigInteger(minimum), new BigInteger(maximum));
     }
 
     protected void testBigIntegerUntil(
             String minimum, String maximum, String until, int iterations) {
-        System.out
-                .format(
+        System.out.println(
+                String.format(
                         "testBigIntegerUntil() minimum %s maximum %s until %s iterations %s",
-                        minimum, maximum, until, iterations)
-                .println();
+                        minimum, maximum, until, iterations));
         BigInteger untilBigInteger = new BigInteger(until);
         for (int i = 0; i < iterations; i++) {
             BigInteger random;
@@ -165,21 +160,19 @@ public class RandomUtilsTest {
     protected void testBigDecimal(String minimum, String maximum) {
         System.out.format("testBigDecimal() minimum %s maximum %s", minimum, maximum).println();
         BigDecimal random = RandomUtils.nextBigDecimal(minimum, maximum);
-        System.out
-                .format(
+        System.out.println(
+                String.format(
                         "testBigDecimal() minimum %s maximum %s -> random %s",
-                        minimum, maximum, random)
-                .println();
+                        minimum, maximum, random));
         assertThat(random).isBetween(new BigDecimal(minimum), new BigDecimal(maximum));
     }
 
     protected void testBigDecimalUntil(
             String minimum, String maximum, String until, int iterations) {
-        System.out
-                .format(
+        System.out.println(
+                String.format(
                         "testBigDecimalUntil() minimum %s maximum %s until %s iterations %s",
-                        minimum, maximum, until, iterations)
-                .println();
+                        minimum, maximum, until, iterations));
         BigDecimal untilBigDecimal = new BigDecimal(until);
         for (int i = 0; i < iterations; i++) {
             BigDecimal random;

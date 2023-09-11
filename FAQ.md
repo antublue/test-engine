@@ -12,7 +12,7 @@ Currently, JUnit 5 does not support parameterized testing at the test class leve
 - It doesn't provide annotations to run methods before / after all test methods and before / after each test argument. (2023-04-18)
 
 
-- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
+- It doesn't provide the detailed information during testing or summaryEngineExecutionListener information typically wanted for parameterized integration testing.
 
 ---
 
@@ -28,7 +28,7 @@ c  - The latest release was on February 13, 2021.
 - It doesn't provide annotations to run methods before / after all test methods and before / after each test argument.
 
 
-- It doesn't provide the detailed information during testing or summary information typically wanted for parameterized integration testing.
+- It doesn't provide the detailed information during testing or summaryEngineExecutionListener information typically wanted for parameterized integration testing.
 
 ---
 
@@ -89,14 +89,15 @@ Using a `ReentrantLock` prevents the scenario.
 
 ### I want to use the Test Engine in place of JUnit 5
 
-You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes.
+You can use the test engine in place of Junit 5 in scenarios where you don't really have parameterized test classes or need to mix testing of parameterized classes and standard classes 
 
-- It's not a "drop in" replacement.
-- Reference the [Design](/MANUAL.md#design) for the state machine flow.
+- **It's not a "drop in" replacement.**
+- **Most JUnit 5 features are missing (by design.)**
+- **Reference the [Design](/MANUAL.md#design) for the state machine flow.**
 
 Example:
 
-- [Junit5ReplacementExampleTest.java](/examples/src/test/java/example/Junit5ReplacementExampleTest.java)
+- [Junit5LikeTest.java](/examples/src/test/java/example/Junit5LikeTest.java)
 
 ---
 

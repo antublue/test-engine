@@ -30,11 +30,9 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class DirectoryTest3 {
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.Conclude")
-    private Directory directory1;
+    @TestEngine.AutoClose.Conclude private Directory directory1;
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll")
-    private Directory directory2;
+    @TestEngine.AutoClose.AfterAll private Directory directory2;
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -51,14 +49,14 @@ public class DirectoryTest3 {
     public void prepare() throws IOException {
         System.out.println("prepare()");
         directory1 = Directory.create("/tmp/directory-" + UUID.randomUUID(), ABSOLUTE);
-        System.out.format("directory1 [%s]", directory1).println();
+        System.out.format(String.format("directory1 [%s]", directory1));
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() throws IOException {
         System.out.println("beforeAll(" + stringArgument + ")");
         directory2 = Directory.create("/tmp/directory-" + UUID.randomUUID(), ABSOLUTE);
-        System.out.format("directory2 [%s]", directory2).println();
+        System.out.println(String.format("directory2 [%s]", directory2));
     }
 
     @TestEngine.BeforeEach

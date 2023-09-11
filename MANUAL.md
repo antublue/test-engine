@@ -20,7 +20,7 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 
 `@TestEngine.Argument` injection example:
 
-- [SimpleTestExample.java](/examples/src/test/java/example/SimpleExampleTest.java)
+- [SimpleTest.java](/examples/src/test/java/example/SimpleTest.java)
 
 `@TestEngine` without method injection example:
 
@@ -307,21 +307,22 @@ The properties filename is resolved using the following in order:
 
 ## Test Engine Summary
 
-When running via Maven in a Linux console, the test engine will report a summary.
+When running via Maven in a Linux console, the test engine will report a summaryEngineExecutionListener.
 
 Example
 
 ```bash
 [INFO] ------------------------------------------------------------------------
-[INFO] AntuBLUE Test Engine <VERSION> Summary
+[INFO] AntuBLUE Test Engine <TEST-ENGINE-VERSION> Summary
 [INFO] ------------------------------------------------------------------------
-[INFO] Test Classes :  62, PASSED :  62, FAILED : 0, SKIPPED : 0
-[INFO] Test Methods : 791, PASSED : 791, FAILED : 0, SKIPPED : 0
+[INFO] Test Classes   :  89, PASSED :  89, FAILED : 0, SKIPPED : 0
+[INFO] Test Arguments : 401, PASSED : 401, FAILED : 0, SKIPPED : 0
+[INFO] Test Methods   : 829, PASSED : 829, FAILED : 0, SKIPPED : 0
 [INFO] ------------------------------------------------------------------------
-[INFO] PASSED
+[INFO] TEST SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total Test Time : 41 ms (41 ms)
-[INFO] Finished At     : 2023-07-01T10:06:53.169
+[INFO] Total Test Time : 5 seconds, 566 ms (5566.034 ms)
+[INFO] Finished At     : 2023-08-31T00:32:12-04:00
 [INFO] ------------------------------------------------------------------------
 
 ```
@@ -361,7 +362,7 @@ To allow parameterized testing at the test class level, targeting integration te
 
 The test engine is not meant to replace JUnit 5 for unit tests, but can be used.
 
-### Logical Flow
+### Logical Flow (without extensions)
 
 ```
 Scan all classpath jars for test classes that contains a method annotated with "@TestEngine.Test"

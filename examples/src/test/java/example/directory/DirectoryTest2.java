@@ -30,8 +30,7 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class DirectoryTest2 {
 
-    @TestEngine.AutoClose(lifecycle = "@TestEngine.AfterAll")
-    private Directory directory;
+    @TestEngine.AutoClose.AfterAll private Directory directory;
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -53,7 +52,7 @@ public class DirectoryTest2 {
     public void beforeAll() throws IOException {
         System.out.println("beforeAll(" + stringArgument + ")");
         directory = Directory.create(UUID.randomUUID().toString(), RELATIVE);
-        System.out.format("directory [%s]", directory).println();
+        System.out.println(String.format("directory [%s]", directory));
     }
 
     @TestEngine.BeforeEach

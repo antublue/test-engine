@@ -1,0 +1,407 @@
+/*
+ * Copyright (C) 2023 The AntuBLUE test-engine project authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.antublue.test.engine.maven.plugin.listener;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.test.ExecutableMetadata;
+import org.antublue.test.engine.test.ExecutableMetadataConstants;
+import org.antublue.test.engine.test.ExecutableMetadataSupport;
+import org.antublue.test.engine.util.AnsiColor;
+import org.antublue.test.engine.util.AnsiColorStringBuilder;
+import org.antublue.test.engine.util.HumanReadableTime;
+import org.antublue.test.engine.util.NanosecondsConverter;
+import org.antublue.test.engine.util.StopWatch;
+import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.TestExecutionResult;
+
+public class TestDescriptorSummaryEngineExecutionListener
+        implements org.junit.platform.engine.EngineExecutionListener {
+
+    private static final String BANNER =
+            new AnsiColorStringBuilder()
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append("Antu")
+                    .color(AnsiColor.BLUE_BOLD_BRIGHT)
+                    .append("BLUE")
+                    .color(AnsiColor.WHITE_BRIGHT)
+                    .append(" Test Engine ")
+                    .append(TestEngine.VERSION)
+                    .color(AnsiColor.TEXT_RESET)
+                    .toString();
+
+    private static final String SUMMARY_BANNER = BANNER + AnsiColor.WHITE_BRIGHT.wrap(" Summary");
+
+    private static final String SEPARATOR =
+            AnsiColor.WHITE_BRIGHT.wrap(
+                    "------------------------------------------------------------------------");
+
+    private static final String INFO =
+            new AnsiColorStringBuilder()
+                    .color(AnsiColor.WHITE)
+                    .append("[")
+                    .color(AnsiColor.BLUE_BOLD)
+                    .append("INFO")
+                    .color(AnsiColor.WHITE)
+                    .append("]")
+                    .color(AnsiColor.TEXT_RESET)
+                    .append(" ")
+                    .toString();
+
+    private final List<TestDescriptor> testDescriptors;
+
+    private final StopWatch stopWatch;
+
+    public TestDescriptorSummaryEngineExecutionListener() {
+        testDescriptors = Collections.synchronizedList(new ArrayList<>());
+
+        stopWatch = new StopWatch();
+    }
+
+    public void begin() {
+        stopWatch.start();
+
+        println(INFO + SEPARATOR);
+        println(INFO + BANNER);
+        println(INFO + SEPARATOR);
+    }
+
+    @Override
+    public void executionSkipped(TestDescriptor testDescriptor, String reason) {
+        testDescriptors.add(testDescriptor);
+    }
+
+    @Override
+    public void executionFinished(
+            TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
+        testDescriptors.add(testDescriptor);
+    }
+
+    public void end(String message) {
+        stopWatch.stop();
+
+        long classTestDescriptorFound = 0;
+        long classTestDescriptorSuccess = 0;
+        long classTestDescriptorFailure = 0;
+        long classTestDescriptorSkipped = 0;
+
+        long argumentTestDescriptorFound = 0;
+        long argumentTestDescriptorSuccess = 0;
+        long argumentTestDescriptorFailure = 0;
+        long argumentTestDescriptorSkipped = 0;
+
+        long methodTestDescriptorFound = 0;
+        long methodTestDescriptorSuccess = 0;
+        long methodTestDescriptorFailure = 0;
+        long methodTestDescriptorSkipped = 0;
+
+        for (TestDescriptor testDescriptor : testDescriptors) {
+            if (testDescriptor instanceof ExecutableMetadataSupport) {
+                ExecutableMetadataSupport executableMetadataSupport =
+                        (ExecutableMetadataSupport) testDescriptor;
+                ExecutableMetadata executableMetadata =
+                        executableMetadataSupport.getExecutableMetadata();
+                String testDescriptorStatus =
+                        executableMetadata.get(ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS);
+                String testDescriptorClassName = testDescriptor.getClass().getName();
+
+                switch (testDescriptorClassName) {
+                    case "org.antublue.test.engine.test.standard.StandardMethodTestDescriptor":
+                    case "org.antublue.test.engine.test.parameterized.ParameterizedMethodTestDescriptor":
+                        {
+                            methodTestDescriptorFound++;
+                            switch (testDescriptorStatus) {
+                                case "PASS":
+                                    {
+                                        methodTestDescriptorSuccess++;
+                                        break;
+                                    }
+                                case "FAIL":
+                                    {
+                                        methodTestDescriptorFailure++;
+                                        break;
+                                    }
+                                case "SKIP":
+                                    {
+                                        methodTestDescriptorSkipped++;
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        // DO NOTHING
+                                        break;
+                                    }
+                            }
+                            break;
+                        }
+                    case "org.antublue.test.engine.test.standard.StandardCLassTestDescriptor":
+                    case "org.antublue.test.engine.test.parameterized.ParameterizedClassTestDescriptor":
+                        {
+                            classTestDescriptorFound++;
+                            switch (testDescriptorStatus) {
+                                case "PASS":
+                                    {
+                                        classTestDescriptorSuccess++;
+                                        break;
+                                    }
+                                case "FAIL":
+                                    {
+                                        classTestDescriptorFailure++;
+                                        break;
+                                    }
+                                case "SKIP":
+                                    {
+                                        classTestDescriptorSkipped++;
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        // DO NOTHING
+                                        break;
+                                    }
+                            }
+                            break;
+                        }
+                    case "org.antublue.test.engine.test.parameterized.ParameterizedArgumentTestDescriptor":
+                        {
+                            argumentTestDescriptorFound++;
+                            switch (testDescriptorStatus) {
+                                case "PASS":
+                                    {
+                                        argumentTestDescriptorSuccess++;
+                                        break;
+                                    }
+                                case "FAIL":
+                                    {
+                                        argumentTestDescriptorFailure++;
+                                        break;
+                                    }
+                                case "SKIP":
+                                    {
+                                        argumentTestDescriptorSkipped++;
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        // DO NOTHING
+                                        break;
+                                    }
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            // DO NOTHING
+                            break;
+                        }
+                }
+            }
+        }
+
+        int columnWidthFound =
+                getColumnWith(
+                        classTestDescriptorFound,
+                        argumentTestDescriptorFound,
+                        methodTestDescriptorFound);
+        int columnWidthSuccess =
+                getColumnWith(
+                        classTestDescriptorSuccess,
+                        argumentTestDescriptorSuccess,
+                        methodTestDescriptorSuccess);
+        int columnWidthFailure =
+                getColumnWith(
+                        classTestDescriptorFailure,
+                        argumentTestDescriptorFailure,
+                        methodTestDescriptorFailure);
+        int columnWidthSkipped =
+                getColumnWith(
+                        classTestDescriptorSkipped,
+                        argumentTestDescriptorSkipped,
+                        methodTestDescriptorSkipped);
+
+        println(INFO + SEPARATOR);
+        println(INFO + SUMMARY_BANNER);
+        println(INFO + SEPARATOR);
+
+        println(
+                new AnsiColorStringBuilder()
+                        .append(INFO)
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append("Test Classes   : ")
+                        .append(pad(classTestDescriptorFound, columnWidthFound))
+                        .append(", ")
+                        .color(AnsiColor.GREEN_BRIGHT)
+                        .append("PASSED")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(classTestDescriptorSuccess, columnWidthSuccess))
+                        .append(", ")
+                        .color(AnsiColor.RED_BRIGHT)
+                        .append("FAILED")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(classTestDescriptorFailure, columnWidthFailure))
+                        .append(", ")
+                        .color(AnsiColor.YELLOW_BRIGHT)
+                        .append("SKIPPED")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(classTestDescriptorSkipped, columnWidthSkipped))
+                        .append(AnsiColor.TEXT_RESET));
+
+        if (argumentTestDescriptorFound > 0) {
+            println(
+                    new AnsiColorStringBuilder()
+                            .append(INFO)
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append("Test Arguments : ")
+                            .append(pad(argumentTestDescriptorFound, columnWidthFound))
+                            .append(", ")
+                            .color(AnsiColor.GREEN_BRIGHT)
+                            .append("PASSED")
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append(" : ")
+                            .append(pad(argumentTestDescriptorSuccess, columnWidthSuccess))
+                            .append(", ")
+                            .color(AnsiColor.RED_BRIGHT)
+                            .append("FAILED")
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append(" : ")
+                            .append(pad(argumentTestDescriptorFailure, columnWidthFailure))
+                            .append(", ")
+                            .color(AnsiColor.YELLOW_BRIGHT)
+                            .append("SKIPPED")
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append(" : ")
+                            .append(pad(argumentTestDescriptorSkipped, columnWidthSkipped))
+                            .append(AnsiColor.TEXT_RESET));
+        }
+
+        println(
+                new AnsiColorStringBuilder()
+                        .append(INFO)
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append("Test Methods   : ")
+                        .append(pad(methodTestDescriptorFound, columnWidthFound))
+                        .append(", ")
+                        .color(AnsiColor.GREEN_BRIGHT)
+                        .append("PASSED")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(methodTestDescriptorSuccess, columnWidthSuccess))
+                        .append(", ")
+                        .color(AnsiColor.RED_BRIGHT)
+                        .append("FAILED")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(methodTestDescriptorFailure, columnWidthFailure))
+                        .append(", ")
+                        .color(AnsiColor.YELLOW_BRIGHT)
+                        .append("SKIPPED")
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append(" : ")
+                        .append(pad(methodTestDescriptorSkipped, columnWidthSkipped))
+                        .append(AnsiColor.TEXT_RESET));
+
+        println(INFO + SEPARATOR);
+        println(INFO + message);
+        println(INFO + SEPARATOR);
+
+        long elapsedTime = stopWatch.elapsedTime();
+
+        println(
+                new AnsiColorStringBuilder()
+                        .append(INFO)
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append("Total Test Time : ")
+                        .append(HumanReadableTime.toHumanReadable(elapsedTime, false))
+                        .append(" (")
+                        .append(
+                                String.format(
+                                        "%s",
+                                        NanosecondsConverter.MILLISECONDS.toString(elapsedTime)))
+                        .append(")")
+                        .color(AnsiColor.TEXT_RESET));
+
+        println(
+                new AnsiColorStringBuilder()
+                        .append(INFO)
+                        .color(AnsiColor.WHITE_BRIGHT)
+                        .append("Finished At     : ")
+                        .append(HumanReadableTime.now())
+                        .color(AnsiColor.TEXT_RESET));
+
+        if (getFailureCount() == 0) {
+            println(INFO + SEPARATOR);
+        }
+    }
+
+    /**
+     * Method to get the failure count
+     *
+     * @return the failure count
+     */
+    public long getFailureCount() {
+        return 0;
+    }
+
+    /**
+     * Method to println an Object
+     *
+     * @param object object
+     */
+    private static void println(Object object) {
+        System.out.println(object);
+        System.out.flush();
+    }
+
+    /**
+     * Method to column width of long values as Strings
+     *
+     * @param values values
+     * @return the return value
+     */
+    private static int getColumnWith(long... values) {
+        int width = 0;
+
+        for (long value : values) {
+            width = Math.max(String.valueOf(value).length(), width);
+        }
+
+        return width;
+    }
+
+    /**
+     * Method to get a String that is the value passed to a specific width
+     *
+     * @param value value
+     * @param width width
+     * @return the return value
+     */
+    private static String pad(long value, long width) {
+        String stringValue = String.valueOf(value);
+
+        StringBuilder paddingStringBuilder = new StringBuilder();
+        while ((paddingStringBuilder.length() + stringValue.length()) < width) {
+            paddingStringBuilder.append(" ");
+        }
+
+        return paddingStringBuilder.append(stringValue).toString();
+    }
+}

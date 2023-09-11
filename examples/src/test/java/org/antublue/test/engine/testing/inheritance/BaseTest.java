@@ -35,7 +35,6 @@ public class BaseTest {
     static {
         EXPECTED.add("prepare()");
         EXPECTED.add("prepare2()");
-
         arguments()
                 .forEach(
                         stringArgument -> {
@@ -54,7 +53,6 @@ public class BaseTest {
                             EXPECTED.add("afterAll2(" + stringArgument + ")");
                             EXPECTED.add("afterAll(" + stringArgument + ")");
                         });
-
         EXPECTED.add("conclude2()");
         EXPECTED.add("conclude()");
     }
