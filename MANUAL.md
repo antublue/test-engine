@@ -40,35 +40,6 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 | `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                          |
 | `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                          |
 
-Annotated methods ...
-
-- `@TestEngine.Prepare`
-- `@TestEngine.BeforeAll`
-- `@TestEngine.BeforeAll`
-- `@TestEngine.BeforeEach`
-- `@TestEngine.AfterEach`
-- `@TestEngine.AfterAll`
-- `@TestEngine.Conclude`
-
-... are execute using a wrapping model.
-
-```
-superclass @TestEngine.Prepare
-  class @TestEngine.Prepare2
-    superclass @TestEngine.BeforeAll
-      class @TestEngine.BeforeAll2
-        superclass @TestEngine.BeforeEach
-          class @TestEngine.BeforeEach2
-            superclass @TestEngine.Test
-            class @TestEngine.Test2
-          class @TestEngine.AfterEach2
-        superclass @TestEngine.AfterEach
-      class @TestEngine.AfterAll2
-    superclass @TestEngine.AfterAll
-  class @TestEngine.Conclude2
-superclass @TestEngine.Conclude
-```
-
 Reference the [Design](https://github.com/antublue/test-engine#design) for the test engine execution flow.
 
 **Notes**
