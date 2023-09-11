@@ -155,7 +155,7 @@ public @interface TestEngine {
             String method() default "";
         }
 
-        /** AfterAll annotation */
+        /** Conclude annotation */
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface Conclude {
