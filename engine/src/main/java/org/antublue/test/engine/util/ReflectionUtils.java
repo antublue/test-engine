@@ -43,11 +43,6 @@ public final class ReflectionUtils {
 
     private static final Object[] NO_OBJECT_ARGS = null;
 
-    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
-    }
-
     private static final Predicate<Class<?>> ALL_CLASSES_FILTER = clazz -> clazz != Object.class;
 
     private static final Predicate<Field> ALL_FIELDS_FILTER =
@@ -321,5 +316,10 @@ public final class ReflectionUtils {
         classSet.add(clazz);
         Class<?> superClass = clazz.getSuperclass();
         resolveClasses(superClass, classSet);
+    }
+
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
     }
 }
