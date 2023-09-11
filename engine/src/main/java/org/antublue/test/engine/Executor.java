@@ -41,8 +41,6 @@ public class Executor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Executor.class);
 
-    private ExecutorService executorService;
-
     /**
      * Method to execute the ExecutionRequest
      *
@@ -56,6 +54,7 @@ public class Executor {
 
         TestDescriptor rootTestDescriptor = executionRequest.getRootTestDescriptor();
 
+        ExecutorService executorService = null;
         AtomicReference<CountDownLatch> countDownLatch = new AtomicReference<>();
 
         try {
