@@ -25,7 +25,6 @@ public class RandomMethodOrderer implements MethodOrderer {
 
     @Override
     public void order(List<Method> testMethods) {
-        System.out.println(String.format("%s order", getClass().getName()));
         Collections.shuffle(testMethods);
     }
 }
