@@ -155,6 +155,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      * @param engineDescriptor engineDescriptor
      */
     private void filterTestClassesByClassName(EngineDescriptor engineDescriptor) {
+        LOGGER.trace("filterTestClassesByClassName()");
+
         Configuration configuration = Configuration.getSingleton();
 
         Optional<String> optional = configuration.get(Constants.TEST_CLASS_INCLUDE_REGEX);
@@ -220,6 +222,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      * @param engineDescriptor engineDescriptor
      */
     private void filterTestClassesByTag(EngineDescriptor engineDescriptor) {
+        LOGGER.trace("filterTestClassesByTag()");
+
         Configuration configuration = Configuration.getSingleton();
 
         Optional<String> optional = configuration.get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
@@ -239,10 +243,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         if (!matcher.find()) {
                             parameterizedClassTestDescriptor.removeFromHierarchy();
                         }
-                        continue;
                     } else {
                         parameterizedClassTestDescriptor.removeFromHierarchy();
                     }
+                    continue;
                 }
                 if (testDescriptor instanceof StandardClassTestDescriptor) {
                     StandardClassTestDescriptor standardClassTestDescriptor =
@@ -277,8 +281,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         if (matcher.find()) {
                             parameterizedClassTestDescriptor.removeFromHierarchy();
                         }
-                        continue;
                     }
+                    continue;
                 }
                 if (testDescriptor instanceof StandardClassTestDescriptor) {
                     StandardClassTestDescriptor standardClassTestDescriptor =
@@ -301,10 +305,13 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      * @param engineDescriptor engineDescriptor
      */
     private void filterTestMethodsByMethodName(EngineDescriptor engineDescriptor) {
+        LOGGER.trace("filterTestMethodsByMethodName()");
+
         Configuration configuration = Configuration.getSingleton();
 
         Optional<String> optional = configuration.get(Constants.TEST_METHOD_INCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_INCLUDE_REGEX, optional.get());
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -333,6 +340,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         optional = configuration.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_EXCLUDE_REGEX, optional.get());
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -366,10 +374,13 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      * @param engineDescriptor engineDescriptor
      */
     private void filterTestMethodsByTag(EngineDescriptor engineDescriptor) {
+        LOGGER.trace("filterTestMethodsByTag()");
+
         Configuration configuration = Configuration.getSingleton();
 
         Optional<String> optional = configuration.get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_TAG_INCLUDE_REGEX, optional.get());
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -385,10 +396,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         if (!matcher.find()) {
                             parameterizedMethodTestDescriptor.removeFromHierarchy();
                         }
-                        continue;
                     } else {
                         parameterizedMethodTestDescriptor.removeFromHierarchy();
                     }
+                    continue;
                 }
                 if (testDescriptor instanceof StandardMethodTestDescriptor) {
                     StandardMethodTestDescriptor standardMethodTestDescriptor =
@@ -408,6 +419,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         optional = configuration.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_EXCLUDE_REGEX, optional.get());
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -423,8 +435,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         if (matcher.find()) {
                             parameterizedMethodTestDescriptor.removeFromHierarchy();
                         }
-                        continue;
                     }
+                    continue;
                 }
                 if (testDescriptor instanceof StandardMethodTestDescriptor) {
                     StandardMethodTestDescriptor standardMethodTestDescriptor =
