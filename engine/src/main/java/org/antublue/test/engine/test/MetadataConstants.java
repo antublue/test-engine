@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.test;
 
-public class ExecutableMetadataConstants {
+public class MetadataConstants {
 
     public static String PASS = "PASS";
 
@@ -34,7 +34,7 @@ public class ExecutableMetadataConstants {
 
     public static final String TEST_DESCRIPTOR_ELAPSED_TIME = "testDescriptorElapsedTime";
 
-    private ExecutableMetadataConstants() {
+    private MetadataConstants() {
         // DO NOTHING
     }
 }

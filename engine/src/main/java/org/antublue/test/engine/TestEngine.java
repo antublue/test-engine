@@ -19,15 +19,23 @@ package org.antublue.test.engine;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.antublue.test.engine.configuration.Configuration;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
 import org.antublue.test.engine.test.extension.ExtensionManager;
+import org.antublue.test.engine.test.parameterized.ParameterizedClassTestDescriptor;
+import org.antublue.test.engine.test.parameterized.ParameterizedMethodTestDescriptor;
 import org.antublue.test.engine.test.parameterized.ParameterizedTestFactory;
+import org.antublue.test.engine.test.standard.StandardClassTestDescriptor;
+import org.antublue.test.engine.test.standard.StandardMethodTestDescriptor;
 import org.antublue.test.engine.test.standard.StandardTestFactory;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
@@ -114,6 +122,15 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             new StandardTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
             new ParameterizedTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
 
+            // Filter the engine descriptor
+            filterTestClassesByClassName(engineDescriptor);
+            filterTestClassesByTag(engineDescriptor);
+            filterTestMethodsByMethodName(engineDescriptor);
+            filterTestMethodsByTag(engineDescriptor);
+
+            // Prune the engine descriptor
+            prune(engineDescriptor);
+
             // Shuffle or sort then engine descriptor's children
             shuffleOrSortTestDescriptors(engineDescriptor);
 
@@ -133,6 +150,321 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     }
 
     /**
+     * Method to filter test classes
+     *
+     * @param engineDescriptor engineDescriptor
+     */
+    private void filterTestClassesByClassName(EngineDescriptor engineDescriptor) {
+        Configuration configuration = Configuration.getSingleton();
+
+        Optional<String> optional = configuration.get(Constants.TEST_CLASS_INCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
+
+            Set<? extends TestDescriptor> children =
+                    new LinkedHashSet<>(engineDescriptor.getChildren());
+            for (TestDescriptor testDescriptor : children) {
+                if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
+                    ParameterizedClassTestDescriptor parameterizedClassTestDescriptor =
+                            (ParameterizedClassTestDescriptor) testDescriptor;
+                    matcher.reset(parameterizedClassTestDescriptor.getTestClass().getName());
+                    if (!matcher.find()) {
+                        parameterizedClassTestDescriptor.removeFromHierarchy();
+                    }
+                    continue;
+                }
+                if (testDescriptor instanceof StandardClassTestDescriptor) {
+                    StandardClassTestDescriptor standardClassTestDescriptor =
+                            (StandardClassTestDescriptor) testDescriptor;
+                    matcher.reset(standardClassTestDescriptor.getTestClass().getName());
+                    if (!matcher.find()) {
+                        standardClassTestDescriptor.removeFromHierarchy();
+                    }
+                }
+            }
+        }
+
+        optional = configuration.get(Constants.TEST_CLASS_EXCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
+
+            Set<? extends TestDescriptor> children =
+                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+            for (TestDescriptor testDescriptor : children) {
+                if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
+                    ParameterizedClassTestDescriptor parameterizedClassTestDescriptor =
+                            (ParameterizedClassTestDescriptor) testDescriptor;
+                    matcher.reset(parameterizedClassTestDescriptor.getTestClass().getName());
+                    if (matcher.find()) {
+                        parameterizedClassTestDescriptor.removeFromHierarchy();
+                    }
+                    continue;
+                }
+                if (testDescriptor instanceof StandardClassTestDescriptor) {
+                    StandardClassTestDescriptor standardClassTestDescriptor =
+                            (StandardClassTestDescriptor) testDescriptor;
+                    matcher.reset(standardClassTestDescriptor.getTestClass().getName());
+                    if (matcher.find()) {
+                        standardClassTestDescriptor.removeFromHierarchy();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to filter test classes
+     *
+     * @param engineDescriptor engineDescriptor
+     */
+    private void filterTestClassesByTag(EngineDescriptor engineDescriptor) {
+        Configuration configuration = Configuration.getSingleton();
+
+        Optional<String> optional = configuration.get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
+
+            Set<? extends TestDescriptor> children =
+                    new LinkedHashSet<>(engineDescriptor.getChildren());
+            for (TestDescriptor testDescriptor : children) {
+                if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
+                    ParameterizedClassTestDescriptor parameterizedClassTestDescriptor =
+                            (ParameterizedClassTestDescriptor) testDescriptor;
+                    String tag = parameterizedClassTestDescriptor.getTag();
+                    if (tag != null) {
+                        matcher.reset(tag);
+                        if (!matcher.find()) {
+                            parameterizedClassTestDescriptor.removeFromHierarchy();
+                        }
+                        continue;
+                    } else {
+                        parameterizedClassTestDescriptor.removeFromHierarchy();
+                    }
+                }
+                if (testDescriptor instanceof StandardClassTestDescriptor) {
+                    StandardClassTestDescriptor standardClassTestDescriptor =
+                            (StandardClassTestDescriptor) testDescriptor;
+                    String tag = standardClassTestDescriptor.getTag();
+                    if (tag != null) {
+                        matcher.reset(tag);
+                        if (!matcher.find()) {
+                            standardClassTestDescriptor.removeFromHierarchy();
+                        }
+                    } else {
+                        standardClassTestDescriptor.removeFromHierarchy();
+                    }
+                }
+            }
+        }
+
+        optional = configuration.get(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
+
+            Set<? extends TestDescriptor> children =
+                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+            for (TestDescriptor testDescriptor : children) {
+                if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
+                    ParameterizedClassTestDescriptor parameterizedClassTestDescriptor =
+                            (ParameterizedClassTestDescriptor) testDescriptor;
+                    String tag = parameterizedClassTestDescriptor.getTag();
+                    if (tag != null) {
+                        matcher.reset(tag);
+                        if (matcher.find()) {
+                            parameterizedClassTestDescriptor.removeFromHierarchy();
+                        }
+                        continue;
+                    }
+                }
+                if (testDescriptor instanceof StandardClassTestDescriptor) {
+                    StandardClassTestDescriptor standardClassTestDescriptor =
+                            (StandardClassTestDescriptor) testDescriptor;
+                    String tag = standardClassTestDescriptor.getTag();
+                    if (tag != null) {
+                        matcher.reset(tag);
+                        if (matcher.find()) {
+                            standardClassTestDescriptor.removeFromHierarchy();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to filter test methods by test method name
+     *
+     * @param engineDescriptor engineDescriptor
+     */
+    private void filterTestMethodsByMethodName(EngineDescriptor engineDescriptor) {
+        Configuration configuration = Configuration.getSingleton();
+
+        Optional<String> optional = configuration.get(Constants.TEST_METHOD_INCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
+
+            Set<? extends TestDescriptor> children =
+                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+            for (TestDescriptor testDescriptor : children) {
+                if (testDescriptor instanceof ParameterizedMethodTestDescriptor) {
+                    ParameterizedMethodTestDescriptor parameterizedMethodTestDescriptor =
+                            (ParameterizedMethodTestDescriptor) testDescriptor;
+                    matcher.reset(parameterizedMethodTestDescriptor.getTestMethod().getName());
+                    if (!matcher.find()) {
+                        parameterizedMethodTestDescriptor.removeFromHierarchy();
+                    }
+                    continue;
+                }
+                if (testDescriptor instanceof StandardMethodTestDescriptor) {
+                    StandardMethodTestDescriptor standardMethodTestDescriptor =
+                            (StandardMethodTestDescriptor) testDescriptor;
+                    matcher.reset(standardMethodTestDescriptor.getTestMethod().getName());
+                    if (!matcher.find()) {
+                        standardMethodTestDescriptor.removeFromHierarchy();
+                    }
+                }
+            }
+        }
+
+        optional = configuration.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
+
+            Set<? extends TestDescriptor> children =
+                    new LinkedHashSet<>(engineDescriptor.getChildren());
+            for (TestDescriptor testDescriptor : children) {
+                if (testDescriptor instanceof ParameterizedMethodTestDescriptor) {
+                    ParameterizedMethodTestDescriptor parameterizedMethodTestDescriptor =
+                            (ParameterizedMethodTestDescriptor) testDescriptor;
+                    matcher.reset(parameterizedMethodTestDescriptor.getTestMethod().getName());
+                    if (matcher.find()) {
+                        parameterizedMethodTestDescriptor.removeFromHierarchy();
+                    }
+                    continue;
+                }
+                if (testDescriptor instanceof StandardMethodTestDescriptor) {
+                    StandardMethodTestDescriptor standardMethodTestDescriptor =
+                            (StandardMethodTestDescriptor) testDescriptor;
+                    matcher.reset(standardMethodTestDescriptor.getTestMethod().getName());
+                    if (matcher.find()) {
+                        standardMethodTestDescriptor.removeFromHierarchy();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to filter test methods
+     *
+     * @param engineDescriptor engineDescriptor
+     */
+    private void filterTestMethodsByTag(EngineDescriptor engineDescriptor) {
+        Configuration configuration = Configuration.getSingleton();
+
+        Optional<String> optional = configuration.get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
+
+            Set<? extends TestDescriptor> children =
+                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+            for (TestDescriptor testDescriptor : children) {
+                if (testDescriptor instanceof ParameterizedMethodTestDescriptor) {
+                    ParameterizedMethodTestDescriptor parameterizedMethodTestDescriptor =
+                            (ParameterizedMethodTestDescriptor) testDescriptor;
+                    String tag = parameterizedMethodTestDescriptor.getTag();
+                    if (tag != null) {
+                        matcher.reset(tag);
+                        if (!matcher.find()) {
+                            parameterizedMethodTestDescriptor.removeFromHierarchy();
+                        }
+                        continue;
+                    } else {
+                        parameterizedMethodTestDescriptor.removeFromHierarchy();
+                    }
+                }
+                if (testDescriptor instanceof StandardMethodTestDescriptor) {
+                    StandardMethodTestDescriptor standardMethodTestDescriptor =
+                            (StandardMethodTestDescriptor) testDescriptor;
+                    String tag = standardMethodTestDescriptor.getTag();
+                    if (tag != null) {
+                        matcher.reset(tag);
+                        if (!matcher.find()) {
+                            standardMethodTestDescriptor.removeFromHierarchy();
+                        }
+                    } else {
+                        standardMethodTestDescriptor.removeFromHierarchy();
+                    }
+                }
+            }
+        }
+
+        optional = configuration.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
+
+            Set<? extends TestDescriptor> children =
+                    new LinkedHashSet<>(engineDescriptor.getChildren());
+            for (TestDescriptor testDescriptor : children) {
+                if (testDescriptor instanceof ParameterizedMethodTestDescriptor) {
+                    ParameterizedMethodTestDescriptor parameterizedMethodTestDescriptor =
+                            (ParameterizedMethodTestDescriptor) testDescriptor;
+                    String tag = parameterizedMethodTestDescriptor.getTag();
+                    if (tag != null) {
+                        matcher.reset(tag);
+                        if (matcher.find()) {
+                            parameterizedMethodTestDescriptor.removeFromHierarchy();
+                        }
+                        continue;
+                    }
+                }
+                if (testDescriptor instanceof StandardMethodTestDescriptor) {
+                    StandardMethodTestDescriptor standardMethodTestDescriptor =
+                            (StandardMethodTestDescriptor) testDescriptor;
+                    String tag = standardMethodTestDescriptor.getTag();
+                    if (tag != null) {
+                        matcher.reset(tag);
+                        if (matcher.find()) {
+                            standardMethodTestDescriptor.removeFromHierarchy();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to prune a test descriptor depth first
+     *
+     * @param testDescriptor testDescriptor
+     */
+    private void prune(TestDescriptor testDescriptor) {
+        // Prune child test descriptors
+        Set<? extends TestDescriptor> children = new LinkedHashSet<>(testDescriptor.getChildren());
+        for (TestDescriptor child : children) {
+            prune(child);
+        }
+
+        // If we are the root, ignore pruning
+        if (testDescriptor.isRoot()) {
+            return;
+        }
+
+        // If test descriptor doesn't have children, remove it
+        if (testDescriptor.isContainer() && testDescriptor.getChildren().isEmpty()) {
+            testDescriptor.removeFromHierarchy();
+        }
+    }
+
+    /**
      * Method to shuffle or sort an engine descriptor's children
      *
      * <p>Workaround for the fact that the engine descriptor returns an unmodifiable Set which can't
@@ -145,11 +477,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         // Get the test descriptors and remove them from the engine descriptor
         List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
-        testDescriptors.forEach(testDescriptor -> engineDescriptor.removeChild(testDescriptor));
+        testDescriptors.forEach(engineDescriptor::removeChild);
 
         // Shuffle or sort the test descriptor list based on configuration
         Optional<String> optionalShuffle = configuration.get(Constants.TEST_CLASS_SHUFFLE);
-
         if (optionalShuffle.isPresent() && Constants.TRUE.equals(optionalShuffle.get())) {
             Collections.shuffle(testDescriptors);
         } else {
@@ -157,7 +488,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         }
 
         // Add the shuffled or sorted test descriptors to the engine descriptor
-        testDescriptors.forEach(testDescriptor -> engineDescriptor.addChild(testDescriptor));
+        testDescriptors.forEach(engineDescriptor::addChild);
     }
 
     /**
@@ -174,8 +505,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         } catch (Throwable t) {
             throw new TestEngineException("Exception loading extensions", t);
         }
-
-        // printTestDescriptorTree(executionRequest.getRootTestDescriptor(), 0);
 
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();

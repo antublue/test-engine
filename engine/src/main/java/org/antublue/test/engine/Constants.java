@@ -56,37 +56,41 @@ public final class Constants {
     public static final String CONSOLE_LOG_TEST_MESSAGES = CONSOLE_LOG + ".test.messages";
 
     /** Configuration constant */
-    public static final String CONSOLE_LOG_PASS_MESSAGES = CONSOLE_LOG + ".pass.messages";
+    public static final String CONSOLE_LOG_SKIP_MESSAGES = CONSOLE_LOG + ".skip.messages";
 
     /** Configuration constant */
-    public static final String CONSOLE_LOG_SKIP_MESSAGES = CONSOLE_LOG + ".skip.messages";
+    public static final String CONSOLE_LOG_PASS_MESSAGES = CONSOLE_LOG + ".pass.messages";
 
     /** Configuration constant */
     public static final String TEST_CLASS_SHUFFLE = PREFIX + ".test.class.shuffle";
 
     /** Configuration constant */
-    public static final String TEST_CLASS_INCLUDE = PREFIX + ".test.class.include";
+    public static final String TEST_CLASS_INCLUDE_REGEX = PREFIX + ".test.class.include.regex";
 
     /** Configuration constant */
-    public static final String TEST_CLASS_EXCLUDE = PREFIX + ".test.class.exclude";
+    public static final String TEST_CLASS_EXCLUDE_REGEX = PREFIX + ".test.class.exclude.regex";
 
     /** Configuration constant */
-    public static final String TEST_METHOD_INCLUDE = PREFIX + ".test.method.include";
+    public static final String TEST_METHOD_INCLUDE_REGEX = PREFIX + ".test.method.include.regex";
 
     /** Configuration constant */
-    public static final String TEST_METHOD_EXCLUDE = PREFIX + ".test.method.exclude";
+    public static final String TEST_METHOD_EXCLUDE_REGEX = PREFIX + ".test.method.exclude.regex";
 
     /** Configuration constant */
-    public static final String TEST_CLASS_TAG_INCLUDE = PREFIX + ".test.class.tag.include";
+    public static final String TEST_CLASS_TAG_INCLUDE_REGEX =
+            PREFIX + ".test.class.tag.include.regex";
 
     /** Configuration constant */
-    public static final String TEST_CLASS_TAG_EXCLUDE = PREFIX + ".test.class.tag.exclude";
+    public static final String TEST_CLASS_TAG_EXCLUDE_REGEX =
+            PREFIX + ".test.class.tag.exclude.regex";
 
     /** Configuration constant */
-    public static final String TEST_METHOD_TAG_INCLUDE = PREFIX + ".test.method.tag.include";
+    public static final String TEST_METHOD_TAG_INCLUDE_REGEX =
+            PREFIX + ".test.method.tag.include.regex";
 
     /** Configuration constant */
-    public static final String TEST_METHOD_TAG_EXCLUDE = PREFIX + ".test.method.tag.exclude";
+    public static final String TEST_METHOD_TAG_EXCLUDE_REGEX =
+            PREFIX + ".test.method.tag.exclude.regex";
 
     /** Configuration constant */
     public static final String MAVEN_PLUGIN = PREFIX + ".maven.plugin";

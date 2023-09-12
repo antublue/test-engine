@@ -27,7 +27,7 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class LifecycleTest {
+public class DuplicateArgumentNamesLifecycleTest {
 
     private static final List<String> EXPECTED = new ArrayList<>();
     private static final List<String> actual = new ArrayList<>();
@@ -56,8 +56,8 @@ public class LifecycleTest {
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
-        for (int i = 0; i < 1; i++) {
-            collection.add(StringArgument.of(String.valueOf(i)));
+        for (int i = 0; i < 5; i++) {
+            collection.add(StringArgument.of("StringArgument"));
         }
         return collection.stream();
     }

@@ -39,10 +39,6 @@ public final class ReflectionUtils {
 
     private static final ReflectionUtils SINGLETON = new ReflectionUtils();
 
-    private static final Class<?>[] NO_CLASS_ARGS = null;
-
-    private static final Object[] NO_OBJECT_ARGS = null;
-
     private static final Predicate<Class<?>> ALL_CLASSES_FILTER = clazz -> clazz != Object.class;
 
     private static final Predicate<Field> ALL_FIELDS_FILTER =
@@ -50,6 +46,10 @@ public final class ReflectionUtils {
 
     private static final Predicate<Method> ALL_METHODS_FILTER =
             method -> method.getDeclaringClass() != Object.class;
+
+    public static final Class<?>[] NO_CLASS_ARGS = null;
+
+    public static final Object[] NO_OBJECT_ARGS = null;
 
     private ReflectionUtils() {
         // DO NOTHING

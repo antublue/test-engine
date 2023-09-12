@@ -20,21 +20,21 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.test.ExecutableMetadataConstants;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
+import org.antublue.test.engine.test.MetadataConstants;
 import org.antublue.test.engine.test.ThrowableContext;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.RandomFieldInjector;
 import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.Invariant;
 import org.antublue.test.engine.util.StandardStreams;
-import org.antublue.test.engine.util.StopWatch;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -48,7 +48,18 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private final Class<?> testClass;
     private final Method testArgumentSupplierMethod;
     private final Argument testArgument;
-    private final StopWatch stopWatch;
+
+    private enum State {
+        BEGIN,
+        SET_ARGUMENT_FIELDS,
+        SET_RANDOM_FIELDS,
+        BEFORE_ALL,
+        EXECUTE_OR_SKIP,
+        AFTER_ALL,
+        SET_ARGUMENT_FIELDS_NULL,
+        CLOSE_AUTO_CLOSE_FIELDS,
+        END
+    }
 
     /**
      * Constructor
@@ -67,7 +78,6 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         this.testClass = testClass;
         this.testArgumentSupplierMethod = testArgumentSupplierMethod;
         this.testArgument = testArgument;
-        this.stopWatch = new StopWatch();
     }
 
     @Override
@@ -84,28 +94,16 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         return testArgument;
     }
 
-    private enum State {
-        BEGIN,
-        SET_ARGUMENT_FIELDS,
-        SET_RANDOM_FIELDS,
-        BEFORE_ALL,
-        EXECUTE_OR_SKIP,
-        AFTER_ALL,
-        SET_ARGUMENT_FIELDS_NULL,
-        CLOSE_AUTO_CLOSE_FIELDS,
-        END
-    }
-
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        stopWatch.start();
+        getStopWatch().start();
 
         Object testInstance = getParent(ExecutableTestDescriptor.class).getTestInstance();
         Invariant.check(testInstance != null);
         setTestInstance(testInstance);
 
-        getExecutableMetadata().put(ExecutableMetadataConstants.TEST_CLASS, testClass);
-        getExecutableMetadata().put(ExecutableMetadataConstants.TEST_ARGUMENT, testArgument);
+        getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
+        getMetadata().put(MetadataConstants.TEST_ARGUMENT, testArgument);
 
         if (!getThrowableContext().isEmpty()) {
             getChildren()
@@ -118,15 +116,12 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                                         }
                                     });
 
-            stopWatch.stop();
-            getExecutableMetadata()
+            getStopWatch().stop();
+            getMetadata()
                     .put(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                            stopWatch.elapsedTime());
-            getExecutableMetadata()
-                    .put(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                            ExecutableMetadataConstants.SKIP);
+                            MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
+                            getStopWatch().elapsedTime());
+            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
             executionRequest.getEngineExecutionListener().executionSkipped(this, "");
             return;
         }
@@ -183,18 +178,13 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
             }
         }
 
-        stopWatch.stop();
+        getStopWatch().stop();
 
-        getExecutableMetadata()
-                .put(
-                        ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedTime());
+        getMetadata()
+                .put(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, getStopWatch().elapsedTime());
 
         if (getThrowableContext().isEmpty()) {
-            getExecutableMetadata()
-                    .put(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                            ExecutableMetadataConstants.PASS);
+            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
@@ -207,10 +197,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                                     String.format(
                                             "Exception testing test class [%s]",
                                             TEST_UTILS.getDisplayName(testClass))));
-            getExecutableMetadata()
-                    .put(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                            ExecutableMetadataConstants.FAIL);
+            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(
@@ -268,7 +255,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
             List<Method> beforeAllMethods =
                     REFLECTION_UTILS.findMethods(
                             testClass, ParameterizedTestFilters.BEFORE_ALL_METHOD);
-            TEST_UTILS.sortMethods(beforeAllMethods, TestUtils.Sort.FORWARD);
+            TEST_UTILS.orderTestMethods(beforeAllMethods, TestUtils.Sort.FORWARD);
 
             for (Method method : beforeAllMethods) {
                 LOCK_PROCESSOR.processLocks(method);
@@ -309,7 +296,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         ThrowableContext throwableContext = getThrowableContext();
         List<Method> afterAllMethods =
                 REFLECTION_UTILS.findMethods(testClass, ParameterizedTestFilters.AFTER_ALL_METHOD);
-        TEST_UTILS.sortMethods(afterAllMethods, TestUtils.Sort.REVERSE);
+        TEST_UTILS.orderTestMethods(afterAllMethods, TestUtils.Sort.REVERSE);
         for (Method method : afterAllMethods) {
             LOCK_PROCESSOR.processLocks(method);
             TEST_UTILS.invoke(method, testInstance, testArgument, throwableContext);
@@ -394,7 +381,8 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                                 .getUniqueId()
                                 .append(
                                         ParameterizedArgumentTestDescriptor.class.getName(),
-                                        testArgument.name());
+                                        UUID.randomUUID() + "/" + testArgument.name());
+
                 TestDescriptor testDescriptor =
                         new ParameterizedArgumentTestDescriptor(
                                 testDescriptorUniqueId,
@@ -406,7 +394,8 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                 List<Method> testMethods =
                         REFLECTION_UTILS.findMethods(
                                 testClass, ParameterizedTestFilters.TEST_METHOD);
-                TEST_UTILS.sortMethods(testMethods, TestUtils.Sort.FORWARD);
+                TEST_UTILS.orderTestMethods(testMethods, TestUtils.Sort.FORWARD);
+                TEST_UTILS.orderTestMethods(testClass, testMethods);
                 for (Method testMethod : testMethods) {
                     if (testMethodFilter == null || testMethodFilter.test(testMethod)) {
                         testDescriptor.addChild(

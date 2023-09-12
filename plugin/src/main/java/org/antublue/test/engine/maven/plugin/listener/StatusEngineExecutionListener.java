@@ -22,9 +22,9 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.configuration.Configuration;
 import org.antublue.test.engine.logger.Logger;
 import org.antublue.test.engine.logger.LoggerFactory;
-import org.antublue.test.engine.test.ExecutableMetadata;
-import org.antublue.test.engine.test.ExecutableMetadataConstants;
-import org.antublue.test.engine.test.ExecutableMetadataSupport;
+import org.antublue.test.engine.test.Metadata;
+import org.antublue.test.engine.test.MetadataConstants;
+import org.antublue.test.engine.test.MetadataSupport;
 import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.AnsiColor;
 import org.antublue.test.engine.util.AnsiColorStringBuilder;
@@ -34,10 +34,10 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 
 /** Class to implement a TestStatusEngineExecutionListener */
-public class TestDescriptorExecutionListener implements EngineExecutionListener {
+public class StatusEngineExecutionListener implements EngineExecutionListener {
 
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(TestDescriptorExecutionListener.class);
+            LoggerFactory.getLogger(StatusEngineExecutionListener.class);
 
     private static final Configuration CONFIGURATION = Configuration.getSingleton();
 
@@ -86,7 +86,7 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
     private final NanosecondsConverter nanosecondsConverter;
 
     /** Constructor */
-    public TestDescriptorExecutionListener() {
+    public StatusEngineExecutionListener() {
         logTiming =
                 CONFIGURATION
                         .get(Constants.CONSOLE_LOG_TIMING)
@@ -163,15 +163,12 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
 
     @Override
     public void executionStarted(TestDescriptor testDescriptor) {
-        if (logTestMessages && testDescriptor instanceof ExecutableMetadataSupport) {
-            ExecutableMetadataSupport executableMetadataSupport =
-                    (ExecutableMetadataSupport) testDescriptor;
-            ExecutableMetadata executableMetadata =
-                    executableMetadataSupport.getExecutableMetadata();
-            Class<?> testClass = executableMetadata.get(ExecutableMetadataConstants.TEST_CLASS);
-            Argument testArgument =
-                    executableMetadata.get(ExecutableMetadataConstants.TEST_ARGUMENT);
-            Method testMethod = executableMetadata.get(ExecutableMetadataConstants.TEST_METHOD);
+        if (logTestMessages && testDescriptor instanceof MetadataSupport) {
+            MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
+            Metadata metadata = metadataSupport.getMetadata();
+            Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
+            Argument testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
+            Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
 
             AnsiColorStringBuilder ansiColorStringBuilder =
                     new AnsiColorStringBuilder()
@@ -204,18 +201,13 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
 
     @Override
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-        if (logSkipMessages && testDescriptor instanceof ExecutableMetadataSupport) {
-            ExecutableMetadataSupport executableMetadataSupport =
-                    (ExecutableMetadataSupport) testDescriptor;
-            ExecutableMetadata executableMetadata =
-                    executableMetadataSupport.getExecutableMetadata();
-            Class<?> testClass = executableMetadata.get(ExecutableMetadataConstants.TEST_CLASS);
-            Argument testArgument =
-                    executableMetadata.get(ExecutableMetadataConstants.TEST_ARGUMENT);
-            Method testMethod = executableMetadata.get(ExecutableMetadataConstants.TEST_METHOD);
-            Long elapsedTime =
-                    executableMetadata.get(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
+        if (logSkipMessages && testDescriptor instanceof MetadataSupport) {
+            MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
+            Metadata metadata = metadataSupport.getMetadata();
+            Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
+            Argument testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
+            Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
+            Long elapsedTime = metadata.get(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
 
             AnsiColorStringBuilder ansiColorStringBuilder =
                     new AnsiColorStringBuilder()
@@ -255,20 +247,14 @@ public class TestDescriptorExecutionListener implements EngineExecutionListener 
     @Override
     public void executionFinished(
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-        if (logPassMessages && testDescriptor instanceof ExecutableMetadataSupport) {
-            ExecutableMetadataSupport executableMetadataSupport =
-                    (ExecutableMetadataSupport) testDescriptor;
-            ExecutableMetadata executableMetadata =
-                    executableMetadataSupport.getExecutableMetadata();
-            Class<?> testClass = executableMetadata.get(ExecutableMetadataConstants.TEST_CLASS);
-            Argument testArgument =
-                    executableMetadata.get(ExecutableMetadataConstants.TEST_ARGUMENT);
-            Method testMethod = executableMetadata.get(ExecutableMetadataConstants.TEST_METHOD);
-            Long elapsedTime =
-                    executableMetadata.get(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
-            String testDescriptorStatus =
-                    executableMetadata.get(ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS);
+        if (logPassMessages && testDescriptor instanceof MetadataSupport) {
+            MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
+            Metadata metadata = metadataSupport.getMetadata();
+            Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
+            Argument testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
+            Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
+            Long elapsedTime = metadata.get(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
+            String testDescriptorStatus = metadata.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
 
             AnsiColorStringBuilder ansiColorStringBuilder =
                     new AnsiColorStringBuilder()

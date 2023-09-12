@@ -24,6 +24,7 @@ import org.antublue.test.engine.test.util.LockProcessor;
 import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.Invariant;
 import org.antublue.test.engine.util.ReflectionUtils;
+import org.antublue.test.engine.util.StopWatch;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
@@ -31,7 +32,7 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 /** Abstract class to implement an ExecutableTestDescriptor */
 public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
-        implements ExecutableMetadataSupport {
+        implements MetadataSupport {
 
     protected static final Argument NULL_TEST_ARGUMENT = null;
 
@@ -47,19 +48,25 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
     protected static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
 
     private final ThrowableContext throwableContext;
-    private final ExecutableMetadata executableMetadata;
+    private final Metadata metadata;
+    private final StopWatch stopWatch;
     private Object testInstance;
 
     public ExecutableTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
+        stopWatch = new StopWatch();
         throwableContext = new ThrowableContext();
-        executableMetadata = new ExecutableMetadata();
+        metadata = new Metadata();
     }
 
     public <T> T getParent(Class<T> clazz) {
         Optional<TestDescriptor> optional = getParent();
         Invariant.check(optional.isPresent());
         return clazz.cast(optional.get());
+    }
+
+    public StopWatch getStopWatch() {
+        return stopWatch;
     }
 
     public void setTestInstance(Object testInstance) {
@@ -74,8 +81,9 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         return throwableContext;
     }
 
-    public ExecutableMetadata getExecutableMetadata() {
-        return executableMetadata;
+    @Override
+    public Metadata getMetadata() {
+        return metadata;
     }
 
     /**

@@ -21,11 +21,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unchecked")
-public class ExecutableMetadata {
+public class Metadata {
 
     private final Map<String, Object> map;
 
-    public ExecutableMetadata() {
+    public Metadata() {
         map = new ConcurrentHashMap<>();
     }
 

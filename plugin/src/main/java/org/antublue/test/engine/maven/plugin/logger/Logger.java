@@ -32,54 +32,104 @@ public class Logger {
         this.log = log;
     }
 
+    /**
+     * Method to log a DEBUG message
+     *
+     * @param message message
+     */
     public void debug(String message) {
         if (log.isDebugEnabled()) {
             log.debug(message);
         }
     }
 
+    /**
+     * Method to log a DEBUG message
+     *
+     * @param format format
+     * @param objects object
+     */
     public void debug(String format, Object... objects) {
         if (log.isDebugEnabled()) {
             log.debug(String.format(format, objects));
         }
     }
 
+    /**
+     * Method to log an INFO message
+     *
+     * @param message message
+     */
     public void info(String message) {
         if (log.isInfoEnabled()) {
             log.info(message);
         }
     }
 
+    /**
+     * Method to log an INFO message
+     *
+     * @param format format
+     * @param objects object
+     */
     public void info(String format, Object... objects) {
         if (log.isInfoEnabled()) {
             log.info(String.format(format, objects));
         }
     }
 
+    /**
+     * Method to log an WARN message
+     *
+     * @param message message
+     */
     public void warn(String message) {
         if (log.isWarnEnabled()) {
             log.warn(message);
         }
     }
 
-    public void war(String format, Object... objects) {
+    /**
+     * Method to log a WARN message
+     *
+     * @param format format
+     * @param objects object
+     */
+    public void warn(String format, Object... objects) {
         if (log.isWarnEnabled()) {
             log.warn(String.format(format, objects));
         }
     }
 
+    /**
+     * Method to log an ERROR message
+     *
+     * @param message message
+     */
     public void error(String message) {
         if (log.isErrorEnabled()) {
             log.error(message);
         }
     }
 
+    /**
+     * Method to log an ERROR message
+     *
+     * @param format format
+     * @param objects object
+     */
     public void error(String format, Object... objects) {
         if (log.isErrorEnabled()) {
             log.error(String.format(format, objects));
         }
     }
 
+    /**
+     * Method to create a Logger from a Maven Log
+     *
+     * @param log log
+     * @return a Logger
+     */
     public static Logger from(Log log) {
         return new Logger(log);
     }

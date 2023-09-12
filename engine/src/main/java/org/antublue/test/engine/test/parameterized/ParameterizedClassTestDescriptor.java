@@ -26,14 +26,13 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.test.ExecutableMetadataConstants;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
+import org.antublue.test.engine.test.MetadataConstants;
 import org.antublue.test.engine.test.ThrowableContext;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.Invariant;
 import org.antublue.test.engine.util.StandardStreams;
-import org.antublue.test.engine.util.StopWatch;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -45,7 +44,16 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
     private final Class<?> testClass;
-    private final StopWatch stopWatch;
+
+    private enum State {
+        BEGIN,
+        INSTANTIATE,
+        PREPARE,
+        EXECUTE_OR_SKIP,
+        CONCLUDE,
+        CLOSE_AUTO_CLOSE_FIELDS,
+        END
+    }
 
     /**
      * Constructor
@@ -56,7 +64,6 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     private ParameterizedClassTestDescriptor(UniqueId uniqueId, Class<?> testClass) {
         super(uniqueId, TEST_UTILS.getDisplayName(testClass));
         this.testClass = testClass;
-        this.stopWatch = new StopWatch();
     }
 
     @Override
@@ -69,21 +76,19 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         return Type.CONTAINER_AND_TEST;
     }
 
-    private enum State {
-        BEGIN,
-        INSTANTIATE,
-        PREPARE,
-        EXECUTE_OR_SKIP,
-        CONCLUDE,
-        CLOSE_AUTO_CLOSE_FIELDS,
-        END
+    public Class<?> getTestClass() {
+        return testClass;
+    }
+
+    public String getTag() {
+        return TEST_UTILS.getTag(testClass);
     }
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        stopWatch.start();
+        getStopWatch().start();
 
-        getExecutableMetadata().put(ExecutableMetadataConstants.TEST_CLASS, testClass);
+        getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
 
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
@@ -93,7 +98,9 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
             EXTENSION_MANAGER.initialize(testClass);
         } catch (Throwable t) {
             throw new TestEngineException(
-                    String.format("Exception loading extensions for test class [%s]", testClass));
+                    String.format(
+                            "Exception loading extensions for test class [%s]",
+                            testClass.getName()));
         }
 
         State state = State.BEGIN;
@@ -141,26 +148,18 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
             }
         }
 
-        stopWatch.stop();
+        getStopWatch().stop();
 
-        getExecutableMetadata()
-                .put(
-                        ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedTime());
+        getMetadata()
+                .put(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, getStopWatch().elapsedTime());
 
         if (getThrowableContext().isEmpty()) {
-            getExecutableMetadata()
-                    .put(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                            ExecutableMetadataConstants.PASS);
+            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
-            getExecutableMetadata()
-                    .put(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                            ExecutableMetadataConstants.FAIL);
+            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(
@@ -203,7 +202,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
             List<Method> prepareMethods =
                     REFLECTION_UTILS.findMethods(
                             testClass, ParameterizedTestFilters.PREPARE_METHOD);
-            TEST_UTILS.sortMethods(prepareMethods, TestUtils.Sort.FORWARD);
+            TEST_UTILS.orderTestMethods(prepareMethods, TestUtils.Sort.FORWARD);
             for (Method method : prepareMethods) {
                 LOCK_PROCESSOR.processLocks(method);
                 TEST_UTILS.invoke(method, testInstance, null, getThrowableContext());
@@ -241,7 +240,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         Invariant.check(testInstance != null);
         List<Method> concludeMethods =
                 REFLECTION_UTILS.findMethods(testClass, ParameterizedTestFilters.CONCLUDE_METHOD);
-        TEST_UTILS.sortMethods(concludeMethods, TestUtils.Sort.REVERSE);
+        TEST_UTILS.orderTestMethods(concludeMethods, TestUtils.Sort.REVERSE);
         for (Method method : concludeMethods) {
             LOCK_PROCESSOR.processLocks(method);
             TEST_UTILS.invoke(method, testInstance, null, getThrowableContext());
@@ -452,6 +451,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                                 .append(
                                         ParameterizedClassTestDescriptor.class.getName(),
                                         testClass.getName());
+
                 TestDescriptor testDescriptor =
                         new ParameterizedClassTestDescriptor(testDescriptorUniqueId, testClass);
                 parentTestDescriptor.addChild(testDescriptor);

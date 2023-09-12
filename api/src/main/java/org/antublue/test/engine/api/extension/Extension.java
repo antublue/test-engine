@@ -119,6 +119,7 @@ public interface Extension {
      * Method to execute after all @TestEngine.AfterAll methods
      *
      * @param testInstance testInstance
+     * @param testArgument testArgument
      * @throws Throwable Throwable
      */
     default void postAfterAllCallback(Object testInstance, Argument testArgument) throws Throwable {

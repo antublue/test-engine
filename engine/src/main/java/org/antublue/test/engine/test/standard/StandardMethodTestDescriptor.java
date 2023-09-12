@@ -23,15 +23,14 @@ import java.util.Optional;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.test.ExecutableMetadata;
-import org.antublue.test.engine.test.ExecutableMetadataConstants;
 import org.antublue.test.engine.test.ExecutableTestDescriptor;
+import org.antublue.test.engine.test.Metadata;
+import org.antublue.test.engine.test.MetadataConstants;
 import org.antublue.test.engine.test.ThrowableContext;
 import org.antublue.test.engine.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.test.util.TestUtils;
 import org.antublue.test.engine.util.Invariant;
 import org.antublue.test.engine.util.StandardStreams;
-import org.antublue.test.engine.util.StopWatch;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -44,20 +43,29 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
 
     private final Class<?> testClass;
     private final Method testMethod;
-    private final StopWatch stopWatch;
-    private final ExecutableMetadata executableMetadata;
+    private final Metadata metadata;
 
-    /** Constructor */
-    public StandardMethodTestDescriptor(
-            UniqueId parentUniqueId, Class<?> testClass, Method testMethod) {
-        super(
-                parentUniqueId.append(
-                        StandardMethodTestDescriptor.class.getSimpleName(), testMethod.getName()),
-                testMethod.getName());
+    private enum State {
+        BEGIN,
+        BEFORE_EACH,
+        TEST,
+        AFTER_EACH,
+        CLOSE_AUTO_CLOSE_FIELDS,
+        END
+    }
+
+    /**
+     * Constructor
+     *
+     * @param uniqueId uniqueId
+     * @param testClass testClass
+     * @param testMethod testMethod
+     */
+    public StandardMethodTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method testMethod) {
+        super(uniqueId, TEST_UTILS.getDisplayName(testMethod));
         this.testClass = testClass;
         this.testMethod = testMethod;
-        this.stopWatch = new StopWatch();
-        this.executableMetadata = new ExecutableMetadata();
+        this.metadata = new Metadata();
     }
 
     @Override
@@ -71,40 +79,36 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     @Override
-    public ExecutableMetadata getExecutableMetadata() {
-        return executableMetadata;
+    public Metadata getMetadata() {
+        return metadata;
     }
 
-    private enum State {
-        BEGIN,
-        BEFORE_EACH,
-        TEST,
-        AFTER_EACH,
-        CLOSE_AUTO_CLOSE_FIELDS,
-        END
+    public Method getTestMethod() {
+        return testMethod;
+    }
+
+    public String getTag() {
+        return TEST_UTILS.getTag(testMethod);
     }
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        stopWatch.start();
+        getStopWatch().start();
 
         Object testInstance = getParent(ExecutableTestDescriptor.class).getTestInstance();
         Invariant.check(testInstance != null);
         setTestInstance(testInstance);
 
-        getExecutableMetadata().put(ExecutableMetadataConstants.TEST_CLASS, testClass);
-        getExecutableMetadata().put(ExecutableMetadataConstants.TEST_METHOD, testMethod);
+        getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
+        getMetadata().put(MetadataConstants.TEST_METHOD, testMethod);
 
         if (!getThrowableContext().isEmpty()) {
-            stopWatch.stop();
-            getExecutableMetadata()
+            getStopWatch().stop();
+            getMetadata()
                     .put(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                            stopWatch.elapsedTime());
-            getExecutableMetadata()
-                    .put(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                            ExecutableMetadataConstants.SKIP);
+                            MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
+                            getStopWatch().elapsedTime());
+            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
             executionRequest.getEngineExecutionListener().executionSkipped(this, "");
             return;
         }
@@ -146,17 +150,12 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
             }
         }
 
-        stopWatch.stop();
-        getExecutableMetadata()
-                .put(
-                        ExecutableMetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedTime());
+        getStopWatch().stop();
+        getMetadata()
+                .put(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME, getStopWatch().elapsedTime());
 
         if (getThrowableContext().isEmpty()) {
-            getExecutableMetadata()
-                    .put(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                            ExecutableMetadataConstants.PASS);
+            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
@@ -169,10 +168,7 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
                                     String.format(
                                             "Exception testing test class [%s]",
                                             TEST_UTILS.getDisplayName(testClass))));
-            getExecutableMetadata()
-                    .put(
-                            ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS,
-                            ExecutableMetadataConstants.FAIL);
+            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(
@@ -192,7 +188,7 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
             List<Method> beforeEachMethods =
                     REFLECTION_UTILS.findMethods(
                             testInstance.getClass(), StandardTestFilters.BEFORE_EACH_METHOD);
-            TEST_UTILS.sortMethods(beforeEachMethods, TestUtils.Sort.FORWARD);
+            TEST_UTILS.orderTestMethods(beforeEachMethods, TestUtils.Sort.FORWARD);
             for (Method method : beforeEachMethods) {
                 LOCK_PROCESSOR.processLocks(method);
                 TEST_UTILS.invoke(method, testInstance, null, throwableContext);
@@ -240,7 +236,7 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
         List<Method> afterEachMethods =
                 REFLECTION_UTILS.findMethods(
                         testInstance.getClass(), StandardTestFilters.AFTER_EACH_METHOD);
-        TEST_UTILS.sortMethods(afterEachMethods, TestUtils.Sort.REVERSE);
+        TEST_UTILS.orderTestMethods(afterEachMethods, TestUtils.Sort.REVERSE);
         for (Method method : afterEachMethods) {
             LOCK_PROCESSOR.processLocks(method);
             TEST_UTILS.invoke(method, testInstance, null, throwableContext);
@@ -296,6 +292,7 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
                                 .append(
                                         StandardMethodTestDescriptor.class.getName(),
                                         testMethod.getName());
+
                 TestDescriptor testDescriptor =
                         new StandardMethodTestDescriptor(
                                 testDescriptorUniqueId, testClass, testMethod);

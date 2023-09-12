@@ -36,6 +36,11 @@ public @interface TestEngine {
     @Retention(RetentionPolicy.RUNTIME)
     @interface Argument {}
 
+    /** ArgumentSupplier annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface MethodOrderSupplier {}
+
     /** Prepare annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)

@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.test.ExecutableMetadata;
-import org.antublue.test.engine.test.ExecutableMetadataConstants;
-import org.antublue.test.engine.test.ExecutableMetadataSupport;
+import org.antublue.test.engine.test.Metadata;
+import org.antublue.test.engine.test.MetadataConstants;
+import org.antublue.test.engine.test.MetadataSupport;
 import org.antublue.test.engine.util.AnsiColor;
 import org.antublue.test.engine.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.util.HumanReadableTime;
@@ -31,7 +31,8 @@ import org.antublue.test.engine.util.StopWatch;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 
-public class TestDescriptorSummaryEngineExecutionListener
+/** Class to implement a TestDescriptorSummaryEngineExecutionListener */
+public class SummaryEngineExecutionListener
         implements org.junit.platform.engine.EngineExecutionListener {
 
     private static final String BANNER =
@@ -64,22 +65,35 @@ public class TestDescriptorSummaryEngineExecutionListener
                     .append(" ")
                     .toString();
 
+    private boolean hasTests;
+
+    private boolean hasFailures;
+
     private final List<TestDescriptor> testDescriptors;
 
     private final StopWatch stopWatch;
 
-    public TestDescriptorSummaryEngineExecutionListener() {
+    /** Constructor */
+    public SummaryEngineExecutionListener() {
         testDescriptors = Collections.synchronizedList(new ArrayList<>());
 
         stopWatch = new StopWatch();
     }
 
+    /** Method to begin the summary output */
     public void begin() {
         stopWatch.start();
 
         println(INFO + SEPARATOR);
         println(INFO + BANNER);
         println(INFO + SEPARATOR);
+    }
+
+    @Override
+    public void executionStarted(TestDescriptor testDescriptor) {
+        if (!testDescriptor.isRoot()) {
+            hasTests = true;
+        }
     }
 
     @Override
@@ -91,8 +105,17 @@ public class TestDescriptorSummaryEngineExecutionListener
     public void executionFinished(
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
         testDescriptors.add(testDescriptor);
+        if (!testDescriptor.isRoot()
+                && testExecutionResult.getStatus() == TestExecutionResult.Status.FAILED) {
+            hasFailures = true;
+        }
     }
 
+    /**
+     * Method to end the summary output
+     *
+     * @param message message
+     */
     public void end(String message) {
         stopWatch.stop();
 
@@ -112,13 +135,11 @@ public class TestDescriptorSummaryEngineExecutionListener
         long methodTestDescriptorSkipped = 0;
 
         for (TestDescriptor testDescriptor : testDescriptors) {
-            if (testDescriptor instanceof ExecutableMetadataSupport) {
-                ExecutableMetadataSupport executableMetadataSupport =
-                        (ExecutableMetadataSupport) testDescriptor;
-                ExecutableMetadata executableMetadata =
-                        executableMetadataSupport.getExecutableMetadata();
+            if (testDescriptor instanceof MetadataSupport) {
+                MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
+                Metadata metadata = metadataSupport.getMetadata();
                 String testDescriptorStatus =
-                        executableMetadata.get(ExecutableMetadataConstants.TEST_DESCRIPTOR_STATUS);
+                        metadata.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
                 String testDescriptorClassName = testDescriptor.getClass().getName();
 
                 switch (testDescriptorClassName) {
@@ -235,91 +256,93 @@ public class TestDescriptorSummaryEngineExecutionListener
                         argumentTestDescriptorSkipped,
                         methodTestDescriptorSkipped);
 
-        println(INFO + SEPARATOR);
-        println(INFO + SUMMARY_BANNER);
-        println(INFO + SEPARATOR);
+        if (hasTests) {
+            println(INFO + SEPARATOR);
+            println(INFO + SUMMARY_BANNER);
+            println(INFO + SEPARATOR);
 
-        println(
-                new AnsiColorStringBuilder()
-                        .append(INFO)
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append("Test Classes   : ")
-                        .append(pad(classTestDescriptorFound, columnWidthFound))
-                        .append(", ")
-                        .color(AnsiColor.GREEN_BRIGHT)
-                        .append("PASSED")
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append(" : ")
-                        .append(pad(classTestDescriptorSuccess, columnWidthSuccess))
-                        .append(", ")
-                        .color(AnsiColor.RED_BRIGHT)
-                        .append("FAILED")
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append(" : ")
-                        .append(pad(classTestDescriptorFailure, columnWidthFailure))
-                        .append(", ")
-                        .color(AnsiColor.YELLOW_BRIGHT)
-                        .append("SKIPPED")
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append(" : ")
-                        .append(pad(classTestDescriptorSkipped, columnWidthSkipped))
-                        .append(AnsiColor.TEXT_RESET));
-
-        if (argumentTestDescriptorFound > 0) {
             println(
                     new AnsiColorStringBuilder()
                             .append(INFO)
                             .color(AnsiColor.WHITE_BRIGHT)
-                            .append("Test Arguments : ")
-                            .append(pad(argumentTestDescriptorFound, columnWidthFound))
+                            .append("Test Classes   : ")
+                            .append(pad(classTestDescriptorFound, columnWidthFound))
                             .append(", ")
                             .color(AnsiColor.GREEN_BRIGHT)
                             .append("PASSED")
                             .color(AnsiColor.WHITE_BRIGHT)
                             .append(" : ")
-                            .append(pad(argumentTestDescriptorSuccess, columnWidthSuccess))
+                            .append(pad(classTestDescriptorSuccess, columnWidthSuccess))
                             .append(", ")
                             .color(AnsiColor.RED_BRIGHT)
                             .append("FAILED")
                             .color(AnsiColor.WHITE_BRIGHT)
                             .append(" : ")
-                            .append(pad(argumentTestDescriptorFailure, columnWidthFailure))
+                            .append(pad(classTestDescriptorFailure, columnWidthFailure))
                             .append(", ")
                             .color(AnsiColor.YELLOW_BRIGHT)
                             .append("SKIPPED")
                             .color(AnsiColor.WHITE_BRIGHT)
                             .append(" : ")
-                            .append(pad(argumentTestDescriptorSkipped, columnWidthSkipped))
+                            .append(pad(classTestDescriptorSkipped, columnWidthSkipped))
                             .append(AnsiColor.TEXT_RESET));
+
+            if (argumentTestDescriptorFound > 0) {
+                println(
+                        new AnsiColorStringBuilder()
+                                .append(INFO)
+                                .color(AnsiColor.WHITE_BRIGHT)
+                                .append("Test Arguments : ")
+                                .append(pad(argumentTestDescriptorFound, columnWidthFound))
+                                .append(", ")
+                                .color(AnsiColor.GREEN_BRIGHT)
+                                .append("PASSED")
+                                .color(AnsiColor.WHITE_BRIGHT)
+                                .append(" : ")
+                                .append(pad(argumentTestDescriptorSuccess, columnWidthSuccess))
+                                .append(", ")
+                                .color(AnsiColor.RED_BRIGHT)
+                                .append("FAILED")
+                                .color(AnsiColor.WHITE_BRIGHT)
+                                .append(" : ")
+                                .append(pad(argumentTestDescriptorFailure, columnWidthFailure))
+                                .append(", ")
+                                .color(AnsiColor.YELLOW_BRIGHT)
+                                .append("SKIPPED")
+                                .color(AnsiColor.WHITE_BRIGHT)
+                                .append(" : ")
+                                .append(pad(argumentTestDescriptorSkipped, columnWidthSkipped))
+                                .append(AnsiColor.TEXT_RESET));
+            }
+
+            println(
+                    new AnsiColorStringBuilder()
+                            .append(INFO)
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append("Test Methods   : ")
+                            .append(pad(methodTestDescriptorFound, columnWidthFound))
+                            .append(", ")
+                            .color(AnsiColor.GREEN_BRIGHT)
+                            .append("PASSED")
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append(" : ")
+                            .append(pad(methodTestDescriptorSuccess, columnWidthSuccess))
+                            .append(", ")
+                            .color(AnsiColor.RED_BRIGHT)
+                            .append("FAILED")
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append(" : ")
+                            .append(pad(methodTestDescriptorFailure, columnWidthFailure))
+                            .append(", ")
+                            .color(AnsiColor.YELLOW_BRIGHT)
+                            .append("SKIPPED")
+                            .color(AnsiColor.WHITE_BRIGHT)
+                            .append(" : ")
+                            .append(pad(methodTestDescriptorSkipped, columnWidthSkipped))
+                            .append(AnsiColor.TEXT_RESET));
+            println(INFO + SEPARATOR);
         }
 
-        println(
-                new AnsiColorStringBuilder()
-                        .append(INFO)
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append("Test Methods   : ")
-                        .append(pad(methodTestDescriptorFound, columnWidthFound))
-                        .append(", ")
-                        .color(AnsiColor.GREEN_BRIGHT)
-                        .append("PASSED")
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append(" : ")
-                        .append(pad(methodTestDescriptorSuccess, columnWidthSuccess))
-                        .append(", ")
-                        .color(AnsiColor.RED_BRIGHT)
-                        .append("FAILED")
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append(" : ")
-                        .append(pad(methodTestDescriptorFailure, columnWidthFailure))
-                        .append(", ")
-                        .color(AnsiColor.YELLOW_BRIGHT)
-                        .append("SKIPPED")
-                        .color(AnsiColor.WHITE_BRIGHT)
-                        .append(" : ")
-                        .append(pad(methodTestDescriptorSkipped, columnWidthSkipped))
-                        .append(AnsiColor.TEXT_RESET));
-
-        println(INFO + SEPARATOR);
         println(INFO + message);
         println(INFO + SEPARATOR);
 
@@ -347,18 +370,27 @@ public class TestDescriptorSummaryEngineExecutionListener
                         .append(HumanReadableTime.now())
                         .color(AnsiColor.TEXT_RESET));
 
-        if (getFailureCount() == 0) {
+        if (!hasFailures) {
             println(INFO + SEPARATOR);
         }
     }
 
     /**
-     * Method to get the failure count
+     * Method to get whether tests were executed
      *
-     * @return the failure count
+     * @return true if there were tests executed, otherwise false
      */
-    public long getFailureCount() {
-        return 0;
+    public boolean hasTests() {
+        return hasTests;
+    }
+
+    /**
+     * Method to get whether failures were encountered
+     *
+     * @return true if there were failures, otherwise false
+     */
+    public boolean hasFailures() {
+        return hasFailures;
     }
 
     /**

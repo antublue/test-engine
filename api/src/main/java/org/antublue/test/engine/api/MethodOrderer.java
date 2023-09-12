@@ -14,9 +14,18 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.test;
+package org.antublue.test.engine.api;
 
-public interface ExecutableMetadataSupport {
+import java.lang.reflect.Method;
+import java.util.List;
 
-    ExecutableMetadata getExecutableMetadata();
+/** Interface to implement a MethodSequencer */
+public interface MethodOrderer {
+
+    /**
+     * Method to order a List of test methods
+     *
+     * @param testMethods testMethods
+     */
+    void order(List<Method> testMethods);
 }
