@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
-import org.antublue.test.engine.api.extension.Extension;
 
 /** Example test */
 public class AutoCloseTest2 {
@@ -121,19 +121,19 @@ public class AutoCloseTest2 {
     public static class TestExtension implements Extension {
 
         @Override
-        public void postAfterEachCallback(Object testInstance, Argument testArgument) {
+        public void postAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
             AutoCloseTest2 autoCloseExampleTest2 = (AutoCloseTest2) testInstance;
             assertThat(autoCloseExampleTest2.afterEachTestObject.isDestroyed()).isFalse();
         }
 
         @Override
-        public void postAfterAllCallback(Object testInstance, Argument testArgument) {
+        public void postAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
             AutoCloseTest2 autoCloseExampleTest2 = (AutoCloseTest2) testInstance;
             assertThat(autoCloseExampleTest2.afterAllTestObject.isDestroyed()).isFalse();
         }
 
-        public void postConcludeCallback(Object testInstance) {
-            System.out.println("afterConcludeCallback()");
+        public void postConcludeMethodsCallback(Object testInstance) {
+            System.out.println("afterConcludeMethodsCallback()");
             AutoCloseTest2 autoCloseExampleTest2 = (AutoCloseTest2) testInstance;
             assertThat(autoCloseExampleTest2.afterConcludeTestObject.isDestroyed()).isFalse();
         }

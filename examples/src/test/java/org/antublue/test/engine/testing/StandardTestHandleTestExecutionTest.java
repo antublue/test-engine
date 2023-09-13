@@ -20,8 +20,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.extension.Extension;
 
 @TestEngine.Disabled
 public class StandardTestHandleTestExecutionTest {

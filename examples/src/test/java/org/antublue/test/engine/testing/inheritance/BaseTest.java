@@ -17,7 +17,6 @@
 package org.antublue.test.engine.testing.inheritance;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.Fail.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +28,7 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 @TestEngine.BaseClass
 public class BaseTest {
 
-    private static final List<String> EXPECTED = new ArrayList<>();
+    public static final List<String> EXPECTED = new ArrayList<>();
     protected final List<String> actual = new ArrayList<>();
 
     static {
@@ -53,8 +52,8 @@ public class BaseTest {
                             EXPECTED.add("afterAll2(" + stringArgument + ")");
                             EXPECTED.add("afterAll(" + stringArgument + ")");
                         });
-        EXPECTED.add("conclude2()");
         EXPECTED.add("conclude()");
+        EXPECTED.add("conclude2()");
     }
 
     @TestEngine.Argument protected IntegerArgument integerArgument;
@@ -111,18 +110,9 @@ public class BaseTest {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
-        System.out.println("conclude()");
+    public void conclude2() {
+        System.out.println("conclude2()");
         assertThat(integerArgument).isNull();
-        actual.add("conclude()");
-        assertThat(actual.size()).isEqualTo(EXPECTED.size());
-        for (int i = 0; i < actual.size(); i++) {
-            if (!actual.get(i).equals(EXPECTED.get(i))) {
-                fail(
-                        String.format(
-                                "index [%d] actual [%s] expected [%s]",
-                                i, actual.get(i), EXPECTED.get(i)));
-            }
-        }
+        actual.add("conclude2()");
     }
 }

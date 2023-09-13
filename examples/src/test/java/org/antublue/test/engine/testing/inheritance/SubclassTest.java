@@ -18,10 +18,23 @@ package org.antublue.test.engine.testing.inheritance;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Stream;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.testing.Validation;
+import org.antublue.test.engine.testing.ValidationExtension;
 
 /** Example test */
-public class SubclassTest extends BaseTest {
+public class SubclassTest extends BaseTest implements Validation {
+
+    @TestEngine.ExtensionSupplier
+    public static Stream<Extension> extensions() {
+        Collection<Extension> collection = new ArrayList<>();
+        collection.add(new ValidationExtension());
+        return collection.stream();
+    }
 
     @TestEngine.Prepare
     public void prepare2() {
@@ -66,9 +79,14 @@ public class SubclassTest extends BaseTest {
     }
 
     @TestEngine.Conclude
-    public void conclude2() {
-        System.out.println("conclude2()");
+    public void conclude() {
+        System.out.println("conclude()");
         assertThat(integerArgument).isNull();
-        actual.add("conclude2()");
+        actual.add("conclude()");
+    }
+
+    @Override
+    public void validate() {
+        assertThat(actual).isEqualTo(EXPECTED);
     }
 }

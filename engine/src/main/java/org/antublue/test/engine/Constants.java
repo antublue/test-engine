@@ -26,10 +26,11 @@ public final class Constants {
     public static final String PREFIX = "antublue.test.engine";
 
     /** Configuration constant */
-    public static final String EXPERIMENTAL = ".experimental";
+    public static final String THREAD_COUNT = PREFIX + ".thread.count";
 
     /** Configuration constant */
-    public static final String THREAD_COUNT = PREFIX + ".thread.count";
+    public static final String THREAD_THROTTLE_MILLISECONDS =
+            PREFIX + ".thread.throttle.milliseconds";
 
     /** Configuration constant */
     public static final String EXTENSIONS = PREFIX + ".extensions";

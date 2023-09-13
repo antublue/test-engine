@@ -31,11 +31,11 @@ import java.util.Set;
 import org.antublue.test.engine.ConfigurationParameters;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.api.utils.AnsiColor;
 import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.StatusEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.SummaryEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.logger.Logger;
-import org.antublue.test.engine.util.AnsiColor;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -213,7 +213,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                         testEngine.discover(
                                 launcherDiscoveryRequest, UniqueId.forEngine(TestEngine.ENGINE_ID));
             } catch (Throwable t) {
-                summaryMessage = AnsiColor.RED_BOLD_BRIGHT.wrap("EXCEPTION DURING DISCOVERY");
+                summaryMessage = AnsiColor.TEXT_RED_BOLD_BRIGHT.wrap("EXCEPTION DURING DISCOVERY");
 
                 t.printStackTrace();
                 System.err.flush();
@@ -231,15 +231,15 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
                     if (summaryEngineExecutionListener.hasTests()) {
                         if (summaryEngineExecutionListener.hasFailures()) {
-                            summaryMessage = AnsiColor.RED_BOLD.wrap("TEST FAILURE");
+                            summaryMessage = AnsiColor.TEXT_RED_BOLD.wrap("TEST FAILURE");
                         } else {
-                            summaryMessage = AnsiColor.GREEN_BOLD.wrap("TEST SUCCESS");
+                            summaryMessage = AnsiColor.TEXT_GREEN_BOLD.wrap("TEST SUCCESS");
                         }
                     } else {
-                        summaryMessage = AnsiColor.RED_BOLD.wrap("NO TESTS EXECUTED");
+                        summaryMessage = AnsiColor.TEXT_RED_BOLD.wrap("NO TESTS EXECUTED");
                     }
                 } catch (Throwable t) {
-                    summaryMessage = AnsiColor.RED_BOLD.wrap("EXCEPTION DURING EXECUTION");
+                    summaryMessage = AnsiColor.TEXT_RED_BOLD.wrap("EXCEPTION DURING EXECUTION");
                     t.printStackTrace();
                     System.err.flush();
                 }

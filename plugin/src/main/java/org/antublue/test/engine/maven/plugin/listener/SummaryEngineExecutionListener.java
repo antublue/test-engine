@@ -20,14 +20,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.test.Metadata;
-import org.antublue.test.engine.test.MetadataConstants;
-import org.antublue.test.engine.test.MetadataSupport;
-import org.antublue.test.engine.util.AnsiColor;
-import org.antublue.test.engine.util.AnsiColorStringBuilder;
-import org.antublue.test.engine.util.HumanReadableTime;
-import org.antublue.test.engine.util.NanosecondsConverter;
-import org.antublue.test.engine.util.StopWatch;
+import org.antublue.test.engine.api.utils.AnsiColor;
+import org.antublue.test.engine.api.utils.AnsiColorStringBuilder;
+import org.antublue.test.engine.api.utils.HumanReadableTime;
+import org.antublue.test.engine.api.utils.NanosecondsConverter;
+import org.antublue.test.engine.api.utils.StopWatch;
+import org.antublue.test.engine.internal.test.descriptor.Metadata;
+import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
+import org.antublue.test.engine.internal.test.descriptor.MetadataSupport;
+import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedArgumentTestDescriptor;
+import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedClassTestDescriptor;
+import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedMethodTestDescriptor;
+import org.antublue.test.engine.internal.test.descriptor.standard.StandardClassTestDescriptor;
+import org.antublue.test.engine.internal.test.descriptor.standard.StandardMethodTestDescriptor;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 
@@ -37,29 +42,30 @@ public class SummaryEngineExecutionListener
 
     private static final String BANNER =
             new AnsiColorStringBuilder()
-                    .color(AnsiColor.WHITE_BRIGHT)
+                    .color(AnsiColor.TEXT_WHITE_BRIGHT)
                     .append("Antu")
-                    .color(AnsiColor.BLUE_BOLD_BRIGHT)
+                    .color(AnsiColor.TEXT_BLUE_BOLD_BRIGHT)
                     .append("BLUE")
-                    .color(AnsiColor.WHITE_BRIGHT)
+                    .color(AnsiColor.TEXT_WHITE_BRIGHT)
                     .append(" Test Engine ")
                     .append(TestEngine.VERSION)
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
-    private static final String SUMMARY_BANNER = BANNER + AnsiColor.WHITE_BRIGHT.wrap(" Summary");
+    private static final String SUMMARY_BANNER =
+            BANNER + AnsiColor.TEXT_WHITE_BRIGHT.wrap(" Summary");
 
     private static final String SEPARATOR =
-            AnsiColor.WHITE_BRIGHT.wrap(
+            AnsiColor.TEXT_WHITE_BRIGHT.wrap(
                     "------------------------------------------------------------------------");
 
     private static final String INFO =
             new AnsiColorStringBuilder()
-                    .color(AnsiColor.WHITE)
+                    .color(AnsiColor.TEXT_WHITE)
                     .append("[")
-                    .color(AnsiColor.BLUE_BOLD)
+                    .color(AnsiColor.TEXT_BLUE_BOLD)
                     .append("INFO")
-                    .color(AnsiColor.WHITE)
+                    .color(AnsiColor.TEXT_WHITE)
                     .append("]")
                     .color(AnsiColor.TEXT_RESET)
                     .append(" ")
@@ -140,97 +146,81 @@ public class SummaryEngineExecutionListener
                 Metadata metadata = metadataSupport.getMetadata();
                 String testDescriptorStatus =
                         metadata.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
-                String testDescriptorClassName = testDescriptor.getClass().getName();
 
-                switch (testDescriptorClassName) {
-                    case "org.antublue.test.engine.test.standard.StandardMethodTestDescriptor":
-                    case "org.antublue.test.engine.test.parameterized.ParameterizedMethodTestDescriptor":
-                        {
-                            methodTestDescriptorFound++;
-                            switch (testDescriptorStatus) {
-                                case "PASS":
-                                    {
-                                        methodTestDescriptorSuccess++;
-                                        break;
-                                    }
-                                case "FAIL":
-                                    {
-                                        methodTestDescriptorFailure++;
-                                        break;
-                                    }
-                                case "SKIP":
-                                    {
-                                        methodTestDescriptorSkipped++;
-                                        break;
-                                    }
-                                default:
-                                    {
-                                        // DO NOTHING
-                                        break;
-                                    }
+                if (testDescriptor instanceof StandardMethodTestDescriptor
+                        || testDescriptor instanceof ParameterizedMethodTestDescriptor) {
+                    methodTestDescriptorFound++;
+                    switch (testDescriptorStatus) {
+                        case "PASS":
+                            {
+                                methodTestDescriptorSuccess++;
+                                break;
                             }
-                            break;
-                        }
-                    case "org.antublue.test.engine.test.standard.StandardCLassTestDescriptor":
-                    case "org.antublue.test.engine.test.parameterized.ParameterizedClassTestDescriptor":
-                        {
-                            classTestDescriptorFound++;
-                            switch (testDescriptorStatus) {
-                                case "PASS":
-                                    {
-                                        classTestDescriptorSuccess++;
-                                        break;
-                                    }
-                                case "FAIL":
-                                    {
-                                        classTestDescriptorFailure++;
-                                        break;
-                                    }
-                                case "SKIP":
-                                    {
-                                        classTestDescriptorSkipped++;
-                                        break;
-                                    }
-                                default:
-                                    {
-                                        // DO NOTHING
-                                        break;
-                                    }
+                        case "FAIL":
+                            {
+                                methodTestDescriptorFailure++;
+                                break;
                             }
-                            break;
-                        }
-                    case "org.antublue.test.engine.test.parameterized.ParameterizedArgumentTestDescriptor":
-                        {
-                            argumentTestDescriptorFound++;
-                            switch (testDescriptorStatus) {
-                                case "PASS":
-                                    {
-                                        argumentTestDescriptorSuccess++;
-                                        break;
-                                    }
-                                case "FAIL":
-                                    {
-                                        argumentTestDescriptorFailure++;
-                                        break;
-                                    }
-                                case "SKIP":
-                                    {
-                                        argumentTestDescriptorSkipped++;
-                                        break;
-                                    }
-                                default:
-                                    {
-                                        // DO NOTHING
-                                        break;
-                                    }
+                        case "SKIP":
+                            {
+                                methodTestDescriptorSkipped++;
+                                break;
                             }
-                            break;
-                        }
-                    default:
-                        {
-                            // DO NOTHING
-                            break;
-                        }
+                        default:
+                            {
+                                // DO NOTHING
+                                break;
+                            }
+                    }
+                } else if (testDescriptor instanceof StandardClassTestDescriptor
+                        || testDescriptor instanceof ParameterizedClassTestDescriptor) {
+                    classTestDescriptorFound++;
+                    switch (testDescriptorStatus) {
+                        case "PASS":
+                            {
+                                classTestDescriptorSuccess++;
+                                break;
+                            }
+                        case "FAIL":
+                            {
+                                classTestDescriptorFailure++;
+                                break;
+                            }
+                        case "SKIP":
+                            {
+                                classTestDescriptorSkipped++;
+                                break;
+                            }
+                        default:
+                            {
+                                // DO NOTHING
+                                break;
+                            }
+                    }
+                } else if (testDescriptor instanceof ParameterizedArgumentTestDescriptor) {
+                    argumentTestDescriptorFound++;
+                    switch (testDescriptorStatus) {
+                        case "PASS":
+                            {
+                                argumentTestDescriptorSuccess++;
+                                break;
+                            }
+                        case "FAIL":
+                            {
+                                argumentTestDescriptorFailure++;
+                                break;
+                            }
+                        case "SKIP":
+                            {
+                                argumentTestDescriptorSkipped++;
+                                break;
+                            }
+                        default:
+                            {
+                                // DO NOTHING
+                                break;
+                            }
+                    }
                 }
             }
         }
@@ -264,25 +254,25 @@ public class SummaryEngineExecutionListener
             println(
                     new AnsiColorStringBuilder()
                             .append(INFO)
-                            .color(AnsiColor.WHITE_BRIGHT)
+                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
                             .append("Test Classes   : ")
                             .append(pad(classTestDescriptorFound, columnWidthFound))
                             .append(", ")
-                            .color(AnsiColor.GREEN_BRIGHT)
+                            .color(AnsiColor.TEXT_GREEN_BRIGHT)
                             .append("PASSED")
-                            .color(AnsiColor.WHITE_BRIGHT)
+                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
                             .append(" : ")
                             .append(pad(classTestDescriptorSuccess, columnWidthSuccess))
                             .append(", ")
-                            .color(AnsiColor.RED_BRIGHT)
+                            .color(AnsiColor.TEXT_RED_BRIGHT)
                             .append("FAILED")
-                            .color(AnsiColor.WHITE_BRIGHT)
+                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
                             .append(" : ")
                             .append(pad(classTestDescriptorFailure, columnWidthFailure))
                             .append(", ")
-                            .color(AnsiColor.YELLOW_BRIGHT)
+                            .color(AnsiColor.TEXT_YELLOW_BRIGHT)
                             .append("SKIPPED")
-                            .color(AnsiColor.WHITE_BRIGHT)
+                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
                             .append(" : ")
                             .append(pad(classTestDescriptorSkipped, columnWidthSkipped))
                             .append(AnsiColor.TEXT_RESET));
@@ -291,25 +281,25 @@ public class SummaryEngineExecutionListener
                 println(
                         new AnsiColorStringBuilder()
                                 .append(INFO)
-                                .color(AnsiColor.WHITE_BRIGHT)
+                                .color(AnsiColor.TEXT_WHITE_BRIGHT)
                                 .append("Test Arguments : ")
                                 .append(pad(argumentTestDescriptorFound, columnWidthFound))
                                 .append(", ")
-                                .color(AnsiColor.GREEN_BRIGHT)
+                                .color(AnsiColor.TEXT_GREEN_BRIGHT)
                                 .append("PASSED")
-                                .color(AnsiColor.WHITE_BRIGHT)
+                                .color(AnsiColor.TEXT_WHITE_BRIGHT)
                                 .append(" : ")
                                 .append(pad(argumentTestDescriptorSuccess, columnWidthSuccess))
                                 .append(", ")
-                                .color(AnsiColor.RED_BRIGHT)
+                                .color(AnsiColor.TEXT_RED_BRIGHT)
                                 .append("FAILED")
-                                .color(AnsiColor.WHITE_BRIGHT)
+                                .color(AnsiColor.TEXT_WHITE_BRIGHT)
                                 .append(" : ")
                                 .append(pad(argumentTestDescriptorFailure, columnWidthFailure))
                                 .append(", ")
-                                .color(AnsiColor.YELLOW_BRIGHT)
+                                .color(AnsiColor.TEXT_YELLOW_BRIGHT)
                                 .append("SKIPPED")
-                                .color(AnsiColor.WHITE_BRIGHT)
+                                .color(AnsiColor.TEXT_WHITE_BRIGHT)
                                 .append(" : ")
                                 .append(pad(argumentTestDescriptorSkipped, columnWidthSkipped))
                                 .append(AnsiColor.TEXT_RESET));
@@ -318,25 +308,25 @@ public class SummaryEngineExecutionListener
             println(
                     new AnsiColorStringBuilder()
                             .append(INFO)
-                            .color(AnsiColor.WHITE_BRIGHT)
+                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
                             .append("Test Methods   : ")
                             .append(pad(methodTestDescriptorFound, columnWidthFound))
                             .append(", ")
-                            .color(AnsiColor.GREEN_BRIGHT)
+                            .color(AnsiColor.TEXT_GREEN_BRIGHT)
                             .append("PASSED")
-                            .color(AnsiColor.WHITE_BRIGHT)
+                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
                             .append(" : ")
                             .append(pad(methodTestDescriptorSuccess, columnWidthSuccess))
                             .append(", ")
-                            .color(AnsiColor.RED_BRIGHT)
+                            .color(AnsiColor.TEXT_RED_BRIGHT)
                             .append("FAILED")
-                            .color(AnsiColor.WHITE_BRIGHT)
+                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
                             .append(" : ")
                             .append(pad(methodTestDescriptorFailure, columnWidthFailure))
                             .append(", ")
-                            .color(AnsiColor.YELLOW_BRIGHT)
+                            .color(AnsiColor.TEXT_YELLOW_BRIGHT)
                             .append("SKIPPED")
-                            .color(AnsiColor.WHITE_BRIGHT)
+                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
                             .append(" : ")
                             .append(pad(methodTestDescriptorSkipped, columnWidthSkipped))
                             .append(AnsiColor.TEXT_RESET));
@@ -346,12 +336,12 @@ public class SummaryEngineExecutionListener
         println(INFO + message);
         println(INFO + SEPARATOR);
 
-        long elapsedTime = stopWatch.elapsedTime();
+        long elapsedTime = stopWatch.elapsedNanoTime();
 
         println(
                 new AnsiColorStringBuilder()
                         .append(INFO)
-                        .color(AnsiColor.WHITE_BRIGHT)
+                        .color(AnsiColor.TEXT_WHITE_BRIGHT)
                         .append("Total Test Time : ")
                         .append(HumanReadableTime.toHumanReadable(elapsedTime, false))
                         .append(" (")
@@ -365,7 +355,7 @@ public class SummaryEngineExecutionListener
         println(
                 new AnsiColorStringBuilder()
                         .append(INFO)
-                        .color(AnsiColor.WHITE_BRIGHT)
+                        .color(AnsiColor.TEXT_WHITE_BRIGHT)
                         .append("Finished At     : ")
                         .append(HumanReadableTime.now())
                         .color(AnsiColor.TEXT_RESET));

@@ -17,7 +17,6 @@
 package org.antublue.test.engine.testing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -127,14 +126,6 @@ public class DuplicateArgumentNamesLifecycleTest {
         System.out.println("conclude()");
         assertThat(stringArgument).isNull();
         actual.add("conclude()");
-        assertThat(actual.size()).isEqualTo(EXPECTED.size());
-        for (int i = 0; i < actual.size(); i++) {
-            if (!actual.get(i).equals(EXPECTED.get(i))) {
-                fail(
-                        String.format(
-                                "index [%d] actual [%s] expected [%s]",
-                                i, actual.get(i), EXPECTED.get(i)));
-            }
-        }
+        assertThat(actual).isEqualTo(EXPECTED);
     }
 }

@@ -36,10 +36,10 @@ public @interface TestEngine {
     @Retention(RetentionPolicy.RUNTIME)
     @interface Argument {}
 
-    /** ArgumentSupplier annotation */
+    /** ExtensionSupplier annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface MethodOrderSupplier {}
+    @interface ExtensionSupplier {}
 
     /** Prepare annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
@@ -76,11 +76,6 @@ public @interface TestEngine {
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @interface Conclude {}
-
-    /** Conclude annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface ExtensionSupplier {}
 
     /** Order annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})

@@ -17,20 +17,20 @@
 package org.antublue.test.engine.testing;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class LifecycleTest {
+public class LifecycleTest implements Validation {
 
     private static final List<String> EXPECTED = new ArrayList<>();
-    private static final List<String> actual = new ArrayList<>();
+    private static final List<String> ACTUAL = new ArrayList<>();
 
     static {
         EXPECTED.add("prepare2()");
@@ -62,11 +62,18 @@ public class LifecycleTest {
         return collection.stream();
     }
 
+    @TestEngine.ExtensionSupplier
+    public static Stream<Extension> extensions() {
+        Collection<Extension> collection = new ArrayList<>();
+        collection.add(new ValidationExtension());
+        return collection.stream();
+    }
+
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
         assertThat(stringArgument).isNull();
-        actual.add("prepare()");
+        ACTUAL.add("prepare()");
     }
 
     @TestEngine.Prepare
@@ -74,67 +81,64 @@ public class LifecycleTest {
     public void prepare2() {
         System.out.println("prepare2()");
         assertThat(stringArgument).isNull();
-        actual.add("prepare2()");
+        ACTUAL.add("prepare2()");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        actual.add("beforeAll(" + stringArgument + ")");
+        ACTUAL.add("beforeAll(" + stringArgument + ")");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
-        actual.add("beforeEach(" + stringArgument + ")");
+        ACTUAL.add("beforeEach(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 1)
     public void test1() {
         System.out.println("test1(" + stringArgument + ")");
-        actual.add("test1(" + stringArgument + ")");
+        ACTUAL.add("test1(" + stringArgument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 0)
     public void test2() {
         System.out.println("test2(" + stringArgument + ")");
-        actual.add("test2(" + stringArgument + ")");
+        ACTUAL.add("test2(" + stringArgument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
-        actual.add("afterEach(" + stringArgument + ")");
+        ACTUAL.add("afterEach(" + stringArgument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
-        actual.add("afterAll(" + stringArgument + ")");
+        ACTUAL.add("afterAll(" + stringArgument + ")");
     }
 
     @TestEngine.AfterAll
     @TestEngine.Order(order = 0)
     public void afterAll2() {
         System.out.println("afterAll2()");
-        actual.add("afterAll2(" + stringArgument + ")");
+        ACTUAL.add("afterAll2(" + stringArgument + ")");
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
         assertThat(stringArgument).isNull();
-        actual.add("conclude()");
-        assertThat(actual.size()).isEqualTo(EXPECTED.size());
-        for (int i = 0; i < actual.size(); i++) {
-            if (!actual.get(i).equals(EXPECTED.get(i))) {
-                fail(
-                        String.format(
-                                "index [%d] actual [%s] expected [%s]",
-                                i, actual.get(i), EXPECTED.get(i)));
-            }
-        }
+        ACTUAL.add("conclude()");
+    }
+
+    @Override
+    public void validate() {
+        assertThat(ACTUAL).isEqualTo(EXPECTED);
+        System.out.println("VALIDATION SUCCESS");
     }
 }
