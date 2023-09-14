@@ -19,8 +19,8 @@ package example.extension;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import org.antublue.test.engine.api.extension.Extension;
-import org.antublue.test.engine.util.StopWatch;
+import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.utils.StopWatch;
 
 /** Example Extension */
 public class StopWatchExtension implements Extension {
@@ -49,7 +49,7 @@ public class StopWatchExtension implements Extension {
     }
 
     @Override
-    public void postConcludeCallback(Object testInstance) {
+    public void postConcludeMethodsCallback(Object testInstance) {
         StopWatch stopWatch = stopWatchMap.remove(testInstance.getClass()).stop();
         synchronized (System.out) {
             System.out.println(
@@ -59,7 +59,7 @@ public class StopWatchExtension implements Extension {
                             "test class [%s] elapsed time [%s] ms",
                             testInstance.getClass().getName(),
                             TimeUnit.MILLISECONDS.convert(
-                                    stopWatch.elapsedTime(), TimeUnit.NANOSECONDS)));
+                                    stopWatch.elapsedNanoTime(), TimeUnit.NANOSECONDS)));
             System.out.println(
                     "------------------------------------------------------------------------");
             System.out.flush();

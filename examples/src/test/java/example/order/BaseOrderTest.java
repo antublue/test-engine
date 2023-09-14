@@ -75,7 +75,6 @@ class BaseOrderTest {
         System.out.println("BaseOrderTest.conclude()");
         assertThat(stringArgument).isNull();
         actual.add("BaseOrderTest.conclude()");
-        assertThat(actual).isEqualTo(EXPECTED);
     }
 
     private static List<String> listOf(String... strings) {

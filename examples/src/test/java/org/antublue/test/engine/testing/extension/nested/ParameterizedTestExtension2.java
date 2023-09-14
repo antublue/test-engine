@@ -18,7 +18,7 @@ package org.antublue.test.engine.testing.extension.nested;
 
 import java.lang.reflect.Method;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.extension.Extension;
+import org.antublue.test.engine.api.Extension;
 
 /** Example Extension */
 @SuppressWarnings("unchecked")
@@ -28,71 +28,71 @@ public class ParameterizedTestExtension2 implements Extension {
     public void postInstantiateCallback(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s afterInstantiateCallback(class [%s])",
+                        "%s postInstantiateCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void postPrepareCallback(Object testInstance) {
+    public void postPrepareMethodsCallback(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s prepareCallback(class [%s])",
+                        "%s postPrepareMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void postBeforeAllCallback(Object testInstance, Argument testArgument) {
+    public void postBeforeAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s beforeAllCallback(class [%s])",
+                        "%s postBeforeAllMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void postBeforeEachCallback(Object testInstance, Argument testArgument) {
+    public void postBeforeEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s beforeEachCallback(class [%s])",
+                        "%s postBeforeEachMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void preTestCallback(Object testInstance, Argument testArgument, Method testMethod) {
+    public void preTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s beforeTestCallback(class [%s])",
+                        "%s preTestMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void postTestCallback(Object testInstance, Argument testArgument, Method testMethod) {
+    public void postTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s afterTestCallback(class [%s])",
+                        "%s postTestMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void postAfterEachCallback(Object testInstance, Argument testArgument) {
+    public void postAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s afterEachCallback(class [%s])",
+                        "%s postAfterEachMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void postAfterAllCallback(Object testInstance, Argument testArgument) {
+    public void postAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s afterAllCallback(class [%s])",
+                        "%s postAfterAllMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 
     @Override
-    public void postConcludeCallback(Object testInstance) {
+    public void postConcludeMethodsCallback(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s concludeCallback(class [%s])",
+                        "%s postConcludeMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
 }

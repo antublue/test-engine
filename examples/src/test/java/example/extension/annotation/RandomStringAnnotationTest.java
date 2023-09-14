@@ -18,8 +18,8 @@ package example.extension.annotation;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.extension.Extension;
 
 /** Example test */
 public class RandomStringAnnotationTest {

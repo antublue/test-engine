@@ -21,8 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.extension.Extension;
+import org.antublue.test.engine.api.Extension;
 
 /** Example Extension */
 @SuppressWarnings("unchecked")
@@ -31,26 +32,32 @@ public class ParameterizedTest1Extension implements Extension {
     private static final List<String> EXPECTED = new ArrayList<>();
 
     static {
-        EXPECTED.add("extension.postInstantiateCallback()");
+        EXPECTED.add("extension.postInstantiateMethodsCallback()");
+        EXPECTED.add("extension.prePrepareMethodsCallback()");
         EXPECTED.add("prepare()");
-        EXPECTED.add("extension.postPrepareCallback()");
+        EXPECTED.add("extension.postPrepareMethodsCallback()");
         for (int i = 0; i < 2; i++) {
+            EXPECTED.add("extension.preBeforeAllMethodsCallback()");
             EXPECTED.add("beforeAll(StringArgument " + i + ")");
-            EXPECTED.add("extension.postBeforeAllCallback()");
+            EXPECTED.add("extension.postBeforeAllMethodsCallback()");
             for (int j = 0; j < 2; j++) {
+                EXPECTED.add("extension.preBeforeEachMethodsCallback()");
                 EXPECTED.add("beforeEach(StringArgument " + i + ")");
-                EXPECTED.add("extension.postBeforeEachCallback()");
-                EXPECTED.add("extension.preTestCallback()");
+                EXPECTED.add("extension.postBeforeEachMethodsCallback()");
+                EXPECTED.add("extension.preTestMethodsCallback()");
                 EXPECTED.add("test" + (j + 1) + "(StringArgument " + i + ")");
-                EXPECTED.add("extension.postTestCallback()");
+                EXPECTED.add("extension.postTestMethodsCallback()");
+                EXPECTED.add("extension.preAfterEachMethodsCallback()");
                 EXPECTED.add("afterEach(StringArgument " + i + ")");
-                EXPECTED.add("extension.postAfterEachCallback()");
+                EXPECTED.add("extension.postAfterEachMethodsCallback()");
             }
+            EXPECTED.add("extension.preAfterAllMethodsCallback()");
             EXPECTED.add("afterAll(StringArgument " + i + ")");
-            EXPECTED.add("extension.postAfterAllCallback()");
+            EXPECTED.add("extension.postAfterAllMethodsCallback()");
         }
+        EXPECTED.add("extension.preConcludeMethodsCallback()");
         EXPECTED.add("conclude()");
-        EXPECTED.add("extension.postConcludeCallback()");
+        EXPECTED.add("extension.postConcludeMethodsCallback()");
     }
 
     @Override
@@ -59,80 +66,144 @@ public class ParameterizedTest1Extension implements Extension {
                 String.format(
                         "%s afterInstantiateCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postInstantiateCallback()");
+        ((ParameterizedTest1) testInstance)
+                .ACTUAL.add("extension.postInstantiateMethodsCallback()");
     }
 
     @Override
-    public void postPrepareCallback(Object testInstance) {
+    public void prePrepareMethodsCallback(Object testInstance) {
+        System.out.println(
+                String.format(
+                        "%s prePrepareMethodsCallback(class [%s])",
+                        this.getClass().getSimpleName(), testInstance.getClass().getName()));
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.prePrepareMethodsCallback()");
+    }
+
+    @Override
+    public void postPrepareMethodsCallback(Object testInstance) {
         System.out.println(
                 String.format(
                         "%s postPrepareCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postPrepareCallback()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postPrepareMethodsCallback()");
     }
 
     @Override
-    public void postBeforeAllCallback(Object testInstance, Argument testArgument) {
+    public void preBeforeAllMethodsCallback(Object testInstance, Argument testArgument) {
+        System.out.println(
+                String.format(
+                        "%s preBeforeAllMethodsCallback(class [%s])",
+                        this.getClass().getSimpleName(), testInstance.getClass().getName()));
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preBeforeAllMethodsCallback()");
+    }
+
+    @Override
+    public void postBeforeAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
                         "%s postBeforeAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postBeforeAllCallback()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postBeforeAllMethodsCallback()");
     }
 
     @Override
-    public void postBeforeEachCallback(Object testInstance, Argument testArgument) {
+    public void preBeforeEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s postBeforeEachCallback(class [%s])",
+                        "%s preBeforeEachMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postBeforeEachCallback()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preBeforeEachMethodsCallback()");
     }
 
     @Override
-    public void preTestCallback(Object testInstance, Argument testArgument, Method testMethod) {
+    public void postBeforeEachMethodsCallback(Object testInstance, Argument testArgument) {
+        System.out.println(
+                String.format(
+                        "%s postBeforeEachMethodsCallback(class [%s])",
+                        this.getClass().getSimpleName(), testInstance.getClass().getName()));
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postBeforeEachMethodsCallback()");
+    }
+
+    @Override
+    public void preTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
                         "%s preTestCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preTestCallback()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preTestMethodsCallback()");
     }
 
     @Override
-    public void postTestCallback(Object testInstance, Argument testArgument, Method testMethod) {
+    public void postTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
-                        "%s postTestCallback(class [%s])",
+                        "%s postTestMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postTestCallback()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postTestMethodsCallback()");
     }
 
     @Override
-    public void postAfterEachCallback(Object testInstance, Argument testArgument) {
+    public void preAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
+        System.out.println(
+                String.format(
+                        "%s preAfterEachMethodsCallback(class [%s])",
+                        this.getClass().getSimpleName(), testInstance.getClass().getName()));
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preAfterEachMethodsCallback()");
+    }
+
+    @Override
+    public void postAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
                         "%s postAfterEachCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postAfterEachCallback()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postAfterEachMethodsCallback()");
     }
 
     @Override
-    public void postAfterAllCallback(Object testInstance, Argument testArgument) {
+    public void preAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
+        System.out.println(
+                String.format(
+                        "%s preAfterAllMethodsCallback(class [%s])",
+                        this.getClass().getSimpleName(), testInstance.getClass().getName()));
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preAfterAllMethodsCallback()");
+    }
+
+    @Override
+    public void postAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
                 String.format(
                         "%s postAfterAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
-        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postAfterAllCallback()");
+        ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postAfterAllMethodsCallback()");
     }
 
     @Override
-    public void postConcludeCallback(Object testInstance) {
+    public void preConcludeMethodsCallback(Object testInstance) {
         System.out.println(
                 String.format(
-                        "%s postConcludeCallback(class [%s])",
+                        "%s preConcludeMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         List<String> ACTUAL = ((ParameterizedTest1) testInstance).ACTUAL;
-        ACTUAL.add("extension.postConcludeCallback()");
-        assertThat(ACTUAL).isEqualTo(EXPECTED);
+        ACTUAL.add("extension.preConcludeMethodsCallback()");
+    }
+
+    @Override
+    public void postConcludeMethodsCallback(Object testInstance) {
+        System.out.println(
+                String.format(
+                        "%s postConcludeMethodsCallback(class [%s])",
+                        this.getClass().getSimpleName(), testInstance.getClass().getName()));
+        List<String> ACTUAL = ((ParameterizedTest1) testInstance).ACTUAL;
+        ACTUAL.add("extension.postConcludeMethodsCallback()");
+    }
+
+    @Override
+    public void preDestroyCallback(Class<?> testClass, Optional<Object> optionalTestInstance) {
+        System.out.println(
+                String.format(
+                        "%s preDestroyCallback(class [%s])",
+                        this.getClass().getSimpleName(), testClass.getName()));
+        assertThat((((ParameterizedTest1) optionalTestInstance.get())).ACTUAL).isEqualTo(EXPECTED);
     }
 }

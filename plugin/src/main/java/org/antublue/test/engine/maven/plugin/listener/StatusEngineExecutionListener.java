@@ -19,16 +19,16 @@ package org.antublue.test.engine.maven.plugin.listener;
 import java.lang.reflect.Method;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.configuration.Configuration;
-import org.antublue.test.engine.logger.Logger;
-import org.antublue.test.engine.logger.LoggerFactory;
-import org.antublue.test.engine.test.Metadata;
-import org.antublue.test.engine.test.MetadataConstants;
-import org.antublue.test.engine.test.MetadataSupport;
-import org.antublue.test.engine.test.util.TestUtils;
-import org.antublue.test.engine.util.AnsiColor;
-import org.antublue.test.engine.util.AnsiColorStringBuilder;
-import org.antublue.test.engine.util.NanosecondsConverter;
+import org.antublue.test.engine.api.utils.AnsiColor;
+import org.antublue.test.engine.api.utils.AnsiColorStringBuilder;
+import org.antublue.test.engine.api.utils.NanosecondsConverter;
+import org.antublue.test.engine.internal.configuration.Configuration;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.test.descriptor.Metadata;
+import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
+import org.antublue.test.engine.internal.test.descriptor.MetadataSupport;
+import org.antublue.test.engine.internal.test.util.TestUtils;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -45,49 +45,49 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
     private static final String INFO =
             new AnsiColorStringBuilder()
-                    .color(AnsiColor.WHITE)
+                    .color(AnsiColor.TEXT_WHITE)
                     .append("[")
-                    .color(AnsiColor.BLUE_BOLD)
+                    .color(AnsiColor.TEXT_BLUE_BOLD)
                     .append("INFO")
-                    .color(AnsiColor.WHITE)
+                    .color(AnsiColor.TEXT_WHITE)
                     .append("]")
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
     private static final String PASS =
             new AnsiColorStringBuilder()
-                    .color(AnsiColor.GREEN_BOLD_BRIGHT)
+                    .color(AnsiColor.TEXT_GREEN_BOLD_BRIGHT)
                     .append("PASS")
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
     private static final String FAIL =
             new AnsiColorStringBuilder()
-                    .color(AnsiColor.RED_BOLD_BRIGHT)
+                    .color(AnsiColor.TEXT_RED_BOLD_BRIGHT)
                     .append("FAIL")
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
     private static final String SKIP =
             new AnsiColorStringBuilder()
-                    .color(AnsiColor.YELLOW_BOLD_BRIGHT)
+                    .color(AnsiColor.TEXT_YELLOW_BOLD_BRIGHT)
                     .append("SKIP")
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
-    private final boolean logTiming;
+    private final boolean consoleLogTiming;
 
-    private final boolean logTestMessages;
+    private final boolean consoleLogTestMessages;
 
-    private final boolean logSkipMessages;
+    private final boolean consoleLogSkipMessages;
 
-    private final boolean logPassMessages;
+    private final boolean consoleLogPassMessages;
 
     private final NanosecondsConverter nanosecondsConverter;
 
     /** Constructor */
     public StatusEngineExecutionListener() {
-        logTiming =
+        consoleLogTiming =
                 CONFIGURATION
                         .get(Constants.CONSOLE_LOG_TIMING)
                         .map(
@@ -100,7 +100,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                                 })
                         .orElse(true);
 
-        LOGGER.trace("configuration [%s] = [%b]", Constants.CONSOLE_LOG_TIMING, logTiming);
+        LOGGER.trace("configuration [%s] = [%b]", Constants.CONSOLE_LOG_TIMING, consoleLogTiming);
 
         nanosecondsConverter =
                 CONFIGURATION
@@ -112,7 +112,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                 "configuration [%s] = [%s]",
                 Constants.CONSOLE_LOG_TIMING_UNITS, nanosecondsConverter);
 
-        logTestMessages =
+        consoleLogTestMessages =
                 CONFIGURATION
                         .get(Constants.CONSOLE_LOG_TEST_MESSAGES)
                         .map(
@@ -126,9 +126,10 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                         .orElse(true);
 
         LOGGER.trace(
-                "configuration [%s] = [%b]", Constants.CONSOLE_LOG_TEST_MESSAGES, logTestMessages);
+                "configuration [%s] = [%b]",
+                Constants.CONSOLE_LOG_TEST_MESSAGES, consoleLogTestMessages);
 
-        logPassMessages =
+        consoleLogPassMessages =
                 CONFIGURATION
                         .get(Constants.CONSOLE_LOG_PASS_MESSAGES)
                         .map(
@@ -142,9 +143,10 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                         .orElse(true);
 
         LOGGER.trace(
-                "configuration [%s] = [%b]", Constants.CONSOLE_LOG_PASS_MESSAGES, logPassMessages);
+                "configuration [%s] = [%b]",
+                Constants.CONSOLE_LOG_PASS_MESSAGES, consoleLogPassMessages);
 
-        logSkipMessages =
+        consoleLogSkipMessages =
                 CONFIGURATION
                         .get(Constants.CONSOLE_LOG_SKIP_MESSAGES)
                         .map(
@@ -158,12 +160,13 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                         .orElse(true);
 
         LOGGER.trace(
-                "configuration [%s] = [%b]", Constants.CONSOLE_LOG_SKIP_MESSAGES, logSkipMessages);
+                "configuration [%s] = [%b]",
+                Constants.CONSOLE_LOG_SKIP_MESSAGES, consoleLogSkipMessages);
     }
 
     @Override
     public void executionStarted(TestDescriptor testDescriptor) {
-        if (logTestMessages && testDescriptor instanceof MetadataSupport) {
+        if (consoleLogTestMessages && testDescriptor instanceof MetadataSupport) {
             MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
             Metadata metadata = metadataSupport.getMetadata();
             Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
@@ -176,7 +179,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                             .append(" ")
                             .append(Thread.currentThread().getName())
                             .append(" | ")
-                            .append(AnsiColor.WHITE_BRIGHT)
+                            .append(AnsiColor.TEXT_WHITE_BRIGHT)
                             .append("TEST")
                             .color(AnsiColor.TEXT_RESET);
 
@@ -201,7 +204,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
     @Override
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-        if (logSkipMessages && testDescriptor instanceof MetadataSupport) {
+        if (consoleLogSkipMessages && testDescriptor instanceof MetadataSupport) {
             MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
             Metadata metadata = metadataSupport.getMetadata();
             Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
@@ -215,7 +218,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                             .append(" ")
                             .append(Thread.currentThread().getName())
                             .append(" | ")
-                            .append(AnsiColor.WHITE_BRIGHT);
+                            .append(AnsiColor.TEXT_WHITE_BRIGHT);
 
             ansiColorStringBuilder.append(SKIP).color(AnsiColor.TEXT_RESET);
 
@@ -231,7 +234,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                 ansiColorStringBuilder.append(" | ").append(TEST_UTILS.getDisplayName(testMethod));
             }
 
-            if (logTiming && elapsedTime != null) {
+            if (consoleLogTiming && elapsedTime != null) {
                 ansiColorStringBuilder
                         .append(" ")
                         .append(nanosecondsConverter.toString(elapsedTime));
@@ -247,7 +250,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
     @Override
     public void executionFinished(
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-        if (logPassMessages && testDescriptor instanceof MetadataSupport) {
+        if (consoleLogPassMessages && testDescriptor instanceof MetadataSupport) {
             MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
             Metadata metadata = metadataSupport.getMetadata();
             Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
@@ -262,7 +265,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                             .append(" ")
                             .append(Thread.currentThread().getName())
                             .append(" | ")
-                            .append(AnsiColor.WHITE_BRIGHT);
+                            .append(AnsiColor.TEXT_WHITE_BRIGHT);
 
             switch (testDescriptorStatus) {
                 case "PASS":
@@ -282,7 +285,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                     }
                 default:
                     {
-                        ansiColorStringBuilder.append(AnsiColor.CYAN_BOLD.wrap("????"));
+                        ansiColorStringBuilder.append(AnsiColor.TEXT_CYAN_BOLD.wrap("????"));
                     }
             }
 
@@ -300,7 +303,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                 ansiColorStringBuilder.append(" | ").append(TEST_UTILS.getDisplayName(testMethod));
             }
 
-            if (logTiming && elapsedTime != null) {
+            if (consoleLogTiming && elapsedTime != null) {
                 ansiColorStringBuilder
                         .append(" ")
                         .append(nanosecondsConverter.toString(elapsedTime));
