@@ -58,25 +58,25 @@ public class StateMachine<T> {
         return this;
     }
 
-    public void run(T begin) throws Throwable {
+    public void run(T begin) throws StateMachineException {
         T state = begin;
         T nextState;
         do {
             Action<T> action = actions.get(state);
             if (action == null) {
-                throw new RuntimeException(
+                throw new StateMachineException(
                         String.format("No action defined for state [%s]", state));
             } else {
                 nextState = action.perform();
                 if (nextState == null) {
-                    throw new RuntimeException(
+                    throw new StateMachineException(
                             String.format("Action for state [%s] returned null", nextState));
                 }
                 if (nextState != null
                         && !definitions
                                 .computeIfAbsent(state, k -> new HashSet<>())
                                 .contains(nextState)) {
-                    throw new RuntimeException(
+                    throw new StateMachineException(
                             String.format(
                                     "Invalid state transition [%s] -> [%s]", state, nextState));
                 } else {
