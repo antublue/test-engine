@@ -74,6 +74,7 @@ public class AutoCloseProcessor {
                 methodName = autoCloseConcludeAnnotation.method();
             }
 
+            field.setAccessible(true);
             Object o = field.get(object);
             if (o == null) {
                 return;

@@ -18,14 +18,8 @@ package org.antublue.test.engine.internal.test.descriptor;
 
 import java.util.Optional;
 import org.antublue.test.engine.Constants;
-import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.utils.StopWatch;
 import org.antublue.test.engine.internal.configuration.Configuration;
-import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedTestUtils;
-import org.antublue.test.engine.internal.test.extension.ExtensionManager;
-import org.antublue.test.engine.internal.test.util.LockProcessor;
-import org.antublue.test.engine.internal.test.util.ReflectionUtils;
-import org.antublue.test.engine.internal.test.util.TestUtils;
 import org.antublue.test.engine.internal.test.util.ThrowableContext;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
@@ -35,19 +29,6 @@ import org.junit.platform.engine.TestDescriptor;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         implements MetadataSupport {
-
-    protected static final Argument NULL_TEST_ARGUMENT = null;
-
-    protected static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
-
-    protected static final TestUtils TEST_UTILS = TestUtils.getSingleton();
-
-    protected static final ParameterizedTestUtils PARAMETERIZED_UTILS =
-            ParameterizedTestUtils.getSingleton();
-
-    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
-
-    protected static final LockProcessor LOCK_PROCESSOR = LockProcessor.getSingleton();
 
     private final ThrowableContext throwableContext;
     private final Metadata metadata;

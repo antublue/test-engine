@@ -25,10 +25,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -46,8 +48,6 @@ public class ExtensionManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionManager.class);
 
-    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
-
     private static final Configuration CONFIGURATION = Configuration.getSingleton();
 
     private static final List<Extension> EMPTY_EXTENSION_LIST = new ArrayList<>();
@@ -58,6 +58,17 @@ public class ExtensionManager {
     private final Map<Class<?>, List<Extension>> testExtensionsReversedMap;
 
     private boolean initialized;
+
+    public static final Predicate<Method> EXTENSION_SUPPLIER_METHOD =
+            method ->
+                    method.isAnnotationPresent(TestEngine.ExtensionSupplier.class)
+                            && !method.isAnnotationPresent(TestEngine.Disabled.class)
+                            && ReflectionUtils.isStatic(method)
+                            && (ReflectionUtils.isPublic(method)
+                                    || ReflectionUtils.isProtected(method))
+                            && ReflectionUtils.hasParameterCount(method, 0)
+                            && (ReflectionUtils.hasReturnType(method, Stream.class)
+                                    || ReflectionUtils.hasReturnType(method, Iterable.class));
 
     /** Constructor */
     private ExtensionManager() {
@@ -89,7 +100,9 @@ public class ExtensionManager {
                 for (String className : classNames) {
                     LOGGER.trace("loading extension [%s]", className);
                     if (!extensionMap.containsKey(className)) {
-                        Object object = REFLECTION_UTILS.newInstance(className);
+                        Class<?> clazz =
+                                Thread.currentThread().getContextClassLoader().loadClass(className);
+                        Object object = ReflectionUtils.newInstance(clazz);
                         if (object instanceof Extension) {
                             extensionMap.put(className, (Extension) object);
                         }
@@ -425,9 +438,7 @@ public class ExtensionManager {
 
         List<Method> extensionSupplierMethods =
                 ReflectionSupport.findMethods(
-                        testClass,
-                        ExtensionFilters.EXTENSION_SUPPLIER_METHOD,
-                        HierarchyTraversalMode.TOP_DOWN);
+                        testClass, EXTENSION_SUPPLIER_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
         for (Method method : extensionSupplierMethods) {
             Object object = method.invoke(null, (Object[]) null);

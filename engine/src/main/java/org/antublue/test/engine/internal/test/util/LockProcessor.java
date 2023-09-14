@@ -33,18 +33,12 @@ import org.antublue.test.engine.internal.logger.LoggerFactory;
 /** Class to process @TestEngine.Lock, @TestEngine.Unlock, @TestEngine.ResourceLock annotations */
 public class LockProcessor {
 
-    private static final LockProcessor SINGLETON = new LockProcessor();
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LockProcessor.class);
 
-    private final Map<String, ReentrantReadWriteLock> LOCK_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, ReentrantReadWriteLock> LOCK_MAP = new ConcurrentHashMap<>();
 
     private LockProcessor() {
         // DO NOTHING
-    }
-
-    public static LockProcessor getSingleton() {
-        return SINGLETON;
     }
 
     /**
@@ -52,7 +46,7 @@ public class LockProcessor {
      *
      * @param method method
      */
-    public void processLocks(Method method) {
+    public static void processLocks(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Lock.class)
                 && !method.isAnnotationPresent(TestEngine.Lock.List.class)
                 && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
@@ -92,7 +86,7 @@ public class LockProcessor {
      * @param name name
      * @param mode mode
      */
-    private void lock(Method method, String name, TestEngine.LockMode mode) {
+    private static void lock(Method method, String name, TestEngine.LockMode mode) {
         if (name != null && !name.trim().isEmpty()) {
             String trimmedName = name.trim();
 
@@ -117,7 +111,7 @@ public class LockProcessor {
      *
      * @param method method
      */
-    public void processUnlocks(Method method) {
+    public static void processUnlocks(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Unlock.class)
                 && !method.isAnnotationPresent(TestEngine.Unlock.List.class)
                 && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
@@ -158,7 +152,7 @@ public class LockProcessor {
      * @param name name
      * @param mode mode
      */
-    private void unlock(Method method, String name, TestEngine.LockMode mode) {
+    private static void unlock(Method method, String name, TestEngine.LockMode mode) {
         if (name != null && !name.trim().isEmpty()) {
             ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
             if (reentrantReadWriteLock != null) {
@@ -196,7 +190,7 @@ public class LockProcessor {
      * @param fair fair
      * @return a ReentrantReadWriteLock
      */
-    private ReentrantReadWriteLock createLock(String name, boolean fair) {
+    private static ReentrantReadWriteLock createLock(String name, boolean fair) {
         LOGGER.trace("createLock name [%s] fair [%b]", name, fair);
 
         return new ReentrantReadWriteLock(fair);

@@ -32,30 +32,30 @@ public class BaseTest {
     protected final List<String> actual = new ArrayList<>();
 
     static {
-        EXPECTED.add("prepare()");
-        EXPECTED.add("prepare3()");
+        EXPECTED.add("b/prepare()");
+        EXPECTED.add("b/prepare3()");
         EXPECTED.add("prepare2()");
         arguments()
                 .forEach(
                         stringArgument -> {
-                            EXPECTED.add("beforeAll(" + stringArgument + ")");
+                            EXPECTED.add("b/beforeAll(" + stringArgument + ")");
                             EXPECTED.add("beforeAll2(" + stringArgument + ")");
-                            EXPECTED.add("beforeEach(" + stringArgument + ")");
+                            EXPECTED.add("b/beforeEach(" + stringArgument + ")");
                             EXPECTED.add("beforeEach2(" + stringArgument + ")");
-                            EXPECTED.add("testA(" + stringArgument + ")");
+                            EXPECTED.add("b/testA(" + stringArgument + ")");
                             EXPECTED.add("afterEach2(" + stringArgument + ")");
-                            EXPECTED.add("afterEach(" + stringArgument + ")");
-                            EXPECTED.add("beforeEach(" + stringArgument + ")");
+                            EXPECTED.add("b/afterEach(" + stringArgument + ")");
+                            EXPECTED.add("b/beforeEach(" + stringArgument + ")");
                             EXPECTED.add("beforeEach2(" + stringArgument + ")");
                             EXPECTED.add("testB(" + stringArgument + ")");
                             EXPECTED.add("afterEach2(" + stringArgument + ")");
-                            EXPECTED.add("afterEach(" + stringArgument + ")");
+                            EXPECTED.add("b/afterEach(" + stringArgument + ")");
                             EXPECTED.add("afterAll2(" + stringArgument + ")");
-                            EXPECTED.add("afterAll(" + stringArgument + ")");
+                            EXPECTED.add("b/afterAll(" + stringArgument + ")");
                         });
         EXPECTED.add("conclude2()");
-        EXPECTED.add("conclude()");
-        EXPECTED.add("conclude3()");
+        EXPECTED.add("b/conclude3()");
+        EXPECTED.add("b/conclude()");
     }
 
     @TestEngine.Argument protected IntegerArgument integerArgument;
@@ -71,64 +71,64 @@ public class BaseTest {
 
     @TestEngine.Prepare
     public void prepare() {
-        System.out.println("prepare()");
+        System.out.println("b/prepare()");
         assertThat(integerArgument).isNull();
-        actual.add("prepare()");
+        actual.add("b/prepare()");
     }
 
     @TestEngine.Prepare
     public void prepare3() {
-        System.out.println("prepare3()");
+        System.out.println("b/prepare3()");
         assertThat(integerArgument).isNull();
-        actual.add("prepare3()");
+        actual.add("b/prepare3()");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll(" + integerArgument + ")");
+        System.out.println("b/beforeAll(" + integerArgument + ")");
         assertThat(integerArgument).isNotNull();
-        actual.add("beforeAll(" + integerArgument + ")");
+        actual.add("b/beforeAll(" + integerArgument + ")");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println("beforeEach(" + integerArgument + ")");
+        System.out.println("b/beforeEach(" + integerArgument + ")");
         assertThat(integerArgument).isNotNull();
-        actual.add("beforeEach(" + integerArgument + ")");
+        actual.add("b/beforeEach(" + integerArgument + ")");
     }
 
     @TestEngine.Test
     public void testA() {
-        System.out.println("testA(" + integerArgument + ")");
+        System.out.println("b/testA(" + integerArgument + ")");
         assertThat(integerArgument).isNotNull();
-        actual.add("testA(" + integerArgument + ")");
+        actual.add("b/testA(" + integerArgument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
-        System.out.println("afterEach(" + integerArgument + ")");
+        System.out.println("b/afterEach(" + integerArgument + ")");
         assertThat(integerArgument).isNotNull();
-        actual.add("afterEach(" + integerArgument + ")");
+        actual.add("b/afterEach(" + integerArgument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll(" + integerArgument + ")");
+        System.out.println("b/afterAll(" + integerArgument + ")");
         assertThat(integerArgument).isNotNull();
-        actual.add("afterAll(" + integerArgument + ")");
+        actual.add("b/afterAll(" + integerArgument + ")");
     }
 
     @TestEngine.Conclude
     public void conclude() {
-        System.out.println("conclude()");
+        System.out.println("b/conclude()");
         assertThat(integerArgument).isNull();
-        actual.add("conclude()");
+        actual.add("b/conclude()");
     }
 
     @TestEngine.Conclude
     public void conclude3() {
-        System.out.println("conclude3()");
+        System.out.println("b/conclude3()");
         assertThat(integerArgument).isNull();
-        actual.add("conclude3()");
+        actual.add("b/conclude3()");
     }
 }

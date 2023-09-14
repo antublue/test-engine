@@ -46,8 +46,8 @@ public class JUnit5LikeTest3Extension implements Extension {
             EXPECTED.add("test" + (i + 1) + "()");
             EXPECTED.add("extension.postTestMethodsCallback()");
             EXPECTED.add("extension.preAfterEachMethodsCallback()");
-            EXPECTED.add("afterEach()");
             EXPECTED.add("afterEach2()");
+            EXPECTED.add("afterEach()");
             EXPECTED.add("extension.postAfterEachMethodsCallback()");
         }
         EXPECTED.add("extension.preConcludeMethodsCallback()");

@@ -22,14 +22,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestArgumentFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
+import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
+import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
 import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedArgumentTestDescriptor;
-import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedTestFilters;
+import org.antublue.test.engine.internal.test.extension.ExtensionManager;
 import org.antublue.test.engine.internal.test.util.AutoCloseProcessor;
+import org.antublue.test.engine.internal.test.util.LockProcessor;
 import org.antublue.test.engine.internal.test.util.StateMachine;
+import org.antublue.test.engine.internal.test.util.TestUtils;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -44,8 +49,13 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 /** Class to implement a ParameterMethodTestDescriptor */
 public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
 
+    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
+
     private final Class<?> testClass;
+    private final List<Field> autoCloseFields;
+    private final List<Method> beforeEachMethods;
     private final Method testMethod;
+    private final List<Method> afterEachMethods;
     private final Argument testArgument = null;
 
     private enum State {
@@ -67,7 +77,10 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
     private StandardMethodTestDescriptor(Builder builder) {
         setUniqueId(builder.uniqueId);
         setDisplayName(builder.displayName);
+        this.autoCloseFields = builder.autoCloseFields;
+        this.beforeEachMethods = builder.beforeEachMethods;
         this.testClass = builder.testClass;
+        this.afterEachMethods = builder.afterEachMethods;
         this.testMethod = builder.testMethod;
     }
 
@@ -86,7 +99,7 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     public String getTag() {
-        return TEST_UTILS.getTag(testMethod);
+        return TestUtils.getTag(testMethod);
     }
 
     @Override
@@ -211,18 +224,10 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         try {
-            List<Method> beforeEachMethods =
-                    ReflectionSupport.findMethods(
-                            testClass,
-                            ParameterizedTestFilters.BEFORE_EACH_METHOD,
-                            HierarchyTraversalMode.TOP_DOWN);
-
-            beforeEachMethods = TEST_UTILS.orderTestMethods(beforeEachMethods);
-
             for (Method method : beforeEachMethods) {
-                LOCK_PROCESSOR.processLocks(method);
-                TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-                LOCK_PROCESSOR.processUnlocks(method);
+                LockProcessor.processLocks(method);
+                TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
+                LockProcessor.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
                 }
@@ -263,9 +268,9 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
     private State test() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        LOCK_PROCESSOR.processLocks(testMethod);
-        TEST_UTILS.invoke(testMethod, getTestInstance(), testArgument, getThrowableContext());
-        LOCK_PROCESSOR.processUnlocks(testMethod);
+        LockProcessor.processLocks(testMethod);
+        TestUtils.invoke(testMethod, getTestInstance(), testArgument, getThrowableContext());
+        LockProcessor.processUnlocks(testMethod);
 
         return State.POST_TEST;
     }
@@ -295,18 +300,10 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
     private State afterEach() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        List<Method> afterEachMethods =
-                ReflectionSupport.findMethods(
-                        testClass,
-                        ParameterizedTestFilters.AFTER_EACH_METHOD,
-                        HierarchyTraversalMode.BOTTOM_UP);
-
-        afterEachMethods = TEST_UTILS.orderTestMethods(afterEachMethods);
-
         for (Method method : afterEachMethods) {
-            LOCK_PROCESSOR.processLocks(method);
-            TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-            LOCK_PROCESSOR.processUnlocks(method);
+            LockProcessor.processLocks(method);
+            TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
+            LockProcessor.processUnlocks(method);
         }
 
         return State.POST_AFTER_EACH;
@@ -326,11 +323,8 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
 
         AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.getSingleton();
 
-        List<Field> testFields =
-                REFLECTION_UTILS.findFields(
-                        testClass, ParameterizedTestFilters.AFTER_EACH_AUTO_CLOSE_FIELD);
-        for (Field testField : testFields) {
-            autoCloseProcessor.close(getTestInstance(), testField, getThrowableContext());
+        for (Field field : autoCloseFields) {
+            autoCloseProcessor.close(getTestInstance(), field, getThrowableContext());
         }
 
         return State.END;
@@ -348,6 +342,9 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
 
         private UniqueId uniqueId;
         private String displayName;
+        private List<Field> autoCloseFields;
+        private List<Method> beforeEachMethods;
+        private List<Method> afterEachMethods;
 
         public Builder setParentTestDescriptor(TestDescriptor parentTestDescriptor) {
             this.parentTestDescriptor = parentTestDescriptor;
@@ -373,7 +370,35 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
                                         StandardMethodTestDescriptor.class.getName(),
                                         UUID.randomUUID() + "/" + testMethod.getName());
 
-                displayName = TEST_UTILS.getDisplayName(testMethod);
+                displayName = TestUtils.getDisplayName(testMethod);
+
+                autoCloseFields =
+                        ReflectionSupport.findFields(
+                                testClass,
+                                AnnotationFieldFilter.of(TestEngine.AutoClose.AfterEach.class),
+                                HierarchyTraversalMode.TOP_DOWN);
+
+                beforeEachMethods =
+                        ReflectionSupport.findMethods(
+                                testClass,
+                                AnnotationMethodFilter.of(TestEngine.BeforeEach.class),
+                                HierarchyTraversalMode.TOP_DOWN);
+
+                beforeEachMethods =
+                        TestUtils.orderTestMethods(
+                                beforeEachMethods, HierarchyTraversalMode.TOP_DOWN);
+
+                afterEachMethods =
+                        ReflectionSupport.findMethods(
+                                testClass,
+                                AnnotationMethodFilter.of(TestEngine.AfterEach.class),
+                                HierarchyTraversalMode.TOP_DOWN);
+
+                afterEachMethods =
+                        TestUtils.orderTestMethods(
+                                afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
+
+                validate();
 
                 TestDescriptor testDescriptor = new StandardMethodTestDescriptor(this);
 
@@ -383,6 +408,10 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
             } catch (Throwable t) {
                 throw new TestEngineException(t);
             }
+        }
+
+        private void validate() throws Throwable {
+            // TODO validate testClass
         }
     }
 }

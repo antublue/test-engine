@@ -177,6 +177,66 @@ public @interface TestEngine {
         @Retention(RetentionPolicy.RUNTIME)
         @interface Boolean {}
 
+        /** Byte annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Byte {
+
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
+            byte minimum() default java.lang.Byte.MIN_VALUE;
+
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
+            byte maximum() default java.lang.Byte.MAX_VALUE;
+        }
+
+        /** Char annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Character {
+
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
+            char minimum() default java.lang.Character.MIN_VALUE;
+
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
+            char maximum() default java.lang.Character.MAX_VALUE;
+        }
+
+        /** Short annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Short {
+
+            /**
+             * Minimum value
+             *
+             * @return the minimum value
+             */
+            short minimum() default java.lang.Short.MIN_VALUE;
+
+            /**
+             * Maximum value
+             *
+             * @return the maximum value
+             */
+            short maximum() default java.lang.Short.MAX_VALUE;
+        }
+
         /** Integer annotation */
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)

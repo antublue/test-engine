@@ -25,19 +25,22 @@ import java.util.List;
 import java.util.Map;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.ClassUtils;
 
 public class TestUtils {
 
     private static final TestUtils SINGLETON = new TestUtils();
 
-    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
+    private static final DefaultMethodOrderTopDownComparator
+            DEFAULT_METHOD_ORDER_TOP_DOWN_COMPARATOR = new DefaultMethodOrderTopDownComparator();
 
-    private static final DefaultMethodOrderComparator DEFAULT_METHOD_ORDER_COMPARATOR =
-            new DefaultMethodOrderComparator();
+    private static final DefaultMethodOrderBottomUpComparator
+            DEFAULT_METHOD_ORDER_BOTTOM_UP_COMPARATOR = new DefaultMethodOrderBottomUpComparator();
 
     private static final TestEngineOrderAnnotationMethodComparator
-            TEST_ENGINE_ORDER_ANNOTATION_COMPARATOR = new TestEngineOrderAnnotationMethodComparator();
+            TEST_ENGINE_ORDER_ANNOTATION_COMPARATOR =
+                    new TestEngineOrderAnnotationMethodComparator();
 
     private static final MethodNameComparator METHOD_NAME_COMPARATOR = new MethodNameComparator();
 
@@ -49,13 +52,14 @@ public class TestUtils {
         return SINGLETON;
     }
 
-    public void invoke(
+    public static void invoke(
             Method method,
             Object testInstance,
             Object testArgument,
             ThrowableContext throwableContext) {
         try {
-            if (REFLECTION_UTILS.acceptsArguments(method, Argument.class)) {
+            method.setAccessible(true);
+            if (ReflectionUtils.acceptsArguments(method, Argument.class)) {
                 method.invoke(testInstance, testArgument);
             } else {
                 method.invoke(testInstance, (Object[]) null);
@@ -71,7 +75,7 @@ public class TestUtils {
      * @param testClass testClass
      * @return the display name
      */
-    public String getDisplayName(Class<?> testClass) {
+    public static String getDisplayName(Class<?> testClass) {
         String displayName = testClass.getName();
 
         TestEngine.DisplayName annotation = testClass.getAnnotation(TestEngine.DisplayName.class);
@@ -91,7 +95,7 @@ public class TestUtils {
      * @param testMethod testMethod
      * @return the display name
      */
-    public String getDisplayName(Method testMethod) {
+    public static String getDisplayName(Method testMethod) {
         String displayName = testMethod.getName();
 
         TestEngine.DisplayName annotation = testMethod.getAnnotation(TestEngine.DisplayName.class);
@@ -111,7 +115,7 @@ public class TestUtils {
      * @param annotatedElement annotatedElement
      * @return the tag value
      */
-    public String getTag(AnnotatedElement annotatedElement) {
+    public static String getTag(AnnotatedElement annotatedElement) {
         String tagValue = null;
 
         TestEngine.Tag annotation = annotatedElement.getAnnotation(TestEngine.Tag.class);
@@ -126,12 +130,16 @@ public class TestUtils {
     }
 
     /**
-     * Method to order test methods within the hierarchy, keeping the groups by component type / declaring class
+     * Method to order test methods within the hierarchy, keeping the groups by component type /
+     * declaring class
      *
      * @param testMethods testMethods
      * @return the list of methods ordered
      */
-    public List<Method> orderTestMethods(List<Method> testMethods) {
+    public static List<Method> orderTestMethods(
+            List<Method> testMethods, HierarchyTraversalMode hierarchyTraversalMode) {
+        // The code assumes that the list of already ordered by component type / declaring class
+
         // Group methods based on component type / declaring class
         Map<Class<?>, List<Method>> methodMap = new LinkedHashMap<>();
         for (Method method : testMethods) {
@@ -143,26 +151,44 @@ public class TestUtils {
             methods.add(method);
         }
 
-        List<Method> orderedMethods = new ArrayList<>();
+        Comparator<Method> methodComparator = DEFAULT_METHOD_ORDER_TOP_DOWN_COMPARATOR;
+        if (hierarchyTraversalMode == HierarchyTraversalMode.BOTTOM_UP) {
+            methodComparator = DEFAULT_METHOD_ORDER_BOTTOM_UP_COMPARATOR;
+        }
 
         // Sort methods for each group and add them to the list
         for (Map.Entry<Class<?>, List<Method>> entry : methodMap.entrySet()) {
-            entry.getValue().sort(DEFAULT_METHOD_ORDER_COMPARATOR);
-            orderedMethods.addAll(entry.getValue());
+            entry.getValue().sort(methodComparator);
+        }
+
+        List<Method> orderedMethods = new ArrayList<>();
+        for (Class<?> key : methodMap.keySet()) {
+            List<Method> methods = methodMap.get(key);
+            orderedMethods.addAll(methods);
         }
 
         return orderedMethods;
     }
 
-    private static class DefaultMethodOrderComparator implements Comparator<Method> {
+    private static class DefaultMethodOrderTopDownComparator implements Comparator<Method> {
 
         @Override
         public int compare(Method method1, Method method2) {
-            int comparison =
-                    TEST_ENGINE_ORDER_ANNOTATION_COMPARATOR.compare(
-                            method1, method2);
+            int comparison = TEST_ENGINE_ORDER_ANNOTATION_COMPARATOR.compare(method1, method2);
             if (comparison == 0) {
                 comparison = METHOD_NAME_COMPARATOR.compare(method1, method2);
+            }
+            return comparison;
+        }
+    }
+
+    private static class DefaultMethodOrderBottomUpComparator implements Comparator<Method> {
+
+        @Override
+        public int compare(Method method1, Method method2) {
+            int comparison = TEST_ENGINE_ORDER_ANNOTATION_COMPARATOR.compare(method1, method2);
+            if (comparison == 0) {
+                comparison = -METHOD_NAME_COMPARATOR.compare(method1, method2);
             }
             return comparison;
         }

@@ -45,6 +45,8 @@ public class RandomFieldInjector {
                 "inject class [%s] field [%s] field type [%s]",
                 object.getClass().getName(), field.getName(), field.getType().getName());
 
+        field.setAccessible(true);
+
         if (field.isAnnotationPresent(TestEngine.Random.Boolean.class)) {
             setBoolean(object, field);
             return;
@@ -132,6 +134,7 @@ public class RandomFieldInjector {
                 "injecting random integer class [%s] field [%s] minimum [%s] maximum [%s]",
                 object.getClass().getName(), field.getName(), minimum, maximum);
 
+        field.setAccessible(true);
         field.set(object, RandomUtils.nextInteger(minimum, maximum));
     }
 

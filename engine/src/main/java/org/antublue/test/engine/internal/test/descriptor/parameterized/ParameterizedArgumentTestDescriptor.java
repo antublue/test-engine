@@ -24,19 +24,24 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
+import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
+import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
+import org.antublue.test.engine.internal.test.extension.ExtensionManager;
 import org.antublue.test.engine.internal.test.util.AutoCloseProcessor;
+import org.antublue.test.engine.internal.test.util.LockProcessor;
 import org.antublue.test.engine.internal.test.util.RandomFieldInjector;
 import org.antublue.test.engine.internal.test.util.StateMachine;
+import org.antublue.test.engine.internal.test.util.TestUtils;
 import org.antublue.test.engine.internal.test.util.ThrowableContext;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
-import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -47,9 +52,16 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 /** Class to implement a ParameterArgumentTestDescriptor */
 public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescriptor {
 
+    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
+
     private final Class<?> testClass;
     private final Method testArgumentSupplierMethod;
     private final Argument testArgument;
+    private final List<Field> testArgumentFields;
+    private final List<Field> randomFields;
+    private final List<Field> autoCloseFields;
+    private final List<Method> beforeAllMethods;
+    private final List<Method> afterAllMethods;
 
     private enum State {
         BEGIN,
@@ -78,6 +90,11 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         this.testClass = builder.testClass;
         this.testArgumentSupplierMethod = builder.testArgumentSupplierMethod;
         this.testArgument = builder.testArgument;
+        this.testArgumentFields = builder.testArgumentFields;
+        this.randomFields = builder.randomFields;
+        this.autoCloseFields = builder.autoCloseFields;
+        this.beforeAllMethods = builder.beforeAllMethods;
+        this.afterAllMethods = builder.afterAllMethods;
     }
 
     @Override
@@ -204,7 +221,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                             new TestClassFailedException(
                                     String.format(
                                             "Exception testing test class [%s]",
-                                            TEST_UTILS.getDisplayName(testClass))));
+                                            TestUtils.getDisplayName(testClass))));
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
             executionRequest
                     .getEngineExecutionListener()
@@ -225,9 +242,8 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         try {
-            List<Field> fields =
-                    REFLECTION_UTILS.findFields(testClass, ParameterizedTestFilters.ARGUMENT_FIELD);
-            for (Field field : fields) {
+            for (Field field : testArgumentFields) {
+                field.setAccessible(true);
                 field.set(getTestInstance(), testArgument);
                 EXTENSION_MANAGER.postFieldCallback(
                         field, getTestInstance(), getThrowableContext());
@@ -247,9 +263,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         try {
-            List<Field> fields =
-                    REFLECTION_UTILS.findFields(testClass, ParameterizedTestFilters.RANDOM_FIELD);
-            for (Field field : fields) {
+            for (Field field : randomFields) {
                 RandomFieldInjector.inject(getTestInstance(), field);
                 EXTENSION_MANAGER.postFieldCallback(
                         field, getTestInstance(), getThrowableContext());
@@ -280,18 +294,10 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         try {
-            List<Method> beforeAllMethods =
-                    ReflectionSupport.findMethods(
-                            testClass,
-                            ParameterizedTestFilters.BEFORE_ALL_METHOD,
-                            HierarchyTraversalMode.TOP_DOWN);
-
-            beforeAllMethods = TEST_UTILS.orderTestMethods(beforeAllMethods);
-
             for (Method method : beforeAllMethods) {
-                LOCK_PROCESSOR.processLocks(method);
-                TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-                LOCK_PROCESSOR.processUnlocks(method);
+                LockProcessor.processLocks(method);
+                TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
+                LockProcessor.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
                 }
@@ -344,18 +350,10 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State afterAll() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        List<Method> afterAllMethods =
-                ReflectionUtils.findMethods(
-                        testClass,
-                        ParameterizedTestFilters.AFTER_ALL_METHOD,
-                        ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP);
-
-        afterAllMethods = TEST_UTILS.orderTestMethods(afterAllMethods);
-
         for (Method method : afterAllMethods) {
-            LOCK_PROCESSOR.processLocks(method);
-            TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-            LOCK_PROCESSOR.processUnlocks(method);
+            LockProcessor.processLocks(method);
+            TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
+            LockProcessor.processUnlocks(method);
         }
 
         return State.POST_AFTER_ALL;
@@ -373,9 +371,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State clearArgumentFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        List<Field> fields =
-                REFLECTION_UTILS.findFields(testClass, ParameterizedTestFilters.ARGUMENT_FIELD);
-        for (Field field : fields) {
+        for (Field field : testArgumentFields) {
             try {
                 field.set(getTestInstance(), null);
             } catch (Throwable t) {
@@ -391,10 +387,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
 
         AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.getSingleton();
 
-        List<Field> testFields =
-                REFLECTION_UTILS.findFields(
-                        testClass, ParameterizedTestFilters.AFTER_ALL_AUTO_CLOSE_FIELD);
-        for (Field testField : testFields) {
+        for (Field testField : autoCloseFields) {
             autoCloseProcessor.close(getTestInstance(), testField, getThrowableContext());
         }
 
@@ -415,6 +408,11 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
 
         private UniqueId uniqueId;
         private String displayName;
+        private List<Field> testArgumentFields;
+        private List<Field> randomFields;
+        private List<Field> autoCloseFields;
+        private List<Method> beforeAllMethods;
+        private List<Method> afterAllMethods;
 
         public Builder setParentTestDescriptor(TestDescriptor parentTestDescriptor) {
             this.parentTestDescriptor = parentTestDescriptor;
@@ -454,6 +452,57 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
 
                 displayName = testArgument.name();
 
+                testArgumentFields =
+                        ReflectionSupport.findFields(
+                                testClass,
+                                AnnotationFieldFilter.of(TestEngine.Argument.class),
+                                HierarchyTraversalMode.TOP_DOWN);
+
+                randomFields =
+                        ReflectionSupport.findFields(
+                                testClass,
+                                AnnotationFieldFilter.of(
+                                        TestEngine.Random.UUID.class,
+                                        TestEngine.Random.Boolean.class,
+                                        TestEngine.Random.Byte.class,
+                                        TestEngine.Random.Character.class,
+                                        TestEngine.Random.Short.class,
+                                        TestEngine.Random.Integer.class,
+                                        TestEngine.Random.Long.class,
+                                        TestEngine.Random.Float.class,
+                                        TestEngine.Random.Double.class,
+                                        TestEngine.Random.BigInteger.class,
+                                        TestEngine.Random.BigDecimal.class),
+                                HierarchyTraversalMode.TOP_DOWN);
+
+                autoCloseFields =
+                        ReflectionSupport.findFields(
+                                testClass,
+                                AnnotationFieldFilter.of(TestEngine.AutoClose.AfterAll.class),
+                                HierarchyTraversalMode.TOP_DOWN);
+
+                beforeAllMethods =
+                        ReflectionSupport.findMethods(
+                                testClass,
+                                AnnotationMethodFilter.of(TestEngine.BeforeAll.class),
+                                HierarchyTraversalMode.TOP_DOWN);
+
+                beforeAllMethods =
+                        TestUtils.orderTestMethods(
+                                beforeAllMethods, HierarchyTraversalMode.TOP_DOWN);
+
+                afterAllMethods =
+                        ReflectionSupport.findMethods(
+                                testClass,
+                                AnnotationMethodFilter.of(TestEngine.AfterAll.class),
+                                HierarchyTraversalMode.BOTTOM_UP);
+
+                afterAllMethods =
+                        TestUtils.orderTestMethods(
+                                afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
+
+                validate();
+
                 TestDescriptor testDescriptor = new ParameterizedArgumentTestDescriptor(this);
 
                 parentTestDescriptor.addChild(testDescriptor);
@@ -461,10 +510,11 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                 List<Method> testMethods =
                         ReflectionSupport.findMethods(
                                 testClass,
-                                ParameterizedTestFilters.TEST_METHOD,
+                                AnnotationMethodFilter.of(TestEngine.Test.class),
                                 HierarchyTraversalMode.TOP_DOWN);
 
-                testMethods = TEST_UTILS.orderTestMethods(testMethods);
+                testMethods =
+                        TestUtils.orderTestMethods(testMethods, HierarchyTraversalMode.TOP_DOWN);
 
                 ThrowableContext throwableContext = new ThrowableContext();
                 EXTENSION_MANAGER.postTestMethodDiscovery(testClass, testMethods, throwableContext);
@@ -488,6 +538,10 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
             } catch (Throwable t) {
                 throw new TestEngineException(t);
             }
+        }
+
+        private void validate() throws Throwable {
+            // TODO validate
         }
     }
 }

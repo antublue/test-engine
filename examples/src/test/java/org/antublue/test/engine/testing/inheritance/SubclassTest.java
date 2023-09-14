@@ -87,6 +87,23 @@ public class SubclassTest extends BaseTest implements Validation {
 
     @Override
     public void validate() {
+        assertThat(actual.size()).isEqualTo(EXPECTED.size());
+
+        for (int i = 0; i < actual.size(); i++) {
+            if (!actual.get(i).equals(EXPECTED.get(i))) {
+                System.out.println(
+                        "equal ["
+                                + actual.get(i).equals(EXPECTED.get(i))
+                                + "] index "
+                                + i
+                                + " actual ["
+                                + actual.get(i)
+                                + "] expected ["
+                                + EXPECTED.get(i)
+                                + "]");
+            }
+        }
+
         assertThat(actual).isEqualTo(EXPECTED);
     }
 }

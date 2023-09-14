@@ -18,9 +18,8 @@ package org.antublue.test.engine.internal.test.descriptor.standard;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.function.Predicate;
 import org.antublue.test.engine.internal.test.descriptor.TestDescriptorFactory;
-import org.antublue.test.engine.internal.test.util.ReflectionUtils;
+import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.discovery.ClassSelector;
@@ -32,8 +31,6 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a StandardTestDescriptorFactory */
 public class StandardTestFactory implements TestDescriptorFactory {
-
-    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
     @Override
     public void discover(
@@ -78,9 +75,10 @@ public class StandardTestFactory implements TestDescriptorFactory {
             EngineDiscoveryRequest engineDiscoveryRequest,
             ClasspathRootSelector classpathRootSelector,
             EngineDescriptor engineDescriptor) {
-        REFLECTION_UTILS
-                .findAllClasses(
-                        classpathRootSelector.getClasspathRoot(), StandardTestFilters.TEST_CLASS)
+        ReflectionSupport.findAllClassesInClasspathRoot(
+                        classpathRootSelector.getClasspathRoot(),
+                        StandardTestPredicates.TEST_CLASS,
+                        className -> true)
                 .forEach(
                         testClass -> {
                             if (accept(engineDiscoveryRequest, testClass)) {
@@ -103,15 +101,16 @@ public class StandardTestFactory implements TestDescriptorFactory {
             EngineDiscoveryRequest engineDiscoveryRequest,
             PackageSelector packageSelector,
             EngineDescriptor engineDescriptor) {
-        REFLECTION_UTILS
-                .findAllClasses(packageSelector.getPackageName(), StandardTestFilters.TEST_CLASS)
+        ReflectionSupport.findAllClassesInPackage(
+                        packageSelector.getPackageName(),
+                        StandardTestPredicates.TEST_CLASS,
+                        className -> true)
                 .forEach(
-                        testClass -> {
-                            if (StandardTestFilters.TEST_CLASS.test(testClass)
-                                    && accept(engineDiscoveryRequest, testClass)) {
+                        clazz -> {
+                            if (accept(engineDiscoveryRequest, clazz)) {
                                 new StandardClassTestDescriptor.Builder()
                                         .setParentTestDescriptor(engineDescriptor)
-                                        .setTestClass(testClass)
+                                        .setTestClass(clazz)
                                         .build();
                             }
                         });
@@ -128,13 +127,13 @@ public class StandardTestFactory implements TestDescriptorFactory {
             EngineDiscoveryRequest engineDiscoveryRequest,
             ClassSelector classSelector,
             EngineDescriptor engineDescriptor) {
-        Class<?> testClass = classSelector.getJavaClass();
-        if (StandardTestFilters.TEST_CLASS.test(testClass)
-                && accept(engineDiscoveryRequest, testClass)) {
+        Class<?> clazz = classSelector.getJavaClass();
+        if (StandardTestPredicates.TEST_CLASS.test(clazz)
+                && accept(engineDiscoveryRequest, clazz)) {
             engineDescriptor.addChild(
                     new StandardClassTestDescriptor.Builder()
                             .setParentTestDescriptor(engineDescriptor)
-                            .setTestClass(testClass)
+                            .setTestClass(clazz)
                             .build());
         }
     }
@@ -150,15 +149,15 @@ public class StandardTestFactory implements TestDescriptorFactory {
             EngineDiscoveryRequest engineDiscoveryRequest,
             MethodSelector methodSelector,
             EngineDescriptor engineDescriptor) {
-        Class<?> testClass = methodSelector.getJavaClass();
-        Method testMethod = methodSelector.getJavaMethod();
-        if (StandardTestFilters.TEST_CLASS.test(testClass)
-                && StandardTestFilters.TEST_METHOD.test(testMethod)
-                && accept(engineDiscoveryRequest, testClass)) {
+        Class<?> clazz = methodSelector.getJavaClass();
+        Method method = methodSelector.getJavaMethod();
+        if (StandardTestPredicates.TEST_CLASS.test(clazz)
+                && StandardTestPredicates.TEST_METHOD.test(method)
+                && accept(engineDiscoveryRequest, clazz)) {
             new StandardClassTestDescriptor.Builder()
                     .setParentTestDescriptor(engineDescriptor)
-                    .setTestClass(testClass)
-                    .setTestMethodFilter(new TestMethodFilter(testMethod))
+                    .setTestClass(clazz)
+                    .setTestMethod(method)
                     .build();
         }
     }
@@ -170,7 +169,7 @@ public class StandardTestFactory implements TestDescriptorFactory {
      * @param clazz class
      * @return true if the class should be accepted, else false
      */
-    public boolean accept(EngineDiscoveryRequest engineDiscoveryRequest, Class<?> clazz) {
+    public static boolean accept(EngineDiscoveryRequest engineDiscoveryRequest, Class<?> clazz) {
         List<PackageNameFilter> packageNameFilters =
                 engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
         for (PackageNameFilter packageNameFilter : packageNameFilters) {
@@ -180,25 +179,5 @@ public class StandardTestFactory implements TestDescriptorFactory {
             }
         }
         return true;
-    }
-
-    /** Class to implement a TestMethodFilter */
-    private static class TestMethodFilter implements Predicate<Method> {
-
-        private final Method testMethod;
-
-        /**
-         * Constructor
-         *
-         * @param testMethod testMethod
-         */
-        public TestMethodFilter(Method testMethod) {
-            this.testMethod = testMethod;
-        }
-
-        @Override
-        public boolean test(Method testMethod) {
-            return this.testMethod.equals(testMethod);
-        }
     }
 }

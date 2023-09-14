@@ -28,7 +28,7 @@ public class BadTest {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    // @TestEngine.ArgumentSupplier
+    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -38,8 +38,12 @@ public class BadTest {
     }
 
     @TestEngine.ArgumentSupplier
-    public static String arguments2() {
-        return "argument";
+    public static Stream<StringArgument> arguments2() {
+        Collection<StringArgument> collection = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            collection.add(StringArgument.of("StringArgument " + i));
+        }
+        return collection.stream();
     }
 
     @TestEngine.Prepare

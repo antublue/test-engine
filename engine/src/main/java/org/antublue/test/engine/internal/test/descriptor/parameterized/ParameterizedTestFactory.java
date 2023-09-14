@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.test.descriptor.TestDescriptorFactory;
-import org.antublue.test.engine.internal.test.util.ReflectionUtils;
+import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.TestDescriptor;
@@ -38,8 +38,6 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a ParameterizedTestDescriptorFactory */
 public class ParameterizedTestFactory implements TestDescriptorFactory {
-
-    private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
 
     @Override
     public void discover(
@@ -89,10 +87,10 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
             EngineDiscoveryRequest engineDiscoveryRequest,
             ClasspathRootSelector classpathRootSelector,
             EngineDescriptor engineDescriptor) {
-        REFLECTION_UTILS
-                .findAllClasses(
+        ReflectionSupport.findAllClassesInClasspathRoot(
                         classpathRootSelector.getClasspathRoot(),
-                        ParameterizedTestFilters.TEST_CLASS)
+                        ParameterizedTestPredicates.TEST_CLASS,
+                        className -> true)
                 .forEach(
                         testClass -> {
                             if (accept(engineDiscoveryRequest, testClass)) {
@@ -115,13 +113,13 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
             EngineDiscoveryRequest engineDiscoveryRequest,
             PackageSelector packageSelector,
             EngineDescriptor engineDescriptor) {
-        REFLECTION_UTILS
-                .findAllClasses(
-                        packageSelector.getPackageName(), ParameterizedTestFilters.TEST_CLASS)
+        ReflectionSupport.findAllClassesInPackage(
+                        packageSelector.getPackageName(),
+                        ParameterizedTestPredicates.TEST_CLASS,
+                        className -> true)
                 .forEach(
                         testClass -> {
-                            if (ParameterizedTestFilters.TEST_CLASS.test(testClass)
-                                    && accept(engineDiscoveryRequest, testClass)) {
+                            if (accept(engineDiscoveryRequest, testClass)) {
                                 new ParameterizedClassTestDescriptor.Builder()
                                         .setParentTestDescriptor(engineDescriptor)
                                         .setTestClass(testClass)
@@ -142,7 +140,7 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
             ClassSelector classSelector,
             EngineDescriptor engineDescriptor) {
         Class<?> testClass = classSelector.getJavaClass();
-        if (ParameterizedTestFilters.TEST_CLASS.test(testClass)
+        if (ParameterizedTestPredicates.TEST_CLASS.test(testClass)
                 && accept(engineDiscoveryRequest, testClass)) {
             new ParameterizedClassTestDescriptor.Builder()
                     .setParentTestDescriptor(engineDescriptor)
@@ -241,8 +239,8 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
             EngineDescriptor engineDescriptor) {
         Class<?> testClass = methodSelector.getJavaClass();
         Method testMethod = methodSelector.getJavaMethod();
-        if (ParameterizedTestFilters.TEST_CLASS.test(testClass)
-                && ParameterizedTestFilters.TEST_METHOD.test(testMethod)
+        if (ParameterizedTestPredicates.TEST_CLASS.test(testClass)
+                && ParameterizedTestPredicates.TEST_METHOD.test(testMethod)
                 && accept(engineDiscoveryRequest, testClass)) {
             new ParameterizedClassTestDescriptor.Builder()
                     .setParentTestDescriptor(engineDescriptor)

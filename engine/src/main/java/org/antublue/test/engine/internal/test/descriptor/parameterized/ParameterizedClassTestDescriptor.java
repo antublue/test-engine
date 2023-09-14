@@ -16,18 +16,31 @@
 
 package org.antublue.test.engine.internal.test.descriptor.parameterized;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
+import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
+import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
+import org.antublue.test.engine.internal.test.descriptor.standard.StandardClassTestDescriptor;
+import org.antublue.test.engine.internal.test.extension.ExtensionManager;
 import org.antublue.test.engine.internal.test.util.AutoCloseProcessor;
+import org.antublue.test.engine.internal.test.util.LockProcessor;
+import org.antublue.test.engine.internal.test.util.ReflectionUtils;
 import org.antublue.test.engine.internal.test.util.StateMachine;
+import org.antublue.test.engine.internal.test.util.TestUtils;
 import org.antublue.test.engine.internal.test.util.ThrowableContext;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
@@ -41,9 +54,15 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /** Class to implement a ParameterClassTestDescriptor */
+@SuppressWarnings("unchecked")
 public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
+    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
+
     private final Class<?> testClass;
+    private final List<Field> autoCloseFields;
+    private final List<Method> prepareMethods;
+    private final List<Method> concludeMethods;
 
     private enum State {
         BEGIN,
@@ -70,6 +89,9 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         setUniqueId(builder.uniqueId);
         setDisplayName(builder.displayName);
         this.testClass = builder.testClass;
+        this.autoCloseFields = builder.autoCloseFields;
+        this.prepareMethods = builder.prepareMethods;
+        this.concludeMethods = builder.concludeMethods;
     }
 
     @Override
@@ -87,7 +109,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     public String getTag() {
-        return TEST_UTILS.getTag(testClass);
+        return TestUtils.getTag(testClass);
     }
 
     @Override
@@ -201,7 +223,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         Preconditions.condition(getThrowableContext().isEmpty(), "Programming error");
 
         try {
-            setTestInstance(REFLECTION_UTILS.newInstance(testClass.getName()));
+            setTestInstance(ReflectionUtils.newInstance(testClass));
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
         }
@@ -235,18 +257,10 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         try {
-            List<Method> prepareMethods =
-                    ReflectionSupport.findMethods(
-                            testClass,
-                            ParameterizedTestFilters.PREPARE_METHOD,
-                            HierarchyTraversalMode.TOP_DOWN);
-
-            prepareMethods = TEST_UTILS.orderTestMethods(prepareMethods);
-
             for (Method method : prepareMethods) {
-                LOCK_PROCESSOR.processLocks(method);
-                TEST_UTILS.invoke(method, getTestInstance(), null, getThrowableContext());
-                LOCK_PROCESSOR.processUnlocks(method);
+                LockProcessor.processLocks(method);
+                TestUtils.invoke(method, getTestInstance(), null, getThrowableContext());
+                LockProcessor.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
                 }
@@ -294,18 +308,10 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     private State conclude() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        List<Method> concludeMethods =
-                ReflectionSupport.findMethods(
-                        testClass,
-                        ParameterizedTestFilters.CONCLUDE_METHOD,
-                        HierarchyTraversalMode.BOTTOM_UP);
-
-        concludeMethods = TEST_UTILS.orderTestMethods(concludeMethods);
-
         for (Method method : concludeMethods) {
-            LOCK_PROCESSOR.processLocks(method);
-            TEST_UTILS.invoke(method, getTestInstance(), null, getThrowableContext());
-            LOCK_PROCESSOR.processUnlocks(method);
+            LockProcessor.processLocks(method);
+            TestUtils.invoke(method, getTestInstance(), null, getThrowableContext());
+            LockProcessor.processUnlocks(method);
         }
 
         return State.POST_CONCLUDE;
@@ -324,12 +330,8 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
         AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.getSingleton();
 
-        List<Field> testFields =
-                REFLECTION_UTILS.findFields(
-                        testClass, ParameterizedTestFilters.AFTER_CONCLUDE_AUTO_CLOSE_FIELDS);
-
-        for (Field testField : testFields) {
-            autoCloseProcessor.close(getTestInstance(), testField, getThrowableContext());
+        for (Field field : autoCloseFields) {
+            autoCloseProcessor.close(getTestInstance(), field, getThrowableContext());
         }
 
         return State.END;
@@ -342,6 +344,38 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         return null;
     }
 
+    private static Method getArumentSupplierMethod(Class<?> testClass) {
+        List<Method> methods =
+                ReflectionSupport.findMethods(
+                        testClass,
+                        AnnotationMethodFilter.of(TestEngine.ArgumentSupplier.class),
+                        HierarchyTraversalMode.BOTTOM_UP);
+
+        Method method = methods.get(0);
+        method.setAccessible(true);
+
+        return method;
+    }
+
+    public static List<Argument> getArguments(Class<?> testClass) throws Throwable {
+        List<Argument> testArguments = new ArrayList<>();
+
+        Object object = getArumentSupplierMethod(testClass).invoke(null, (Object[]) null);
+        if (object instanceof Stream) {
+            Stream<Argument> stream = (Stream<Argument>) object;
+            stream.forEach(testArguments::add);
+        } else if (object instanceof Iterable) {
+            ((Iterable<Argument>) object).forEach(testArguments::add);
+        } else {
+            throw new TestClassDefinitionException(
+                    String.format(
+                            "Exception getting arguments for test class [%s]",
+                            testClass.getName()));
+        }
+
+        return testArguments;
+    }
+
     public static class Builder {
 
         private TestDescriptor parentTestDescriptor;
@@ -350,6 +384,9 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
         private UniqueId uniqueId;
         private String displayName;
+        private List<Field> autoCloseFields;
+        private List<Method> prepareMethods;
+        private List<Method> concludeMethods;
 
         public Builder setParentTestDescriptor(TestDescriptor parentTestDescriptor) {
             this.parentTestDescriptor = parentTestDescriptor;
@@ -374,19 +411,45 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                         parentTestDescriptor
                                 .getUniqueId()
                                 .append(
-                                        ParameterizedClassTestDescriptor.class.getName(),
+                                        StandardClassTestDescriptor.class.getName(),
                                         UUID.randomUUID() + "/" + testClass.getName());
 
-                displayName = TEST_UTILS.getDisplayName(testClass);
+                displayName = TestUtils.getDisplayName(testClass);
+
+                prepareMethods =
+                        ReflectionSupport.findMethods(
+                                testClass,
+                                AnnotationMethodFilter.of(TestEngine.Prepare.class),
+                                HierarchyTraversalMode.TOP_DOWN);
+
+                prepareMethods =
+                        TestUtils.orderTestMethods(prepareMethods, HierarchyTraversalMode.TOP_DOWN);
+
+                concludeMethods =
+                        ReflectionSupport.findMethods(
+                                testClass,
+                                AnnotationMethodFilter.of(TestEngine.Conclude.class),
+                                HierarchyTraversalMode.BOTTOM_UP);
+
+                concludeMethods =
+                        TestUtils.orderTestMethods(
+                                concludeMethods, HierarchyTraversalMode.BOTTOM_UP);
+
+                autoCloseFields =
+                        ReflectionSupport.findFields(
+                                testClass,
+                                AnnotationFieldFilter.of(TestEngine.AutoClose.Conclude.class),
+                                HierarchyTraversalMode.BOTTOM_UP);
+
+                Method testArgumentSupplierMethod = getArumentSupplierMethod(testClass);
+
+                List<Argument> testArguments = getArguments(testClass);
+
+                validate();
 
                 TestDescriptor testDescriptor = new ParameterizedClassTestDescriptor(this);
 
                 parentTestDescriptor.addChild(testDescriptor);
-
-                Method testArgumentSupplierMethod =
-                        PARAMETERIZED_UTILS.getArumentSupplierMethod(testClass);
-
-                List<Argument> testArguments = PARAMETERIZED_UTILS.getArguments(testClass);
 
                 for (Argument testArgument : testArguments) {
                     testDescriptor.addChild(
@@ -402,6 +465,35 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                 throw e;
             } catch (Throwable t) {
                 throw new TestEngineException(t);
+            }
+        }
+
+        private void validate() throws Throwable {
+            // TODO validate testClass
+
+            int argumentSupplierCount = 0;
+            int extensionSupplierCount = 0;
+
+            List<Annotation> annotations = Arrays.asList(testClass.getAnnotations());
+            for (Annotation annotation : annotations) {
+                if (annotation.annotationType().equals(TestEngine.ArgumentSupplier.class)) {
+                    argumentSupplierCount++;
+                    continue;
+                }
+                if (annotation.annotationType().equals(TestEngine.ExtensionSupplier.class)) {
+                    extensionSupplierCount++;
+                    continue;
+                }
+            }
+
+            if (argumentSupplierCount > 1) {
+                throw new TestClassDefinitionException(
+                        String.format("More than 1 @TestEngine.ArgumentSupplier method"));
+            }
+
+            if (extensionSupplierCount > 1) {
+                throw new TestClassDefinitionException(
+                        String.format("More than 1 @TestEngine.ExtensionSupplier method"));
             }
         }
     }
