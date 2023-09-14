@@ -87,7 +87,7 @@ public class StateMachine<T> {
                     afterEachAction.perform();
                 }
             }
-        } while (state != end);
+        } while (!state.equals(end));
 
         endAction.perform();
     }
