@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.utils.ReflectionUtils;
+import org.antublue.test.engine.internal.test.util.ReflectionUtils;
 
 public class ExtensionFilters {
 

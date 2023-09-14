@@ -16,30 +16,71 @@
 
 package org.antublue.test.engine.testing.validation;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 
 public class ExtendedTest extends BaseTest {
 
+    @TestEngine.ExtensionSupplier
+    public static Stream<Extension> extensions() {
+        Collection<Extension> collection = new ArrayList<>();
+        collection.add(new MethodOrderExtension());
+        return collection.stream();
+    }
+
+    @BeforeEach
+    @Order(2)
     @TestEngine.BeforeEach
     @TestEngine.Order(order = 2)
     public void beforeEach2() {
         System.out.format("    %s beforeEach2()", ExtendedTest.class.getName()).println();
     }
 
+    @Test
+    @Order(20)
     @TestEngine.Test
     @TestEngine.Order(order = 20)
     public void test2() {
         System.out.format("%s test2()", ExtendedTest.class.getName()).println();
     }
 
+    @Test
+    @Order(30)
     @TestEngine.Test
     @TestEngine.Order(order = 30)
     public void test3() {
         System.out.format("%s test3()", ExtendedTest.class.getName()).println();
     }
 
+    @AfterEach
     @TestEngine.AfterEach
     public void afterEach2() {
         System.out.format("    %s afterEach2()", ExtendedTest.class.getName()).println();
+    }
+
+    @AfterEach
+    @TestEngine.AfterEach
+    public void afterEach4() {
+        System.out.format("    %s afterEach4()", ExtendedTest.class.getName()).println();
+    }
+
+    private static class MethodOrderExtension implements Extension {
+
+        @Override
+        public void postTestMethodDiscovery(Class<?> testClass, List<Method> testMethods)
+                throws Throwable {
+            for (Method testMethod : testMethods) {
+                System.out.println(String.format("testMethod [%s]", testMethod));
+            }
+        }
     }
 }

@@ -33,6 +33,7 @@ public class BaseTest {
 
     static {
         EXPECTED.add("prepare()");
+        EXPECTED.add("prepare3()");
         EXPECTED.add("prepare2()");
         arguments()
                 .forEach(
@@ -52,14 +53,15 @@ public class BaseTest {
                             EXPECTED.add("afterAll2(" + stringArgument + ")");
                             EXPECTED.add("afterAll(" + stringArgument + ")");
                         });
-        EXPECTED.add("conclude()");
         EXPECTED.add("conclude2()");
+        EXPECTED.add("conclude()");
+        EXPECTED.add("conclude3()");
     }
 
     @TestEngine.Argument protected IntegerArgument integerArgument;
 
     @TestEngine.ArgumentSupplier
-    protected static Stream<IntegerArgument> arguments() {
+    public static Stream<IntegerArgument> arguments() {
         Collection<IntegerArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
             collection.add(IntegerArgument.of(i));
@@ -72,6 +74,13 @@ public class BaseTest {
         System.out.println("prepare()");
         assertThat(integerArgument).isNull();
         actual.add("prepare()");
+    }
+
+    @TestEngine.Prepare
+    public void prepare3() {
+        System.out.println("prepare3()");
+        assertThat(integerArgument).isNull();
+        actual.add("prepare3()");
     }
 
     @TestEngine.BeforeAll
@@ -110,9 +119,16 @@ public class BaseTest {
     }
 
     @TestEngine.Conclude
-    public void conclude2() {
-        System.out.println("conclude2()");
+    public void conclude() {
+        System.out.println("conclude()");
         assertThat(integerArgument).isNull();
-        actual.add("conclude2()");
+        actual.add("conclude()");
+    }
+
+    @TestEngine.Conclude
+    public void conclude3() {
+        System.out.println("conclude3()");
+        assertThat(integerArgument).isNull();
+        actual.add("conclude3()");
     }
 }

@@ -22,7 +22,9 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.utils.ReflectionUtils;
+import org.antublue.test.engine.internal.test.util.ReflectionUtils;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
+import org.junit.platform.commons.support.ReflectionSupport;
 
 public class StandardTestFilters {
 
@@ -58,7 +60,9 @@ public class StandardTestFilters {
                                 && !Modifier.isAbstract(clazz.getModifiers());
 
                 if (isSimpleTestClass) {
-                    List<Method> methods = REFLECTION_UTILS.findMethods(clazz);
+                    List<Method> methods =
+                            ReflectionSupport.findMethods(
+                                    clazz, method -> true, HierarchyTraversalMode.TOP_DOWN);
 
                     int testCount = 0;
                     int argumentSupplierCount = 0;

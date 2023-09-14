@@ -79,10 +79,10 @@ public class SubclassTest extends BaseTest implements Validation {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
-        System.out.println("conclude()");
+    public void conclude2() {
+        System.out.println("conclude2()");
         assertThat(integerArgument).isNull();
-        actual.add("conclude()");
+        actual.add("conclude2()");
     }
 
     @Override

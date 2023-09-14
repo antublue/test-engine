@@ -29,12 +29,14 @@ import java.util.stream.Stream;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
-import org.antublue.test.engine.api.utils.ReflectionUtils;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.test.util.ReflectionUtils;
 import org.antublue.test.engine.internal.test.util.ThrowableContext;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
+import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to implement an ExtensionProcessor */
 @SuppressWarnings({"unchecked", "PMD.UnusedPrivateMethod"})
@@ -118,6 +120,17 @@ public class ExtensionManager {
                 Collections.reverse(testExtensionReversed);
                 testExtensionsMap.put(testClass, testExtensions);
                 testExtensionsReversedMap.put(testClass, testExtensionReversed);
+            }
+        }
+    }
+
+    public void postTestMethodDiscovery(
+            Class<?> testClass, List<Method> testMethods, ThrowableContext throwableContext) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
+            try {
+                testExtension.postTestMethodDiscovery(testClass, testMethods);
+            } catch (Throwable t) {
+                throwableContext.add(testClass, t);
             }
         }
     }
@@ -409,8 +422,13 @@ public class ExtensionManager {
         LOGGER.trace("buildTestExtensionList() testClass [%s]", testClass.getName());
 
         List<Extension> testExtensions = new ArrayList<>();
+
         List<Method> extensionSupplierMethods =
-                REFLECTION_UTILS.findMethods(testClass, ExtensionFilters.EXTENSION_SUPPLIER_METHOD);
+                ReflectionSupport.findMethods(
+                        testClass,
+                        ExtensionFilters.EXTENSION_SUPPLIER_METHOD,
+                        HierarchyTraversalMode.TOP_DOWN);
+
         for (Method method : extensionSupplierMethods) {
             Object object = method.invoke(null, (Object[]) null);
             if (object instanceof Stream) {

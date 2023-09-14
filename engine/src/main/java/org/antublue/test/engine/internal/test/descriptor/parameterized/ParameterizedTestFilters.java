@@ -24,7 +24,9 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.utils.ReflectionUtils;
+import org.antublue.test.engine.internal.test.util.ReflectionUtils;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
+import org.junit.platform.commons.support.ReflectionSupport;
 
 public class ParameterizedTestFilters {
 
@@ -100,7 +102,9 @@ public class ParameterizedTestFilters {
                                 && !Modifier.isAbstract(clazz.getModifiers());
 
                 if (isParameterizedTestClass) {
-                    List<Method> methods = REFLECTION_UTILS.findMethods(clazz);
+                    List<Method> methods =
+                            ReflectionSupport.findMethods(
+                                    clazz, method -> true, HierarchyTraversalMode.TOP_DOWN);
 
                     int testCount = 0;
                     int argumentSupplierCount = 0;

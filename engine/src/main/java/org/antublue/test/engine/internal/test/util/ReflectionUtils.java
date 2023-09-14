@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.utils;
+package org.antublue.test.engine.internal.test.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -30,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to implement ReflectionUtils */
@@ -51,7 +50,7 @@ public final class ReflectionUtils {
 
     public static final Object[] NO_OBJECT_ARGS = null;
 
-    public enum HierarchyTraversalMode {
+    private enum HierarchyTraversalMode {
         TOP_DOWN,
         BOTTOM_UP
     }
@@ -62,16 +61,6 @@ public final class ReflectionUtils {
 
     public static ReflectionUtils getSingleton() {
         return SINGLETON;
-    }
-
-    /**
-     * Method to find all classes for a URI
-     *
-     * @param uri uri
-     * @return a List of Classes
-     */
-    public List<Class<?>> findAllClasses(URI uri) {
-        return findAllClasses(uri, ALL_CLASSES_FILTER);
     }
 
     /**
@@ -146,7 +135,7 @@ public final class ReflectionUtils {
      * @param clazz class to inspect
      * @return a List of Methods
      */
-    public List<Method> findMethods(Class<?> clazz) {
+    private List<Method> findMethods(Class<?> clazz) {
         return findMethods(clazz, ALL_METHODS_FILTER);
     }
 
@@ -157,7 +146,7 @@ public final class ReflectionUtils {
      * @param methodFilter methodFilter
      * @return a List of Methods
      */
-    public List<Method> findMethods(Class<?> clazz, Predicate<Method> methodFilter) {
+    private List<Method> findMethods(Class<?> clazz, Predicate<Method> methodFilter) {
         return findMethods(clazz, methodFilter, HierarchyTraversalMode.BOTTOM_UP);
     }
 
@@ -168,10 +157,24 @@ public final class ReflectionUtils {
      * @param methodFilter methodFilter
      * @return a List of Methods
      */
-    public List<Method> findMethods(
+    private List<Method> findMethods(
             Class<?> clazz,
             Predicate<Method> methodFilter,
             HierarchyTraversalMode hierarchyTraversalMode) {
+
+        if (hierarchyTraversalMode == HierarchyTraversalMode.TOP_DOWN) {
+            return ReflectionSupport.findMethods(
+                    clazz,
+                    methodFilter,
+                    org.junit.platform.commons.support.HierarchyTraversalMode.TOP_DOWN);
+        } else {
+            return ReflectionSupport.findMethods(
+                    clazz,
+                    methodFilter,
+                    org.junit.platform.commons.support.HierarchyTraversalMode.BOTTOM_UP);
+        }
+
+        /*
         try {
             return buildClassHierarchy(clazz, hierarchyTraversalMode).stream()
                     .flatMap(
@@ -207,6 +210,7 @@ public final class ReflectionUtils {
         } catch (NoClassDefFoundError e) {
             return new ArrayList<>();
         }
+        */
     }
 
     /**

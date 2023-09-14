@@ -31,6 +31,8 @@ import org.antublue.test.engine.internal.test.descriptor.parameterized.Parameter
 import org.antublue.test.engine.internal.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.internal.test.util.StateMachine;
 import org.antublue.test.engine.internal.util.StandardStreams;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
+import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -210,10 +212,12 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
 
         try {
             List<Method> beforeEachMethods =
-                    REFLECTION_UTILS.findMethods(
-                            testClass, ParameterizedTestFilters.BEFORE_EACH_METHOD);
+                    ReflectionSupport.findMethods(
+                            testClass,
+                            ParameterizedTestFilters.BEFORE_EACH_METHOD,
+                            HierarchyTraversalMode.TOP_DOWN);
 
-            TEST_UTILS.orderTestMethods(beforeEachMethods);
+            beforeEachMethods = TEST_UTILS.orderTestMethods(beforeEachMethods);
 
             for (Method method : beforeEachMethods) {
                 LOCK_PROCESSOR.processLocks(method);
@@ -292,9 +296,12 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         List<Method> afterEachMethods =
-                REFLECTION_UTILS.findMethods(testClass, ParameterizedTestFilters.AFTER_EACH_METHOD);
+                ReflectionSupport.findMethods(
+                        testClass,
+                        ParameterizedTestFilters.AFTER_EACH_METHOD,
+                        HierarchyTraversalMode.BOTTOM_UP);
 
-        TEST_UTILS.orderTestMethodsReverse(afterEachMethods);
+        afterEachMethods = TEST_UTILS.orderTestMethods(afterEachMethods);
 
         for (Method method : afterEachMethods) {
             LOCK_PROCESSOR.processLocks(method);

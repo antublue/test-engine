@@ -16,21 +16,30 @@
 
 package org.antublue.test.engine.internal.test.util;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.utils.ReflectionUtils;
+import org.junit.platform.commons.util.ClassUtils;
 
 public class TestUtils {
 
     private static final TestUtils SINGLETON = new TestUtils();
 
     private static final ReflectionUtils REFLECTION_UTILS = ReflectionUtils.getSingleton();
+
+    private static final DefaultMethodOrderComparator DEFAULT_METHOD_ORDER_COMPARATOR =
+            new DefaultMethodOrderComparator();
+
+    private static final TestEngineOrderAnnotationMethodComparator
+            TEST_ENGINE_ORDER_ANNOTATION_COMPARATOR = new TestEngineOrderAnnotationMethodComparator();
+
+    private static final MethodNameComparator METHOD_NAME_COMPARATOR = new MethodNameComparator();
 
     private TestUtils() {
         // DO NOTHING
@@ -99,13 +108,13 @@ public class TestUtils {
     /**
      * Method to get a test class tag value
      *
-     * @param testClass testClass
+     * @param annotatedElement annotatedElement
      * @return the tag value
      */
-    public String getTag(Class<?> testClass) {
+    public String getTag(AnnotatedElement annotatedElement) {
         String tagValue = null;
 
-        TestEngine.Tag annotation = testClass.getAnnotation(TestEngine.Tag.class);
+        TestEngine.Tag annotation = annotatedElement.getAnnotation(TestEngine.Tag.class);
         if (annotation != null) {
             String tag = annotation.tag();
             if (tag != null && !tag.trim().isEmpty()) {
@@ -117,32 +126,12 @@ public class TestUtils {
     }
 
     /**
-     * Method to get a test method tag value
-     *
-     * @param testMethod testMethod
-     * @return the tag value
-     */
-    public String getTag(Method testMethod) {
-        String tagValue = null;
-
-        TestEngine.Tag annotation = testMethod.getAnnotation(TestEngine.Tag.class);
-        if (annotation != null) {
-            String tag = annotation.tag();
-            if (tag != null && !tag.trim().isEmpty()) {
-                tagValue = tag.trim();
-            }
-        }
-
-        return tagValue;
-    }
-
-    /**
-     * Method to order test methods first by @TestEngine.Order annotation, then by name for a class
-     * within the hierarchy
+     * Method to order test methods within the hierarchy, keeping the groups by component type / declaring class
      *
      * @param testMethods testMethods
+     * @return the list of methods ordered
      */
-    public void orderTestMethods(List<Method> testMethods) {
+    public List<Method> orderTestMethods(List<Method> testMethods) {
         // Group methods based on component type / declaring class
         Map<Class<?>, List<Method>> methodMap = new LinkedHashMap<>();
         for (Method method : testMethods) {
@@ -150,119 +139,71 @@ public class TestUtils {
             if (componentType == null) {
                 componentType = method.getDeclaringClass();
             }
-            List<Method> methods = methodMap.get(componentType);
-            if (methods == null) {
-                methods = new ArrayList<>();
-                methodMap.put(componentType, methods);
-            }
+            List<Method> methods = methodMap.computeIfAbsent(componentType, k -> new ArrayList<>());
             methods.add(method);
         }
 
-        // Sort methods for each group
+        List<Method> orderedMethods = new ArrayList<>();
+
+        // Sort methods for each group and add them to the list
         for (Map.Entry<Class<?>, List<Method>> entry : methodMap.entrySet()) {
-            entry.getValue()
-                    .sort(
-                            (o1, o2) -> {
-                                int o1Order = Integer.MAX_VALUE;
-                                TestEngine.Order o1Annotation =
-                                        o1.getAnnotation(TestEngine.Order.class);
-                                if (o1Annotation != null) {
-                                    o1Order = o1Annotation.order();
-                                }
-
-                                int o2Order = Integer.MAX_VALUE;
-                                TestEngine.Order o2Annotation =
-                                        o2.getAnnotation(TestEngine.Order.class);
-                                if (o2Annotation != null) {
-                                    o2Order = o2Annotation.order();
-                                }
-
-                                if (o1Order != o2Order) {
-                                    return Integer.compare(o1Order, o2Order);
-                                }
-
-                                // Order by display name which is either
-                                // the name declared by @TestEngine.DisplayName
-                                // or the real method name
-                                String o1DisplayName = getDisplayName(o1);
-                                String o2DisplayName = getDisplayName(o2);
-
-                                return o1DisplayName.compareTo(o2DisplayName);
-                            });
+            entry.getValue().sort(DEFAULT_METHOD_ORDER_COMPARATOR);
+            orderedMethods.addAll(entry.getValue());
         }
 
-        // Clear the test method list
-        testMethods.clear();
+        return orderedMethods;
+    }
 
-        // Rebuild the test method set
-        for (Map.Entry<Class<?>, List<Method>> entry : methodMap.entrySet()) {
-            testMethods.addAll(entry.getValue());
+    private static class DefaultMethodOrderComparator implements Comparator<Method> {
+
+        @Override
+        public int compare(Method method1, Method method2) {
+            int comparison =
+                    TEST_ENGINE_ORDER_ANNOTATION_COMPARATOR.compare(
+                            method1, method2);
+            if (comparison == 0) {
+                comparison = METHOD_NAME_COMPARATOR.compare(method1, method2);
+            }
+            return comparison;
         }
     }
 
-    /**
-     * Method to order test methods in reverse first by @TestEngine.Order annotation, then by name
-     * for a class within the hierarchy
-     *
-     * @param testMethods testMethods
-     */
-    public void orderTestMethodsReverse(List<Method> testMethods) {
-        // Group methods based on component type / declaring class
-        Map<Class<?>, List<Method>> methodMap = new LinkedHashMap<>();
-        for (Method method : testMethods) {
-            Class<?> componentType = method.getDeclaringClass().getComponentType();
-            if (componentType == null) {
-                componentType = method.getDeclaringClass();
+    /** Class to order methods based on @TestEngine.Order annotation */
+    private static class TestEngineOrderAnnotationMethodComparator implements Comparator<Method> {
+
+        private static final int DEFAULT_ORDER = Integer.MAX_VALUE;
+
+        @Override
+        public int compare(Method o1, Method o2) {
+            int o1Order = DEFAULT_ORDER;
+            TestEngine.Order o1Annotation = o1.getAnnotation(TestEngine.Order.class);
+            if (o1Annotation != null) {
+                o1Order = o1Annotation.order();
             }
-            List<Method> methods = methodMap.get(componentType);
-            if (methods == null) {
-                methods = new ArrayList<>();
-                methodMap.put(componentType, methods);
+
+            int o2Order = DEFAULT_ORDER;
+            TestEngine.Order o2Annotation = o2.getAnnotation(TestEngine.Order.class);
+            if (o2Annotation != null) {
+                o2Order = o2Annotation.order();
             }
-            methods.add(method);
+
+            return Integer.compare(o1Order, o2Order);
         }
+    }
 
-        // Sort methods for each group
-        for (Map.Entry<Class<?>, List<Method>> entry : methodMap.entrySet()) {
-            entry.getValue()
-                    .sort(
-                            (o1, o2) -> {
-                                int o1Order = Integer.MAX_VALUE;
-                                TestEngine.Order o1Annotation =
-                                        o1.getAnnotation(TestEngine.Order.class);
-                                if (o1Annotation != null) {
-                                    o1Order = o1Annotation.order();
-                                }
+    /** Class to order methods based on method name, then parameter types */
+    private static class MethodNameComparator implements Comparator<Method> {
 
-                                int o2Order = Integer.MAX_VALUE;
-                                TestEngine.Order o2Annotation =
-                                        o2.getAnnotation(TestEngine.Order.class);
-                                if (o2Annotation != null) {
-                                    o2Order = o2Annotation.order();
-                                }
-
-                                if (o1Order != o2Order) {
-                                    return -Integer.compare(o1Order, o2Order);
-                                }
-
-                                // Order by display name which is either
-                                // the name declared by @TestEngine.DisplayName
-                                // or the real method name
-                                String o1DisplayName = getDisplayName(o1);
-                                String o2DisplayName = getDisplayName(o2);
-
-                                return -o1DisplayName.compareTo(o2DisplayName);
-                            });
+        @Override
+        public int compare(Method method1, Method method2) {
+            int comparison = method1.getName().compareTo(method2.getName());
+            if (comparison == 0) {
+                comparison =
+                        ClassUtils.nullSafeToString(method1.getParameterTypes())
+                                .compareTo(
+                                        ClassUtils.nullSafeToString(method2.getParameterTypes()));
+            }
+            return comparison;
         }
-
-        // Clear the test method list
-        testMethods.clear();
-
-        // Rebuild the test method set
-        for (Map.Entry<Class<?>, List<Method>> entry : methodMap.entrySet()) {
-            testMethods.addAll(entry.getValue());
-        }
-
-        Collections.reverse(testMethods);
     }
 }

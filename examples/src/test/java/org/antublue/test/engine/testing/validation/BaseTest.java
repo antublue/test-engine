@@ -17,38 +17,52 @@
 package org.antublue.test.engine.testing.validation;
 
 import org.antublue.test.engine.api.TestEngine;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 
 public class BaseTest {
 
+    @BeforeEach
+    @Order(1)
     @TestEngine.BeforeEach
     @TestEngine.Order(order = 1)
     public void beforeEach() {
         System.out.format("%s beforeEach()", BaseTest.class.getName()).println();
     }
 
+    @BeforeEach
+    @Order(3)
     @TestEngine.BeforeEach
     @TestEngine.Order(order = 3)
     public void beforeEach3() {
         System.out.format("%s beforeEach3()", BaseTest.class.getName()).println();
     }
 
+    @Test
+    @Order(1)
     @TestEngine.Test
     @TestEngine.Order(order = 1)
     public void test4() {
         System.out.format("%s test4()", BaseTest.class.getName()).println();
     }
 
+    @Test
+    @Order(10000)
     @TestEngine.Test
     @TestEngine.Order(order = 10000)
     public void test5() {
         System.out.format("%s test4()", BaseTest.class.getName()).println();
     }
 
+    @AfterEach
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.format("%s afterEach()", BaseTest.class.getName()).println();
     }
 
+    @AfterEach
     @TestEngine.AfterEach
     public void afterEach3() {
         System.out.format("%s afterEach3()", BaseTest.class.getName()).println();

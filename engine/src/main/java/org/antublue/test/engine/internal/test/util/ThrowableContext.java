@@ -53,4 +53,10 @@ public class ThrowableContext {
     public List<Throwable> getThrowables() {
         return throwables;
     }
+
+    public void throwFirst() throws Throwable {
+        if (!throwables.isEmpty()) {
+            throw throwables.get(0);
+        }
+    }
 }

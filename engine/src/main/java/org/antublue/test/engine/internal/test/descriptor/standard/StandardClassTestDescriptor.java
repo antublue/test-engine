@@ -23,8 +23,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
@@ -34,6 +32,8 @@ import org.antublue.test.engine.internal.test.util.RandomFieldInjector;
 import org.antublue.test.engine.internal.test.util.StateMachine;
 import org.antublue.test.engine.internal.test.util.ThrowableContext;
 import org.antublue.test.engine.internal.util.StandardStreams;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
+import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -96,8 +96,6 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
     @Override
     public void execute(ExecutionRequest executionRequest) {
         getStopWatch().start();
-
-        validate();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
 
@@ -264,9 +262,12 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         List<Method> prepareMethods =
-                REFLECTION_UTILS.findMethods(testClass, StandardTestFilters.PREPARE_METHOD);
+                ReflectionSupport.findMethods(
+                        testClass,
+                        StandardTestFilters.PREPARE_METHOD,
+                        HierarchyTraversalMode.TOP_DOWN);
 
-        TEST_UTILS.orderTestMethods(prepareMethods);
+        prepareMethods = TEST_UTILS.orderTestMethods(prepareMethods);
 
         for (Method method : prepareMethods) {
             LOCK_PROCESSOR.processLocks(method);
@@ -321,9 +322,12 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         List<Method> concludeMethods =
-                REFLECTION_UTILS.findMethods(testClass, ParameterizedTestFilters.CONCLUDE_METHOD);
+                ReflectionSupport.findMethods(
+                        testClass,
+                        ParameterizedTestFilters.CONCLUDE_METHOD,
+                        HierarchyTraversalMode.BOTTOM_UP);
 
-        TEST_UTILS.orderTestMethodsReverse(concludeMethods);
+        concludeMethods = TEST_UTILS.orderTestMethods(concludeMethods);
 
         for (Method method : concludeMethods) {
             LOCK_PROCESSOR.processLocks(method);
@@ -363,99 +367,6 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
         return null;
     }
 
-    private void validate() {
-        try {
-            testClass.getDeclaredConstructor((Class<?>[]) null);
-        } catch (Throwable t) {
-            throw new TestClassDefinitionException(
-                    String.format(
-                            "Test class [%s] must have a no-argument constructor",
-                            testClass.getName()));
-        }
-
-        List<Method> methods =
-                REFLECTION_UTILS.findMethods(
-                        testClass, method -> method.isAnnotationPresent(TestEngine.Prepare.class));
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
-                continue;
-            }
-            if (!StandardTestFilters.PREPARE_METHOD.test(method)) {
-                throw new TestClassDefinitionException(
-                        String.format(
-                                "Test class [%s] @TestEngine.Prepare method [%s] definition is"
-                                        + " invalid",
-                                testClass.getName(), method.getName()));
-            }
-        }
-
-        methods =
-                REFLECTION_UTILS.findMethods(
-                        testClass,
-                        method -> method.isAnnotationPresent(TestEngine.BeforeEach.class));
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
-                continue;
-            }
-            if (!StandardTestFilters.BEFORE_EACH_METHOD.test(method)) {
-                throw new TestClassDefinitionException(
-                        String.format(
-                                "Test class [%s] @TestEngine.BeforeEach method [%s] definition is"
-                                        + " invalid",
-                                testClass.getName(), method.getName()));
-            }
-        }
-
-        methods =
-                REFLECTION_UTILS.findMethods(
-                        testClass, method -> method.isAnnotationPresent(TestEngine.Test.class));
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
-                continue;
-            }
-            if (!StandardTestFilters.TEST_METHOD.test(method)) {
-                throw new TestClassDefinitionException(
-                        String.format(
-                                "Test class [%s] @TestEngine.Test method [%s] definition is"
-                                        + " invalid",
-                                testClass.getName(), method.getName()));
-            }
-        }
-
-        methods =
-                REFLECTION_UTILS.findMethods(
-                        testClass,
-                        method -> method.isAnnotationPresent(TestEngine.AfterEach.class));
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
-                continue;
-            }
-            if (!StandardTestFilters.AFTER_EACH_METHOD.test(method)) {
-                throw new TestClassDefinitionException(
-                        String.format(
-                                "Test class [%s] @TestEngine.AfterEach method [%s] definition is"
-                                        + " invalid",
-                                testClass.getName(), method.getName()));
-            }
-        }
-
-        methods =
-                REFLECTION_UTILS.findMethods(
-                        testClass, method -> method.isAnnotationPresent(TestEngine.Conclude.class));
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(TestEngine.Disabled.class)) {
-                continue;
-            }
-            if (!StandardTestFilters.CONCLUDE_METHOD.test(method)) {
-                throw new TestClassDefinitionException(
-                        String.format(
-                                "Test class [%s] @TestEngine.Conclude method [%s] definition is"
-                                        + " invalid",
-                                testClass.getName(), method.getName()));
-            }
-        }
-    }
-
     public static class Builder {
 
         private TestDescriptor parentTestDescriptor;
@@ -482,6 +393,8 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
 
         public TestDescriptor build() {
             try {
+                EXTENSION_MANAGER.initialize(testClass);
+
                 uniqueId =
                         parentTestDescriptor
                                 .getUniqueId()
@@ -496,8 +409,17 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
                 parentTestDescriptor.addChild(testDescriptor);
 
                 List<Method> testMethods =
-                        REFLECTION_UTILS.findMethods(testClass, StandardTestFilters.TEST_METHOD);
-                TEST_UTILS.orderTestMethods(testMethods);
+                        ReflectionSupport.findMethods(
+                                testClass,
+                                StandardTestFilters.TEST_METHOD,
+                                HierarchyTraversalMode.TOP_DOWN);
+
+                testMethods = TEST_UTILS.orderTestMethods(testMethods);
+
+                ThrowableContext throwableContext = new ThrowableContext();
+                EXTENSION_MANAGER.postTestMethodDiscovery(testClass, testMethods, throwableContext);
+                throwableContext.throwFirst();
+
                 for (Method testMethod : testMethods) {
                     if (testMethodFilter == null || testMethodFilter.test(testMethod)) {
                         new StandardMethodTestDescriptor.Builder()

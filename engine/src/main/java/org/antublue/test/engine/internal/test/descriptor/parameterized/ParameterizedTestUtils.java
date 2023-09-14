@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.utils.ReflectionUtils;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
+import org.antublue.test.engine.internal.test.util.ReflectionUtils;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
+import org.junit.platform.commons.support.ReflectionSupport;
 
 @SuppressWarnings("unchecked")
 public class ParameterizedTestUtils {
@@ -41,10 +43,12 @@ public class ParameterizedTestUtils {
 
     public Method getArumentSupplierMethod(Class<?> testClass) {
         List<Method> methods =
-                REFLECTION_UTILS.findMethods(
+                ReflectionSupport.findMethods(
                         testClass,
                         ParameterizedTestFilters.ARGUMENT_SUPPLIER_METHOD,
-                        ReflectionUtils.HierarchyTraversalMode.TOP_DOWN);
+                        HierarchyTraversalMode.BOTTOM_UP);
+
+        methods.get(0).setAccessible(true);
 
         return methods.get(0);
     }

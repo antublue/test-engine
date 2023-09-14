@@ -31,8 +31,12 @@ import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.internal.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.internal.test.util.RandomFieldInjector;
 import org.antublue.test.engine.internal.test.util.StateMachine;
+import org.antublue.test.engine.internal.test.util.ThrowableContext;
 import org.antublue.test.engine.internal.util.StandardStreams;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
+import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
+import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -277,10 +281,12 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
 
         try {
             List<Method> beforeAllMethods =
-                    REFLECTION_UTILS.findMethods(
-                            testClass, ParameterizedTestFilters.BEFORE_ALL_METHOD);
+                    ReflectionSupport.findMethods(
+                            testClass,
+                            ParameterizedTestFilters.BEFORE_ALL_METHOD,
+                            HierarchyTraversalMode.TOP_DOWN);
 
-            TEST_UTILS.orderTestMethods(beforeAllMethods);
+            beforeAllMethods = TEST_UTILS.orderTestMethods(beforeAllMethods);
 
             for (Method method : beforeAllMethods) {
                 LOCK_PROCESSOR.processLocks(method);
@@ -339,9 +345,12 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         List<Method> afterAllMethods =
-                REFLECTION_UTILS.findMethods(testClass, ParameterizedTestFilters.AFTER_ALL_METHOD);
+                ReflectionUtils.findMethods(
+                        testClass,
+                        ParameterizedTestFilters.AFTER_ALL_METHOD,
+                        ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP);
 
-        TEST_UTILS.orderTestMethodsReverse(afterAllMethods);
+        afterAllMethods = TEST_UTILS.orderTestMethods(afterAllMethods);
 
         for (Method method : afterAllMethods) {
             LOCK_PROCESSOR.processLocks(method);
@@ -434,6 +443,8 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
 
         public TestDescriptor build() {
             try {
+                EXTENSION_MANAGER.initialize(testClass);
+
                 uniqueId =
                         parentTestDescriptor
                                 .getUniqueId()
@@ -448,10 +459,16 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                 parentTestDescriptor.addChild(testDescriptor);
 
                 List<Method> testMethods =
-                        REFLECTION_UTILS.findMethods(
-                                testClass, ParameterizedTestFilters.TEST_METHOD);
+                        ReflectionSupport.findMethods(
+                                testClass,
+                                ParameterizedTestFilters.TEST_METHOD,
+                                HierarchyTraversalMode.TOP_DOWN);
 
-                TEST_UTILS.orderTestMethods(testMethods);
+                testMethods = TEST_UTILS.orderTestMethods(testMethods);
+
+                ThrowableContext throwableContext = new ThrowableContext();
+                EXTENSION_MANAGER.postTestMethodDiscovery(testClass, testMethods, throwableContext);
+                throwableContext.throwFirst();
 
                 for (Method testMethod : testMethods) {
                     if (testMethodFilter == null || testMethodFilter.test(testMethod)) {
