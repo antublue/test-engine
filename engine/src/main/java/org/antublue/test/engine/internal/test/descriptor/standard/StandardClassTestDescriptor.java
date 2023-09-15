@@ -81,8 +81,7 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
      * @param builder builder
      */
     private StandardClassTestDescriptor(Builder builder) {
-        setUniqueId(builder.uniqueId);
-        setDisplayName(builder.displayName);
+        super(builder.uniqueId, builder.displayName);
         this.testClass = builder.testClass;
         this.randomFields = builder.randomFields;
         this.autoCloseFields = builder.autoCloseFields;

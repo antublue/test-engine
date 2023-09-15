@@ -85,8 +85,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
      * @param builder builder
      */
     private ParameterizedArgumentTestDescriptor(Builder builder) {
-        setUniqueId(builder.uniqueId);
-        setDisplayName(builder.displayName);
+        super(builder.uniqueId, builder.displayName);
         this.testClass = builder.testClass;
         this.testArgumentSupplierMethod = builder.testArgumentSupplierMethod;
         this.testArgument = builder.testArgument;

@@ -24,6 +24,8 @@ import org.antublue.test.engine.internal.test.util.ThrowableContext;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 /** Abstract class to implement an ExecutableTestDescriptor */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -37,7 +39,9 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
     private long throttleMilliseconds;
     private Object testInstance;
 
-    protected ExecutableTestDescriptor() {
+    protected ExecutableTestDescriptor(UniqueId uniqueId, String displayName) {
+        super(uniqueId, displayName);
+
         stopWatch = new StopWatch();
         throwableContext = new ThrowableContext();
         metadata = new Metadata();

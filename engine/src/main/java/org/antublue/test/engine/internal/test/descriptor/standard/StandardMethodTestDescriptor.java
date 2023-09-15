@@ -75,8 +75,7 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
 
     /** Constructor */
     private StandardMethodTestDescriptor(Builder builder) {
-        setUniqueId(builder.uniqueId);
-        setDisplayName(builder.displayName);
+        super(builder.uniqueId, builder.displayName);
         this.autoCloseFields = builder.autoCloseFields;
         this.beforeEachMethods = builder.beforeEachMethods;
         this.testClass = builder.testClass;

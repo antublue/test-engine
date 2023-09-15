@@ -75,8 +75,7 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
 
     /** Constructor */
     private ParameterizedMethodTestDescriptor(Builder builder) {
-        setUniqueId(builder.uniqueId);
-        setDisplayName(builder.displayName);
+        super(builder.uniqueId, builder.displayName);
         this.testClass = builder.testClass;
         this.testArgument = builder.testArgument;
         this.autoCloseFields = builder.autoCloseFields;

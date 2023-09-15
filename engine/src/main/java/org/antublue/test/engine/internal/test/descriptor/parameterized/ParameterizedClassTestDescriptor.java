@@ -86,8 +86,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
      * @param builder builder
      */
     private ParameterizedClassTestDescriptor(Builder builder) {
-        setUniqueId(builder.uniqueId);
-        setDisplayName(builder.displayName);
+        super(builder.uniqueId, builder.displayName);
         this.testClass = builder.testClass;
         this.autoCloseFields = builder.autoCloseFields;
         this.prepareMethods = builder.prepareMethods;
