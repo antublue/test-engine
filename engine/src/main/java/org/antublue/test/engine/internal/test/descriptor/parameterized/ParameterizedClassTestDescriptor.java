@@ -20,10 +20,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
@@ -387,11 +385,6 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         private List<Method> prepareMethods;
         private List<Method> concludeMethods;
 
-        public Builder setParentTestDescriptor(TestDescriptor parentTestDescriptor) {
-            this.parentTestDescriptor = parentTestDescriptor;
-            return this;
-        }
-
         public Builder setTestClass(Class<?> testClass) {
             this.testClass = testClass;
             return this;
@@ -402,16 +395,18 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
             return this;
         }
 
-        public void build() {
+        public void build(TestDescriptor parentTestDescriptor) {
             try {
                 EXTENSION_MANAGER.initialize(testClass);
+
+                this.parentTestDescriptor = parentTestDescriptor;
 
                 uniqueId =
                         parentTestDescriptor
                                 .getUniqueId()
                                 .append(
                                         StandardClassTestDescriptor.class.getName(),
-                                        UUID.randomUUID() + "/" + testClass.getName());
+                                        testClass.getName());
 
                 displayName = TestUtils.getDisplayName(testClass);
 
@@ -450,15 +445,16 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
                 parentTestDescriptor.addChild(testDescriptor);
 
-                for (Argument testArgument : testArguments) {
-                    testDescriptor.addChild(
-                            new ParameterizedArgumentTestDescriptor.Builder()
-                                    .setParentTestDescriptor(testDescriptor)
-                                    .setTestClass(testClass)
-                                    .setTestArgumentSupplierMethod(testArgumentSupplierMethod)
-                                    .setTestArgument(testArgument)
-                                    .setTestMethodFilter(testMethodFilter)
-                                    .build());
+                for (int testArgumentIndex = 0;
+                        testArgumentIndex < testArguments.size();
+                        testArgumentIndex++) {
+                    new ParameterizedArgumentTestDescriptor.Builder()
+                            .setTestClass(testClass)
+                            .setTestArgumentSupplierMethod(testArgumentSupplierMethod)
+                            .setTestArgument(
+                                    testArgumentIndex, testArguments.get(testArgumentIndex))
+                            .setTestMethodFilter(testMethodFilter)
+                            .build(testDescriptor);
                 }
             } catch (RuntimeException e) {
                 throw e;
@@ -473,7 +469,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
             int argumentSupplierCount = 0;
             int extensionSupplierCount = 0;
 
-            List<Annotation> annotations = Arrays.asList(testClass.getAnnotations());
+            Annotation[] annotations = testClass.getAnnotations();
             for (Annotation annotation : annotations) {
                 if (annotation.annotationType().equals(TestEngine.ArgumentSupplier.class)) {
                     argumentSupplierCount++;
@@ -481,7 +477,6 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                 }
                 if (annotation.annotationType().equals(TestEngine.ExtensionSupplier.class)) {
                     extensionSupplierCount++;
-                    continue;
                 }
             }
 

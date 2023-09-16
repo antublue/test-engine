@@ -20,7 +20,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.Argument;
@@ -402,6 +401,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         private TestDescriptor parentTestDescriptor;
         private Class<?> testClass;
         private Method testArgumentSupplierMethod;
+        private int testArgumentIndex;
         private Argument testArgument;
         private Predicate<Method> testMethodFilter;
 
@@ -413,11 +413,6 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         private List<Method> beforeAllMethods;
         private List<Method> afterAllMethods;
 
-        public Builder setParentTestDescriptor(TestDescriptor parentTestDescriptor) {
-            this.parentTestDescriptor = parentTestDescriptor;
-            return this;
-        }
-
         public Builder setTestClass(Class<?> testClass) {
             this.testClass = testClass;
             return this;
@@ -428,7 +423,8 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
             return this;
         }
 
-        public Builder setTestArgument(Argument testArgument) {
+        public Builder setTestArgument(int testArgumentIndex, Argument testArgument) {
+            this.testArgumentIndex = testArgumentIndex;
             this.testArgument = testArgument;
             return this;
         }
@@ -438,16 +434,18 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
             return this;
         }
 
-        public TestDescriptor build() {
+        public void build(TestDescriptor parentTestDescriptor) {
             try {
                 EXTENSION_MANAGER.initialize(testClass);
+
+                this.parentTestDescriptor = parentTestDescriptor;
 
                 uniqueId =
                         parentTestDescriptor
                                 .getUniqueId()
                                 .append(
                                         ParameterizedArgumentTestDescriptor.class.getName(),
-                                        UUID.randomUUID() + "/" + testArgument.name());
+                                        testArgumentIndex + "/" + testArgument.name());
 
                 displayName = testArgument.name();
 
@@ -521,17 +519,13 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
 
                 for (Method testMethod : testMethods) {
                     if (testMethodFilter == null || testMethodFilter.test(testMethod)) {
-                        testDescriptor.addChild(
-                                new ParameterizedMethodTestDescriptor.Builder()
-                                        .setParentTestDescriptor(testDescriptor)
-                                        .setTestClass(testClass)
-                                        .setTestArgument(testArgument)
-                                        .setTestMethod(testMethod)
-                                        .build());
+                        new ParameterizedMethodTestDescriptor.Builder()
+                                .setTestClass(testClass)
+                                .setTestArgument(testArgument)
+                                .setTestMethod(testMethod)
+                                .build(testDescriptor);
                     }
                 }
-
-                return testDescriptor;
             } catch (RuntimeException e) {
                 throw e;
             } catch (Throwable t) {

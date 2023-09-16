@@ -83,9 +83,8 @@ public class StandardTestFactory implements TestDescriptorFactory {
                         testClass -> {
                             if (accept(engineDiscoveryRequest, testClass)) {
                                 new StandardClassTestDescriptor.Builder()
-                                        .setParentTestDescriptor(engineDescriptor)
                                         .setTestClass(testClass)
-                                        .build();
+                                        .build(engineDescriptor);
                             }
                         });
     }
@@ -109,9 +108,8 @@ public class StandardTestFactory implements TestDescriptorFactory {
                         clazz -> {
                             if (accept(engineDiscoveryRequest, clazz)) {
                                 new StandardClassTestDescriptor.Builder()
-                                        .setParentTestDescriptor(engineDescriptor)
                                         .setTestClass(clazz)
-                                        .build();
+                                        .build(engineDescriptor);
                             }
                         });
     }
@@ -130,11 +128,7 @@ public class StandardTestFactory implements TestDescriptorFactory {
         Class<?> clazz = classSelector.getJavaClass();
         if (StandardTestPredicates.TEST_CLASS.test(clazz)
                 && accept(engineDiscoveryRequest, clazz)) {
-            engineDescriptor.addChild(
-                    new StandardClassTestDescriptor.Builder()
-                            .setParentTestDescriptor(engineDescriptor)
-                            .setTestClass(clazz)
-                            .build());
+            new StandardClassTestDescriptor.Builder().setTestClass(clazz).build(engineDescriptor);
         }
     }
 
@@ -155,10 +149,9 @@ public class StandardTestFactory implements TestDescriptorFactory {
                 && StandardTestPredicates.TEST_METHOD.test(method)
                 && accept(engineDiscoveryRequest, clazz)) {
             new StandardClassTestDescriptor.Builder()
-                    .setParentTestDescriptor(engineDescriptor)
                     .setTestClass(clazz)
                     .setTestMethod(method)
-                    .build();
+                    .build(engineDescriptor);
         }
     }
 

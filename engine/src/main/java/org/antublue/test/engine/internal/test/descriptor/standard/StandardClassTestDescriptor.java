@@ -20,7 +20,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestEngineException;
@@ -372,11 +371,6 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
         private List<Method> prepareMethods;
         private List<Method> concludeMethods;
 
-        public Builder setParentTestDescriptor(TestDescriptor parentTestDescriptor) {
-            this.parentTestDescriptor = parentTestDescriptor;
-            return this;
-        }
-
         public Builder setTestClass(Class<?> testClass) {
             this.testClass = testClass;
             return this;
@@ -387,16 +381,18 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
             return this;
         }
 
-        public TestDescriptor build() {
+        public void build(TestDescriptor parentTestDescriptor) {
             try {
                 EXTENSION_MANAGER.initialize(testClass);
+
+                this.parentTestDescriptor = parentTestDescriptor;
 
                 uniqueId =
                         parentTestDescriptor
                                 .getUniqueId()
                                 .append(
                                         StandardClassTestDescriptor.class.getName(),
-                                        UUID.randomUUID() + "/" + testClass.getName());
+                                        testClass.getName());
 
                 displayName = TestUtils.getDisplayName(testClass);
 
@@ -463,21 +459,17 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
 
                 if (testMethod != null) {
                     new StandardMethodTestDescriptor.Builder()
-                            .setParentTestDescriptor(testDescriptor)
                             .setTestClass(testClass)
                             .setTestMethod(testMethod)
-                            .build();
+                            .build(testDescriptor);
                 } else {
                     for (Method testMethod : testMethods) {
                         new StandardMethodTestDescriptor.Builder()
-                                .setParentTestDescriptor(testDescriptor)
                                 .setTestClass(testClass)
                                 .setTestMethod(testMethod)
-                                .build();
+                                .build(testDescriptor);
                     }
                 }
-
-                return testDescriptor;
             } catch (RuntimeException e) {
                 throw e;
             } catch (Throwable t) {

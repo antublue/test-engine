@@ -20,7 +20,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestArgumentFailedException;
@@ -345,11 +344,6 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
         private List<Method> beforeEachMethods;
         private List<Method> afterEachMethods;
 
-        public Builder setParentTestDescriptor(TestDescriptor parentTestDescriptor) {
-            this.parentTestDescriptor = parentTestDescriptor;
-            return this;
-        }
-
         public Builder setTestClass(Class<?> testClass) {
             this.testClass = testClass;
             return this;
@@ -360,14 +354,16 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
             return this;
         }
 
-        public void build() {
+        public void build(TestDescriptor parentTestDescriptor) {
             try {
+                this.parentTestDescriptor = parentTestDescriptor;
+
                 uniqueId =
                         parentTestDescriptor
                                 .getUniqueId()
                                 .append(
                                         StandardMethodTestDescriptor.class.getName(),
-                                        UUID.randomUUID() + "/" + testMethod.getName());
+                                        testMethod.getName());
 
                 displayName = TestUtils.getDisplayName(testMethod);
 

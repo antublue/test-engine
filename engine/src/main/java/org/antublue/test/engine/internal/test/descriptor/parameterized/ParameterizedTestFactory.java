@@ -17,16 +17,13 @@
 package org.antublue.test.engine.internal.test.descriptor.parameterized;
 
 import java.lang.reflect.Method;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.test.descriptor.TestDescriptorFactory;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.FilterResult;
-import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
@@ -73,6 +70,7 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
 
         List<UniqueIdSelector> uniqueIdSelectors =
                 engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class);
+
         discover(uniqueIdSelectors, engineDescriptor);
     }
 
@@ -95,9 +93,8 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                         testClass -> {
                             if (accept(engineDiscoveryRequest, testClass)) {
                                 new ParameterizedClassTestDescriptor.Builder()
-                                        .setParentTestDescriptor(engineDescriptor)
                                         .setTestClass(testClass)
-                                        .build();
+                                        .build(engineDescriptor);
                             }
                         });
     }
@@ -121,9 +118,8 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                         testClass -> {
                             if (accept(engineDiscoveryRequest, testClass)) {
                                 new ParameterizedClassTestDescriptor.Builder()
-                                        .setParentTestDescriptor(engineDescriptor)
                                         .setTestClass(testClass)
-                                        .build();
+                                        .build(engineDescriptor);
                             }
                         });
     }
@@ -143,9 +139,8 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
         if (ParameterizedTestPredicates.TEST_CLASS.test(testClass)
                 && accept(engineDiscoveryRequest, testClass)) {
             new ParameterizedClassTestDescriptor.Builder()
-                    .setParentTestDescriptor(engineDescriptor)
                     .setTestClass(testClass)
-                    .build();
+                    .build(engineDescriptor);
         }
     }
 
@@ -171,39 +166,8 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
             }
 
             new ParameterizedClassTestDescriptor.Builder()
-                    .setParentTestDescriptor(engineDescriptor)
                     .setTestClass(testClass)
-                    .build();
-        }
-
-        Set<UniqueId> uniqueIds = new LinkedHashSet<>();
-        for (UniqueIdSelector uniqueIdSelector : uniqueIdSelectors) {
-            uniqueIds.add(uniqueIdSelector.getUniqueId());
-        }
-
-        if (!uniqueIds.isEmpty()) {
-            filter(uniqueIds, engineDescriptor);
-        }
-    }
-
-    private void filter(Set<UniqueId> uniqueIds, TestDescriptor testDescriptor) {
-        if (testDescriptor instanceof EngineDescriptor) {
-            for (TestDescriptor child : testDescriptor.getChildren()) {
-                filter(uniqueIds, child);
-            }
-            return;
-        }
-
-        if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
-            Set<TestDescriptor> testDescriptorsToRemove = new LinkedHashSet<>();
-            for (TestDescriptor child : testDescriptor.getChildren()) {
-                if (!uniqueIds.contains(child.getUniqueId())) {
-                    testDescriptorsToRemove.add(child);
-                }
-            }
-            for (TestDescriptor testDescriptorToRemove : testDescriptorsToRemove) {
-                testDescriptor.removeChild(testDescriptorToRemove);
-            }
+                    .build(engineDescriptor);
         }
     }
 
@@ -243,10 +207,9 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                 && ParameterizedTestPredicates.TEST_METHOD.test(testMethod)
                 && accept(engineDiscoveryRequest, testClass)) {
             new ParameterizedClassTestDescriptor.Builder()
-                    .setParentTestDescriptor(engineDescriptor)
                     .setTestClass(testClass)
                     .setTestMethodFilter(new TestMethodFilter(testMethod))
-                    .build();
+                    .build(engineDescriptor);
         }
     }
 
