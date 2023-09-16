@@ -25,8 +25,8 @@ import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
-@TestEngine.BaseClass
-public class BaseTest {
+// @TestEngine.BaseClass
+public abstract class BaseTest {
 
     public static final List<String> EXPECTED = new ArrayList<>();
     protected final List<String> actual = new ArrayList<>();

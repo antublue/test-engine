@@ -95,11 +95,6 @@ public @interface TestEngine {
     @Retention(RetentionPolicy.RUNTIME)
     @interface Disabled {}
 
-    /** BaseClass annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface BaseClass {}
-
     /** Tag annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)

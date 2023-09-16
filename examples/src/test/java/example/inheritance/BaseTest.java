@@ -24,8 +24,7 @@ import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
-@TestEngine.BaseClass
-public class BaseTest {
+public abstract class BaseTest {
 
     @TestEngine.Argument private IntegerArgument privateIntegerArgument;
 

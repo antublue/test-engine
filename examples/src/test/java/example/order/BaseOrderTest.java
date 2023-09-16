@@ -23,9 +23,7 @@ import java.util.List;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
-@TestEngine.BaseClass
-@TestEngine.Order(order = 3)
-class BaseOrderTest {
+public abstract class BaseOrderTest {
 
     protected final List<String> EXPECTED =
             listOf(

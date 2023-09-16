@@ -36,7 +36,6 @@ public class StandardTestPredicates {
         public boolean test(Class<?> clazz) {
             return !ReflectionUtils.isAbstract(clazz)
                     && !clazz.isAnnotationPresent(TestEngine.Disabled.class)
-                    && !clazz.isAnnotationPresent(TestEngine.BaseClass.class)
                     && !ReflectionSupport.findMethods(
                                     clazz,
                                     AnnotationMethodFilter.of(TestEngine.Test.class),

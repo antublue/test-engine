@@ -39,7 +39,6 @@ public class NestedTest {
         }
     }
 
-    @TestEngine.BaseClass
     public abstract static class BaseTest {
 
         @TestEngine.Argument protected IntegerArgument integerArgument;

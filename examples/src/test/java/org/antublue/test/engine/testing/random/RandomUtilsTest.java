@@ -25,8 +25,7 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 import org.antublue.test.engine.api.utils.RandomUtils;
 
-@TestEngine.BaseClass
-public class RandomUtilsTest {
+public abstract class RandomUtilsTest {
 
     protected static final int ITERATIONS = 1000000;
 
