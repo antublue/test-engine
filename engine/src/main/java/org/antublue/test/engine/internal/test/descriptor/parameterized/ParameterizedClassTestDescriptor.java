@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
@@ -341,43 +342,11 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         return null;
     }
 
-    private static Method getArumentSupplierMethod(Class<?> testClass) {
-        List<Method> methods =
-                ReflectionSupport.findMethods(
-                        testClass,
-                        AnnotationMethodFilter.of(TestEngine.ArgumentSupplier.class),
-                        HierarchyTraversalMode.BOTTOM_UP);
-
-        Method method = methods.get(0);
-        method.setAccessible(true);
-
-        return method;
-    }
-
-    public static List<Argument> getArguments(Class<?> testClass) throws Throwable {
-        List<Argument> testArguments = new ArrayList<>();
-
-        Object object = getArumentSupplierMethod(testClass).invoke(null, (Object[]) null);
-        if (object instanceof Stream) {
-            Stream<Argument> stream = (Stream<Argument>) object;
-            stream.forEach(testArguments::add);
-        } else if (object instanceof Iterable) {
-            ((Iterable<Argument>) object).forEach(testArguments::add);
-        } else {
-            throw new TestClassDefinitionException(
-                    String.format(
-                            "Exception getting arguments for test class [%s]",
-                            testClass.getName()));
-        }
-
-        return testArguments;
-    }
-
     public static class Builder {
 
-        private TestDescriptor parentTestDescriptor;
         private Class<?> testClass;
-        private Predicate<Method> testMethodFilter;
+        private List<Argument> testArguments;
+        private List<Method> testMethods;
 
         private UniqueId uniqueId;
         private String displayName;
@@ -390,16 +359,19 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
             return this;
         }
 
-        public Builder setTestMethodFilter(Predicate<Method> testMethodFilter) {
-            this.testMethodFilter = testMethodFilter;
+        public Builder setTestArguments(List<Argument> testArguments) {
+            this.testArguments = testArguments;
+            return this;
+        }
+
+        public Builder setTestMethods(List<Method> testMethods) {
+            this.testMethods = testMethods;
             return this;
         }
 
         public void build(TestDescriptor parentTestDescriptor) {
             try {
                 EXTENSION_MANAGER.initialize(testClass);
-
-                this.parentTestDescriptor = parentTestDescriptor;
 
                 uniqueId =
                         parentTestDescriptor
@@ -435,59 +407,23 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                                 AnnotationFieldFilter.of(TestEngine.AutoClose.Conclude.class),
                                 HierarchyTraversalMode.BOTTOM_UP);
 
-                Method testArgumentSupplierMethod = getArumentSupplierMethod(testClass);
-
-                List<Argument> testArguments = getArguments(testClass);
-
-                validate();
-
                 TestDescriptor testDescriptor = new ParameterizedClassTestDescriptor(this);
 
                 parentTestDescriptor.addChild(testDescriptor);
 
-                for (int testArgumentIndex = 0;
-                        testArgumentIndex < testArguments.size();
-                        testArgumentIndex++) {
+                int testArgumentIndex = 0;
+                for (Argument testArgument : testArguments) {
                     new ParameterizedArgumentTestDescriptor.Builder()
                             .setTestClass(testClass)
-                            .setTestArgumentSupplierMethod(testArgumentSupplierMethod)
-                            .setTestArgument(
-                                    testArgumentIndex, testArguments.get(testArgumentIndex))
-                            .setTestMethodFilter(testMethodFilter)
+                            .setTestArgument(testArgumentIndex, testArgument)
+                            .setTestMethods(testMethods)
                             .build(testDescriptor);
+                    testArgumentIndex++;
                 }
             } catch (RuntimeException e) {
                 throw e;
             } catch (Throwable t) {
                 throw new TestEngineException(t);
-            }
-        }
-
-        private void validate() throws Throwable {
-            // TODO validate testClass
-
-            int argumentSupplierCount = 0;
-            int extensionSupplierCount = 0;
-
-            Annotation[] annotations = testClass.getAnnotations();
-            for (Annotation annotation : annotations) {
-                if (annotation.annotationType().equals(TestEngine.ArgumentSupplier.class)) {
-                    argumentSupplierCount++;
-                    continue;
-                }
-                if (annotation.annotationType().equals(TestEngine.ExtensionSupplier.class)) {
-                    extensionSupplierCount++;
-                }
-            }
-
-            if (argumentSupplierCount > 1) {
-                throw new TestClassDefinitionException(
-                        String.format("More than 1 @TestEngine.ArgumentSupplier method"));
-            }
-
-            if (extensionSupplierCount > 1) {
-                throw new TestClassDefinitionException(
-                        String.format("More than 1 @TestEngine.ExtensionSupplier method"));
             }
         }
     }

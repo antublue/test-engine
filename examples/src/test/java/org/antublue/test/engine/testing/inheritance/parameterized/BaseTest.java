@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.testing.inheritance;
+package org.antublue.test.engine.testing.inheritance.parameterized;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 

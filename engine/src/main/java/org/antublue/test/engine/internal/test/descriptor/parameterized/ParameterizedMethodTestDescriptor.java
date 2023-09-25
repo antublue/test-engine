@@ -336,8 +336,8 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
 
     public static class Builder {
 
-        private TestDescriptor parentTestDescriptor;
         private Class<?> testClass;
+        private int testArgumentIndex;
         private Argument testArgument;
         private Method testMethod;
 
@@ -352,7 +352,8 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
             return this;
         }
 
-        public Builder setTestArgument(Argument testArgument) {
+        public Builder setTestArgument(int testArgumentIndex, Argument testArgument) {
+            this.testArgumentIndex = testArgumentIndex;
             this.testArgument = testArgument;
             return this;
         }
@@ -364,8 +365,6 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
 
         public void build(TestDescriptor parentTestDescriptor) {
             try {
-                this.parentTestDescriptor = parentTestDescriptor;
-
                 uniqueId =
                         parentTestDescriptor
                                 .getUniqueId()
@@ -401,8 +400,6 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
                         TestUtils.orderTestMethods(
                                 afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
 
-                validate();
-
                 TestDescriptor testDescriptor = new ParameterizedMethodTestDescriptor(this);
 
                 parentTestDescriptor.addChild(testDescriptor);
@@ -411,10 +408,6 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
             } catch (Throwable t) {
                 throw new TestEngineException(t);
             }
-        }
-
-        private void validate() {
-            // TODO validate
         }
     }
 }

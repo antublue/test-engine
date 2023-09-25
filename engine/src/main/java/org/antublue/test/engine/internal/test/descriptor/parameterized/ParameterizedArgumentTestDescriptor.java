@@ -18,8 +18,10 @@ package org.antublue.test.engine.internal.test.descriptor.parameterized;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.Argument;
@@ -46,6 +48,7 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.ClassSource;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /** Class to implement a ParameterArgumentTestDescriptor */
@@ -54,7 +57,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
 
     private final Class<?> testClass;
-    private final Method testArgumentSupplierMethod;
+    private final int testArgumentIndex;
     private final Argument testArgument;
     private final List<Field> testArgumentFields;
     private final List<Field> randomFields;
@@ -86,7 +89,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private ParameterizedArgumentTestDescriptor(Builder builder) {
         super(builder.uniqueId, builder.displayName);
         this.testClass = builder.testClass;
-        this.testArgumentSupplierMethod = builder.testArgumentSupplierMethod;
+        this.testArgumentIndex = builder.testArgumentIndex;
         this.testArgument = builder.testArgument;
         this.testArgumentFields = builder.testArgumentFields;
         this.randomFields = builder.randomFields;
@@ -97,7 +100,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
 
     @Override
     public Optional<TestSource> getSource() {
-        return Optional.of(MethodSource.from(testArgumentSupplierMethod));
+        return Optional.of(ClassSource.from(testClass));
     }
 
     @Override
@@ -398,12 +401,10 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
 
     public static class Builder {
 
-        private TestDescriptor parentTestDescriptor;
         private Class<?> testClass;
-        private Method testArgumentSupplierMethod;
         private int testArgumentIndex;
         private Argument testArgument;
-        private Predicate<Method> testMethodFilter;
+        private List<Method> testMethods;
 
         private UniqueId uniqueId;
         private String displayName;
@@ -418,27 +419,20 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
             return this;
         }
 
-        public Builder setTestArgumentSupplierMethod(Method testArgumentSupplierMethod) {
-            this.testArgumentSupplierMethod = testArgumentSupplierMethod;
-            return this;
-        }
-
         public Builder setTestArgument(int testArgumentIndex, Argument testArgument) {
             this.testArgumentIndex = testArgumentIndex;
             this.testArgument = testArgument;
             return this;
         }
 
-        public Builder setTestMethodFilter(Predicate<Method> testMethodFilter) {
-            this.testMethodFilter = testMethodFilter;
+        public Builder setTestMethods(List<Method> testMethods) {
+            this.testMethods = testMethods;
             return this;
         }
 
         public void build(TestDescriptor parentTestDescriptor) {
             try {
                 EXTENSION_MANAGER.initialize(testClass);
-
-                this.parentTestDescriptor = parentTestDescriptor;
 
                 uniqueId =
                         parentTestDescriptor
@@ -498,43 +492,26 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                         TestUtils.orderTestMethods(
                                 afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
 
-                validate();
-
                 TestDescriptor testDescriptor = new ParameterizedArgumentTestDescriptor(this);
 
                 parentTestDescriptor.addChild(testDescriptor);
-
-                List<Method> testMethods =
-                        ReflectionSupport.findMethods(
-                                testClass,
-                                AnnotationMethodFilter.of(TestEngine.Test.class),
-                                HierarchyTraversalMode.TOP_DOWN);
-
-                testMethods =
-                        TestUtils.orderTestMethods(testMethods, HierarchyTraversalMode.TOP_DOWN);
 
                 ThrowableContext throwableContext = new ThrowableContext();
                 EXTENSION_MANAGER.postTestMethodDiscovery(testClass, testMethods, throwableContext);
                 throwableContext.throwFirst();
 
                 for (Method testMethod : testMethods) {
-                    if (testMethodFilter == null || testMethodFilter.test(testMethod)) {
                         new ParameterizedMethodTestDescriptor.Builder()
                                 .setTestClass(testClass)
-                                .setTestArgument(testArgument)
+                                .setTestArgument(testArgumentIndex, testArgument)
                                 .setTestMethod(testMethod)
                                 .build(testDescriptor);
-                    }
                 }
             } catch (RuntimeException e) {
                 throw e;
             } catch (Throwable t) {
                 throw new TestEngineException(t);
             }
-        }
-
-        private void validate() throws Throwable {
-            // TODO validate
         }
     }
 }
