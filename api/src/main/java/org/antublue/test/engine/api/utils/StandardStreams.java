@@ -16,17 +16,39 @@
 
 package org.antublue.test.engine.api.utils;
 
+import static java.lang.String.format;
+
+/** Class to implement StandardStreams */
 public class StandardStreams {
 
+    /** Constructor */
     private StandardStreams() {
         // DO NOTHING
     }
 
-    public static void println(String format, Object... objects) {
-        System.out.println(String.format(format, objects));
+    /**
+     * Method to print a line to System.out and flush streams
+     *
+     * @param format format
+     * @param objects objects
+     */
+    public static void print(String format, Object... objects) {
+        System.out.print(format(format, objects));
         flush();
     }
 
+    /**
+     * Method to print a line with newline to System.out and flush streams
+     *
+     * @param format format
+     * @param objects objects
+     */
+    public static void println(String format, Object... objects) {
+        System.out.println(format(format, objects));
+        flush();
+    }
+
+    /** Method to flush streams */
     public static void flush() {
         System.out.flush();
         System.err.flush();
