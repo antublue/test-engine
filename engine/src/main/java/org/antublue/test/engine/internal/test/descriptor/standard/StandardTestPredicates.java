@@ -21,7 +21,6 @@ import java.util.function.Predicate;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
 import org.antublue.test.engine.internal.test.util.ReflectionUtils;
-import org.antublue.test.engine.internal.test.util.TestUtils;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
