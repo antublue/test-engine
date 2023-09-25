@@ -57,7 +57,6 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 | Annotation                                             | Scope            | Required | Usage                                                                                                                              |
 |--------------------------------------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
 | `@TestEngine.Disabled`                                 | class<br/>method | no       | Marks a test class or method disabled                                                                                              |
-| `@TestEngine.BaseClass`                                | class            | no       | Marks a test class as being a base test class (skips direct execution)                                                             |
 | `@TestEngine.Order(order = <int>)`                     | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
 | `@TestEngine.Tag(tag = "<string>")`                    | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
 | `@TestEngine.DisplayName(name = "<string>")`           | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
@@ -84,7 +83,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - `@TestEngine.Order(order = <int>)` is applies to methods defined in the class.
 
 
-- `@TestEngine.Order(order = <int>)` is ignored for abstract and `@TestEngine.BaseClass` annotated classes.
+- `@TestEngine.Order(order = <int>)` is ignored for abstract test classes.
 
 
 - For `@TestEngine.Tag(tag = "<string>")` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`.
