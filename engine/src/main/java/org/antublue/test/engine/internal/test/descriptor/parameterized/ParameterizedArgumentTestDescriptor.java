@@ -48,6 +48,7 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /** Class to implement a ParameterArgumentTestDescriptor */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescriptor {
 
     protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();

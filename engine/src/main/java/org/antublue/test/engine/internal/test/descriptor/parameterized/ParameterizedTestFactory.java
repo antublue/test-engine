@@ -44,7 +44,7 @@ import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a ParameterizedTestDescriptorFactory */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
 public class ParameterizedTestFactory implements TestDescriptorFactory {
 
     @Override

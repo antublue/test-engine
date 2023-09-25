@@ -24,6 +24,7 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 /** Class to process @TestEngine.Random.X annotations */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class RandomFieldInjector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomFieldInjector.class);

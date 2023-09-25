@@ -28,6 +28,7 @@ import org.antublue.test.engine.api.TestEngine;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.ClassUtils;
 
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class TestUtils {
 
     private static final TestUtils SINGLETON = new TestUtils();
