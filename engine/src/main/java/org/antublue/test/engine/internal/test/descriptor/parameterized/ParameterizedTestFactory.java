@@ -23,10 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
-
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
@@ -60,19 +57,33 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                 .forEach(
                         classpathRootSelector -> {
                             try {
-                                List<Class<?>> javaClasses = ReflectionSupport.findAllClassesInClasspathRoot(classpathRootSelector.getClasspathRoot(), ParameterizedTestPredicates.TEST_CLASS, className -> true);
+                                List<Class<?>> javaClasses =
+                                        ReflectionSupport.findAllClassesInClasspathRoot(
+                                                classpathRootSelector.getClasspathRoot(),
+                                                ParameterizedTestPredicates.TEST_CLASS,
+                                                className -> true);
                                 for (Class<?> javaClass : javaClasses) {
                                     // Class -> Argument mappings
                                     List<Argument> arguments = getArguments(javaClass);
                                     for (Argument argument : arguments) {
-                                        classArgumentMap.computeIfAbsent(javaClass, c -> new ArrayList<>()).add(argument);
+                                        classArgumentMap
+                                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                                .add(argument);
                                     }
 
                                     // Class -> Method mappings
-                                    List<Method> javaMethods = ReflectionSupport.findMethods(javaClass, ParameterizedTestPredicates.TEST_METHOD, HierarchyTraversalMode.TOP_DOWN);
-                                    javaMethods  = TestUtils.orderTestMethods(javaMethods, HierarchyTraversalMode.TOP_DOWN);
+                                    List<Method> javaMethods =
+                                            ReflectionSupport.findMethods(
+                                                    javaClass,
+                                                    ParameterizedTestPredicates.TEST_METHOD,
+                                                    HierarchyTraversalMode.TOP_DOWN);
+                                    javaMethods =
+                                            TestUtils.orderTestMethods(
+                                                    javaMethods, HierarchyTraversalMode.TOP_DOWN);
                                     for (Method javaMethod : javaMethods) {
-                                        classMethodMap.computeIfAbsent(javaClass, c -> new ArrayList<>()).add(javaMethod);
+                                        classMethodMap
+                                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                                .add(javaMethod);
                                     }
 
                                     classes.add(javaClass);
@@ -88,20 +99,37 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                         packageSelector -> {
                             try {
                                 String packageName = packageSelector.getPackageName();
-                                List<Class<?>> javaClasses = ReflectionSupport.findAllClassesInPackage(packageName, ParameterizedTestPredicates.TEST_CLASS, p -> true);
+                                List<Class<?>> javaClasses =
+                                        ReflectionSupport.findAllClassesInPackage(
+                                                packageName,
+                                                ParameterizedTestPredicates.TEST_CLASS,
+                                                p -> true);
                                 for (Class<?> javaClass : javaClasses) {
                                     if (ParameterizedTestPredicates.TEST_CLASS.test(javaClass)) {
                                         // Class -> Argument mappings
                                         List<Argument> arguments = getArguments(javaClass);
                                         for (Argument argument : arguments) {
-                                            classArgumentMap.computeIfAbsent(javaClass, c -> new ArrayList<>()).add(argument);
+                                            classArgumentMap
+                                                    .computeIfAbsent(
+                                                            javaClass, c -> new ArrayList<>())
+                                                    .add(argument);
                                         }
 
                                         // Class -> Method mappings
-                                        List<Method> javaMethods = ReflectionSupport.findMethods(javaClass, ParameterizedTestPredicates.TEST_METHOD, HierarchyTraversalMode.TOP_DOWN);
-                                        javaMethods  = TestUtils.orderTestMethods(javaMethods, HierarchyTraversalMode.TOP_DOWN);
+                                        List<Method> javaMethods =
+                                                ReflectionSupport.findMethods(
+                                                        javaClass,
+                                                        ParameterizedTestPredicates.TEST_METHOD,
+                                                        HierarchyTraversalMode.TOP_DOWN);
+                                        javaMethods =
+                                                TestUtils.orderTestMethods(
+                                                        javaMethods,
+                                                        HierarchyTraversalMode.TOP_DOWN);
                                         for (Method javaMethod : javaMethods) {
-                                            classMethodMap.computeIfAbsent(javaClass, c -> new ArrayList<>()).add(javaMethod);
+                                            classMethodMap
+                                                    .computeIfAbsent(
+                                                            javaClass, c -> new ArrayList<>())
+                                                    .add(javaMethod);
                                         }
 
                                         classes.add(javaClass);
@@ -110,118 +138,168 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                             } catch (Throwable t) {
                                 t.printStackTrace();
                             }
-                        }
-                );
+                        });
 
         engineDiscoveryRequest
                 .getSelectorsByType(ClassSelector.class)
-                        .forEach(
-                                classSelector -> {
-                                    try {
-                                        Class<?> javaClass = classSelector.getJavaClass();
-                                        if (ParameterizedTestPredicates.TEST_CLASS.test(javaClass)) {
-                                            // Class -> Argument mappings
-                                            List<Argument> arguments = getArguments(javaClass);
-                                            for (Argument argument : arguments) {
-                                                classArgumentMap.computeIfAbsent(javaClass, c -> new ArrayList<>()).add(argument);
-                                            }
-
-                                            // Class -> Method mappings
-                                            List<Method> javaMethods = ReflectionSupport.findMethods(javaClass, ParameterizedTestPredicates.TEST_METHOD, HierarchyTraversalMode.TOP_DOWN);
-                                            javaMethods  = TestUtils.orderTestMethods(javaMethods, HierarchyTraversalMode.TOP_DOWN);
-                                            for (Method javaMethod : javaMethods) {
-                                                classMethodMap.computeIfAbsent(javaClass, c -> new ArrayList<>()).add(javaMethod);
-                                            }
-
-                                            classes.add(javaClass);
-                                        }
-                                    } catch (Throwable t) {
-                                        t.printStackTrace();
+                .forEach(
+                        classSelector -> {
+                            try {
+                                Class<?> javaClass = classSelector.getJavaClass();
+                                if (ParameterizedTestPredicates.TEST_CLASS.test(javaClass)) {
+                                    // Class -> Argument mappings
+                                    List<Argument> arguments = getArguments(javaClass);
+                                    for (Argument argument : arguments) {
+                                        classArgumentMap
+                                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                                .add(argument);
                                     }
+
+                                    // Class -> Method mappings
+                                    List<Method> javaMethods =
+                                            ReflectionSupport.findMethods(
+                                                    javaClass,
+                                                    ParameterizedTestPredicates.TEST_METHOD,
+                                                    HierarchyTraversalMode.TOP_DOWN);
+                                    javaMethods =
+                                            TestUtils.orderTestMethods(
+                                                    javaMethods, HierarchyTraversalMode.TOP_DOWN);
+                                    for (Method javaMethod : javaMethods) {
+                                        classMethodMap
+                                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                                .add(javaMethod);
+                                    }
+
+                                    classes.add(javaClass);
                                 }
-                        );
+                            } catch (Throwable t) {
+                                t.printStackTrace();
+                            }
+                        });
 
         engineDiscoveryRequest
                 .getSelectorsByType(MethodSelector.class)
                 .forEach(
-                         methodSelector -> {
-                             try {
-                                 Class<?> javaClass = methodSelector.getJavaClass();
-                                 Method javaMethod = methodSelector.getJavaMethod();
+                        methodSelector -> {
+                            try {
+                                Class<?> javaClass = methodSelector.getJavaClass();
+                                Method javaMethod = methodSelector.getJavaMethod();
 
-                                 if (ParameterizedTestPredicates.TEST_CLASS.test(javaClass)
-                                         && ParameterizedTestPredicates.TEST_METHOD.test(javaMethod)) {
-                                     // Class -> Argument mappings
-                                     List<Argument> arguments = getArguments(javaClass);
-                                     for (Argument argument : arguments) {
-                                         classArgumentMap.computeIfAbsent(javaClass, c -> new ArrayList<>()).add(argument);
-                                     }
-
-                                     classMethodMap.computeIfAbsent(javaClass, c -> new ArrayList<>()).add(javaMethod);
-
-                                     classes.add(javaClass);
-                                 }
-                             } catch (Throwable t) {
-                                 t.printStackTrace();
-                             }
-                         });
-
-        // FIX UniqueIdSelector
-        engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class)
-                .forEach(uniqueIdSelector -> {
-                    try {
-                        UniqueId uniqueId = uniqueIdSelector.getUniqueId();
-                        List<UniqueId.Segment> segments = uniqueId.getSegments();
-                        Class<?> javaClass = null;
-                        Method javaMethod = null;
-
-                        switch (segments.size()) {
-                            case 3: {
-                                String className = segments.get(1).getValue();
-                                javaClass = Thread.currentThread().getContextClassLoader().loadClass(className);
-                                if (!ParameterizedTestPredicates.TEST_CLASS.test(javaClass)) {
-                                    break;
-                                }
-
-                                String methodName = segments.get(2).getValue();
-                                List<Method> javaMethods =
-                                        ReflectionSupport.findMethods(
-                                                javaClass,
-                                                ParameterizedTestPredicates.TEST_METHOD,
-                                                HierarchyTraversalMode.BOTTOM_UP);
-                                for (Method method :  javaMethods) {
-                                    if (method.getName().equals(methodName)) {
-                                        javaMethod = method;
-                                        break;
-                                    }
-                                }
-
-                                if (javaClass != null && javaMethod != null) {
+                                if (ParameterizedTestPredicates.TEST_CLASS.test(javaClass)
+                                        && ParameterizedTestPredicates.TEST_METHOD.test(
+                                                javaMethod)) {
                                     // Class -> Argument mappings
                                     List<Argument> arguments = getArguments(javaClass);
                                     for (Argument argument : arguments) {
-                                        classArgumentMap.computeIfAbsent(javaClass, c -> new ArrayList<>()).add(argument);
+                                        classArgumentMap
+                                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                                .add(argument);
                                     }
 
-                                    classMethodMap.computeIfAbsent(javaClass, c -> new ArrayList<>()).add(javaMethod);
+                                    classMethodMap
+                                            .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                            .add(javaMethod);
 
                                     classes.add(javaClass);
                                 }
-                                break;
+                            } catch (Throwable t) {
+                                t.printStackTrace();
                             }
-                        }
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
-                });
+                        });
+
+        // FIX UniqueIdSelector
+        engineDiscoveryRequest
+                .getSelectorsByType(UniqueIdSelector.class)
+                .forEach(
+                        uniqueIdSelector -> {
+                            try {
+                                UniqueId uniqueId = uniqueIdSelector.getUniqueId();
+                                List<UniqueId.Segment> segments = uniqueId.getSegments();
+
+                                Class<?> javaClass = null;
+                                int argumentIndex = -1;
+                                Method javaMethod = null;
+
+                                for (UniqueId.Segment segment : segments) {
+                                    String segmentTypeString = segment.getType().toString();
+
+                                    if (segmentTypeString.equals(
+                                            EngineDescriptor.class.getName())) {
+                                        continue;
+                                    } else if (segmentTypeString.equals(
+                                            ParameterizedClassTestDescriptor.class.getName())) {
+                                        String javaClassName = segment.getValue();
+                                        javaClass =
+                                                Thread.currentThread()
+                                                        .getContextClassLoader()
+                                                        .loadClass(javaClassName);
+                                    } else if (segmentTypeString.equals(
+                                            ParameterizedArgumentTestDescriptor.class.getName())) {
+                                        String value = segment.getValue();
+                                        if (value.indexOf("/") > 0) {
+                                            argumentIndex =
+                                                    Integer.parseInt(
+                                                            value.substring(0, value.indexOf("/")));
+                                        }
+                                    } else if (segmentTypeString.equals(
+                                            ParameterizedMethodTestDescriptor.class.getName())) {
+                                        String javaMethodName = segment.getValue();
+                                        List<Method> javaMethods =
+                                                ReflectionSupport.findMethods(
+                                                        javaClass,
+                                                        ParameterizedTestPredicates.TEST_METHOD,
+                                                        HierarchyTraversalMode.TOP_DOWN);
+                                        if (javaMethods != null && javaMethods.size() > 0) {
+                                            javaMethod = javaMethods.get(0);
+                                        }
+                                    }
+                                }
+
+                                if (javaClass != null) {
+                                    classes.add(javaClass);
+
+                                    List<Argument> arguments = getArguments(javaClass);
+                                    if (argumentIndex != -1) {
+                                        classArgumentMap
+                                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                                .add(arguments.get(argumentIndex));
+                                    } else {
+                                        classArgumentMap
+                                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                                .addAll(arguments);
+                                    }
+
+                                    if (javaMethod != null) {
+                                        classMethodMap
+                                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                                .add(javaMethod);
+                                    } else {
+                                        List<Method> javaMethods =
+                                                ReflectionSupport.findMethods(
+                                                        javaClass,
+                                                        ParameterizedTestPredicates.TEST_METHOD,
+                                                        HierarchyTraversalMode.TOP_DOWN);
+                                        javaMethods =
+                                                TestUtils.orderTestMethods(
+                                                        javaMethods,
+                                                        HierarchyTraversalMode.TOP_DOWN);
+                                        classMethodMap
+                                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                                .addAll(javaMethods);
+                                    }
+                                }
+
+                            } catch (Throwable t) {
+                                t.printStackTrace();
+                            }
+                        });
 
         for (Class<?> clazz : classes) {
-                new ParameterizedClassTestDescriptor
-                        .Builder()
-                        .setTestClass(clazz)
-                        .setTestArguments(classArgumentMap.get(clazz))
-                        .setTestMethods(classMethodMap.get(clazz))
-                        .build(engineDescriptor);
+            new ParameterizedClassTestDescriptor.Builder()
+                    .setTestClass(clazz)
+                    .setTestArguments(classArgumentMap.get(clazz))
+                    .setTestMethods(classMethodMap.get(clazz))
+                    .build(engineDescriptor);
         }
     }
 

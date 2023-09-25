@@ -28,7 +28,6 @@ import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescripto
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
-import org.antublue.test.engine.internal.test.descriptor.standard.StandardMethodTestDescriptor;
 import org.antublue.test.engine.internal.test.extension.ExtensionManager;
 import org.antublue.test.engine.internal.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.internal.test.util.LockProcessor;
@@ -369,7 +368,7 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
                         parentTestDescriptor
                                 .getUniqueId()
                                 .append(
-                                        StandardMethodTestDescriptor.class.getName(),
+                                        ParameterizedMethodTestDescriptor.class.getName(),
                                         testMethod.getName());
 
                 displayName = TestUtils.getDisplayName(testMethod);

@@ -28,7 +28,6 @@ import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescripto
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
-import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedArgumentTestDescriptor;
 import org.antublue.test.engine.internal.test.extension.ExtensionManager;
 import org.antublue.test.engine.internal.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.internal.test.util.LockProcessor;
@@ -181,7 +180,7 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
-            getParent(ParameterizedArgumentTestDescriptor.class)
+            getParent(StandardClassTestDescriptor.class)
                     .getThrowableContext()
                     .add(
                             testClass,

@@ -16,24 +16,17 @@
 
 package org.antublue.test.engine.internal.test.descriptor.parameterized;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
-import org.antublue.test.engine.internal.test.descriptor.standard.StandardClassTestDescriptor;
 import org.antublue.test.engine.internal.test.extension.ExtensionManager;
 import org.antublue.test.engine.internal.test.util.AutoCloseProcessor;
 import org.antublue.test.engine.internal.test.util.LockProcessor;
@@ -377,7 +370,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                         parentTestDescriptor
                                 .getUniqueId()
                                 .append(
-                                        StandardClassTestDescriptor.class.getName(),
+                                        ParameterizedClassTestDescriptor.class.getName(),
                                         testClass.getName());
 
                 displayName = TestUtils.getDisplayName(testClass);
