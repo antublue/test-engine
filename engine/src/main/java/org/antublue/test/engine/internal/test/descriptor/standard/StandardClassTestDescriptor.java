@@ -360,9 +360,8 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
 
     public static class Builder {
 
-        private TestDescriptor parentTestDescriptor;
         private Class<?> testClass;
-        private Method testMethod;
+        private List<Method> testMethods;
 
         private UniqueId uniqueId;
         private String displayName;
@@ -376,16 +375,14 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
             return this;
         }
 
-        public Builder setTestMethod(Method testMethod) {
-            this.testMethod = testMethod;
+        public Builder setTestMethods(List<Method> testMethods) {
+            this.testMethods = testMethods;
             return this;
         }
 
         public void build(TestDescriptor parentTestDescriptor) {
             try {
                 EXTENSION_MANAGER.initialize(testClass);
-
-                this.parentTestDescriptor = parentTestDescriptor;
 
                 uniqueId =
                         parentTestDescriptor
@@ -438,16 +435,8 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
                                 AnnotationFieldFilter.of(TestEngine.AutoClose.Conclude.class),
                                 HierarchyTraversalMode.TOP_DOWN);
 
-                List<Method> testMethods =
-                        ReflectionSupport.findMethods(
-                                testClass,
-                                StandardTestPredicates.TEST_METHOD,
-                                HierarchyTraversalMode.TOP_DOWN);
-
                 testMethods =
                         TestUtils.orderTestMethods(testMethods, HierarchyTraversalMode.TOP_DOWN);
-
-                validate();
 
                 TestDescriptor testDescriptor = new StandardClassTestDescriptor(this);
 
@@ -457,28 +446,17 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
                 EXTENSION_MANAGER.postTestMethodDiscovery(testClass, testMethods, throwableContext);
                 throwableContext.throwFirst();
 
-                if (testMethod != null) {
+                for (Method testMethod : testMethods) {
                     new StandardMethodTestDescriptor.Builder()
                             .setTestClass(testClass)
                             .setTestMethod(testMethod)
                             .build(testDescriptor);
-                } else {
-                    for (Method testMethod : testMethods) {
-                        new StandardMethodTestDescriptor.Builder()
-                                .setTestClass(testClass)
-                                .setTestMethod(testMethod)
-                                .build(testDescriptor);
-                    }
                 }
             } catch (RuntimeException e) {
                 throw e;
             } catch (Throwable t) {
                 throw new TestEngineException(t);
             }
-        }
-
-        private void validate() throws Throwable {
-            // TODO validate testClass
         }
     }
 }

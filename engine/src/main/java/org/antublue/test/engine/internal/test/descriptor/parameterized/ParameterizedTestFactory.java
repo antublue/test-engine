@@ -214,13 +214,6 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                 UniqueId uniqueId = uniqueIdSelector.getUniqueId();
                 List<UniqueId.Segment> segments = uniqueId.getSegments();
 
-                for (int i = 0; i < segments.size(); i++) {
-                    System.out.println(
-                            String.format(
-                                    "Segment [%d] = [%s] [%s]",
-                                    i, segments.get(i).getType(), segments.get(i).getValue()));
-                }
-
                 Class<?> javaClass = null;
                 int argumentIndex = -1;
                 Method javaMethod = null;

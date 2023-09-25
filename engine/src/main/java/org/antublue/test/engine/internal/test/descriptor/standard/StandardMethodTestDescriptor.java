@@ -333,7 +333,6 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
 
     public static class Builder {
 
-        private TestDescriptor parentTestDescriptor;
         private Class<?> testClass;
         private Method testMethod;
 
@@ -355,8 +354,6 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
 
         public void build(TestDescriptor parentTestDescriptor) {
             try {
-                this.parentTestDescriptor = parentTestDescriptor;
-
                 uniqueId =
                         parentTestDescriptor
                                 .getUniqueId()
@@ -392,8 +389,6 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
                         TestUtils.orderTestMethods(
                                 afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
 
-                validate();
-
                 TestDescriptor testDescriptor = new StandardMethodTestDescriptor(this);
 
                 parentTestDescriptor.addChild(testDescriptor);
@@ -402,10 +397,6 @@ public class StandardMethodTestDescriptor extends ExecutableTestDescriptor {
             } catch (Throwable t) {
                 throw new TestEngineException(t);
             }
-        }
-
-        private void validate() throws Throwable {
-            // TODO validate testClass
         }
     }
 }
