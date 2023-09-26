@@ -70,11 +70,10 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                 for (Class<?> javaClass : javaClasses) {
                     // Class -> Argument mappings
                     List<Argument> arguments = getArguments(javaClass);
-                    for (Argument argument : arguments) {
-                        classArgumentMap
-                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
-                                .add(argument);
-                    }
+
+                    classArgumentMap
+                            .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                            .addAll(arguments);
 
                     // Class -> Method mappings
                     List<Method> javaMethods =
@@ -82,14 +81,14 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                                     javaClass,
                                     ParameterizedTestPredicates.TEST_METHOD,
                                     HierarchyTraversalMode.TOP_DOWN);
+
                     javaMethods =
                             TestUtils.orderTestMethods(
                                     javaMethods, HierarchyTraversalMode.TOP_DOWN);
-                    for (Method javaMethod : javaMethods) {
-                        classMethodMap
-                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
-                                .add(javaMethod);
-                    }
+
+                    classMethodMap
+                            .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                            .addAll(javaMethods);
 
                     classes.add(javaClass);
                 }
@@ -112,11 +111,10 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                     if (ParameterizedTestPredicates.TEST_CLASS.test(javaClass)) {
                         // Class -> Argument mappings
                         List<Argument> arguments = getArguments(javaClass);
-                        for (Argument argument : arguments) {
-                            classArgumentMap
-                                    .computeIfAbsent(javaClass, c -> new ArrayList<>())
-                                    .add(argument);
-                        }
+
+                        classArgumentMap
+                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                .addAll(arguments);
 
                         // Class -> Method mappings
                         List<Method> javaMethods =
@@ -124,14 +122,14 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                                         javaClass,
                                         ParameterizedTestPredicates.TEST_METHOD,
                                         HierarchyTraversalMode.TOP_DOWN);
+
                         javaMethods =
                                 TestUtils.orderTestMethods(
                                         javaMethods, HierarchyTraversalMode.TOP_DOWN);
-                        for (Method javaMethod : javaMethods) {
-                            classMethodMap
-                                    .computeIfAbsent(javaClass, c -> new ArrayList<>())
-                                    .add(javaMethod);
-                        }
+
+                        classMethodMap
+                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                .addAll(javaMethods);
 
                         classes.add(javaClass);
                     }
@@ -150,11 +148,10 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                 if (ParameterizedTestPredicates.TEST_CLASS.test(javaClass)) {
                     // Class -> Argument mappings
                     List<Argument> arguments = getArguments(javaClass);
-                    for (Argument argument : arguments) {
-                        classArgumentMap
-                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
-                                .add(argument);
-                    }
+
+                    classArgumentMap
+                            .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                            .addAll(arguments);
 
                     // Class -> Method mappings
                     List<Method> javaMethods =
@@ -162,14 +159,14 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                                     javaClass,
                                     ParameterizedTestPredicates.TEST_METHOD,
                                     HierarchyTraversalMode.TOP_DOWN);
+
                     javaMethods =
                             TestUtils.orderTestMethods(
                                     javaMethods, HierarchyTraversalMode.TOP_DOWN);
-                    for (Method javaMethod : javaMethods) {
-                        classMethodMap
-                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
-                                .add(javaMethod);
-                    }
+
+                    classMethodMap
+                            .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                            .addAll(javaMethods);
 
                     classes.add(javaClass);
                 }
@@ -189,11 +186,10 @@ public class ParameterizedTestFactory implements TestDescriptorFactory {
                         && ParameterizedTestPredicates.TEST_METHOD.test(javaMethod)) {
                     // Class -> Argument mappings
                     List<Argument> arguments = getArguments(javaClass);
-                    for (Argument argument : arguments) {
-                        classArgumentMap
-                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
-                                .add(argument);
-                    }
+
+                    classArgumentMap
+                            .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                            .addAll(arguments);
 
                     classMethodMap
                             .computeIfAbsent(javaClass, c -> new ArrayList<>())

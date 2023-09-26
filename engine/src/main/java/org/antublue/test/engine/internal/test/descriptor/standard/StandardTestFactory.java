@@ -68,14 +68,14 @@ public class StandardTestFactory implements TestDescriptorFactory {
                                     javaClass,
                                     StandardTestPredicates.TEST_METHOD,
                                     HierarchyTraversalMode.TOP_DOWN);
+
                     javaMethods =
                             TestUtils.orderTestMethods(
                                     javaMethods, HierarchyTraversalMode.TOP_DOWN);
-                    for (Method javaMethod : javaMethods) {
-                        classMethodMap
-                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
-                                .add(javaMethod);
-                    }
+
+                    classMethodMap
+                            .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                            .addAll(javaMethods);
 
                     classes.add(javaClass);
                 }
@@ -102,14 +102,14 @@ public class StandardTestFactory implements TestDescriptorFactory {
                                         javaClass,
                                         StandardTestPredicates.TEST_METHOD,
                                         HierarchyTraversalMode.TOP_DOWN);
+
                         javaMethods =
                                 TestUtils.orderTestMethods(
                                         javaMethods, HierarchyTraversalMode.TOP_DOWN);
-                        for (Method javaMethod : javaMethods) {
-                            classMethodMap
-                                    .computeIfAbsent(javaClass, c -> new ArrayList<>())
-                                    .add(javaMethod);
-                        }
+
+                        classMethodMap
+                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                                .addAll(javaMethods);
 
                         classes.add(javaClass);
                     }
@@ -132,14 +132,14 @@ public class StandardTestFactory implements TestDescriptorFactory {
                                     javaClass,
                                     StandardTestPredicates.TEST_METHOD,
                                     HierarchyTraversalMode.TOP_DOWN);
+
                     javaMethods =
                             TestUtils.orderTestMethods(
                                     javaMethods, HierarchyTraversalMode.TOP_DOWN);
-                    for (Method javaMethod : javaMethods) {
-                        classMethodMap
-                                .computeIfAbsent(javaClass, c -> new ArrayList<>())
-                                .add(javaMethod);
-                    }
+
+                    classMethodMap
+                            .computeIfAbsent(javaClass, c -> new ArrayList<>())
+                            .addAll(javaMethods);
 
                     classes.add(javaClass);
                 }
