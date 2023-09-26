@@ -23,7 +23,7 @@ public class AnsiColor {
      * Configuration constants must be in sync with values in
      * org.antublue.test.engine.internal.Constants
      *
-     * They are declared here to prevents a cyclic dependency
+     * They are declared here to prevent a cyclic dependency
      * on the engine project
      */
 
