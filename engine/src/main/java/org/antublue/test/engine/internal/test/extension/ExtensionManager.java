@@ -59,6 +59,7 @@ public class ExtensionManager {
 
     private boolean initialized;
 
+    /** Predicate to test of a method is an extension supplier method */
     public static final Predicate<Method> EXTENSION_SUPPLIER_METHOD =
             method ->
                     method.isAnnotationPresent(TestEngine.ExtensionSupplier.class)
@@ -78,6 +79,11 @@ public class ExtensionManager {
         testExtensionsReversedMap = new HashMap<>();
     }
 
+    /**
+     * Method to get the singleton extension manager
+     *
+     * @return the singleton extension manager
+     */
     public static ExtensionManager getSingleton() {
         return SINGLETON;
     }
@@ -137,6 +143,13 @@ public class ExtensionManager {
         }
     }
 
+    /**
+     * Method to run postTestMethodDiscovery extension methods
+     *
+     * @param testClass testClass
+     * @param testMethods testMethods
+     * @param throwableContext throwableContext
+     */
     public void postTestMethodDiscovery(
             Class<?> testClass, List<Method> testMethods, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testClass)) {
@@ -180,6 +193,13 @@ public class ExtensionManager {
         }
     }
 
+    /**
+     * Method to run postFieldCallback extension methods
+     *
+     * @param testField testField
+     * @param testInstance testInstance
+     * @param throwableContext throwableContext
+     */
     public void postFieldCallback(
             Field testField, Object testInstance, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
@@ -191,6 +211,12 @@ public class ExtensionManager {
         }
     }
 
+    /**
+     * Method to run prePrepareMethodsCallback extension methods
+     *
+     * @param testInstance testInstance
+     * @param throwableContext throwableContext
+     */
     public void prePrepareMethodsCallback(Object testInstance, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
@@ -217,6 +243,13 @@ public class ExtensionManager {
         }
     }
 
+    /**
+     * Method to run preBeforeAllMethodsCallback extenion methods
+     *
+     * @param testInstance testInstance
+     * @param testArgument testArgument
+     * @param throwableContext throwableContext
+     */
     public void preBeforeAllMethodsCallback(
             Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
@@ -246,6 +279,13 @@ public class ExtensionManager {
         }
     }
 
+    /**
+     * Method to run preBeforeEachMethodsCallback extension methods
+     *
+     * @param testInstance testInstance
+     * @param testArgument testArgument
+     * @param throwableContext throwableCollector
+     */
     public void preBeforeEachMethodsCallback(
             Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
@@ -319,6 +359,13 @@ public class ExtensionManager {
         }
     }
 
+    /**
+     * Method to run preAfterEachMethodsCallback extension methods
+     *
+     * @param testInstance testInstance
+     * @param testArgument testArgument
+     * @param throwableContext throwableCollector
+     */
     public void preAfterEachMethodsCallback(
             Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
@@ -348,6 +395,13 @@ public class ExtensionManager {
         }
     }
 
+    /**
+     * Method to run preAfterAllMethodsCallback extension methods
+     *
+     * @param testInstance testInstance
+     * @param testArgument testArgument
+     * @param throwableContext throwableCollector
+     */
     public void preAfterAllMethodsCallback(
             Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
@@ -360,7 +414,7 @@ public class ExtensionManager {
     }
 
     /**
-     * Method to run afterAll extension methods
+     * Method to run postAfterAllMethodsCallback extension methods
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
@@ -377,6 +431,12 @@ public class ExtensionManager {
         }
     }
 
+    /**
+     * Method to run preConcludeMethodsCallback extension methods
+     *
+     * @param testInstance testInstance
+     * @param throwableContext throwableCollector
+     */
     public void preConcludeMethodsCallback(Object testInstance, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {

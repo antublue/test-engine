@@ -370,7 +370,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     }
 
     /**
-     * Method to filter test methods
+     * Method to filter test methods by tag
      *
      * @param engineDescriptor engineDescriptor
      */

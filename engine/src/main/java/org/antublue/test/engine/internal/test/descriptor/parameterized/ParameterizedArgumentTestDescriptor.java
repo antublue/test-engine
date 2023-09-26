@@ -396,6 +396,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         return null;
     }
 
+    /** Class to implement a Builder */
     public static class Builder {
 
         private Class<?> testClass;
@@ -411,22 +412,46 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         private List<Method> beforeAllMethods;
         private List<Method> afterAllMethods;
 
+        /**
+         * Method to set the test class
+         *
+         * @param testClass testClass
+         * @return this
+         */
         public Builder setTestClass(Class<?> testClass) {
             this.testClass = testClass;
             return this;
         }
 
+        /**
+         * Method to set the test argument
+         *
+         * @param testArgumentIndex testArgumentIndex
+         * @param testArgument testArgument
+         * @return this
+         */
         public Builder setTestArgument(int testArgumentIndex, Argument testArgument) {
             this.testArgumentIndex = testArgumentIndex;
             this.testArgument = testArgument;
             return this;
         }
 
+        /**
+         * Method to set the list of test methods
+         *
+         * @param testMethods testMethods
+         * @return this
+         */
         public Builder setTestMethods(List<Method> testMethods) {
             this.testMethods = testMethods;
             return this;
         }
 
+        /**
+         * Method to build the test descriptor and any children
+         *
+         * @param parentTestDescriptor parentTestDescriptor
+         */
         public void build(TestDescriptor parentTestDescriptor) {
             try {
                 EXTENSION_MANAGER.initialize(testClass);

@@ -103,6 +103,7 @@ public interface Extension {
      * Method to call before processing all @TestEngine.BeforeAll methods
      *
      * @param testInstance testInstance
+     * @param testArgument testArgument
      * @throws Throwable Throwable
      */
     default void preBeforeAllMethodsCallback(Object testInstance, Argument testArgument)
@@ -114,6 +115,7 @@ public interface Extension {
      * Method to call after processing all @TestEngine.BeforeAll methods
      *
      * @param testInstance testInstance
+     * @param testArgument testArgument
      * @throws Throwable Throwable
      */
     default void postBeforeAllMethodsCallback(Object testInstance, Argument testArgument)
@@ -125,6 +127,7 @@ public interface Extension {
      * Method to call before processing all @TestEngine.BeforeEach methods
      *
      * @param testInstance testInstance
+     * @param testArgument testArgument
      * @throws Throwable Throwable
      */
     default void preBeforeEachMethodsCallback(Object testInstance, Argument testArgument)
@@ -136,6 +139,7 @@ public interface Extension {
      * Method to call after processing all @TestEngine.BeforeEach methods
      *
      * @param testInstance testInstance
+     * @param testArgument testArgument
      * @throws Throwable Throwable
      */
     default void postBeforeEachMethodsCallback(Object testInstance, Argument testArgument)
@@ -148,6 +152,7 @@ public interface Extension {
      *
      * @param testMethod testMethod
      * @param testInstance testInstance
+     * @param testArgument testArgument
      * @throws Throwable Throwable
      */
     default void preTestMethodsCallback(
@@ -160,6 +165,7 @@ public interface Extension {
      *
      * @param testMethod testMethod
      * @param testInstance testInstance
+     * @param testArgument testArgument
      * @throws Throwable Throwable
      */
     default void postTestMethodsCallback(
@@ -171,6 +177,7 @@ public interface Extension {
      * Method to call after processing all @TestEngine.AfterEach methods
      *
      * @param testInstance testInstance
+     * @param testArgument testArgument
      * @throws Throwable Throwable
      */
     default void preAfterEachMethodsCallback(Object testInstance, Argument testArgument)
@@ -182,6 +189,7 @@ public interface Extension {
      * Method to call before processing all @TestEngine.AfterEach methods
      *
      * @param testInstance testInstance
+     * @param testArgument testArgument
      * @throws Throwable Throwable
      */
     default void postAfterEachMethodsCallback(Object testInstance, Argument testArgument)
@@ -193,6 +201,7 @@ public interface Extension {
      * Method to call after processing all @TestEngine.AfterAll methods
      *
      * @param testInstance testInstance
+     * @param testArgument testArgument
      * @throws Throwable Throwable
      */
     default void preAfterAllMethodsCallback(Object testInstance, Argument testArgument)
@@ -204,6 +213,7 @@ public interface Extension {
      * Method to call before processing all @TestEngine.AfterAll methods
      *
      * @param testInstance testInstance
+     * @param testArgument testArgument
      * @throws Throwable Throwable
      */
     default void postAfterAllMethodsCallback(Object testInstance, Argument testArgument)

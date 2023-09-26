@@ -358,6 +358,7 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
         return null;
     }
 
+    /** Class to implement a Builder */
     public static class Builder {
 
         private Class<?> testClass;
@@ -370,16 +371,33 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
         private List<Method> prepareMethods;
         private List<Method> concludeMethods;
 
+        /**
+         * Method to set the test class
+         *
+         * @param testClass testClass
+         * @return this
+         */
         public Builder setTestClass(Class<?> testClass) {
             this.testClass = testClass;
             return this;
         }
 
+        /**
+         * Method to set the list of test methods
+         *
+         * @param testMethods testMethods
+         * @return this
+         */
         public Builder setTestMethods(List<Method> testMethods) {
             this.testMethods = testMethods;
             return this;
         }
 
+        /**
+         * Method to build the test descriptor and any children
+         *
+         * @param parentTestDescriptor parentTestDescriptor
+         */
         public void build(TestDescriptor parentTestDescriptor) {
             try {
                 EXTENSION_MANAGER.initialize(testClass);

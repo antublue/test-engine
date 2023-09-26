@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/** Class to implement a StateMachine */
 @SuppressWarnings("unchecked")
 public class StateMachine<T> {
 
@@ -34,6 +35,11 @@ public class StateMachine<T> {
     private T end;
     private Action<T> endAction;
 
+    /**
+     * Constructor
+     *
+     * @param id id
+     */
     public StateMachine(String id) {
         this.id = id;
         this.definitions = new HashMap<>();
@@ -41,11 +47,25 @@ public class StateMachine<T> {
         this.afterEachActions = new ArrayList<>();
     }
 
+    /**
+     * Method to add an afterEach action
+     *
+     * @param afterEachAction afterEachAction
+     * @return this
+     */
     public StateMachine<T> afterEach(Action<T> afterEachAction) {
         afterEachActions.add(afterEachAction);
         return this;
     }
 
+    /**
+     * Method to define a state, the action to perform, and possible target states
+     *
+     * @param source source
+     * @param action action
+     * @param targets targets
+     * @return this
+     */
     public StateMachine<T> define(T source, Action<T> action, T... targets) {
         Set<T> set = definitions.computeIfAbsent(source, k -> new HashSet<>());
         Collections.addAll(set, targets);
@@ -53,12 +73,25 @@ public class StateMachine<T> {
         return this;
     }
 
+    /**
+     * Method to set the end state and action
+     *
+     * @param end end
+     * @param endAction endAction
+     * @return this
+     */
     public StateMachine<T> end(T end, Action<T> endAction) {
         this.end = end;
         this.endAction = endAction;
         return this;
     }
 
+    /**
+     * Method to run the state machine
+     *
+     * @param begin begin
+     * @throws StateMachineException StateMachineException
+     */
     public void run(T begin) throws StateMachineException {
         T state = begin;
         T nextState;
@@ -98,8 +131,18 @@ public class StateMachine<T> {
         return id;
     }
 
+    /**
+     * Interface to implement an Action
+     *
+     * @param <T> type
+     */
     public interface Action<T> {
 
+        /**
+         * Method to implement the action
+         *
+         * @return the next state
+         */
         T perform();
     }
 }

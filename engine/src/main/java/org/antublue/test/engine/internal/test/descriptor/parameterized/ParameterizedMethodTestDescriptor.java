@@ -333,6 +333,7 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
         return null;
     }
 
+    /** Class to implement a Builder */
     public static class Builder {
 
         private Class<?> testClass;
@@ -346,22 +347,46 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
         private List<Method> beforeEachMethods;
         private List<Method> afterEachMethods;
 
+        /**
+         * Method to set the test claass
+         *
+         * @param testClass testClass
+         * @return this
+         */
         public Builder setTestClass(Class<?> testClass) {
             this.testClass = testClass;
             return this;
         }
 
+        /**
+         * Method to set the test argument index and test argument
+         *
+         * @param testArgumentIndex testArgumentIndex
+         * @param testArgument testArgument
+         * @return this
+         */
         public Builder setTestArgument(int testArgumentIndex, Argument testArgument) {
             this.testArgumentIndex = testArgumentIndex;
             this.testArgument = testArgument;
             return this;
         }
 
+        /**
+         * Method to set the test method
+         *
+         * @param testMethod testMethod
+         * @return this
+         */
         public Builder setTestMethod(Method testMethod) {
             this.testMethod = testMethod;
             return this;
         }
 
+        /**
+         * Method to build the test descriptor and any children
+         *
+         * @param parentTestDescriptor parentTestDescriptor
+         */
         public void build(TestDescriptor parentTestDescriptor) {
             try {
                 uniqueId =
