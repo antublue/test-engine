@@ -16,37 +16,11 @@
 
 package org.antublue.test.engine.api;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Optional;
 
 /** Interface to implement an Extension */
 public interface Extension {
-
-    /**
-     * Method to call post test argument discovery
-     *
-     * @param testClass testClass
-     * @param testArguments testArguments
-     * @throws Throwable Throwable
-     */
-    default void postTestArgumentDiscovery(Class<?> testClass, List<Argument> testArguments)
-            throws Throwable {
-        // DO NOTHING
-    }
-
-    /**
-     * Method to call post test method discovery
-     *
-     * @param testClass testClass
-     * @param testMethods testMethods
-     * @throws Throwable Throwable
-     */
-    default void postTestMethodDiscovery(Class<?> testClass, List<Method> testMethods)
-            throws Throwable {
-        // DO NOTHING
-    }
 
     /**
      * Method to call before test object creation
@@ -65,17 +39,6 @@ public interface Extension {
      * @throws Throwable Throwable
      */
     default void postInstantiateCallback(Object testInstance) throws Throwable {
-        // DO NOTHING
-    }
-
-    /**
-     * Method to call after processing a field
-     *
-     * @param testField testField
-     * @param testInstance testInstance
-     * @throws Throwable Throwable
-     */
-    default void postFieldCallback(Field testField, Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -247,7 +210,8 @@ public interface Extension {
      * @param testClass testClass
      * @param optionalTestInstance optionalTestInstance
      */
-    default void preDestroyCallback(Class<?> testClass, Optional<Object> optionalTestInstance) {
+    default void preDestroyCallback(Class<?> testClass, Optional<Object> optionalTestInstance)
+            throws Throwable {
         // DO NOTHING
     }
 }

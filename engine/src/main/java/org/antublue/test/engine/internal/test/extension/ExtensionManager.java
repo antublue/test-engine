@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.test.extension;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -144,24 +143,6 @@ public class ExtensionManager {
     }
 
     /**
-     * Method to run postTestMethodDiscovery extension methods
-     *
-     * @param testClass testClass
-     * @param testMethods testMethods
-     * @param throwableContext throwableContext
-     */
-    public void postTestMethodDiscovery(
-            Class<?> testClass, List<Method> testMethods, ThrowableContext throwableContext) {
-        for (Extension testExtension : getTestExtensions(testClass)) {
-            try {
-                testExtension.postTestMethodDiscovery(testClass, testMethods);
-            } catch (Throwable t) {
-                throwableContext.add(testClass, t);
-            }
-        }
-    }
-
-    /**
      * Method to run preInstantiateCallback extension methods
      *
      * @param testClass testClass
@@ -187,24 +168,6 @@ public class ExtensionManager {
         for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postInstantiateCallback(testInstance);
-            } catch (Throwable t) {
-                throwableContext.add(testInstance.getClass(), t);
-            }
-        }
-    }
-
-    /**
-     * Method to run postFieldCallback extension methods
-     *
-     * @param testField testField
-     * @param testInstance testInstance
-     * @param throwableContext throwableContext
-     */
-    public void postFieldCallback(
-            Field testField, Object testInstance, ThrowableContext throwableContext) {
-        for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
-            try {
-                testExtension.postFieldCallback(testField, testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testInstance.getClass(), t);
             }

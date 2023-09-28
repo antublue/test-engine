@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.testing;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -111,13 +110,6 @@ public class SimpleExtensionTest {
         public void postInstantiateCallback(Object instance) throws Throwable {
             StandardStreams.println(
                     "postInstantiateCallback() instance [%s]", instance.getClass().getName());
-        }
-
-        @Override
-        public void postFieldCallback(Field testField, Object instance) throws Throwable {
-            StandardStreams.println(
-                    "postFieldCallback() instance [%s] field [%s]",
-                    instance.getClass().getName(), testField.getName());
         }
 
         @Override

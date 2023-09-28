@@ -23,8 +23,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.antublue.test.engine.api.MethodProcessor;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.test.descriptor.TestDescriptorFactory;
+import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
 import org.antublue.test.engine.internal.test.util.TestUtils;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -73,6 +77,11 @@ public class StandardTestFactory implements TestDescriptorFactory {
                             TestUtils.orderTestMethods(
                                     javaMethods, HierarchyTraversalMode.TOP_DOWN);
 
+                    MethodProcessor methodProcessor = getMethodProcessor(javaClass);
+                    if (methodProcessor != null) {
+                        methodProcessor.process(javaClass, javaMethods);
+                    }
+
                     classMethodMap
                             .computeIfAbsent(javaClass, c -> new ArrayList<>())
                             .addAll(javaMethods);
@@ -107,6 +116,11 @@ public class StandardTestFactory implements TestDescriptorFactory {
                                 TestUtils.orderTestMethods(
                                         javaMethods, HierarchyTraversalMode.TOP_DOWN);
 
+                        MethodProcessor methodProcessor = getMethodProcessor(javaClass);
+                        if (methodProcessor != null) {
+                            methodProcessor.process(javaClass, javaMethods);
+                        }
+
                         classMethodMap
                                 .computeIfAbsent(javaClass, c -> new ArrayList<>())
                                 .addAll(javaMethods);
@@ -136,6 +150,11 @@ public class StandardTestFactory implements TestDescriptorFactory {
                     javaMethods =
                             TestUtils.orderTestMethods(
                                     javaMethods, HierarchyTraversalMode.TOP_DOWN);
+
+                    MethodProcessor methodProcessor = getMethodProcessor(javaClass);
+                    if (methodProcessor != null) {
+                        methodProcessor.process(javaClass, javaMethods);
+                    }
 
                     classMethodMap
                             .computeIfAbsent(javaClass, c -> new ArrayList<>())
@@ -217,6 +236,11 @@ public class StandardTestFactory implements TestDescriptorFactory {
                                         StandardTestPredicates.TEST_METHOD,
                                         HierarchyTraversalMode.BOTTOM_UP);
 
+                        MethodProcessor methodProcessor = getMethodProcessor(javaClass);
+                        if (methodProcessor != null) {
+                            methodProcessor.process(javaClass, javaMethods);
+                        }
+
                         classMethodMap
                                 .computeIfAbsent(javaClass, c -> new ArrayList<>())
                                 .addAll(javaMethods);
@@ -236,5 +260,41 @@ public class StandardTestFactory implements TestDescriptorFactory {
                     .setTestMethods(classMethodMap.get(clazz))
                     .build(engineDescriptor);
         }
+    }
+
+    private static Method getMethodOrdererSupplierMethod(Class<?> testClass) throws Throwable {
+        Method method = null;
+
+        List<Method> methods =
+                ReflectionSupport.findMethods(
+                        testClass,
+                        AnnotationMethodFilter.of(TestEngine.MethodProcessorSupplier.class),
+                        HierarchyTraversalMode.BOTTOM_UP);
+
+        if (!methods.isEmpty()) {
+            method = methods.get(0);
+            method.setAccessible(true);
+        }
+
+        return method;
+    }
+
+    private static MethodProcessor getMethodProcessor(Class<?> testClass) throws Throwable {
+        MethodProcessor methodProcessor = null;
+
+        Method methodOrdererMethod = getMethodOrdererSupplierMethod(testClass);
+        if (methodOrdererMethod != null) {
+            Object object = methodOrdererMethod.invoke(null, (Object[]) null);
+            if (object instanceof MethodProcessor) {
+                methodProcessor = (MethodProcessor) object;
+            } else {
+                throw new TestClassDefinitionException(
+                        String.format(
+                                "Exception getting method orderer for test class [%s]",
+                                testClass.getName()));
+            }
+        }
+
+        return methodProcessor;
     }
 }

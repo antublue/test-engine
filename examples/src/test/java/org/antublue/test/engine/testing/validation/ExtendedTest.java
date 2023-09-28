@@ -17,11 +17,8 @@
 package org.antublue.test.engine.testing.validation;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
-import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.MethodProcessor;
 import org.antublue.test.engine.api.TestEngine;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,11 +27,9 @@ import org.junit.jupiter.api.Test;
 
 public class ExtendedTest extends BaseTest {
 
-    @TestEngine.ExtensionSupplier
-    public static Stream<Extension> extensions() {
-        Collection<Extension> collection = new ArrayList<>();
-        collection.add(new MethodOrderExtension());
-        return collection.stream();
+    @TestEngine.MethodProcessorSupplier
+    public static MethodProcessor methodProcessor() {
+        return new TestMethodProcessor();
     }
 
     @BeforeEach
@@ -73,11 +68,10 @@ public class ExtendedTest extends BaseTest {
         System.out.format("    %s afterEach4()", ExtendedTest.class.getName()).println();
     }
 
-    private static class MethodOrderExtension implements Extension {
+    private static class TestMethodProcessor implements MethodProcessor {
 
         @Override
-        public void postTestMethodDiscovery(Class<?> testClass, List<Method> testMethods)
-                throws Throwable {
+        public void process(Class<?> testClass, List<Method> testMethods) {
             for (Method testMethod : testMethods) {
                 System.out.println(String.format("testMethod [%s]", testMethod));
             }

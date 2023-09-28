@@ -35,7 +35,6 @@ import org.antublue.test.engine.internal.test.util.LockProcessor;
 import org.antublue.test.engine.internal.test.util.RandomFieldInjector;
 import org.antublue.test.engine.internal.test.util.StateMachine;
 import org.antublue.test.engine.internal.test.util.TestUtils;
-import org.antublue.test.engine.internal.test.util.ThrowableContext;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -243,8 +242,6 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
             for (Field field : testArgumentFields) {
                 field.setAccessible(true);
                 field.set(getTestInstance(), testArgument);
-                EXTENSION_MANAGER.postFieldCallback(
-                        field, getTestInstance(), getThrowableContext());
                 if (!getThrowableContext().isEmpty()) {
                     return State.EXECUTE_OR_SKIP;
                 }
@@ -263,8 +260,6 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         try {
             for (Field field : randomFields) {
                 RandomFieldInjector.inject(getTestInstance(), field);
-                EXTENSION_MANAGER.postFieldCallback(
-                        field, getTestInstance(), getThrowableContext());
                 if (!getThrowableContext().isEmpty()) {
                     return State.EXECUTE_OR_SKIP;
                 }
@@ -517,10 +512,6 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                 TestDescriptor testDescriptor = new ParameterizedArgumentTestDescriptor(this);
 
                 parentTestDescriptor.addChild(testDescriptor);
-
-                ThrowableContext throwableContext = new ThrowableContext();
-                EXTENSION_MANAGER.postTestMethodDiscovery(testClass, testMethods, throwableContext);
-                throwableContext.throwFirst();
 
                 for (Method testMethod : testMethods) {
                     new ParameterizedMethodTestDescriptor.Builder()

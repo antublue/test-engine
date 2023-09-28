@@ -16,12 +16,9 @@
 
 package org.antublue.test.engine.testing.extension.standard;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.MethodProcessor;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
@@ -30,11 +27,9 @@ public class JUnit5LikeTest2 {
 
     public final List<String> ACTUAL = new ArrayList<>();
 
-    @TestEngine.ExtensionSupplier
-    public static Collection<Extension> extensions() {
-        Collection<Extension> extensions = new ArrayList<>();
-        extensions.add(new RandomizeTestMethods());
-        return extensions;
+    @TestEngine.MethodProcessorSupplier
+    public static MethodProcessor methodProcessor() {
+        return MethodProcessor.SHUFFLE_METHODS;
     }
 
     @TestEngine.Prepare
@@ -71,13 +66,5 @@ public class JUnit5LikeTest2 {
     public void conclude() {
         System.out.println("conclude()");
         ACTUAL.add("conclude()");
-    }
-
-    public static class RandomizeTestMethods implements Extension {
-
-        @Override
-        public void postTestMethodDiscovery(Class<?> testClass, List<Method> testMethods) {
-            Collections.shuffle(testMethods);
-        }
     }
 }

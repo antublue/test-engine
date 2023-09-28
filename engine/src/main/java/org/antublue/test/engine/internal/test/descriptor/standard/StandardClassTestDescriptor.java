@@ -244,8 +244,6 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
         try {
             for (Field field : randomFields) {
                 RandomFieldInjector.inject(getTestInstance(), field);
-                EXTENSION_MANAGER.postFieldCallback(
-                        field, getTestInstance(), getThrowableContext());
                 if (!getThrowableContext().isEmpty()) {
                     return State.EXECUTE_OR_SKIP;
                 }
@@ -453,16 +451,9 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
                                 AnnotationFieldFilter.of(TestEngine.AutoClose.Conclude.class),
                                 HierarchyTraversalMode.TOP_DOWN);
 
-                testMethods =
-                        TestUtils.orderTestMethods(testMethods, HierarchyTraversalMode.TOP_DOWN);
-
                 TestDescriptor testDescriptor = new StandardClassTestDescriptor(this);
 
                 parentTestDescriptor.addChild(testDescriptor);
-
-                ThrowableContext throwableContext = new ThrowableContext();
-                EXTENSION_MANAGER.postTestMethodDiscovery(testClass, testMethods, throwableContext);
-                throwableContext.throwFirst();
 
                 for (Method testMethod : testMethods) {
                     new StandardMethodTestDescriptor.Builder()

@@ -16,23 +16,15 @@
 
 package org.antublue.test.engine.testing.order.method;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.MethodProcessor;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class StandardTestWithMethodOrderTest {
+public class StandardTestWithMethodProcessorTest {
 
-    @TestEngine.ExtensionSupplier
-    public static Stream<Extension> extensions() {
-        Collection<Extension> collection = new ArrayList<>();
-        collection.add(new ShuffleTestMethods());
-        return collection.stream();
+    @TestEngine.MethodProcessorSupplier
+    public static MethodProcessor methodProcessor() {
+        return MethodProcessor.SHUFFLE_METHODS;
     }
 
     @TestEngine.Prepare
@@ -78,13 +70,5 @@ public class StandardTestWithMethodOrderTest {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-    }
-
-    private static class ShuffleTestMethods implements Extension {
-
-        @Override
-        public void postTestMethodDiscovery(Class<?> testClass, List<Method> testMethods) {
-            Collections.shuffle(testMethods);
-        }
     }
 }
