@@ -27,7 +27,7 @@ public class IntegerArgumentTest {
 
     @TestEngine.Argument protected IntegerArgument integerArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<IntegerArgument> arguments() {
         Collection<IntegerArgument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

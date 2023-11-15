@@ -31,8 +31,6 @@ import org.antublue.test.engine.internal.test.descriptor.MetadataSupport;
 import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedArgumentTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedClassTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedMethodTestDescriptor;
-import org.antublue.test.engine.internal.test.descriptor.standard.StandardClassTestDescriptor;
-import org.antublue.test.engine.internal.test.descriptor.standard.StandardMethodTestDescriptor;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 
@@ -147,8 +145,7 @@ public class SummaryEngineExecutionListener
                 String testDescriptorStatus =
                         metadata.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
 
-                if (testDescriptor instanceof StandardMethodTestDescriptor
-                        || testDescriptor instanceof ParameterizedMethodTestDescriptor) {
+                if (testDescriptor instanceof ParameterizedMethodTestDescriptor) {
                     methodTestDescriptorFound++;
                     switch (testDescriptorStatus) {
                         case "PASS":
@@ -172,8 +169,7 @@ public class SummaryEngineExecutionListener
                                 break;
                             }
                     }
-                } else if (testDescriptor instanceof StandardClassTestDescriptor
-                        || testDescriptor instanceof ParameterizedClassTestDescriptor) {
+                } else if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
                     classTestDescriptorFound++;
                     switch (testDescriptorStatus) {
                         case "PASS":

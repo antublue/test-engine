@@ -30,7 +30,7 @@ public class FilteredArgumentStreamTest {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         return ArgumentSupplier.arguments(
                 integerArgument -> !integerArgument.value().contains("b"));

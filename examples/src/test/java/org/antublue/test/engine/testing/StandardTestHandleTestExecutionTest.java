@@ -26,7 +26,7 @@ import org.antublue.test.engine.api.TestEngine;
 @TestEngine.Disabled
 public class StandardTestHandleTestExecutionTest {
 
-    @TestEngine.Supplier.Extension
+    @TestEngine.ExtensionSupplier
     public static List<Extension> extensions() {
         List<Extension> list = new ArrayList<>();
         list.add(new HandleTestExecutionTestExtension());

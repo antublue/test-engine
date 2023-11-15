@@ -52,7 +52,7 @@ public class DuplicateArgumentNamesLifecycleTest {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 5; i++) {

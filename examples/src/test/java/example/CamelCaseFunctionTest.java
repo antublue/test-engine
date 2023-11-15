@@ -39,7 +39,7 @@ public class CamelCaseFunctionTest {
 
     @TestEngine.Argument protected ObjectArgument<InputOutputArgument> objectArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<ObjectArgument<InputOutputArgument>> arguments() {
         Collection<ObjectArgument<InputOutputArgument>> collection = new ArrayList<>();
 

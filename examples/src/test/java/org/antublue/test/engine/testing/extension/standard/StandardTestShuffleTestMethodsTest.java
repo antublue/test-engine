@@ -28,7 +28,7 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class StandardTestShuffleTestMethodsTest {
 
-    @TestEngine.Supplier.Extension
+    @TestEngine.ExtensionSupplier
     public static Stream<Extension> extensionSupplier() {
         Collection<Extension> collection = new ArrayList<>();
         collection.add(new ShuffleTestMethodsExtension());

@@ -31,7 +31,7 @@ public class JUnit5LikeTest2 {
 
     public final List<String> ACTUAL = new ArrayList<>();
 
-    @TestEngine.Supplier.Extension
+    @TestEngine.ExtensionSupplier
     public static Stream<Extension> extensionSupplier() {
         Collection<Extension> collection = new ArrayList<>();
         collection.add(new ShuffleTestMethodsExtension());

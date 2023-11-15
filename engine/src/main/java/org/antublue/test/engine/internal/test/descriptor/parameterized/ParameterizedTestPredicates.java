@@ -43,7 +43,7 @@ public class ParameterizedTestPredicates {
                             .isEmpty()
                     && !ReflectionSupport.findMethods(
                                     clazz,
-                                    AnnotationMethodFilter.of(TestEngine.Supplier.Argument.class),
+                                    AnnotationMethodFilter.of(TestEngine.ArgumentSupplier.class),
                                     HierarchyTraversalMode.TOP_DOWN)
                             .isEmpty();
         }

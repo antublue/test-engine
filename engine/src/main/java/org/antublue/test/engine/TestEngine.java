@@ -34,8 +34,6 @@ import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedClassTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedMethodTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedTestFactory;
-import org.antublue.test.engine.internal.test.descriptor.standard.StandardClassTestDescriptor;
-import org.antublue.test.engine.internal.test.descriptor.standard.StandardMethodTestDescriptor;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
@@ -117,8 +115,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             // Create an engine descriptor to build the list of test descriptors
             EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
-            // Use the test factories to find tests build the test descriptor tree
-            // new StandardTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
             new ParameterizedTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
 
             // Filter the engine descriptor
@@ -175,14 +171,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     }
                     continue;
                 }
-                if (testDescriptor instanceof StandardClassTestDescriptor) {
-                    StandardClassTestDescriptor standardClassTestDescriptor =
-                            (StandardClassTestDescriptor) testDescriptor;
-                    matcher.reset(standardClassTestDescriptor.getTestClass().getName());
-                    if (!matcher.find()) {
-                        standardClassTestDescriptor.removeFromHierarchy();
-                    }
-                }
             }
         }
 
@@ -202,14 +190,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         parameterizedClassTestDescriptor.removeFromHierarchy();
                     }
                     continue;
-                }
-                if (testDescriptor instanceof StandardClassTestDescriptor) {
-                    StandardClassTestDescriptor standardClassTestDescriptor =
-                            (StandardClassTestDescriptor) testDescriptor;
-                    matcher.reset(standardClassTestDescriptor.getTestClass().getName());
-                    if (matcher.find()) {
-                        standardClassTestDescriptor.removeFromHierarchy();
-                    }
                 }
             }
         }
@@ -247,19 +227,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     }
                     continue;
                 }
-                if (testDescriptor instanceof StandardClassTestDescriptor) {
-                    StandardClassTestDescriptor standardClassTestDescriptor =
-                            (StandardClassTestDescriptor) testDescriptor;
-                    String tag = standardClassTestDescriptor.getTag();
-                    if (tag != null) {
-                        matcher.reset(tag);
-                        if (!matcher.find()) {
-                            standardClassTestDescriptor.removeFromHierarchy();
-                        }
-                    } else {
-                        standardClassTestDescriptor.removeFromHierarchy();
-                    }
-                }
             }
         }
 
@@ -282,17 +249,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         }
                     }
                     continue;
-                }
-                if (testDescriptor instanceof StandardClassTestDescriptor) {
-                    StandardClassTestDescriptor standardClassTestDescriptor =
-                            (StandardClassTestDescriptor) testDescriptor;
-                    String tag = standardClassTestDescriptor.getTag();
-                    if (tag != null) {
-                        matcher.reset(tag);
-                        if (matcher.find()) {
-                            standardClassTestDescriptor.removeFromHierarchy();
-                        }
-                    }
                 }
             }
         }
@@ -326,14 +282,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     }
                     continue;
                 }
-                if (testDescriptor instanceof StandardMethodTestDescriptor) {
-                    StandardMethodTestDescriptor standardMethodTestDescriptor =
-                            (StandardMethodTestDescriptor) testDescriptor;
-                    matcher.reset(standardMethodTestDescriptor.getTestMethod().getName());
-                    if (!matcher.find()) {
-                        standardMethodTestDescriptor.removeFromHierarchy();
-                    }
-                }
             }
         }
 
@@ -354,14 +302,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         parameterizedMethodTestDescriptor.removeFromHierarchy();
                     }
                     continue;
-                }
-                if (testDescriptor instanceof StandardMethodTestDescriptor) {
-                    StandardMethodTestDescriptor standardMethodTestDescriptor =
-                            (StandardMethodTestDescriptor) testDescriptor;
-                    matcher.reset(standardMethodTestDescriptor.getTestMethod().getName());
-                    if (matcher.find()) {
-                        standardMethodTestDescriptor.removeFromHierarchy();
-                    }
                 }
             }
         }
@@ -400,19 +340,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     }
                     continue;
                 }
-                if (testDescriptor instanceof StandardMethodTestDescriptor) {
-                    StandardMethodTestDescriptor standardMethodTestDescriptor =
-                            (StandardMethodTestDescriptor) testDescriptor;
-                    String tag = standardMethodTestDescriptor.getTag();
-                    if (tag != null) {
-                        matcher.reset(tag);
-                        if (!matcher.find()) {
-                            standardMethodTestDescriptor.removeFromHierarchy();
-                        }
-                    } else {
-                        standardMethodTestDescriptor.removeFromHierarchy();
-                    }
-                }
             }
         }
 
@@ -436,17 +363,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         }
                     }
                     continue;
-                }
-                if (testDescriptor instanceof StandardMethodTestDescriptor) {
-                    StandardMethodTestDescriptor standardMethodTestDescriptor =
-                            (StandardMethodTestDescriptor) testDescriptor;
-                    String tag = standardMethodTestDescriptor.getTag();
-                    if (tag != null) {
-                        matcher.reset(tag);
-                        if (matcher.find()) {
-                            standardMethodTestDescriptor.removeFromHierarchy();
-                        }
-                    }
                 }
             }
         }

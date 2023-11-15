@@ -34,7 +34,7 @@ public class ParameterizedTest4 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -43,7 +43,7 @@ public class ParameterizedTest4 {
         return collection.stream();
     }
 
-    @TestEngine.Supplier.Extension
+    @TestEngine.ExtensionSupplier
     public static Stream<Extension> extensionSupplier() {
         Collection<Extension> collection = new ArrayList<>();
         collection.add(new ShuffleTestMethodsExtension());

@@ -28,7 +28,7 @@ public class DisabledTest {
 
     @TestEngine.Argument private StringArgument stringArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         return StringArgumentSupplier.arguments();
     }

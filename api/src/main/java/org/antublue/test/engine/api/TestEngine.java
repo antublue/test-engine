@@ -26,20 +26,15 @@ import org.junit.platform.commons.annotation.Testable;
 /** Interface that contains all TestEngine annotations */
 public @interface TestEngine {
 
-    /** Supplier meta-annotation */
-    @Target(ElementType.ANNOTATION_TYPE)
-    @interface Supplier {
+    /** Argument annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface ArgumentSupplier {}
 
-        /** Argument annotation */
-        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-        @Retention(RetentionPolicy.RUNTIME)
-        @interface Argument {}
-
-        /** Extension annotation */
-        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-        @Retention(RetentionPolicy.RUNTIME)
-        @interface Extension {}
-    }
+    /** Extension annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface ExtensionSupplier {}
 
     /** Argument annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})

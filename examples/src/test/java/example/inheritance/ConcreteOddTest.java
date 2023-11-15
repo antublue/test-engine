@@ -24,7 +24,7 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 
 public class ConcreteOddTest extends OddBaseTest {
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     protected static Stream<IntegerArgument> arguments() {
         return OddBaseTest.arguments();
     }

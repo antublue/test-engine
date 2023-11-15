@@ -25,7 +25,7 @@ public class ComplexArgumentTest {
 
     @TestEngine.Argument @TestEngine.AutoClose.AfterAll protected ComplexArgument complexArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<ComplexArgument> arguments() {
         return Stream.of(
                 new ComplexArgument("A", "http://foo.bar"),

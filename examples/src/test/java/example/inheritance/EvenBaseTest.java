@@ -22,7 +22,7 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 
 public abstract class EvenBaseTest extends BaseTest {
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     protected static Stream<IntegerArgument> arguments() {
         return BaseTest.arguments()
                 .filter(

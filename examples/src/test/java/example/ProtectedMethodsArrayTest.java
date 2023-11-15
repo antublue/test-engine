@@ -29,7 +29,7 @@ public class ProtectedMethodsArrayTest {
 
     @TestEngine.Argument protected ObjectArgument<String[]> objectArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<ObjectArgument<String[]>> arguments() {
         Collection<ObjectArgument<String[]>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

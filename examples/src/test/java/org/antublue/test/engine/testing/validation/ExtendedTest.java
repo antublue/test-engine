@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 
 public class ExtendedTest extends BaseTest {
 
-    @TestEngine.Supplier.Extension
+    @TestEngine.ExtensionSupplier
     public static Stream<Extension> extensionSupplier() {
         Collection<Extension> collection = new ArrayList<>();
         collection.add(new ShuffleTestMethodsExtension());

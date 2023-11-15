@@ -27,7 +27,7 @@ public class ConcreteParameterizedTestFactory {
 
     @TestEngine.Argument private IntegerArgument integerArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<Argument> arguments() {
         List<Argument> arguments = new ArrayList<>();
         for (int i = 0; i < 2; i++) {

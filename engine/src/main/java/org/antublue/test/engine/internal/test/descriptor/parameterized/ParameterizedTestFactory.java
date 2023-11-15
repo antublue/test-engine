@@ -322,7 +322,7 @@ public class ParameterizedTestFactory {
         List<Method> methods =
                 ReflectionSupport.findMethods(
                         testClass,
-                        AnnotationMethodFilter.of(TestEngine.Supplier.Argument.class),
+                        AnnotationMethodFilter.of(TestEngine.ArgumentSupplier.class),
                         HierarchyTraversalMode.BOTTOM_UP);
 
         Method method = methods.get(0);

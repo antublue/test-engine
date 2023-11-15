@@ -28,7 +28,7 @@ public class HumanReadableTimeTest {
 
     @TestEngine.Argument public HumanReadableTimeTestArgument humanReadableTimeTestArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<HumanReadableTimeTestArgument> arguments() {
         return Stream.of(
                 new HumanReadableTimeTestArgument("11969L", 11969L, "11 seconds, 969 ms"),

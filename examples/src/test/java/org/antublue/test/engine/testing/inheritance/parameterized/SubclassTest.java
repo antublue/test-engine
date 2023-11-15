@@ -29,7 +29,7 @@ import org.antublue.test.engine.testing.ValidationExtension;
 /** Example test */
 public class SubclassTest extends BaseTest implements Validation {
 
-    @TestEngine.Supplier.Extension
+    @TestEngine.ExtensionSupplier
     public static Stream<Extension> extensions() {
         Collection<Extension> collection = new ArrayList<>();
         collection.add(new ValidationExtension());

@@ -27,7 +27,7 @@ public class DisabledMethodTest {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         return StringArgumentSupplier.arguments();
     }

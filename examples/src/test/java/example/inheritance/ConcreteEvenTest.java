@@ -24,7 +24,7 @@ import org.antublue.test.engine.api.argument.IntegerArgument;
 
 public class ConcreteEvenTest extends EvenBaseTest {
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<IntegerArgument> arguments() {
         return EvenBaseTest.arguments();
     }

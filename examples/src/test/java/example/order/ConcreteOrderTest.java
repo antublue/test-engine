@@ -31,7 +31,7 @@ import org.antublue.test.engine.testing.ValidationExtension;
 @TestEngine.Order(order = 3)
 public class ConcreteOrderTest extends BaseOrderTest implements Validation {
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 1; i++) {
@@ -41,7 +41,7 @@ public class ConcreteOrderTest extends BaseOrderTest implements Validation {
         return collection.stream();
     }
 
-    @TestEngine.Supplier.Extension
+    @TestEngine.ExtensionSupplier
     public static Stream<Extension> extensions() {
         Collection<Extension> collection = new ArrayList<>();
         collection.add(new ValidationExtension());

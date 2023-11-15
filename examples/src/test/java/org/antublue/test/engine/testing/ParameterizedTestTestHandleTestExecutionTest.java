@@ -27,7 +27,7 @@ import org.antublue.test.engine.api.argument.StringArgument;
 @TestEngine.Disabled
 public class ParameterizedTestTestHandleTestExecutionTest {
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static List<Argument> arguments() {
         List<Argument> list = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -36,7 +36,7 @@ public class ParameterizedTestTestHandleTestExecutionTest {
         return list;
     }
 
-    @TestEngine.Supplier.Extension
+    @TestEngine.ExtensionSupplier
     public static List<Extension> extensions() {
         List<Extension> list = new ArrayList<>();
         list.add(new HandleTestExecutionTestExtension());

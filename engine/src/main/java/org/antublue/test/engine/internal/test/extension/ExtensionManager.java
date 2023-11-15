@@ -62,7 +62,7 @@ public class ExtensionManager {
     /** Predicate to test of a method is an extension supplier method */
     public static final Predicate<Method> EXTENSION_SUPPLIER_METHOD =
             method ->
-                    method.isAnnotationPresent(TestEngine.Supplier.Extension.class)
+                    method.isAnnotationPresent(TestEngine.ExtensionSupplier.class)
                             && !method.isAnnotationPresent(TestEngine.Disabled.class)
                             && ReflectionUtils.isStatic(method)
                             && (ReflectionUtils.isPublic(method)

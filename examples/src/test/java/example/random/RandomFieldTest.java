@@ -45,7 +45,7 @@ public class RandomFieldTest {
             maximum = "10000000000000000000")
     protected BigDecimal randomBigDecimal;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {

@@ -38,7 +38,7 @@ public class ResourceLockMethodLockingTest1 {
 
     @TestEngine.Argument public IntegerArgument integerArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<IntegerArgument> arguments() {
         return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
     }

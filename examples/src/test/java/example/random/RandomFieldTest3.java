@@ -43,7 +43,7 @@ public class RandomFieldTest3 {
     @TestEngine.Random.Double(minimum = 0D, maximum = 1D)
     protected Double randomDouble;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {

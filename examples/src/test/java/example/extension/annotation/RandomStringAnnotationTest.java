@@ -27,7 +27,7 @@ public class RandomStringAnnotationTest {
     @RandomStringAnnotation.Random.String.AlphaNumeric(minimumLength = -1, maximumLength = 20)
     public String randomAlphaNumericString;
 
-    @TestEngine.Supplier.Extension
+    @TestEngine.ExtensionSupplier
     public static List<Extension> extensions() {
         List<Extension> list = new ArrayList<>();
         list.add(new RandomStringExtension());

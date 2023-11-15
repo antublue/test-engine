@@ -27,7 +27,7 @@ public class LongArgumentTest {
 
     @TestEngine.Argument protected LongArgument longArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<LongArgument> arguments() {
         Collection<LongArgument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

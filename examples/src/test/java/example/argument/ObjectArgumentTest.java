@@ -29,7 +29,7 @@ public class ObjectArgumentTest {
 
     @TestEngine.Argument protected ObjectArgument<CustomObject> objectArgument;
 
-    @TestEngine.Supplier.Argument
+    @TestEngine.ArgumentSupplier
     public static Stream<ObjectArgument<CustomObject>> arguments() {
         Collection<ObjectArgument<CustomObject>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
