@@ -27,7 +27,7 @@ public class FloatArgumentTest {
 
     @TestEngine.Argument protected FloatArgument floatArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<FloatArgument> arguments() {
         Collection<FloatArgument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

@@ -17,8 +17,12 @@
 package org.antublue.test.engine.testing.validation;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import org.antublue.test.engine.api.MethodProcessor;
+import java.util.stream.Stream;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,9 +31,11 @@ import org.junit.jupiter.api.Test;
 
 public class ExtendedTest extends BaseTest {
 
-    @TestEngine.MethodProcessorSupplier
-    public static MethodProcessor methodProcessor() {
-        return new TestMethodProcessor();
+    @TestEngine.Supplier.Extension
+    public static Stream<Extension> extensionSupplier() {
+        Collection<Extension> collection = new ArrayList<>();
+        collection.add(new ShuffleTestMethodsExtension());
+        return collection.stream();
     }
 
     @BeforeEach
@@ -68,13 +74,12 @@ public class ExtendedTest extends BaseTest {
         System.out.format("    %s afterEach4()", ExtendedTest.class.getName()).println();
     }
 
-    private static class TestMethodProcessor implements MethodProcessor {
+    public static class ShuffleTestMethodsExtension implements Extension {
 
         @Override
-        public void process(Class<?> testClass, List<Method> testMethods) {
-            for (Method testMethod : testMethods) {
-                System.out.println(String.format("testMethod [%s]", testMethod));
-            }
+        public void postTestMethodDiscoveryCallback(Class<?> testClass, List<Method> testMethods)
+                throws Throwable {
+            Collections.shuffle(testMethods);
         }
     }
 }

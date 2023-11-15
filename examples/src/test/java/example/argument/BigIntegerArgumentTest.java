@@ -28,7 +28,7 @@ public class BigIntegerArgumentTest {
 
     @TestEngine.Argument protected BigIntegerArgument bigIntegerArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<BigIntegerArgument> arguments() {
         Collection<BigIntegerArgument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

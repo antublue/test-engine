@@ -28,7 +28,7 @@ public class BadTest {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -37,7 +37,7 @@ public class BadTest {
         return collection.stream();
     }
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<StringArgument> arguments2() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {

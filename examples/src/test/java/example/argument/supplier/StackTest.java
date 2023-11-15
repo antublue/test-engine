@@ -25,7 +25,7 @@ public class StackTest {
 
     @TestEngine.Argument protected IntegerArgument integerArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stack<IntegerArgument> arguments() {
         Stack<IntegerArgument> arguments = new Stack<>();
         arguments.add(IntegerArgument.of(1));

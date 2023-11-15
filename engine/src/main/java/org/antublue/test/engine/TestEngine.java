@@ -36,8 +36,6 @@ import org.antublue.test.engine.internal.test.descriptor.parameterized.Parameter
 import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedTestFactory;
 import org.antublue.test.engine.internal.test.descriptor.standard.StandardClassTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.standard.StandardMethodTestDescriptor;
-import org.antublue.test.engine.internal.test.descriptor.standard.StandardTestFactory;
-import org.antublue.test.engine.internal.test.extension.ExtensionManager;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
@@ -120,7 +118,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
             // Use the test factories to find tests build the test descriptor tree
-            new StandardTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
+            // new StandardTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
             new ParameterizedTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
 
             // Filter the engine descriptor
@@ -512,12 +510,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     @Override
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute()");
-
-        try {
-            ExtensionManager.getSingleton().initialize();
-        } catch (Throwable t) {
-            throw new TestEngineException("Exception loading extensions", t);
-        }
 
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();

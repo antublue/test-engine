@@ -59,7 +59,7 @@ public class KafkaTest {
     @TestEngine.Argument @TestEngine.AutoClose.AfterAll
     protected KafkaTestContainer kafkaTestContainer;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<KafkaTestContainer> arguments() {
         return Stream.of(
                 KafkaTestContainer.of("confluentinc/cp-kafka:7.0.9"),

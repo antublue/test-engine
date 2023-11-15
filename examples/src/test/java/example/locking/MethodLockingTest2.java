@@ -37,7 +37,7 @@ public class MethodLockingTest2 {
 
     @TestEngine.Argument public IntegerArgument integerArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<IntegerArgument> arguments() {
         return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
     }

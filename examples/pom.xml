@@ -67,7 +67,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <includes>
+                        <include>%regex[.*JUnit5Test.*]</include>
+                    </includes>
                 </configuration>
             </plugin>
             <plugin>

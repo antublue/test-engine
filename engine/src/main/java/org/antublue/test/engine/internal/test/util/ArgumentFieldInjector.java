@@ -46,24 +46,27 @@ public class ArgumentFieldInjector {
     /**
      * Method to inject an Argument into a Field
      *
-     * @param object object
-     * @param argument argument
+     * @param testInstance testInstance
+     * @param testArgument testArgument
      * @param field field
      * @throws Throwable Throwable
      */
-    public void inject(Object object, Argument argument, Field field) throws Throwable {
+    public void inject(Object testInstance, Argument testArgument, Field field) throws Throwable {
         TestEngine.Argument annotation = field.getAnnotation(TestEngine.Argument.class);
         if (annotation != null) {
             String name = null;
-            if (argument != null) {
-                name = argument.name();
+            if (testArgument != null) {
+                name = testArgument.name();
             }
 
             LOGGER.trace(
                     "injecting argument class [%s] argument [%s] field [%s] field type [%s]",
-                    object.getClass().getName(), name, field.getName(), field.getType().getName());
+                    testInstance.getClass().getName(),
+                    name,
+                    field.getName(),
+                    field.getType().getName());
 
-            field.set(object, argument);
+            field.set(testInstance, testArgument);
         }
     }
 }

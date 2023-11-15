@@ -26,7 +26,7 @@ public class SetTest {
 
     @TestEngine.Argument protected IntegerArgument integerArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Set<IntegerArgument> arguments() {
         Set<IntegerArgument> arguments = new LinkedHashSet<>();
         arguments.add(IntegerArgument.of(1));

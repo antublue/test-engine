@@ -32,7 +32,7 @@ public class LineSourceTest2 {
 
     @TestEngine.Argument public StringArgument stringArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<StringArgument> arguments() throws IOException {
         try (InputStream inputStream = LineSourceTest2.class.getResourceAsStream(RESOURCE_NAME)) {
             return LineSource.of(new InputStreamReader(inputStream, StandardCharsets.UTF_8));

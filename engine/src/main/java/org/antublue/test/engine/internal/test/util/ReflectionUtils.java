@@ -128,26 +128,6 @@ public final class ReflectionUtils {
         return true;
     }
 
-    public static boolean acceptsArguments(Method method, Object... arguments) {
-        return acceptsArguments(method, getArgumentTypes(arguments));
-    }
-
-    private static Class<?>[] getArgumentTypes(Object... arguments) {
-        if (arguments == null) {
-            return null;
-        }
-
-        if (arguments.length == 1 && arguments[0] == null) {
-            return null;
-        }
-
-        Class<?>[] argumentTypes = new Class[arguments.length];
-        for (int i = 0; i < arguments.length; i++) {
-            argumentTypes[i] = arguments[i].getClass();
-        }
-        return argumentTypes;
-    }
-
     /**
      * Method to determine if a Method returns a specific type
      *

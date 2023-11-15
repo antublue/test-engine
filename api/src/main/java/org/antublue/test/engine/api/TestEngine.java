@@ -26,25 +26,25 @@ import org.junit.platform.commons.annotation.Testable;
 /** Interface that contains all TestEngine annotations */
 public @interface TestEngine {
 
-    /** ArgumentSupplier annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface ArgumentSupplier {}
+    /** Supplier meta-annotation */
+    @Target(ElementType.ANNOTATION_TYPE)
+    @interface Supplier {
+
+        /** Argument annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Argument {}
+
+        /** Extension annotation */
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Extension {}
+    }
 
     /** Argument annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
     @Retention(RetentionPolicy.RUNTIME)
     @interface Argument {}
-
-    /** ExtensionSupplier annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface ExtensionSupplier {}
-
-    /** MethodProcessorSupplier annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface MethodProcessorSupplier {}
 
     /** Prepare annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
@@ -126,7 +126,8 @@ public @interface TestEngine {
         String name();
     }
 
-    /** AutoClose annotation */
+    /** AutoClose meta-annotation */
+    @Target(ElementType.ANNOTATION_TYPE)
     @interface AutoClose {
 
         /** AfterEach annotation */
@@ -169,7 +170,8 @@ public @interface TestEngine {
         }
     }
 
-    /** Random annotation */
+    /** Random meta-annotation */
+    @Target(ElementType.ANNOTATION_TYPE)
     @interface Random {
 
         /** Boolean annotation */

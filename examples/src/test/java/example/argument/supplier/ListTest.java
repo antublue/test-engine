@@ -26,7 +26,7 @@ public class ListTest {
 
     @TestEngine.Argument protected IntegerArgument integerArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static List<IntegerArgument> arguments() {
         ArrayList<IntegerArgument> arguments = new ArrayList<>();
         arguments.add(IntegerArgument.of(1));

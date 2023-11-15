@@ -17,18 +17,43 @@
 package org.antublue.test.engine.api;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
 
 /** Interface to implement an Extension */
 public interface Extension {
 
     /**
-     * Method to call before test object creation
+     * Method to call after test parameters have been discovered
      *
-     * @param clazz clazz
+     * @param testClass testClass
+     * @param testArguments testArguments
      * @throws Throwable Throwable
      */
-    default void preInstantiateCallback(Class<?> clazz) throws Throwable {
+    default void postTestArgumentDiscoveryCallback(Class<?> testClass, List<Argument> testArguments)
+            throws Throwable {
+        // DO NOTHING
+    }
+
+    /**
+     * Method to call after test methods have been discovered
+     *
+     * @param testClass testClass
+     * @param testMethods testMethods
+     * @throws Throwable Throwable
+     */
+    default void postTestMethodDiscoveryCallback(Class<?> testClass, List<Method> testMethods)
+            throws Throwable {
+        // DO NOTHING
+    }
+
+    /**
+     * Method to call before test object creation
+     *
+     * @param testClass testClass
+     * @throws Throwable Throwable
+     */
+    default void preInstantiateCallback(Class<?> testClass) throws Throwable {
         // DO NOTHING
     }
 

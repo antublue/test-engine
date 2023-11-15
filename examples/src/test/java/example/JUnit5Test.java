@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api;
+package example;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
+import org.junit.jupiter.api.Test;
 
-/** Interface to implement a MethodProcessor */
-public interface MethodProcessor {
+public class JUnit5Test {
 
-    /** MethodProcessor to shuffle test methods */
-    MethodProcessor SHUFFLE_METHODS = (testClass, testMethods) -> Collections.shuffle(testMethods);
-
-    /**
-     * Method to process test method List
-     *
-     * @param testClass testClass
-     * @param testMethods testMethods
-     */
-    void process(Class<?> testClass, List<Method> testMethods);
+    @Test
+    public void test() {
+        System.out.println("TESTING JUNIT5");
+    }
 }

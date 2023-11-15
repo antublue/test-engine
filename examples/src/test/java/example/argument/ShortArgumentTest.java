@@ -27,7 +27,7 @@ public class ShortArgumentTest {
 
     @TestEngine.Argument protected ShortArgument shortArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<ShortArgument> arguments() {
         Collection<ShortArgument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

@@ -31,7 +31,7 @@ public class ObjectArgumentArrayTest {
 
     @TestEngine.Argument protected ObjectArgument<int[]> objectArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<ObjectArgument<int[]>> arguments() {
         Collection<ObjectArgument<int[]>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

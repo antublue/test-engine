@@ -28,7 +28,7 @@ public class JUnit5LikeTest1 {
 
     public final List<String> ACTUAL = new ArrayList<>();
 
-    @TestEngine.ExtensionSupplier
+    @TestEngine.Supplier.Extension
     public static Collection<Extension> extensions() {
         Collection<Extension> extensions = new ArrayList<>();
         extensions.add(new JUnit5LikeTest1Extension());

@@ -37,7 +37,7 @@ public class StoreExampleTest3 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {

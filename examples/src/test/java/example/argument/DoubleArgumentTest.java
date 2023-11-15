@@ -27,7 +27,7 @@ public class DoubleArgumentTest {
 
     @TestEngine.Argument protected DoubleArgument doubleArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<DoubleArgument> arguments() {
         Collection<DoubleArgument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

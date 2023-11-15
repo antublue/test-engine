@@ -31,6 +31,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
+import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -61,7 +62,7 @@ public class ExtensionManager {
     /** Predicate to test of a method is an extension supplier method */
     public static final Predicate<Method> EXTENSION_SUPPLIER_METHOD =
             method ->
-                    method.isAnnotationPresent(TestEngine.ExtensionSupplier.class)
+                    method.isAnnotationPresent(TestEngine.Supplier.Extension.class)
                             && !method.isAnnotationPresent(TestEngine.Disabled.class)
                             && ReflectionUtils.isStatic(method)
                             && (ReflectionUtils.isPublic(method)
@@ -92,7 +93,7 @@ public class ExtensionManager {
      *
      * @throws Throwable Throwable
      */
-    public void initialize() throws Throwable {
+    private void initialize() throws Throwable {
         LOGGER.trace("initialize()");
         synchronized (this) {
             if (initialized) {
@@ -125,19 +126,56 @@ public class ExtensionManager {
      * Method to initialize extensions for a test class
      *
      * @param testClass testClass
-     * @throws Throwable Throwable
      */
-    public void initialize(Class<?> testClass) throws Throwable {
+    private void initialize(Class<?> testClass) {
         LOGGER.trace("initialize() test class [%s]", testClass.getName());
-        synchronized (this) {
-            List<Extension> testExtensions = testExtensionsMap.get(testClass);
-            if (testExtensions == null) {
-                testExtensions = new ArrayList<>(globalExtensions);
-                testExtensions.addAll(buildTestExtensionList(testClass));
-                List<Extension> testExtensionReversed = new ArrayList<>(testExtensions);
-                Collections.reverse(testExtensionReversed);
-                testExtensionsMap.put(testClass, testExtensions);
-                testExtensionsReversedMap.put(testClass, testExtensionReversed);
+
+        try {
+            initialize();
+            synchronized (this) {
+                List<Extension> testExtensions = testExtensionsMap.get(testClass);
+                if (testExtensions == null) {
+                    testExtensions = new ArrayList<>(globalExtensions);
+                    testExtensions.addAll(buildTestExtensionList(testClass));
+                    List<Extension> testExtensionReversed = new ArrayList<>(testExtensions);
+                    Collections.reverse(testExtensionReversed);
+                    testExtensionsMap.put(testClass, testExtensions);
+                    testExtensionsReversedMap.put(testClass, testExtensionReversed);
+                }
+            }
+        } catch (Throwable t) {
+            throw new TestEngineException(
+                    String.format(
+                            "Exception initializing extensions for test class [%s]",
+                            testClass.getName()),
+                    t);
+        }
+    }
+
+    public void postTestArgumentDiscoveryCallback(
+            Class<?> testClass, List<Argument> testArguments, ThrowableContext throwableContext) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
+            try {
+                testExtension.postTestArgumentDiscoveryCallback(testClass, testArguments);
+            } catch (Throwable t) {
+                throwableContext.add(testClass, t);
+            }
+        }
+    }
+
+    /**
+     * Method to run postTestMethodDiscoveryCallback extension methods
+     *
+     * @param testClass testClass
+     * @param throwableContext throwableContext
+     */
+    public void postTestMethodDiscoveryCallback(
+            Class<?> testClass, List<Method> testMethods, ThrowableContext throwableContext) {
+        for (Extension testExtension : getTestExtensions(testClass)) {
+            try {
+                testExtension.postTestMethodDiscoveryCallback(testClass, testMethods);
+            } catch (Throwable t) {
+                throwableContext.add(testClass, t);
             }
         }
     }
@@ -481,10 +519,12 @@ public class ExtensionManager {
     }
 
     private List<Extension> getTestExtensions(Class<?> testClass) {
+        initialize(testClass);
         return testExtensionsMap.getOrDefault(testClass, EMPTY_EXTENSION_LIST);
     }
 
     private List<Extension> getTestExtensionsReversed(Class<?> testClass) {
+        initialize(testClass);
         return testExtensionsReversedMap.getOrDefault(testClass, EMPTY_EXTENSION_LIST);
     }
 }

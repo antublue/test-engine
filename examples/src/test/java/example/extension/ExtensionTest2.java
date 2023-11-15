@@ -28,7 +28,7 @@ public class ExtensionTest2 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -37,7 +37,7 @@ public class ExtensionTest2 {
         return collection.stream();
     }
 
-    @TestEngine.ExtensionSupplier
+    @TestEngine.Supplier.Extension
     public static Stream<Extension> extensions() {
         Collection<Extension> collection = new ArrayList<>();
 

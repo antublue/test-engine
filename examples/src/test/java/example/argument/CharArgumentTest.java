@@ -27,7 +27,7 @@ public class CharArgumentTest {
 
     @TestEngine.Argument protected CharArgument charArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<CharArgument> arguments() {
         char[] characters = new char[] {'a', 'b', 'c', 'd', 'e'};
         Collection<CharArgument> collection = new ArrayList<>();

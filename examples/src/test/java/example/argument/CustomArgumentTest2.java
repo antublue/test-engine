@@ -29,7 +29,7 @@ public class CustomArgumentTest2 {
 
     @TestEngine.Argument private CustomArgument customArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<Argument> arguments() {
         Collection<Argument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

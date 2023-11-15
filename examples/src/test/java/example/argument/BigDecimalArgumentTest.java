@@ -28,7 +28,7 @@ public class BigDecimalArgumentTest {
 
     @TestEngine.Argument protected BigDecimalArgument bigDecimalArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<BigDecimalArgument> arguments() {
         Collection<BigDecimalArgument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

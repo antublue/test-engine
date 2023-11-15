@@ -33,7 +33,7 @@ public class RandomFieldTest2 {
     @TestEngine.Random.Float protected Float randomFloat;
     @TestEngine.Random.Double protected Double randomDouble;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {

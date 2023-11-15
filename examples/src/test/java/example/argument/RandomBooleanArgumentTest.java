@@ -27,7 +27,7 @@ public class RandomBooleanArgumentTest {
 
     @TestEngine.Argument protected BooleanArgument booleanArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<BooleanArgument> arguments() {
         Collection<BooleanArgument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {

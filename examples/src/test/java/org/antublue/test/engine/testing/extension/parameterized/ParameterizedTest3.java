@@ -16,11 +16,13 @@
 
 package org.antublue.test.engine.testing.extension.parameterized;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.MethodProcessor;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
@@ -32,7 +34,7 @@ public class ParameterizedTest3 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -41,9 +43,11 @@ public class ParameterizedTest3 {
         return collection.stream();
     }
 
-    @TestEngine.MethodProcessorSupplier
-    public static MethodProcessor methodProcessor() {
-        return MethodProcessor.SHUFFLE_METHODS;
+    @TestEngine.Supplier.Extension
+    public static Stream<Extension> extensionSupplier() {
+        Collection<Extension> collection = new ArrayList<>();
+        collection.add(new ShuffleTestMethodsExtension());
+        return collection.stream();
     }
 
     @TestEngine.Prepare
@@ -92,5 +96,13 @@ public class ParameterizedTest3 {
     public void conclude() {
         System.out.println("conclude()");
         ACTUAL.add("conclude()");
+    }
+
+    public static class ShuffleTestMethodsExtension implements Extension {
+
+        @Override
+        public void postTestMethodDiscoveryCallback(Class<?> testClass, List<Method> testMethods) {
+            Collections.shuffle(testMethods);
+        }
     }
 }

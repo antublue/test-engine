@@ -32,7 +32,7 @@ public class StackTracePruningTest {
     @TestEngine.Argument protected StringArgument stringArgument;
 
     // The stringArgument provides a node in the hierarchy, but is not actually used in test methods
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     protected static Stream<StringArgument> arguments() {
         return Stream.of(StringArgument.of("----"));
     }

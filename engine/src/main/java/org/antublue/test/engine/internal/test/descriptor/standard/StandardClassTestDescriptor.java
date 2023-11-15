@@ -115,13 +115,6 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
         setExecutionRequest(executionRequest);
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
-        try {
-            EXTENSION_MANAGER.initialize(testClass);
-        } catch (Throwable t) {
-            throw new TestEngineException(
-                    String.format("Exception loading extensions for test class [%s]", testClass));
-        }
-
         StateMachine<State> stateMachine =
                 new StateMachine<State>(getUniqueId().toString())
                         .define(State.BEGIN, this::begin, State.PRE_INSTANTIATE)
@@ -398,8 +391,6 @@ public class StandardClassTestDescriptor extends ExecutableTestDescriptor {
          */
         public void build(TestDescriptor parentTestDescriptor) {
             try {
-                EXTENSION_MANAGER.initialize(testClass);
-
                 uniqueId =
                         parentTestDescriptor
                                 .getUniqueId()

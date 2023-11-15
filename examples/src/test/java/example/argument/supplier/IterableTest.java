@@ -25,7 +25,7 @@ public class IterableTest {
 
     @TestEngine.Argument protected IntegerArgument integerArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Iterable<IntegerArgument> arguments() {
         ArrayList<IntegerArgument> arguments = new ArrayList<>();
         arguments.add(IntegerArgument.of(1));

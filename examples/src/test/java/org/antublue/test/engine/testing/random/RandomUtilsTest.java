@@ -29,7 +29,7 @@ public abstract class RandomUtilsTest {
 
     protected static final int ITERATIONS = 1000000;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     protected static Stream<StringArgument> arguments() {
         return Stream.of(StringArgument.of("----"));
     }

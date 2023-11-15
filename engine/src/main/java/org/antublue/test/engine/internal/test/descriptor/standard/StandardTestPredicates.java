@@ -43,7 +43,7 @@ public class StandardTestPredicates {
                             .isEmpty()
                     && ReflectionSupport.findMethods(
                                     clazz,
-                                    AnnotationMethodFilter.of(TestEngine.ArgumentSupplier.class),
+                                    AnnotationMethodFilter.of(TestEngine.Supplier.Argument.class),
                                     HierarchyTraversalMode.TOP_DOWN)
                             .isEmpty();
         }

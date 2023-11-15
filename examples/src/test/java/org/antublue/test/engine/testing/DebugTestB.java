@@ -29,7 +29,7 @@ public class DebugTestB {
 
     @TestEngine.Argument public StringArgument stringArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<StringArgument> arguments() {
         return Stream.of(StringArgument.of("a"), StringArgument.of("b"), StringArgument.of("c"));
     }

@@ -30,7 +30,7 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 
 | Annotation                     | Static | Type   | Required | Example                                                                                                                                                                            |
 |--------------------------------|--------|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `@TestEngine.ArgumentSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments();`</nobr> |
+| `@TestEngine.Supplier.Argument` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments();`</nobr> |
 | `@TestEngine.Argument`         | no     | field  | no       | `public Argument argument;`                                                                                                                                                        |
 | `@TestEngine.Prepare`          | no     | method | no       | `public void prepare();`                                                                                                                                                           |
 | `@TestEngine.BeforeAll`        | no     | method | no       | `public void beforeAll();`                                                                                                                                                         |
@@ -346,7 +346,7 @@ for (each test class in the Collection<Class<?>>) {
   
   thread {
   
-    invoke the test class "@TestEngine.ArgumentSupplier" method to get a Stream<Argument> or Iterable<Argument>
+    invoke the test class "@TestEngine.Supplier.Argument" method to get a Stream<Argument> or Iterable<Argument>
 
     create a single instance of the test class  
 

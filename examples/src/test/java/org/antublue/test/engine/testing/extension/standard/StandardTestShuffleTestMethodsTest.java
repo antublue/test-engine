@@ -14,12 +14,26 @@
  * limitations under the License.
  */
 
-package example;
+package org.antublue.test.engine.testing.extension.standard;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class JUnit5LikeTest {
+public class StandardTestShuffleTestMethodsTest {
+
+    @TestEngine.Supplier.Extension
+    public static Stream<Extension> extensionSupplier() {
+        Collection<Extension> collection = new ArrayList<>();
+        collection.add(new ShuffleTestMethodsExtension());
+        return collection.stream();
+    }
 
     @TestEngine.Prepare
     public void prepare() {
@@ -41,6 +55,21 @@ public class JUnit5LikeTest {
         System.out.println("test2()");
     }
 
+    @TestEngine.Test
+    public void test3() {
+        System.out.println("test3()");
+    }
+
+    @TestEngine.Test
+    public void test4() {
+        System.out.println("test4()");
+    }
+
+    @TestEngine.Test
+    public void test5() {
+        System.out.println("test5()");
+    }
+
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
@@ -49,5 +78,13 @@ public class JUnit5LikeTest {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
+    }
+
+    public static class ShuffleTestMethodsExtension implements Extension {
+
+        @Override
+        public void postTestMethodDiscoveryCallback(Class<?> testClass, List<Method> testMethods) {
+            Collections.shuffle(testMethods);
+        }
     }
 }

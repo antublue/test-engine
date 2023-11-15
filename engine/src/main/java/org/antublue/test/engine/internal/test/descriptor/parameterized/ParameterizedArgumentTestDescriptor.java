@@ -449,8 +449,6 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
          */
         public void build(TestDescriptor parentTestDescriptor) {
             try {
-                EXTENSION_MANAGER.initialize(testClass);
-
                 uniqueId =
                         parentTestDescriptor
                                 .getUniqueId()

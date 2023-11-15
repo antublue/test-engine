@@ -28,7 +28,7 @@ import org.antublue.test.engine.api.argument.StringArgument;
 @TestEngine.Order(order = 4)
 public class ConcreteOrderTest2 extends BaseOrderTest {
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 1; i++) {

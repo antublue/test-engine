@@ -26,7 +26,7 @@ public class CollectionTest {
 
     @TestEngine.Argument protected IntegerArgument integerArgument;
 
-    @TestEngine.ArgumentSupplier
+    @TestEngine.Supplier.Argument
     public static Collection<IntegerArgument> arguments() {
         ArrayList<IntegerArgument> arguments = new ArrayList<>();
         arguments.add(IntegerArgument.of(1));

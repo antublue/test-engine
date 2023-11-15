@@ -59,4 +59,8 @@ public class ThrowableContext {
             throw throwables.get(0);
         }
     }
+
+    public void clear() {
+        throwables.clear();
+    }
 }
