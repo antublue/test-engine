@@ -37,7 +37,8 @@ public class ClassResourceLockTestC {
     @TestEngine.Test
     public void test() throws InterruptedException {
         System.out.println(
-                String.format("class [%s] testing [%s]", getClass().getName(), argument.name()));
+                String.format(
+                        "test() class [%s] testing [%s]", getClass().getName(), argument.name()));
         Thread.sleep(10000);
     }
 }
