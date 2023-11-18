@@ -21,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.utils.HumanReadableTime;
+import org.antublue.test.engine.internal.util.HumanReadableTimeUtils;
 
 /** Test for HumanReadableTime */
-public class HumanReadableTimeTest {
+public class HumanReadableTimeUtilsTest {
 
     @TestEngine.Argument public HumanReadableTimeTestArgument humanReadableTimeTestArgument;
 
@@ -46,7 +46,7 @@ public class HumanReadableTimeTest {
     public void testHumanReadableTime() {
         long nanoseconds = (long) (humanReadableTimeTestArgument.milliseconds() * 1e+6);
         String expectedHumanReadableTime = humanReadableTimeTestArgument.humanReadableTime();
-        String actualHumanReadableTime = HumanReadableTime.toHumanReadable(nanoseconds);
+        String actualHumanReadableTime = HumanReadableTimeUtils.toHumanReadable(nanoseconds);
         if (!actualHumanReadableTime.equals(expectedHumanReadableTime)) {
             fail(
                     String.format(

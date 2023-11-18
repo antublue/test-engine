@@ -18,11 +18,11 @@ package example.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import example.util.KeyGenerator;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Key;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -30,9 +30,10 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class StoreExampleTest1 {
 
-    private static final String CLOSEABLE_KEY = Key.of(StoreExampleTest1.class, "closeable");
+    private static final String CLOSEABLE_KEY =
+            KeyGenerator.of(StoreExampleTest1.class, "closeable");
     private static final String AUTO_CLOSEABLE_KEY =
-            Key.of(StoreExampleTest1.class, "autoClosable");
+            KeyGenerator.of(StoreExampleTest1.class, "autoClosable");
 
     private Store store;
 

@@ -28,18 +28,10 @@ import org.antublue.test.engine.internal.configuration.Configuration;
 public class ThrowableUtils {
 
     private static final boolean STACK_TRACE_PRUNING =
-            Configuration.getSingleton()
-                    .getBooleanOrDefault(Constants.STACK_TRACE_PRUNE, true)
-                    .get();
+            Configuration.singleton().getBoolean(Constants.STACK_TRACE_PRUNE).orElse(true);
 
     private static final Predicate<String> EXCLUDE =
-            s ->
-                    s.startsWith("org.antublue.test.engine.internal.test.standard.")
-                            || s.startsWith("org.antublue.test.engine.internal.test.parameterized.")
-                            || s.startsWith("org.antublue.test.engine.internal.test.extension.")
-                            || s.startsWith("org.antublue.test.engine.internal.test.util.")
-                            || s.startsWith("org.antublue.test.engine.internal.Executor")
-                            || s.startsWith("java.base/");
+            s -> s.startsWith("org.antublue.test.engine.internal.") || s.startsWith("java.base/");
 
     /** Constructor */
     private ThrowableUtils() {

@@ -35,7 +35,7 @@ public class AutoCloseProcessor {
         // DO NOTHING
     }
 
-    public static final AutoCloseProcessor getSingleton() {
+    public static final AutoCloseProcessor singleton() {
         return SINGLETON;
     }
 

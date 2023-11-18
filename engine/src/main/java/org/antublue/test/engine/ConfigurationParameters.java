@@ -27,13 +27,13 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
 
     private static ConfigurationParameters SINGLETON = new ConfigurationParameters();
 
-    private static final Configuration CONFIGURATION = Configuration.getSingleton();
+    private static final Configuration CONFIGURATION = Configuration.singleton();
 
     private ConfigurationParameters() {
         // DO NOTHING
     }
 
-    public static ConfigurationParameters getSingleton() {
+    public static ConfigurationParameters singleton() {
         return SINGLETON;
     }
 

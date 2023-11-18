@@ -32,17 +32,17 @@ import java.util.function.Function;
  *
  * <p>Locking of Objects in the Store is the responsibility of the calling code
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
 public final class Store {
 
     private static final Store SINGLETON = new Store();
 
-    private final ReentrantLock reentrantLock;
+    private final Lock lock;
     private final Map<String, Object> map;
 
     /** Constructor */
     public Store() {
-        reentrantLock = new ReentrantLock(true);
+        lock = new ReentrantLock(true);
         map = new LinkedHashMap<>();
     }
 
@@ -51,7 +51,7 @@ public final class Store {
      *
      * @return the singleton instance
      */
-    public static Store getSingleton() {
+    public static Store singleton() {
         return SINGLETON;
     }
 
@@ -61,8 +61,8 @@ public final class Store {
      * @return the Lock
      */
     public Lock lock() {
-        reentrantLock.lock();
-        return reentrantLock;
+        lock.lock();
+        return lock;
     }
 
     /**
@@ -71,8 +71,8 @@ public final class Store {
      * @return the Store Lock
      */
     public Lock unlock() {
-        reentrantLock.unlock();
-        return reentrantLock;
+        lock.unlock();
+        return lock;
     }
 
     /**
@@ -81,7 +81,7 @@ public final class Store {
      * @return the Store Lock
      */
     public Lock getLock() {
-        return reentrantLock;
+        return lock;
     }
 
     /**
@@ -254,9 +254,9 @@ public final class Store {
         String validKey = checkKey(key);
 
         try {
-            lock();
+            lock.lock();
             Object object = map.remove(validKey);
-            if (object instanceof AutoCloseable) {
+            if (object != null && object instanceof AutoCloseable) {
                 try {
                     ((AutoCloseable) object).close();
                 } catch (Throwable t) {
@@ -268,7 +268,7 @@ public final class Store {
                 }
             }
         } finally {
-            unlock();
+            lock.unlock();
         }
     }
 

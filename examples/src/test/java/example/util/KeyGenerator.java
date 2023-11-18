@@ -14,54 +14,37 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api;
+package example.util;
 
 /** Class to implement a Key */
-public final class Key {
+public final class KeyGenerator {
 
     /** Constructor */
-    private Key() {
+    private KeyGenerator() {
         // DO NOTHING
     }
 
     /**
-     * Method to create a key
+     * Method to create a String key using the toString() value of each object.
+     *
+     * <p>i.e. objects[0].toString() + "/" + objects[1].toString() + "/" .... objects[n].toString()
      *
      * @param objects objects
      * @return a key
      */
     public static String of(Object... objects) {
-        checkNotNull(objects, "objects is null");
-        checkTrue(objects.length > 0, "objects is an empty array");
+        if (objects == null) {
+            throw new IllegalArgumentException("objects is null");
+        }
+
+        if (objects.length < 1) {
+            throw new IllegalArgumentException("objects is an empty array");
+        }
 
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < objects.length; i++) {
             stringBuilder.append("/").append(objects[i]);
         }
         return stringBuilder.toString().trim();
-    }
-
-    /**
-     * Method to validate a condition is true
-     *
-     * @param b b
-     * @param message message
-     */
-    private static void checkTrue(boolean b, String message) {
-        if (!b) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-
-    /**
-     * Method to validate a value is not null
-     *
-     * @param object object
-     * @param message message
-     */
-    private static void checkNotNull(Object object, String message) {
-        if (object == null) {
-            throw new IllegalArgumentException(message);
-        }
     }
 }

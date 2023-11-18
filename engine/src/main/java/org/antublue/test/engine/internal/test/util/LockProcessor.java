@@ -41,6 +41,26 @@ public class LockProcessor {
         // DO NOTHING
     }
 
+    public static void processLock(Class<?> clazz) {
+        TestEngine.ResourceLock annotation = clazz.getAnnotation(TestEngine.ResourceLock.class);
+        if (annotation != null) {
+            String name = annotation.name();
+            if (name != null && !name.trim().isEmpty()) {
+                String trimmedName = name.trim();
+                TestEngine.LockMode mode = annotation.mode();
+                if (mode == TestEngine.LockMode.READ_WRITE) {
+                    LOCK_MAP.computeIfAbsent(trimmedName, n -> createLock(n, true))
+                            .writeLock()
+                            .lock();
+                } else {
+                    LOCK_MAP.computeIfAbsent(trimmedName, n -> createLock(n, true))
+                            .readLock()
+                            .lock();
+                }
+            }
+        }
+    }
+
     /**
      * Method to process locking/unlocking on a Method, if annotated
      *
@@ -103,6 +123,40 @@ public class LockProcessor {
             LOGGER.trace(
                     "Acquired lock [%s] mode [%s] class [%s] method [%s]",
                     trimmedName, mode, method.getDeclaringClass().getName(), method.getName());
+        }
+    }
+
+    public static void processUnlocks(Class<?> clazz) {
+        TestEngine.ResourceLock annotation = clazz.getAnnotation(TestEngine.ResourceLock.class);
+        if (annotation != null) {
+            String name = annotation.name();
+            if (name != null && !name.trim().isEmpty()) {
+                String trimmedName = name.trim();
+                TestEngine.LockMode mode = annotation.mode();
+                ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
+                if (reentrantReadWriteLock != null) {
+                    LOGGER.trace(
+                            "Releasing lock [%s] mode [%s] class [%s]",
+                            trimmedName, mode, clazz.getName());
+
+                    if (mode == TestEngine.LockMode.READ_WRITE) {
+                        reentrantReadWriteLock.writeLock().unlock();
+                    } else {
+                        reentrantReadWriteLock.readLock().unlock();
+                    }
+
+                    LOGGER.trace(
+                            "Released lock [%s] mode [%s] class",
+                            trimmedName, mode, clazz.getName());
+
+                } else {
+                    throw new TestClassDefinitionException(
+                            String.format(
+                                    "@TestEngine.Unlock without @TestEngine.Lock, name [%s] mode"
+                                            + " [%s] class [%s]",
+                                    trimmedName, mode, clazz.getName()));
+                }
+            }
         }
     }
 

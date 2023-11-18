@@ -18,12 +18,12 @@ package example.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import example.util.KeyGenerator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Key;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -31,7 +31,8 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class StoreExampleTest3 {
 
-    private static final String TEST_OBJECT_KEY = Key.of(StoreExampleTest3.class, "testObject");
+    private static final String TEST_OBJECT_KEY =
+            KeyGenerator.of(StoreExampleTest3.class, "testObject");
 
     private Store store;
 

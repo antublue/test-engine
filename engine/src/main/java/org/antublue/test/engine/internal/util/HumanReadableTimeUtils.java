@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.utils;
+package org.antublue.test.engine.internal.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,10 +24,10 @@ import java.util.concurrent.TimeUnit;
 /** Class to create a human-readable time from a duration */
 // Suppress PMD.UselessParentheses - PMD has bug around UselessParentheses calculating milliseconds
 @SuppressWarnings("PMD.UselessParentheses")
-public final class HumanReadableTime {
+public final class HumanReadableTimeUtils {
 
     /** Constructor */
-    private HumanReadableTime() {
+    private HumanReadableTimeUtils() {
         // DO NOTHING
     }
 
@@ -50,8 +50,7 @@ public final class HumanReadableTime {
      */
     public static String toHumanReadable(long nanoseconds, boolean useShortFormat) {
         long nanosecondsPositive = nanoseconds > 0 ? nanoseconds : -nanoseconds;
-        long millisecondsDuration =
-                (long) NanosecondsConverter.MILLISECONDS.convert(nanosecondsPositive);
+        long millisecondsDuration = (long) ((double) nanosecondsPositive / 1e+6d);
         long hours = TimeUnit.MILLISECONDS.toHours(millisecondsDuration);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(millisecondsDuration) - (hours * 60);
         long seconds =
@@ -142,5 +141,45 @@ public final class HumanReadableTime {
                 new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.ENGLISH);
 
         return simpleDateFormat.format(new Date());
+    }
+
+    /**
+     * Method to convert nanoseconds to specific timing unit String
+     *
+     * @param timingUnit timingUnit
+     * @param nanoseconds nanoseconds
+     * @return a String representing the converted nanoseconds value
+     */
+    public static String toTimingUnit(long nanoseconds, String timingUnit) {
+        String workingUnit =
+                timingUnit == null || timingUnit.trim().equalsIgnoreCase("")
+                        ? "milliseconds"
+                        : timingUnit.trim().toLowerCase(Locale.ENGLISH);
+
+        if (workingUnit.equals("nanoseconds")) {
+            return nanoseconds + " ns";
+        } else if (workingUnit.equals("microseconds")) {
+            return (nanoseconds / 1e+3) + " μs";
+        } else if (workingUnit.equals("milliseconds")) {
+            return (nanoseconds / 1e+6) + " ms";
+        } else if (workingUnit.equals("seconds")) {
+            return (nanoseconds / 1e+9) + " s";
+        } else if (workingUnit.equals("minutes")) {
+            return (nanoseconds / 1e+12) + " m";
+        } else if (workingUnit.equals("adaptive")) {
+            if (nanoseconds >= 1e+12) {
+                return (nanoseconds / 1e+12) + " m";
+            } else if (nanoseconds >= 1e+9) {
+                return (nanoseconds / 1e+9) + " s";
+            } else if (nanoseconds >= 1e+6) {
+                return (nanoseconds / 1e+6) + " ms";
+            } else if (nanoseconds >= 1e+3) {
+                return (nanoseconds / 1e+3) + " μs";
+            } else {
+                return nanoseconds + " ns";
+            }
+        } else {
+            return (nanoseconds / 1e+6) + " ms";
+        }
     }
 }

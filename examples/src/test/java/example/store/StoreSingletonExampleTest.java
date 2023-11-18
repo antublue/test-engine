@@ -18,11 +18,11 @@ package example.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import example.util.KeyGenerator;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Key;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -30,9 +30,10 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class StoreSingletonExampleTest {
 
-    private static final String CLOSEABLE_KEY = Key.of(StoreExampleTest1.class, "closeable");
+    private static final String CLOSEABLE_KEY =
+            KeyGenerator.of(StoreExampleTest1.class, "closeable");
     private static final String AUTO_CLOSEABLE_KEY =
-            Key.of(StoreExampleTest1.class, "autoClosable");
+            KeyGenerator.of(StoreExampleTest1.class, "autoClosable");
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -48,8 +49,8 @@ public class StoreSingletonExampleTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        Store.getSingleton().put(CLOSEABLE_KEY, new TestCloseable());
-        Store.getSingleton().put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
+        Store.singleton().put(CLOSEABLE_KEY, new TestCloseable());
+        Store.singleton().put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
     }
 
     @TestEngine.BeforeAll
@@ -85,10 +86,10 @@ public class StoreSingletonExampleTest {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        Store.getSingleton().removeAndClose(CLOSEABLE_KEY);
-        Store.getSingleton().removeAndClose(AUTO_CLOSEABLE_KEY);
-        assertThat(Store.getSingleton().get(CLOSEABLE_KEY)).isNotPresent();
-        assertThat(Store.getSingleton().get(AUTO_CLOSEABLE_KEY)).isNotPresent();
+        Store.singleton().removeAndClose(CLOSEABLE_KEY);
+        Store.singleton().removeAndClose(AUTO_CLOSEABLE_KEY);
+        assertThat(Store.singleton().get(CLOSEABLE_KEY)).isNotPresent();
+        assertThat(Store.singleton().get(AUTO_CLOSEABLE_KEY)).isNotPresent();
     }
 
     private static class TestAutoCloseable implements AutoCloseable {

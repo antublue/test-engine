@@ -23,7 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.antublue.test.engine.Constants;
@@ -37,7 +36,7 @@ public class Logger {
             new SimpleDateFormat("yyyy-MM-dd | HH:mm:ss.SSS", Locale.getDefault());
 
     private final String name;
-    private final Level level;
+    private Level level;
 
     /**
      * Constructor
@@ -46,26 +45,23 @@ public class Logger {
      */
     public Logger(String name) {
         this.name = name;
+        this.level = Level.INFO;
 
-        Configuration configuration = Configuration.getSingleton();
+        Configuration configuration = Configuration.singleton();
 
-        Level derivedLevel = Level.INFO;
-
-        Optional<String> optionalLevel =
-                configuration.getOrDefault(Constants.LOGGER_LEVEL, Level.INFO.toString());
-        Optional<String> optionalRegex = configuration.getOrDefault(Constants.LOGGER_REGEX, ".*");
+        String loggerLevel =
+                configuration.get(Constants.LOGGER_LEVEL).orElse(Level.INFO.toString());
+        String regex = configuration.get(Constants.LOGGER_REGEX).orElse(".*");
 
         try {
-            Pattern pattern = Pattern.compile(optionalRegex.get());
+            Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(name);
             if (matcher.find()) {
-                derivedLevel = Level.toLevel(optionalLevel.get(), Level.INFO);
+                level = Level.toLevel(loggerLevel, Level.INFO);
             }
         } catch (Throwable t) {
             // DO NOTHING
         }
-
-        this.level = derivedLevel;
     }
 
     /**
@@ -111,6 +107,17 @@ public class Logger {
      */
     public boolean isErrorEnabled() {
         return level.toInt() >= Level.ERROR.toInt();
+    }
+
+    /**
+     * Method to dynamically change the logging level
+     *
+     * @param level level
+     */
+    public void setLevel(Level level) {
+        if (level != null) {
+            this.level = level;
+        }
     }
 
     /**

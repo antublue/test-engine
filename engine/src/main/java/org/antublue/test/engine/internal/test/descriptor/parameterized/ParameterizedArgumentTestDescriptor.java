@@ -50,7 +50,7 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescriptor {
 
-    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
+    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.singleton();
 
     private final Class<?> testClass;
     private final int testArgumentIndex;
@@ -378,7 +378,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State closeAutoCloseFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.getSingleton();
+        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
 
         for (Field testField : autoCloseFields) {
             autoCloseProcessor.close(getTestInstance(), testField, getThrowableContext());

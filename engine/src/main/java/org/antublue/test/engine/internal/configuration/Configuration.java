@@ -120,7 +120,7 @@ public class Configuration {
         }
     }
 
-    public static Configuration getSingleton() {
+    public static Configuration singleton() {
         return SINGLETON;
     }
 
@@ -140,19 +140,6 @@ public class Configuration {
      * Method to get a configuration property
      *
      * @param key the key
-     * @param defaultValue the default value
-     * @return the property value
-     */
-    public Optional<String> getOrDefault(String key, String defaultValue) {
-        String value = properties.getProperty(key, defaultValue);
-        trace("get name [%s] defaultValue [%s] value [%s]", key, defaultValue, value);
-        return Optional.ofNullable(value);
-    }
-
-    /**
-     * Method to get a configuration property
-     *
-     * @param key the key
      * @return the value
      */
     public Optional<Boolean> getBoolean(String key) {
@@ -164,27 +151,6 @@ public class Configuration {
         } else {
             trace("getBoolean name [%s] value [%s]", key, null);
             return Optional.empty();
-        }
-    }
-
-    /**
-     * Method to get a configuration property
-     *
-     * @param key the key
-     * @param defaultValue the default value
-     * @return the value
-     */
-    public Optional<Boolean> getBooleanOrDefault(String key, boolean defaultValue) {
-        Optional<String> optional = get(key);
-        if (optional.isPresent()) {
-            String value = optional.get();
-            trace("getBoolean name [%s] defaultValue [%s] value [%s]", key, defaultValue, value);
-            return Optional.of(Boolean.parseBoolean(value));
-        } else {
-            trace(
-                    "getBoolean name [%s] defaultValue [%s] value [%s]",
-                    key, defaultValue, defaultValue);
-            return Optional.of(defaultValue);
         }
     }
 

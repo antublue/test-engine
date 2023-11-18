@@ -20,17 +20,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.api.utils.AnsiColor;
-import org.antublue.test.engine.api.utils.AnsiColorStringBuilder;
-import org.antublue.test.engine.api.utils.HumanReadableTime;
-import org.antublue.test.engine.api.utils.NanosecondsConverter;
-import org.antublue.test.engine.api.utils.StopWatch;
 import org.antublue.test.engine.internal.test.descriptor.Metadata;
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.internal.test.descriptor.MetadataSupport;
 import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedArgumentTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedClassTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedMethodTestDescriptor;
+import org.antublue.test.engine.internal.util.AnsiColor;
+import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
+import org.antublue.test.engine.internal.util.HumanReadableTimeUtils;
+import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 
@@ -339,13 +338,10 @@ public class SummaryEngineExecutionListener
                         .append(INFO)
                         .color(AnsiColor.TEXT_WHITE_BRIGHT)
                         .append("Total Test Time : ")
-                        .append(HumanReadableTime.toHumanReadable(elapsedTime, false))
+                        .append(HumanReadableTimeUtils.toHumanReadable(elapsedTime, false))
                         .append(" (")
-                        .append(
-                                String.format(
-                                        "%s",
-                                        NanosecondsConverter.MILLISECONDS.toString(elapsedTime)))
-                        .append(")")
+                        .append(elapsedTime / 1e+6)
+                        .append(" ms)")
                         .color(AnsiColor.TEXT_RESET));
 
         println(
@@ -353,7 +349,7 @@ public class SummaryEngineExecutionListener
                         .append(INFO)
                         .color(AnsiColor.TEXT_WHITE_BRIGHT)
                         .append("Finished At     : ")
-                        .append(HumanReadableTime.now())
+                        .append(HumanReadableTimeUtils.now())
                         .color(AnsiColor.TEXT_RESET));
 
         if (!hasFailures) {

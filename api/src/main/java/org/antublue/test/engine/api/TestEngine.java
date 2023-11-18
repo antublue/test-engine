@@ -26,7 +26,7 @@ import org.junit.platform.commons.annotation.Testable;
 /** Interface that contains all TestEngine annotations */
 public @interface TestEngine {
 
-    /** Argument annotation */
+    /** ArgumentSupplier annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @interface ArgumentSupplier {}
@@ -361,7 +361,7 @@ public @interface TestEngine {
     }
 
     /** Lock annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @Repeatable(ResourceLock.List.class)
     @interface ResourceLock {

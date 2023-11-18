@@ -18,9 +18,9 @@ package org.antublue.test.engine.internal.test.descriptor;
 
 import java.util.Optional;
 import org.antublue.test.engine.Constants;
-import org.antublue.test.engine.api.utils.StopWatch;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.test.util.ThrowableContext;
+import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -46,7 +46,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         throwableContext = new ThrowableContext();
         metadata = new Metadata();
 
-        Configuration.getSingleton()
+        Configuration.singleton()
                 .get(Constants.THREAD_THROTTLE_MILLISECONDS)
                 .ifPresent(
                         s -> {

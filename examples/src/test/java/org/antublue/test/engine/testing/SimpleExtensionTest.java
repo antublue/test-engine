@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
-import org.antublue.test.engine.api.utils.StandardStreams;
+import org.antublue.test.engine.internal.util.StandardStreams;
 
 /** Example test */
 public class SimpleExtensionTest {

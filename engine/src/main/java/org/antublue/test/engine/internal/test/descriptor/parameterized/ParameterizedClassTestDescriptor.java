@@ -49,7 +49,7 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 @SuppressWarnings("unchecked")
 public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
-    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
+    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.singleton();
 
     private final Class<?> testClass;
     private final List<Field> autoCloseFields;
@@ -194,6 +194,8 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private State preInstantiate() {
+        LockProcessor.processLock(getTestClass());
+
         EXTENSION_MANAGER.preInstantiateCallback(testClass, getThrowableContext());
 
         if (getThrowableContext().isEmpty()) {
@@ -312,7 +314,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     private State closeAutoCloseFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.getSingleton();
+        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
 
         for (Field field : autoCloseFields) {
             autoCloseProcessor.close(getTestInstance(), field, getThrowableContext());
@@ -324,6 +326,8 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     private State end() {
         EXTENSION_MANAGER.preDestroyCallback(
                 testClass, Optional.ofNullable(getTestInstance()), new ThrowableContext());
+
+        LockProcessor.processUnlocks(getTestClass());
 
         return null;
     }

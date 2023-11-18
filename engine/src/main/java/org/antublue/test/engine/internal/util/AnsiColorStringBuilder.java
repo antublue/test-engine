@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.utils;
+package org.antublue.test.engine.internal.util;
 
 /** Class to build AnsiColor strings using a fluent pattern */
 public class AnsiColorStringBuilder {

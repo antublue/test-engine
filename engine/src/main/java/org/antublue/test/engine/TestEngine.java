@@ -152,7 +152,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestClassesByClassName(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestClassesByClassName()");
 
-        Configuration configuration = Configuration.getSingleton();
+        Configuration configuration = Configuration.singleton();
 
         Optional<String> optional = configuration.get(Constants.TEST_CLASS_INCLUDE_REGEX);
         if (optional.isPresent()) {
@@ -203,7 +203,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestClassesByTag(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestClassesByTag()");
 
-        Configuration configuration = Configuration.getSingleton();
+        Configuration configuration = Configuration.singleton();
 
         Optional<String> optional = configuration.get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
@@ -262,7 +262,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestMethodsByMethodName(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestMethodsByMethodName()");
 
-        Configuration configuration = Configuration.getSingleton();
+        Configuration configuration = Configuration.singleton();
 
         Optional<String> optional = configuration.get(Constants.TEST_METHOD_INCLUDE_REGEX);
         if (optional.isPresent()) {
@@ -315,7 +315,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestMethodsByTag(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestMethodsByTag()");
 
-        Configuration configuration = Configuration.getSingleton();
+        Configuration configuration = Configuration.singleton();
 
         Optional<String> optional = configuration.get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
@@ -400,7 +400,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      * @param engineDescriptor engineDescriptor
      */
     private void shuffleOrSortTestDescriptors(EngineDescriptor engineDescriptor) {
-        Configuration configuration = Configuration.getSingleton();
+        Configuration configuration = Configuration.singleton();
 
         // Get the test descriptors and remove them from the engine descriptor
         List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
@@ -433,8 +433,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
 
-            ConfigurationParameters configurationParameters =
-                    ConfigurationParameters.getSingleton();
+            ConfigurationParameters configurationParameters = ConfigurationParameters.singleton();
 
             new Executor()
                     .execute(

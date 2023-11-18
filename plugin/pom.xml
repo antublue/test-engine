@@ -132,7 +132,7 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>3.9.4</version>
+                                    <version>3.9.2</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
@@ -269,19 +269,19 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
-            <version>3.9.4</version>
+            <version>3.9.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact</artifactId>
-            <version>3.9.4</version>
+            <version>3.9.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>3.9.4</version>
+            <version>3.9.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

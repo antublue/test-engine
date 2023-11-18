@@ -19,9 +19,6 @@ package org.antublue.test.engine.maven.plugin.listener;
 import java.lang.reflect.Method;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.utils.AnsiColor;
-import org.antublue.test.engine.api.utils.AnsiColorStringBuilder;
-import org.antublue.test.engine.api.utils.NanosecondsConverter;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -29,6 +26,9 @@ import org.antublue.test.engine.internal.test.descriptor.Metadata;
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.internal.test.descriptor.MetadataSupport;
 import org.antublue.test.engine.internal.test.util.TestUtils;
+import org.antublue.test.engine.internal.util.AnsiColor;
+import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
+import org.antublue.test.engine.internal.util.HumanReadableTimeUtils;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -39,9 +39,9 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(StatusEngineExecutionListener.class);
 
-    private static final Configuration CONFIGURATION = Configuration.getSingleton();
+    private static final Configuration CONFIGURATION = Configuration.singleton();
 
-    private static final TestUtils TEST_UTILS = TestUtils.getSingleton();
+    private static final TestUtils TEST_UTILS = TestUtils.singleton();
 
     private static final String INFO =
             new AnsiColorStringBuilder()
@@ -77,13 +77,13 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
     private final boolean consoleLogTiming;
 
+    private final String consoleLogTimingUnits;
+
     private final boolean consoleLogTestMessages;
 
     private final boolean consoleLogSkipMessages;
 
     private final boolean consoleLogPassMessages;
-
-    private final NanosecondsConverter nanosecondsConverter;
 
     /** Constructor */
     public StatusEngineExecutionListener() {
@@ -102,15 +102,12 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
         LOGGER.trace("configuration [%s] = [%b]", Constants.CONSOLE_LOG_TIMING, consoleLogTiming);
 
-        nanosecondsConverter =
-                CONFIGURATION
-                        .get(Constants.CONSOLE_LOG_TIMING_UNITS)
-                        .map(NanosecondsConverter::decode)
-                        .orElse(NanosecondsConverter.MILLISECONDS);
+        consoleLogTimingUnits =
+                CONFIGURATION.get(Constants.CONSOLE_LOG_TIMING_UNITS).orElse("milliseconds");
 
         LOGGER.trace(
                 "configuration [%s] = [%s]",
-                Constants.CONSOLE_LOG_TIMING_UNITS, nanosecondsConverter);
+                Constants.CONSOLE_LOG_TIMING_UNITS, consoleLogTimingUnits);
 
         consoleLogTestMessages =
                 CONFIGURATION
@@ -237,7 +234,9 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             if (consoleLogTiming && elapsedTime != null) {
                 ansiColorStringBuilder
                         .append(" ")
-                        .append(nanosecondsConverter.toString(elapsedTime));
+                        .append(
+                                HumanReadableTimeUtils.toTimingUnit(
+                                        elapsedTime, consoleLogTimingUnits));
             }
 
             ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
@@ -306,7 +305,9 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             if (consoleLogTiming && elapsedTime != null) {
                 ansiColorStringBuilder
                         .append(" ")
-                        .append(nanosecondsConverter.toString(elapsedTime));
+                        .append(
+                                HumanReadableTimeUtils.toTimingUnit(
+                                        elapsedTime, consoleLogTimingUnits));
             }
 
             ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);

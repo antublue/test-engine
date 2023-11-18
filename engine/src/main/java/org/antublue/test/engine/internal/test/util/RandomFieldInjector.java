@@ -19,9 +19,9 @@ package org.antublue.test.engine.internal.test.util;
 import java.lang.reflect.Field;
 import java.util.UUID;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.utils.RandomUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.RandomUtils;
 
 /** Class to process @TestEngine.Random.X annotations */
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")

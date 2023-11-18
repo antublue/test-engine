@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import org.antublue.test.engine.api.Extension;
-import org.antublue.test.engine.api.utils.StopWatch;
+import org.antublue.test.engine.internal.util.StopWatch;
 
 /** Example Extension */
 public class StopWatchExtension implements Extension {
@@ -39,7 +39,7 @@ public class StopWatchExtension implements Extension {
      *
      * @return the singleton instance
      */
-    public static StopWatchExtension getSingleton() {
+    public static StopWatchExtension singleton() {
         return SINGLETON;
     }
 

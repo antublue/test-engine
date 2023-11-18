@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
-import org.antublue.test.engine.api.utils.StandardStreams;
+import org.antublue.test.engine.internal.util.StandardStreams;
 
 public class SystemOutExtension implements Extension {
 
