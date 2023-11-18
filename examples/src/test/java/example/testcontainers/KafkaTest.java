@@ -62,11 +62,12 @@ public class KafkaTest {
     @TestEngine.ArgumentSupplier
     public static Stream<KafkaTestContainer> arguments() {
         return Stream.of(
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.0.9"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.1.8"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.2.6"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.3.4"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.4.1"));
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.0.12"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.1.10"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.2.8"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.3.6"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.4.3"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.5.2"));
     }
 
     @TestEngine.Prepare
