@@ -173,15 +173,12 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                         .define(
                                 State.POST_AFTER_ALL,
                                 this::postAfterAll,
-                                State.CLEAR_ARGUMENTS_FIELDS)
-                        .define(
-                                State.CLEAR_ARGUMENTS_FIELDS,
-                                this::clearArgumentFields,
                                 State.CLOSE_AUTO_CLOSE_FIELDS)
                         .define(
                                 State.CLOSE_AUTO_CLOSE_FIELDS,
                                 this::closeAutoCloseFields,
-                                State.END)
+                                State.CLEAR_ARGUMENTS_FIELDS)
+                        .define(State.CLEAR_ARGUMENTS_FIELDS, this::clearArgumentFields, State.END)
                         .afterEach(
                                 () -> {
                                     StandardStreams.flush();
@@ -242,6 +239,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
             for (Field field : testArgumentFields) {
                 field.setAccessible(true);
                 field.set(getTestInstance(), testArgument);
+
                 if (!getThrowableContext().isEmpty()) {
                     return State.EXECUTE_OR_SKIP;
                 }
@@ -358,6 +356,18 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         EXTENSION_MANAGER.postAfterAllMethodsCallback(
                 getTestInstance(), testArgument, getThrowableContext());
 
+        return State.CLOSE_AUTO_CLOSE_FIELDS;
+    }
+
+    private State closeAutoCloseFields() {
+        Preconditions.notNull(getTestInstance(), "testInstance is null");
+
+        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
+
+        for (Field testField : autoCloseFields) {
+            autoCloseProcessor.close(getTestInstance(), testField, getThrowableContext());
+        }
+
         return State.CLEAR_ARGUMENTS_FIELDS;
     }
 
@@ -370,18 +380,6 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
             } catch (Throwable t) {
                 getThrowableContext().add(testClass, t);
             }
-        }
-
-        return State.CLOSE_AUTO_CLOSE_FIELDS;
-    }
-
-    private State closeAutoCloseFields() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
-
-        for (Field testField : autoCloseFields) {
-            autoCloseProcessor.close(getTestInstance(), testField, getThrowableContext());
         }
 
         return State.END;
