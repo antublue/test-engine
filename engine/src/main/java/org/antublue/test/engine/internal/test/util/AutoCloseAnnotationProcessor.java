@@ -24,18 +24,20 @@ import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 /** Class to implement FieldInjector */
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
-public class AutoCloseProcessor {
+public class AutoCloseAnnotationProcessor {
 
-    private static final AutoCloseProcessor SINGLETON = new AutoCloseProcessor();
+    private static final AutoCloseAnnotationProcessor SINGLETON =
+            new AutoCloseAnnotationProcessor();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AutoCloseProcessor.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(AutoCloseAnnotationProcessor.class);
 
     /** Constructor */
-    private AutoCloseProcessor() {
+    private AutoCloseAnnotationProcessor() {
         // DO NOTHING
     }
 
-    public static final AutoCloseProcessor singleton() {
+    public static final AutoCloseAnnotationProcessor getSingleton() {
         return SINGLETON;
     }
 

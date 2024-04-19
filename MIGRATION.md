@@ -174,7 +174,7 @@ public class Test {
 
 The `Store` object has been refactored to allow both global usage and local test class usage.
 
-Previous static methods have been removed; use `Store.singleton()`
+Previous static methods have been removed; use `Store.getSingleton()`
 
 `5.x.x` code:
 
@@ -205,7 +205,7 @@ public class Test {
   public void test() {
     // ... code omitted ...
     
-    String value = Store.singleton().get("key");
+    String value = Store.getSingleton().get("key");
   }
 }
 ```

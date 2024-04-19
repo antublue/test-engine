@@ -294,14 +294,14 @@ public class ParameterizedTestFactory {
                 List<Argument> arguments = classArgumentMap.get(clazz);
 
                 ThrowableContext throwableContext = new ThrowableContext();
-                ExtensionManager.singleton()
+                ExtensionManager.getSingleton()
                         .postTestArgumentDiscoveryCallback(clazz, arguments, throwableContext);
                 throwableContext.throwFirst();
 
                 List<Method> testMethods = classMethodMap.get(clazz);
 
                 throwableContext.clear();
-                ExtensionManager.singleton()
+                ExtensionManager.getSingleton()
                         .postTestMethodDiscoveryCallback(clazz, testMethods, throwableContext);
                 throwableContext.throwFirst();
 

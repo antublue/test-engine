@@ -14,30 +14,18 @@
  * limitations under the License.
  */
 
-package example.store;
+package org.antublue.test.engine.testing;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import example.util.KeyGenerator;
-import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class StoreSingletonExampleTest {
+@TestEngine.Disabled
+public class DuplicateOrderTest {
 
-    private static final String CLOSEABLE_KEY =
-            KeyGenerator.of(StoreExampleTest1.class, "closeable");
-    private static final String AUTO_CLOSEABLE_KEY =
-            KeyGenerator.of(StoreExampleTest1.class, "autoClosable");
-
-    @TestEngine.Argument protected StringArgument stringArgument;
-
-    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -46,71 +34,50 @@ public class StoreSingletonExampleTest {
         return collection.stream();
     }
 
+    @TestEngine.Order(order = 0)
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        Store.getSingleton().put(CLOSEABLE_KEY, new TestCloseable());
-        Store.getSingleton().put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
+    }
+
+    @TestEngine.Order(order = 0)
+    @TestEngine.Prepare
+    public void prepare2() {
+        System.out.println("prepare2()");
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll() {
+    public void beforeAll(StringArgument stringArgument) {
         System.out.println("beforeAll(" + stringArgument + ")");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach() {
+    public void beforeEach(StringArgument stringArgument) {
         System.out.println("beforeEach(" + stringArgument + ")");
     }
 
     @TestEngine.Test
-    public void test1() {
+    public void test1(StringArgument stringArgument) {
         System.out.println("test1(" + stringArgument + ")");
     }
 
     @TestEngine.Test
-    public void test2() {
+    public void test2(StringArgument stringArgument) {
         System.out.println("test2(" + stringArgument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach() {
+    public void afterEach(StringArgument stringArgument) {
         System.out.println("afterEach(" + stringArgument + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll() {
+    public void afterAll(StringArgument stringArgument) {
         System.out.println("afterAll(" + stringArgument + ")");
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        Store.getSingleton().removeAndClose(CLOSEABLE_KEY);
-        Store.getSingleton().removeAndClose(AUTO_CLOSEABLE_KEY);
-        assertThat(Store.getSingleton().get(CLOSEABLE_KEY)).isNotPresent();
-        assertThat(Store.getSingleton().get(AUTO_CLOSEABLE_KEY)).isNotPresent();
-    }
-
-    private static class TestAutoCloseable implements AutoCloseable {
-
-        public TestAutoCloseable() {
-            // DO NOTHING
-        }
-
-        public void close() {
-            System.out.println(getClass().getName() + ".close()");
-        }
-    }
-
-    private static class TestCloseable implements Closeable {
-
-        public TestCloseable() {
-            // DO NOTHING
-        }
-
-        public void close() {
-            System.out.println(getClass().getName() + ".close()");
-        }
     }
 }

@@ -84,7 +84,7 @@ public class ExtensionManager {
      *
      * @return the singleton extension manager
      */
-    public static ExtensionManager singleton() {
+    public static ExtensionManager getSingleton() {
         return SINGLETON;
     }
 

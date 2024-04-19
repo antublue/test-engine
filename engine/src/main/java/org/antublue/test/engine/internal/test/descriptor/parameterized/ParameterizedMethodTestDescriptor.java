@@ -29,8 +29,8 @@ import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
 import org.antublue.test.engine.internal.test.extension.ExtensionManager;
-import org.antublue.test.engine.internal.test.util.AutoCloseProcessor;
-import org.antublue.test.engine.internal.test.util.LockProcessor;
+import org.antublue.test.engine.internal.test.util.AutoCloseAnnotationProcessor;
+import org.antublue.test.engine.internal.test.util.LockAnnotationProcessor;
 import org.antublue.test.engine.internal.test.util.StateMachine;
 import org.antublue.test.engine.internal.test.util.TestUtils;
 import org.antublue.test.engine.internal.util.StandardStreams;
@@ -47,7 +47,7 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 /** Class to implement a ParameterMethodTestDescriptor */
 public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor {
 
-    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.singleton();
+    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
 
     private final Class<?> testClass;
     private final Argument testArgument;
@@ -224,9 +224,9 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
 
         try {
             for (Method method : beforeEachMethods) {
-                LockProcessor.processLocks(method);
+                LockAnnotationProcessor.processLocks(method);
                 TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-                LockProcessor.processUnlocks(method);
+                LockAnnotationProcessor.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
                 }
@@ -267,9 +267,9 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
     private State test() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        LockProcessor.processLocks(testMethod);
+        LockAnnotationProcessor.processLocks(testMethod);
         TestUtils.invoke(testMethod, getTestInstance(), testArgument, getThrowableContext());
-        LockProcessor.processUnlocks(testMethod);
+        LockAnnotationProcessor.processUnlocks(testMethod);
 
         return State.POST_TEST;
     }
@@ -300,9 +300,9 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         for (Method method : afterEachMethods) {
-            LockProcessor.processLocks(method);
+            LockAnnotationProcessor.processLocks(method);
             TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-            LockProcessor.processUnlocks(method);
+            LockAnnotationProcessor.processUnlocks(method);
         }
 
         return State.POST_AFTER_EACH;
@@ -320,10 +320,11 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
     private State closeAutoCloseFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
+        AutoCloseAnnotationProcessor autoCloseAnnotationProcessor =
+                AutoCloseAnnotationProcessor.getSingleton();
 
         for (Field field : autoCloseFields) {
-            autoCloseProcessor.close(getTestInstance(), field, getThrowableContext());
+            autoCloseAnnotationProcessor.close(getTestInstance(), field, getThrowableContext());
         }
 
         return State.END;

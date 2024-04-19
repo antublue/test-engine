@@ -31,13 +31,13 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 /** Class to process @TestEngine.Lock, @TestEngine.Unlock, @TestEngine.ResourceLock annotations */
-public class LockProcessor {
+public class LockAnnotationProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LockProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LockAnnotationProcessor.class);
 
     private static final Map<String, ReentrantReadWriteLock> LOCK_MAP = new ConcurrentHashMap<>();
 
-    private LockProcessor() {
+    private LockAnnotationProcessor() {
         // DO NOTHING
     }
 

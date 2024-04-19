@@ -7,7 +7,7 @@
 
     <groupId>org.antublue</groupId>
     <artifactId>test-engine-examples</artifactId>
-    <version>7.0.0</version>
+    <version>7.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>AntuBLUE Test Engine Examples</name>
 
@@ -75,7 +75,7 @@
             <plugin>
                 <groupId>org.antublue</groupId>
                 <artifactId>test-engine-maven-plugin</artifactId>
-                <version>7.0.0</version>
+                <version>7.0.0-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <phase>integration-test</phase>
@@ -157,19 +157,19 @@
         <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine-api</artifactId>
-            <version>7.0.0</version>
+            <version>7.0.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine</artifactId>
-            <version>7.0.0</version>
+            <version>7.0.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.antublue</groupId>
             <artifactId>test-engine-extras</artifactId>
-            <version>7.0.0</version>
+            <version>7.0.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>

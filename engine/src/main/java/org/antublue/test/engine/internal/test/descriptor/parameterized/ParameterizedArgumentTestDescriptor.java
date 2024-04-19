@@ -30,9 +30,9 @@ import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
 import org.antublue.test.engine.internal.test.extension.ExtensionManager;
-import org.antublue.test.engine.internal.test.util.AutoCloseProcessor;
-import org.antublue.test.engine.internal.test.util.LockProcessor;
-import org.antublue.test.engine.internal.test.util.RandomFieldInjector;
+import org.antublue.test.engine.internal.test.util.AutoCloseAnnotationProcessor;
+import org.antublue.test.engine.internal.test.util.LockAnnotationProcessor;
+import org.antublue.test.engine.internal.test.util.RandomAnnotationProcessor;
 import org.antublue.test.engine.internal.test.util.StateMachine;
 import org.antublue.test.engine.internal.test.util.TestUtils;
 import org.antublue.test.engine.internal.util.StandardStreams;
@@ -50,7 +50,7 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescriptor {
 
-    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.singleton();
+    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
 
     private final Class<?> testClass;
     private final int testArgumentIndex;
@@ -257,7 +257,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
 
         try {
             for (Field field : randomFields) {
-                RandomFieldInjector.inject(getTestInstance(), field);
+                RandomAnnotationProcessor.inject(getTestInstance(), field);
                 if (!getThrowableContext().isEmpty()) {
                     return State.EXECUTE_OR_SKIP;
                 }
@@ -286,9 +286,9 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
 
         try {
             for (Method method : beforeAllMethods) {
-                LockProcessor.processLocks(method);
+                LockAnnotationProcessor.processLocks(method);
                 TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-                LockProcessor.processUnlocks(method);
+                LockAnnotationProcessor.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
                 }
@@ -342,9 +342,9 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         for (Method method : afterAllMethods) {
-            LockProcessor.processLocks(method);
+            LockAnnotationProcessor.processLocks(method);
             TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-            LockProcessor.processUnlocks(method);
+            LockAnnotationProcessor.processUnlocks(method);
         }
 
         return State.POST_AFTER_ALL;
@@ -362,10 +362,11 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State closeAutoCloseFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        AutoCloseProcessor autoCloseProcessor = AutoCloseProcessor.singleton();
+        AutoCloseAnnotationProcessor autoCloseAnnotationProcessor =
+                AutoCloseAnnotationProcessor.getSingleton();
 
         for (Field testField : autoCloseFields) {
-            autoCloseProcessor.close(getTestInstance(), testField, getThrowableContext());
+            autoCloseAnnotationProcessor.close(getTestInstance(), testField, getThrowableContext());
         }
 
         return State.CLEAR_ARGUMENTS_FIELDS;

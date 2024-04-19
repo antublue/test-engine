@@ -23,14 +23,14 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 /** Class to implement FieldInjector */
-public class ArgumentFieldInjector {
+public class ArgumentAnnotationProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentFieldInjector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentAnnotationProcessor.class);
 
-    private static final ArgumentFieldInjector SINGLETON = new ArgumentFieldInjector();
+    private static final ArgumentAnnotationProcessor SINGLETON = new ArgumentAnnotationProcessor();
 
     /** Constructor */
-    private ArgumentFieldInjector() {
+    private ArgumentAnnotationProcessor() {
         // DO NOTHING
     }
 
@@ -39,7 +39,7 @@ public class ArgumentFieldInjector {
      *
      * @return the singleton
      */
-    public static ArgumentFieldInjector singleton() {
+    public static ArgumentAnnotationProcessor singleton() {
         return SINGLETON;
     }
 

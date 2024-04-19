@@ -51,7 +51,17 @@ public final class Store {
      *
      * @return the singleton instance
      */
+    @Deprecated
     public static Store singleton() {
+        return getSingleton();
+    }
+
+    /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static Store getSingleton() {
         return SINGLETON;
     }
 

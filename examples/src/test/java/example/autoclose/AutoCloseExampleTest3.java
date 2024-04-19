@@ -14,30 +14,17 @@
  * limitations under the License.
  */
 
-package example.store;
+package example.autoclose;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import example.util.KeyGenerator;
-import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class StoreSingletonExampleTest {
+public class AutoCloseExampleTest3 {
 
-    private static final String CLOSEABLE_KEY =
-            KeyGenerator.of(StoreExampleTest1.class, "closeable");
-    private static final String AUTO_CLOSEABLE_KEY =
-            KeyGenerator.of(StoreExampleTest1.class, "autoClosable");
-
-    @TestEngine.Argument protected StringArgument stringArgument;
-
-    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -46,71 +33,71 @@ public class StoreSingletonExampleTest {
         return collection.stream();
     }
 
+    @TestEngine.AutoClose.AfterEach(method = "destroy")
+    private TestObject afterEachTestObject;
+
+    @TestEngine.AutoClose.AfterAll(method = "destroy")
+    private TestObject afterAllTestObject;
+
+    @TestEngine.AutoClose.Conclude(method = "destroy")
+    private TestObject concludeTestObject;
+
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        Store.getSingleton().put(CLOSEABLE_KEY, new TestCloseable());
-        Store.getSingleton().put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
+
+        concludeTestObject = new TestObject("concludeTestObject");
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll() {
+    public void beforeAll(StringArgument stringArgument) {
         System.out.println("beforeAll(" + stringArgument + ")");
+
+        afterAllTestObject = new TestObject("afterAllTestObject");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach() {
+    public void beforeEach(StringArgument stringArgument) {
         System.out.println("beforeEach(" + stringArgument + ")");
+
+        afterEachTestObject = new TestObject("afterEachTestObject");
     }
 
     @TestEngine.Test
-    public void test1() {
+    public void test1(StringArgument stringArgument) {
         System.out.println("test1(" + stringArgument + ")");
     }
 
     @TestEngine.Test
-    public void test2() {
+    public void test2(StringArgument stringArgument) {
         System.out.println("test2(" + stringArgument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach() {
+    public void afterEach(StringArgument stringArgument) {
         System.out.println("afterEach(" + stringArgument + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll() {
+    public void afterAll(StringArgument stringArgument) {
         System.out.println("afterAll(" + stringArgument + ")");
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        Store.getSingleton().removeAndClose(CLOSEABLE_KEY);
-        Store.getSingleton().removeAndClose(AUTO_CLOSEABLE_KEY);
-        assertThat(Store.getSingleton().get(CLOSEABLE_KEY)).isNotPresent();
-        assertThat(Store.getSingleton().get(AUTO_CLOSEABLE_KEY)).isNotPresent();
     }
 
-    private static class TestAutoCloseable implements AutoCloseable {
+    private static class TestObject {
 
-        public TestAutoCloseable() {
-            // DO NOTHING
+        private final String name;
+
+        public TestObject(String name) {
+            this.name = name;
         }
 
-        public void close() {
-            System.out.println(getClass().getName() + ".close()");
-        }
-    }
-
-    private static class TestCloseable implements Closeable {
-
-        public TestCloseable() {
-            // DO NOTHING
-        }
-
-        public void close() {
-            System.out.println(getClass().getName() + ".close()");
+        public void destroy() {
+            System.out.println(name + ".destroy()");
         }
     }
 }

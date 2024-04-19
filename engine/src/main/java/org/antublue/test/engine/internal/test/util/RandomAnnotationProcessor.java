@@ -25,12 +25,12 @@ import org.antublue.test.engine.internal.util.RandomUtils;
 
 /** Class to process @TestEngine.Random.X annotations */
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
-public class RandomFieldInjector {
+public class RandomAnnotationProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RandomFieldInjector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RandomAnnotationProcessor.class);
 
     /** Constructor */
-    private RandomFieldInjector() {
+    private RandomAnnotationProcessor() {
         // DO NOTHING
     }
 
