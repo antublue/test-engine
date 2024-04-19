@@ -42,6 +42,9 @@ public class Executor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Executor.class);
 
+    private static final int MAX_THREAD_COUNT =
+            Math.max(1, Runtime.getRuntime().availableProcessors() - 2);
+
     /**
      * Method to execute the ExecutionRequest
      *
@@ -70,14 +73,13 @@ public class Executor {
                                         int intValue;
                                         try {
                                             intValue = Integer.parseInt(value);
-                                            if (intValue >= 1) {
-                                                return intValue;
-                                            } else {
+                                            if (intValue < 1) {
                                                 throw new TestEngineException(
                                                         String.format(
                                                                 "Invalid thread count [%d]",
                                                                 intValue));
                                             }
+                                            return intValue;
                                         } catch (NumberFormatException e) {
                                             throw new TestEngineException(
                                                     String.format(
@@ -85,7 +87,7 @@ public class Executor {
                                                     e);
                                         }
                                     })
-                            .orElse(Runtime.getRuntime().availableProcessors());
+                            .orElse(MAX_THREAD_COUNT);
 
             LOGGER.trace("[%s] = [%d]", Constants.THREAD_COUNT, threadCount);
 
