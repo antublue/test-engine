@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/41181447cffb4015bebbba9cb65b8679)](https://app.codacy.com/gh/antublue/test-engine?utm_source=github.com&utm_medium=referral&utm_content=antublue/test-engine&utm_campaign=Badge_Grade)
 [![Build](https://github.com/antublue/test-engine/actions/workflows/build.yml/badge.svg)](https://github.com/antublue/test-engine/actions/workflows/build.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/06036e5d592b46238f98025f297add26)](https://app.codacy.com/gh/antublue/test-engine/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 <br/>
