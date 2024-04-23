@@ -16,6 +16,8 @@
 
 package example;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -23,8 +25,11 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class SimpleExampleTest {
+public class SimpleTest2 {
 
+    private StringArgument stringArgument;
+
+    @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
@@ -33,39 +38,52 @@ public class SimpleExampleTest {
         return collection.stream();
     }
 
+    @TestEngine.Argument
+    public void argument(StringArgument stringArgument) {
+        System.out.println("argument(" + stringArgument + ")");
+        this.stringArgument = stringArgument;
+        assertThat(stringArgument).isNotNull();
+    }
+
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(StringArgument stringArgument) {
+    public void beforeAll() {
         System.out.println("beforeAll(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach(StringArgument stringArgument) {
+    public void beforeEach() {
         System.out.println("beforeEach(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.Test
-    public void test1(StringArgument stringArgument) {
+    public void test1() {
         System.out.println("test1(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.Test
-    public void test2(StringArgument stringArgument) {
+    public void test2() {
         System.out.println("test2(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.AfterEach
-    public void afterEach(StringArgument stringArgument) {
+    public void afterEach() {
         System.out.println("afterEach(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.AfterAll
-    public void afterAll(StringArgument stringArgument) {
+    public void afterAll() {
         System.out.println("afterAll(" + stringArgument + ")");
+        assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.Conclude

@@ -37,7 +37,7 @@ public @interface TestEngine {
     @interface ExtensionSupplier {}
 
     /** Argument annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @interface Argument {}
 

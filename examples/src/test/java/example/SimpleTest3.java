@@ -25,7 +25,7 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class NoArgumentDeclarationTest {
+public class SimpleTest3 {
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
