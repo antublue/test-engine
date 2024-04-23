@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.test.descriptor.parameterized;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +27,6 @@ import org.antublue.test.engine.internal.test.annotation.AutoCloseAnnotationProc
 import org.antublue.test.engine.internal.test.annotation.LockAnnotationProcessor;
 import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
-import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
 import org.antublue.test.engine.internal.test.extension.ExtensionManager;
 import org.antublue.test.engine.internal.test.util.StateMachine;
@@ -51,7 +49,6 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
 
     private final Class<?> testClass;
     private final Argument testArgument;
-    private final List<Field> autoCloseFields;
     private final List<Method> beforeEachMethods;
     private final Method testMethod;
     private final List<Method> afterEachMethods;
@@ -76,7 +73,6 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
         super(builder.uniqueId, builder.displayName);
         this.testClass = builder.testClass;
         this.testArgument = builder.testArgument;
-        this.autoCloseFields = builder.autoCloseFields;
         this.beforeEachMethods = builder.beforeEachMethods;
         this.testMethod = builder.testMethod;
         this.afterEachMethods = builder.afterEachMethods;
@@ -337,13 +333,11 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
     public static class Builder {
 
         private Class<?> testClass;
-        private int testArgumentIndex;
         private Argument testArgument;
         private Method testMethod;
 
         private UniqueId uniqueId;
         private String displayName;
-        private List<Field> autoCloseFields;
         private List<Method> beforeEachMethods;
         private List<Method> afterEachMethods;
 
@@ -366,7 +360,6 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
          * @return this
          */
         public Builder setTestArgument(int testArgumentIndex, Argument testArgument) {
-            this.testArgumentIndex = testArgumentIndex;
             this.testArgument = testArgument;
             return this;
         }
@@ -397,12 +390,6 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
                                         testMethod.getName());
 
                 displayName = TestUtils.getDisplayName(testMethod);
-
-                autoCloseFields =
-                        ReflectionSupport.findFields(
-                                testClass,
-                                AnnotationFieldFilter.of(TestEngine.AutoClose.AfterEach.class),
-                                HierarchyTraversalMode.TOP_DOWN);
 
                 beforeEachMethods =
                         ReflectionSupport.findMethods(
