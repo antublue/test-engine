@@ -67,7 +67,7 @@ public final class LoggerFactory {
      * @return the return value
      */
     public static Logger getLogger(String name) {
-        Configuration configuration = Configuration.singleton();
+        Configuration configuration = Configuration.getSingleton();
 
         synchronized (configuration) {
             if (SINGLETON == null) {

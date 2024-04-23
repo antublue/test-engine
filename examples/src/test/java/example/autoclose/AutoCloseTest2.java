@@ -84,11 +84,14 @@ public class AutoCloseTest2 {
     public void afterAll() {
         System.out.println("afterAll(" + stringArgument + ")");
         assertThat(afterEachTestObject.isDestroyed()).isTrue();
+        assertThat(afterAllTestObject.isDestroyed()).isFalse();
+        assertThat(afterConcludeTestObject.isDestroyed()).isFalse();
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
+        assertThat(afterEachTestObject.isDestroyed()).isTrue();
         assertThat(afterAllTestObject.isDestroyed()).isTrue();
         assertThat(afterConcludeTestObject.isDestroyed()).isFalse();
     }

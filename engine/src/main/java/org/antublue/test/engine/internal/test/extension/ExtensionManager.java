@@ -48,7 +48,7 @@ public class ExtensionManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionManager.class);
 
-    private static final Configuration CONFIGURATION = Configuration.singleton();
+    private static final Configuration CONFIGURATION = Configuration.getSingleton();
 
     private static final List<Extension> EMPTY_EXTENSION_LIST = new ArrayList<>();
 

@@ -16,20 +16,18 @@
 
 package org.antublue.test.engine.internal.test.descriptor.parameterized;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestEngineException;
+import org.antublue.test.engine.internal.test.annotation.AutoCloseAnnotationProcessor;
+import org.antublue.test.engine.internal.test.annotation.LockAnnotationProcessor;
 import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
-import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
 import org.antublue.test.engine.internal.test.extension.ExtensionManager;
-import org.antublue.test.engine.internal.test.util.AutoCloseAnnotationProcessor;
-import org.antublue.test.engine.internal.test.util.LockAnnotationProcessor;
 import org.antublue.test.engine.internal.test.util.ReflectionUtils;
 import org.antublue.test.engine.internal.test.util.StateMachine;
 import org.antublue.test.engine.internal.test.util.TestUtils;
@@ -46,13 +44,11 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /** Class to implement a ParameterClassTestDescriptor */
-@SuppressWarnings("unchecked")
 public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
     protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
 
     private final Class<?> testClass;
-    private final List<Field> autoCloseFields;
     private final List<Method> prepareMethods;
     private final List<Method> concludeMethods;
 
@@ -80,7 +76,6 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     private ParameterizedClassTestDescriptor(Builder builder) {
         super(builder.uniqueId, builder.displayName);
         this.testClass = builder.testClass;
-        this.autoCloseFields = builder.autoCloseFields;
         this.prepareMethods = builder.prepareMethods;
         this.concludeMethods = builder.concludeMethods;
     }
@@ -314,12 +309,11 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     private State closeAutoCloseFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        AutoCloseAnnotationProcessor autoCloseAnnotationProcessor =
-                AutoCloseAnnotationProcessor.getSingleton();
-
-        for (Field field : autoCloseFields) {
-            autoCloseAnnotationProcessor.close(getTestInstance(), field, getThrowableContext());
-        }
+        AutoCloseAnnotationProcessor.getSingleton()
+                .conclude(
+                        getTestInstance(),
+                        AutoCloseAnnotationProcessor.Type.AFTER_CONCLUDE,
+                        getThrowableContext());
 
         return State.END;
     }
@@ -342,7 +336,6 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
         private UniqueId uniqueId;
         private String displayName;
-        private List<Field> autoCloseFields;
         private List<Method> prepareMethods;
         private List<Method> concludeMethods;
 
@@ -413,12 +406,6 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                 concludeMethods =
                         TestUtils.orderTestMethods(
                                 concludeMethods, HierarchyTraversalMode.BOTTOM_UP);
-
-                autoCloseFields =
-                        ReflectionSupport.findFields(
-                                testClass,
-                                AnnotationFieldFilter.of(TestEngine.AutoClose.Conclude.class),
-                                HierarchyTraversalMode.BOTTOM_UP);
 
                 TestDescriptor testDescriptor = new ParameterizedClassTestDescriptor(this);
 

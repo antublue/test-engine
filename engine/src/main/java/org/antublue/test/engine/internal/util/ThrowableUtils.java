@@ -28,7 +28,7 @@ import org.antublue.test.engine.internal.configuration.Configuration;
 public class ThrowableUtils {
 
     private static final boolean STACK_TRACE_PRUNING =
-            Configuration.singleton().getBoolean(Constants.STACK_TRACE_PRUNE).orElse(true);
+            Configuration.getSingleton().getBoolean(Constants.STACK_TRACE_PRUNE).orElse(true);
 
     private static final Predicate<String> EXCLUDE =
             s -> s.startsWith("org.antublue.test.engine.internal.") || s.startsWith("java.base/");
