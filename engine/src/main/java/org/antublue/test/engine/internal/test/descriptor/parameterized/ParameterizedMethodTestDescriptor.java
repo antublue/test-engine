@@ -24,13 +24,13 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestArgumentFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
+import org.antublue.test.engine.internal.test.annotation.AutoCloseAnnotationProcessor;
+import org.antublue.test.engine.internal.test.annotation.LockAnnotationProcessor;
 import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
 import org.antublue.test.engine.internal.test.extension.ExtensionManager;
-import org.antublue.test.engine.internal.test.util.AutoCloseAnnotationProcessor;
-import org.antublue.test.engine.internal.test.util.LockAnnotationProcessor;
 import org.antublue.test.engine.internal.test.util.StateMachine;
 import org.antublue.test.engine.internal.test.util.TestUtils;
 import org.antublue.test.engine.internal.util.StandardStreams;
@@ -320,12 +320,11 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
     private State closeAutoCloseFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        AutoCloseAnnotationProcessor autoCloseAnnotationProcessor =
-                AutoCloseAnnotationProcessor.getSingleton();
-
-        for (Field field : autoCloseFields) {
-            autoCloseAnnotationProcessor.close(getTestInstance(), field, getThrowableContext());
-        }
+        AutoCloseAnnotationProcessor.getSingleton()
+                .conclude(
+                        getTestInstance(),
+                        AutoCloseAnnotationProcessor.Type.AFTER_EACH,
+                        getThrowableContext());
 
         return State.END;
     }
