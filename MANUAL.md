@@ -18,27 +18,31 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 - `@TestEngine.AfterEach`
 - `@TestEngine.AfterAll`
 
-`@TestEngine.Argument` injection example:
+`@TestEngine.Argument` field injection example:
 
 - [SimpleTest.java](/examples/src/test/java/example/SimpleTest.java)
 
-`@TestEngine` without method injection example:
+`@TestEngine.Argument` method injection example:
 
-- [NoArgumentDeclarationTest.java](/examples/src/test/java/example/NoArgumentDeclarationTest.java)
+- [SimpleTest2.java](/examples/src/test/java/example/SimpleTest2.java)
+
+`@TestEngine` test method argument example:
+
+- [SimpleTest3.java](/examples/src/test/java/example/SimpleTest3.java)
 
 ### Test Annotations
 
-| Annotation                     | Static | Type   | Required | Example                                                                                                                                                                            |
-|--------------------------------|--------|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `@TestEngine.ArgumentSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments();`</nobr> |
-| `@TestEngine.Argument`         | no     | field  | no       | `public Argument argument;`                                                                                                                                                        |
-| `@TestEngine.Prepare`          | no     | method | no       | `public void prepare();`                                                                                                                                                           |
-| `@TestEngine.BeforeAll`        | no     | method | no       | `public void beforeAll();`                                                                                                                                                         |
-| `@TestEngine.BeforeEach`       | no     | method | no       | `public void beforeEach();`                                                                                                                                                        |
-| `@TestEngine.Test`             | no     | method | yes      | `public void test();` or `public void test(Argument argument)`                                                                                                                     |
-| `@TestEngine.AfterEach`        | no     | method | no       | `public void afterEach();`                                                                                                                                                         |
-| `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                          |
-| `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                          |
+| Annotation                     | Static | Type            | Required | Example                                                                                                                                                                            |
+|--------------------------------|--------|-----------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.ArgumentSupplier` | yes    | method          | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments();`</nobr> |
+| `@TestEngine.Argument`         | no     | field or method | no       | Note: can be used on a field or method                                                                                                                                             |
+| `@TestEngine.Prepare`          | no     | method          | no       | `public void prepare();`                                                                                                                                                           |
+| `@TestEngine.BeforeAll`        | no     | method          | no       | `public void beforeAll();`                                                                                                                                                         |
+| `@TestEngine.BeforeEach`       | no     | method          | no       | `public void beforeEach();`                                                                                                                                                        |
+| `@TestEngine.Test`             | no     | method          | yes      | `public void test();` or `public void test(Argument argument)`                                                                                                                     |
+| `@TestEngine.AfterEach`        | no     | method          | no       | `public void afterEach();`                                                                                                                                                         |
+| `@TestEngine.AfterAll`         | no     | method          | no       | `public void afterAll();`                                                                                                                                                          |
+| `@TestEngine.Conclude`         | no     | method          | no       | `public void conclude();`                                                                                                                                                          |
 
 Reference the [Design](https://github.com/antublue/test-engine#design) for the test engine execution flow.
 

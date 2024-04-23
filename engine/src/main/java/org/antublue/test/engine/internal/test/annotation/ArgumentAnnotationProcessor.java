@@ -17,12 +17,14 @@
 package org.antublue.test.engine.internal.test.annotation;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
+import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
 import org.antublue.test.engine.internal.test.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -62,7 +64,7 @@ public class ArgumentAnnotationProcessor {
                 "prepare() class [%s] instance [%s], argument [%s]",
                 testInstance.getClass(), testInstance, testArgument.name());
 
-        process(testInstance, testArgument, throwableContext);
+        process(testInstance, testArgument, true, throwableContext);
     }
 
     /**
@@ -80,7 +82,7 @@ public class ArgumentAnnotationProcessor {
                 testInstance,
                 testArgument != null ? testArgument.name() : null);
 
-        process(testInstance, testArgument, throwableContext);
+        process(testInstance, testArgument, false, throwableContext);
     }
 
     /**
@@ -88,10 +90,14 @@ public class ArgumentAnnotationProcessor {
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
+     * @param invokeMethod invokeMethod
      * @param throwableContext throwableContext
      */
     private void process(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance,
+            Argument testArgument,
+            boolean invokeMethod,
+            ThrowableContext throwableContext) {
         try {
             List<Field> fields =
                     ReflectionSupport.findFields(
@@ -102,6 +108,19 @@ public class ArgumentAnnotationProcessor {
             for (Field field : fields) {
                 field.setAccessible(true);
                 field.set(testInstance, testArgument);
+            }
+
+            if (invokeMethod) {
+                List<Method> methods =
+                        ReflectionSupport.findMethods(
+                                testInstance.getClass(),
+                                AnnotationMethodFilter.of(TestEngine.Argument.class),
+                                HierarchyTraversalMode.TOP_DOWN);
+
+                for (Method method : methods) {
+                    method.setAccessible(true);
+                    method.invoke(testInstance, testArgument);
+                }
             }
         } catch (Throwable t) {
             throwableContext.add(testInstance.getClass(), t);
