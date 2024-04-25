@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -116,7 +116,7 @@ public class Configuration {
         }
 
         if (keySet == null) {
-            keySet = new HashSet<>();
+            keySet = new LinkedHashSet<>();
         }
     }
 

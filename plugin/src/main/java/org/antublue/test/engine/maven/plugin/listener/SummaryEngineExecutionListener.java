@@ -19,7 +19,10 @@ package org.antublue.test.engine.maven.plugin.listener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.test.descriptor.Metadata;
 import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
 import org.antublue.test.engine.internal.test.descriptor.MetadataSupport;
@@ -90,6 +93,19 @@ public class SummaryEngineExecutionListener
         println(INFO + SEPARATOR);
         println(INFO + BANNER);
         println(INFO + SEPARATOR);
+
+        Configuration configuration = Configuration.getSingleton();
+        Set<String> keySet = configuration.keySet();
+
+        if (keySet.size() > 0) {
+            for (String key : configuration.keySet()) {
+                Optional<String> optional = configuration.get(key);
+                String value = optional.orElse("");
+                println(INFO + "[" + key + "] = [" + value + "]");
+            }
+
+            println(INFO + SEPARATOR);
+        }
     }
 
     @Override
