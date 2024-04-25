@@ -27,8 +27,6 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class SimpleTest2 {
 
-    private StringArgument stringArgument;
-
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
@@ -38,50 +36,43 @@ public class SimpleTest2 {
         return collection.stream();
     }
 
-    @TestEngine.Argument
-    public void argument(StringArgument stringArgument) {
-        System.out.println("argument(" + stringArgument + ")");
-        this.stringArgument = stringArgument;
-        assertThat(stringArgument).isNotNull();
-    }
-
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll() {
+    public void beforeAll(StringArgument stringArgument) {
         System.out.println("beforeAll(" + stringArgument + ")");
         assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach() {
+    public void beforeEach(StringArgument stringArgument) {
         System.out.println("beforeEach(" + stringArgument + ")");
         assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.Test
-    public void test1() {
+    public void test1(StringArgument stringArgument) {
         System.out.println("test1(" + stringArgument + ")");
         assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.Test
-    public void test2() {
+    public void test2(StringArgument stringArgument) {
         System.out.println("test2(" + stringArgument + ")");
         assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.AfterEach
-    public void afterEach() {
+    public void afterEach(StringArgument stringArgument) {
         System.out.println("afterEach(" + stringArgument + ")");
         assertThat(stringArgument).isNotNull();
     }
 
     @TestEngine.AfterAll
-    public void afterAll() {
+    public void afterAll(StringArgument stringArgument) {
         System.out.println("afterAll(" + stringArgument + ")");
         assertThat(stringArgument).isNotNull();
     }

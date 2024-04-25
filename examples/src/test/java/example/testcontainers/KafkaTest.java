@@ -62,12 +62,13 @@ public class KafkaTest {
     @TestEngine.ArgumentSupplier
     public static Stream<KafkaTestContainer> arguments() {
         return Stream.of(
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.0.12"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.1.10"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.2.8"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.3.6"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.4.3"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.5.2"));
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.0.14"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.1.12"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.2.10"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.3.8"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.4.5"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.5.4"),
+                KafkaTestContainer.of("confluentinc/cp-kafka:7.6.1"));
     }
 
     @TestEngine.Prepare
@@ -196,7 +197,9 @@ public class KafkaTest {
             kafkaContainer = new KafkaContainer(DockerImageName.parse(dockerImageName));
             kafkaContainer.withNetwork(network);
 
-            if (dockerImageName.startsWith("confluentinc/cp-kafka:7.4")) {
+            if (dockerImageName.startsWith("confluentinc/cp-kafka:7.4")
+                    || dockerImageName.startsWith("confluentinc/cp-kafka:7.5")
+                    || dockerImageName.startsWith("confluentinc/cp-kafka:7.6")) {
                 kafkaContainer.withKraft();
             } else {
                 kafkaContainer.withEmbeddedZookeeper();
