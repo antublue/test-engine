@@ -93,7 +93,7 @@ public class KafkaTest {
     @TestEngine.Test
     @TestEngine.Order(order = 1)
     public void testProduce() throws Throwable {
-        info("testing produce ...");
+        info("testing testProduce() ...");
 
         message = randomString(16);
 
@@ -126,7 +126,7 @@ public class KafkaTest {
     @TestEngine.Test
     @TestEngine.Order(order = 2)
     public void testConsume() {
-        info("testing consume ...");
+        info("testing testConsume() ...");
 
         String bootstrapServers = kafkaTestContainer.getBootstrapServers();
 
@@ -162,8 +162,47 @@ public class KafkaTest {
         }
     }
 
-    /** Class to implement a KafkaTestContainer */
-    private static class KafkaTestContainer implements Argument, Closeable {
+    @TestEngine.Test
+    @TestEngine.Order(order = 3)
+    public void testConsume2() {
+        info("testing testConsume2() ...");
+
+        String bootstrapServers = kafkaTestContainer.getBootstrapServers();
+
+        info("consuming message from [%s] ...", bootstrapServers);
+
+        Properties properties = new Properties();
+        properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        properties.setProperty(
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.setProperty(
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
+        properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, EARLIEST);
+
+        KafkaConsumer<String, String> consumer = null;
+
+        try {
+            List<String> topicList = Collections.singletonList(TOPIC);
+
+            consumer = new KafkaConsumer<>(properties);
+            consumer.subscribe(topicList);
+
+            ConsumerRecords<String, String> consumerRecords =
+                    consumer.poll(Duration.ofMillis(1000));
+            for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
+                info("consumed message [%s] from [%s]", consumerRecord.value(), bootstrapServers);
+                assertThat(consumerRecord.value()).isEqualTo(message);
+            }
+        } finally {
+            if (consumer != null) {
+                consumer.close();
+            }
+        }
+    }
+
+    /** Class to implement a TestContext */
+    public static class KafkaTestContainer implements Argument, Closeable {
 
         private final String dockerImageName;
         private KafkaContainer kafkaContainer;
@@ -256,10 +295,21 @@ public class KafkaTest {
                 .toString();
     }
 
+    /**
+     * Method to print an info print
+     *
+     * @param object object
+     */
     private static void info(Object object) {
         System.out.println(object);
     }
 
+    /**
+     * Metod to print an info print
+     *
+     * @param format format
+     * @param objects objects
+     */
     private static void info(String format, Object... objects) {
         info(String.format(format, objects));
     }
