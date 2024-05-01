@@ -164,7 +164,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        getStopWatch().elapsedNanoTime());
+                        getStopWatch().elapsedNanoseconds());
 
         if (getThrowableContext().isEmpty()) {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);

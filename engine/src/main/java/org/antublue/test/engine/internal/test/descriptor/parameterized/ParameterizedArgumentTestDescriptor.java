@@ -125,7 +125,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
             getMetadata()
                     .put(
                             MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                            getStopWatch().elapsedNanoTime());
+                            getStopWatch().elapsedNanoseconds());
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
             executionRequest.getEngineExecutionListener().executionSkipped(this, "");
             return;
@@ -191,7 +191,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         getMetadata()
                 .put(
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        getStopWatch().elapsedNanoTime());
+                        getStopWatch().elapsedNanoseconds());
 
         if (getThrowableContext().isEmpty()) {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);

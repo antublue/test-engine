@@ -20,31 +20,21 @@ package org.antublue.test.engine.internal.util;
 public class StopWatch {
 
     private long startNanoTime;
-    private long stopNanoTime;
+    private Long stopNanoTime;
 
     /** Constructor */
     public StopWatch() {
-        this(false);
+        start();
     }
 
     /**
-     * Constructor
-     *
-     * @param autoStart autoStart
-     */
-    public StopWatch(boolean autoStart) {
-        if (autoStart) {
-            start();
-        }
-    }
-
-    /**
-     * Method to start the stop watch
+     * Method to start (reset) the stop watch
      *
      * @return this
      */
     public StopWatch start() {
         startNanoTime = System.nanoTime();
+        stopNanoTime = null;
         return this;
     }
 
@@ -63,7 +53,20 @@ public class StopWatch {
      *
      * @return the elapsed time in nanoseconds
      */
-    public long elapsedNanoTime() {
-        return stopNanoTime - startNanoTime;
+    public long elapsedNanoseconds() {
+        if (stopNanoTime == null) {
+            return System.nanoTime() - startNanoTime;
+        } else {
+            return stopNanoTime - startNanoTime;
+        }
+    }
+
+    /**
+     * Method to get the elapsed time in milliseconds
+     *
+     * @return the elapsed time in milliseconds
+     */
+    public long elapsedMilliseconds() {
+        return elapsedNanoseconds() / 1000000;
     }
 }
