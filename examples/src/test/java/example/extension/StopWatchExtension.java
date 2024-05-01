@@ -39,7 +39,7 @@ public class StopWatchExtension implements Extension {
      *
      * @return the singleton instance
      */
-    public static StopWatchExtension getSingleton() {
+    public static StopWatchExtension getInstance() {
         return SINGLETON;
     }
 

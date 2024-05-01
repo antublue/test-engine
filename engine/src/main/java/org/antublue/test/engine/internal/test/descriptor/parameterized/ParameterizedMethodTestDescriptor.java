@@ -45,7 +45,7 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 /** Class to implement a ParameterMethodTestDescriptor */
 public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor {
 
-    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
+    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
     private final Class<?> testClass;
     private final Argument testArgument;
@@ -316,7 +316,7 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
     private State closeAutoCloseFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        AutoCloseAnnotationProcessor.getSingleton()
+        AutoCloseAnnotationProcessor.getInstance()
                 .conclude(
                         getTestInstance(),
                         AutoCloseAnnotationProcessor.Type.AFTER_EACH,

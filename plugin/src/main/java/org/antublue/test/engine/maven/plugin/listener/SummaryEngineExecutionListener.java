@@ -94,7 +94,7 @@ public class SummaryEngineExecutionListener
         println(INFO + BANNER);
         println(INFO + SEPARATOR);
 
-        Configuration configuration = Configuration.getSingleton();
+        Configuration configuration = Configuration.getInstance();
         Set<String> keySet = configuration.keySet();
 
         if (keySet.size() > 0) {

@@ -47,7 +47,7 @@ public class Logger {
         this.name = name;
         this.level = Level.INFO;
 
-        Configuration configuration = Configuration.getSingleton();
+        Configuration configuration = Configuration.getInstance();
 
         String loggerLevel =
                 configuration.get(Constants.LOGGER_LEVEL).orElse(Level.INFO.toString());

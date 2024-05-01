@@ -53,7 +53,7 @@ public class AutoCloseAnnotationProcessor {
      *
      * @return the singleton
      */
-    public static AutoCloseAnnotationProcessor getSingleton() {
+    public static AutoCloseAnnotationProcessor getInstance() {
         return SINGLETON;
     }
 
