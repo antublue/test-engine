@@ -49,6 +49,8 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 @SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
 public class ParameterizedTestFactory {
 
+    private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
+
     public void discover(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         Set<Class<?>> classes = new LinkedHashSet<>();
@@ -294,15 +296,15 @@ public class ParameterizedTestFactory {
                 List<Argument> arguments = classArgumentMap.get(clazz);
 
                 ThrowableContext throwableContext = new ThrowableContext();
-                ExtensionManager.getInstance()
-                        .postTestArgumentDiscoveryCallback(clazz, arguments, throwableContext);
+                EXTENSION_MANAGER.postTestArgumentDiscoveryCallback(
+                        clazz, arguments, throwableContext);
                 throwableContext.throwFirst();
 
                 List<Method> testMethods = classMethodMap.get(clazz);
 
                 throwableContext.clear();
-                ExtensionManager.getInstance()
-                        .postTestMethodDiscoveryCallback(clazz, testMethods, throwableContext);
+                EXTENSION_MANAGER.postTestMethodDiscoveryCallback(
+                        clazz, testMethods, throwableContext);
                 throwableContext.throwFirst();
 
                 new ParameterizedClassTestDescriptor.Builder()

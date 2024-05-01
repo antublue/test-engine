@@ -23,11 +23,22 @@ import java.math.RoundingMode;
 import java.util.concurrent.ThreadLocalRandom;
 
 /** Class to implement RandomUtils */
-public class RandomUtils {
+public class RandomGenerator {
+
+    private static final RandomGenerator INSTANCE = new RandomGenerator();
 
     /** Constructor */
-    private RandomUtils() {
+    private RandomGenerator() {
         // DO NOTHING
+    }
+
+    /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static RandomGenerator getInstance() {
+        return INSTANCE;
     }
 
     /**
@@ -35,7 +46,7 @@ public class RandomUtils {
      *
      * @return a random boolean
      */
-    public static boolean nextBoolean() {
+    public boolean nextBoolean() {
         return ThreadLocalRandom.current().nextBoolean();
     }
 
@@ -46,7 +57,7 @@ public class RandomUtils {
      * @param maximum maximum
      * @return a random integer
      */
-    public static int nextInteger(int minimum, int maximum) {
+    public int nextInteger(int minimum, int maximum) {
         if (minimum == maximum) {
             return minimum;
         }
@@ -69,7 +80,7 @@ public class RandomUtils {
      * @param maximum maximum
      * @return a random long
      */
-    public static long nextLong(long minimum, long maximum) {
+    public long nextLong(long minimum, long maximum) {
         if (minimum == maximum) {
             return minimum;
         }
@@ -92,7 +103,7 @@ public class RandomUtils {
      * @param maximum maximum
      * @return a random float
      */
-    public static float nextFloat(float minimum, float maximum) {
+    public float nextFloat(float minimum, float maximum) {
         if (minimum == maximum) {
             return minimum;
         }
@@ -108,7 +119,7 @@ public class RandomUtils {
      * @param maximum maximum
      * @return a random double
      */
-    public static double nextDouble(double minimum, double maximum) {
+    public double nextDouble(double minimum, double maximum) {
         if (minimum == maximum) {
             return minimum;
         }
@@ -124,7 +135,7 @@ public class RandomUtils {
      * @param maximum maximum
      * @return a random BigInteger
      */
-    public static BigInteger nextBigInteger(String minimum, String maximum) {
+    public BigInteger nextBigInteger(String minimum, String maximum) {
         if (minimum.contains(".")) {
             throw new NumberFormatException(
                     String.format("BigInteger minimum [%s] is invalid ", minimum));
@@ -192,7 +203,7 @@ public class RandomUtils {
      * @param maximum maximum
      * @return a random BigDecimal
      */
-    public static BigDecimal nextBigDecimal(String minimum, String maximum) {
+    public BigDecimal nextBigDecimal(String minimum, String maximum) {
         BigDecimal minimumBigDecimal;
         BigDecimal maximummBigDecimal;
 
@@ -220,7 +231,7 @@ public class RandomUtils {
      * @param maximum maximum
      * @return a random BigDecimal
      */
-    private static BigDecimal nextBigDecimal(BigDecimal minimum, BigDecimal maximum) {
+    private BigDecimal nextBigDecimal(BigDecimal minimum, BigDecimal maximum) {
         if (minimum.equals(maximum)) {
             return minimum;
         }

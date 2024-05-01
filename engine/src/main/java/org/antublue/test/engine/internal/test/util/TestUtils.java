@@ -31,7 +31,7 @@ import org.junit.platform.commons.util.ClassUtils;
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class TestUtils {
 
-    private static final TestUtils SINGLETON = new TestUtils();
+    private static final TestUtils INSTANCE = new TestUtils();
 
     private static final DefaultMethodOrderTopDownComparator
             DEFAULT_METHOD_ORDER_TOP_DOWN_COMPARATOR = new DefaultMethodOrderTopDownComparator();
@@ -50,7 +50,7 @@ public class TestUtils {
     }
 
     public static TestUtils getInstance() {
-        return SINGLETON;
+        return INSTANCE;
     }
 
     public static void invoke(

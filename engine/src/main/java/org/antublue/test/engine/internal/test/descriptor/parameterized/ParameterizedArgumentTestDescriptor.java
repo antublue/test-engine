@@ -49,7 +49,19 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescriptor {
 
-    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
+    private static final ArgumentAnnotationProcessor ARGUMENT_ANNOTATION_PROCESSOR =
+            ArgumentAnnotationProcessor.getInstance();
+
+    private static final RandomAnnotationProcessor RANDOM_ANNOTATION_PROCESSOR =
+            RandomAnnotationProcessor.getInstance();
+
+    private static final LockAnnotationProcessor LOCK_ANNOTATION_PROCESSOR =
+            LockAnnotationProcessor.getInstance();
+
+    private static final AutoCloseAnnotationProcessor AUTO_CLOSE_ANNOTATION_PROCESSOR =
+            AutoCloseAnnotationProcessor.getInstance();
+
+    private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
     private final Class<?> testClass;
     private final Argument testArgument;
@@ -226,8 +238,8 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State setArgumentFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        ArgumentAnnotationProcessor.getInstance()
-                .prepare(getTestInstance(), testArgument, getThrowableContext());
+        ARGUMENT_ANNOTATION_PROCESSOR.prepare(
+                getTestInstance(), testArgument, getThrowableContext());
 
         if (!getThrowableContext().isEmpty()) {
             return State.EXECUTE_OR_SKIP;
@@ -239,7 +251,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State setRandomFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        RandomAnnotationProcessor.getInstance().prepare(getTestInstance(), getThrowableContext());
+        RANDOM_ANNOTATION_PROCESSOR.prepare(getTestInstance(), getThrowableContext());
 
         if (!getThrowableContext().isEmpty()) {
             return State.EXECUTE_OR_SKIP;
@@ -264,9 +276,9 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
 
         try {
             for (Method method : beforeAllMethods) {
-                LockAnnotationProcessor.processLocks(method);
+                LOCK_ANNOTATION_PROCESSOR.processLocks(method);
                 TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-                LockAnnotationProcessor.processUnlocks(method);
+                LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
                 }
@@ -320,9 +332,9 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         for (Method method : afterAllMethods) {
-            LockAnnotationProcessor.processLocks(method);
+            LOCK_ANNOTATION_PROCESSOR.processLocks(method);
             TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-            LockAnnotationProcessor.processUnlocks(method);
+            LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
         }
 
         return State.POST_AFTER_ALL;
@@ -340,11 +352,10 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State closeAutoCloseFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        AutoCloseAnnotationProcessor.getInstance()
-                .conclude(
-                        getTestInstance(),
-                        AutoCloseAnnotationProcessor.Type.AFTER_ALL,
-                        getThrowableContext());
+        AUTO_CLOSE_ANNOTATION_PROCESSOR.conclude(
+                getTestInstance(),
+                AutoCloseAnnotationProcessor.Type.AFTER_ALL,
+                getThrowableContext());
 
         return State.CLEAR_ARGUMENTS_FIELDS;
     }
@@ -352,8 +363,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State clearArgumentFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        ArgumentAnnotationProcessor.getInstance()
-                .conclude(getTestInstance(), null, getThrowableContext());
+        ARGUMENT_ANNOTATION_PROCESSOR.conclude(getTestInstance(), null, getThrowableContext());
 
         return State.END;
     }

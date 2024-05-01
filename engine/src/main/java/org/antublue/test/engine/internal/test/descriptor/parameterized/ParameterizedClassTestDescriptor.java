@@ -46,7 +46,13 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 /** Class to implement a ParameterClassTestDescriptor */
 public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
-    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
+    private static final AutoCloseAnnotationProcessor AUTO_CLOSE_ANNOTATION_PROCESSOR =
+            AutoCloseAnnotationProcessor.getInstance();
+
+    private static final LockAnnotationProcessor LOCK_ANNOTATION_PROCESSOR =
+            LockAnnotationProcessor.getInstance();
+
+    private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
     private final Class<?> testClass;
     private final List<Method> prepareMethods;
@@ -189,7 +195,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private State preInstantiate() {
-        LockAnnotationProcessor.processLock(getTestClass());
+        LOCK_ANNOTATION_PROCESSOR.processLock(getTestClass());
 
         EXTENSION_MANAGER.preInstantiateCallback(testClass, getThrowableContext());
 
@@ -239,9 +245,9 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
 
         try {
             for (Method method : prepareMethods) {
-                LockAnnotationProcessor.processLocks(method);
+                LOCK_ANNOTATION_PROCESSOR.processLocks(method);
                 TestUtils.invoke(method, getTestInstance(), null, getThrowableContext());
-                LockAnnotationProcessor.processUnlocks(method);
+                LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
                 }
@@ -290,9 +296,9 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         for (Method method : concludeMethods) {
-            LockAnnotationProcessor.processLocks(method);
+            LOCK_ANNOTATION_PROCESSOR.processLocks(method);
             TestUtils.invoke(method, getTestInstance(), null, getThrowableContext());
-            LockAnnotationProcessor.processUnlocks(method);
+            LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
         }
 
         return State.POST_CONCLUDE;
@@ -309,11 +315,10 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
     private State closeAutoCloseFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        AutoCloseAnnotationProcessor.getInstance()
-                .conclude(
-                        getTestInstance(),
-                        AutoCloseAnnotationProcessor.Type.AFTER_CONCLUDE,
-                        getThrowableContext());
+        AUTO_CLOSE_ANNOTATION_PROCESSOR.conclude(
+                getTestInstance(),
+                AutoCloseAnnotationProcessor.Type.AFTER_CONCLUDE,
+                getThrowableContext());
 
         return State.END;
     }
@@ -322,7 +327,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         EXTENSION_MANAGER.preDestroyCallback(
                 testClass, Optional.ofNullable(getTestInstance()), new ThrowableContext());
 
-        LockAnnotationProcessor.processUnlocks(getTestClass());
+        LOCK_ANNOTATION_PROCESSOR.processUnlocks(getTestClass());
 
         return null;
     }

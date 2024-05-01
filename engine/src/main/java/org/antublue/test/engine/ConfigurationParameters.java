@@ -25,7 +25,7 @@ import org.antublue.test.engine.internal.configuration.Configuration;
 @SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
-    private static ConfigurationParameters SINGLETON = new ConfigurationParameters();
+    private static final ConfigurationParameters INSTANCE = new ConfigurationParameters();
 
     private static final Configuration CONFIGURATION = Configuration.getInstance();
 
@@ -34,7 +34,7 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
     }
 
     public static ConfigurationParameters getInstance() {
-        return SINGLETON;
+        return INSTANCE;
     }
 
     @Override

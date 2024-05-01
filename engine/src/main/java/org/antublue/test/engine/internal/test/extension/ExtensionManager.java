@@ -44,7 +44,7 @@ import org.junit.platform.commons.support.ReflectionSupport;
 @SuppressWarnings({"unchecked", "PMD.UnusedPrivateMethod"})
 public class ExtensionManager {
 
-    private static final ExtensionManager SINGLETON = new ExtensionManager();
+    private static final ExtensionManager INSTANCE = new ExtensionManager();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionManager.class);
 
@@ -85,7 +85,7 @@ public class ExtensionManager {
      * @return the singleton extension manager
      */
     public static ExtensionManager getInstance() {
-        return SINGLETON;
+        return INSTANCE;
     }
 
     /**

@@ -32,6 +32,8 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         implements MetadataSupport {
 
+    private static final Configuration CONFIGURATION = Configuration.getInstance();
+
     private final ThrowableContext throwableContext;
     private final Metadata metadata;
     private final StopWatch stopWatch;
@@ -46,7 +48,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         throwableContext = new ThrowableContext();
         metadata = new Metadata();
 
-        Configuration.getInstance()
+        CONFIGURATION
                 .get(Constants.THREAD_THROTTLE_MILLISECONDS)
                 .ifPresent(
                         s -> {

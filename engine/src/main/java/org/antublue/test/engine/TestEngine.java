@@ -47,6 +47,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
+    private static final Configuration CONFIGURATION = Configuration.getInstance();
+
     /** Configuration constant */
     public static final String ENGINE_ID = "antublue-test-engine";
 
@@ -152,9 +154,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestClassesByClassName(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestClassesByClassName()");
 
-        Configuration configuration = Configuration.getInstance();
-
-        Optional<String> optional = configuration.get(Constants.TEST_CLASS_INCLUDE_REGEX);
+        Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_INCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -174,7 +174,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             }
         }
 
-        optional = configuration.get(Constants.TEST_CLASS_EXCLUDE_REGEX);
+        optional = CONFIGURATION.get(Constants.TEST_CLASS_EXCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -203,9 +203,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestClassesByTag(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestClassesByTag()");
 
-        Configuration configuration = Configuration.getInstance();
-
-        Optional<String> optional = configuration.get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
+        Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -230,7 +228,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             }
         }
 
-        optional = configuration.get(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX);
+        optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -262,9 +260,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestMethodsByMethodName(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestMethodsByMethodName()");
 
-        Configuration configuration = Configuration.getInstance();
-
-        Optional<String> optional = configuration.get(Constants.TEST_METHOD_INCLUDE_REGEX);
+        Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_INCLUDE_REGEX);
         if (optional.isPresent()) {
             LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_INCLUDE_REGEX, optional.get());
             Pattern pattern = Pattern.compile(optional.get());
@@ -285,7 +281,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             }
         }
 
-        optional = configuration.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
+        optional = CONFIGURATION.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
         if (optional.isPresent()) {
             LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_EXCLUDE_REGEX, optional.get());
             Pattern pattern = Pattern.compile(optional.get());
@@ -315,9 +311,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestMethodsByTag(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestMethodsByTag()");
 
-        Configuration configuration = Configuration.getInstance();
-
-        Optional<String> optional = configuration.get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
+        Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
             LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_TAG_INCLUDE_REGEX, optional.get());
             Pattern pattern = Pattern.compile(optional.get());
@@ -343,7 +337,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             }
         }
 
-        optional = configuration.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
+        optional = CONFIGURATION.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
         if (optional.isPresent()) {
             LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_EXCLUDE_REGEX, optional.get());
             Pattern pattern = Pattern.compile(optional.get());

@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.antublue.test.engine.api.TestEngine;
 
-public class RandomUtilsBigDecimalTest extends RandomUtilsTest {
+public class RandomGeneratorBigDecimalTest extends RandomGeneratorTest {
 
     @TestEngine.Test
     public void testBigDecimals() {

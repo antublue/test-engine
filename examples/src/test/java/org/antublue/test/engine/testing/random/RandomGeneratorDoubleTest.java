@@ -18,7 +18,7 @@ package org.antublue.test.engine.testing.random;
 
 import org.antublue.test.engine.api.TestEngine;
 
-public class RandomUtilsDoubleTest extends RandomUtilsTest {
+public class RandomGeneratorDoubleTest extends RandomGeneratorTest {
 
     @TestEngine.Test
     public void testDoubles() {

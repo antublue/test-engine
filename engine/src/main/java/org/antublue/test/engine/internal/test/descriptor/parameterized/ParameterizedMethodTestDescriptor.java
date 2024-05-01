@@ -45,7 +45,13 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 /** Class to implement a ParameterMethodTestDescriptor */
 public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor {
 
-    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
+    private static final AutoCloseAnnotationProcessor AUTO_CLOSE_ANNOTATION_PROCESSOR =
+            AutoCloseAnnotationProcessor.getInstance();
+
+    private static final LockAnnotationProcessor LOCK_ANNOTATION_PROCESSOR =
+            LockAnnotationProcessor.getInstance();
+
+    private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
     private final Class<?> testClass;
     private final Argument testArgument;
@@ -220,9 +226,9 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
 
         try {
             for (Method method : beforeEachMethods) {
-                LockAnnotationProcessor.processLocks(method);
+                LOCK_ANNOTATION_PROCESSOR.processLocks(method);
                 TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-                LockAnnotationProcessor.processUnlocks(method);
+                LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
                 }
@@ -263,9 +269,9 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
     private State test() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        LockAnnotationProcessor.processLocks(testMethod);
+        LOCK_ANNOTATION_PROCESSOR.processLocks(testMethod);
         TestUtils.invoke(testMethod, getTestInstance(), testArgument, getThrowableContext());
-        LockAnnotationProcessor.processUnlocks(testMethod);
+        LOCK_ANNOTATION_PROCESSOR.processUnlocks(testMethod);
 
         return State.POST_TEST;
     }
@@ -296,9 +302,9 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         for (Method method : afterEachMethods) {
-            LockAnnotationProcessor.processLocks(method);
+            LOCK_ANNOTATION_PROCESSOR.processLocks(method);
             TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-            LockAnnotationProcessor.processUnlocks(method);
+            LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
         }
 
         return State.POST_AFTER_EACH;
@@ -316,11 +322,10 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
     private State closeAutoCloseFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        AutoCloseAnnotationProcessor.getInstance()
-                .conclude(
-                        getTestInstance(),
-                        AutoCloseAnnotationProcessor.Type.AFTER_EACH,
-                        getThrowableContext());
+        AUTO_CLOSE_ANNOTATION_PROCESSOR.conclude(
+                getTestInstance(),
+                AutoCloseAnnotationProcessor.Type.AFTER_EACH,
+                getThrowableContext());
 
         return State.END;
     }
@@ -342,7 +347,7 @@ public class ParameterizedMethodTestDescriptor extends ExecutableTestDescriptor 
         private List<Method> afterEachMethods;
 
         /**
-         * Method to set the test claass
+         * Method to set the test class
          *
          * @param testClass testClass
          * @return this

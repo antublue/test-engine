@@ -35,13 +35,29 @@ public class LockAnnotationProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LockAnnotationProcessor.class);
 
-    private static final Map<String, ReentrantReadWriteLock> LOCK_MAP = new ConcurrentHashMap<>();
+    private static final LockAnnotationProcessor INSTANCE = new LockAnnotationProcessor();
+
+    private final Map<String, ReentrantReadWriteLock> LOCK_MAP = new ConcurrentHashMap<>();
 
     private LockAnnotationProcessor() {
         // DO NOTHING
     }
 
-    public static void processLock(Class<?> clazz) {
+    /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static LockAnnotationProcessor getInstance() {
+        return INSTANCE;
+    }
+
+    /**
+     * Method to process locking/unlocking on a Class, if annotated
+     *
+     * @param clazz clazz
+     */
+    public void processLock(Class<?> clazz) {
         TestEngine.ResourceLock annotation = clazz.getAnnotation(TestEngine.ResourceLock.class);
         if (annotation != null) {
             String name = annotation.name();
@@ -66,7 +82,7 @@ public class LockAnnotationProcessor {
      *
      * @param method method
      */
-    public static void processLocks(Method method) {
+    public void processLocks(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Lock.class)
                 && !method.isAnnotationPresent(TestEngine.Lock.List.class)
                 && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
@@ -106,7 +122,7 @@ public class LockAnnotationProcessor {
      * @param name name
      * @param mode mode
      */
-    private static void lock(Method method, String name, TestEngine.LockMode mode) {
+    private void lock(Method method, String name, TestEngine.LockMode mode) {
         if (name != null && !name.trim().isEmpty()) {
             String trimmedName = name.trim();
 
@@ -126,7 +142,7 @@ public class LockAnnotationProcessor {
         }
     }
 
-    public static void processUnlocks(Class<?> clazz) {
+    public void processUnlocks(Class<?> clazz) {
         TestEngine.ResourceLock annotation = clazz.getAnnotation(TestEngine.ResourceLock.class);
         if (annotation != null) {
             String name = annotation.name();
@@ -165,7 +181,7 @@ public class LockAnnotationProcessor {
      *
      * @param method method
      */
-    public static void processUnlocks(Method method) {
+    public void processUnlocks(Method method) {
         if (!method.isAnnotationPresent(TestEngine.Unlock.class)
                 && !method.isAnnotationPresent(TestEngine.Unlock.List.class)
                 && !method.isAnnotationPresent(TestEngine.ResourceLock.class)
@@ -206,7 +222,7 @@ public class LockAnnotationProcessor {
      * @param name name
      * @param mode mode
      */
-    private static void unlock(Method method, String name, TestEngine.LockMode mode) {
+    private void unlock(Method method, String name, TestEngine.LockMode mode) {
         if (name != null && !name.trim().isEmpty()) {
             ReentrantReadWriteLock reentrantReadWriteLock = LOCK_MAP.get(name);
             if (reentrantReadWriteLock != null) {
@@ -244,9 +260,8 @@ public class LockAnnotationProcessor {
      * @param fair fair
      * @return a ReentrantReadWriteLock
      */
-    private static ReentrantReadWriteLock createLock(String name, boolean fair) {
+    private ReentrantReadWriteLock createLock(String name, boolean fair) {
         LOGGER.trace("createLock name [%s] fair [%b]", name, fair);
-
         return new ReentrantReadWriteLock(fair);
     }
 }
