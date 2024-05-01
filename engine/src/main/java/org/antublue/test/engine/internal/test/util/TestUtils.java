@@ -49,7 +49,7 @@ public class TestUtils {
         // DO NOTHING
     }
 
-    public static TestUtils getSingleton() {
+    public static TestUtils getInstance() {
         return SINGLETON;
     }
 

@@ -32,7 +32,7 @@ public class MultipleMethodsLockingTest2 {
     public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
-        Store.getSingleton().putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
+        Store.getInstance().putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
     @TestEngine.Argument public IntegerArgument integerArgument;
@@ -63,7 +63,7 @@ public class MultipleMethodsLockingTest2 {
         System.out.println("test1()");
 
         AtomicInteger atomicInteger =
-                Store.getSingleton().get(COUNTER_NAME, AtomicInteger.class).get();
+                Store.getInstance().get(COUNTER_NAME, AtomicInteger.class).get();
 
         int count = atomicInteger.incrementAndGet();
         if (count != 1) {
@@ -81,7 +81,7 @@ public class MultipleMethodsLockingTest2 {
         System.out.println("test2()");
 
         AtomicInteger atomicInteger =
-                Store.getSingleton().get(COUNTER_NAME, AtomicInteger.class).get();
+                Store.getInstance().get(COUNTER_NAME, AtomicInteger.class).get();
         int count = atomicInteger.incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");

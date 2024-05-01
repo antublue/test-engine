@@ -120,7 +120,7 @@ public class Configuration {
         }
     }
 
-    public static Configuration getSingleton() {
+    public static Configuration getInstance() {
         return SINGLETON;
     }
 

@@ -43,7 +43,7 @@ public class RandomAnnotationProcessor {
         // DO NOTHING
     }
 
-    public static RandomAnnotationProcessor getSingleton() {
+    public static RandomAnnotationProcessor getInstance() {
         return SINGLETON;
     }
 

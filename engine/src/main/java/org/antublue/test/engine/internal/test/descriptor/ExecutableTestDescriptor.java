@@ -46,7 +46,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         throwableContext = new ThrowableContext();
         metadata = new Metadata();
 
-        Configuration.getSingleton()
+        Configuration.getInstance()
                 .get(Constants.THREAD_THROTTLE_MILLISECONDS)
                 .ifPresent(
                         s -> {

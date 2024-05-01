@@ -49,7 +49,7 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescriptor {
 
-    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getSingleton();
+    protected static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
     private final Class<?> testClass;
     private final Argument testArgument;
@@ -226,7 +226,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State setArgumentFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        ArgumentAnnotationProcessor.getSingleton()
+        ArgumentAnnotationProcessor.getInstance()
                 .prepare(getTestInstance(), testArgument, getThrowableContext());
 
         if (!getThrowableContext().isEmpty()) {
@@ -239,7 +239,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State setRandomFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        RandomAnnotationProcessor.getSingleton().prepare(getTestInstance(), getThrowableContext());
+        RandomAnnotationProcessor.getInstance().prepare(getTestInstance(), getThrowableContext());
 
         if (!getThrowableContext().isEmpty()) {
             return State.EXECUTE_OR_SKIP;
@@ -340,7 +340,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State closeAutoCloseFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        AutoCloseAnnotationProcessor.getSingleton()
+        AutoCloseAnnotationProcessor.getInstance()
                 .conclude(
                         getTestInstance(),
                         AutoCloseAnnotationProcessor.Type.AFTER_ALL,
@@ -352,7 +352,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
     private State clearArgumentFields() {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
-        ArgumentAnnotationProcessor.getSingleton()
+        ArgumentAnnotationProcessor.getInstance()
                 .conclude(getTestInstance(), null, getThrowableContext());
 
         return State.END;

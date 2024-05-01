@@ -39,9 +39,9 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(StatusEngineExecutionListener.class);
 
-    private static final Configuration CONFIGURATION = Configuration.getSingleton();
+    private static final Configuration CONFIGURATION = Configuration.getInstance();
 
-    private static final TestUtils TEST_UTILS = TestUtils.getSingleton();
+    private static final TestUtils TEST_UTILS = TestUtils.getInstance();
 
     private static final String INFO =
             new AnsiColorStringBuilder()

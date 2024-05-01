@@ -45,7 +45,7 @@ public class ArgumentAnnotationProcessor {
      *
      * @return the singleton
      */
-    public static ArgumentAnnotationProcessor getSingleton() {
+    public static ArgumentAnnotationProcessor getInstance() {
         return SINGLETON;
     }
 

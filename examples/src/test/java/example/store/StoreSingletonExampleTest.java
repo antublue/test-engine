@@ -49,8 +49,8 @@ public class StoreSingletonExampleTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        Store.getSingleton().put(CLOSEABLE_KEY, new TestCloseable());
-        Store.getSingleton().put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
+        Store.getInstance().put(CLOSEABLE_KEY, new TestCloseable());
+        Store.getInstance().put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
     }
 
     @TestEngine.BeforeAll
@@ -86,10 +86,10 @@ public class StoreSingletonExampleTest {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        Store.getSingleton().removeAndClose(CLOSEABLE_KEY);
-        Store.getSingleton().removeAndClose(AUTO_CLOSEABLE_KEY);
-        assertThat(Store.getSingleton().get(CLOSEABLE_KEY)).isNotPresent();
-        assertThat(Store.getSingleton().get(AUTO_CLOSEABLE_KEY)).isNotPresent();
+        Store.getInstance().removeAndClose(CLOSEABLE_KEY);
+        Store.getInstance().removeAndClose(AUTO_CLOSEABLE_KEY);
+        assertThat(Store.getInstance().get(CLOSEABLE_KEY)).isNotPresent();
+        assertThat(Store.getInstance().get(AUTO_CLOSEABLE_KEY)).isNotPresent();
     }
 
     private static class TestAutoCloseable implements AutoCloseable {
