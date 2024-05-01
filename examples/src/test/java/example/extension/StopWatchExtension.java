@@ -59,7 +59,7 @@ public class StopWatchExtension implements Extension {
                             "test class [%s] elapsed time [%s] ms",
                             testInstance.getClass().getName(),
                             TimeUnit.MILLISECONDS.convert(
-                                    stopWatch.elapsedNanoTime(), TimeUnit.NANOSECONDS)));
+                                    stopWatch.elapsedNanoseconds(), TimeUnit.NANOSECONDS)));
             System.out.println(
                     "------------------------------------------------------------------------");
             System.out.flush();
