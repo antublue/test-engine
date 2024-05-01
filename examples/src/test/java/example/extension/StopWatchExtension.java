@@ -25,7 +25,7 @@ import org.antublue.test.engine.internal.util.StopWatch;
 /** Example Extension */
 public class StopWatchExtension implements Extension {
 
-    private static final StopWatchExtension SINGLETON = new StopWatchExtension();
+    private static final StopWatchExtension INSTANCE = new StopWatchExtension();
 
     private final Map<Class<?>, StopWatch> stopWatchMap;
 
@@ -40,7 +40,7 @@ public class StopWatchExtension implements Extension {
      * @return the singleton instance
      */
     public static StopWatchExtension getInstance() {
-        return SINGLETON;
+        return INSTANCE;
     }
 
     @Override

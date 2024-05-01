@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Configuration {
 
-    private static final Configuration SINGLETON = new Configuration();
+    private static final Configuration INSTANCE = new Configuration();
 
     /** Configuration constant */
     public static final String ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE =
@@ -120,8 +120,13 @@ public class Configuration {
         }
     }
 
+    /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
     public static Configuration getInstance() {
-        return SINGLETON;
+        return INSTANCE;
     }
 
     /**

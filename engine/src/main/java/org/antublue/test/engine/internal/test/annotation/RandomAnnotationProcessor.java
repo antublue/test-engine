@@ -26,7 +26,7 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
 import org.antublue.test.engine.internal.test.util.ThrowableContext;
-import org.antublue.test.engine.internal.util.RandomUtils;
+import org.antublue.test.engine.internal.util.RandomGenerator;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
@@ -34,9 +34,11 @@ import org.junit.platform.commons.support.ReflectionSupport;
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class RandomAnnotationProcessor {
 
-    private static final RandomAnnotationProcessor SINGLETON = new RandomAnnotationProcessor();
-
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomAnnotationProcessor.class);
+
+    private static final RandomAnnotationProcessor INSTANCE = new RandomAnnotationProcessor();
+
+    private static final RandomGenerator RANDOM_GENERATOR = RandomGenerator.getInstance();
 
     /** Constructor */
     private RandomAnnotationProcessor() {
@@ -44,7 +46,7 @@ public class RandomAnnotationProcessor {
     }
 
     public static RandomAnnotationProcessor getInstance() {
-        return SINGLETON;
+        return INSTANCE;
     }
 
     /**
@@ -79,7 +81,7 @@ public class RandomAnnotationProcessor {
 
         for (Field field : fields) {
             try {
-                boolean value = RandomUtils.nextBoolean();
+                boolean value = RANDOM_GENERATOR.nextBoolean();
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -111,7 +113,8 @@ public class RandomAnnotationProcessor {
                 TestEngine.Random.Integer annotation =
                         field.getAnnotation(TestEngine.Random.Integer.class);
 
-                int value = RandomUtils.nextInteger(annotation.minimum(), annotation.maximum());
+                int value =
+                        RANDOM_GENERATOR.nextInteger(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -143,7 +146,7 @@ public class RandomAnnotationProcessor {
                 TestEngine.Random.Long annotation =
                         field.getAnnotation(TestEngine.Random.Long.class);
 
-                long value = RandomUtils.nextLong(annotation.minimum(), annotation.maximum());
+                long value = RANDOM_GENERATOR.nextLong(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -175,7 +178,8 @@ public class RandomAnnotationProcessor {
                 TestEngine.Random.Float annotation =
                         field.getAnnotation(TestEngine.Random.Float.class);
 
-                float value = RandomUtils.nextFloat(annotation.minimum(), annotation.maximum());
+                float value =
+                        RANDOM_GENERATOR.nextFloat(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -207,7 +211,8 @@ public class RandomAnnotationProcessor {
                 TestEngine.Random.Double annotation =
                         field.getAnnotation(TestEngine.Random.Double.class);
 
-                double value = RandomUtils.nextDouble(annotation.minimum(), annotation.maximum());
+                double value =
+                        RANDOM_GENERATOR.nextDouble(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -240,7 +245,7 @@ public class RandomAnnotationProcessor {
                         field.getAnnotation(TestEngine.Random.BigInteger.class);
 
                 BigInteger value =
-                        RandomUtils.nextBigInteger(annotation.minimum(), annotation.maximum());
+                        RANDOM_GENERATOR.nextBigInteger(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -273,7 +278,7 @@ public class RandomAnnotationProcessor {
                         field.getAnnotation(TestEngine.Random.BigDecimal.class);
 
                 BigDecimal value =
-                        RandomUtils.nextBigDecimal(annotation.minimum(), annotation.maximum());
+                        RANDOM_GENERATOR.nextBigDecimal(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {

@@ -33,7 +33,7 @@ public class ArgumentAnnotationProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentAnnotationProcessor.class);
 
-    private static final ArgumentAnnotationProcessor SINGLETON = new ArgumentAnnotationProcessor();
+    private static final ArgumentAnnotationProcessor INSTANCE = new ArgumentAnnotationProcessor();
 
     /** Constructor */
     private ArgumentAnnotationProcessor() {
@@ -46,7 +46,7 @@ public class ArgumentAnnotationProcessor {
      * @return the singleton
      */
     public static ArgumentAnnotationProcessor getInstance() {
-        return SINGLETON;
+        return INSTANCE;
     }
 
     /**

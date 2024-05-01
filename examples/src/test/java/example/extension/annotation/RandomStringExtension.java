@@ -19,12 +19,14 @@ package example.extension.annotation;
 import java.lang.reflect.Field;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
-import org.antublue.test.engine.internal.util.RandomUtils;
+import org.antublue.test.engine.internal.util.RandomGenerator;
 
 /**
  * Example extension to process a field with a custom annotation after @TestEngine.BeforeAll methods
  */
 public class RandomStringExtension implements Extension {
+
+    private static final RandomGenerator RANDOM_GENERATOR = RandomGenerator.getInstance();
 
     private static char[] ALPHA_NUMERIC_CHARACTERS =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
@@ -65,7 +67,7 @@ public class RandomStringExtension implements Extension {
      */
     private static String randomAlphaNumericString(int minimumLength, int maximumLength) {
         StringBuilder stringBuilder = new StringBuilder();
-        int count = RandomUtils.nextInteger(minimumLength, maximumLength);
+        int count = RANDOM_GENERATOR.nextInteger(minimumLength, maximumLength);
         if (count == 0) {
             return "";
         } else if (count == -1) {
@@ -74,7 +76,8 @@ public class RandomStringExtension implements Extension {
             for (int i = 0; i < count; i++) {
                 stringBuilder.append(
                         ALPHA_NUMERIC_CHARACTERS[
-                                RandomUtils.nextInteger(0, ALPHA_NUMERIC_CHARACTERS.length - 1)]);
+                                RANDOM_GENERATOR.nextInteger(
+                                        0, ALPHA_NUMERIC_CHARACTERS.length - 1)]);
             }
             return stringBuilder.toString();
         }

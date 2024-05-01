@@ -32,6 +32,8 @@ import org.antublue.test.engine.internal.configuration.Configuration;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Logger {
 
+    private static final Configuration CONFIGURATION = Configuration.getInstance();
+
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd | HH:mm:ss.SSS", Locale.getDefault());
 
@@ -47,11 +49,9 @@ public class Logger {
         this.name = name;
         this.level = Level.INFO;
 
-        Configuration configuration = Configuration.getInstance();
-
         String loggerLevel =
-                configuration.get(Constants.LOGGER_LEVEL).orElse(Level.INFO.toString());
-        String regex = configuration.get(Constants.LOGGER_REGEX).orElse(".*");
+                CONFIGURATION.get(Constants.LOGGER_LEVEL).orElse(Level.INFO.toString());
+        String regex = CONFIGURATION.get(Constants.LOGGER_REGEX).orElse(".*");
 
         try {
             Pattern pattern = Pattern.compile(regex);
