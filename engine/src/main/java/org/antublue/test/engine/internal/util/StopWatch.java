@@ -67,6 +67,11 @@ public class StopWatch {
      * @return the elapsed time in milliseconds
      */
     public long elapsedMilliseconds() {
-        return elapsedNanoseconds() / 1000000;
+        long elapsedNanoseconds = elapsedNanoseconds();
+        if (elapsedNanoseconds <= 0) {
+            return 0;
+        } else {
+            return elapsedNanoseconds() / 1000000;
+        }
     }
 }
