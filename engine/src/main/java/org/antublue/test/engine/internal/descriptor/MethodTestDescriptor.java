@@ -131,28 +131,29 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
         try {
             stateMachine
-                    .state(State.BEGIN, this::begin, State.PRE_BEFORE_EACH)
-                    .state(
+                    .definition(State.BEGIN, this::begin, State.PRE_BEFORE_EACH)
+                    .definition(
                             State.PRE_BEFORE_EACH,
                             this::preBeforeEach,
                             State.BEFORE_EACH,
                             State.POST_BEFORE_EACH)
-                    .state(State.BEFORE_EACH, this::beforeEach, State.POST_BEFORE_EACH)
-                    .state(State.POST_BEFORE_EACH, this::postBeforeEach, State.PRE_TEST)
-                    .state(State.PRE_TEST, this::preTest, State.TEST, State.POST_TEST)
-                    .state(State.TEST, this::test, State.POST_TEST)
-                    .state(State.POST_TEST, this::postTest, State.PRE_AFTER_EACH)
-                    .state(
+                    .definition(State.BEFORE_EACH, this::beforeEach, State.POST_BEFORE_EACH)
+                    .definition(State.POST_BEFORE_EACH, this::postBeforeEach, State.PRE_TEST)
+                    .definition(State.PRE_TEST, this::preTest, State.TEST, State.POST_TEST)
+                    .definition(State.TEST, this::test, State.POST_TEST)
+                    .definition(State.POST_TEST, this::postTest, State.PRE_AFTER_EACH)
+                    .definition(
                             State.PRE_AFTER_EACH,
                             this::preAfterEach,
                             State.AFTER_EACH,
                             State.POST_AFTER_EACH)
-                    .state(State.AFTER_EACH, this::afterEach, State.POST_AFTER_EACH)
-                    .state(
+                    .definition(State.AFTER_EACH, this::afterEach, State.POST_AFTER_EACH)
+                    .definition(
                             State.POST_AFTER_EACH,
                             this::postAfterEach,
                             State.CLOSE_AUTO_CLOSE_FIELDS)
-                    .state(State.CLOSE_AUTO_CLOSE_FIELDS, this::closeAutoCloseFields, State.END)
+                    .definition(
+                            State.CLOSE_AUTO_CLOSE_FIELDS, this::closeAutoCloseFields, State.END)
                     .afterEach(
                             () -> {
                                 StandardStreams.flush();

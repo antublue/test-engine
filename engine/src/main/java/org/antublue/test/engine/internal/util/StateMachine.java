@@ -67,7 +67,7 @@ public class StateMachine<T> {
      * @param nextStates nextStates
      * @return this
      */
-    public StateMachine<T> state(T state, Action<T> action, T... nextStates)
+    public StateMachine<T> definition(T state, Action<T> action, T... nextStates)
             throws StateMachineException {
         if (actions.containsKey(state)) {
             throw new StateMachineException(

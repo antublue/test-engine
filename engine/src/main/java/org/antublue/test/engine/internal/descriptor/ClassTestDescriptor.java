@@ -116,30 +116,33 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         try {
             stateMachine
-                    .state(State.BEGIN, this::begin, State.PRE_INSTANTIATE)
-                    .state(
+                    .definition(State.BEGIN, this::begin, State.PRE_INSTANTIATE)
+                    .definition(
                             State.PRE_INSTANTIATE,
                             this::preInstantiate,
                             State.INSTANTIATE,
                             State.POST_INSTANTIATE)
-                    .state(State.INSTANTIATE, this::instantiate, State.POST_INSTANTIATE)
-                    .state(
+                    .definition(State.INSTANTIATE, this::instantiate, State.POST_INSTANTIATE)
+                    .definition(
                             State.POST_INSTANTIATE,
                             this::postInstantiate,
                             State.PRE_PREPARE,
                             State.EXECUTE_OR_SKIP)
-                    .state(State.PRE_PREPARE, this::prePrepare, State.PREPARE, State.POST_PREPARE)
-                    .state(State.PREPARE, this::prepare, State.POST_PREPARE)
-                    .state(State.POST_PREPARE, this::postPrepare, State.EXECUTE_OR_SKIP)
-                    .state(State.EXECUTE_OR_SKIP, this::executeOrSkip, State.PRE_CONCLUDE)
-                    .state(
+                    .definition(
+                            State.PRE_PREPARE, this::prePrepare, State.PREPARE, State.POST_PREPARE)
+                    .definition(State.PREPARE, this::prepare, State.POST_PREPARE)
+                    .definition(State.POST_PREPARE, this::postPrepare, State.EXECUTE_OR_SKIP)
+                    .definition(State.EXECUTE_OR_SKIP, this::executeOrSkip, State.PRE_CONCLUDE)
+                    .definition(
                             State.PRE_CONCLUDE,
                             this::preConclude,
                             State.CONCLUDE,
                             State.POST_CONCLUDE)
-                    .state(State.CONCLUDE, this::conclude, State.POST_CONCLUDE)
-                    .state(State.POST_CONCLUDE, this::postConclude, State.CLOSE_AUTO_CLOSE_FIELDS)
-                    .state(State.CLOSE_AUTO_CLOSE_FIELDS, this::closeAutoCloseFields, State.END)
+                    .definition(State.CONCLUDE, this::conclude, State.POST_CONCLUDE)
+                    .definition(
+                            State.POST_CONCLUDE, this::postConclude, State.CLOSE_AUTO_CLOSE_FIELDS)
+                    .definition(
+                            State.CLOSE_AUTO_CLOSE_FIELDS, this::closeAutoCloseFields, State.END)
                     .afterEach(
                             () -> {
                                 StandardStreams.flush();

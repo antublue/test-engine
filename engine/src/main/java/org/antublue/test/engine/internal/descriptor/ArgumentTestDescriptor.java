@@ -149,37 +149,38 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         try {
             stateMachine
-                    .state(State.BEGIN, this::begin, State.SET_ARGUMENT_FIELDS)
-                    .state(
+                    .definition(State.BEGIN, this::begin, State.SET_ARGUMENT_FIELDS)
+                    .definition(
                             State.SET_ARGUMENT_FIELDS,
                             this::setArgumentFields,
                             State.SET_RANDOM_FIELDS,
                             State.EXECUTE_OR_SKIP)
-                    .state(
+                    .definition(
                             State.SET_RANDOM_FIELDS,
                             this::setRandomFields,
                             State.PRE_BEFORE_ALL,
                             State.EXECUTE_OR_SKIP)
-                    .state(
+                    .definition(
                             State.PRE_BEFORE_ALL,
                             this::preBeforeAll,
                             State.BEFORE_ALL,
                             State.POST_BEFORE_ALL)
-                    .state(State.BEFORE_ALL, this::beforeAll, State.POST_BEFORE_ALL)
-                    .state(State.POST_BEFORE_ALL, this::postBeforeAll, State.EXECUTE_OR_SKIP)
-                    .state(State.EXECUTE_OR_SKIP, this::executeOrSkip, State.PRE_AFTER_ALL)
-                    .state(
+                    .definition(State.BEFORE_ALL, this::beforeAll, State.POST_BEFORE_ALL)
+                    .definition(State.POST_BEFORE_ALL, this::postBeforeAll, State.EXECUTE_OR_SKIP)
+                    .definition(State.EXECUTE_OR_SKIP, this::executeOrSkip, State.PRE_AFTER_ALL)
+                    .definition(
                             State.PRE_AFTER_ALL,
                             this::preAfterAll,
                             State.AFTER_ALL,
                             State.POST_AFTER_ALL)
-                    .state(State.AFTER_ALL, this::afterAll, State.POST_AFTER_ALL)
-                    .state(State.POST_AFTER_ALL, this::postAfterAll, State.CLOSE_AUTO_CLOSE_FIELDS)
-                    .state(
+                    .definition(State.AFTER_ALL, this::afterAll, State.POST_AFTER_ALL)
+                    .definition(
+                            State.POST_AFTER_ALL, this::postAfterAll, State.CLOSE_AUTO_CLOSE_FIELDS)
+                    .definition(
                             State.CLOSE_AUTO_CLOSE_FIELDS,
                             this::closeAutoCloseFields,
                             State.CLEAR_ARGUMENTS_FIELDS)
-                    .state(State.CLEAR_ARGUMENTS_FIELDS, this::clearArgumentFields, State.END)
+                    .definition(State.CLEAR_ARGUMENTS_FIELDS, this::clearArgumentFields, State.END)
                     .afterEach(
                             () -> {
                                 StandardStreams.flush();
