@@ -231,15 +231,16 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
                     if (summaryEngineExecutionListener.hasTests()) {
                         if (summaryEngineExecutionListener.hasFailures()) {
-                            summaryMessage = AnsiColor.TEXT_RED_BOLD.wrap("TEST FAILURE");
+                            summaryMessage = AnsiColor.TEXT_RED_BOLD.wrap("FAIL");
                         } else {
-                            summaryMessage = AnsiColor.TEXT_GREEN_BOLD.wrap("TEST SUCCESS");
+                            summaryMessage = AnsiColor.TEXT_GREEN_BOLD.wrap("PASS");
                         }
                     } else {
-                        summaryMessage = AnsiColor.TEXT_RED_BOLD.wrap("NO TESTS EXECUTED");
+                        summaryMessage = AnsiColor.TEXT_RED_BOLD.wrap("FAIL / NO TESTS EXECUTED");
                     }
                 } catch (Throwable t) {
-                    summaryMessage = AnsiColor.TEXT_RED_BOLD.wrap("EXCEPTION DURING EXECUTION");
+                    summaryMessage =
+                            AnsiColor.TEXT_RED_BOLD.wrap("FAIL / EXCEPTION DURING EXECUTION");
                     t.printStackTrace();
                     System.err.flush();
                 }
