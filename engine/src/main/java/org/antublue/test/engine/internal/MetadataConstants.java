@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.util;
+package org.antublue.test.engine.internal;
 
-/** Class to implement a StateMachineException */
-public class StateMachineException extends Exception {
+public class MetadataConstants {
 
-    /**
-     * Constructor
-     *
-     * @param message message
-     */
-    public StateMachineException(String message) {
-        super(message);
+    public static String PASS = "PASS";
+
+    public static String FAIL = "FAIL";
+
+    public static String SKIP = "SKIP";
+
+    public static final String TEST_CLASS = "testClass";
+
+    public static final String TEST_ARGUMENT = "testArgument";
+
+    public static final String TEST_METHOD = "testMethod";
+
+    public static final String TEST_DESCRIPTOR_STATUS = "testDescriptorStatus";
+
+    public static final String TEST_DESCRIPTOR_ELAPSED_TIME = "testDescriptorElapsedTime";
+
+    private MetadataConstants() {
+        // DO NOTHING
     }
 }

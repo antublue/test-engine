@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.descriptor;
+package org.antublue.test.engine.internal;
 
 import java.util.Map;
 import java.util.Set;

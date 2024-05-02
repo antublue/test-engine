@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.descriptor.parameterized;
+package org.antublue.test.engine.internal.descriptor;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -24,14 +24,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.antublue.test.engine.ExtensionManager;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
-import org.antublue.test.engine.internal.test.extension.ExtensionManager;
-import org.antublue.test.engine.internal.test.util.TestUtils;
-import org.antublue.test.engine.internal.test.util.ThrowableContext;
+import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
+import org.antublue.test.engine.internal.predicate.TestClassPredicate;
+import org.antublue.test.engine.internal.predicate.TestMethodPredicate;
+import org.antublue.test.engine.internal.util.TestUtils;
+import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -47,11 +49,24 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a ParameterizedTestDescriptorFactory */
 @SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
-public class ParameterizedTestFactory {
+public class EngineDescriptorFactory {
 
     private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
-    public void discover(
+    private static final EngineDescriptorFactory INSTANCE = new EngineDescriptorFactory();
+
+    public static EngineDescriptorFactory getInstance() {
+        return INSTANCE;
+    }
+
+    public EngineDescriptor createEngineDescriptor(
+            UniqueId uniqueId, String name, EngineDiscoveryRequest engineDiscoveryRequest) {
+        EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, name);
+        discover(engineDiscoveryRequest, engineDescriptor);
+        return engineDescriptor;
+    }
+
+    private void discover(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         Set<Class<?>> classes = new LinkedHashSet<>();
         Map<Class<?>, List<Argument>> classArgumentMap = new LinkedHashMap<>();
@@ -67,7 +82,7 @@ public class ParameterizedTestFactory {
                 List<Class<?>> javaClasses =
                         ReflectionSupport.findAllClassesInClasspathRoot(
                                 classpathRootSelector.getClasspathRoot(),
-                                ParameterizedTestPredicates.TEST_CLASS,
+                                TestClassPredicate.TEST_CLASS_PREDICATE,
                                 className -> true);
 
                 for (Class<?> javaClass : javaClasses) {
@@ -82,7 +97,7 @@ public class ParameterizedTestFactory {
                     List<Method> javaMethods =
                             ReflectionSupport.findMethods(
                                     javaClass,
-                                    ParameterizedTestPredicates.TEST_METHOD,
+                                    TestMethodPredicate.TEST_METHOD_PREDICATE,
                                     HierarchyTraversalMode.TOP_DOWN);
 
                     javaMethods =
@@ -108,7 +123,7 @@ public class ParameterizedTestFactory {
 
                 List<Class<?>> javaClasses =
                         ReflectionSupport.findAllClassesInPackage(
-                                packageName, ParameterizedTestPredicates.TEST_CLASS, p -> true);
+                                packageName, TestClassPredicate.TEST_CLASS_PREDICATE, p -> true);
 
                 for (Class<?> javaClass : javaClasses) {
                     // Class -> Argument mappings
@@ -122,7 +137,7 @@ public class ParameterizedTestFactory {
                     List<Method> javaMethods =
                             ReflectionSupport.findMethods(
                                     javaClass,
-                                    ParameterizedTestPredicates.TEST_METHOD,
+                                    TestMethodPredicate.TEST_METHOD_PREDICATE,
                                     HierarchyTraversalMode.TOP_DOWN);
 
                     javaMethods =
@@ -146,7 +161,7 @@ public class ParameterizedTestFactory {
                 ClassSelector classSelector = (ClassSelector) discoverySelector;
                 Class<?> javaClass = classSelector.getJavaClass();
 
-                if (ParameterizedTestPredicates.TEST_CLASS.test(javaClass)) {
+                if (TestClassPredicate.TEST_CLASS_PREDICATE.test(javaClass)) {
                     // Class -> Argument mappings
                     List<Argument> testArguments = getArguments(javaClass);
 
@@ -158,7 +173,7 @@ public class ParameterizedTestFactory {
                     List<Method> javaMethods =
                             ReflectionSupport.findMethods(
                                     javaClass,
-                                    ParameterizedTestPredicates.TEST_METHOD,
+                                    TestMethodPredicate.TEST_METHOD_PREDICATE,
                                     HierarchyTraversalMode.TOP_DOWN);
 
                     javaMethods =
@@ -183,8 +198,8 @@ public class ParameterizedTestFactory {
                 Class<?> javaClass = methodSelector.getJavaClass();
                 Method javaMethod = methodSelector.getJavaMethod();
 
-                if (ParameterizedTestPredicates.TEST_CLASS.test(javaClass)
-                        && ParameterizedTestPredicates.TEST_METHOD.test(javaMethod)) {
+                if (TestClassPredicate.TEST_CLASS_PREDICATE.test(javaClass)
+                        && TestMethodPredicate.TEST_METHOD_PREDICATE.test(javaMethod)) {
                     // Class -> Argument mappings
                     List<Argument> testArguments = getArguments(javaClass);
 
@@ -218,28 +233,26 @@ public class ParameterizedTestFactory {
                 for (UniqueId.Segment segment : segments) {
                     String segmentType = segment.getType();
 
-                    if (segmentType.equals(ParameterizedClassTestDescriptor.class.getName())) {
+                    if (segmentType.equals(ClassTestDescriptor.class.getName())) {
                         String javaClassName = segment.getValue();
                         javaClass =
                                 Thread.currentThread()
                                         .getContextClassLoader()
                                         .loadClass(javaClassName);
-                    } else if (segmentType.equals(
-                            ParameterizedArgumentTestDescriptor.class.getName())) {
+                    } else if (segmentType.equals(ArgumentTestDescriptor.class.getName())) {
                         String value = segment.getValue();
                         if (value.indexOf("/") > 0) {
                             testArgumentIndex =
                                     Integer.parseInt(value.substring(0, value.indexOf("/")));
                         }
-                    } else if (segmentType.equals(
-                            ParameterizedMethodTestDescriptor.class.getName())) {
+                    } else if (segmentType.equals(MethodTestDescriptor.class.getName())) {
                         Preconditions.notNull(javaClass, "javaClass is null, uniqueId errors");
 
                         String javaMethodName = segment.getValue();
                         List<Method> javaMethods =
                                 ReflectionSupport.findMethods(
                                         javaClass,
-                                        ParameterizedTestPredicates.TEST_METHOD,
+                                        TestMethodPredicate.TEST_METHOD_PREDICATE,
                                         HierarchyTraversalMode.BOTTOM_UP);
 
                         for (Method method : javaMethods) {
@@ -273,7 +286,7 @@ public class ParameterizedTestFactory {
                         List<Method> javaMethods =
                                 ReflectionSupport.findMethods(
                                         javaClass,
-                                        ParameterizedTestPredicates.TEST_METHOD,
+                                        TestMethodPredicate.TEST_METHOD_PREDICATE,
                                         HierarchyTraversalMode.TOP_DOWN);
 
                         javaMethods =
@@ -307,7 +320,7 @@ public class ParameterizedTestFactory {
                         clazz, testMethods, throwableContext);
                 throwableContext.throwFirst();
 
-                new ParameterizedClassTestDescriptor.Builder()
+                new ClassTestDescriptor.Builder()
                         .setTestClass(clazz)
                         .setTestArguments(classArgumentMap.get(clazz))
                         .setTestMethods(classMethodMap.get(clazz))
@@ -324,7 +337,7 @@ public class ParameterizedTestFactory {
         List<Method> methods =
                 ReflectionSupport.findMethods(
                         testClass,
-                        AnnotationMethodFilter.of(TestEngine.ArgumentSupplier.class),
+                        AnnotationMethodPredicate.of(TestEngine.ArgumentSupplier.class),
                         HierarchyTraversalMode.BOTTOM_UP);
 
         Method method = methods.get(0);

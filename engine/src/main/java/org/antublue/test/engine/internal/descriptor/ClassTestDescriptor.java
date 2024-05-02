@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.descriptor.parameterized;
+package org.antublue.test.engine.internal.descriptor;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+import org.antublue.test.engine.ExtensionManager;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.internal.test.annotation.AutoCloseAnnotationProcessor;
-import org.antublue.test.engine.internal.test.annotation.LockAnnotationProcessor;
-import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescriptor;
-import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
-import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
-import org.antublue.test.engine.internal.test.extension.ExtensionManager;
-import org.antublue.test.engine.internal.test.util.ReflectionUtils;
-import org.antublue.test.engine.internal.test.util.StateMachine;
-import org.antublue.test.engine.internal.test.util.TestUtils;
-import org.antublue.test.engine.internal.test.util.ThrowableContext;
+import org.antublue.test.engine.internal.MetadataConstants;
+import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
+import org.antublue.test.engine.internal.processor.AutoCloseAnnotationProcessor;
+import org.antublue.test.engine.internal.processor.LockAnnotationProcessor;
+import org.antublue.test.engine.internal.util.ReflectionUtils;
 import org.antublue.test.engine.internal.util.StandardStreams;
+import org.antublue.test.engine.internal.util.StateMachine;
+import org.antublue.test.engine.internal.util.TestUtils;
+import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -43,8 +42,8 @@ import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
-/** Class to implement a ParameterClassTestDescriptor */
-public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
+/** Class to implement a ClassTestDescriptor */
+public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
     private static final AutoCloseAnnotationProcessor AUTO_CLOSE_ANNOTATION_PROCESSOR =
             AutoCloseAnnotationProcessor.getInstance();
@@ -79,7 +78,7 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
      *
      * @param builder builder
      */
-    private ParameterizedClassTestDescriptor(Builder builder) {
+    private ClassTestDescriptor(Builder builder) {
         super(builder.uniqueId, builder.displayName);
         this.testClass = builder.testClass;
         this.prepareMethods = builder.prepareMethods;
@@ -113,52 +112,42 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
         setExecutionRequest(executionRequest);
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
-        StateMachine<State> stateMachine =
-                new StateMachine<State>(getUniqueId().toString())
-                        .define(State.BEGIN, this::begin, State.PRE_INSTANTIATE)
-                        .define(
-                                State.PRE_INSTANTIATE,
-                                this::preInstantiate,
-                                State.INSTANTIATE,
-                                State.POST_INSTANTIATE)
-                        .define(State.INSTANTIATE, this::instantiate, State.POST_INSTANTIATE)
-                        .define(
-                                State.POST_INSTANTIATE,
-                                this::postInstantiate,
-                                State.PRE_PREPARE,
-                                State.EXECUTE_OR_SKIP)
-                        .define(
-                                State.PRE_PREPARE,
-                                this::prePrepare,
-                                State.PREPARE,
-                                State.POST_PREPARE)
-                        .define(State.PREPARE, this::prepare, State.POST_PREPARE)
-                        .define(State.POST_PREPARE, this::postPrepare, State.EXECUTE_OR_SKIP)
-                        .define(State.EXECUTE_OR_SKIP, this::executeOrSkip, State.PRE_CONCLUDE)
-                        .define(
-                                State.PRE_CONCLUDE,
-                                this::preConclude,
-                                State.CONCLUDE,
-                                State.POST_CONCLUDE)
-                        .define(State.CONCLUDE, this::conclude, State.POST_CONCLUDE)
-                        .define(
-                                State.POST_CONCLUDE,
-                                this::postConclude,
-                                State.CLOSE_AUTO_CLOSE_FIELDS)
-                        .define(
-                                State.CLOSE_AUTO_CLOSE_FIELDS,
-                                this::closeAutoCloseFields,
-                                State.END)
-                        .afterEach(
-                                () -> {
-                                    StandardStreams.flush();
-                                    throttle();
-                                    return null;
-                                })
-                        .end(State.END, this::end);
+        StateMachine<State> stateMachine = new StateMachine<State>(getUniqueId().toString());
 
         try {
-            stateMachine.run(State.BEGIN);
+            stateMachine
+                    .state(State.BEGIN, this::begin, State.PRE_INSTANTIATE)
+                    .state(
+                            State.PRE_INSTANTIATE,
+                            this::preInstantiate,
+                            State.INSTANTIATE,
+                            State.POST_INSTANTIATE)
+                    .state(State.INSTANTIATE, this::instantiate, State.POST_INSTANTIATE)
+                    .state(
+                            State.POST_INSTANTIATE,
+                            this::postInstantiate,
+                            State.PRE_PREPARE,
+                            State.EXECUTE_OR_SKIP)
+                    .state(State.PRE_PREPARE, this::prePrepare, State.PREPARE, State.POST_PREPARE)
+                    .state(State.PREPARE, this::prepare, State.POST_PREPARE)
+                    .state(State.POST_PREPARE, this::postPrepare, State.EXECUTE_OR_SKIP)
+                    .state(State.EXECUTE_OR_SKIP, this::executeOrSkip, State.PRE_CONCLUDE)
+                    .state(
+                            State.PRE_CONCLUDE,
+                            this::preConclude,
+                            State.CONCLUDE,
+                            State.POST_CONCLUDE)
+                    .state(State.CONCLUDE, this::conclude, State.POST_CONCLUDE)
+                    .state(State.POST_CONCLUDE, this::postConclude, State.CLOSE_AUTO_CLOSE_FIELDS)
+                    .state(State.CLOSE_AUTO_CLOSE_FIELDS, this::closeAutoCloseFields, State.END)
+                    .afterEach(
+                            () -> {
+                                StandardStreams.flush();
+                                throttle();
+                                return null;
+                            })
+                    .end(State.END, this::end)
+                    .run(State.BEGIN);
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
         }
@@ -387,16 +376,14 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                 uniqueId =
                         parentTestDescriptor
                                 .getUniqueId()
-                                .append(
-                                        ParameterizedClassTestDescriptor.class.getName(),
-                                        testClass.getName());
+                                .append(ClassTestDescriptor.class.getName(), testClass.getName());
 
                 displayName = TestUtils.getDisplayName(testClass);
 
                 prepareMethods =
                         ReflectionSupport.findMethods(
                                 testClass,
-                                AnnotationMethodFilter.of(TestEngine.Prepare.class),
+                                AnnotationMethodPredicate.of(TestEngine.Prepare.class),
                                 HierarchyTraversalMode.TOP_DOWN);
 
                 prepareMethods =
@@ -405,20 +392,20 @@ public class ParameterizedClassTestDescriptor extends ExecutableTestDescriptor {
                 concludeMethods =
                         ReflectionSupport.findMethods(
                                 testClass,
-                                AnnotationMethodFilter.of(TestEngine.Conclude.class),
+                                AnnotationMethodPredicate.of(TestEngine.Conclude.class),
                                 HierarchyTraversalMode.BOTTOM_UP);
 
                 concludeMethods =
                         TestUtils.orderTestMethods(
                                 concludeMethods, HierarchyTraversalMode.BOTTOM_UP);
 
-                TestDescriptor testDescriptor = new ParameterizedClassTestDescriptor(this);
+                TestDescriptor testDescriptor = new ClassTestDescriptor(this);
 
                 parentTestDescriptor.addChild(testDescriptor);
 
                 int testArgumentIndex = 0;
                 for (Argument testArgument : testArguments) {
-                    new ParameterizedArgumentTestDescriptor.Builder()
+                    new ArgumentTestDescriptor.Builder()
                             .setTestClass(testClass)
                             .setTestArgument(testArgumentIndex, testArgument)
                             .setTestMethods(testMethods)

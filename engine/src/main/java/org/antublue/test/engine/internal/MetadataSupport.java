@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.descriptor;
+package org.antublue.test.engine.internal;
 
 /** Interface to implement ExecutableTestDescriptorMetadataSupport */
 public interface MetadataSupport {

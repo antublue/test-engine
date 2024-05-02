@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.util;
+package org.antublue.test.engine.internal.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +32,7 @@ public class StateMachine<T> {
     private final Map<T, Set<T>> definitions;
     private final Map<T, Action<T>> actions;
     private final List<Action<T>> afterEachActions;
-    private T end;
+    private T endState;
     private Action<T> endAction;
 
     /**
@@ -59,41 +59,47 @@ public class StateMachine<T> {
     }
 
     /**
-     * Method to define a state, the action to perform, and possible target states
+     * Method to define a state, the action to perform when the state is encountered, and valid next
+     * states
      *
-     * @param source source
+     * @param state state
      * @param action action
-     * @param targets targets
+     * @param nextStates nextStates
      * @return this
      */
-    public StateMachine<T> define(T source, Action<T> action, T... targets) {
-        Set<T> set = definitions.computeIfAbsent(source, k -> new HashSet<>());
-        Collections.addAll(set, targets);
-        actions.put(source, action);
+    public StateMachine<T> state(T state, Action<T> action, T... nextStates)
+            throws StateMachineException {
+        if (actions.containsKey(state)) {
+            throw new StateMachineException(
+                    String.format("Action for state [%s] already defined", state));
+        }
+        Set<T> set = definitions.computeIfAbsent(state, k -> new HashSet<>());
+        Collections.addAll(set, nextStates);
+        actions.put(state, action);
         return this;
     }
 
     /**
      * Method to set the end state and action
      *
-     * @param end end
-     * @param endAction endAction
+     * @param state state
+     * @param action action
      * @return this
      */
-    public StateMachine<T> end(T end, Action<T> endAction) {
-        this.end = end;
-        this.endAction = endAction;
+    public StateMachine<T> end(T state, Action<T> action) {
+        this.endState = state;
+        this.endAction = action;
         return this;
     }
 
     /**
      * Method to run the state machine
      *
-     * @param begin begin
+     * @param initialState initialState
      * @throws StateMachineException StateMachineException
      */
-    public void run(T begin) throws StateMachineException {
-        T state = begin;
+    public void run(T initialState) throws StateMachineException {
+        T state = initialState;
         T nextState;
         do {
             Action<T> action = actions.get(state);
@@ -121,7 +127,7 @@ public class StateMachine<T> {
                     afterEachAction.perform();
                 }
             }
-        } while (!state.equals(end));
+        } while (!state.equals(endState));
 
         endAction.perform();
     }

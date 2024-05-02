@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.internal.Metadata;
+import org.antublue.test.engine.internal.MetadataConstants;
+import org.antublue.test.engine.internal.MetadataSupport;
 import org.antublue.test.engine.internal.configuration.Configuration;
-import org.antublue.test.engine.internal.test.descriptor.Metadata;
-import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
-import org.antublue.test.engine.internal.test.descriptor.MetadataSupport;
-import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedArgumentTestDescriptor;
-import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedClassTestDescriptor;
-import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedMethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.internal.util.HumanReadableTimeUtils;
@@ -160,7 +160,7 @@ public class SummaryEngineExecutionListener
                 String testDescriptorStatus =
                         metadata.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
 
-                if (testDescriptor instanceof ParameterizedMethodTestDescriptor) {
+                if (testDescriptor instanceof MethodTestDescriptor) {
                     methodTestDescriptorFound++;
                     switch (testDescriptorStatus) {
                         case "PASS":
@@ -184,7 +184,7 @@ public class SummaryEngineExecutionListener
                                 break;
                             }
                     }
-                } else if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
+                } else if (testDescriptor instanceof ClassTestDescriptor) {
                     classTestDescriptorFound++;
                     switch (testDescriptorStatus) {
                         case "PASS":
@@ -208,7 +208,7 @@ public class SummaryEngineExecutionListener
                                 break;
                             }
                     }
-                } else if (testDescriptor instanceof ParameterizedArgumentTestDescriptor) {
+                } else if (testDescriptor instanceof ArgumentTestDescriptor) {
                     argumentTestDescriptorFound++;
                     switch (testDescriptorStatus) {
                         case "PASS":

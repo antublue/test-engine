@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.descriptor.filter;
+package org.antublue.test.engine.internal.predicate;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -24,11 +24,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class AnnotationMethodFilter implements Predicate<Method> {
+/** Class to implement a predicate to match a test method */
+public class AnnotationMethodPredicate implements Predicate<Method> {
 
     private final List<Class<? extends Annotation>> annotations;
 
-    private AnnotationMethodFilter(List<Class<? extends Annotation>> annotations) {
+    private AnnotationMethodPredicate(List<Class<? extends Annotation>> annotations) {
         this.annotations = annotations;
     }
 
@@ -42,16 +43,34 @@ public class AnnotationMethodFilter implements Predicate<Method> {
         return false;
     }
 
-    public static AnnotationMethodFilter of(Class<? extends Annotation> annotation) {
+    /**
+     * Method to get an AnnotationMethodPredicate for an Annotation
+     *
+     * @param annotation annotation
+     * @return an AnnotationMethodPredicate for an Annotation
+     */
+    public static AnnotationMethodPredicate of(Class<? extends Annotation> annotation) {
         return of(Collections.singletonList(annotation));
     }
 
+    /**
+     * Method to get an AnnotationMethodPredicate for a list of Annotations
+     *
+     * @param annotations annotations
+     * @return an AnnotationMethodPredicate for a list of Annotations
+     */
     @SafeVarargs
-    public static AnnotationMethodFilter of(Class<? extends Annotation>... annotations) {
-        return new AnnotationMethodFilter(new ArrayList<>(Arrays.asList(annotations)));
+    public static AnnotationMethodPredicate of(Class<? extends Annotation>... annotations) {
+        return new AnnotationMethodPredicate(new ArrayList<>(Arrays.asList(annotations)));
     }
 
-    public static AnnotationMethodFilter of(List<Class<? extends Annotation>> annotations) {
-        return new AnnotationMethodFilter(annotations);
+    /**
+     * Method to get an AnnotationMethodPredicate for a list of Annotations
+     *
+     * @param annotations annotations
+     * @return an AnnotationMethodPredicate for a list of Annotations
+     */
+    public static AnnotationMethodPredicate of(List<Class<? extends Annotation>> annotations) {
+        return new AnnotationMethodPredicate(annotations);
     }
 }

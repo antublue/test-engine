@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.util;
+package org.antublue.test.engine.internal.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

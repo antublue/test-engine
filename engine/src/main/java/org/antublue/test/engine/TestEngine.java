@@ -29,11 +29,11 @@ import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.Executor;
 import org.antublue.test.engine.internal.configuration.Configuration;
+import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.EngineDescriptorFactory;
+import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedClassTestDescriptor;
-import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedMethodTestDescriptor;
-import org.antublue.test.engine.internal.test.descriptor.parameterized.ParameterizedTestFactory;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
@@ -114,10 +114,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("discover()");
 
         try {
-            // Create an engine descriptor to build the list of test descriptors
-            EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
-
-            new ParameterizedTestFactory().discover(engineDiscoveryRequest, engineDescriptor);
+            // Create the engine descriptor with test descriptors
+            EngineDescriptor engineDescriptor =
+                    EngineDescriptorFactory.getInstance()
+                            .createEngineDescriptor(uniqueId, getId(), engineDiscoveryRequest);
 
             // Filter the engine descriptor
             filterTestClassesByClassName(engineDescriptor);
@@ -162,12 +162,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Set<? extends TestDescriptor> children =
                     new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
-                    ParameterizedClassTestDescriptor parameterizedClassTestDescriptor =
-                            (ParameterizedClassTestDescriptor) testDescriptor;
-                    matcher.reset(parameterizedClassTestDescriptor.getTestClass().getName());
+                if (testDescriptor instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
+                    matcher.reset(classTestDescriptor.getTestClass().getName());
                     if (!matcher.find()) {
-                        parameterizedClassTestDescriptor.removeFromHierarchy();
+                        classTestDescriptor.removeFromHierarchy();
                     }
                     continue;
                 }
@@ -182,12 +181,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Set<? extends TestDescriptor> children =
                     new LinkedHashSet<>(engineDescriptor.getDescendants());
             for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
-                    ParameterizedClassTestDescriptor parameterizedClassTestDescriptor =
-                            (ParameterizedClassTestDescriptor) testDescriptor;
-                    matcher.reset(parameterizedClassTestDescriptor.getTestClass().getName());
+                if (testDescriptor instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
+                    matcher.reset(classTestDescriptor.getTestClass().getName());
                     if (matcher.find()) {
-                        parameterizedClassTestDescriptor.removeFromHierarchy();
+                        classTestDescriptor.removeFromHierarchy();
                     }
                     continue;
                 }
@@ -211,17 +209,16 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Set<? extends TestDescriptor> children =
                     new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
-                    ParameterizedClassTestDescriptor parameterizedClassTestDescriptor =
-                            (ParameterizedClassTestDescriptor) testDescriptor;
-                    String tag = parameterizedClassTestDescriptor.getTag();
+                if (testDescriptor instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
+                    String tag = classTestDescriptor.getTag();
                     if (tag != null) {
                         matcher.reset(tag);
                         if (!matcher.find()) {
-                            parameterizedClassTestDescriptor.removeFromHierarchy();
+                            classTestDescriptor.removeFromHierarchy();
                         }
                     } else {
-                        parameterizedClassTestDescriptor.removeFromHierarchy();
+                        classTestDescriptor.removeFromHierarchy();
                     }
                     continue;
                 }
@@ -236,14 +233,13 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Set<? extends TestDescriptor> children =
                     new LinkedHashSet<>(engineDescriptor.getDescendants());
             for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ParameterizedClassTestDescriptor) {
-                    ParameterizedClassTestDescriptor parameterizedClassTestDescriptor =
-                            (ParameterizedClassTestDescriptor) testDescriptor;
-                    String tag = parameterizedClassTestDescriptor.getTag();
+                if (testDescriptor instanceof ClassTestDescriptor) {
+                    ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
+                    String tag = classTestDescriptor.getTag();
                     if (tag != null) {
                         matcher.reset(tag);
                         if (matcher.find()) {
-                            parameterizedClassTestDescriptor.removeFromHierarchy();
+                            classTestDescriptor.removeFromHierarchy();
                         }
                     }
                     continue;
@@ -269,12 +265,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Set<? extends TestDescriptor> children =
                     new LinkedHashSet<>(engineDescriptor.getDescendants());
             for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ParameterizedMethodTestDescriptor) {
-                    ParameterizedMethodTestDescriptor parameterizedMethodTestDescriptor =
-                            (ParameterizedMethodTestDescriptor) testDescriptor;
-                    matcher.reset(parameterizedMethodTestDescriptor.getTestMethod().getName());
+                if (testDescriptor instanceof MethodTestDescriptor) {
+                    MethodTestDescriptor methodTestDescriptor =
+                            (MethodTestDescriptor) testDescriptor;
+                    matcher.reset(methodTestDescriptor.getTestMethod().getName());
                     if (!matcher.find()) {
-                        parameterizedMethodTestDescriptor.removeFromHierarchy();
+                        methodTestDescriptor.removeFromHierarchy();
                     }
                     continue;
                 }
@@ -290,12 +286,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Set<? extends TestDescriptor> children =
                     new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ParameterizedMethodTestDescriptor) {
-                    ParameterizedMethodTestDescriptor parameterizedMethodTestDescriptor =
-                            (ParameterizedMethodTestDescriptor) testDescriptor;
-                    matcher.reset(parameterizedMethodTestDescriptor.getTestMethod().getName());
+                if (testDescriptor instanceof MethodTestDescriptor) {
+                    MethodTestDescriptor methodTestDescriptor =
+                            (MethodTestDescriptor) testDescriptor;
+                    matcher.reset(methodTestDescriptor.getTestMethod().getName());
                     if (matcher.find()) {
-                        parameterizedMethodTestDescriptor.removeFromHierarchy();
+                        methodTestDescriptor.removeFromHierarchy();
                     }
                     continue;
                 }
@@ -320,17 +316,17 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Set<? extends TestDescriptor> children =
                     new LinkedHashSet<>(engineDescriptor.getDescendants());
             for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ParameterizedMethodTestDescriptor) {
-                    ParameterizedMethodTestDescriptor parameterizedMethodTestDescriptor =
-                            (ParameterizedMethodTestDescriptor) testDescriptor;
-                    String tag = parameterizedMethodTestDescriptor.getTag();
+                if (testDescriptor instanceof MethodTestDescriptor) {
+                    MethodTestDescriptor methodTestDescriptor =
+                            (MethodTestDescriptor) testDescriptor;
+                    String tag = methodTestDescriptor.getTag();
                     if (tag != null) {
                         matcher.reset(tag);
                         if (!matcher.find()) {
-                            parameterizedMethodTestDescriptor.removeFromHierarchy();
+                            methodTestDescriptor.removeFromHierarchy();
                         }
                     } else {
-                        parameterizedMethodTestDescriptor.removeFromHierarchy();
+                        methodTestDescriptor.removeFromHierarchy();
                     }
                     continue;
                 }
@@ -346,14 +342,14 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Set<? extends TestDescriptor> children =
                     new LinkedHashSet<>(engineDescriptor.getChildren());
             for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ParameterizedMethodTestDescriptor) {
-                    ParameterizedMethodTestDescriptor parameterizedMethodTestDescriptor =
-                            (ParameterizedMethodTestDescriptor) testDescriptor;
-                    String tag = parameterizedMethodTestDescriptor.getTag();
+                if (testDescriptor instanceof MethodTestDescriptor) {
+                    MethodTestDescriptor methodTestDescriptor =
+                            (MethodTestDescriptor) testDescriptor;
+                    String tag = methodTestDescriptor.getTag();
                     if (tag != null) {
                         matcher.reset(tag);
                         if (matcher.find()) {
-                            parameterizedMethodTestDescriptor.removeFromHierarchy();
+                            methodTestDescriptor.removeFromHierarchy();
                         }
                     }
                     continue;
@@ -394,14 +390,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      * @param engineDescriptor engineDescriptor
      */
     private void shuffleOrSortTestDescriptors(EngineDescriptor engineDescriptor) {
-        Configuration configuration = Configuration.getInstance();
-
         // Get the test descriptors and remove them from the engine descriptor
         List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
         testDescriptors.forEach(engineDescriptor::removeChild);
 
         // Shuffle or sort the test descriptor list based on configuration
-        Optional<String> optionalShuffle = configuration.get(Constants.TEST_CLASS_SHUFFLE);
+        Optional<String> optionalShuffle = CONFIGURATION.get(Constants.TEST_CLASS_SHUFFLE);
         if (optionalShuffle.isPresent() && Constants.TRUE.equals(optionalShuffle.get())) {
             Collections.shuffle(testDescriptors);
         } else {
@@ -427,14 +421,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
 
-            ConfigurationParameters configurationParameters = ConfigurationParameters.getInstance();
-
             new Executor()
                     .execute(
                             ExecutionRequest.create(
                                     executionRequest.getRootTestDescriptor(),
                                     executionRequest.getEngineExecutionListener(),
-                                    configurationParameters));
+                                    ConfigurationParameters.getInstance()));
         } finally {
             engineExecutionListener.executionFinished(
                     executionRequest.getRootTestDescriptor(), TestExecutionResult.successful());

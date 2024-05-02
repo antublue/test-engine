@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.descriptor.parameterized;
+package org.antublue.test.engine.internal.descriptor;
 
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import org.antublue.test.engine.ExtensionManager;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.internal.test.annotation.ArgumentAnnotationProcessor;
-import org.antublue.test.engine.internal.test.annotation.AutoCloseAnnotationProcessor;
-import org.antublue.test.engine.internal.test.annotation.LockAnnotationProcessor;
-import org.antublue.test.engine.internal.test.annotation.RandomAnnotationProcessor;
-import org.antublue.test.engine.internal.test.descriptor.ExecutableTestDescriptor;
-import org.antublue.test.engine.internal.test.descriptor.MetadataConstants;
-import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationMethodFilter;
-import org.antublue.test.engine.internal.test.extension.ExtensionManager;
-import org.antublue.test.engine.internal.test.util.StateMachine;
-import org.antublue.test.engine.internal.test.util.TestUtils;
+import org.antublue.test.engine.internal.MetadataConstants;
+import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
+import org.antublue.test.engine.internal.processor.ArgumentAnnotationProcessor;
+import org.antublue.test.engine.internal.processor.AutoCloseAnnotationProcessor;
+import org.antublue.test.engine.internal.processor.LockAnnotationProcessor;
+import org.antublue.test.engine.internal.processor.RandomAnnotationProcessor;
 import org.antublue.test.engine.internal.util.StandardStreams;
+import org.antublue.test.engine.internal.util.StateMachine;
+import org.antublue.test.engine.internal.util.TestUtils;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -45,9 +44,9 @@ import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
-/** Class to implement a ParameterArgumentTestDescriptor */
+/** Class to implement a ArgumentTestDescriptor */
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
-public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescriptor {
+public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
     private static final ArgumentAnnotationProcessor ARGUMENT_ANNOTATION_PROCESSOR =
             ArgumentAnnotationProcessor.getInstance();
@@ -89,7 +88,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
      *
      * @param builder builder
      */
-    private ParameterizedArgumentTestDescriptor(Builder builder) {
+    private ArgumentTestDescriptor(Builder builder) {
         super(builder.uniqueId, builder.displayName);
         this.testClass = builder.testClass;
         this.testArgument = builder.testArgument;
@@ -146,52 +145,49 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
         setExecutionRequest(executionRequest);
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
-        StateMachine<State> stateMachine =
-                new StateMachine<State>(getUniqueId().toString())
-                        .define(State.BEGIN, this::begin, State.SET_ARGUMENT_FIELDS)
-                        .define(
-                                State.SET_ARGUMENT_FIELDS,
-                                this::setArgumentFields,
-                                State.SET_RANDOM_FIELDS,
-                                State.EXECUTE_OR_SKIP)
-                        .define(
-                                State.SET_RANDOM_FIELDS,
-                                this::setRandomFields,
-                                State.PRE_BEFORE_ALL,
-                                State.EXECUTE_OR_SKIP)
-                        .define(
-                                State.PRE_BEFORE_ALL,
-                                this::preBeforeAll,
-                                State.BEFORE_ALL,
-                                State.POST_BEFORE_ALL)
-                        .define(State.BEFORE_ALL, this::beforeAll, State.POST_BEFORE_ALL)
-                        .define(State.POST_BEFORE_ALL, this::postBeforeAll, State.EXECUTE_OR_SKIP)
-                        .define(State.EXECUTE_OR_SKIP, this::executeOrSkip, State.PRE_AFTER_ALL)
-                        .define(
-                                State.PRE_AFTER_ALL,
-                                this::preAfterAll,
-                                State.AFTER_ALL,
-                                State.POST_AFTER_ALL)
-                        .define(State.AFTER_ALL, this::afterAll, State.POST_AFTER_ALL)
-                        .define(
-                                State.POST_AFTER_ALL,
-                                this::postAfterAll,
-                                State.CLOSE_AUTO_CLOSE_FIELDS)
-                        .define(
-                                State.CLOSE_AUTO_CLOSE_FIELDS,
-                                this::closeAutoCloseFields,
-                                State.CLEAR_ARGUMENTS_FIELDS)
-                        .define(State.CLEAR_ARGUMENTS_FIELDS, this::clearArgumentFields, State.END)
-                        .afterEach(
-                                () -> {
-                                    StandardStreams.flush();
-                                    throttle();
-                                    return null;
-                                })
-                        .end(State.END, this::end);
+        StateMachine<State> stateMachine = new StateMachine<State>(getUniqueId().toString());
 
         try {
-            stateMachine.run(State.BEGIN);
+            stateMachine
+                    .state(State.BEGIN, this::begin, State.SET_ARGUMENT_FIELDS)
+                    .state(
+                            State.SET_ARGUMENT_FIELDS,
+                            this::setArgumentFields,
+                            State.SET_RANDOM_FIELDS,
+                            State.EXECUTE_OR_SKIP)
+                    .state(
+                            State.SET_RANDOM_FIELDS,
+                            this::setRandomFields,
+                            State.PRE_BEFORE_ALL,
+                            State.EXECUTE_OR_SKIP)
+                    .state(
+                            State.PRE_BEFORE_ALL,
+                            this::preBeforeAll,
+                            State.BEFORE_ALL,
+                            State.POST_BEFORE_ALL)
+                    .state(State.BEFORE_ALL, this::beforeAll, State.POST_BEFORE_ALL)
+                    .state(State.POST_BEFORE_ALL, this::postBeforeAll, State.EXECUTE_OR_SKIP)
+                    .state(State.EXECUTE_OR_SKIP, this::executeOrSkip, State.PRE_AFTER_ALL)
+                    .state(
+                            State.PRE_AFTER_ALL,
+                            this::preAfterAll,
+                            State.AFTER_ALL,
+                            State.POST_AFTER_ALL)
+                    .state(State.AFTER_ALL, this::afterAll, State.POST_AFTER_ALL)
+                    .state(State.POST_AFTER_ALL, this::postAfterAll, State.CLOSE_AUTO_CLOSE_FIELDS)
+                    .state(
+                            State.CLOSE_AUTO_CLOSE_FIELDS,
+                            this::closeAutoCloseFields,
+                            State.CLEAR_ARGUMENTS_FIELDS)
+                    .state(State.CLEAR_ARGUMENTS_FIELDS, this::clearArgumentFields, State.END)
+                    .afterEach(
+                            () -> {
+                                StandardStreams.flush();
+                                throttle();
+                                return null;
+                            })
+                    .end(State.END, this::end)
+                    .run(State.BEGIN);
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
         }
@@ -211,7 +207,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
-            getParent(ParameterizedClassTestDescriptor.class)
+            getParent(ClassTestDescriptor.class)
                     .getThrowableContext()
                     .add(
                             getTestInstance().getClass(),
@@ -431,7 +427,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                         parentTestDescriptor
                                 .getUniqueId()
                                 .append(
-                                        ParameterizedArgumentTestDescriptor.class.getName(),
+                                        ArgumentTestDescriptor.class.getName(),
                                         testArgumentIndex + "/" + testArgument.name());
 
                 displayName = testArgument.name();
@@ -439,7 +435,7 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                 beforeAllMethods =
                         ReflectionSupport.findMethods(
                                 testClass,
-                                AnnotationMethodFilter.of(TestEngine.BeforeAll.class),
+                                AnnotationMethodPredicate.of(TestEngine.BeforeAll.class),
                                 HierarchyTraversalMode.TOP_DOWN);
 
                 beforeAllMethods =
@@ -449,19 +445,19 @@ public class ParameterizedArgumentTestDescriptor extends ExecutableTestDescripto
                 afterAllMethods =
                         ReflectionSupport.findMethods(
                                 testClass,
-                                AnnotationMethodFilter.of(TestEngine.AfterAll.class),
+                                AnnotationMethodPredicate.of(TestEngine.AfterAll.class),
                                 HierarchyTraversalMode.BOTTOM_UP);
 
                 afterAllMethods =
                         TestUtils.orderTestMethods(
                                 afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
 
-                TestDescriptor testDescriptor = new ParameterizedArgumentTestDescriptor(this);
+                TestDescriptor testDescriptor = new ArgumentTestDescriptor(this);
 
                 parentTestDescriptor.addChild(testDescriptor);
 
                 for (Method testMethod : testMethods) {
-                    new ParameterizedMethodTestDescriptor.Builder()
+                    new MethodTestDescriptor.Builder()
                             .setTestClass(testClass)
                             .setTestArgument(testArgumentIndex, testArgument)
                             .setTestMethod(testMethod)

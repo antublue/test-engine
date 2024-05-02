@@ -67,9 +67,7 @@ public final class LoggerFactory {
      * @return the return value
      */
     public static Logger getLogger(String name) {
-        Configuration configuration = Configuration.getInstance();
-
-        synchronized (configuration) {
+        synchronized (Configuration.getInstance()) {
             if (INSTANCE == null) {
                 INSTANCE = new LoggerFactory();
             }

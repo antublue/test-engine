@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.annotation;
+package org.antublue.test.engine.internal.processor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -22,8 +22,8 @@ import java.util.List;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.test.descriptor.filter.AnnotationFieldFilter;
-import org.antublue.test.engine.internal.test.util.ThrowableContext;
+import org.antublue.test.engine.internal.predicate.AnnotationFieldPredicate;
+import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
@@ -92,7 +92,7 @@ public class AutoCloseAnnotationProcessor {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
-                        AnnotationFieldFilter.of(TestEngine.AutoClose.AfterEach.class),
+                        AnnotationFieldPredicate.of(TestEngine.AutoClose.AfterEach.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
         for (Field field : fields) {
@@ -108,7 +108,7 @@ public class AutoCloseAnnotationProcessor {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
-                        AnnotationFieldFilter.of(TestEngine.AutoClose.AfterAll.class),
+                        AnnotationFieldPredicate.of(TestEngine.AutoClose.AfterAll.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
         for (Field field : fields) {
@@ -124,7 +124,7 @@ public class AutoCloseAnnotationProcessor {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
-                        AnnotationFieldFilter.of(TestEngine.AutoClose.Conclude.class),
+                        AnnotationFieldPredicate.of(TestEngine.AutoClose.Conclude.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
         for (Field field : fields) {
