@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.descriptor.filter;
+package org.antublue.test.engine.internal.predicate;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -24,11 +24,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class AnnotationFieldFilter implements Predicate<Field> {
+/** Class to implement a predicate to match a test field */
+public class AnnotationFieldPredicate implements Predicate<Field> {
 
     private final List<Class<? extends Annotation>> annotations;
 
-    private AnnotationFieldFilter(List<Class<? extends Annotation>> annotations) {
+    private AnnotationFieldPredicate(List<Class<? extends Annotation>> annotations) {
         this.annotations = annotations;
     }
 
@@ -42,16 +43,34 @@ public class AnnotationFieldFilter implements Predicate<Field> {
         return false;
     }
 
-    public static AnnotationFieldFilter of(Class<? extends Annotation> annotation) {
+    /**
+     * Method to get an AnnotationFieldPredicate for an Annotation
+     *
+     * @param annotation annotation
+     * @return an AnnotationFieldPredicate for an Annotation
+     */
+    public static AnnotationFieldPredicate of(Class<? extends Annotation> annotation) {
         return of(Collections.singletonList(annotation));
     }
 
+    /**
+     * Method to get an AnnotationFieldPredicate for an Annotation
+     *
+     * @param annotations annotations
+     * @return an AnnotationFieldPredicate for an Annotation
+     */
     @SafeVarargs
-    public static AnnotationFieldFilter of(Class<? extends Annotation>... annotations) {
-        return new AnnotationFieldFilter(new ArrayList<>(Arrays.asList(annotations)));
+    public static AnnotationFieldPredicate of(Class<? extends Annotation>... annotations) {
+        return new AnnotationFieldPredicate(new ArrayList<>(Arrays.asList(annotations)));
     }
 
-    public static AnnotationFieldFilter of(List<Class<? extends Annotation>> annotations) {
-        return new AnnotationFieldFilter(annotations);
+    /**
+     * Method to get an AnnotationFieldPredicate for an Annotation
+     *
+     * @param annotations annotations
+     * @return an AnnotationFieldPredicate for an Annotation
+     */
+    public static AnnotationFieldPredicate of(List<Class<? extends Annotation>> annotations) {
+        return new AnnotationFieldPredicate(annotations);
     }
 }

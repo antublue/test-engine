@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.extension;
+package org.antublue.test.engine;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
@@ -35,8 +34,8 @@ import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.test.util.ReflectionUtils;
-import org.antublue.test.engine.internal.test.util.ThrowableContext;
+import org.antublue.test.engine.internal.util.ReflectionUtils;
+import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 

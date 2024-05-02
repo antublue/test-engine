@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.util;
+package org.antublue.test.engine.internal.util;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.antublue.test.engine.Constants;
-import org.antublue.test.engine.internal.util.StandardStreams;
-import org.antublue.test.engine.internal.util.ThrowableUtils;
 
 public class ThrowableContext {
 

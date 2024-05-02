@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.test.annotation;
+package org.antublue.test.engine.internal.processor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
