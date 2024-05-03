@@ -128,14 +128,23 @@ There are standard argument implementations for common Java data types:
 -  `DoubleArgument`
 -  `BigDecimalArgument`
 -  `StringArgument`
+-  `GenericArgument`
 
-Additionally, there is an `ObjectArgument<T>` argument implementation that allows passing an arbitrary object as an argument.
+Additionally, there is an `ObjectArgument<T>` argument implementation that allows passing an arbitrary unrelated objects as an argument.
 
 **Notes**
 
 - It's recommended to implement a test specific `Argument` object instead of using `ObjectArgument<T>` whenever possible.
 
-### What is a `Store` ?
+## Extras
+
+The extras project provides classes to help with testing beyond the core API.
+
+### `LockManager`
+
+The `LockManager` is a thread-safe convenience class to work with cross test class/threads to allow locking when working with shared resources that require synchronization.
+
+### `Store`
 
 A `Store` is a thread-safe convenience class that allow sharing of Objects between tests.
 

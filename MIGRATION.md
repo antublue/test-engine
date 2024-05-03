@@ -195,6 +195,11 @@ public class Test {
 
 `6.x.x` code:
 
+`Store` now has `getInstance()` to get a singleton instance.
+
+- `singleton()` has been deprecated
+- `getSingleton()` has been deprecated
+
 ```java
 public class Test {
 
@@ -205,7 +210,11 @@ public class Test {
   public void test() {
     // ... code omitted ...
     
-    String value = Store.getSingleton().get("key");
+    String value = Store.getInstance().get("key");
   }
 }
 ```
+
+`Directory` has been moved to the `extras` module.
+
+`LineSource` has been moved to the `extras` module.

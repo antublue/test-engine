@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api;
+package org.antublue.test.engine.extras;
 
 import java.io.File;
 import java.io.IOException;

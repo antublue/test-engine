@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.source;
+package org.antublue.test.engine.extras.source;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

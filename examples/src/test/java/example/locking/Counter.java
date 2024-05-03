@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The AntuBLUE test-engine project authors
+ * Copyright (C) 2024 The AntuBLUE test-engine project authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,27 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.extras;
+package example.locking;
 
-/** PlaceHolder class to prevent Maven warnings */
-public class PlaceHolder {
+public class Counter {
 
-    // DO NOTHING
+    private long count;
+
+    public Counter() {
+        // DO NOTHING
+    }
+
+    public long increment() {
+        count++;
+        return count;
+    }
+
+    public long decrement() {
+        count--;
+        return count;
+    }
+
+    public long getCount() {
+        return count;
+    }
 }
