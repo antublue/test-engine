@@ -59,7 +59,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> afterEachMethods;
 
     private enum State {
-        BEGIN,
+        NULL,
         PRE_BEFORE_EACH,
         BEFORE_EACH,
         POST_BEFORE_EACH,
@@ -131,7 +131,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
         try {
             stateMachine
-                    .definition(State.BEGIN, this::begin, State.PRE_BEFORE_EACH)
+                    .definition(State.NULL, this::begin, State.PRE_BEFORE_EACH)
                     .definition(
                             State.PRE_BEFORE_EACH,
                             this::preBeforeEach,
@@ -161,7 +161,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                                 return null;
                             })
                     .end(State.END, this::end)
-                    .run(State.BEGIN);
+                    .run(State.NULL);
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
         }

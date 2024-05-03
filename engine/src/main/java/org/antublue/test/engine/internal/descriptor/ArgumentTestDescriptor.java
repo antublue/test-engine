@@ -68,7 +68,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> afterAllMethods;
 
     private enum State {
-        BEGIN,
+        NULL,
         SET_ARGUMENT_FIELDS,
         SET_RANDOM_FIELDS,
         PRE_BEFORE_ALL,
@@ -149,7 +149,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         try {
             stateMachine
-                    .definition(State.BEGIN, this::begin, State.SET_ARGUMENT_FIELDS)
+                    .definition(State.NULL, this::begin, State.SET_ARGUMENT_FIELDS)
                     .definition(
                             State.SET_ARGUMENT_FIELDS,
                             this::setArgumentFields,
@@ -188,7 +188,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                 return null;
                             })
                     .end(State.END, this::end)
-                    .run(State.BEGIN);
+                    .run(State.NULL);
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
         }

@@ -58,7 +58,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> concludeMethods;
 
     private enum State {
-        BEGIN,
+        NULL,
         PRE_INSTANTIATE,
         INSTANTIATE,
         POST_INSTANTIATE,
@@ -116,7 +116,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         try {
             stateMachine
-                    .definition(State.BEGIN, this::begin, State.PRE_INSTANTIATE)
+                    .definition(State.NULL, this::begin, State.PRE_INSTANTIATE)
                     .definition(
                             State.PRE_INSTANTIATE,
                             this::preInstantiate,
@@ -150,7 +150,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                                 return null;
                             })
                     .end(State.END, this::end)
-                    .run(State.BEGIN);
+                    .run(State.NULL);
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
         }
