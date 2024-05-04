@@ -39,6 +39,6 @@ public class ClassResourceLockTestB {
         System.out.println(
                 String.format(
                         "test() class [%s] testing [%s]", getClass().getName(), argument.name()));
-        Thread.sleep(10000);
+        Thread.sleep(5000);
     }
 }

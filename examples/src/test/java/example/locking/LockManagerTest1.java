@@ -30,7 +30,6 @@ public class LockManagerTest1 {
 
     public static final String PREFIX = "LockManagerTest";
     public static final String LOCK_NAME = PREFIX + ".lock";
-
     public static final String COUNTER_NAME = PREFIX + ".counter";
 
     @TestEngine.Argument public IntegerArgument integerArgument;
