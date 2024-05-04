@@ -86,6 +86,6 @@ public class GenericArgument<T> extends AbstractArgument {
      * @return the return value
      */
     public static <T> GenericArgument<T> of(String name, T value) {
-        return new GenericArgument(String.valueOf(value), value);
+        return new GenericArgument(name, value);
     }
 }

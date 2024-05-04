@@ -65,16 +65,59 @@ public class Directory implements AutoCloseable {
         return file;
     }
 
-    /** Method to close (delete) the directory */
-    public void close() {
+    /** Method to delete the directory */
+    public void delete() {
         if (path != null) {
             try {
-                delete(new File(path));
+                delete(path);
             } catch (IOException e) {
                 e.printStackTrace(System.out);
                 System.out.flush();
             }
         }
+    }
+
+    /** Method to close (delete) the directory */
+    @Override
+    public void close() {
+        delete();
+    }
+
+    /**
+     * Method to create a directory relative to "java.tmpdir"
+     *
+     * @param path path
+     * @return a TempDir
+     * @throws IOException if the directory can't be created
+     */
+    public static Directory createRelative(String path) throws IOException {
+        checkNotNullOrEmpty(path, "path is null", "path is empty");
+        return create(path, PathType.RELATIVE);
+    }
+
+    /**
+     * Method to create an absolute directory
+     *
+     * @param path path
+     * @return a TempDir
+     * @throws IOException if the directory can't be created
+     */
+    public static Directory createAbsolute(String path) throws IOException {
+        checkNotNullOrEmpty(path, "path is null", "path is empty");
+        return create(path, PathType.ABSOLUTE);
+    }
+
+    /**
+     * Method to create a temporary directory
+     *
+     * @param path path
+     * @param pathType pathType
+     * @return a TempDir
+     * @throws IOException if the directory can't be created
+     */
+    public static Directory create(String path, PathType pathType) throws IOException {
+        checkNotNullOrEmpty(path, "path is null", "path is empty");
+        return new Directory(path, pathType);
     }
 
     @Override
@@ -89,7 +132,7 @@ public class Directory implements AutoCloseable {
         Directory directory = (Directory) o;
         return Objects.equals(path, directory.path)
                 && pathType == directory.pathType
-                && Objects.equals(file, directory.file);
+                && Objects.equals(file.getAbsolutePath(), directory.file.getAbsolutePath());
     }
 
     @Override
@@ -97,10 +140,20 @@ public class Directory implements AutoCloseable {
         return Objects.hash(path, pathType, file);
     }
 
-    private void delete(File f) throws IOException {
+    /**
+     * Method to delete a directory
+     *
+     * @param path path
+     * @throws IOException if the directory can't be deleted
+     */
+    private void delete(String path) throws IOException {
+        File f = new File(path);
         if (f.isDirectory()) {
-            for (File c : f.listFiles()) {
-                delete(c);
+            File[] files = f.listFiles();
+            if (files != null) {
+                for (File c : files) {
+                    delete(c.getAbsolutePath());
+                }
             }
         }
 
@@ -110,36 +163,19 @@ public class Directory implements AutoCloseable {
     }
 
     /**
-     * Method to create a directory relative to "java.tmpdir"
+     * Method to validate a value is not null and not empty
      *
-     * @param path path
-     * @return a TempDir
-     * @throws IOException if the temporary directory can't be created
+     * @param string string
+     * @param nullMessage nullMessage
+     * @param emptyMessage emptyMessage
      */
-    public static Directory createRelative(String path) throws IOException {
-        return create(path, PathType.RELATIVE);
-    }
-
-    /**
-     * Method to create an absolute directory
-     *
-     * @param path path
-     * @return a TempDir
-     * @throws IOException if the temporary directory can't be created
-     */
-    public static Directory createAbsolution(String path) throws IOException {
-        return create(path, PathType.ABSOLUTE);
-    }
-
-    /**
-     * Method to create a temporary directory
-     *
-     * @param path path
-     * @param pathType pathType
-     * @return a TempDir
-     * @throws IOException if the temporary directory can't be created
-     */
-    public static Directory create(String path, PathType pathType) throws IOException {
-        return new Directory(path, pathType);
+    private static void checkNotNullOrEmpty(
+            String string, String nullMessage, String emptyMessage) {
+        if (string == null) {
+            throw new IllegalArgumentException(nullMessage);
+        }
+        if (string.trim().equalsIgnoreCase("")) {
+            throw new IllegalArgumentException(emptyMessage);
+        }
     }
 }
