@@ -31,6 +31,7 @@ import java.util.Set;
 import org.antublue.test.engine.ConfigurationParameters;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.StatusEngineExecutionListener;
@@ -65,6 +66,10 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     private static final String ARTIFACT_ID = "test-engine-maven-plugin";
 
     private static final String VERSION = Information.getVersion();
+
+    static {
+        Store.getInstance();
+    }
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
