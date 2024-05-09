@@ -65,7 +65,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
     private static final String ARTIFACT_ID = "test-engine-maven-plugin";
 
-    private static final String VERSION = Information.getVersion();
+    private static final String VERSION = Information.getInstance().getVersion();
 
     static {
         Store.getInstance();
@@ -79,6 +79,11 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
     @Parameter(property = "properties")
     private Map<String, String> properties;
+
+    /** Constructor */
+    public TestEngineMavenPlugin() {
+        super();
+    }
 
     /**
      * Method to execute the plugin

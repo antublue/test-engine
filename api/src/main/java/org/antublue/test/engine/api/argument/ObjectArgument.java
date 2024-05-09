@@ -83,7 +83,7 @@ public class ObjectArgument<T> extends AbstractArgument {
      * @param name name
      * @param value value
      * @return T the return value
-     * @param <T> T the type
+     * @param <T> the type
      */
     public static <T> ObjectArgument<T> of(String name, T value) {
         return new ObjectArgument<>(name, value);

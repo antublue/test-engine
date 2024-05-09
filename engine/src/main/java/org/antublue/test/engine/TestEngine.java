@@ -59,7 +59,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public static final String ARTIFACT_ID = "test-engine";
 
     /** Configuration constant */
-    public static final String VERSION = Information.getVersion();
+    public static final String VERSION = Information.getInstance().getVersion();
 
     /**
      * Method to get the test engine id

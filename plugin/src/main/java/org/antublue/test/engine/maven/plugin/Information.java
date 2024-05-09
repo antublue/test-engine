@@ -24,16 +24,35 @@ import java.util.Properties;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Information {
 
+    private static Information INSTANCE;
+
     private static final String RESOURCE_PATH = "/test-engine-maven-plugin.properties";
     private static final String VERSION = "version";
     private static final String UNKNOWN = "Unknown";
+
+    /** Constructor */
+    private Information() {
+        // DO NOTHING
+    }
+
+    /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static synchronized Information getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Information();
+        }
+        return INSTANCE;
+    }
 
     /**
      * Method to get the TestEngine version
      *
      * @return the return value
      */
-    public static String getVersion() {
+    public String getVersion() {
         return getProperty(VERSION, UNKNOWN);
     }
 
@@ -44,7 +63,7 @@ public class Information {
      * @param defaultValue the default value
      * @return the value
      */
-    private static String getProperty(String key, String defaultValue) {
+    private String getProperty(String key, String defaultValue) {
         String value = defaultValue;
 
         try (InputStream inputStream = Information.class.getResourceAsStream(RESOURCE_PATH)) {

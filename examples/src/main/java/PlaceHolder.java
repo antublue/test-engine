@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** Dummy class to prevent Maven Jar Plugin build errors */
+/** Dummay class to prevent Maven jar errors */
 public class PlaceHolder {
 
     /** Constructor */
