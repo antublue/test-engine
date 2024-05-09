@@ -27,8 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
+import org.antublue.test.engine.internal.ConfigurationParameters;
 import org.antublue.test.engine.internal.Executor;
-import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.EngineDescriptorFactory;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
@@ -160,7 +160,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Matcher matcher = pattern.matcher("");
 
             Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getChildren());
+                    new LinkedHashSet<>(engineDescriptor.getDescendants());
             for (TestDescriptor testDescriptor : children) {
                 if (testDescriptor instanceof ClassTestDescriptor) {
                     ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
@@ -207,7 +207,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Matcher matcher = pattern.matcher("");
 
             Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getChildren());
+                    new LinkedHashSet<>(engineDescriptor.getDescendants());
             for (TestDescriptor testDescriptor : children) {
                 if (testDescriptor instanceof ClassTestDescriptor) {
                     ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
@@ -284,7 +284,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             Matcher matcher = pattern.matcher("");
 
             Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getChildren());
+                    new LinkedHashSet<>(engineDescriptor.getDescendants());
             for (TestDescriptor testDescriptor : children) {
                 if (testDescriptor instanceof MethodTestDescriptor) {
                     MethodTestDescriptor methodTestDescriptor =
@@ -328,19 +328,18 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     } else {
                         methodTestDescriptor.removeFromHierarchy();
                     }
-                    continue;
                 }
             }
         }
 
-        optional = CONFIGURATION.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
+        optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_EXCLUDE_REGEX, optional.get());
+            LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_TAG_EXCLUDE_REGEX, optional.get());
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
             Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getChildren());
+                    new LinkedHashSet<>(engineDescriptor.getDescendants());
             for (TestDescriptor testDescriptor : children) {
                 if (testDescriptor instanceof MethodTestDescriptor) {
                     MethodTestDescriptor methodTestDescriptor =
@@ -352,7 +351,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                             methodTestDescriptor.removeFromHierarchy();
                         }
                     }
-                    continue;
                 }
             }
         }
