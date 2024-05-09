@@ -101,16 +101,15 @@ public class SummaryEngineExecutionListener
             println(INFO + "properties [" + propertiesFilename + "]");
 
             Set<String> keySet = configuration.keySet();
-
             if (!keySet.isEmpty()) {
                 for (String key : configuration.keySet()) {
                     Optional<String> optional = configuration.get(key);
                     String value = optional.orElse("");
                     println(INFO + "[" + key + "] = [" + value + "]");
                 }
-
-                println(INFO + SEPARATOR);
             }
+
+            println(INFO + SEPARATOR);
         }
     }
 

@@ -236,15 +236,19 @@ The test engine uses a properties file for configuration.
 The properties filename is resolved using the following in order:
 
 - Environment variable `ANTUBLUE_TEST_ENGINE_PROPERTIES`
-
-
 - System property `antublue.test.engine.properties`
 
- 
-- Default file `./.antublue-test-engine.properties` (current directory)
+If these aren't defined, then the test engine will recursively search...
 
+current directory `antublue-test-engine.properties`
+ parent directory `antublue-test-engine.properties`
+  parent directory `antublue-test-engine.properties`
 
-- Default file `~/.antublue-test-engine.properties` (home directory)
+If no file named `antublue-test-engine.properties` is found, then the test engine will recursively search...
+
+current directory `.antublue-test-engine.properties`
+  parent directory `.antublue-test-engine.properties`
+    parent directory `.antublue-test-engine.properties`
 
 ### Standard Test Engine properties
 
@@ -264,8 +268,12 @@ The properties filename is resolved using the following in order:
 | antublue.test.engine.console.log.timing            | boolean | true                             |
 | antublue.test.engine.console.log.timing.units      | string  | milliseconds                     |
 | antublue.test.engine.console.log.test.messages     | boolean | true                             |
+| antublue.test.engine.console.log.test.message      | string  | TEST                             |
 | antublue.test.engine.console.log.skip.messages     | boolean | true                             |
+| antublue.test.engine.console.log.skip.message      | string  | SKIP                             |
 | antublue.test.engine.console.log.pass.messages     | boolean | true                             |
+| antublue.test.engine.console.log.pass.message      | string  | PASS                             |
+| antublue.test.engine.console.log.fail.message      | string  | FAIL                             |
 
 **Notes**
 
@@ -276,16 +284,6 @@ The properties filename is resolved using the following in order:
 - `milliseconds`
 - `seconds`
 - `minutes`
-
-### Experimental Test Engine Configuration
-
-| Property                                                    | Type    | Default value |
-|-------------------------------------------------------------|---------|---------------|
-| antublue.test.engine.experimental.console.log.pass.messages | boolean | true          |
-
-**Notes**
-
-- Experimental configuration values are subject to change at any time.
 
 ## Test Engine Summary
 
