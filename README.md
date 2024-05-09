@@ -6,7 +6,7 @@
 
 # Test Engine
 
-The AntuBLUE Test Engine is a [JUnit 5](https://github.com/junit-team/junit5)-based test engine designed specifically for parameterized container (class) testing.
+The AntuBLUE Test Engine is a [JUnit 5](https://junit.org/junit5/)-based test engine designed specifically for parameterized container (class) testing.
 
 Common usage scenarios
 
