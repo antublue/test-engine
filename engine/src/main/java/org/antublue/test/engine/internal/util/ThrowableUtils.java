@@ -21,8 +21,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
-import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.Configuration;
+import org.antublue.test.engine.Constants;
 
 /** Class to implement ThrowableUtils */
 public class ThrowableUtils {

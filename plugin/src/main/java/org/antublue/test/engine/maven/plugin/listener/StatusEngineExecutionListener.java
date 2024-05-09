@@ -17,9 +17,9 @@
 package org.antublue.test.engine.maven.plugin.listener;
 
 import java.lang.reflect.Method;
+import org.antublue.test.engine.Configuration;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.Configuration;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.MetadataSupport;
