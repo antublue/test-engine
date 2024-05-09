@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The AntuBLUE test-engine project authors
+ * Copyright (C) 2024 The AntuBLUE test-engine project authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
 
@@ -45,7 +44,7 @@ import org.testcontainers.utility.DockerImageName;
  *
  * <p>Disabled by default since users may not have Docker installed
  */
-@TestEngine.Disabled
+// @TestEngine.Disabled
 public class KafkaTest {
 
     private static final String TOPIC = "test";
@@ -61,14 +60,7 @@ public class KafkaTest {
 
     @TestEngine.ArgumentSupplier
     public static Stream<KafkaTestContainer> arguments() {
-        return Stream.of(
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.0.14"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.1.12"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.2.10"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.3.8"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.4.5"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.5.4"),
-                KafkaTestContainer.of("confluentinc/cp-kafka:7.6.1"));
+        return Stream.of(KafkaTestContainer.of("apache/kafka:3.7.0"));
     }
 
     @TestEngine.Prepare
@@ -235,15 +227,6 @@ public class KafkaTest {
 
             kafkaContainer = new KafkaContainer(DockerImageName.parse(dockerImageName));
             kafkaContainer.withNetwork(network);
-
-            if (dockerImageName.startsWith("confluentinc/cp-kafka:7.4")
-                    || dockerImageName.startsWith("confluentinc/cp-kafka:7.5")
-                    || dockerImageName.startsWith("confluentinc/cp-kafka:7.6")) {
-                kafkaContainer.withKraft();
-            } else {
-                kafkaContainer.withEmbeddedZookeeper();
-            }
-
             kafkaContainer.start();
 
             info("test container [%s] started", dockerImageName);
