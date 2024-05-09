@@ -31,7 +31,7 @@ import org.junit.platform.commons.support.ReflectionSupport;
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class AutoCloseAnnotationProcessor {
 
-    private static final AutoCloseAnnotationProcessor INSTANCE = new AutoCloseAnnotationProcessor();
+    private static AutoCloseAnnotationProcessor INSTANCE;
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(AutoCloseAnnotationProcessor.class);
@@ -52,7 +52,10 @@ public class AutoCloseAnnotationProcessor {
      *
      * @return the singleton
      */
-    public static AutoCloseAnnotationProcessor getInstance() {
+    public static synchronized AutoCloseAnnotationProcessor getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new AutoCloseAnnotationProcessor();
+        }
         return INSTANCE;
     }
 

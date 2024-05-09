@@ -31,7 +31,7 @@ import org.junit.platform.commons.util.ClassUtils;
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class TestUtils {
 
-    private static final TestUtils INSTANCE = new TestUtils();
+    private static TestUtils INSTANCE;
 
     private static final DefaultMethodOrderTopDownComparator
             DEFAULT_METHOD_ORDER_TOP_DOWN_COMPARATOR = new DefaultMethodOrderTopDownComparator();
@@ -49,7 +49,10 @@ public class TestUtils {
         // DO NOTHING
     }
 
-    public static TestUtils getInstance() {
+    public static synchronized TestUtils getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new TestUtils();
+        }
         return INSTANCE;
     }
 

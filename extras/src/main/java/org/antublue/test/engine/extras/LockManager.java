@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /** Class to implement a LockManager */
 public class LockManager {
 
-    private static final LockManager INSTANCE = new LockManager();
+    private static LockManager INSTANCE;
 
     private final ReentrantLock reentrantLock;
     private final Map<String, ReentrantReadWriteLock> reentrantReadWriteLockMap;
@@ -40,7 +40,10 @@ public class LockManager {
      *
      * @return the singleton instance
      */
-    public static LockManager getInstance() {
+    public static synchronized LockManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new LockManager();
+        }
         return INSTANCE;
     }
 

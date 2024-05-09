@@ -95,16 +95,22 @@ public class SummaryEngineExecutionListener
         println(INFO + SEPARATOR);
 
         Configuration configuration = Configuration.getInstance();
-        Set<String> keySet = configuration.keySet();
+        String propertiesFilename = configuration.getPropertiesFilename();
 
-        if (keySet.size() > 0) {
-            for (String key : configuration.keySet()) {
-                Optional<String> optional = configuration.get(key);
-                String value = optional.orElse("");
-                println(INFO + "[" + key + "] = [" + value + "]");
+        if (propertiesFilename != null) {
+            println(INFO + "properties [" + propertiesFilename + "]");
+
+            Set<String> keySet = configuration.keySet();
+
+            if (!keySet.isEmpty()) {
+                for (String key : configuration.keySet()) {
+                    Optional<String> optional = configuration.get(key);
+                    String value = optional.orElse("");
+                    println(INFO + "[" + key + "] = [" + value + "]");
+                }
+
+                println(INFO + SEPARATOR);
             }
-
-            println(INFO + SEPARATOR);
         }
     }
 

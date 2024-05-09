@@ -36,7 +36,7 @@ public class RandomAnnotationProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomAnnotationProcessor.class);
 
-    private static final RandomAnnotationProcessor INSTANCE = new RandomAnnotationProcessor();
+    private static RandomAnnotationProcessor INSTANCE;
 
     private static final RandomGenerator RANDOM_GENERATOR = RandomGenerator.getInstance();
 
@@ -45,7 +45,10 @@ public class RandomAnnotationProcessor {
         // DO NOTHING
     }
 
-    public static RandomAnnotationProcessor getInstance() {
+    public static synchronized RandomAnnotationProcessor getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new RandomAnnotationProcessor();
+        }
         return INSTANCE;
     }
 

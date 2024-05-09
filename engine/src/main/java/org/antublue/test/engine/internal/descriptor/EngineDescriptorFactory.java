@@ -53,9 +53,12 @@ public class EngineDescriptorFactory {
 
     private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
-    private static final EngineDescriptorFactory INSTANCE = new EngineDescriptorFactory();
+    private static EngineDescriptorFactory INSTANCE;
 
-    public static EngineDescriptorFactory getInstance() {
+    public static synchronized EngineDescriptorFactory getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new EngineDescriptorFactory();
+        }
         return INSTANCE;
     }
 

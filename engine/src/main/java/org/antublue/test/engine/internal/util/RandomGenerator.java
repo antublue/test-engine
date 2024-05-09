@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /** Class to implement RandomUtils */
 public class RandomGenerator {
 
-    private static final RandomGenerator INSTANCE = new RandomGenerator();
+    private static RandomGenerator INSTANCE;
 
     /** Constructor */
     private RandomGenerator() {
@@ -37,7 +37,10 @@ public class RandomGenerator {
      *
      * @return the singleton instance
      */
-    public static RandomGenerator getInstance() {
+    public static synchronized RandomGenerator getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new RandomGenerator();
+        }
         return INSTANCE;
     }
 

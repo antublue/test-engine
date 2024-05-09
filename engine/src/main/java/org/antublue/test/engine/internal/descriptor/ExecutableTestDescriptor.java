@@ -36,6 +36,20 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
 
     private static final Configuration CONFIGURATION = Configuration.getInstance();
 
+    private static long THREAD_THROTTLE_MILLISECONDS = 0;
+
+    static {
+        Optional<String> optional = CONFIGURATION.get(Constants.THREAD_THROTTLE_MILLISECONDS);
+
+        if (optional.isPresent()) {
+            try {
+                THREAD_THROTTLE_MILLISECONDS = Long.parseLong(optional.get());
+            } catch (Throwable t) {
+                // DO NOTHING
+            }
+        }
+    }
+
     private final ThrowableContext throwableContext;
     private final Metadata metadata;
     private final StopWatch stopWatch;
@@ -49,17 +63,6 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         stopWatch = new StopWatch();
         throwableContext = new ThrowableContext();
         metadata = new Metadata();
-
-        CONFIGURATION
-                .get(Constants.THREAD_THROTTLE_MILLISECONDS)
-                .ifPresent(
-                        s -> {
-                            try {
-                                throttleMilliseconds = Long.parseLong(s);
-                            } catch (Throwable t) {
-                                // DO NOTHING
-                            }
-                        });
     }
 
     protected void throttle() {

@@ -35,7 +35,8 @@ import java.util.function.Function;
 @SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
 public final class Store {
 
-    private static final Store INSTANCE = new Store();
+    private static final Object LOCK = new Object();
+    private static Store INSTANCE;
 
     private final Lock lock;
     private final Map<String, Object> map;
@@ -71,7 +72,10 @@ public final class Store {
      *
      * @return the singleton instance
      */
-    public static Store getInstance() {
+    public static synchronized Store getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Store();
+        }
         return INSTANCE;
     }
 

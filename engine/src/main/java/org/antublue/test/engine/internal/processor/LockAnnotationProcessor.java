@@ -35,7 +35,7 @@ public class LockAnnotationProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LockAnnotationProcessor.class);
 
-    private static final LockAnnotationProcessor INSTANCE = new LockAnnotationProcessor();
+    private static LockAnnotationProcessor INSTANCE;
 
     private final Map<String, ReentrantReadWriteLock> LOCK_MAP = new ConcurrentHashMap<>();
 
@@ -48,7 +48,10 @@ public class LockAnnotationProcessor {
      *
      * @return the singleton instance
      */
-    public static LockAnnotationProcessor getInstance() {
+    public static synchronized LockAnnotationProcessor getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new LockAnnotationProcessor();
+        }
         return INSTANCE;
     }
 
