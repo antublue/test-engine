@@ -43,6 +43,18 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
     private static final TestUtils TEST_UTILS = TestUtils.getInstance();
 
+    private static final String MESSAGE_TEST;
+    private static final String MESSAGE_PASS;
+    private static final String MESSAGE_FAIL;
+    private static final String MESSAGE_SKIP;
+
+    static {
+        MESSAGE_TEST = CONFIGURATION.get(Constants.CONSOLE_LOG_TEST_MESSAGE).orElse("TEST");
+        MESSAGE_PASS = CONFIGURATION.get(Constants.CONSOLE_LOG_PASS_MESSAGE).orElse("PASS");
+        MESSAGE_FAIL = CONFIGURATION.get(Constants.CONSOLE_LOG_FAIL_MESSAGE).orElse("FAIL");
+        MESSAGE_SKIP = CONFIGURATION.get(Constants.CONSOLE_LOG_SKIP_MESSAGE).orElse("SKIP");
+    }
+
     private static final String INFO =
             new AnsiColorStringBuilder()
                     .color(AnsiColor.TEXT_WHITE)
@@ -54,24 +66,31 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
+    private static final String TEST =
+            new AnsiColorStringBuilder()
+                    .append(AnsiColor.TEXT_WHITE_BRIGHT)
+                    .append(MESSAGE_TEST)
+                    .color(AnsiColor.TEXT_RESET)
+                    .toString();
+
     private static final String PASS =
             new AnsiColorStringBuilder()
                     .color(AnsiColor.TEXT_GREEN_BOLD_BRIGHT)
-                    .append("PASS")
+                    .append(MESSAGE_PASS)
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
     private static final String FAIL =
             new AnsiColorStringBuilder()
                     .color(AnsiColor.TEXT_RED_BOLD_BRIGHT)
-                    .append("FAIL")
+                    .append(MESSAGE_FAIL)
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
     private static final String SKIP =
             new AnsiColorStringBuilder()
                     .color(AnsiColor.TEXT_YELLOW_BOLD_BRIGHT)
-                    .append("SKIP")
+                    .append(MESSAGE_SKIP)
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
@@ -176,8 +195,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                             .append(" ")
                             .append(Thread.currentThread().getName())
                             .append(" | ")
-                            .append(AnsiColor.TEXT_WHITE_BRIGHT)
-                            .append("TEST")
+                            .append(TEST)
                             .color(AnsiColor.TEXT_RESET);
 
             if (testArgument != null) {

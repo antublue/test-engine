@@ -54,13 +54,25 @@ public final class Constants {
     public static final String CONSOLE_LOG_TIMING_UNITS = CONSOLE_LOG_TIMING + ".units";
 
     /** Configuration constant */
+    public static final String CONSOLE_LOG_TEST_MESSAGE = CONSOLE_LOG + ".test.message";
+
+    /** Configuration constant */
     public static final String CONSOLE_LOG_TEST_MESSAGES = CONSOLE_LOG + ".test.messages";
+
+    /** Configuration constant */
+    public static final String CONSOLE_LOG_SKIP_MESSAGE = CONSOLE_LOG + ".skip.message";
 
     /** Configuration constant */
     public static final String CONSOLE_LOG_SKIP_MESSAGES = CONSOLE_LOG + ".skip.messages";
 
     /** Configuration constant */
+    public static final String CONSOLE_LOG_PASS_MESSAGE = CONSOLE_LOG + ".pass.message";
+
+    /** Configuration constant */
     public static final String CONSOLE_LOG_PASS_MESSAGES = CONSOLE_LOG + ".pass.messages";
+
+    /** Configuration constant */
+    public static final String CONSOLE_LOG_FAIL_MESSAGE = CONSOLE_LOG + ".fail.message";
 
     /** Configuration constant */
     public static final String TEST_CLASS_SHUFFLE = PREFIX + ".test.class.shuffle";

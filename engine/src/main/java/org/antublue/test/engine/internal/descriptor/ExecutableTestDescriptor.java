@@ -54,7 +54,6 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
     private final Metadata metadata;
     private final StopWatch stopWatch;
     private ExecutionRequest executionRequest;
-    private long throttleMilliseconds;
     private Object testInstance;
 
     protected ExecutableTestDescriptor(UniqueId uniqueId, String displayName) {
@@ -66,9 +65,9 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
     }
 
     protected void throttle() {
-        if (throttleMilliseconds > 0) {
+        if (THREAD_THROTTLE_MILLISECONDS > 0) {
             try {
-                Thread.sleep(throttleMilliseconds);
+                Thread.sleep(THREAD_THROTTLE_MILLISECONDS);
             } catch (Throwable t) {
                 // DO NOTHING
             }
