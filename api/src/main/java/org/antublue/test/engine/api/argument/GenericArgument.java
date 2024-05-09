@@ -18,7 +18,11 @@ package org.antublue.test.engine.api.argument;
 
 import java.util.Objects;
 
-/** Class to implement a BooleanArgument */
+/**
+ * Class to implement a BooleanArgument
+ *
+ * @param <T> the value type
+ */
 @SuppressWarnings("unchecked")
 public class GenericArgument<T> extends AbstractArgument {
 
@@ -49,7 +53,7 @@ public class GenericArgument<T> extends AbstractArgument {
     /**
      * Method to get the BooleanArgument value
      *
-     * @return <T> the return value
+     * @return T the return value
      */
     public T value() {
         return value;
@@ -83,7 +87,7 @@ public class GenericArgument<T> extends AbstractArgument {
      *
      * @param name name
      * @param value value
-     * @return the return value
+     * @return T the return value
      */
     public static <T> GenericArgument<T> of(String name, T value) {
         return new GenericArgument(name, value);

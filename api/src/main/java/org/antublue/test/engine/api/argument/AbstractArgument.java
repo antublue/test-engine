@@ -21,6 +21,11 @@ import org.antublue.test.engine.api.Argument;
 /** Abstract class for common arguments */
 public abstract class AbstractArgument implements Argument {
 
+    /** Constructor */
+    public AbstractArgument() {
+        // DO NOTHING
+    }
+
     /**
      * Method to validate a name is not null and not empty
      *

@@ -234,6 +234,7 @@ public interface Extension {
      *
      * @param testClass testClass
      * @param optionalTestInstance optionalTestInstance
+     * @throws Throwable throwable
      */
     default void preDestroyCallback(Class<?> testClass, Optional<Object> optionalTestInstance)
             throws Throwable {

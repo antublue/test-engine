@@ -18,7 +18,11 @@ package org.antublue.test.engine.api.argument;
 
 import java.util.Objects;
 
-/** Class to implement a ObjectArgument */
+/**
+ * Class to implement a ObjectArgument
+ *
+ * @param <T> the value type
+ */
 @Deprecated
 public class ObjectArgument<T> extends AbstractArgument {
 
@@ -49,7 +53,7 @@ public class ObjectArgument<T> extends AbstractArgument {
     /**
      * Method to get the ObjectArgument value
      *
-     * @return <T> the return value
+     * @return T the return value
      */
     public T value() {
         return value;
@@ -78,8 +82,8 @@ public class ObjectArgument<T> extends AbstractArgument {
      *
      * @param name name
      * @param value value
-     * @return the return vaalue
-     * @param <T> the type
+     * @return T the return value
+     * @param <T> T the type
      */
     public static <T> ObjectArgument<T> of(String name, T value) {
         return new ObjectArgument<>(name, value);
