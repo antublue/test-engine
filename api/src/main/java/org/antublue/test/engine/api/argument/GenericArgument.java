@@ -91,6 +91,6 @@ public class GenericArgument<T> extends AbstractArgument {
      * @param <T> the type
      */
     public static <T> GenericArgument<T> of(String name, T value) {
-        return new GenericArgument(name, value);
+        return new GenericArgument<>(name, value);
     }
 }
