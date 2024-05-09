@@ -49,7 +49,7 @@ public class GenericArgument<T> extends AbstractArgument {
     /**
      * Method to get the BooleanArgument value
      *
-     * @return the return value
+     * @return <T> the return value
      */
     public T value() {
         return value;

@@ -19,6 +19,7 @@ package org.antublue.test.engine.api.argument;
 import java.util.Objects;
 
 /** Class to implement a ObjectArgument */
+@Deprecated
 public class ObjectArgument<T> extends AbstractArgument {
 
     private final String name;
@@ -48,7 +49,7 @@ public class ObjectArgument<T> extends AbstractArgument {
     /**
      * Method to get the ObjectArgument value
      *
-     * @return the return value
+     * @return <T> the return value
      */
     public T value() {
         return value;
