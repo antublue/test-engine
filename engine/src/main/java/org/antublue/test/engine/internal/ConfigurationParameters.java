@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine;
+package org.antublue.test.engine.internal;
+
+import org.antublue.test.engine.Configuration;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import org.antublue.test.engine.internal.configuration.Configuration;
 
 /** Class to implement ConfigurationParameters */
 @SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})

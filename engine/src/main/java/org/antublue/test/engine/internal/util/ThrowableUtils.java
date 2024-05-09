@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import org.antublue.test.engine.Constants;
-import org.antublue.test.engine.internal.configuration.Configuration;
+import org.antublue.test.engine.Configuration;
 
 /** Class to implement ThrowableUtils */
 public class ThrowableUtils {

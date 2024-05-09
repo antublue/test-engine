@@ -18,9 +18,9 @@ package org.antublue.test.engine.internal.descriptor;
 
 import java.util.Optional;
 import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.Configuration;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataSupport;
-import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.util.StopWatch;
 import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.util.Preconditions;

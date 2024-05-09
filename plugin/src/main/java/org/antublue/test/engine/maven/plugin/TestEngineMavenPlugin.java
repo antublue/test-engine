@@ -28,7 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.antublue.test.engine.ConfigurationParameters;
+import org.antublue.test.engine.internal.ConfigurationParameters;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.api.Store;
