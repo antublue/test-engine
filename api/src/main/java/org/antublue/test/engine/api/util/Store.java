@@ -25,7 +25,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import org.antublue.test.engine.api.StoreException;
 
 /**
  * Class to implement a Store
