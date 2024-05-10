@@ -26,6 +26,7 @@ import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to process @TestEngine.Store annotations */
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class StoreAnnotationProcessor {
 
     /** Constructor */
