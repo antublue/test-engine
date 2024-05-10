@@ -19,6 +19,8 @@ package org.antublue.test.engine.api;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -100,6 +102,27 @@ public final class Store {
      */
     public Lock getLock() {
         return lock;
+    }
+
+    /**
+     * Method to get the Store's keys. Keys that start with "." are considered hidden and will not
+     * be returned.
+     *
+     * @return the Store keys
+     */
+    public Set<String> keySet() {
+        try {
+            lock();
+            Set<String> treeSet = new TreeSet<>();
+            for (String key : map.keySet()) {
+                if (!key.startsWith(".")) {
+                    treeSet.add(key);
+                }
+            }
+            return treeSet;
+        } finally {
+            unlock();
+        }
     }
 
     /**
