@@ -42,8 +42,6 @@ import org.junit.platform.commons.support.ReflectionSupport;
 @SuppressWarnings({"unchecked", "PMD.UnusedPrivateMethod"})
 public class ExtensionManager {
 
-    private static ExtensionManager INSTANCE;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionManager.class);
 
     private static final Configuration CONFIGURATION = Configuration.getInstance();
@@ -82,11 +80,8 @@ public class ExtensionManager {
      *
      * @return the singleton extension manager
      */
-    public static synchronized ExtensionManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ExtensionManager();
-        }
-        return INSTANCE;
+    public static ExtensionManager getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     /**
@@ -527,5 +522,12 @@ public class ExtensionManager {
     private List<Extension> getTestExtensionsReversed(Class<?> testClass) {
         initialize(testClass);
         return testExtensionsReversedMap.getOrDefault(testClass, EMPTY_EXTENSION_LIST);
+    }
+
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final ExtensionManager INSTANCE = new ExtensionManager();
     }
 }

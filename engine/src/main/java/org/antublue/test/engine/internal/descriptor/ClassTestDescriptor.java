@@ -45,6 +45,8 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 /** Class to implement a ClassTestDescriptor */
 public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
+    private static final TestUtils TEST_UTILS = TestUtils.getInstance();
+
     private static final AutoCloseAnnotationProcessor AUTO_CLOSE_ANNOTATION_PROCESSOR =
             AutoCloseAnnotationProcessor.getInstance();
 
@@ -100,7 +102,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     public String getTag() {
-        return TestUtils.getTag(testClass);
+        return TEST_UTILS.getTag(testClass);
     }
 
     @Override
@@ -238,7 +240,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         try {
             for (Method method : prepareMethods) {
                 LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-                TestUtils.invoke(method, getTestInstance(), null, getThrowableContext());
+                TEST_UTILS.invoke(method, getTestInstance(), null, getThrowableContext());
                 LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
@@ -289,7 +291,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         for (Method method : concludeMethods) {
             LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-            TestUtils.invoke(method, getTestInstance(), null, getThrowableContext());
+            TEST_UTILS.invoke(method, getTestInstance(), null, getThrowableContext());
             LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
         }
 
@@ -381,7 +383,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                                 .getUniqueId()
                                 .append(ClassTestDescriptor.class.getName(), testClass.getName());
 
-                displayName = TestUtils.getDisplayName(testClass);
+                displayName = TEST_UTILS.getDisplayName(testClass);
 
                 prepareMethods =
                         ReflectionSupport.findMethods(
@@ -390,7 +392,8 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                                 HierarchyTraversalMode.TOP_DOWN);
 
                 prepareMethods =
-                        TestUtils.orderTestMethods(prepareMethods, HierarchyTraversalMode.TOP_DOWN);
+                        TEST_UTILS.orderTestMethods(
+                                prepareMethods, HierarchyTraversalMode.TOP_DOWN);
 
                 concludeMethods =
                         ReflectionSupport.findMethods(
@@ -399,7 +402,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                                 HierarchyTraversalMode.BOTTOM_UP);
 
                 concludeMethods =
-                        TestUtils.orderTestMethods(
+                        TEST_UTILS.orderTestMethods(
                                 concludeMethods, HierarchyTraversalMode.BOTTOM_UP);
 
                 TestDescriptor testDescriptor = new ClassTestDescriptor(this);

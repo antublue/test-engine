@@ -44,6 +44,8 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 /** Class to implement a MethodTestDescriptor */
 public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
+    private static final TestUtils TEST_UTILS = TestUtils.getInstance();
+
     private static final AutoCloseAnnotationProcessor AUTO_CLOSE_ANNOTATION_PROCESSOR =
             AutoCloseAnnotationProcessor.getInstance();
 
@@ -98,7 +100,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     public String getTag() {
-        return TestUtils.getTag(testMethod);
+        return TEST_UTILS.getTag(testMethod);
     }
 
     @Override
@@ -224,7 +226,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         try {
             for (Method method : beforeEachMethods) {
                 LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-                TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
+                TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
                 LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
@@ -267,7 +269,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         Preconditions.notNull(getTestInstance(), "testInstance is null");
 
         LOCK_ANNOTATION_PROCESSOR.processLocks(testMethod);
-        TestUtils.invoke(testMethod, getTestInstance(), testArgument, getThrowableContext());
+        TEST_UTILS.invoke(testMethod, getTestInstance(), testArgument, getThrowableContext());
         LOCK_ANNOTATION_PROCESSOR.processUnlocks(testMethod);
 
         return State.POST_TEST;
@@ -300,7 +302,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
         for (Method method : afterEachMethods) {
             LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-            TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
+            TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
             LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
         }
 
@@ -389,7 +391,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                                 .getUniqueId()
                                 .append(MethodTestDescriptor.class.getName(), testMethod.getName());
 
-                displayName = TestUtils.getDisplayName(testMethod);
+                displayName = TEST_UTILS.getDisplayName(testMethod);
 
                 beforeEachMethods =
                         ReflectionSupport.findMethods(
@@ -398,7 +400,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                                 HierarchyTraversalMode.TOP_DOWN);
 
                 beforeEachMethods =
-                        TestUtils.orderTestMethods(
+                        TEST_UTILS.orderTestMethods(
                                 beforeEachMethods, HierarchyTraversalMode.TOP_DOWN);
 
                 afterEachMethods =
@@ -408,7 +410,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                                 HierarchyTraversalMode.BOTTOM_UP);
 
                 afterEachMethods =
-                        TestUtils.orderTestMethods(
+                        TEST_UTILS.orderTestMethods(
                                 afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
 
                 TestDescriptor testDescriptor = new MethodTestDescriptor(this);

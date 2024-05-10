@@ -24,8 +24,6 @@ import java.util.Properties;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Information {
 
-    private static Information INSTANCE;
-
     private static final String RESOURCE_PATH = "/test-engine.properties";
     private static final String VERSION = "version";
     private static final String UNKNOWN = "Unknown";
@@ -40,11 +38,8 @@ public class Information {
      *
      * @return the singleton instance
      */
-    public static synchronized Information getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Information();
-        }
-        return INSTANCE;
+    public static Information getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     /**
@@ -77,5 +72,12 @@ public class Information {
         }
 
         return value;
+    }
+
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final Information INSTANCE = new Information();
     }
 }

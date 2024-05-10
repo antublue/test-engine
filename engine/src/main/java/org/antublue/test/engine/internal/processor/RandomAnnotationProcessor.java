@@ -22,8 +22,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.predicate.AnnotationFieldPredicate;
 import org.antublue.test.engine.internal.util.RandomGenerator;
 import org.antublue.test.engine.internal.util.ThrowableContext;
@@ -34,10 +32,6 @@ import org.junit.platform.commons.support.ReflectionSupport;
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class RandomAnnotationProcessor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RandomAnnotationProcessor.class);
-
-    private static RandomAnnotationProcessor INSTANCE;
-
     private static final RandomGenerator RANDOM_GENERATOR = RandomGenerator.getInstance();
 
     /** Constructor */
@@ -45,11 +39,8 @@ public class RandomAnnotationProcessor {
         // DO NOTHING
     }
 
-    public static synchronized RandomAnnotationProcessor getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new RandomAnnotationProcessor();
-        }
-        return INSTANCE;
+    public static RandomAnnotationProcessor getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     /**
@@ -322,5 +313,12 @@ public class RandomAnnotationProcessor {
                 throwableContext.add(testInstance.getClass(), t);
             }
         }
+    }
+
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final RandomAnnotationProcessor INSTANCE = new RandomAnnotationProcessor();
     }
 }

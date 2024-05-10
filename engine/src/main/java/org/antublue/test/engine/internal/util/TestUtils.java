@@ -31,8 +31,6 @@ import org.junit.platform.commons.util.ClassUtils;
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class TestUtils {
 
-    private static TestUtils INSTANCE;
-
     private static final DefaultMethodOrderTopDownComparator
             DEFAULT_METHOD_ORDER_TOP_DOWN_COMPARATOR = new DefaultMethodOrderTopDownComparator();
 
@@ -49,14 +47,11 @@ public class TestUtils {
         // DO NOTHING
     }
 
-    public static synchronized TestUtils getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new TestUtils();
-        }
-        return INSTANCE;
+    public static TestUtils getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
-    public static void invoke(
+    public void invoke(
             Method method,
             Object testInstance,
             Object testArgument,
@@ -79,7 +74,7 @@ public class TestUtils {
      * @param testClass testClass
      * @return the display name
      */
-    public static String getDisplayName(Class<?> testClass) {
+    public String getDisplayName(Class<?> testClass) {
         String displayName = testClass.getName();
 
         TestEngine.DisplayName annotation = testClass.getAnnotation(TestEngine.DisplayName.class);
@@ -99,7 +94,7 @@ public class TestUtils {
      * @param testMethod testMethod
      * @return the display name
      */
-    public static String getDisplayName(Method testMethod) {
+    public String getDisplayName(Method testMethod) {
         String displayName = testMethod.getName();
 
         TestEngine.DisplayName annotation = testMethod.getAnnotation(TestEngine.DisplayName.class);
@@ -119,7 +114,7 @@ public class TestUtils {
      * @param annotatedElement annotatedElement
      * @return the tag value
      */
-    public static String getTag(AnnotatedElement annotatedElement) {
+    public String getTag(AnnotatedElement annotatedElement) {
         String tagValue = null;
 
         TestEngine.Tag annotation = annotatedElement.getAnnotation(TestEngine.Tag.class);
@@ -140,7 +135,7 @@ public class TestUtils {
      * @param testMethods testMethods
      * @return the list of methods ordered
      */
-    public static List<Method> orderTestMethods(
+    public List<Method> orderTestMethods(
             List<Method> testMethods, HierarchyTraversalMode hierarchyTraversalMode) {
         // The code assumes that the list of already ordered by component type / declaring class
 
@@ -235,5 +230,12 @@ public class TestUtils {
             }
             return comparison;
         }
+    }
+
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final TestUtils INSTANCE = new TestUtils();
     }
 }
