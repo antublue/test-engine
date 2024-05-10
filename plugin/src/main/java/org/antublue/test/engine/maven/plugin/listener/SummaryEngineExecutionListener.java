@@ -88,7 +88,7 @@ public class SummaryEngineExecutionListener
 
     /** Method to begin the summary output */
     public void begin() {
-        stopWatch.start();
+        stopWatch.reset();
 
         println(INFO + SEPARATOR);
         println(INFO + BANNER);

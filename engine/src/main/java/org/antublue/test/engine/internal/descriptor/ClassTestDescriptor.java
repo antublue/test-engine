@@ -107,7 +107,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        getStopWatch().start();
+        getStopWatch().reset();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
 

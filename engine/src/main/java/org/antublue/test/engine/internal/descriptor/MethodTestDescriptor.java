@@ -105,7 +105,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        getStopWatch().start();
+        getStopWatch().reset();
 
         Object testInstance = getParent(ExecutableTestDescriptor.class).getTestInstance();
         Preconditions.notNull(testInstance, "testInstance is null");

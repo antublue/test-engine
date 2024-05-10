@@ -22,17 +22,18 @@ public class StopWatch {
     private long startNanoTime;
     private Long stopNanoTime;
 
-    /** Constructor */
-    public StopWatch() {
-        start();
-    }
-
     /**
-     * Method to start (reset) the stop watch
+     * Constructor
+     *
+     * <p>The stop watch starts automatically
+     *
+     * <p>/ public StopWatch() { reset(); }
+     *
+     * <p>/** Method to reset the stop watch
      *
      * @return this
      */
-    public StopWatch start() {
+    public StopWatch reset() {
         startNanoTime = System.nanoTime();
         stopNanoTime = null;
         return this;
