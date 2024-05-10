@@ -24,8 +24,6 @@ import org.antublue.test.engine.Configuration;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public final class LoggerFactory {
 
-    private static LoggerFactory INSTANCE;
-
     private final Map<String, Logger> loggerMap = new HashMap<>();
 
     /** Constructor */
@@ -68,11 +66,14 @@ public final class LoggerFactory {
      */
     public static Logger getLogger(String name) {
         synchronized (Configuration.getInstance()) {
-            if (INSTANCE == null) {
-                INSTANCE = new LoggerFactory();
-            }
+            return SingletonHolder.INSTANCE.createLogger(name);
         }
+    }
 
-        return INSTANCE.createLogger(name);
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final LoggerFactory INSTANCE = new LoggerFactory();
     }
 }

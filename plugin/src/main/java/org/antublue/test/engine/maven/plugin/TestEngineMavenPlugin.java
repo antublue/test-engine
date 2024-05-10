@@ -68,6 +68,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     private static final String VERSION = Information.getInstance().getVersion();
 
     static {
+        // Load the Store singleton in the current classloader
         Store.getInstance();
     }
 

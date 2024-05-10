@@ -25,8 +25,6 @@ import java.util.concurrent.ThreadLocalRandom;
 /** Class to implement RandomUtils */
 public class RandomGenerator {
 
-    private static RandomGenerator INSTANCE;
-
     /** Constructor */
     private RandomGenerator() {
         // DO NOTHING
@@ -37,11 +35,8 @@ public class RandomGenerator {
      *
      * @return the singleton instance
      */
-    public static synchronized RandomGenerator getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new RandomGenerator();
-        }
-        return INSTANCE;
+    public static RandomGenerator getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     /**
@@ -257,5 +252,12 @@ public class RandomGenerator {
                         .movePointLeft(digitCount);
 
         return minimum.add(maximum.subtract(minimum).multiply(alpha, new MathContext(digitCount)));
+    }
+
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final RandomGenerator INSTANCE = new RandomGenerator();
     }
 }

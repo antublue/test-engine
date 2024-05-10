@@ -48,6 +48,8 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
+    private static final TestUtils TEST_UTILS = TestUtils.getInstance();
+
     private static final ArgumentAnnotationProcessor ARGUMENT_ANNOTATION_PROCESSOR =
             ArgumentAnnotationProcessor.getInstance();
 
@@ -215,7 +217,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                             new TestClassFailedException(
                                     String.format(
                                             "Exception testing test class [%s]",
-                                            TestUtils.getDisplayName(testClass))));
+                                            TEST_UTILS.getDisplayName(testClass))));
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
             executionRequest
                     .getEngineExecutionListener()
@@ -274,7 +276,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         try {
             for (Method method : beforeAllMethods) {
                 LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-                TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
+                TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
                 LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
@@ -330,7 +332,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         for (Method method : afterAllMethods) {
             LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-            TestUtils.invoke(method, getTestInstance(), testArgument, getThrowableContext());
+            TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
             LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
         }
 
@@ -440,7 +442,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                 HierarchyTraversalMode.TOP_DOWN);
 
                 beforeAllMethods =
-                        TestUtils.orderTestMethods(
+                        TEST_UTILS.orderTestMethods(
                                 beforeAllMethods, HierarchyTraversalMode.TOP_DOWN);
 
                 afterAllMethods =
@@ -450,7 +452,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                 HierarchyTraversalMode.BOTTOM_UP);
 
                 afterAllMethods =
-                        TestUtils.orderTestMethods(
+                        TEST_UTILS.orderTestMethods(
                                 afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
 
                 TestDescriptor testDescriptor = new ArgumentTestDescriptor(this);

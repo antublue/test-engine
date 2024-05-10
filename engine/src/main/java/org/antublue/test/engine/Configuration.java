@@ -33,8 +33,6 @@ import java.util.TreeMap;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Configuration {
 
-    private static Configuration INSTANCE;
-
     /** Configuration constant */
     public static final String ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE =
             "ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE";
@@ -110,11 +108,8 @@ public class Configuration {
      *
      * @return the singleton instance
      */
-    public static synchronized Configuration getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Configuration();
-        }
-        return INSTANCE;
+    public static Configuration getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     /**
@@ -202,5 +197,12 @@ public class Configuration {
         }
 
         return null;
+    }
+
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final Configuration INSTANCE = new Configuration();
     }
 }

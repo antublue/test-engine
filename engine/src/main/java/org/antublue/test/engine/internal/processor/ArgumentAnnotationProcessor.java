@@ -33,8 +33,6 @@ public class ArgumentAnnotationProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentAnnotationProcessor.class);
 
-    private static ArgumentAnnotationProcessor INSTANCE;
-
     /** Constructor */
     private ArgumentAnnotationProcessor() {
         // DO NOTHING
@@ -45,11 +43,8 @@ public class ArgumentAnnotationProcessor {
      *
      * @return the singleton
      */
-    public static synchronized ArgumentAnnotationProcessor getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ArgumentAnnotationProcessor();
-        }
-        return INSTANCE;
+    public static ArgumentAnnotationProcessor getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     /**
@@ -109,5 +104,13 @@ public class ArgumentAnnotationProcessor {
         } catch (Throwable t) {
             throwableContext.add(testInstance.getClass(), t);
         }
+    }
+
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final ArgumentAnnotationProcessor INSTANCE =
+                new ArgumentAnnotationProcessor();
     }
 }

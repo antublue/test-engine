@@ -35,9 +35,6 @@ import java.util.function.Function;
 @SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
 public final class Store {
 
-    private static final Object LOCK = new Object();
-    private static Store INSTANCE;
-
     private final Lock lock;
     private final Map<String, Object> map;
 
@@ -64,7 +61,7 @@ public final class Store {
      */
     @Deprecated
     public static Store getSingleton() {
-        return INSTANCE;
+        return getInstance();
     }
 
     /**
@@ -72,11 +69,8 @@ public final class Store {
      *
      * @return the singleton instance
      */
-    public static synchronized Store getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Store();
-        }
-        return INSTANCE;
+    public static Store getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     /**
@@ -280,7 +274,7 @@ public final class Store {
         try {
             lock.lock();
             Object object = map.remove(validKey);
-            if (object != null && object instanceof AutoCloseable) {
+            if (object instanceof AutoCloseable) {
                 try {
                     ((AutoCloseable) object).close();
                 } catch (Throwable t) {
@@ -324,5 +318,12 @@ public final class Store {
         if (object == null) {
             throw new IllegalArgumentException(message);
         }
+    }
+
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final Store INSTANCE = new Store();
     }
 }

@@ -51,15 +51,12 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 @SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
 public class EngineDescriptorFactory {
 
+    private static final TestUtils TEST_UTILS = TestUtils.getInstance();
+
     private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
-    private static EngineDescriptorFactory INSTANCE;
-
-    public static synchronized EngineDescriptorFactory getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new EngineDescriptorFactory();
-        }
-        return INSTANCE;
+    public static EngineDescriptorFactory getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     public EngineDescriptor createEngineDescriptor(
@@ -104,7 +101,7 @@ public class EngineDescriptorFactory {
                                     HierarchyTraversalMode.TOP_DOWN);
 
                     javaMethods =
-                            TestUtils.orderTestMethods(
+                            TEST_UTILS.orderTestMethods(
                                     javaMethods, HierarchyTraversalMode.TOP_DOWN);
 
                     classMethodMap
@@ -144,7 +141,7 @@ public class EngineDescriptorFactory {
                                     HierarchyTraversalMode.TOP_DOWN);
 
                     javaMethods =
-                            TestUtils.orderTestMethods(
+                            TEST_UTILS.orderTestMethods(
                                     javaMethods, HierarchyTraversalMode.TOP_DOWN);
 
                     classMethodMap
@@ -180,7 +177,7 @@ public class EngineDescriptorFactory {
                                     HierarchyTraversalMode.TOP_DOWN);
 
                     javaMethods =
-                            TestUtils.orderTestMethods(
+                            TEST_UTILS.orderTestMethods(
                                     javaMethods, HierarchyTraversalMode.TOP_DOWN);
 
                     classMethodMap
@@ -293,7 +290,7 @@ public class EngineDescriptorFactory {
                                         HierarchyTraversalMode.TOP_DOWN);
 
                         javaMethods =
-                                TestUtils.orderTestMethods(
+                                TEST_UTILS.orderTestMethods(
                                         javaMethods, HierarchyTraversalMode.TOP_DOWN);
 
                         classMethodMap
@@ -366,5 +363,12 @@ public class EngineDescriptorFactory {
         }
 
         return testArguments;
+    }
+
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final EngineDescriptorFactory INSTANCE = new EngineDescriptorFactory();
     }
 }

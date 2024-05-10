@@ -25,19 +25,14 @@ import org.antublue.test.engine.Configuration;
 @SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
-    private static ConfigurationParameters INSTANCE;
-
     private static final Configuration CONFIGURATION = Configuration.getInstance();
 
     private ConfigurationParameters() {
         // DO NOTHING
     }
 
-    public static synchronized ConfigurationParameters getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ConfigurationParameters();
-        }
-        return INSTANCE;
+    public static ConfigurationParameters getInstance() {
+        return SingletonHolder.INSTANCE;
     }
 
     @Override
@@ -53,11 +48,7 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
     @Override
     public <T> Optional<T> get(String key, Function<String, T> transformer) {
         Optional<String> value = CONFIGURATION.get(key);
-        if (value.isPresent()) {
-            return Optional.ofNullable(transformer.apply(value.get()));
-        } else {
-            return Optional.empty();
-        }
+        return value.map(transformer);
     }
 
     @SuppressWarnings("deprecation")
@@ -69,5 +60,12 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
     @Override
     public Set<String> keySet() {
         return CONFIGURATION.keySet();
+    }
+
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final ConfigurationParameters INSTANCE = new ConfigurationParameters();
     }
 }
