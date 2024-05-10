@@ -32,8 +32,11 @@ public class StoreExampleTest1 {
 
     private static final String CLOSEABLE_KEY =
             KeyGenerator.of(StoreExampleTest1.class, "closeable");
+
     private static final String AUTO_CLOSEABLE_KEY =
             KeyGenerator.of(StoreExampleTest1.class, "autoClosable");
+
+    private static final String HIDDEN_KEY = ".hidden";
 
     private Store store;
 
@@ -54,6 +57,7 @@ public class StoreExampleTest1 {
         store = new Store();
         store.put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
         store.put(CLOSEABLE_KEY, new TestCloseable());
+        store.put(HIDDEN_KEY, new Object());
     }
 
     @TestEngine.BeforeAll
@@ -89,6 +93,14 @@ public class StoreExampleTest1 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
+
+        for (String key : store.keySet()) {
+            System.out.println("key [" + key + "]");
+        }
+
+        assertThat(store.keySet()).doesNotContain(HIDDEN_KEY);
+        assertThat(store.get(HIDDEN_KEY)).isNotNull();
+
         store.removeAndClose(AUTO_CLOSEABLE_KEY);
         store.removeAndClose(CLOSEABLE_KEY);
         assertThat(store.get(AUTO_CLOSEABLE_KEY)).isNotPresent();
