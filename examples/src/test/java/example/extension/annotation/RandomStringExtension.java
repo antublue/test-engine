@@ -19,7 +19,7 @@ package example.extension.annotation;
 import java.lang.reflect.Field;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
-import org.antublue.test.engine.internal.util.RandomGenerator;
+import org.antublue.test.engine.api.util.RandomGenerator;
 
 /**
  * Example extension to process a field with a custom annotation after @TestEngine.BeforeAll methods
@@ -28,7 +28,7 @@ public class RandomStringExtension implements Extension {
 
     private static final RandomGenerator RANDOM_GENERATOR = RandomGenerator.getInstance();
 
-    private static char[] ALPHA_NUMERIC_CHARACTERS =
+    private static final char[] ALPHA_NUMERIC_CHARACTERS =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
 
     /**
@@ -63,7 +63,7 @@ public class RandomStringExtension implements Extension {
      *
      * @param minimumLength minimumLength
      * @param maximumLength maximumLength
-     * @return
+     * @return a random alphanumeric String
      */
     private static String randomAlphaNumericString(int minimumLength, int maximumLength) {
         StringBuilder stringBuilder = new StringBuilder();
