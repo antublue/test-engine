@@ -272,7 +272,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     if (!matcher.find()) {
                         methodTestDescriptor.removeFromHierarchy();
                     }
-                    continue;
                 }
             }
         }
@@ -293,7 +292,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     if (matcher.find()) {
                         methodTestDescriptor.removeFromHierarchy();
                     }
-                    continue;
                 }
             }
         }
