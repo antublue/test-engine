@@ -74,6 +74,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 | `@TestEngine.Random.BigInteger`                        | field            | no       | Provides a way to inject a random BigInteger value                                                                                 |
 | `@TestEngine.Random.BigDecimal`                        | field            | no       | Provides a way to inject a random BigDecimal value                                                                                 |
 | `@TestEngine.Random.UUID`                              | field            | no       | Provides a way to inject a `UUID`                                                                                                  |
+| `@TestEngine.Store`                                    | field            | no       | Provides a way to inject the `Store` singleton                                                                                     |
 
 **Notes**
 
