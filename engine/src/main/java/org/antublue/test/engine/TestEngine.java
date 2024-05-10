@@ -154,41 +154,47 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestClassesByClassName(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestClassesByClassName()");
 
-        Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_INCLUDE_REGEX);
-        if (optional.isPresent()) {
-            Pattern pattern = Pattern.compile(optional.get());
-            Matcher matcher = pattern.matcher("");
+        CONFIGURATION
+                .get(Constants.TEST_CLASS_INCLUDE_REGEX)
+                .ifPresent(
+                        s -> {
+                            Pattern pattern = Pattern.compile(s);
+                            Matcher matcher = pattern.matcher("");
 
-            Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-            for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ClassTestDescriptor) {
-                    ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
-                    matcher.reset(classTestDescriptor.getTestClass().getName());
-                    if (!matcher.find()) {
-                        classTestDescriptor.removeFromHierarchy();
-                    }
-                }
-            }
-        }
+                            Set<? extends TestDescriptor> children =
+                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+                            for (TestDescriptor testDescriptor : children) {
+                                if (testDescriptor instanceof ClassTestDescriptor) {
+                                    ClassTestDescriptor classTestDescriptor =
+                                            (ClassTestDescriptor) testDescriptor;
+                                    matcher.reset(classTestDescriptor.getTestClass().getName());
+                                    if (!matcher.find()) {
+                                        classTestDescriptor.removeFromHierarchy();
+                                    }
+                                }
+                            }
+                        });
 
-        optional = CONFIGURATION.get(Constants.TEST_CLASS_EXCLUDE_REGEX);
-        if (optional.isPresent()) {
-            Pattern pattern = Pattern.compile(optional.get());
-            Matcher matcher = pattern.matcher("");
+        CONFIGURATION
+                .get(Constants.TEST_CLASS_EXCLUDE_REGEX)
+                .ifPresent(
+                        s -> {
+                            Pattern pattern = Pattern.compile(s);
+                            Matcher matcher = pattern.matcher("");
 
-            Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-            for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ClassTestDescriptor) {
-                    ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
-                    matcher.reset(classTestDescriptor.getTestClass().getName());
-                    if (matcher.find()) {
-                        classTestDescriptor.removeFromHierarchy();
-                    }
-                }
-            }
-        }
+                            Set<? extends TestDescriptor> children =
+                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+                            for (TestDescriptor testDescriptor : children) {
+                                if (testDescriptor instanceof ClassTestDescriptor) {
+                                    ClassTestDescriptor classTestDescriptor =
+                                            (ClassTestDescriptor) testDescriptor;
+                                    matcher.reset(classTestDescriptor.getTestClass().getName());
+                                    if (matcher.find()) {
+                                        classTestDescriptor.removeFromHierarchy();
+                                    }
+                                }
+                            }
+                        });
     }
 
     /**
@@ -199,49 +205,55 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestClassesByTag(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestClassesByTag()");
 
-        Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
-        if (optional.isPresent()) {
-            Pattern pattern = Pattern.compile(optional.get());
-            Matcher matcher = pattern.matcher("");
+        CONFIGURATION
+                .get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX)
+                .ifPresent(
+                        s -> {
+                            Pattern pattern = Pattern.compile(s);
+                            Matcher matcher = pattern.matcher("");
 
-            Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-            for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ClassTestDescriptor) {
-                    ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
-                    String tag = classTestDescriptor.getTag();
-                    if (tag != null) {
-                        matcher.reset(tag);
-                        if (!matcher.find()) {
-                            classTestDescriptor.removeFromHierarchy();
-                        }
-                    } else {
-                        classTestDescriptor.removeFromHierarchy();
-                    }
-                }
-            }
-        }
+                            Set<? extends TestDescriptor> children =
+                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+                            for (TestDescriptor testDescriptor : children) {
+                                if (testDescriptor instanceof ClassTestDescriptor) {
+                                    ClassTestDescriptor classTestDescriptor =
+                                            (ClassTestDescriptor) testDescriptor;
+                                    String tag = classTestDescriptor.getTag();
+                                    if (tag != null) {
+                                        matcher.reset(tag);
+                                        if (!matcher.find()) {
+                                            classTestDescriptor.removeFromHierarchy();
+                                        }
+                                    } else {
+                                        classTestDescriptor.removeFromHierarchy();
+                                    }
+                                }
+                            }
+                        });
 
-        optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX);
-        if (optional.isPresent()) {
-            Pattern pattern = Pattern.compile(optional.get());
-            Matcher matcher = pattern.matcher("");
+        CONFIGURATION
+                .get(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX)
+                .ifPresent(
+                        s -> {
+                            Pattern pattern = Pattern.compile(s);
+                            Matcher matcher = pattern.matcher("");
 
-            Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-            for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof ClassTestDescriptor) {
-                    ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) testDescriptor;
-                    String tag = classTestDescriptor.getTag();
-                    if (tag != null) {
-                        matcher.reset(tag);
-                        if (matcher.find()) {
-                            classTestDescriptor.removeFromHierarchy();
-                        }
-                    }
-                }
-            }
-        }
+                            Set<? extends TestDescriptor> children =
+                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+                            for (TestDescriptor testDescriptor : children) {
+                                if (testDescriptor instanceof ClassTestDescriptor) {
+                                    ClassTestDescriptor classTestDescriptor =
+                                            (ClassTestDescriptor) testDescriptor;
+                                    String tag = classTestDescriptor.getTag();
+                                    if (tag != null) {
+                                        matcher.reset(tag);
+                                        if (matcher.find()) {
+                                            classTestDescriptor.removeFromHierarchy();
+                                        }
+                                    }
+                                }
+                            }
+                        });
     }
 
     /**
@@ -252,45 +264,47 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestMethodsByMethodName(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestMethodsByMethodName()");
 
-        Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_INCLUDE_REGEX);
-        if (optional.isPresent()) {
-            LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_INCLUDE_REGEX, optional.get());
-            Pattern pattern = Pattern.compile(optional.get());
-            Matcher matcher = pattern.matcher("");
+        CONFIGURATION
+                .get(Constants.TEST_METHOD_INCLUDE_REGEX)
+                .ifPresent(
+                        s -> {
+                            Pattern pattern = Pattern.compile(s);
+                            Matcher matcher = pattern.matcher("");
 
-            Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-            for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof MethodTestDescriptor) {
-                    MethodTestDescriptor methodTestDescriptor =
-                            (MethodTestDescriptor) testDescriptor;
-                    matcher.reset(methodTestDescriptor.getTestMethod().getName());
-                    if (!matcher.find()) {
-                        methodTestDescriptor.removeFromHierarchy();
-                    }
-                }
-            }
-        }
+                            Set<? extends TestDescriptor> children =
+                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+                            for (TestDescriptor testDescriptor : children) {
+                                if (testDescriptor instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor methodTestDescriptor =
+                                            (MethodTestDescriptor) testDescriptor;
+                                    matcher.reset(methodTestDescriptor.getTestMethod().getName());
+                                    if (!matcher.find()) {
+                                        methodTestDescriptor.removeFromHierarchy();
+                                    }
+                                }
+                            }
+                        });
 
-        optional = CONFIGURATION.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
-        if (optional.isPresent()) {
-            LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_EXCLUDE_REGEX, optional.get());
-            Pattern pattern = Pattern.compile(optional.get());
-            Matcher matcher = pattern.matcher("");
+        CONFIGURATION
+                .get(Constants.TEST_METHOD_EXCLUDE_REGEX)
+                .ifPresent(
+                        s -> {
+                            Pattern pattern = Pattern.compile(s);
+                            Matcher matcher = pattern.matcher("");
 
-            Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-            for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof MethodTestDescriptor) {
-                    MethodTestDescriptor methodTestDescriptor =
-                            (MethodTestDescriptor) testDescriptor;
-                    matcher.reset(methodTestDescriptor.getTestMethod().getName());
-                    if (matcher.find()) {
-                        methodTestDescriptor.removeFromHierarchy();
-                    }
-                }
-            }
-        }
+                            Set<? extends TestDescriptor> children =
+                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+                            for (TestDescriptor testDescriptor : children) {
+                                if (testDescriptor instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor methodTestDescriptor =
+                                            (MethodTestDescriptor) testDescriptor;
+                                    matcher.reset(methodTestDescriptor.getTestMethod().getName());
+                                    if (matcher.find()) {
+                                        methodTestDescriptor.removeFromHierarchy();
+                                    }
+                                }
+                            }
+                        });
     }
 
     /**
@@ -301,53 +315,55 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     private void filterTestMethodsByTag(EngineDescriptor engineDescriptor) {
         LOGGER.trace("filterTestMethodsByTag()");
 
-        Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
-        if (optional.isPresent()) {
-            LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_TAG_INCLUDE_REGEX, optional.get());
-            Pattern pattern = Pattern.compile(optional.get());
-            Matcher matcher = pattern.matcher("");
+        CONFIGURATION
+                .get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX)
+                .ifPresent(
+                        s -> {
+                            Pattern pattern = Pattern.compile(s);
+                            Matcher matcher = pattern.matcher("");
 
-            Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-            for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof MethodTestDescriptor) {
-                    MethodTestDescriptor methodTestDescriptor =
-                            (MethodTestDescriptor) testDescriptor;
-                    String tag = methodTestDescriptor.getTag();
-                    if (tag != null) {
-                        matcher.reset(tag);
-                        if (!matcher.find()) {
-                            methodTestDescriptor.removeFromHierarchy();
-                        }
-                    } else {
-                        methodTestDescriptor.removeFromHierarchy();
-                    }
-                }
-            }
-        }
+                            Set<? extends TestDescriptor> children =
+                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+                            for (TestDescriptor testDescriptor : children) {
+                                if (testDescriptor instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor methodTestDescriptor =
+                                            (MethodTestDescriptor) testDescriptor;
+                                    String tag = methodTestDescriptor.getTag();
+                                    if (tag != null) {
+                                        matcher.reset(tag);
+                                        if (!matcher.find()) {
+                                            methodTestDescriptor.removeFromHierarchy();
+                                        }
+                                    } else {
+                                        methodTestDescriptor.removeFromHierarchy();
+                                    }
+                                }
+                            }
+                        });
 
-        optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX);
-        if (optional.isPresent()) {
-            LOGGER.trace("[%s] = [%s]", Constants.TEST_METHOD_TAG_EXCLUDE_REGEX, optional.get());
-            Pattern pattern = Pattern.compile(optional.get());
-            Matcher matcher = pattern.matcher("");
+        CONFIGURATION
+                .get(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX)
+                .ifPresent(
+                        s -> {
+                            Pattern pattern = Pattern.compile(s);
+                            Matcher matcher = pattern.matcher("");
 
-            Set<? extends TestDescriptor> children =
-                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-            for (TestDescriptor testDescriptor : children) {
-                if (testDescriptor instanceof MethodTestDescriptor) {
-                    MethodTestDescriptor methodTestDescriptor =
-                            (MethodTestDescriptor) testDescriptor;
-                    String tag = methodTestDescriptor.getTag();
-                    if (tag != null) {
-                        matcher.reset(tag);
-                        if (matcher.find()) {
-                            methodTestDescriptor.removeFromHierarchy();
-                        }
-                    }
-                }
-            }
-        }
+                            Set<? extends TestDescriptor> children =
+                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
+                            for (TestDescriptor testDescriptor : children) {
+                                if (testDescriptor instanceof MethodTestDescriptor) {
+                                    MethodTestDescriptor methodTestDescriptor =
+                                            (MethodTestDescriptor) testDescriptor;
+                                    String tag = methodTestDescriptor.getTag();
+                                    if (tag != null) {
+                                        matcher.reset(tag);
+                                        if (matcher.find()) {
+                                            methodTestDescriptor.removeFromHierarchy();
+                                        }
+                                    }
+                                }
+                            }
+                        });
     }
 
     /**
@@ -388,11 +404,14 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         // Shuffle or sort the test descriptor list based on configuration
         Optional<String> optionalShuffle = CONFIGURATION.get(Constants.TEST_CLASS_SHUFFLE);
-        if (optionalShuffle.isPresent() && Constants.TRUE.equals(optionalShuffle.get())) {
-            Collections.shuffle(testDescriptors);
-        } else {
-            testDescriptors.sort(Comparator.comparing(TestDescriptor::getDisplayName));
-        }
+        optionalShuffle.ifPresent(
+                s -> {
+                    if (Constants.TRUE.equals(optionalShuffle.get())) {
+                        Collections.shuffle(testDescriptors);
+                    } else {
+                        testDescriptors.sort(Comparator.comparing(TestDescriptor::getDisplayName));
+                    }
+                });
 
         // Add the shuffled or sorted test descriptors to the engine descriptor
         testDescriptors.forEach(engineDescriptor::addChild);

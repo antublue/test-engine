@@ -21,6 +21,8 @@ import org.antublue.test.engine.Configuration;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataSupport;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.StopWatch;
 import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.util.Preconditions;
@@ -34,20 +36,26 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         implements MetadataSupport {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutableTestDescriptor.class);
+
     private static final Configuration CONFIGURATION = Configuration.getInstance();
 
     private static long THREAD_THROTTLE_MILLISECONDS = 0;
 
     static {
-        Optional<String> optional = CONFIGURATION.get(Constants.THREAD_THROTTLE_MILLISECONDS);
-
-        if (optional.isPresent()) {
-            try {
-                THREAD_THROTTLE_MILLISECONDS = Long.parseLong(optional.get());
-            } catch (Throwable t) {
-                // DO NOTHING
-            }
-        }
+        CONFIGURATION
+                .get(Constants.THREAD_THROTTLE_MILLISECONDS)
+                .ifPresent(
+                        s -> {
+                            try {
+                                THREAD_THROTTLE_MILLISECONDS = Long.parseLong(s);
+                            } catch (Throwable t) {
+                                LOGGER.warn(
+                                        Constants.THREAD_THROTTLE_MILLISECONDS
+                                                + " [%s] is invalid, ignoring",
+                                        s);
+                            }
+                        });
     }
 
     private final ThrowableContext throwableContext;
