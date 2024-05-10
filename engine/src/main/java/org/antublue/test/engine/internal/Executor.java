@@ -116,7 +116,7 @@ public class Executor {
                                 try {
                                     executableTestDescriptor.execute(executionRequest);
                                 } catch (Throwable t) {
-                                    t.printStackTrace();
+                                    t.printStackTrace(System.err);
                                     StandardStreams.flush();
                                 } finally {
                                     countDownLatch.get().countDown();

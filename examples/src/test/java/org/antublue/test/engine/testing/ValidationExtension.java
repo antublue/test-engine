@@ -26,7 +26,7 @@ public class ValidationExtension implements Extension {
         try {
             ((Validation) optionalTestInstance.get()).validate();
         } catch (Throwable t) {
-            t.printStackTrace();
+            t.printStackTrace(System.err);
         }
     }
 }

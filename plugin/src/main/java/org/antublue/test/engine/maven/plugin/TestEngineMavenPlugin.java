@@ -226,7 +226,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
             } catch (Throwable t) {
                 summaryMessage = AnsiColor.TEXT_RED_BOLD_BRIGHT.wrap("EXCEPTION DURING DISCOVERY");
 
-                t.printStackTrace();
+                t.printStackTrace(System.err);
                 System.err.flush();
             }
 
@@ -252,7 +252,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                 } catch (Throwable t) {
                     summaryMessage =
                             AnsiColor.TEXT_RED_BOLD.wrap("FAIL / EXCEPTION DURING EXECUTION");
-                    t.printStackTrace();
+                    t.printStackTrace(System.err);
                     System.err.flush();
                 }
             }

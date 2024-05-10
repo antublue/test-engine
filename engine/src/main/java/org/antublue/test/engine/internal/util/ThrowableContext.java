@@ -34,7 +34,7 @@ public class ThrowableContext {
     public void add(Class<?> clazz, Throwable throwable) {
         Throwable prunedThrowable = ThrowableUtils.prune(clazz, throwable);
         if (PRINT_STACKTRACE) {
-            prunedThrowable.printStackTrace();
+            prunedThrowable.printStackTrace(System.err);
             StandardStreams.flush();
         }
         throwables.add(prunedThrowable);
