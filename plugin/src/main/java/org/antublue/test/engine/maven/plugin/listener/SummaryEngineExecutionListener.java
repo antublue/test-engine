@@ -98,14 +98,14 @@ public class SummaryEngineExecutionListener
         String propertiesFilename = configuration.getPropertiesFilename();
 
         if (propertiesFilename != null) {
-            println(INFO + "properties [" + propertiesFilename + "]");
+            println(INFO + "[" + propertiesFilename + "]");
 
             Set<String> keySet = configuration.keySet();
             if (!keySet.isEmpty()) {
                 for (String key : configuration.keySet()) {
                     Optional<String> optional = configuration.get(key);
                     String value = optional.orElse("");
-                    println(INFO + "[" + key + "] = [" + value + "]");
+                    println(INFO + "- [" + key + "] = [" + value + "]");
                 }
             }
 
