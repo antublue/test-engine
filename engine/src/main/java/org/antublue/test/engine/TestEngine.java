@@ -168,7 +168,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     if (!matcher.find()) {
                         classTestDescriptor.removeFromHierarchy();
                     }
-                    continue;
                 }
             }
         }
@@ -187,7 +186,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     if (matcher.find()) {
                         classTestDescriptor.removeFromHierarchy();
                     }
-                    continue;
                 }
             }
         }
@@ -220,7 +218,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     } else {
                         classTestDescriptor.removeFromHierarchy();
                     }
-                    continue;
                 }
             }
         }
@@ -242,7 +239,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                             classTestDescriptor.removeFromHierarchy();
                         }
                     }
-                    continue;
                 }
             }
         }
