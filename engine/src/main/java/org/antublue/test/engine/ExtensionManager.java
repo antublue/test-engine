@@ -241,7 +241,7 @@ public class ExtensionManager {
     }
 
     /**
-     * Method to run preBeforeAllMethodsCallback extenion methods
+     * Method to run preBeforeAllMethodsCallback extension methods
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
