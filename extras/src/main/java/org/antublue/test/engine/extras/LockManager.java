@@ -16,21 +16,17 @@
 
 package org.antublue.test.engine.extras;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.antublue.test.engine.api.Store;
 
 /** Class to implement a LockManager */
 public class LockManager {
 
-    private final ReentrantLock reentrantLock;
-    private final Map<String, ReentrantReadWriteLock> reentrantReadWriteLockMap;
+    private final Store store;
 
     /** Constructor */
     private LockManager() {
-        reentrantLock = new ReentrantLock(true);
-        reentrantReadWriteLockMap = new HashMap<>();
+        store = new Store();
     }
 
     /**
@@ -46,24 +42,31 @@ public class LockManager {
      * Method to get a ReentrantReadWriteLock. Creates the ReentrantReadWriteLock if it doesn't
      * exist.
      *
-     * @param name name
+     * @param key key
      * @return a ReentrantReadWriteLock
      */
-    public ReentrantReadWriteLock getLock(String name) {
-        ReentrantReadWriteLock reentrantReadWriteLock;
+    public ReentrantReadWriteLock getLock(String key) {
+        key = checkKey(key);
+        return (ReentrantReadWriteLock)
+                store.putIfAbsent(key, s -> new ReentrantReadWriteLock(true)).get();
+    }
 
-        try {
-            reentrantLock.lock();
-            reentrantReadWriteLock = reentrantReadWriteLockMap.get(name);
-            if (reentrantReadWriteLock == null) {
-                reentrantReadWriteLock = new ReentrantReadWriteLock(true);
-                reentrantReadWriteLockMap.put(name, reentrantReadWriteLock);
-            }
-        } finally {
-            reentrantLock.unlock();
+    /**
+     * Method to validate a key is not null and not blank
+     *
+     * @param key key
+     * @return the key trimmed
+     */
+    private static String checkKey(String key) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
         }
 
-        return reentrantReadWriteLock;
+        if (key.trim().isEmpty()) {
+            throw new IllegalArgumentException("key is empty");
+        }
+
+        return key.trim();
     }
 
     /** Class to hold the singleton instance */
