@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.util;
+package org.antublue.test.engine.internal.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

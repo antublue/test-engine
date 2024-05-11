@@ -17,6 +17,7 @@
 package org.antublue.test.engine.internal.util;
 
 /** Class to implement a stop watch */
+@SuppressWarnings("UnusedReturnValue")
 public class StopWatch {
 
     private long startNanoTime;

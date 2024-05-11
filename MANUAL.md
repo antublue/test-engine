@@ -28,7 +28,7 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 
 ### Test Annotations
 
-| Annotation                     | Static | Type   | Required | Example                                                                                                                                                                            |
+| Annotation                     | Static | Scope   | Required | Example                                                                                                                                                                            |
 |--------------------------------|--------|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `@TestEngine.ArgumentSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments();`</nobr> |
 | `@TestEngine.Argument`         | no     | field  | no       | `public Argument argument;`                                                                                                                                                        |
@@ -78,8 +78,8 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 **Notes**
 
-- Abstract test classes are not executed.
 
+- Additional test annotations require non-static fields/methods
 
 - `@TestEngine.Order(order = <int>)` is applies to methods defined in the class.
 
@@ -111,6 +111,8 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - `@TestEngine.Random.BigInteger` and `@TestEngine.Random.BigDecimal` have required `minimum` and `maximum` values.
   - The `minimum` and `maximum` values are inclusive.
   - If `minimum` is greater than `maximum`, then the values are swapped to create a valid range.
+
+- Abstract test classes are not executed.
 
 ### What is an `Argument`?
 

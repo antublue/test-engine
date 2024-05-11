@@ -16,9 +16,13 @@
 
 package org.antublue.test.engine.api;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -30,35 +34,16 @@ import java.util.function.Function;
  *
  * <p>Locking of Objects in the Store is the responsibility of the calling code
  */
-@SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
-@Deprecated
+@SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock", "UnusedMethod"})
 public final class Store {
 
-    private final org.antublue.test.engine.api.util.Store store;
+    private final Lock lock;
+    private final Map<String, Object> map;
 
     /** Constructor */
     public Store() {
-        store = new org.antublue.test.engine.api.util.Store();
-    }
-
-    /**
-     * Method to get the singleton instance
-     *
-     * @return the singleton instance
-     */
-    @Deprecated
-    public static Store singleton() {
-        return getSingleton();
-    }
-
-    /**
-     * Method to get the singleton instance
-     *
-     * @return the singleton instance
-     */
-    @Deprecated
-    public static Store getSingleton() {
-        return getInstance();
+        lock = new ReentrantLock(true);
+        map = new LinkedHashMap<>();
     }
 
     /**
@@ -76,7 +61,8 @@ public final class Store {
      * @return the Lock
      */
     public Lock lock() {
-        return store.lock();
+        lock.lock();
+        return lock;
     }
 
     /**
@@ -85,7 +71,8 @@ public final class Store {
      * @return the Store Lock
      */
     public Lock unlock() {
-        return store.unlock();
+        lock.unlock();
+        return lock;
     }
 
     /**
@@ -94,7 +81,7 @@ public final class Store {
      * @return the Store Lock
      */
     public Lock getLock() {
-        return store.getLock();
+        return lock;
     }
 
     /**
@@ -104,7 +91,18 @@ public final class Store {
      * @return the Store keys
      */
     public Set<String> keySet() {
-        return store.keySet();
+        try {
+            lock();
+            Set<String> treeSet = new TreeSet<>();
+            for (String key : map.keySet()) {
+                if (!key.startsWith(".")) {
+                    treeSet.add(key);
+                }
+            }
+            return treeSet;
+        } finally {
+            unlock();
+        }
     }
 
     /**
@@ -116,7 +114,14 @@ public final class Store {
      *     exist for the key
      */
     public Optional<Object> put(String key, Object value) {
-        return store.put(key, value);
+        String validKey = checkKey(key);
+
+        try {
+            lock();
+            return Optional.ofNullable(map.put(validKey, value));
+        } finally {
+            unlock();
+        }
     }
 
     /**
@@ -129,7 +134,15 @@ public final class Store {
      *     returned by the Function
      */
     public Optional<Object> putIfAbsent(String key, Function<String, Object> function) {
-        return store.putIfAbsent(key, function);
+        String validKey = checkKey(key);
+        checkNotNull(function, "function is null");
+
+        try {
+            lock();
+            return Optional.ofNullable(map.computeIfAbsent(validKey, function));
+        } finally {
+            unlock();
+        }
     }
 
     /**
@@ -140,7 +153,14 @@ public final class Store {
      *     exist
      */
     public Optional<Object> get(String key) {
-        return store.get(key);
+        String validKey = checkKey(key);
+
+        try {
+            lock();
+            return Optional.ofNullable(map.get(validKey));
+        } finally {
+            unlock();
+        }
     }
 
     /**
@@ -148,11 +168,19 @@ public final class Store {
      *
      * @param key key
      * @param function function
-     * @return on Optional containing the value returned by the function
      * @param <T> the return type
+     * @return on Optional containing the value returned by the function
      */
     public <T> Optional<T> get(String key, Function<Object, T> function) {
-        return store.get(key, function);
+        String validKey = checkKey(key);
+        checkNotNull(function, "function is null");
+
+        try {
+            lock();
+            return Optional.ofNullable(function.apply(map.get(validKey)));
+        } finally {
+            unlock();
+        }
     }
 
     /**
@@ -160,12 +188,20 @@ public final class Store {
      *
      * @param key key
      * @param clazz clazz
+     * @param <T> the return type
      * @return an Optional containing the existing value, or an empty Optional if a value doesn't
      *     exist
-     * @param <T> the return type
      */
     public <T> Optional<T> get(String key, Class<T> clazz) {
-        return store.get(key, clazz);
+        String validKey = checkKey(key);
+        checkNotNull(clazz, "class is null");
+
+        try {
+            lock();
+            return Optional.ofNullable(clazz.cast(map.get(validKey)));
+        } finally {
+            unlock();
+        }
     }
 
     /**
@@ -176,7 +212,14 @@ public final class Store {
      *     exist
      */
     public Optional<Object> remove(String key) {
-        return store.remove(key);
+        String validKey = checkKey(key);
+
+        try {
+            lock();
+            return Optional.ofNullable(map.remove(validKey));
+        } finally {
+            unlock();
+        }
     }
 
     /**
@@ -184,12 +227,20 @@ public final class Store {
      *
      * @param key key
      * @param clazz clazz
+     * @param <T> the return type
      * @return an Optional containing the existing value, or an empty Optional if a value doesn't
      *     exist
-     * @param <T> the return type
      */
     public <T> Optional<T> remove(String key, Class<T> clazz) {
-        return store.remove(key, clazz);
+        String validKey = checkKey(key);
+        checkNotNull(clazz, "class is null");
+
+        try {
+            lock();
+            return Optional.ofNullable(clazz.cast(map.remove(validKey)));
+        } finally {
+            unlock();
+        }
     }
 
     /**
@@ -200,7 +251,17 @@ public final class Store {
      * @param <T> the consumer type
      */
     public <T> void remove(String key, Consumer<T> consumer) {
-        store.remove(key, consumer);
+        String validKey = checkKey(key);
+
+        try {
+            lock();
+            Object object = map.remove(validKey);
+            if (object != null && consumer != null) {
+                consumer.accept((T) object);
+            }
+        } finally {
+            unlock();
+        }
     }
 
     /**
@@ -211,7 +272,55 @@ public final class Store {
      * @throws StoreException exception if AutoCloseable close throws an Exception
      */
     public void removeAndClose(String key) throws StoreException {
-        store.removeAndClose(key);
+        String validKey = checkKey(key);
+
+        try {
+            lock.lock();
+            Object object = map.remove(validKey);
+            if (object instanceof AutoCloseable) {
+                try {
+                    ((AutoCloseable) object).close();
+                } catch (Throwable t) {
+                    throw new StoreException(
+                            String.format(
+                                    "Exception closing Object, key [%s] object" + " [%s]",
+                                    key, object.getClass().getName()),
+                            t);
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * Method to validate a key is not null and not blank
+     *
+     * @param key key
+     * @return the key trimmed
+     */
+    private static String checkKey(String key) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
+        }
+
+        if (key.trim().isEmpty()) {
+            throw new IllegalArgumentException("key is empty");
+        }
+
+        return key.trim();
+    }
+
+    /**
+     * Method to validate a value is not null
+     *
+     * @param object object
+     * @param message message
+     */
+    private static void checkNotNull(Object object, String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
+        }
     }
 
     /** Class to hold the singleton instance */

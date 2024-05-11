@@ -23,7 +23,7 @@ import java.math.BigInteger;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
-import org.antublue.test.engine.api.util.RandomGenerator;
+import org.antublue.test.engine.internal.util.RandomGenerator;
 
 public abstract class RandomGeneratorTest {
 
