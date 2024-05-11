@@ -18,13 +18,13 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 - `@TestEngine.AfterEach`
 - `@TestEngine.AfterAll`
 
-`@TestEngine.Argument` member argument example:
+`@TestEngine.Argument` member field argument example:
 
-- [SimpleTest.java](/examples/src/test/java/example/SimpleTest.java)
+- [SimpleTest1.java](/examples/src/test/java/example/SimpleTest1.java)
 
 `@TestEngine` test method parameter example:
 
-- [NoArgumentDeclarationTest.java](/examples/src/test/java/example/NoArgumentDeclarationTest.java)
+- [SimpleTest2.java](/examples/src/test/java/example/SimpleTest2.java)
 
 ### Test Annotations
 
