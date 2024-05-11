@@ -46,9 +46,9 @@ public class LockManager {
      * @return a ReentrantReadWriteLock
      */
     public ReentrantReadWriteLock getLock(String key) {
-        key = checkKey(key);
+        String validKey = checkKey(key);
         return (ReentrantReadWriteLock)
-                store.putIfAbsent(key, s -> new ReentrantReadWriteLock(true)).get();
+                store.putIfAbsent(validKey, s -> new ReentrantReadWriteLock(true)).get();
     }
 
     /**
