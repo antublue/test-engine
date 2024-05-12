@@ -19,7 +19,6 @@ package org.antublue.test.engine.internal.util;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -182,7 +181,10 @@ public class RandomGenerator {
 
         Random random = ThreadLocalRandom.current();
 
-        BigInteger range = maximumBigInteger.subtract(minimumBigInteger).add(BigInteger.ONE); // Add 1 because upper bound is inclusive
+        BigInteger range =
+                maximumBigInteger
+                        .subtract(minimumBigInteger)
+                        .add(BigInteger.ONE); // Add 1 because upper bound is inclusive
         BigInteger generated = new BigInteger(range.bitLength(), random);
         while (generated.compareTo(range) >= 0) {
             generated = new BigInteger(range.bitLength(), random);
