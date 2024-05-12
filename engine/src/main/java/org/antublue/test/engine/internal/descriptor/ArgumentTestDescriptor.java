@@ -147,7 +147,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         setExecutionRequest(executionRequest);
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
-        StateMachine<State> stateMachine = new StateMachine<State>(getUniqueId().toString());
+        StateMachine<State> stateMachine = new StateMachine<>(getUniqueId().toString());
 
         try {
             stateMachine
