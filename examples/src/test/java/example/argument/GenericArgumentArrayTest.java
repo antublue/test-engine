@@ -22,25 +22,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.ObjectArgument;
+import org.antublue.test.engine.api.argument.GenericArgument;
 
 /** Example test */
-public class ObjectArgumentArrayTest {
+public class GenericArgumentArrayTest {
 
     private int[] values;
 
-    @TestEngine.Argument protected ObjectArgument<int[]> objectArgument;
+    @TestEngine.Argument protected GenericArgument<int[]> GenericArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<ObjectArgument<int[]>> arguments() {
-        Collection<ObjectArgument<int[]>> collection = new ArrayList<>();
+    public static Stream<GenericArgument<int[]>> arguments() {
+        Collection<GenericArgument<int[]>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int[] values = new int[3];
             values[0] = i;
             values[1] = i * 2;
             values[2] = i * 3;
 
-            collection.add(new ObjectArgument<>("values" + i, values));
+            collection.add(new GenericArgument<>("values" + i, values));
         }
         return collection.stream();
     }
@@ -48,7 +48,7 @@ public class ObjectArgumentArrayTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        values = objectArgument.value();
+        values = GenericArgument.value();
     }
 
     @TestEngine.Test

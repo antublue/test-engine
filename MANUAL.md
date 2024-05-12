@@ -133,11 +133,11 @@ There are standard argument implementations for common Java data types:
 -  `StringArgument`
 -  `GenericArgument`
 
-Additionally, there is an `ObjectArgument<T>` argument implementation that allows passing an arbitrary unrelated objects as an argument.
+### `Store`
 
-**Notes**
+A `Store` is a thread-safe convenience class that allow sharing of Objects between tests.
 
-- It's recommended to implement a test specific `Argument` object instead of using `ObjectArgument<T>` whenever possible.
+- [Store.java](/api/src/main/java/org/antublue/test/engine/api/Store.java)
 
 ## Extras
 
@@ -146,12 +146,6 @@ The extras project provides classes to help with testing beyond the core API.
 ### `LockManager`
 
 The `LockManager` is a thread-safe convenience class to work with cross test class/threads to allow locking when working with shared resources that require synchronization.
-
-### `Store`
-
-A `Store` is a thread-safe convenience class that allow sharing of Objects between tests.
-
-- [Store.java](/api/src/main/java/org/antublue/test/engine/api/Store.java)
 
 ## Code Examples
 

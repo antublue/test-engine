@@ -2,7 +2,7 @@
 
 ---
 
-### Migrating from `5.x.x` versions to `6.x.x` versions
+## Migrating from `5.x.x` versions to `6.x.x` versions
 
 Test Engine `6.x.x` versions changed annotations that require values.
 
@@ -116,7 +116,6 @@ public class Test {
   // ... code omitted ...
 
   @TestEngine.Test
-  @TestEngine.Lock("lock-name")
   public void test() {
     // ... code omitted ...
   }
@@ -131,7 +130,6 @@ public class Test {
   // ... code omitted ...
   
   @TestEngine.Test
-  @TestEngine.Lock(name = "lock-name")
   public void test() {
     // ... code omitted ...
   }
@@ -148,7 +146,6 @@ public class Test {
   // ... code omitted ...
 
   @TestEngine.Test
-  @TestEngine.Unlock("lock-name")
   public void test() {
     // ... code omitted ...
   }
@@ -163,14 +160,13 @@ public class Test {
   // ... code omitted ...
   
   @TestEngine.Test
-  @TestEngine.Unlock(name = "lock-name")
   public void test() {
     // ... code omitted ...
   }
 }
 ```
 
-## Store
+### Store
 
 The `Store` object has been refactored to allow both global usage and local test class usage.
 
@@ -184,7 +180,6 @@ public class Test {
   // ... code omitted ...
 
   @TestEngine.Test
-  @TestEngine.Unlock("lock-name")
   public void test() {
     // ... code omitted ...
       
@@ -206,7 +201,6 @@ public class Test {
   // ... code omitted ...
   
   @TestEngine.Test
-  @TestEngine.Unlock(name = "lock-name")
   public void test() {
     // ... code omitted ...
     
@@ -218,3 +212,12 @@ public class Test {
 `Directory` has been moved to the `extras` module.
 
 `LineSource` has been moved to the `extras` module.
+
+## Migrating from `6.x.x` versions to `7.x.x` versions
+
+### Store
+
+Deprecated `Store` methods have been removed.
+
+- `singleton()` has been removed
+- `getSingleton()` has been removed

@@ -20,21 +20,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.ObjectArgument;
+import org.antublue.test.engine.api.argument.GenericArgument;
 
 /** Example test */
 public class ProtectedMethodsArrayTest {
 
     private String[] values;
 
-    @TestEngine.Argument protected ObjectArgument<String[]> objectArgument;
+    @TestEngine.Argument protected GenericArgument<String[]> GenericArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<ObjectArgument<String[]>> arguments() {
-        Collection<ObjectArgument<String[]>> collection = new ArrayList<>();
+    public static Stream<GenericArgument<String[]>> arguments() {
+        Collection<GenericArgument<String[]>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             collection.add(
-                    new ObjectArgument<>(
+                    new GenericArgument<>(
                             "Array [" + i + "]",
                             new String[] {String.valueOf(i), String.valueOf(i * 2)}));
         }
@@ -44,7 +44,7 @@ public class ProtectedMethodsArrayTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        values = objectArgument.value();
+        values = GenericArgument.value();
     }
 
     @TestEngine.BeforeEach
