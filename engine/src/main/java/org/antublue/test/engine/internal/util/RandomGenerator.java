@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /** Class to implement RandomUtils */
@@ -144,28 +145,28 @@ public class RandomGenerator {
                     String.format("BigInteger maximum [%s] is invalid", maximum));
         }
 
-        BigDecimal minimumBigDecimal;
-        BigDecimal maximumBigDecimal;
+        BigInteger minimumBigInteger;
+        BigInteger maximumBigInteger;
 
         try {
-            minimumBigDecimal = new BigDecimal(minimum);
+            minimumBigInteger = new BigInteger(minimum);
         } catch (NumberFormatException e) {
             throw new NumberFormatException(
                     String.format("BigDecimal minimum [%s] is invalid", minimum));
         }
 
         try {
-            maximumBigDecimal = new BigDecimal(maximum);
+            maximumBigInteger = new BigInteger(maximum);
         } catch (NumberFormatException e) {
             throw new NumberFormatException(
                     String.format("BigDecimal maximum [%s] is invalid", maximum));
         }
 
-        if (minimumBigDecimal.equals(maximumBigDecimal)) {
+        if (minimumBigInteger.equals(maximumBigInteger)) {
             return new BigInteger(minimum);
         }
 
-        if (maximumBigDecimal.subtract(minimumBigDecimal).abs().equals(BigDecimal.ONE)) {
+        if (maximumBigInteger.subtract(minimumBigInteger).abs().equals(BigDecimal.ONE)) {
             if (ThreadLocalRandom.current().nextBoolean()) {
                 return new BigInteger(minimum);
             } else {
@@ -173,25 +174,22 @@ public class RandomGenerator {
             }
         }
 
-        if (minimumBigDecimal.compareTo(maximumBigDecimal) > 0) {
-            BigDecimal temp = maximumBigDecimal;
-            maximumBigDecimal = minimumBigDecimal;
-            minimumBigDecimal = temp;
+        if (minimumBigInteger.compareTo(maximumBigInteger) > 0) {
+            BigInteger temp = maximumBigInteger;
+            maximumBigInteger = minimumBigInteger;
+            minimumBigInteger = temp;
         }
 
-        maximumBigDecimal = maximumBigDecimal.add(BigDecimal.ONE);
-        int digitCount = Math.max(minimumBigDecimal.precision(), maximumBigDecimal.precision());
-        int bitCount = (int) (digitCount / Math.log10(2.0));
+        Random random = ThreadLocalRandom.current();
 
-        BigDecimal random = nextBigDecimal(minimumBigDecimal, maximumBigDecimal);
-
-        BigInteger bigInteger =
-                random.round(new MathContext(bitCount, RoundingMode.DOWN)).toBigInteger();
-        if (ThreadLocalRandom.current().nextBoolean()) {
-            bigInteger = bigInteger.add(BigInteger.ONE);
+        BigInteger range = maximumBigInteger.subtract(minimumBigInteger).add(BigInteger.ONE); // Add 1 because upper bound is inclusive
+        BigInteger generated = new BigInteger(range.bitLength(), random);
+        while (generated.compareTo(range) >= 0) {
+            generated = new BigInteger(range.bitLength(), random);
         }
 
-        return bigInteger;
+        // Add minimum value to generated value
+        return generated.add(minimumBigInteger);
     }
 
     /**
@@ -246,7 +244,7 @@ public class RandomGenerator {
         int digitCount = Math.max(realMinimum.precision(), realMaximum.precision()) + 10;
         int bitCount = (int) (digitCount / Math.log10(2.0));
 
-        // convert Random BigInteger to a BigDecimal between 0 and 1
+        // Convert Random BigInteger to a BigDecimal between 0 and 1
         BigDecimal alpha =
                 new BigDecimal(new BigInteger(bitCount, ThreadLocalRandom.current()))
                         .movePointLeft(digitCount);
