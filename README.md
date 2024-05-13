@@ -83,7 +83,7 @@ For changes, you should...
 
 # Support
 
-## YourKit
+![YourKit logo](https://www.yourkit.com/images/yklogo.png)
 
 [YourKit](https://www.yourkit.com/) supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET applications.
 
