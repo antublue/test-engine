@@ -16,6 +16,8 @@
 
 package example.extension;
 
+import static java.lang.String.format;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +55,7 @@ public class StopWatchExtension implements Extension {
             System.out.println(
                     "------------------------------------------------------------------------");
             System.out.println(
-                    String.format(
+                    format(
                             "test class [%s] elapsed time [%s] ms",
                             testInstance.getClass().getName(),
                             TimeUnit.MILLISECONDS.convert(

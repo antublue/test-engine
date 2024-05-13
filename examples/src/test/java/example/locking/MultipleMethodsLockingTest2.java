@@ -20,7 +20,7 @@ import static org.assertj.core.api.Fail.fail;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Store;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
@@ -32,7 +32,7 @@ public class MultipleMethodsLockingTest2 {
     public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
-        Store.getInstance().putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
+        Context.getInstance().getStore().putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
     @TestEngine.Argument public IntegerArgument integerArgument;
@@ -63,7 +63,7 @@ public class MultipleMethodsLockingTest2 {
         System.out.println("test1()");
 
         AtomicInteger atomicInteger =
-                Store.getInstance().get(COUNTER_NAME, AtomicInteger.class).get();
+                (AtomicInteger) Context.getInstance().getStore().get(COUNTER_NAME);
 
         int count = atomicInteger.incrementAndGet();
         if (count != 1) {
@@ -81,7 +81,8 @@ public class MultipleMethodsLockingTest2 {
         System.out.println("test2()");
 
         AtomicInteger atomicInteger =
-                Store.getInstance().get(COUNTER_NAME, AtomicInteger.class).get();
+                (AtomicInteger) Context.getInstance().getStore().get(COUNTER_NAME);
+
         int count = atomicInteger.incrementAndGet();
         if (count != 1) {
             fail("expected count = 1");

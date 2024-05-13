@@ -18,7 +18,7 @@ package org.antublue.test.engine.internal.processor;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import org.antublue.test.engine.api.Store;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.predicate.AnnotationFieldPredicate;
 import org.antublue.test.engine.internal.util.ThrowableContext;
@@ -59,7 +59,7 @@ public class StoreAnnotationProcessor {
 
             for (Field field : fields) {
                 field.setAccessible(true);
-                field.set(testInstance, Store.getInstance());
+                field.set(testInstance, Context.getInstance().getStore());
             }
         } catch (Throwable t) {
             throwableContext.add(testInstance.getClass(), t);

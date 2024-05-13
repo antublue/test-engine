@@ -23,7 +23,7 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Store;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
@@ -49,8 +49,8 @@ public class StoreSingletonHolderExampleTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        Store.getInstance().put(CLOSEABLE_KEY, new TestCloseable());
-        Store.getInstance().put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
+        Context.getInstance().getStore().put(CLOSEABLE_KEY, new TestCloseable());
+        Context.getInstance().getStore().put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
     }
 
     @TestEngine.BeforeAll
@@ -84,12 +84,18 @@ public class StoreSingletonHolderExampleTest {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public void conclude() throws Exception {
         System.out.println("conclude()");
-        Store.getInstance().removeAndClose(CLOSEABLE_KEY);
-        Store.getInstance().removeAndClose(AUTO_CLOSEABLE_KEY);
-        assertThat(Store.getInstance().get(CLOSEABLE_KEY)).isNotPresent();
-        assertThat(Store.getInstance().get(AUTO_CLOSEABLE_KEY)).isNotPresent();
+
+        Closeable closeable = (Closeable) Context.getInstance().getStore().remove(CLOSEABLE_KEY);
+        closeable.close();
+
+        AutoCloseable autoCloseable =
+                (AutoCloseable) Context.getInstance().getStore().remove(AUTO_CLOSEABLE_KEY);
+        autoCloseable.close();
+
+        assertThat(Context.getInstance().getStore().get(CLOSEABLE_KEY)).isNull();
+        assertThat(Context.getInstance().getStore().get(AUTO_CLOSEABLE_KEY)).isNull();
     }
 
     private static class TestAutoCloseable implements AutoCloseable {

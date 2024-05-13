@@ -16,6 +16,7 @@
 
 package example.directory;
 
+import static java.lang.String.format;
 import static org.antublue.test.engine.extras.Directory.PathType.RELATIVE;
 
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class DirectoryTest2 {
     public void beforeAll() throws IOException {
         System.out.println("beforeAll(" + stringArgument + ")");
         directory = Directory.create(UUID.randomUUID().toString(), RELATIVE);
-        System.out.println(String.format("directory [%s]", directory));
+        System.out.println(format("directory [%s]", directory));
     }
 
     @TestEngine.BeforeEach

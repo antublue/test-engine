@@ -18,11 +18,11 @@ package example.store;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import example.util.KeyGenerator;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -30,11 +30,9 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class StoreExampleTest1 {
 
-    private static final String CLOSEABLE_KEY =
-            KeyGenerator.of(StoreExampleTest1.class, "closeable");
+    private static final String CLOSEABLE_KEY = "closeable";
 
-    private static final String AUTO_CLOSEABLE_KEY =
-            KeyGenerator.of(StoreExampleTest1.class, "autoClosable");
+    private static final String AUTO_CLOSEABLE_KEY = "autoClosable";
 
     private static final String HIDDEN_KEY = ".hidden";
 
@@ -54,9 +52,10 @@ public class StoreExampleTest1 {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        store = new Store();
-        store.put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
+
+        store = Context.getInstance().getStore(StoreExampleTest1.class);
         store.put(CLOSEABLE_KEY, new TestCloseable());
+        store.put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
         store.put(HIDDEN_KEY, new Object());
     }
 
@@ -91,7 +90,7 @@ public class StoreExampleTest1 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public void conclude() throws Exception {
         System.out.println("conclude()");
 
         for (String key : store.keySet()) {
@@ -101,10 +100,14 @@ public class StoreExampleTest1 {
         assertThat(store.keySet()).doesNotContain(HIDDEN_KEY);
         assertThat(store.get(HIDDEN_KEY)).isNotNull();
 
-        store.removeAndClose(AUTO_CLOSEABLE_KEY);
-        store.removeAndClose(CLOSEABLE_KEY);
-        assertThat(store.get(AUTO_CLOSEABLE_KEY)).isNotPresent();
-        assertThat(store.get(CLOSEABLE_KEY)).isNotPresent();
+        Closeable closeable = (Closeable) store.remove(CLOSEABLE_KEY);
+        closeable.close();
+
+        AutoCloseable autoCloseable = (AutoCloseable) store.remove(AUTO_CLOSEABLE_KEY);
+        autoCloseable.close();
+
+        assertThat(store.get(CLOSEABLE_KEY)).isNull();
+        assertThat(store.get(AUTO_CLOSEABLE_KEY)).isNull();
     }
 
     private static class TestAutoCloseable implements AutoCloseable {

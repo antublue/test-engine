@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import example.util.KeyGenerator;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -49,7 +49,7 @@ public class StoreExampleTest2 {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        store = new Store();
+        store = Context.getInstance().getStore(StoreExampleTest2.class);
         store.put(TEST_OBJECT_KEY, new TestObject());
     }
 
@@ -86,8 +86,11 @@ public class StoreExampleTest2 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        store.remove(TEST_OBJECT_KEY, (Consumer<TestObject>) testObject -> testObject.close());
-        assertThat(store.get(TEST_OBJECT_KEY)).isNotPresent();
+
+        TestObject testObject = (TestObject) store.remove(TEST_OBJECT_KEY);
+        testObject.close();
+
+        assertThat(store.get(TEST_OBJECT_KEY)).isNull();
     }
 
     private static class TestObject {

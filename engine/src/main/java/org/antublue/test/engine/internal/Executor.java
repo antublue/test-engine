@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal;
 
+import static java.lang.String.format;
+
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -75,16 +77,14 @@ public class Executor {
                                             intValue = Integer.parseInt(value);
                                             if (intValue < 1) {
                                                 throw new TestEngineException(
-                                                        String.format(
+                                                        format(
                                                                 "Invalid thread count [%d]",
                                                                 intValue));
                                             }
                                             return intValue;
                                         } catch (NumberFormatException e) {
                                             throw new TestEngineException(
-                                                    String.format(
-                                                            "Invalid thread count [%s]", value),
-                                                    e);
+                                                    format("Invalid thread count [%s]", value), e);
                                         }
                                     })
                             .orElse(MAX_THREAD_COUNT);

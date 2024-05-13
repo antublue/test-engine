@@ -16,6 +16,8 @@
 
 package example.extension;
 
+import static java.lang.String.format;
+
 import java.lang.reflect.Method;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
@@ -27,7 +29,7 @@ public class ExampleExtension implements Extension {
     @Override
     public void preInstantiateCallback(Class<?> testClass) {
         System.out.println(
-                String.format(
+                format(
                         "%s preInstantiateCallback(class [%s])",
                         this.getClass().getSimpleName(), testClass.getName()));
     }
@@ -35,7 +37,7 @@ public class ExampleExtension implements Extension {
     @Override
     public void postPrepareMethodsCallback(Object testInstance) {
         System.out.println(
-                String.format(
+                format(
                         "%s postPrepareCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
@@ -43,7 +45,7 @@ public class ExampleExtension implements Extension {
     @Override
     public void postBeforeAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s postBeforeAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
@@ -51,7 +53,7 @@ public class ExampleExtension implements Extension {
     @Override
     public void postBeforeEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s postBeforeEachMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
@@ -59,7 +61,7 @@ public class ExampleExtension implements Extension {
     @Override
     public void preTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s preTestCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
@@ -67,7 +69,7 @@ public class ExampleExtension implements Extension {
     @Override
     public void postTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s postTestMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
@@ -75,7 +77,7 @@ public class ExampleExtension implements Extension {
     @Override
     public void postAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s postAfterEachCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
@@ -83,7 +85,7 @@ public class ExampleExtension implements Extension {
     @Override
     public void postAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s postAfterAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
@@ -91,7 +93,7 @@ public class ExampleExtension implements Extension {
     @Override
     public void postConcludeMethodsCallback(Object testInstance) {
         System.out.println(
-                String.format(
+                format(
                         "%s postConcludeMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
     }
@@ -100,6 +102,6 @@ public class ExampleExtension implements Extension {
     public void preDestroyCallback(Class<?> testClass, Optional<Object> testInstance) {
         Object value = testInstance.isPresent() ? testInstance.get() : null;
         System.out.println(
-                String.format("test class [%s] test instance [%s]", testClass.getName(), value));
+                format("test class [%s] test instance [%s]", testClass.getName(), value));
     }
 }

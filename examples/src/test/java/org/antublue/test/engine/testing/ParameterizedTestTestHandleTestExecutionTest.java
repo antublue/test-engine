@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.testing;
 
+import static java.lang.String.format;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +50,7 @@ public class ParameterizedTestTestHandleTestExecutionTest {
         if (stringArgument.name().contains("0")) {
             throw new RuntimeException("Forced exception");
         }
-        System.out.println(String.format("test1(" + stringArgument + ")"));
+        System.out.println(format("test1(" + stringArgument + ")"));
     }
 
     @TestEngine.Test
@@ -56,7 +58,7 @@ public class ParameterizedTestTestHandleTestExecutionTest {
         if (stringArgument.name().contains("1")) {
             throw new RuntimeException("Forced exception");
         }
-        System.out.println(String.format("test2(" + stringArgument + ")"));
+        System.out.println(format("test2(" + stringArgument + ")"));
     }
 
     public static class HandleTestExecutionTestExtension implements Extension {
@@ -65,7 +67,7 @@ public class ParameterizedTestTestHandleTestExecutionTest {
                 Object testInstance, Argument testArgument, Method testMethod, Throwable throwable)
                 throws Throwable {
             System.out.println(
-                    String.format(
+                    format(
                             "Exception in testMethod [%s] for testArgument [%s]",
                             testMethod.getName(), testArgument));
             if (testArgument.name().contains("1")) {

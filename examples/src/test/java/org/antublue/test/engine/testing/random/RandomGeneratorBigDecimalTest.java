@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.testing.random;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.antublue.test.engine.api.TestEngine;
@@ -63,6 +64,6 @@ public class RandomGeneratorBigDecimalTest extends RandomGeneratorTest {
     }
 
     private static String toString(double value) {
-        return String.format("%s", value);
+        return format("%s", value);
     }
 }

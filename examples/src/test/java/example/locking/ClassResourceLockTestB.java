@@ -16,6 +16,8 @@
 
 package example.locking;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import org.antublue.test.engine.api.Argument;
@@ -37,8 +39,7 @@ public class ClassResourceLockTestB {
     @TestEngine.Test
     public void test() throws InterruptedException {
         System.out.println(
-                String.format(
-                        "test() class [%s] testing [%s]", getClass().getName(), argument.name()));
+                format("test() class [%s] testing [%s]", getClass().getName(), argument.name()));
         Thread.sleep(5000);
     }
 }

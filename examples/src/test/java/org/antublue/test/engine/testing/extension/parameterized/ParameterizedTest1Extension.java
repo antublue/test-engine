@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.testing.extension.parameterized;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
@@ -63,7 +64,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void postInstantiateCallback(Object testInstance) {
         System.out.println(
-                String.format(
+                format(
                         "%s afterInstantiateCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance)
@@ -73,7 +74,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void prePrepareMethodsCallback(Object testInstance) {
         System.out.println(
-                String.format(
+                format(
                         "%s prePrepareMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.prePrepareMethodsCallback()");
@@ -82,7 +83,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void postPrepareMethodsCallback(Object testInstance) {
         System.out.println(
-                String.format(
+                format(
                         "%s postPrepareCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postPrepareMethodsCallback()");
@@ -91,7 +92,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void preBeforeAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s preBeforeAllMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preBeforeAllMethodsCallback()");
@@ -100,7 +101,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void postBeforeAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s postBeforeAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postBeforeAllMethodsCallback()");
@@ -109,7 +110,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void preBeforeEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s preBeforeEachMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preBeforeEachMethodsCallback()");
@@ -118,7 +119,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void postBeforeEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s postBeforeEachMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postBeforeEachMethodsCallback()");
@@ -127,7 +128,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void preTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s preTestCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preTestMethodsCallback()");
@@ -136,7 +137,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void postTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s postTestMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postTestMethodsCallback()");
@@ -145,7 +146,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void preAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s preAfterEachMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preAfterEachMethodsCallback()");
@@ -154,7 +155,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void postAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s postAfterEachCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postAfterEachMethodsCallback()");
@@ -163,7 +164,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void preAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s preAfterAllMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.preAfterAllMethodsCallback()");
@@ -172,7 +173,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void postAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "%s postAfterAllCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         ((ParameterizedTest1) testInstance).ACTUAL.add("extension.postAfterAllMethodsCallback()");
@@ -181,7 +182,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void preConcludeMethodsCallback(Object testInstance) {
         System.out.println(
-                String.format(
+                format(
                         "%s preConcludeMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         List<String> ACTUAL = ((ParameterizedTest1) testInstance).ACTUAL;
@@ -191,7 +192,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void postConcludeMethodsCallback(Object testInstance) {
         System.out.println(
-                String.format(
+                format(
                         "%s postConcludeMethodsCallback(class [%s])",
                         this.getClass().getSimpleName(), testInstance.getClass().getName()));
         List<String> ACTUAL = ((ParameterizedTest1) testInstance).ACTUAL;
@@ -201,7 +202,7 @@ public class ParameterizedTest1Extension implements Extension {
     @Override
     public void preDestroyCallback(Class<?> testClass, Optional<Object> optionalTestInstance) {
         System.out.println(
-                String.format(
+                format(
                         "%s preDestroyCallback(class [%s])",
                         this.getClass().getSimpleName(), testClass.getName()));
         assertThat((((ParameterizedTest1) optionalTestInstance.get())).ACTUAL).isEqualTo(EXPECTED);

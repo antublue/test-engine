@@ -16,6 +16,7 @@
 
 package example.testcontainers;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Closeable;
@@ -295,6 +296,6 @@ public class KafkaTest {
      * @param objects objects
      */
     private static void info(String format, Object... objects) {
-        info(String.format(format, objects));
+        info(format(format, objects));
     }
 }

@@ -16,12 +16,14 @@
 
 package org.antublue.test.engine.testing;
 
+import static java.lang.String.format;
+
 import org.antublue.test.engine.api.Extension;
 
 public class GlobalExtension implements Extension {
 
     public GlobalExtension() {
-        System.out.println(String.format("Extension [%s]", getClass()));
+        System.out.println(format("Extension [%s]", getClass()));
     }
 
     /**
@@ -33,7 +35,7 @@ public class GlobalExtension implements Extension {
     @Override
     public void postConcludeMethodsCallback(Object testInstance) throws Throwable {
         System.out.println(
-                String.format(
+                format(
                         "%s.postConcludeMethodsCallback %s",
                         getClass().getSimpleName(), testInstance.getClass().getName()));
     }

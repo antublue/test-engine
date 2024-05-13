@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.testing;
 
+import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.stream.Stream;
@@ -49,7 +50,7 @@ public class HumanReadableTimeTest {
 
         if (!actualHumanReadableTime.equals(expectedHumanReadableTime)) {
             fail(
-                    String.format(
+                    format(
                             "testHumanReadableTime() milliseconds [%d] expected [%s] actual [%s]",
                             milliseconds, expectedHumanReadableTime, actualHumanReadableTime));
         }

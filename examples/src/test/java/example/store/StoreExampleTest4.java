@@ -16,13 +16,12 @@
 
 package example.store;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import example.util.KeyGenerator;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
@@ -50,7 +49,7 @@ public class StoreExampleTest4 {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        System.out.println(String.format("key [%s]", TEST_OBJECT_KEY));
+        System.out.println(format("key [%s]", TEST_OBJECT_KEY));
         store.put(TEST_OBJECT_KEY, new TestObject());
     }
 
@@ -87,10 +86,11 @@ public class StoreExampleTest4 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        Optional<TestObject> optional = store.get(TEST_OBJECT_KEY, o -> (TestObject) o);
-        assertThat(optional).isPresent();
-        store.remove(TEST_OBJECT_KEY, (Consumer<TestObject>) testObject -> testObject.close());
-        assertThat(store.get(TEST_OBJECT_KEY)).isNotPresent();
+
+        TestObject testObject = (TestObject) store.remove(TEST_OBJECT_KEY);
+        testObject.close();
+
+        assertThat(store.get(TEST_OBJECT_KEY)).isNull();
     }
 
     private static class TestObject {

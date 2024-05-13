@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.api.Store;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.internal.ConfigurationParameters;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;
@@ -69,7 +69,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
     static {
         // Load the Store singleton in the current classloader
-        Store.getInstance();
+        Context.getInstance();
     }
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)

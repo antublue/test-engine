@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.testing;
 
+import static java.lang.String.format;
+
 import java.lang.reflect.Method;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
@@ -27,29 +29,25 @@ public class SystemOutExtension implements Extension {
     @Override
     public void postInstantiateCallback(Object testInstance) {
         System.out.println(
-                String.format(
-                        "postInstantiateCallback(class [%s])", testInstance.getClass().getName()));
+                format("postInstantiateCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
     public void prePrepareMethodsCallback(Object testInstance) {
         System.out.println(
-                String.format(
-                        "prePrepareMethodsCallback(class [%s])",
-                        testInstance.getClass().getName()));
+                format("prePrepareMethodsCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
     public void postPrepareMethodsCallback(Object testInstance) {
         System.out.println(
-                String.format(
-                        "postPrepareCallback(class [%s])", testInstance.getClass().getName()));
+                format("postPrepareCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
     public void preBeforeAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "preBeforeAllMethodsCallback(class [%s])",
                         testInstance.getClass().getName()));
     }
@@ -57,14 +55,13 @@ public class SystemOutExtension implements Extension {
     @Override
     public void postBeforeAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
-                        "postBeforeAllCallback(class [%s])", testInstance.getClass().getName()));
+                format("postBeforeAllCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
     public void preBeforeEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "preBeforeEachMethodsCallback(class [%s])",
                         testInstance.getClass().getName()));
     }
@@ -72,7 +69,7 @@ public class SystemOutExtension implements Extension {
     @Override
     public void postBeforeEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "postBeforeEachMethodsCallback(class [%s])",
                         testInstance.getClass().getName()));
     }
@@ -80,20 +77,19 @@ public class SystemOutExtension implements Extension {
     @Override
     public void preTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format("preTestCallback(class [%s])", testInstance.getClass().getName()));
+                format("preTestCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
     public void postTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
-                        "postTestMethodsCallback(class [%s])", testInstance.getClass().getName()));
+                format("postTestMethodsCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
     public void preAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "preAfterEachMethodsCallback(class [%s])",
                         testInstance.getClass().getName()));
     }
@@ -101,14 +97,13 @@ public class SystemOutExtension implements Extension {
     @Override
     public void postAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
-                        "postAfterEachCallback(class [%s])", testInstance.getClass().getName()));
+                format("postAfterEachCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
     public void preAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
+                format(
                         "preAfterAllMethodsCallback(class [%s])",
                         testInstance.getClass().getName()));
     }
@@ -116,14 +111,13 @@ public class SystemOutExtension implements Extension {
     @Override
     public void postAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
         System.out.println(
-                String.format(
-                        "postAfterAllCallback(class [%s])", testInstance.getClass().getName()));
+                format("postAfterAllCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
     public void preConcludeMethodsCallback(Object testInstance) {
         System.out.println(
-                String.format(
+                format(
                         "preConcludeMethodsCallback(class [%s])",
                         testInstance.getClass().getName()));
     }
@@ -131,7 +125,7 @@ public class SystemOutExtension implements Extension {
     @Override
     public void postConcludeMethodsCallback(Object testInstance) {
         System.out.println(
-                String.format(
+                format(
                         "postConcludeMethodsCallback(class [%s])",
                         testInstance.getClass().getName()));
     }

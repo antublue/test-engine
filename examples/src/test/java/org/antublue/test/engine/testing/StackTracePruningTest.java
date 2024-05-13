@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.testing;
 
+import static java.lang.String.format;
+
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;

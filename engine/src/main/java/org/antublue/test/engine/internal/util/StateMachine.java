@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.util;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -70,8 +72,7 @@ public class StateMachine<T> {
     public StateMachine<T> definition(T state, Action<T> action, T... nextStates)
             throws StateMachineException {
         if (actions.containsKey(state)) {
-            throw new StateMachineException(
-                    String.format("Action for state [%s] already defined", state));
+            throw new StateMachineException(format("Action for state [%s] already defined", state));
         }
         Set<T> set = definitions.computeIfAbsent(state, k -> new HashSet<>());
         Collections.addAll(set, nextStates);
@@ -104,21 +105,19 @@ public class StateMachine<T> {
         do {
             Action<T> action = actions.get(state);
             if (action == null) {
-                throw new StateMachineException(
-                        String.format("No action defined for state [%s]", state));
+                throw new StateMachineException(format("No action defined for state [%s]", state));
             } else {
                 nextState = action.perform();
                 if (nextState == null) {
                     throw new StateMachineException(
-                            String.format("Action for state [%s] returned null", nextState));
+                            format("Action for state [%s] returned null", nextState));
                 }
                 if (nextState != null
                         && !definitions
                                 .computeIfAbsent(state, k -> new HashSet<>())
                                 .contains(nextState)) {
                     throw new StateMachineException(
-                            String.format(
-                                    "Invalid state transition [%s] -> [%s]", state, nextState));
+                            format("Invalid state transition [%s] -> [%s]", state, nextState));
                 } else {
                     state = nextState;
                 }
