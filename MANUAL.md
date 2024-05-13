@@ -28,10 +28,11 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 
 ### Test Annotations
 
-| Annotation                     | Static | Scope   | Required | Example                                                                                                                                                                            |
+| Annotation                     | Static | Scope  | Required | Example                                                                                                                                                                            |
 |--------------------------------|--------|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `@TestEngine.ArgumentSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments();`</nobr> |
 | `@TestEngine.Argument`         | no     | field  | no       | `public Argument argument;`                                                                                                                                                        |
+| `@TestEngine.Context`          | no     | field  | no       | `protected Context context                                                                                                                                                         |
 | `@TestEngine.Prepare`          | no     | method | no       | `public void prepare();`                                                                                                                                                           |
 | `@TestEngine.BeforeAll`        | no     | method | no       | `public void beforeAll();`                                                                                                                                                         |
 | `@TestEngine.BeforeEach`       | no     | method | no       | `public void beforeEach();`                                                                                                                                                        |
@@ -136,13 +137,15 @@ There are standard argument implementations for common Java data types:
 
 A `Context` Object provide a common singleton instance to access shared resources between tests during runtime execution.
 
-It's primary use is to get either the global Store...
+It's primary use is to get either the global `Store`...
 
+java
 ``
 Context.getInstance().getStore()
 ```
 
-... or a namespaced store...
+java
+... or a namespaced `Store`...
  
  ```
 Context.getInstance().getStore("some namespace")

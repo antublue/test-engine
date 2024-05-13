@@ -26,8 +26,8 @@ import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
 import org.antublue.test.engine.internal.processor.AutoCloseAnnotationProcessor;
+import org.antublue.test.engine.internal.processor.ContextAnnotationProcessor;
 import org.antublue.test.engine.internal.processor.LockAnnotationProcessor;
-import org.antublue.test.engine.internal.processor.StoreAnnotationProcessor;
 import org.antublue.test.engine.internal.util.ReflectionUtils;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.StateMachine;
@@ -48,8 +48,8 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
     private static final TestUtils TEST_UTILS = TestUtils.getInstance();
 
-    private static final StoreAnnotationProcessor STORE_ANNOTATION_PROCESSOR =
-            StoreAnnotationProcessor.getInstance();
+    private static final ContextAnnotationProcessor STORE_ANNOTATION_PROCESSOR =
+            ContextAnnotationProcessor.getInstance();
 
     private static final AutoCloseAnnotationProcessor AUTO_CLOSE_ANNOTATION_PROCESSOR =
             AutoCloseAnnotationProcessor.getInstance();

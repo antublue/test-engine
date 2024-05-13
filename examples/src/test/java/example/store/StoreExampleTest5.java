@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -31,10 +32,11 @@ public class StoreExampleTest5 {
 
     private static final String TEST_OBJECT_KEY = "testObject";
 
-    @TestEngine.Store(namespace = "StoreExampleTest5")
-    protected Store store;
+    @TestEngine.Context protected Context context;
 
     @TestEngine.Argument protected StringArgument stringArgument;
+
+    protected Store store;
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
@@ -50,6 +52,7 @@ public class StoreExampleTest5 {
         System.out.println("prepare()");
         System.out.println(format("key [%s]", TEST_OBJECT_KEY));
 
+        store = context.getStore(StoreExampleTest5.class);
         store.put(TEST_OBJECT_KEY, new TestObject());
     }
 

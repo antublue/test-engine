@@ -27,10 +27,10 @@ import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to process @TestEngine.Store annotations */
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
-public class StoreAnnotationProcessor {
+public class ContextAnnotationProcessor {
 
     /** Constructor */
-    private StoreAnnotationProcessor() {
+    private ContextAnnotationProcessor() {
         // DO NOTHING
     }
 
@@ -39,8 +39,8 @@ public class StoreAnnotationProcessor {
      *
      * @return the singleton
      */
-    public static StoreAnnotationProcessor getInstance() {
-        return StoreAnnotationProcessor.SingletonHolder.INSTANCE;
+    public static ContextAnnotationProcessor getInstance() {
+        return ContextAnnotationProcessor.SingletonHolder.INSTANCE;
     }
 
     /**
@@ -55,14 +55,12 @@ public class StoreAnnotationProcessor {
             List<Field> fields =
                     ReflectionSupport.findFields(
                             testInstance.getClass(),
-                            AnnotationFieldPredicate.of(TestEngine.Store.class),
+                            AnnotationFieldPredicate.of(TestEngine.Context.class),
                             HierarchyTraversalMode.TOP_DOWN);
 
             for (Field field : fields) {
-                TestEngine.Store storeAnnotation = field.getAnnotation(TestEngine.Store.class);
-                String namespace = storeAnnotation.namespace();
                 field.setAccessible(true);
-                field.set(testInstance, Context.getInstance().getStore(namespace));
+                field.set(testInstance, Context.getInstance());
             }
         } catch (Throwable t) {
             throwableContext.add(testInstance.getClass(), t);
@@ -73,6 +71,6 @@ public class StoreAnnotationProcessor {
     private static final class SingletonHolder {
 
         /** The singleton instance */
-        private static final StoreAnnotationProcessor INSTANCE = new StoreAnnotationProcessor();
+        private static final ContextAnnotationProcessor INSTANCE = new ContextAnnotationProcessor();
     }
 }
