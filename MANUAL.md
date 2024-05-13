@@ -74,7 +74,6 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 | `@TestEngine.Random.BigInteger`                        | field            | no       | Provides a way to inject a random BigInteger value                                                                                 |
 | `@TestEngine.Random.BigDecimal`                        | field            | no       | Provides a way to inject a random BigDecimal value                                                                                 |
 | `@TestEngine.Random.UUID`                              | field            | no       | Provides a way to inject a `UUID`                                                                                                  |
-| `@TestEngine.Store`                                    | field            | no       | Provides a way to inject the `Store` singleton                                                                                     |
 
 **Notes**
 
@@ -133,10 +132,23 @@ There are standard argument implementations for common Java data types:
 -  `StringArgument`
 -  `GenericArgument`
 
-### `Store`
+### `Context`
 
-A `Store` is a thread-safe convenience class that allow sharing of Objects between tests.
+A `Context` Object provide a common singleton instance to access shared resources between tests during runtime execution.
 
+It's primary use is to get either the global Store...
+
+``
+Context.getInstance().getStore()
+```
+
+... or a namespaced store...
+ 
+ ```
+Context.getInstance().getStore("some namespace")
+```
+
+- [Context.java](/api/src/main/java/org/antublue/test/engine/api/Context.java)
 - [Store.java](/api/src/main/java/org/antublue/test/engine/api/Store.java)
 
 ## Extras

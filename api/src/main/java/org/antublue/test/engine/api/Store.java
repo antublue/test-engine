@@ -20,7 +20,19 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
+/** Interface to implement a Store */
 public interface Store {
+
+    /** Global Store namespace */
+    String GLOBAL = "__GLOBAL__";
+
+    /**
+     * Method to get the Store namespace
+     *
+     * @return the store namespace
+     */
+    String getNamespace();
+
     /**
      * Method to lock the Store, returning the Store's Lock
      *
@@ -67,7 +79,7 @@ public interface Store {
      * @param function function
      * @return the existing value, if not found, the Object returned by the Function
      */
-    Object putIfAbsent(String key, Function<String, Object> function);
+    Object computeIfAbsent(String key, Function<String, Object> function);
 
     /**
      * Method to get a value from the store

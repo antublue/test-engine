@@ -98,7 +98,10 @@ public @interface TestEngine {
     /** Store annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Store {}
+    @interface Store {
+
+        String namespace() default "__GLOBAL__";
+    }
 
     /** Tag annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})

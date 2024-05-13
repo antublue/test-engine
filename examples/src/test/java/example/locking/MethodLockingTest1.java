@@ -32,7 +32,7 @@ public class MethodLockingTest1 {
     public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
-        Context.getInstance().getStore().putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
+        Context.getInstance().getStore().computeIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
     @TestEngine.Argument public IntegerArgument integerArgument;

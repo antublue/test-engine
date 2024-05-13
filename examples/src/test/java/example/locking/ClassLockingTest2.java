@@ -34,7 +34,7 @@ public class ClassLockingTest2 {
     static {
         Context.getInstance()
                 .getStore(NAMESPACE)
-                .putIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
+                .computeIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
     @TestEngine.Argument public IntegerArgument integerArgument;
@@ -65,7 +65,7 @@ public class ClassLockingTest2 {
         System.out.println("test1()");
 
         AtomicInteger atomicInteger =
-                (AtomicInteger) Context.getInstance().getStore().get(COUNTER_NAME);
+                (AtomicInteger) Context.getInstance().getStore(NAMESPACE).get(COUNTER_NAME);
 
         int count = atomicInteger.incrementAndGet();
         if (count != 1) {

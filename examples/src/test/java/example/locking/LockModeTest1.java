@@ -31,7 +31,7 @@ public class LockModeTest1 {
     public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
-        Context.getInstance().getStore().putIfAbsent(COUNTER_NAME, k -> 0);
+        Context.getInstance().getStore().computeIfAbsent(COUNTER_NAME, k -> 0);
     }
 
     @TestEngine.Argument public IntegerArgument integerArgument;

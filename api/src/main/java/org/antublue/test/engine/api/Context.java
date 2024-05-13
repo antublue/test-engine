@@ -27,25 +27,47 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
+/** Class to implement a Context */
 public class Context {
 
-    private Store store;
-    private Map<String, Store> namespacedStores;
+    private final Store store;
+    private final Map<String, Store> namespacedStores;
 
+    /** Constructor */
     private Context() {
-        store = new StoreImpl();
+        store = new StoreImpl(Store.GLOBAL);
         namespacedStores = new HashMap<>();
     }
 
+    /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
     public static Context getInstance() {
         return SingletonHolder.INSTANCE;
     }
 
+    /**
+     * Method to get the global Store
+     *
+     * @return the global Store
+     */
     public Store getStore() {
         return store;
     }
 
+    /**
+     * Method to get a namespaced Store. The value Store.GLOBAL will reference the global Store.
+     *
+     * @param namespace namespace
+     * @return the namespaced Store
+     */
     public Store getStore(Object namespace) {
+        if (Store.GLOBAL.equals(namespace)) {
+            return store;
+        }
+
         checkNotNull(namespace, "namespace is null");
 
         String validNamespace;
@@ -55,14 +77,7 @@ public class Context {
             validNamespace = checkKey(namespace.toString());
         }
 
-        synchronized (namespacedStores) {
-            Store store = namespacedStores.get(validNamespace);
-            if (store == null) {
-                store = new StoreImpl();
-                namespacedStores.put(validNamespace, store);
-            }
-        }
-        return store;
+        return namespacedStores.computeIfAbsent(validNamespace, s -> new StoreImpl(validNamespace));
     }
 
     /** Class to hold the singleton instance */
@@ -113,13 +128,24 @@ public class Context {
     @SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock", "UnusedMethod"})
     private static final class StoreImpl implements Store {
 
+        private final String namespace;
         private final Lock lock;
         private final Map<String, Object> map;
 
         /** Constructor */
-        private StoreImpl() {
-            lock = new ReentrantLock(true);
-            map = new LinkedHashMap<>();
+        private StoreImpl(String namespace) {
+            this.namespace = namespace;
+            this.lock = new ReentrantLock(true);
+            this.map = new LinkedHashMap<>();
+        }
+
+        /**
+         * Method to get the Store namespace
+         *
+         * @return the store namespace
+         */
+        public String getNamespace() {
+            return namespace;
         }
 
         /**
@@ -204,7 +230,7 @@ public class Context {
          * @return the existing value, if not found, the Object returned by the Function
          */
         @Override
-        public Object putIfAbsent(String key, Function<String, Object> function) {
+        public Object computeIfAbsent(String key, Function<String, Object> function) {
             String validKey = checkKey(key);
             checkNotNull(function, "function is null");
 
@@ -312,38 +338,6 @@ public class Context {
             } finally {
                 unlock();
             }
-        }
-    }
-
-    /** Class to implement a generic TestEngineException */
-    public static class StoreException extends RuntimeException {
-
-        /**
-         * Constructor
-         *
-         * @param message message
-         */
-        public StoreException(String message) {
-            super(message);
-        }
-
-        /**
-         * Constructor
-         *
-         * @param message message
-         * @param throwable throwable
-         */
-        public StoreException(String message, Throwable throwable) {
-            super(message, throwable);
-        }
-
-        /**
-         * Constructor
-         *
-         * @param throwable throwable
-         */
-        public StoreException(Throwable throwable) {
-            super(throwable);
         }
     }
 }

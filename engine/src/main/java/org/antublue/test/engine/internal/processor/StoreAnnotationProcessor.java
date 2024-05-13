@@ -51,6 +51,7 @@ public class StoreAnnotationProcessor {
      */
     public void process(Object testInstance, ThrowableContext throwableContext) {
         try {
+
             List<Field> fields =
                     ReflectionSupport.findFields(
                             testInstance.getClass(),
@@ -58,8 +59,10 @@ public class StoreAnnotationProcessor {
                             HierarchyTraversalMode.TOP_DOWN);
 
             for (Field field : fields) {
+                TestEngine.Store storeAnnotation = field.getAnnotation(TestEngine.Store.class);
+                String namespace = storeAnnotation.namespace();
                 field.setAccessible(true);
-                field.set(testInstance, Context.getInstance().getStore());
+                field.set(testInstance, Context.getInstance().getStore(namespace));
             }
         } catch (Throwable t) {
             throwableContext.add(testInstance.getClass(), t);

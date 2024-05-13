@@ -19,7 +19,6 @@ package example.store;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import example.util.KeyGenerator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -30,8 +29,7 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class StoreExampleTest4 {
 
-    private static final String TEST_OBJECT_KEY =
-            KeyGenerator.of(StoreExampleTest4.class, "testObject");
+    private static final String TEST_OBJECT_KEY = "testObject";
 
     @TestEngine.Store protected Store store;
 
@@ -50,6 +48,7 @@ public class StoreExampleTest4 {
     public void prepare() {
         System.out.println("prepare()");
         System.out.println(format("key [%s]", TEST_OBJECT_KEY));
+
         store.put(TEST_OBJECT_KEY, new TestObject());
     }
 

@@ -16,6 +16,7 @@
 
 package example.store;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -27,11 +28,12 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class StoreExampleTest2 {
+public class StoreExampleTest6 {
 
     private static final String TEST_OBJECT_KEY = "testObject";
 
-    private Store store;
+    @TestEngine.Store(namespace = Store.GLOBAL)
+    protected Store store;
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -47,8 +49,13 @@ public class StoreExampleTest2 {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        store = Context.getInstance().getStore(StoreExampleTest2.class);
-        store.put(TEST_OBJECT_KEY, new TestObject());
+        System.out.println(format("key [%s]", TEST_OBJECT_KEY));
+
+        TestObject testObject = new TestObject();
+
+        store.put(TEST_OBJECT_KEY, testObject);
+
+        assertThat(Context.getInstance().getStore().get(TEST_OBJECT_KEY) == testObject);
     }
 
     @TestEngine.BeforeAll
@@ -89,6 +96,7 @@ public class StoreExampleTest2 {
         testObject.close();
 
         assertThat(store.get(TEST_OBJECT_KEY)).isNull();
+        assertThat(Context.getInstance().getStore().get(TEST_OBJECT_KEY)).isNull();
     }
 
     private static class TestObject {

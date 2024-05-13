@@ -16,24 +16,23 @@
 
 package example.store;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import example.util.KeyGenerator;
-import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Context;
+import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class StoreSingletonHolderExampleTest {
+public class StoreExampleTest5 {
 
-    private static final String CLOSEABLE_KEY =
-            KeyGenerator.of(StoreExampleTest1.class, "closeable");
-    private static final String AUTO_CLOSEABLE_KEY =
-            KeyGenerator.of(StoreExampleTest1.class, "autoClosable");
+    private static final String TEST_OBJECT_KEY = "testObject";
+
+    @TestEngine.Store(namespace = "StoreExampleTest5")
+    protected Store store;
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -49,8 +48,9 @@ public class StoreSingletonHolderExampleTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        Context.getInstance().getStore().put(CLOSEABLE_KEY, new TestCloseable());
-        Context.getInstance().getStore().put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
+        System.out.println(format("key [%s]", TEST_OBJECT_KEY));
+
+        store.put(TEST_OBJECT_KEY, new TestObject());
     }
 
     @TestEngine.BeforeAll
@@ -84,34 +84,18 @@ public class StoreSingletonHolderExampleTest {
     }
 
     @TestEngine.Conclude
-    public void conclude() throws Exception {
+    public void conclude() {
         System.out.println("conclude()");
 
-        Closeable closeable = (Closeable) Context.getInstance().getStore().remove(CLOSEABLE_KEY);
-        closeable.close();
+        TestObject testObject = (TestObject) store.remove(TEST_OBJECT_KEY);
+        testObject.close();
 
-        AutoCloseable autoCloseable =
-                (AutoCloseable) Context.getInstance().getStore().remove(AUTO_CLOSEABLE_KEY);
-        autoCloseable.close();
-
-        assertThat(Context.getInstance().getStore().get(CLOSEABLE_KEY)).isNull();
-        assertThat(Context.getInstance().getStore().get(AUTO_CLOSEABLE_KEY)).isNull();
+        assertThat(store.get(TEST_OBJECT_KEY)).isNull();
     }
 
-    private static class TestAutoCloseable implements AutoCloseable {
+    private static class TestObject {
 
-        public TestAutoCloseable() {
-            // DO NOTHING
-        }
-
-        public void close() {
-            System.out.println(getClass().getName() + ".close()");
-        }
-    }
-
-    private static class TestCloseable implements Closeable {
-
-        public TestCloseable() {
+        public TestObject() {
             // DO NOTHING
         }
 
