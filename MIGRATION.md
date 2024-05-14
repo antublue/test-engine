@@ -219,7 +219,7 @@ public class Test {
 
 `Store` has been moved into `Context`
 
-To get the global `Store`
+To get the global `Store`...
 
 java
 ```
@@ -231,50 +231,4 @@ To get a namespaced `Store`
 java
 ```
 Context.getInstance().getStore("some namespace")
-```
-
-Additionally, `@TestEngine.Context` can be used to inject the `Context` into a test class field.
-
-java
-```
-public class Test {
-
-  // ... code omitted ...
-  
-  @TestEngine.Context protected context;
-  
-  @TestEngine.Test
-  public void test() {
-    // ... code omitted ...
-    
-    // Get the global Store
-    Store store = context.getStore();
-    
-    // Use the store
-    
-    // ... code omitted ...
-  }
-}
-```
-
-java
-```
-public class Test {
-
-  // ... code omitted ...
-  
-  @TestEngine.Context protected context;
-  
-  @TestEngine.Test
-  public void test() {
-    // ... code omitted ...
-    
-    // Get the namespaced Store
-    Store store = context.getStore(getClass());
-    
-    // Use the store
-    
-    // ... code omitted ...
-  }
-}
 ```

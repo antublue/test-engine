@@ -32,7 +32,6 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 |--------------------------------|--------|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `@TestEngine.ArgumentSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments();`</nobr> |
 | `@TestEngine.Argument`         | no     | field  | no       | `public Argument argument;`                                                                                                                                                        |
-| `@TestEngine.Context`          | no     | field  | no       | `protected Context context                                                                                                                                                         |
 | `@TestEngine.Prepare`          | no     | method | no       | `public void prepare();`                                                                                                                                                           |
 | `@TestEngine.BeforeAll`        | no     | method | no       | `public void beforeAll();`                                                                                                                                                         |
 | `@TestEngine.BeforeEach`       | no     | method | no       | `public void beforeEach();`                                                                                                                                                        |
@@ -140,14 +139,13 @@ A `Context` Object provide a common singleton instance to access shared resource
 It's primary use is to get either the global `Store`...
 
 java
-``
+```
 Context.getInstance().getStore()
 ```
-
-java
 ... or a namespaced `Store`...
- 
- ```
+
+java 
+```
 Context.getInstance().getStore("some namespace")
 ```
 

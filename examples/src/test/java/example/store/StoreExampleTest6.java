@@ -32,8 +32,6 @@ public class StoreExampleTest6 {
 
     private static final String TEST_OBJECT_KEY = "testObject";
 
-    @TestEngine.Context protected Context context;
-
     @TestEngine.Argument protected StringArgument stringArgument;
 
     protected Store store;
@@ -54,7 +52,7 @@ public class StoreExampleTest6 {
 
         TestObject testObject = new TestObject();
 
-        store = context.getStore(StoreExampleTest6.class);
+        store = Context.getInstance().getStore(StoreExampleTest6.class);
         store.put(TEST_OBJECT_KEY, testObject);
 
         assertThat(Context.getInstance().getStore().get(TEST_OBJECT_KEY) == testObject);

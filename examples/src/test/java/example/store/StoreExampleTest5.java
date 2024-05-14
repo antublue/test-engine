@@ -32,11 +32,9 @@ public class StoreExampleTest5 {
 
     private static final String TEST_OBJECT_KEY = "testObject";
 
-    @TestEngine.Context protected Context context;
+    private Store store;
 
     @TestEngine.Argument protected StringArgument stringArgument;
-
-    protected Store store;
 
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
@@ -52,7 +50,7 @@ public class StoreExampleTest5 {
         System.out.println("prepare()");
         System.out.println(format("key [%s]", TEST_OBJECT_KEY));
 
-        store = context.getStore(StoreExampleTest5.class);
+        store = Context.getInstance().getStore(StoreExampleTest5.class);
         store.put(TEST_OBJECT_KEY, new TestObject());
     }
 

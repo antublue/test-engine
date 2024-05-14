@@ -48,6 +48,8 @@ Parameterized integration testing is most common when you...
 
 ### How to lock shared resources?
 
+#### Option 1
+
 The test engine runs multiple test classes in parallel (arguments within a test class are tested sequentially.)
 
 For some test scenarios, shared resources may need to be used.
@@ -73,17 +75,67 @@ Examples:
 
 - Locks are reentrant
 
-
 - By default, `@TestEngine.Lock`, `@TestEngine.Unlock`, `@TestEngine.ResourceLock` use a `ReentrantReadWriteLock`, locking the write lock.
   - You can add `mode = TestEngine.LockMode.READ` to use a read lock.
 
 ---
 
+#### Option 2
+
+Use a `Store`
+
+java
+```
+public class TestClass {
+
+    public static final String NAMESPACE = "UserManagedStoreBasedLockingTest";
+    public static final String LOCK_NAME = "lock";
+    public static final String COUNTER_NAME = "counter";
+
+    @TestEngine.Test
+    public void lockingTest() throws InterruptedException {
+        System.out.println("lockingTest()");
+
+        ReentrantReadWriteLock reentrantReadWriteLock = null;
+
+        try {
+            reentrantReadWriteLock =
+                    (ReentrantReadWriteLock)
+                            Context.getInstance()
+                                    .getStore(NAMESPACE)
+                                    .computeIfAbsent(LOCK_NAME, o -> new ReentrantReadWriteLock());
+
+            reentrantReadWriteLock.writeLock().lock();
+
+            Counter counter = (Counter) Context.getInstance().getStore(NAMESPACE).get(COUNTER_NAME);
+
+            long count = counter.increment();
+            if (count != 1) {
+                fail("expected count = 1");
+            }
+
+            count = counter.decrement();
+            if (count != 0) {
+                fail("expected count = 0");
+            }
+
+            Thread.sleep(RandomGenerator.getInstance().nextInteger(0, 1000));
+        } finally {
+            reentrantReadWriteLock.writeLock().unlock();
+        }
+    }
+}
+```
+
+### Why is `Context` / Why don't inject the `Context` into a field? / Aren't global objects bad?
+
+In general, use of singletons should be limited.
+
+However, field injection doesn't work if you need to set a value in a static initialization block. 
+
 ### Why does `Store` use a `ReentrantLock`?
 
 Using a `ReentrantReadWriteLock` allows for finer grain access patterns, but relies on the end user to not call any `Store` methods that may change values.
-
-Using a `ReentrantLock` prevents the scenario.
 
 ---
 
