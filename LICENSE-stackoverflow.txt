@@ -20,36 +20,4 @@ public static BigDecimal between(BigDecimal min, BigDecimal MAX) {
   return min.add(MAX.subtract(min).multiply(alpha, new MathContext(digitCount)));
 }
 
----------
-Copyright
----------
-
-Copyright (C) 2022 by Ben McKenneby
-
-Code is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
- 
-You should have received a copy of the license along with this
-work. If not, see <http://creativecommons.org/licenses/by-sa/4.0/>.
-
-------
-Source
-------
-
-https://stackoverflow.com/questions/23699371/java-8-distinct-by-property
-
-----
-Code
-----
-
-public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-    Set<Object> seen = ConcurrentHashMap.newKeySet();
-    return t -> seen.add(keyExtractor.apply(t));
-}
-
----------
-Copyright
----------
-
-Copyright (C) 2015 Stuart Marks
-
 ------
