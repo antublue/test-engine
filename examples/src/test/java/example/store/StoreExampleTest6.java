@@ -34,8 +34,6 @@ public class StoreExampleTest6 {
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
-    protected Store store;
-
     @TestEngine.ArgumentSupplier
     public static Stream<StringArgument> arguments() {
         Collection<StringArgument> collection = new ArrayList<>();
@@ -50,12 +48,14 @@ public class StoreExampleTest6 {
         System.out.println("prepare()");
         System.out.println(format("key [%s]", TEST_OBJECT_KEY));
 
-        TestObject testObject = new TestObject();
+        TestObject testObject1 = new TestObject();
+        Context.getInstance().getStore().put(TEST_OBJECT_KEY,  testObject1);
 
-        store = Context.getInstance().getStore(StoreExampleTest6.class);
-        store.put(TEST_OBJECT_KEY, testObject);
+        TestObject testObject2 = new TestObject();
+        Context.getInstance().getStore(StoreExampleTest6.class).put(TEST_OBJECT_KEY,  testObject2);
 
-        assertThat(Context.getInstance().getStore().get(TEST_OBJECT_KEY) == testObject);
+        assertThat(Context.getInstance().getStore().get(TEST_OBJECT_KEY) == testObject1);
+        assertThat(Context.getInstance().getStore(StoreExampleTest6.class).get(TEST_OBJECT_KEY) == testObject2);
     }
 
     @TestEngine.BeforeAll
@@ -92,11 +92,16 @@ public class StoreExampleTest6 {
     public void conclude() {
         System.out.println("conclude()");
 
-        TestObject testObject = (TestObject) store.remove(TEST_OBJECT_KEY);
+        TestObject testObject = (TestObject) Context.getInstance().getStore().remove(TEST_OBJECT_KEY);
         testObject.close();
 
-        assertThat(store.get(TEST_OBJECT_KEY)).isNull();
         assertThat(Context.getInstance().getStore().get(TEST_OBJECT_KEY)).isNull();
+        assertThat(Context.getInstance().getStore(StoreExampleTest6.class).get(TEST_OBJECT_KEY)).isNotNull();
+
+        testObject = (TestObject) Context.getInstance().getStore(StoreExampleTest6.class).remove(TEST_OBJECT_KEY);
+        testObject.close();
+
+        assertThat(Context.getInstance().getStore(StoreExampleTest6.class).get(TEST_OBJECT_KEY)).isNull();
     }
 
     private static class TestObject {
