@@ -61,11 +61,7 @@ public class GenericArgument<T> extends AbstractArgument {
 
     @Override
     public String toString() {
-        if (value == null) {
-            return null;
-        } else {
-            return value.toString();
-        }
+        return name();
     }
 
     @Override
