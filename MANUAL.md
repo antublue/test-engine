@@ -397,5 +397,5 @@ for (each test class in the Collection<Class<?>>) {
 **Notes**
 
 - Each test class will be executed sequentially in a thread, but different test classes are executed in parallel threads.
-  - By default, thread count is equal to number of available processors as reported by Java.
+  - By default, thread count is equal to number of available processors as reported by Java - 2.
 - The thread count can be changed via a configuration value.
