@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.maven.plugin.logger;
 
+import static java.lang.String.format;
+
 import org.apache.maven.plugin.logging.Log;
 
 /** Class to implement MavenPluginLogger */
@@ -51,7 +53,7 @@ public class Logger {
      */
     public void debug(String format, Object... objects) {
         if (log.isDebugEnabled()) {
-            log.debug(String.format(format, objects));
+            log.debug(format(format, objects));
         }
     }
 
@@ -74,7 +76,7 @@ public class Logger {
      */
     public void info(String format, Object... objects) {
         if (log.isInfoEnabled()) {
-            log.info(String.format(format, objects));
+            log.info(format(format, objects));
         }
     }
 
@@ -97,7 +99,7 @@ public class Logger {
      */
     public void warn(String format, Object... objects) {
         if (log.isWarnEnabled()) {
-            log.warn(String.format(format, objects));
+            log.warn(format(format, objects));
         }
     }
 
@@ -120,7 +122,7 @@ public class Logger {
      */
     public void error(String format, Object... objects) {
         if (log.isErrorEnabled()) {
-            log.error(String.format(format, objects));
+            log.error(format(format, objects));
         }
     }
 

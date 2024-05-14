@@ -16,6 +16,8 @@
 
 package example.extension.annotation;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.antublue.test.engine.api.Extension;
@@ -37,30 +39,30 @@ public class RandomStringAnnotationTest {
     @TestEngine.Test
     public void test1() {
         System.out.println(
-                String.format("test1() randomAlphaNumericString [%s]", randomAlphaNumericString));
+                format("test1() randomAlphaNumericString [%s]", randomAlphaNumericString));
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println(
-                String.format("test2() randomAlphaNumericString [%s]", randomAlphaNumericString));
+                format("test2() randomAlphaNumericString [%s]", randomAlphaNumericString));
     }
 
     @TestEngine.Test
     public void test3() {
         System.out.println(
-                String.format("test2() randomAlphaNumericString [%s]", randomAlphaNumericString));
+                format("test2() randomAlphaNumericString [%s]", randomAlphaNumericString));
     }
 
     @TestEngine.Test
     public void test4() {
         System.out.println(
-                String.format("test3() randomAlphaNumericString [%s]", randomAlphaNumericString));
+                format("test3() randomAlphaNumericString [%s]", randomAlphaNumericString));
     }
 
     @TestEngine.Test
     public void test5() {
         System.out.println(
-                String.format("test4() randomAlphaNumericString [%s]", randomAlphaNumericString));
+                format("test4() randomAlphaNumericString [%s]", randomAlphaNumericString));
     }
 }

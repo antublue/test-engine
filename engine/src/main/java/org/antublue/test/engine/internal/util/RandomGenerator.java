@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.util;
 
+import static java.lang.String.format;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -135,13 +137,11 @@ public class RandomGenerator {
      */
     public BigInteger nextBigInteger(String minimum, String maximum) {
         if (minimum.contains(".")) {
-            throw new NumberFormatException(
-                    String.format("BigInteger minimum [%s] is invalid ", minimum));
+            throw new NumberFormatException(format("BigInteger minimum [%s] is invalid ", minimum));
         }
 
         if (maximum.contains(".")) {
-            throw new NumberFormatException(
-                    String.format("BigInteger maximum [%s] is invalid", maximum));
+            throw new NumberFormatException(format("BigInteger maximum [%s] is invalid", maximum));
         }
 
         BigInteger minimumBigInteger;
@@ -150,15 +150,13 @@ public class RandomGenerator {
         try {
             minimumBigInteger = new BigInteger(minimum);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException(
-                    String.format("BigDecimal minimum [%s] is invalid", minimum));
+            throw new NumberFormatException(format("BigDecimal minimum [%s] is invalid", minimum));
         }
 
         try {
             maximumBigInteger = new BigInteger(maximum);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException(
-                    String.format("BigDecimal maximum [%s] is invalid", maximum));
+            throw new NumberFormatException(format("BigDecimal maximum [%s] is invalid", maximum));
         }
 
         if (minimumBigInteger.equals(maximumBigInteger)) {
@@ -208,15 +206,13 @@ public class RandomGenerator {
         try {
             minimumBigDecimal = new BigDecimal(minimum);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException(
-                    String.format("BigDecimal minimum [%s] is invalid", minimum));
+            throw new NumberFormatException(format("BigDecimal minimum [%s] is invalid", minimum));
         }
 
         try {
             maximummBigDecimal = new BigDecimal(maximum);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException(
-                    String.format("BigDecimal maximum [%s] is invalid", maximum));
+            throw new NumberFormatException(format("BigDecimal maximum [%s] is invalid", maximum));
         }
 
         return nextBigDecimal(minimumBigDecimal, maximummBigDecimal);

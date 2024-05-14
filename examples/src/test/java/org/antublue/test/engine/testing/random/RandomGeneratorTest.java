@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.testing.random;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
@@ -40,7 +41,7 @@ public abstract class RandomGeneratorTest {
         System.out.format("testInteger() minimum %s maximum %s", minimum, maximum).println();
         int random = RANDOM_GENERATOR.nextInteger(minimum, maximum);
         System.out.println(
-                String.format(
+                format(
                         "testInteger() minimum %s maximum %s -> random %s",
                         minimum, maximum, random));
         assertThat(random).isBetween(minimum, maximum);
@@ -48,7 +49,7 @@ public abstract class RandomGeneratorTest {
 
     protected void testIntegerUntil(int minimum, int maximum, int until, int interations) {
         System.out.println(
-                String.format(
+                format(
                         "testIntegerUntil() minimum %s maximum %s until %s iterations %s",
                         minimum, maximum, until, interations));
         for (int i = 0; i < interations; i++) {
@@ -64,14 +65,13 @@ public abstract class RandomGeneratorTest {
         System.out.format("testLong() minimum %s maximum %s", minimum, maximum).println();
         long random = RANDOM_GENERATOR.nextLong(minimum, maximum);
         System.out.println(
-                String.format(
-                        "testLong() minimum %s maximum %s -> random %s", minimum, maximum, random));
+                format("testLong() minimum %s maximum %s -> random %s", minimum, maximum, random));
         assertThat(random).isBetween(minimum, maximum);
     }
 
     protected void testLongUntil(long minimum, long maximum, long until, int iterations) {
         System.out.println(
-                String.format(
+                format(
                         "testLongUntil() minimum %s maximum %s until %s iterations %s",
                         minimum, maximum, until, iterations));
 
@@ -88,15 +88,13 @@ public abstract class RandomGeneratorTest {
         System.out.format("testFloat() minimum %s maximum %s", minimum, maximum).println();
         float random = RANDOM_GENERATOR.nextFloat(minimum, maximum);
         System.out.println(
-                String.format(
-                        "testFloat() minimum %s maximum %s -> random %s",
-                        minimum, maximum, random));
+                format("testFloat() minimum %s maximum %s -> random %s", minimum, maximum, random));
         assertThat(random).isBetween(minimum, maximum);
     }
 
     protected void testFloatUntil(float minimum, float maximum, float until, int iterations) {
         System.out.println(
-                String.format(
+                format(
                         "testFloatUntil() minimum %s maximum %s until %s iterations %s",
                         minimum, maximum, until, iterations));
         for (int i = 0; i < iterations; i++) {
@@ -112,7 +110,7 @@ public abstract class RandomGeneratorTest {
         System.out.format("testDouble() minimum %s maximum %s", minimum, maximum).println();
         double random = RANDOM_GENERATOR.nextDouble(minimum, maximum);
         System.out.println(
-                String.format(
+                format(
                         "testDouble() minimum %s maximum %s -> random %s",
                         minimum, maximum, random));
         assertThat(random).isBetween(minimum, maximum);
@@ -120,7 +118,7 @@ public abstract class RandomGeneratorTest {
 
     protected void testDoubleUntil(double minimum, double maximum, double until, int iterations) {
         System.out.println(
-                String.format(
+                format(
                         "testDoubleUntil() minimum %s maximum %s until %s iterations %s",
                         minimum, maximum, until, iterations));
         for (int i = 0; i < iterations; i++) {
@@ -136,7 +134,7 @@ public abstract class RandomGeneratorTest {
         System.out.format("testBigInteger() minimum %s maximum %s", minimum, maximum).println();
         BigInteger random = RANDOM_GENERATOR.nextBigInteger(minimum, maximum);
         System.out.println(
-                String.format(
+                format(
                         "testBigInteger() minimum %s maximum %s -> random %s",
                         minimum, maximum, random));
         assertThat(random).isBetween(new BigInteger(minimum), new BigInteger(maximum));
@@ -145,7 +143,7 @@ public abstract class RandomGeneratorTest {
     protected void testBigIntegerUntil(
             String minimum, String maximum, String until, int iterations) {
         System.out.println(
-                String.format(
+                format(
                         "testBigIntegerUntil() minimum %s maximum %s until %s iterations %s",
                         minimum, maximum, until, iterations));
         BigInteger untilBigInteger = new BigInteger(until);
@@ -162,7 +160,7 @@ public abstract class RandomGeneratorTest {
         System.out.format("testBigDecimal() minimum %s maximum %s", minimum, maximum).println();
         BigDecimal random = RANDOM_GENERATOR.nextBigDecimal(minimum, maximum);
         System.out.println(
-                String.format(
+                format(
                         "testBigDecimal() minimum %s maximum %s -> random %s",
                         minimum, maximum, random));
         assertThat(random).isBetween(new BigDecimal(minimum), new BigDecimal(maximum));
@@ -171,7 +169,7 @@ public abstract class RandomGeneratorTest {
     protected void testBigDecimalUntil(
             String minimum, String maximum, String until, int iterations) {
         System.out.println(
-                String.format(
+                format(
                         "testBigDecimalUntil() minimum %s maximum %s until %s iterations %s",
                         minimum, maximum, until, iterations));
         BigDecimal untilBigDecimal = new BigDecimal(until);

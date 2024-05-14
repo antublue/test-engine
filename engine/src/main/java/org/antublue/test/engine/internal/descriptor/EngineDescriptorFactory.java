@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import static java.lang.String.format;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -357,9 +359,7 @@ public class EngineDescriptorFactory {
             ((Iterable<Argument>) object).forEach(testArguments::add);
         } else {
             throw new TestClassDefinitionException(
-                    String.format(
-                            "Exception getting arguments for test class [%s]",
-                            testClass.getName()));
+                    format("Exception getting arguments for test class [%s]", testClass.getName()));
         }
 
         return testArguments;

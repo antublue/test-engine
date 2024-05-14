@@ -28,7 +28,7 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
 
 /** Example test */
-public class StoreExampleTest3 {
+public class StoreExampleTest5 {
 
     private static final String TEST_OBJECT_KEY = "testObject";
 
@@ -50,10 +50,7 @@ public class StoreExampleTest3 {
         System.out.println("prepare()");
         System.out.println(format("key [%s]", TEST_OBJECT_KEY));
 
-        store = Context.getInstance().getStore(StoreExampleTest3.class);
-
-        assertThat(store).isNotNull();
-
+        store = Context.getInstance().getStore(StoreExampleTest5.class);
         store.put(TEST_OBJECT_KEY, new TestObject());
     }
 
@@ -91,10 +88,8 @@ public class StoreExampleTest3 {
     public void conclude() {
         System.out.println("conclude()");
 
-        TestObject testObject = (TestObject) store.get(TEST_OBJECT_KEY);
+        TestObject testObject = (TestObject) store.remove(TEST_OBJECT_KEY);
         testObject.close();
-
-        store.remove(TEST_OBJECT_KEY);
 
         assertThat(store.get(TEST_OBJECT_KEY)).isNull();
     }

@@ -16,14 +16,13 @@
 
 package example.store;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import example.util.KeyGenerator;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.StringArgument;
@@ -31,10 +30,9 @@ import org.antublue.test.engine.api.argument.StringArgument;
 /** Example test */
 public class StoreExampleTest4 {
 
-    private static final String TEST_OBJECT_KEY =
-            KeyGenerator.of(StoreExampleTest4.class, "testObject");
+    private static final String TEST_OBJECT_KEY = "testObject";
 
-    @TestEngine.Store protected Store store;
+    private Store store;
 
     @TestEngine.Argument protected StringArgument stringArgument;
 
@@ -50,7 +48,9 @@ public class StoreExampleTest4 {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        System.out.println(String.format("key [%s]", TEST_OBJECT_KEY));
+        System.out.println(format("key [%s]", TEST_OBJECT_KEY));
+
+        store = Context.getInstance().getStore(StoreExampleTest4.class);
         store.put(TEST_OBJECT_KEY, new TestObject());
     }
 
@@ -87,10 +87,11 @@ public class StoreExampleTest4 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        Optional<TestObject> optional = store.get(TEST_OBJECT_KEY, o -> (TestObject) o);
-        assertThat(optional).isPresent();
-        store.remove(TEST_OBJECT_KEY, (Consumer<TestObject>) testObject -> testObject.close());
-        assertThat(store.get(TEST_OBJECT_KEY)).isNotPresent();
+
+        TestObject testObject = (TestObject) store.remove(TEST_OBJECT_KEY);
+        testObject.close();
+
+        assertThat(store.get(TEST_OBJECT_KEY)).isNull();
     }
 
     private static class TestObject {

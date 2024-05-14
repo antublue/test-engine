@@ -16,21 +16,26 @@
 
 package example.locking;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
-import java.util.Optional;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Store;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
-import org.antublue.test.engine.extras.LockManager;
+import org.antublue.test.engine.internal.util.RandomGenerator;
 
 /** Example test */
-public class LockManagerTest1 {
+public class UserManagedStoreBasedLockingTest2 {
 
-    public static final String PREFIX = "LockManagerTest";
-    public static final String LOCK_NAME = PREFIX + ".lock";
-    public static final String COUNTER_NAME = PREFIX + ".counter";
+    public static final String NAMESPACE = "UserManagedStoreBasedLockingTest";
+    public static final String LOCK_NAME = "lock";
+    public static final String COUNTER_NAME = "counter";
+
+    static {
+        Context.getInstance().getStore(NAMESPACE).computeIfAbsent(COUNTER_NAME, k -> new Counter());
+    }
 
     @TestEngine.Argument public IntegerArgument integerArgument;
 
@@ -42,6 +47,9 @@ public class LockManagerTest1 {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
+
+        assertThat(Context.getInstance().getStore(NAMESPACE) != Context.getInstance().getStore())
+                .isTrue();
     }
 
     @TestEngine.BeforeAll
@@ -55,28 +63,23 @@ public class LockManagerTest1 {
     }
 
     @TestEngine.Test
-    public void test1() {
+    public void lockingTest() throws InterruptedException {
+        System.out.println("lockingTest()");
+
+        ReentrantReadWriteLock reentrantReadWriteLock = null;
+
         try {
-            LockManager.getInstance().getLock(LOCK_NAME).writeLock().lock();
+            reentrantReadWriteLock =
+                    (ReentrantReadWriteLock)
+                            Context.getInstance()
+                                    .getStore(NAMESPACE)
+                                    .computeIfAbsent(LOCK_NAME, o -> new ReentrantReadWriteLock());
 
-            System.out.println(
-                    "enter test1() thread = ["
-                            + Thread.currentThread().getName()
-                            + "] instance = ["
-                            + this
-                            + "]");
+            reentrantReadWriteLock.writeLock().lock();
 
-            Optional<Object> optional =
-                    Store.getInstance().putIfAbsent(COUNTER_NAME, s -> new Counter());
+            Counter counter = (Counter) Context.getInstance().getStore(NAMESPACE).get(COUNTER_NAME);
 
-            Counter counter = (Counter) optional.get();
-
-            long count = counter.getCount();
-            if (count != 0) {
-                fail("expected count = 0");
-            }
-
-            count = counter.increment();
+            long count = counter.increment();
             if (count != 1) {
                 fail("expected count = 1");
             }
@@ -86,20 +89,9 @@ public class LockManagerTest1 {
                 fail("expected count = 0");
             }
 
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                // DO NOTHING
-            }
+            Thread.sleep(RandomGenerator.getInstance().nextInteger(0, 1000));
         } finally {
-            System.out.println(
-                    "leave test1() thread = ["
-                            + Thread.currentThread().getName()
-                            + "] instance = ["
-                            + this
-                            + "]");
-
-            LockManager.getInstance().getLock(LOCK_NAME).writeLock().unlock();
+            reentrantReadWriteLock.writeLock().unlock();
         }
     }
 

@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.logger;
 
+import static java.lang.String.format;
+
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -162,7 +164,7 @@ public class Logger {
     public void trace(String format, Object... objects) {
         if (isTraceEnabled()) {
             Objects.requireNonNull(format);
-            log(System.out, createMessage(Level.TRACE, String.format(format, objects)));
+            log(System.out, createMessage(Level.TRACE, format(format, objects)));
         }
     }
 
@@ -210,7 +212,7 @@ public class Logger {
     public void debug(String format, Object... objects) {
         if (isDebugEnabled()) {
             Objects.requireNonNull(format);
-            log(System.out, createMessage(Level.DEBUG, String.format(format, objects)));
+            log(System.out, createMessage(Level.DEBUG, format(format, objects)));
         }
     }
 
@@ -258,7 +260,7 @@ public class Logger {
     public void info(String format, Object... objects) {
         if (isInfoEnabled()) {
             Objects.requireNonNull(format);
-            log(System.out, createMessage(Level.INFO, String.format(format, objects)));
+            log(System.out, createMessage(Level.INFO, format(format, objects)));
         }
     }
 
@@ -306,7 +308,7 @@ public class Logger {
     public void warn(String format, Object... objects) {
         if (isWarnEnabled()) {
             Objects.requireNonNull(format);
-            log(System.out, createMessage(Level.WARN, String.format(format, objects)));
+            log(System.out, createMessage(Level.WARN, format(format, objects)));
         }
     }
 
@@ -354,7 +356,7 @@ public class Logger {
     public void error(String format, Object... objects) {
         if (isErrorEnabled()) {
             Objects.requireNonNull(format);
-            log(System.out, createMessage(Level.ERROR, String.format(format, objects)));
+            log(System.out, createMessage(Level.ERROR, format(format, objects)));
         }
     }
 

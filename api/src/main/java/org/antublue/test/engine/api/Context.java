@@ -16,34 +16,31 @@
 
 package org.antublue.test.engine.api;
 
-/** Class to implement a generic TestEngineException */
-public class StoreException extends RuntimeException {
+import org.antublue.test.engine.api.internal.ContextImpl;
+
+public interface Context {
 
     /**
-     * Constructor
+     * Method to get the singleton instance
      *
-     * @param message message
+     * @return the singleton instance
      */
-    public StoreException(String message) {
-        super(message);
+    static Context getInstance() {
+        return ContextImpl.getInstance();
     }
 
     /**
-     * Constructor
+     * Method to get the global Store
      *
-     * @param message message
-     * @param throwable throwable
+     * @return the global Store
      */
-    public StoreException(String message, Throwable throwable) {
-        super(message, throwable);
-    }
+    Store getStore();
 
     /**
-     * Constructor
+     * Method to get a namespaced Store. The value Store.GLOBAL will reference the global Store.
      *
-     * @param throwable throwable
+     * @param namespace namespace
+     * @return the namespaced Store
      */
-    public StoreException(Throwable throwable) {
-        super(throwable);
-    }
+    Store getStore(Object namespace);
 }

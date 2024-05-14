@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.processor;
 
+import static java.lang.String.format;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -165,7 +167,7 @@ public class LockAnnotationProcessor {
 
                 } else {
                     throw new TestClassDefinitionException(
-                            String.format(
+                            format(
                                     "@TestEngine.Unlock without @TestEngine.Lock, name [%s] mode"
                                             + " [%s] class [%s]",
                                     trimmedName, mode, clazz.getName()));
@@ -240,7 +242,7 @@ public class LockAnnotationProcessor {
 
             } else {
                 throw new TestClassDefinitionException(
-                        String.format(
+                        format(
                                 "@TestEngine.Unlock without @TestEngine.Lock, name [%s] mode [%s]"
                                         + " class [%s] method [%s]",
                                 name.trim(),

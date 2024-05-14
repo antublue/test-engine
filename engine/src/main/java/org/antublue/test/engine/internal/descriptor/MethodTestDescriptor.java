@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import static java.lang.String.format;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -188,7 +190,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                     .add(
                             testClass,
                             new TestArgumentFailedException(
-                                    String.format(
+                                    format(
                                             "Exception testing test argument name [%s]",
                                             testArgument.name())));
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);

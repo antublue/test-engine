@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -171,8 +173,7 @@ public class Configuration {
 
     private void trace(String format, Object... objects) {
         if (TRACE) {
-            System.out.println(
-                    "[TRACE] " + Configuration.class + " " + String.format(format, objects));
+            System.out.println("[TRACE] " + Configuration.class + " " + format(format, objects));
             System.out.flush();
         }
     }

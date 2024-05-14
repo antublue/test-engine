@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine;
 
+import static java.lang.String.format;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -141,7 +143,7 @@ public class ExtensionManager {
             }
         } catch (Throwable t) {
             throw new TestEngineException(
-                    String.format(
+                    format(
                             "Exception initializing extensions for test class [%s]",
                             testClass.getName()),
                     t);
@@ -506,7 +508,7 @@ public class ExtensionManager {
                 ((Iterable<Extension>) object).forEach(testExtensions::add);
             } else {
                 throw new TestClassDefinitionException(
-                        String.format(
+                        format(
                                 "Exception getting extensions for test class [%s]",
                                 testClass.getName()));
             }

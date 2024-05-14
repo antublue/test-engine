@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.util;
 
+import static java.lang.String.format;
+
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,13 +40,13 @@ public final class NamedThreadFactory implements ThreadFactory {
     /**
      * Method to create a new Thread
      *
-     * @param r a runnable to be executed by new thread instance
+     * @param runnable a runnable to be executed by new thread instance
      * @return the Thread
      */
     @Override
-    public Thread newThread(Runnable r) {
-        Thread thread = new Thread(r);
-        thread.setName(String.format(format, threadId.getAndIncrement()));
+    public Thread newThread(Runnable runnable) {
+        Thread thread = new Thread(runnable);
+        thread.setName(format(format, threadId.getAndIncrement()));
         thread.setDaemon(true);
         return thread;
     }

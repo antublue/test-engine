@@ -217,7 +217,18 @@ public class Test {
 
 ### Store
 
-Deprecated `Store` methods have been removed.
+`Store` has been moved into `Context`
 
-- `singleton()` has been removed
-- `getSingleton()` has been removed
+To get the global `Store`...
+
+java
+```
+Context.getInstance().getStore()
+```
+
+To get a namespaced `Store`
+
+java
+```
+Context.getInstance().getStore("some namespace")
+```

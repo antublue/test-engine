@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.extras;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -158,7 +160,7 @@ public class Directory implements AutoCloseable {
         }
 
         if (!f.delete()) {
-            throw new IOException(String.format("Failed to delete file [%s]", f));
+            throw new IOException(format("Failed to delete file [%s]", f));
         }
     }
 

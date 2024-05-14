@@ -19,7 +19,7 @@ package example.locking;
 import static org.assertj.core.api.Fail.fail;
 
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Store;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.argument.IntegerArgument;
 
@@ -31,7 +31,7 @@ public class LockModeTest2 {
     public static final String COUNTER_NAME = PREFIX + ".counter";
 
     static {
-        Store.getInstance().putIfAbsent(COUNTER_NAME, k -> 0);
+        Context.getInstance().getStore().computeIfAbsent(COUNTER_NAME, k -> 0);
     }
 
     @TestEngine.Argument public IntegerArgument integerArgument;
@@ -62,23 +62,23 @@ public class LockModeTest2 {
     public void test1() {
         System.out.println("test1()");
 
-        int count = Store.getInstance().get(COUNTER_NAME, Integer.class).get();
+        int count = (Integer) Context.getInstance().getStore().get(COUNTER_NAME);
         if (count != 0) {
             fail("expected count = 0");
         }
 
         count++;
-        Store.getInstance().put(COUNTER_NAME, count);
+        Context.getInstance().getStore().put(COUNTER_NAME, count);
 
-        count = Store.getInstance().get(COUNTER_NAME, Integer.class).get();
+        count = (Integer) Context.getInstance().getStore().get(COUNTER_NAME);
         if (count != 1) {
             fail("expected count = 1");
         }
 
         count--;
-        Store.getInstance().put(COUNTER_NAME, count);
+        Context.getInstance().getStore().put(COUNTER_NAME, count);
 
-        count = Store.getInstance().get(COUNTER_NAME, Integer.class).get();
+        count = (Integer) Context.getInstance().getStore().get(COUNTER_NAME);
         if (count != 0) {
             fail("expected count = 0");
         }
@@ -89,7 +89,7 @@ public class LockModeTest2 {
     @TestEngine.Unlock(name = LOCK_NAME, mode = TestEngine.LockMode.READ)
     public void test2() {
         System.out.println("test2()");
-        int count = Store.getInstance().get(COUNTER_NAME, Integer.class).get();
+        int count = (Integer) Context.getInstance().getStore().get(COUNTER_NAME);
         if (count != 0) {
             fail("expected count = 0");
         }
