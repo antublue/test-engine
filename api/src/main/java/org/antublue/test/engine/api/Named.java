@@ -9,16 +9,16 @@
  */
 
 /*
- * Copied into project for import consistency
+ * Copied from JUnit5 project for test engine API import consistency
  */
 
 //package org.junit.jupiter.api;
 
 package org.antublue.test.engine.api;
 
-import static org.apiguardian.api.API.Status.STABLE;
+//import static org.apiguardian.api.API.Status.STABLE;
 
-import org.apiguardian.api.API;
+//import org.apiguardian.api.API;
 import org.junit.platform.commons.util.Preconditions;
 
 /**
@@ -27,7 +27,7 @@ import org.junit.platform.commons.util.Preconditions;
  * @param <T> the type of the payload
  * @since 5.8
  */
-@API(status = STABLE, since = "5.8")
+//@API(status = STABLE, since = "5.8")
 public interface Named<T> {
 
     /**
