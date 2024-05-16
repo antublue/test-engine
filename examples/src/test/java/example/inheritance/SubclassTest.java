@@ -23,8 +23,6 @@ import org.antublue.test.engine.api.support.NamedInteger;
 
 public class SubclassTest extends BaseTest {
 
-    @TestEngine.Argument protected NamedInteger argument;
-
     @TestEngine.Prepare
     public void prepare2() {
         System.out.println("  prepare2()");
