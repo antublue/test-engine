@@ -19,7 +19,6 @@ package example.inheritance;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedInteger;
 
 public class SubclassTest extends BaseTest {
 
