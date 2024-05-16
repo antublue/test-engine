@@ -16,7 +16,30 @@
 
 package example.testcontainers;
 
+import static java.lang.String.format;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.Closeable;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+import java.util.Random;
+import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.testcontainers.containers.Network;
+import org.testcontainers.kafka.KafkaContainer;
+import org.testcontainers.utility.DockerImageName;
 
 /**
  * Example using testcontainers-java and Apache Kafka
@@ -26,7 +49,6 @@ import org.antublue.test.engine.api.TestEngine;
 @TestEngine.Disabled
 public class KafkaTest {
 
-    /*
     private static final String TOPIC = "test";
     private static final String GROUP_ID = "test-group-id";
     private static final String EARLIEST = "earliest";
@@ -36,11 +58,11 @@ public class KafkaTest {
     @TestEngine.AutoClose.Conclude private Network network;
 
     @TestEngine.Argument @TestEngine.AutoClose.AfterAll
-    protected KafkaTestContainer kafkaTestContainer;
+    protected KafkaTestEnvironment kafkaTestEnvironment;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<KafkaTestContainer> arguments() {
-        return Stream.of(KafkaTestContainer.of("apache/kafka:3.7.0"));
+    public static Stream<KafkaTestEnvironment> arguments() {
+        return Stream.of(KafkaTestEnvironment.of("apache/kafka:3.7.0"));
     }
 
     @TestEngine.Prepare
@@ -57,7 +79,7 @@ public class KafkaTest {
     public void startTestContainer() {
         info("starting test container ...");
 
-        kafkaTestContainer.start(network);
+        kafkaTestEnvironment.start(network);
 
         info("test container started");
     }
@@ -69,7 +91,7 @@ public class KafkaTest {
 
         message = randomString(16);
 
-        String bootstrapServers = kafkaTestContainer.getBootstrapServers();
+        String bootstrapServers = kafkaTestEnvironment.getPayload().getBootstrapServers();
 
         info("producing message [%s] to [%s] ...", message, bootstrapServers);
 
@@ -80,16 +102,9 @@ public class KafkaTest {
         properties.setProperty(
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
-        KafkaProducer<String, String> producer = null;
-
-        try {
-            producer = new KafkaProducer<>(properties);
+        try (KafkaProducer<String, String> producer = new KafkaProducer<>(properties)) {
             ProducerRecord<String, String> producerRecord = new ProducerRecord<>(TOPIC, message);
             producer.send(producerRecord).get();
-        } finally {
-            if (producer != null) {
-                producer.close();
-            }
         }
 
         System.out.format("message [%s] produced", message).println();
@@ -97,10 +112,10 @@ public class KafkaTest {
 
     @TestEngine.Test
     @TestEngine.Order(order = 2)
-    public void testConsume() {
+    public void testConsume1() {
         info("testing testConsume() ...");
 
-        String bootstrapServers = kafkaTestContainer.getBootstrapServers();
+        String bootstrapServers = kafkaTestEnvironment.getPayload().getBootstrapServers();
 
         info("consuming message from [%s] ...", bootstrapServers);
 
@@ -139,7 +154,7 @@ public class KafkaTest {
     public void testConsume2() {
         info("testing testConsume2() ...");
 
-        String bootstrapServers = kafkaTestContainer.getBootstrapServers();
+        String bootstrapServers = kafkaTestEnvironment.getPayload().getBootstrapServers();
 
         info("consuming message from [%s] ...", bootstrapServers);
 
@@ -174,8 +189,7 @@ public class KafkaTest {
     }
 
     /** Class to implement a TestContext */
-    /*
-    public static class KafkaTestContainer implements Argument, Closeable {
+    public static class KafkaTestEnvironment implements Named<KafkaContainer>, Closeable {
 
         private final String dockerImageName;
         private KafkaContainer kafkaContainer;
@@ -185,69 +199,65 @@ public class KafkaTest {
          *
          * @param dockerImageName the name
          */
-    /*
-    public KafkaTestContainer(String dockerImageName) {
-        this.dockerImageName = dockerImageName;
-    }
-
-    /**
-     * Method to get the name
-     *
-     * @return the name
-     */
-    /*
-    public String name() {
-        return dockerImageName;
-    }
-
-    /**
-     * Method to start the KafkaTestContainer using a specific network
-     *
-     * @param network the network
-     */
-    /*
-    public void start(Network network) {
-        info("test container [%s] starting ...", dockerImageName);
-
-        kafkaContainer = new KafkaContainer(DockerImageName.parse(dockerImageName));
-        kafkaContainer.withNetwork(network);
-        kafkaContainer.start();
-
-        info("test container [%s] started", dockerImageName);
-    }
-
-    /**
-     * Method to get the Kafka bootstrap servers
-     *
-     * @return the Kafka bootstrap servers
-     */
-    /*
-    public String getBootstrapServers() {
-        return kafkaContainer.getBootstrapServers();
-    }
-
-    /** Method to close (shutdown) the KafkaTestContainer */
-    /*
-    public void close() {
-        info("test container [%s] stopping ..", dockerImageName);
-
-        if (kafkaContainer != null) {
-            kafkaContainer.stop();
-            kafkaContainer = null;
+        public KafkaTestEnvironment(String dockerImageName) {
+            this.dockerImageName = dockerImageName;
         }
 
-        info("test container [%s] stopped", dockerImageName);
-    }
+        /**
+         * Method to get the name
+         *
+         * @return the name
+         */
+        @Override
+        public String getName() {
+            return dockerImageName;
+        }
 
-    /**
-     * Method to create a KafkaTestContainer
-     *
-     * @param dockerImageName the name
-     * @return a KafkaTestContainer
-     */
-    /*
-        public static KafkaTestContainer of(String dockerImageName) {
-            return new KafkaTestContainer(dockerImageName);
+        /**
+         * Method to get the payload (ourself)
+         *
+         * @return the payload
+         */
+        @Override
+        public KafkaContainer getPayload() {
+            return kafkaContainer;
+        }
+
+        /**
+         * Method to start the KafkaTestEnvironment using a specific network
+         *
+         * @param network the network
+         */
+        public void start(Network network) {
+            info("test container [%s] starting ...", dockerImageName);
+
+            kafkaContainer = new KafkaContainer(DockerImageName.parse(dockerImageName));
+            kafkaContainer.withNetwork(network);
+            kafkaContainer.start();
+
+            info("test container [%s] started", dockerImageName);
+        }
+
+        /** Method to close (shutdown) the KafkaTestEnvironment */
+        public void close() {
+            info("test container [%s] stopping ..", dockerImageName);
+
+            if (kafkaContainer != null) {
+                kafkaContainer.stop();
+                kafkaContainer = null;
+            }
+
+            info("test container [%s] stopped", dockerImageName);
+        }
+
+        /**
+         * Method to create a KafkaTestEnvironment
+         *
+         * @param dockerImageName the name
+         * @return a KafkaTestEnvironment
+         */
+        public static KafkaTestEnvironment of(String dockerImageName) {
+            return new KafkaTestEnvironment(dockerImageName);
         }
     }
 
@@ -257,7 +267,6 @@ public class KafkaTest {
      * @param length length
      * @return a random String
      */
-    /*
     private static String randomString(int length) {
         return new Random()
                 .ints(97, 123 + 1)
@@ -271,7 +280,6 @@ public class KafkaTest {
      *
      * @param object object
      */
-    /*
     private static void info(Object object) {
         System.out.println(object);
     }
@@ -282,9 +290,7 @@ public class KafkaTest {
      * @param format format
      * @param objects objects
      */
-    /*
     private static void info(String format, Object... objects) {
         info(format(format, objects));
     }
-    */
 }

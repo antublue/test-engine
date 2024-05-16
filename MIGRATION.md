@@ -276,11 +276,30 @@ public class SimpleTest1 {
 To get the global `Store`...
 
 ```java
-Context.getInstance().getStore()
+Store store = Context.getInstance().getStore();
 ```
 
 To get a namespaced `Store`
 
 ```java
-Context.getInstance().getStore("some namespace")
+Store store = Context.getInstance().getStore("some namespace")
 ```
+
+### Extras
+
+The `Extras` project has been removed from the core test engine.
+
+While the `Extras` project was meant to contain "helper" `Named<X>` factories, etc., trying to support all of various end user scenarios is difficult.
+
+Example - "I want a JSON object":
+
+The end user most likely wants a specific library implementation of the JSON object...
+
+- Gson
+- Jackson
+- JsonPath
+- JSON.simple
+- org.json (Java JSON)
+- Json-B (JSON Binding API)
+
+... etc.

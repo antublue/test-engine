@@ -1,7 +1,0 @@
-# comment
-Line
-foo
-bar
-
-testing
-1 2 3
