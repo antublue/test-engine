@@ -215,20 +215,72 @@ public class Test {
 
 ## Migrating from `6.x.x` versions to `7.x.x` versions
 
+### Arguments
+
+**The argument paradigm has changed.**
+
+The `Named` generic interface has been introduced as a replacement.
+
+`@TestEngine.Argument` annotated member variables are required to use `Named`.
+
+Example:
+
+```java
+public class SimpleTest1 {
+
+    @TestEngine.Argument
+    protected Named<String> argument;
+
+    @TestEngine.ArgumentSupplier
+    public static Stream<Named<String>> arguments() {
+        Collection<NamedString> collection = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            collection.add(Named.of("StringArgument " + i, "string value " + i));
+        }
+        return collection.stream();
+    }
+
+    // ... code omitted ...
+}
+```
+
+Plain Objects:
+
+If the `@TestEngine.ArgumentSupplier` returns a `Stream` or `Iterable` containing non-`Named` objects, then the test engine will wrap each object with a `Named` using the objects position in the stream/iterable as the name.
+
+Example:
+
+```java
+public class SimpleTest1 {
+
+    @TestEngine.Argument
+    protected Named<String> argument;
+
+    @TestEngine.ArgumentSupplier
+    public static Stream<String> arguments() {
+        Collection<String> collection = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            collection.add("string value " + i);
+        }
+        return collection.stream();
+    }
+
+    // ... code omitted ...
+}
+```
+
 ### Store
 
 `Store` has been moved into `Context`
 
 To get the global `Store`...
 
-java
-```
+```java
 Context.getInstance().getStore()
 ```
 
 To get a namespaced `Store`
 
-java
-```
+```java
 Context.getInstance().getStore("some namespace")
 ```
