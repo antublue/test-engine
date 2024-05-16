@@ -16,15 +16,13 @@
 
 package example;
 
-import example.argument.CustomArgumentTest2;
-import org.antublue.test.engine.api.Named;
-import org.antublue.test.engine.api.TestEngine;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
 public class PlainObjectTest2 {
@@ -62,7 +60,12 @@ public class PlainObjectTest2 {
         assertThat(argument).isNotNull();
 
         System.out.println("test1(" + argument + ")");
-        System.out.println("test1(" + argument.getPayload().getFirstName() + ", " + argument.getPayload().getLastName() + ")");
+        System.out.println(
+                "test1("
+                        + argument.getPayload().getFirstName()
+                        + ", "
+                        + argument.getPayload().getLastName()
+                        + ")");
     }
 
     @TestEngine.AfterEach
