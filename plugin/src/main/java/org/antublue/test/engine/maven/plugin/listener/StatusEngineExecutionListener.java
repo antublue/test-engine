@@ -186,7 +186,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
             Metadata metadata = metadataSupport.getMetadata();
             Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
-            Named testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
+            Named<?> testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
             Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
 
             AnsiColorStringBuilder ansiColorStringBuilder =
@@ -223,7 +223,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
             Metadata metadata = metadataSupport.getMetadata();
             Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
-            Named testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
+            Named<?> testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
             Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
             Long elapsedTime = metadata.get(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
 
@@ -271,7 +271,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
             Metadata metadata = metadataSupport.getMetadata();
             Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
-            Named testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
+            Named<?> testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
             Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
             Long elapsedTime = metadata.get(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
             String testDescriptorStatus = metadata.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);

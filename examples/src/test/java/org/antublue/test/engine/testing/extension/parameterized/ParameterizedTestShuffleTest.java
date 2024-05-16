@@ -107,7 +107,7 @@ public class ParameterizedTestShuffleTest {
 
         @Override
         public void postTestArgumentDiscoveryCallback(
-                Class<?> testClass, List<Named> testArguments) {
+                Class<?> testClass, List<Named<?>> testArguments) {
             Collections.shuffle(testArguments);
         }
 

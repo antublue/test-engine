@@ -72,7 +72,7 @@ public class EngineDescriptorFactory {
     private void discover(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         Set<Class<?>> classes = new LinkedHashSet<>();
-        Map<Class<?>, List<Named>> classArgumentMap = new LinkedHashMap<>();
+        Map<Class<?>, List<Named<?>>> classArgumentMap = new LinkedHashMap<>();
         Map<Class<?>, List<Method>> classMethodMap = new LinkedHashMap<>();
 
         List<? extends DiscoverySelector> discoverySelectors =
@@ -90,7 +90,7 @@ public class EngineDescriptorFactory {
 
                 for (Class<?> javaClass : javaClasses) {
                     // Class -> Argument mappings
-                    List<Named> testArguments = getArguments(javaClass);
+                    List<Named<?>> testArguments = getArguments(javaClass);
 
                     classArgumentMap
                             .computeIfAbsent(javaClass, c -> new ArrayList<>())
@@ -130,7 +130,7 @@ public class EngineDescriptorFactory {
 
                 for (Class<?> javaClass : javaClasses) {
                     // Class -> Argument mappings
-                    List<Named> testArguments = getArguments(javaClass);
+                    List<Named<?>> testArguments = getArguments(javaClass);
 
                     classArgumentMap
                             .computeIfAbsent(javaClass, c -> new ArrayList<>())
@@ -166,7 +166,7 @@ public class EngineDescriptorFactory {
 
                 if (TestClassPredicate.TEST_CLASS_PREDICATE.test(javaClass)) {
                     // Class -> Argument mappings
-                    List<Named> testArguments = getArguments(javaClass);
+                    List<Named<?>> testArguments = getArguments(javaClass);
 
                     classArgumentMap
                             .computeIfAbsent(javaClass, c -> new ArrayList<>())
@@ -204,7 +204,7 @@ public class EngineDescriptorFactory {
                 if (TestClassPredicate.TEST_CLASS_PREDICATE.test(javaClass)
                         && TestMethodPredicate.TEST_METHOD_PREDICATE.test(javaMethod)) {
                     // Class -> Argument mappings
-                    List<Named> testArguments = getArguments(javaClass);
+                    List<Named<?>> testArguments = getArguments(javaClass);
 
                     classArgumentMap
                             .computeIfAbsent(javaClass, c -> new ArrayList<>())
@@ -270,7 +270,7 @@ public class EngineDescriptorFactory {
                 if (javaClass != null) {
                     classes.add(javaClass);
 
-                    List<Named> testArguments = getArguments(javaClass);
+                    List<Named<?>> testArguments = getArguments(javaClass);
                     if (testArgumentIndex != -1) {
                         classArgumentMap
                                 .computeIfAbsent(javaClass, c -> new ArrayList<>())
@@ -309,7 +309,7 @@ public class EngineDescriptorFactory {
 
         try {
             for (Class<?> clazz : classes) {
-                List<Named> arguments = classArgumentMap.get(clazz);
+                List<Named<?>> arguments = classArgumentMap.get(clazz);
 
                 ThrowableContext throwableContext = new ThrowableContext();
                 EXTENSION_MANAGER.postTestArgumentDiscoveryCallback(
@@ -349,8 +349,8 @@ public class EngineDescriptorFactory {
         return method;
     }
 
-    private static List<Named> getArguments(Class<?> testClass) throws Throwable {
-        List<Named> testArguments = new ArrayList<>();
+    private static List<Named<?>> getArguments(Class<?> testClass) throws Throwable {
+        List<Named<?>> testArguments = new ArrayList<>();
 
         Object object = getArumentSupplierMethod(testClass).invoke(null, (Object[]) null);
         if (!(object instanceof Stream || object instanceof Iterable)) {

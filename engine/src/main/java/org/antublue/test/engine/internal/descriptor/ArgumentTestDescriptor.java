@@ -67,7 +67,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
     private final Class<?> testClass;
-    private final Named testArgument;
+    private final Named<?> testArgument;
     private final List<Method> beforeAllMethods;
     private final List<Method> afterAllMethods;
 
@@ -110,7 +110,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         return Type.CONTAINER_AND_TEST;
     }
 
-    public Named getTestArgument() {
+    public Named<?> getTestArgument() {
         return testArgument;
     }
 
@@ -378,7 +378,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         private Class<?> testClass;
         private int testArgumentIndex;
-        private Named testArgument;
+        private Named<?> testArgument;
         private List<Method> testMethods;
 
         private UniqueId uniqueId;
@@ -404,7 +404,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
          * @param testArgument testArgument
          * @return this
          */
-        public Builder setTestArgument(int testArgumentIndex, Named testArgument) {
+        public Builder setTestArgument(int testArgumentIndex, Named<?> testArgument) {
             this.testArgumentIndex = testArgumentIndex;
             this.testArgument = testArgument;
             return this;

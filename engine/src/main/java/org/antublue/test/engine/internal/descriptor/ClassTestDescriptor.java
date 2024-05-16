@@ -330,7 +330,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     public static class Builder {
 
         private Class<?> testClass;
-        private List<Named> testArguments;
+        private List<Named<?>> testArguments;
         private List<Method> testMethods;
 
         private UniqueId uniqueId;
@@ -355,7 +355,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
          * @param testArguments testArguments
          * @return this
          */
-        public Builder setTestArguments(List<Named> testArguments) {
+        public Builder setTestArguments(List<Named<?>> testArguments) {
             this.testArguments = testArguments;
             return this;
         }
@@ -410,7 +410,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                 parentTestDescriptor.addChild(testDescriptor);
 
                 int testArgumentIndex = 0;
-                for (Named testArgument : testArguments) {
+                for (Named<?> testArgument : testArguments) {
                     new ArgumentTestDescriptor.Builder()
                             .setTestClass(testClass)
                             .setTestArgument(testArgumentIndex, testArgument)

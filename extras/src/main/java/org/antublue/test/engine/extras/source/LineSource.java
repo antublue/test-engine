@@ -48,7 +48,7 @@ public final class LineSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<Named> of(File file, Charset charset) throws IOException {
+    public static Stream<Named<String>> of(File file, Charset charset) throws IOException {
         if (file == null) {
             throw new IllegalArgumentException("file is null");
         }
@@ -69,12 +69,12 @@ public final class LineSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<Named> of(Reader reader) throws IOException {
+    public static Stream<Named<String>> of(Reader reader) throws IOException {
         if (reader == null) {
             throw new IllegalArgumentException("reader is null");
         }
 
-        List<Named> list = new ArrayList<>();
+        List<Named<String>> list = new ArrayList<>();
 
         try (BufferedReader bufferedReader = new BufferedReader(reader)) {
             long index = 0;
@@ -100,7 +100,8 @@ public final class LineSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<Named> of(InputStream inputStream, Charset charset) throws IOException {
+    public static Stream<Named<String>> of(InputStream inputStream, Charset charset)
+            throws IOException {
         if (inputStream == null) {
             throw new IllegalArgumentException("inputStream is null");
         }

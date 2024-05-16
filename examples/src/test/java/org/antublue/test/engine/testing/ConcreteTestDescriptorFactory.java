@@ -28,8 +28,8 @@ public class ConcreteTestDescriptorFactory {
     @TestEngine.Argument private NamedInteger argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named> arguments() {
-        List<Named> arguments = new ArrayList<>();
+    public static Stream<Named<?>> arguments() {
+        List<Named<?>> arguments = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
             arguments.add(NamedInteger.of(i));
         }

@@ -23,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
 import org.antublue.test.engine.extras.source.LineSource;
 
 /** Example test */
@@ -32,10 +31,10 @@ public class LineSourceTest2 {
 
     private static final String RESOURCE_NAME = "/sample.txt";
 
-    @TestEngine.Argument public NamedString argument;
+    @TestEngine.Argument public Named<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named> arguments() throws IOException {
+    public static Stream<Named<String>> arguments() throws IOException {
         try (InputStream inputStream = LineSourceTest2.class.getResourceAsStream(RESOURCE_NAME)) {
             return LineSource.of(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         }

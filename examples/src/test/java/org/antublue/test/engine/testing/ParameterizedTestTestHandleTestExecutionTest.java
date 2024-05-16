@@ -30,8 +30,8 @@ import org.antublue.test.engine.api.support.NamedString;
 public class ParameterizedTestTestHandleTestExecutionTest {
 
     @TestEngine.ArgumentSupplier
-    public static List<Named> arguments() {
-        List<Named> list = new ArrayList<>();
+    public static List<NamedString> arguments() {
+        List<NamedString> list = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
             list.add(NamedString.of("StringArgument " + i));
         }

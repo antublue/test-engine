@@ -55,7 +55,7 @@ public class ArgumentAnnotationProcessor {
      * @param throwableContext throwableContext
      */
     public void prepare(
-            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named<?> testArgument, ThrowableContext throwableContext) {
         LOGGER.trace(
                 "prepare() class [%s] instance [%s], argument [%s]",
                 testInstance.getClass(), testInstance, testArgument.getName());
@@ -71,7 +71,7 @@ public class ArgumentAnnotationProcessor {
      * @param throwableContext throwableContext
      */
     public void conclude(
-            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named<?> testArgument, ThrowableContext throwableContext) {
         LOGGER.trace(
                 "conclude() class [%s] instance [%s], argument [%s]",
                 testInstance.getClass(),
@@ -89,7 +89,7 @@ public class ArgumentAnnotationProcessor {
      * @param throwableContext throwableContext
      */
     private void process(
-            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named<?> testArgument, ThrowableContext throwableContext) {
         try {
             List<Field> fields =
                     ReflectionSupport.findFields(
