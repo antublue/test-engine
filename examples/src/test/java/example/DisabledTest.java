@@ -20,16 +20,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 @TestEngine.Disabled
 public class DisabledTest {
 
-    @TestEngine.Argument private StringArgument stringArgument;
+    @TestEngine.Argument private NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
+    public static Stream<NamedString> arguments() {
         return StringArgumentSupplier.arguments();
     }
 
@@ -45,12 +45,12 @@ public class DisabledTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument + ")");
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument + ")");
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach
@@ -65,10 +65,10 @@ public class DisabledTest {
 
     private static class StringArgumentSupplier {
 
-        public static Stream<StringArgument> arguments() {
-            Collection<StringArgument> collection = new ArrayList<>();
+        public static Stream<NamedString> arguments() {
+            Collection<NamedString> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(StringArgument.of(String.valueOf(i)));
+                collection.add(NamedString.of(String.valueOf(i)));
             }
             return collection.stream();
         }

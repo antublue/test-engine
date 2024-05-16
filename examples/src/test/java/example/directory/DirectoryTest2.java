@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 import org.antublue.test.engine.extras.Directory;
 
 /** Example test */
@@ -33,13 +33,13 @@ public class DirectoryTest2 {
 
     @TestEngine.AutoClose.AfterAll private Directory directory;
 
-    @TestEngine.Argument protected StringArgument stringArgument;
+    @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
-        Collection<StringArgument> collection = new ArrayList<>();
+    public static Stream<NamedString> arguments() {
+        Collection<NamedString> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(StringArgument.of("StringArgument " + i));
+            collection.add(NamedString.of("StringArgument " + i));
         }
         return collection.stream();
     }
@@ -51,34 +51,34 @@ public class DirectoryTest2 {
 
     @TestEngine.BeforeAll
     public void beforeAll() throws IOException {
-        System.out.println("beforeAll(" + stringArgument + ")");
+        System.out.println("beforeAll(" + argument + ")");
         directory = Directory.create(UUID.randomUUID().toString(), RELATIVE);
         System.out.println(format("directory [%s]", directory));
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println("beforeEach(" + stringArgument + ")");
+        System.out.println("beforeEach(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument + ")");
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument + ")");
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
-        System.out.println("afterEach(" + stringArgument + ")");
+        System.out.println("afterEach(" + argument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll(" + stringArgument + ")");
+        System.out.println("afterAll(" + argument + ")");
     }
 
     @TestEngine.Conclude

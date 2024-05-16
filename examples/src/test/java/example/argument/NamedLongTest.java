@@ -16,23 +16,22 @@
 
 package example.argument;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.BigDecimalArgument;
+import org.antublue.test.engine.api.support.NamedLong;
 
 /** Example test */
-public class BigDecimalArgumentTest {
+public class NamedLongTest {
 
-    @TestEngine.Argument protected BigDecimalArgument bigDecimalArgument;
+    @TestEngine.Argument protected NamedLong argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<BigDecimalArgument> arguments() {
-        Collection<BigDecimalArgument> collection = new ArrayList<>();
+    public static Stream<NamedLong> arguments() {
+        Collection<NamedLong> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(BigDecimalArgument.of(new BigDecimal(i + ".0")));
+            collection.add(NamedLong.of((long) i));
         }
         return collection.stream();
     }
@@ -44,12 +43,12 @@ public class BigDecimalArgumentTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + bigDecimalArgument.value() + ")");
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + bigDecimalArgument.value() + ")");
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll

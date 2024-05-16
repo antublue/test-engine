@@ -20,38 +20,39 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.BooleanArgument;
+import org.antublue.test.engine.api.support.NamedFloat;
 
 /** Example test */
-public class BooleanArgumentTest {
+public class NamedFloatTest {
+
+    @TestEngine.Argument protected NamedFloat argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<BooleanArgument> arguments() {
-        Collection<BooleanArgument> collection = new ArrayList<>();
+    public static Stream<NamedFloat> arguments() {
+        Collection<NamedFloat> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            boolean value = (i % 2) == 0;
-            collection.add(BooleanArgument.of(value));
+            collection.add(NamedFloat.of(i + 0.1f));
         }
         return collection.stream();
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(BooleanArgument booleanArgument) {
+    public void beforeAll() {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.Test
-    public void test1(BooleanArgument booleanArgument) {
-        System.out.println("test1(" + booleanArgument.value() + ")");
+    public void test1() {
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
-    public void test2(BooleanArgument booleanArgument) {
-        System.out.println("test2(" + booleanArgument.value() + ")");
+    public void test2() {
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(BooleanArgument booleanArgument) {
+    public void afterAll() {
         System.out.println("afterAll()");
     }
 }

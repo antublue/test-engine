@@ -20,18 +20,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.LongArgument;
+import org.antublue.test.engine.api.support.NamedChar;
 
 /** Example test */
-public class LongArgumentTest {
+public class NamedCharTest {
 
-    @TestEngine.Argument protected LongArgument longArgument;
+    @TestEngine.Argument protected NamedChar argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<LongArgument> arguments() {
-        Collection<LongArgument> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            collection.add(LongArgument.of((long) i));
+    public static Stream<NamedChar> arguments() {
+        char[] characters = new char[] {'a', 'b', 'c', 'd', 'e'};
+        Collection<NamedChar> collection = new ArrayList<>();
+        for (int i = 0; i < characters.length; i++) {
+            collection.add(NamedChar.of(characters[i]));
         }
         return collection.stream();
     }
@@ -43,12 +44,12 @@ public class LongArgumentTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + longArgument.value() + ")");
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + longArgument.value() + ")");
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll

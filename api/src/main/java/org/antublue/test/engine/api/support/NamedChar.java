@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.argument;
+package org.antublue.test.engine.api.support;
 
 import java.util.Objects;
 
-/** Class to implement a BooleanArgument */
-public class IntegerArgument extends AbstractArgument {
+/** Class to implement a CharArgument */
+public class NamedChar extends AbstractNamed<Character> {
 
     private final String name;
-    private final int value;
+    private final char value;
 
     /**
      * Constructor
@@ -30,27 +30,27 @@ public class IntegerArgument extends AbstractArgument {
      * @param name name
      * @param value value
      */
-    public IntegerArgument(String name, int value) {
+    public NamedChar(String name, char value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the IntegerArgument name
+     * Method to get the CharArgument name
      *
      * @return the return value
      */
     @Override
-    public String name() {
+    public String getName() {
         return name;
     }
 
     /**
-     * Method to get the IntegerArgument value
+     * Method to get the CharArgument value
      *
      * @return the return value
      */
-    public int value() {
+    public Character getPayload() {
         return value;
     }
 
@@ -63,7 +63,7 @@ public class IntegerArgument extends AbstractArgument {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        IntegerArgument that = (IntegerArgument) o;
+        NamedChar that = (NamedChar) o;
         return value == that.value && Objects.equals(name, that.name);
     }
 
@@ -73,12 +73,12 @@ public class IntegerArgument extends AbstractArgument {
     }
 
     /**
-     * Method to create a IntegerArgument
+     * Method to create a CharArgument
      *
      * @param value value
      * @return the return value
      */
-    public static IntegerArgument of(int value) {
-        return new IntegerArgument(String.valueOf(value), value);
+    public static NamedChar of(char value) {
+        return new NamedChar(String.valueOf(value), value);
     }
 }

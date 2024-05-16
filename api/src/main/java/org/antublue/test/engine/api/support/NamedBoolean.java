@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.argument;
+package org.antublue.test.engine.api.support;
 
 import java.util.Objects;
 
-/** Class to implement a LongArgument */
-public class LongArgument extends AbstractArgument {
+/** Class to implement a BooleanArgument */
+public class NamedBoolean extends AbstractNamed<Boolean> {
 
     private final String name;
-    private final long value;
+    private final boolean value;
 
     /**
      * Constructor
@@ -30,27 +30,27 @@ public class LongArgument extends AbstractArgument {
      * @param name name
      * @param value value
      */
-    public LongArgument(String name, long value) {
+    public NamedBoolean(String name, boolean value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the LongArgument name
+     * Method to get the BooleanArgument name
      *
      * @return the return value
      */
     @Override
-    public String name() {
+    public String getName() {
         return name;
     }
 
     /**
-     * Method to get the LongArgument value
+     * Method to get the BooleanArgument value
      *
      * @return the return value
      */
-    public long value() {
+    public Boolean getPayload() {
         return value;
     }
 
@@ -63,7 +63,7 @@ public class LongArgument extends AbstractArgument {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LongArgument that = (LongArgument) o;
+        NamedBoolean that = (NamedBoolean) o;
         return value == that.value && Objects.equals(name, that.name);
     }
 
@@ -73,12 +73,12 @@ public class LongArgument extends AbstractArgument {
     }
 
     /**
-     * Method to create a LongArgument
+     * Method to create a BooleanArgument
      *
      * @param value value
      * @return the return value
      */
-    public static LongArgument of(long value) {
-        return new LongArgument(String.valueOf(value), value);
+    public static NamedBoolean of(boolean value) {
+        return new NamedBoolean(String.valueOf(value), value);
     }
 }

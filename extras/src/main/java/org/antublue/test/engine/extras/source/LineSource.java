@@ -28,9 +28,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.TestEngine;
 
 /** Class to create a Stream of Arguments where each Argument value is a line of a Stream */
+@TestEngine.Disabled
 public final class LineSource {
 
     /** Constructor */
@@ -46,7 +48,7 @@ public final class LineSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<StringArgument> of(File file, Charset charset) throws IOException {
+    public static Stream<Named> of(File file, Charset charset) throws IOException {
         if (file == null) {
             throw new IllegalArgumentException("file is null");
         }
@@ -67,12 +69,12 @@ public final class LineSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<StringArgument> of(Reader reader) throws IOException {
+    public static Stream<Named> of(Reader reader) throws IOException {
         if (reader == null) {
             throw new IllegalArgumentException("reader is null");
         }
 
-        List<StringArgument> list = new ArrayList<>();
+        List<Named> list = new ArrayList<>();
 
         try (BufferedReader bufferedReader = new BufferedReader(reader)) {
             long index = 0;
@@ -82,7 +84,7 @@ public final class LineSource {
                     break;
                 }
 
-                list.add(new StringArgument("line[" + index + "]", line));
+                list.add(Named.of("line[" + index + "]", line));
                 index++;
             }
         }
@@ -98,8 +100,7 @@ public final class LineSource {
      * @return the return value
      * @throws IOException IOException
      */
-    public static Stream<StringArgument> of(InputStream inputStream, Charset charset)
-            throws IOException {
+    public static Stream<Named> of(InputStream inputStream, Charset charset) throws IOException {
         if (inputStream == null) {
             throw new IllegalArgumentException("inputStream is null");
         }

@@ -20,19 +20,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.CharArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 /** Example test */
-public class CharArgumentTest {
+public class NamedIntegerTest {
 
-    @TestEngine.Argument protected CharArgument charArgument;
+    @TestEngine.Argument protected NamedInteger argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<CharArgument> arguments() {
-        char[] characters = new char[] {'a', 'b', 'c', 'd', 'e'};
-        Collection<CharArgument> collection = new ArrayList<>();
-        for (int i = 0; i < characters.length; i++) {
-            collection.add(CharArgument.of(characters[i]));
+    public static Stream<NamedInteger> arguments() {
+        Collection<NamedInteger> collection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            collection.add(NamedInteger.of(i));
         }
         return collection.stream();
     }
@@ -44,12 +43,12 @@ public class CharArgumentTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + charArgument.value() + ")");
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + charArgument.value() + ")");
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterAll

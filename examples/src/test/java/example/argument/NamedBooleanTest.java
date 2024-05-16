@@ -20,40 +20,38 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.BooleanArgument;
+import org.antublue.test.engine.api.support.NamedBoolean;
 
 /** Example test */
-public class RandomBooleanArgumentTest {
-
-    @TestEngine.Argument protected BooleanArgument booleanArgument;
+public class NamedBooleanTest {
 
     @TestEngine.ArgumentSupplier
-    public static Stream<BooleanArgument> arguments() {
-        Collection<BooleanArgument> collection = new ArrayList<>();
+    public static Stream<NamedBoolean> arguments() {
+        Collection<NamedBoolean> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             boolean value = (i % 2) == 0;
-            collection.add(BooleanArgument.of(value));
+            collection.add(NamedBoolean.of(value));
         }
         return collection.stream();
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll() {
+    public void beforeAll(NamedBoolean namedBoolean) {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.Test
-    public void test1() {
-        System.out.println("test1(" + booleanArgument.value() + ")");
+    public void test1(NamedBoolean namedBoolean) {
+        System.out.println("test1(" + namedBoolean.getPayload() + ")");
     }
 
     @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + booleanArgument.value() + ")");
+    public void test2(NamedBoolean namedBoolean) {
+        System.out.println("test2(" + namedBoolean.getPayload() + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll() {
+    public void afterAll(NamedBoolean namedBoolean) {
         System.out.println("afterAll()");
     }
 }

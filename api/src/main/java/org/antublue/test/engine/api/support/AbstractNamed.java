@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.argument;
+package org.antublue.test.engine.api.support;
 
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Named;
 
 /** Abstract class for common arguments */
-public abstract class AbstractArgument implements Argument {
+public abstract class AbstractNamed<T> implements Named<T> {
 
     /** Constructor */
-    public AbstractArgument() {
+    public AbstractNamed() {
         // DO NOTHING
     }
 

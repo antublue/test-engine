@@ -16,31 +16,23 @@
 
 package example.argument;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.GenericArgument;
+import org.antublue.test.engine.api.support.NamedBigDecimal;
 
 /** Example test */
-public class GenericArgumentArrayTest {
+public class NamedBigDecimalTest {
 
-    private int[] values;
-
-    @TestEngine.Argument protected GenericArgument<int[]> GenericArgument;
+    @TestEngine.Argument protected NamedBigDecimal argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<GenericArgument<int[]>> arguments() {
-        Collection<GenericArgument<int[]>> collection = new ArrayList<>();
+    public static Stream<NamedBigDecimal> arguments() {
+        Collection<NamedBigDecimal> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            int[] values = new int[3];
-            values[0] = i;
-            values[1] = i * 2;
-            values[2] = i * 3;
-
-            collection.add(new GenericArgument<>("values" + i, values));
+            collection.add(NamedBigDecimal.of(new BigDecimal(i + ".0")));
         }
         return collection.stream();
     }
@@ -48,19 +40,16 @@ public class GenericArgumentArrayTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        values = GenericArgument.value();
     }
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1()");
-        assertThat(values[1]).isEqualTo(values[0] * 2);
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test1()");
-        assertThat(values[2]).isEqualTo(values[0] * 3);
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll

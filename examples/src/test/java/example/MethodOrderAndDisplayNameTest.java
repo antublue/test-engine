@@ -18,46 +18,46 @@ package example;
 
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 /** Example test */
 public class MethodOrderAndDisplayNameTest {
 
-    public static Stream<IntegerArgument> arguments() {
-        return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
+    public static Stream<NamedInteger> arguments() {
+        return Stream.of(NamedInteger.of(1), NamedInteger.of(2), NamedInteger.of(3));
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(IntegerArgument integerArgument) {
+    public void beforeAll(NamedInteger argument) {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach(IntegerArgument integerArgument) {
+    public void beforeEach(NamedInteger argument) {
         System.out.println("beforeEach()");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 2)
     @TestEngine.DisplayName(name = "Test A")
-    public void testA(IntegerArgument integerArgument) {
-        System.out.println("testA(" + integerArgument + ")");
+    public void testA(NamedInteger argument) {
+        System.out.println("testA(" + argument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 1)
     @TestEngine.DisplayName(name = "Test B")
-    public void testB(IntegerArgument integerArgument) {
-        System.out.println("testB(" + integerArgument + ")");
+    public void testB(NamedInteger argument) {
+        System.out.println("testB(" + argument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach(IntegerArgument integerArgument) {
+    public void afterEach(NamedInteger argument) {
         System.out.println("afterEach()");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(IntegerArgument integerArgument) {
+    public void afterAll(NamedInteger argument) {
         System.out.println("afterAll()");
     }
 }

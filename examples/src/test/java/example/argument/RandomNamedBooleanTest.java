@@ -20,20 +20,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.GenericArgument;
+import org.antublue.test.engine.api.support.NamedBoolean;
 
 /** Example test */
-public class GenericArgumentTest {
+public class RandomNamedBooleanTest {
 
-    private CustomObject customObject;
-
-    @TestEngine.Argument protected GenericArgument<CustomObject> genericArgument;
+    @TestEngine.Argument protected NamedBoolean argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<GenericArgument<CustomObject>> arguments() {
-        Collection<GenericArgument<CustomObject>> collection = new ArrayList<>();
+    public static Stream<NamedBoolean> arguments() {
+        Collection<NamedBoolean> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(GenericArgument.of("CustomObject " + i, new CustomObject("test " + i)));
+            boolean value = (i % 2) == 0;
+            collection.add(NamedBoolean.of(value));
         }
         return collection.stream();
     }
@@ -41,39 +40,20 @@ public class GenericArgumentTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        customObject = genericArgument.value();
     }
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + genericArgument.name() + " / " + customObject + ")");
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + genericArgument.name() + " / " + customObject + ")");
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
-    }
-
-    public static class CustomObject {
-
-        private final String value;
-
-        public CustomObject(String value) {
-            this.value = value;
-        }
-
-        public String value() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
     }
 }

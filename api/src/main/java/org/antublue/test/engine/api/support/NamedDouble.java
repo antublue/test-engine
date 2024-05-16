@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.argument;
+package org.antublue.test.engine.api.support;
 
 import java.util.Objects;
 
 /** Class to implement a DoubleArgument */
-public class DoubleArgument extends AbstractArgument {
+public class NamedDouble extends AbstractNamed<Double> {
 
     private final String name;
     private final double value;
@@ -30,7 +30,7 @@ public class DoubleArgument extends AbstractArgument {
      * @param name name
      * @param value value
      */
-    public DoubleArgument(String name, double value) {
+    public NamedDouble(String name, double value) {
         this.name = validateName(name);
         this.value = value;
     }
@@ -41,7 +41,7 @@ public class DoubleArgument extends AbstractArgument {
      * @return the return value
      */
     @Override
-    public String name() {
+    public String getName() {
         return name;
     }
 
@@ -50,7 +50,7 @@ public class DoubleArgument extends AbstractArgument {
      *
      * @return the return value
      */
-    public double value() {
+    public Double getPayload() {
         return value;
     }
 
@@ -63,7 +63,7 @@ public class DoubleArgument extends AbstractArgument {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DoubleArgument that = (DoubleArgument) o;
+        NamedDouble that = (NamedDouble) o;
         return Double.compare(that.value, value) == 0 && Objects.equals(name, that.name);
     }
 
@@ -78,7 +78,7 @@ public class DoubleArgument extends AbstractArgument {
      * @param value value
      * @return the return value
      */
-    public static DoubleArgument of(double value) {
-        return new DoubleArgument(String.valueOf(value), value);
+    public static NamedDouble of(double value) {
+        return new NamedDouble(String.valueOf(value), value);
     }
 }

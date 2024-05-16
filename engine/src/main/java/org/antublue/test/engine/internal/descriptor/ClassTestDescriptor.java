@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.ExtensionManager;
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.MetadataConstants;
@@ -330,7 +330,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     public static class Builder {
 
         private Class<?> testClass;
-        private List<Argument> testArguments;
+        private List<Named> testArguments;
         private List<Method> testMethods;
 
         private UniqueId uniqueId;
@@ -355,7 +355,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
          * @param testArguments testArguments
          * @return this
          */
-        public Builder setTestArguments(List<Argument> testArguments) {
+        public Builder setTestArguments(List<Named> testArguments) {
             this.testArguments = testArguments;
             return this;
         }
@@ -410,7 +410,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                 parentTestDescriptor.addChild(testDescriptor);
 
                 int testArgumentIndex = 0;
-                for (Argument testArgument : testArguments) {
+                for (Named testArgument : testArguments) {
                     new ArgumentTestDescriptor.Builder()
                             .setTestClass(testClass)
                             .setTestArgument(testArgumentIndex, testArgument)

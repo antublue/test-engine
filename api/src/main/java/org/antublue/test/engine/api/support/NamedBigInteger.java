@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.argument;
+package org.antublue.test.engine.api.support;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
-/** Class to implement a FloatArgument */
-public class FloatArgument extends AbstractArgument {
+/** Class to implement a BigIntegerArgument */
+public class NamedBigInteger extends AbstractNamed<BigInteger> {
 
     private final String name;
-    private final float value;
+    private final BigInteger value;
 
     /**
      * Constructor
@@ -30,27 +31,27 @@ public class FloatArgument extends AbstractArgument {
      * @param name name
      * @param value value
      */
-    public FloatArgument(String name, float value) {
+    public NamedBigInteger(String name, BigInteger value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the FloatArgument name
+     * Method to get the BigIntegerArgument name
      *
      * @return the return value
      */
     @Override
-    public String name() {
+    public String getName() {
         return name;
     }
 
     /**
-     * Method to get the FloatArgument value
+     * Method to get the BigIntegerArgument value
      *
      * @return the return value
      */
-    public float value() {
+    public BigInteger getPayload() {
         return value;
     }
 
@@ -63,8 +64,8 @@ public class FloatArgument extends AbstractArgument {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FloatArgument that = (FloatArgument) o;
-        return Float.compare(that.value, value) == 0 && Objects.equals(name, that.name);
+        NamedBigInteger that = (NamedBigInteger) o;
+        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
     }
 
     @Override
@@ -73,12 +74,16 @@ public class FloatArgument extends AbstractArgument {
     }
 
     /**
-     * Method to create a FloatArgument
+     * Method to create a BigIntegerArgument
      *
      * @param value value
      * @return the return value
      */
-    public static FloatArgument of(float value) {
-        return new FloatArgument(String.valueOf(value), value);
+    public static NamedBigInteger of(BigInteger value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value is null");
+        }
+
+        return new NamedBigInteger(String.valueOf(value), value);
     }
 }

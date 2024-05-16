@@ -20,12 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 public class ConcreteEvenTest extends EvenBaseTest {
 
     @TestEngine.ArgumentSupplier
-    public static Stream<IntegerArgument> arguments() {
+    public static Stream<NamedInteger> arguments() {
         return EvenBaseTest.arguments();
     }
 
@@ -36,14 +36,14 @@ public class ConcreteEvenTest extends EvenBaseTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + integerArgument + ")");
-        assertThat(integerArgument.value() % 2).isEven();
+        System.out.println("test1(" + argument + ")");
+        assertThat(argument.getPayload() % 2).isEven();
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument + ")");
-        assertThat(integerArgument.value() % 2).isEven();
+        System.out.println("test2(" + argument + ")");
+        assertThat(argument.getPayload() % 2).isEven();
     }
 
     @TestEngine.AfterEach

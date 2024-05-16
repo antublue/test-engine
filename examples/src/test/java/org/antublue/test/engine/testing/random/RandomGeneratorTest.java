@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 import org.antublue.test.engine.internal.util.RandomGenerator;
 
 public abstract class RandomGeneratorTest {
@@ -33,8 +33,8 @@ public abstract class RandomGeneratorTest {
     protected static final int ITERATIONS = 1000000;
 
     @TestEngine.ArgumentSupplier
-    protected static Stream<StringArgument> arguments() {
-        return Stream.of(StringArgument.of("----"));
+    protected static Stream<NamedString> arguments() {
+        return Stream.of(NamedString.of("----"));
     }
 
     protected void testInteger(int minimum, int maximum) {

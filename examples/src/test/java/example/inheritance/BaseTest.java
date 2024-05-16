@@ -22,19 +22,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 public abstract class BaseTest {
 
-    @TestEngine.Argument private IntegerArgument privateIntegerArgument;
+    @TestEngine.Argument private NamedInteger privateNamedInteger;
 
-    @TestEngine.Argument protected IntegerArgument integerArgument;
+    @TestEngine.Argument protected NamedInteger argument;
 
     @TestEngine.ArgumentSupplier
-    protected static Stream<IntegerArgument> arguments() {
-        Collection<IntegerArgument> collection = new ArrayList<>();
+    protected static Stream<NamedInteger> arguments() {
+        Collection<NamedInteger> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(IntegerArgument.of(i));
+            collection.add(NamedInteger.of(i));
         }
         return collection.stream();
     }
@@ -42,49 +42,49 @@ public abstract class BaseTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        assertThat(privateIntegerArgument).isNull();
-        assertThat(integerArgument).isNull();
+        assertThat(privateNamedInteger).isNull();
+        assertThat(argument).isNull();
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        assertThat(privateIntegerArgument).isNotNull();
-        assertThat(integerArgument).isNotNull();
+        assertThat(privateNamedInteger).isNotNull();
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
-        assertThat(privateIntegerArgument).isNotNull();
-        assertThat(integerArgument).isNotNull();
+        assertThat(privateNamedInteger).isNotNull();
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
     public void testA() {
         System.out.println("testA()");
-        assertThat(privateIntegerArgument).isNotNull();
-        assertThat(integerArgument).isNotNull();
+        assertThat(privateNamedInteger).isNotNull();
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
-        assertThat(privateIntegerArgument).isNotNull();
-        assertThat(integerArgument).isNotNull();
+        assertThat(privateNamedInteger).isNotNull();
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
-        assertThat(privateIntegerArgument).isNotNull();
-        assertThat(integerArgument).isNotNull();
+        assertThat(privateNamedInteger).isNotNull();
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        assertThat(privateIntegerArgument).isNull();
-        assertThat(integerArgument).isNull();
+        assertThat(privateNamedInteger).isNull();
+        assertThat(argument).isNull();
     }
 }

@@ -17,8 +17,8 @@
 package example.extension.annotation;
 
 import java.lang.reflect.Field;
-import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.internal.util.RandomGenerator;
 
 /**
@@ -39,7 +39,7 @@ public class RandomStringExtension implements Extension {
      * @throws Throwable Throwable
      */
     @Override
-    public void postBeforeEachMethodsCallback(Object testInstance, Argument testArgument)
+    public void postBeforeEachMethodsCallback(Object testInstance, Named testArgument)
             throws Throwable {
         for (Field field : testInstance.getClass().getDeclaredFields()) {
             RandomStringAnnotation.Random.String.AlphaNumeric annotation =

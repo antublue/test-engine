@@ -19,7 +19,7 @@ package org.antublue.test.engine.testing.inheritance;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 /** Example test */
 public class SubclassTest extends BaseTest {
@@ -31,38 +31,38 @@ public class SubclassTest extends BaseTest {
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll2(IntegerArgument integerArgument) {
-        System.out.println("beforeAll2(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("beforeAll2(" + integerArgument + ")");
+    public void beforeAll2(NamedInteger argument) {
+        System.out.println("beforeAll2(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("beforeAll2(" + argument + ")");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach2(IntegerArgument integerArgument) {
-        System.out.println("beforeEach2(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("beforeEach2(" + integerArgument + ")");
+    public void beforeEach2(NamedInteger argument) {
+        System.out.println("beforeEach2(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("beforeEach2(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void testB(IntegerArgument integerArgument) {
-        System.out.println("testB(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("testB(" + integerArgument + ")");
+    public void testB(NamedInteger argument) {
+        System.out.println("testB(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("testB(" + argument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach2(IntegerArgument integerArgument) {
-        System.out.println("afterEach2(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("afterEach2(" + integerArgument + ")");
+    public void afterEach2(NamedInteger argument) {
+        System.out.println("afterEach2(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("afterEach2(" + argument + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll2(IntegerArgument integerArgument) {
-        System.out.println("afterAll2(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("afterAll2(" + integerArgument + ")");
+    public void afterAll2(NamedInteger argument) {
+        System.out.println("afterAll2(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("afterAll2(" + argument + ")");
     }
 
     @TestEngine.Conclude

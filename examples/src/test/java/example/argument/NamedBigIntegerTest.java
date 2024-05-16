@@ -16,22 +16,23 @@
 
 package example.argument;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.FloatArgument;
+import org.antublue.test.engine.api.support.NamedBigInteger;
 
 /** Example test */
-public class FloatArgumentTest {
+public class NamedBigIntegerTest {
 
-    @TestEngine.Argument protected FloatArgument floatArgument;
+    @TestEngine.Argument protected NamedBigInteger argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<FloatArgument> arguments() {
-        Collection<FloatArgument> collection = new ArrayList<>();
+    public static Stream<NamedBigInteger> arguments() {
+        Collection<NamedBigInteger> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(FloatArgument.of(i + 0.1f));
+            collection.add(NamedBigInteger.of(new BigInteger(String.valueOf(i))));
         }
         return collection.stream();
     }
@@ -43,12 +44,12 @@ public class FloatArgumentTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + floatArgument.value() + ")");
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + floatArgument.value() + ")");
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll

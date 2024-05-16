@@ -23,7 +23,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 import org.antublue.test.engine.internal.util.RandomGenerator;
 
 /** Example test */
@@ -37,11 +37,11 @@ public class UserManagedStoreBasedLockingTest1 {
         Context.getInstance().getStore(NAMESPACE).computeIfAbsent(COUNTER_NAME, k -> new Counter());
     }
 
-    @TestEngine.Argument public IntegerArgument integerArgument;
+    @TestEngine.Argument public NamedInteger argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<IntegerArgument> arguments() {
-        return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
+    public static Stream<NamedInteger> arguments() {
+        return Stream.of(NamedInteger.of(1), NamedInteger.of(2), NamedInteger.of(3));
     }
 
     @TestEngine.Prepare

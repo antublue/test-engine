@@ -20,19 +20,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 import org.antublue.test.engine.extras.source.LineSource;
 
 /** Example test */
+@TestEngine.Disabled
 public class LineSourceTest {
 
     private static final String RESOURCE_NAME = "/sample.txt";
 
-    @TestEngine.Argument public StringArgument stringArgument;
+    @TestEngine.Argument public NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() throws IOException {
+    public static Stream<Named> arguments() throws IOException {
         try (InputStream inputStream = LineSourceTest.class.getResourceAsStream(RESOURCE_NAME)) {
             return LineSource.of(inputStream, StandardCharsets.UTF_8);
         }
@@ -45,12 +47,12 @@ public class LineSourceTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument + ")");
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument + ")");
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterAll

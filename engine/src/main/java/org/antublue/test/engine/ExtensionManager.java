@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
@@ -151,7 +151,7 @@ public class ExtensionManager {
     }
 
     public void postTestArgumentDiscoveryCallback(
-            Class<?> testClass, List<Argument> testArguments, ThrowableContext throwableContext) {
+            Class<?> testClass, List<Named> testArguments, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testClass)) {
             try {
                 testExtension.postTestArgumentDiscoveryCallback(testClass, testArguments);
@@ -250,7 +250,7 @@ public class ExtensionManager {
      * @param throwableContext throwableContext
      */
     public void preBeforeAllMethodsCallback(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
                 testExtension.preBeforeAllMethodsCallback(testInstance, testArgument);
@@ -268,7 +268,7 @@ public class ExtensionManager {
      * @param throwableContext throwableCollector
      */
     public void postBeforeAllMethodsCallback(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postBeforeAllMethodsCallback(testInstance, testArgument);
@@ -286,7 +286,7 @@ public class ExtensionManager {
      * @param throwableContext throwableCollector
      */
     public void preBeforeEachMethodsCallback(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
                 testExtension.preBeforeEachMethodsCallback(testInstance, testArgument);
@@ -304,7 +304,7 @@ public class ExtensionManager {
      * @param throwableContext throwableCollector
      */
     public void postBeforeEachMethodsCallback(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postBeforeEachMethodsCallback(testInstance, testArgument);
@@ -325,7 +325,7 @@ public class ExtensionManager {
     public void preTestMethodsCallback(
             Method testMethod,
             Object testInstance,
-            Argument testArgument,
+            Named testArgument,
             ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
@@ -347,7 +347,7 @@ public class ExtensionManager {
     public void postTestMethodsCallback(
             Method testMethod,
             Object testInstance,
-            Argument testArgument,
+            Named testArgument,
             ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
@@ -366,7 +366,7 @@ public class ExtensionManager {
      * @param throwableContext throwableCollector
      */
     public void preAfterEachMethodsCallback(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
                 testExtension.preAfterEachMethodsCallback(testInstance, testArgument);
@@ -384,7 +384,7 @@ public class ExtensionManager {
      * @param throwableContext throwableCollector
      */
     public void postAfterEachMethodsCallback(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postAfterEachMethodsCallback(testInstance, testArgument);
@@ -402,7 +402,7 @@ public class ExtensionManager {
      * @param throwableContext throwableCollector
      */
     public void preAfterAllMethodsCallback(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensions(testInstance.getClass())) {
             try {
                 testExtension.preAfterAllMethodsCallback(testInstance, testArgument);
@@ -420,7 +420,7 @@ public class ExtensionManager {
      * @param throwableContext throwableCollector
      */
     public void postAfterAllMethodsCallback(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensionsReversed(testInstance.getClass())) {
             try {
                 testExtension.postAfterAllMethodsCallback(testInstance, testArgument);

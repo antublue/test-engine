@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.argument;
+package org.antublue.test.engine.api.support;
 
 import java.util.Objects;
 
-/** Class to implement a CharArgument */
-public class CharArgument extends AbstractArgument {
+/** Class to implement a BooleanArgument */
+public class NamedInteger extends AbstractNamed<Integer> {
 
     private final String name;
-    private final char value;
+    private final int value;
 
     /**
      * Constructor
@@ -30,27 +30,27 @@ public class CharArgument extends AbstractArgument {
      * @param name name
      * @param value value
      */
-    public CharArgument(String name, char value) {
+    public NamedInteger(String name, int value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the CharArgument name
+     * Method to get the IntegerArgument name
      *
      * @return the return value
      */
     @Override
-    public String name() {
+    public String getName() {
         return name;
     }
 
     /**
-     * Method to get the CharArgument value
+     * Method to get the IntegerArgument value
      *
      * @return the return value
      */
-    public char value() {
+    public Integer getPayload() {
         return value;
     }
 
@@ -63,7 +63,7 @@ public class CharArgument extends AbstractArgument {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CharArgument that = (CharArgument) o;
+        NamedInteger that = (NamedInteger) o;
         return value == that.value && Objects.equals(name, that.name);
     }
 
@@ -73,12 +73,12 @@ public class CharArgument extends AbstractArgument {
     }
 
     /**
-     * Method to create a CharArgument
+     * Method to create a IntegerArgument
      *
      * @param value value
      * @return the return value
      */
-    public static CharArgument of(char value) {
-        return new CharArgument(String.valueOf(value), value);
+    public static NamedInteger of(int value) {
+        return new NamedInteger(String.valueOf(value), value);
     }
 }

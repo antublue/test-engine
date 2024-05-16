@@ -18,16 +18,16 @@ package example.argument.supplier;
 
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 /** Example test */
 public class StreamTest {
 
-    @TestEngine.Argument protected IntegerArgument integerArgument;
+    @TestEngine.Argument protected NamedInteger argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<IntegerArgument> arguments() {
-        return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
+    public static Stream<NamedInteger> arguments() {
+        return Stream.of(NamedInteger.of(1), NamedInteger.of(2), NamedInteger.of(3));
     }
 
     @TestEngine.BeforeAll
@@ -42,12 +42,12 @@ public class StreamTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + integerArgument + ")");
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument + ")");
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach

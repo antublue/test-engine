@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.argument;
+package org.antublue.test.engine.api.support;
 
 import java.util.Objects;
 
-/**
- * Class to implement a BooleanArgument
- *
- * @param <T> the value type
- */
-@SuppressWarnings("unchecked")
-public class GenericArgument<T> extends AbstractArgument {
+/** Class to implement a FloatArgument */
+public class NamedFloat extends AbstractNamed<Float> {
 
     private final String name;
-    private final T value;
+    private final float value;
 
     /**
      * Constructor
@@ -35,42 +30,41 @@ public class GenericArgument<T> extends AbstractArgument {
      * @param name name
      * @param value value
      */
-    public GenericArgument(String name, T value) {
+    public NamedFloat(String name, float value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the BooleanArgument name
+     * Method to get the FloatArgument name
      *
      * @return the return value
      */
     @Override
-    public String name() {
+    public String getName() {
         return name;
     }
 
     /**
-     * Method to get the BooleanArgument value
+     * Method to get the FloatArgument value
      *
-     * @return T the return value
+     * @return the return value
      */
-    public T value() {
+    public Float getPayload() {
         return value;
     }
 
     @Override
     public String toString() {
-        return name();
+        return String.valueOf(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GenericArgument<T> that = (GenericArgument<T>) o;
-        if (value == null && that.value == null) return true;
-        return Objects.equals(name, that.name) && value.equals(that.value);
+        NamedFloat that = (NamedFloat) o;
+        return Float.compare(that.value, value) == 0 && Objects.equals(name, that.name);
     }
 
     @Override
@@ -79,14 +73,12 @@ public class GenericArgument<T> extends AbstractArgument {
     }
 
     /**
-     * Method to create a BooleanArgument
+     * Method to create a FloatArgument
      *
-     * @param name name
      * @param value value
-     * @return T the return value
-     * @param <T> the type
+     * @return the return value
      */
-    public static <T> GenericArgument<T> of(String name, T value) {
-        return new GenericArgument<>(name, value);
+    public static NamedFloat of(float value) {
+        return new NamedFloat(String.valueOf(value), value);
     }
 }

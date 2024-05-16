@@ -18,7 +18,7 @@ package org.antublue.test.engine.internal.processor;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -55,10 +55,10 @@ public class ArgumentAnnotationProcessor {
      * @param throwableContext throwableContext
      */
     public void prepare(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
         LOGGER.trace(
                 "prepare() class [%s] instance [%s], argument [%s]",
-                testInstance.getClass(), testInstance, testArgument.name());
+                testInstance.getClass(), testInstance, testArgument.getName());
 
         process(testInstance, testArgument, throwableContext);
     }
@@ -71,12 +71,12 @@ public class ArgumentAnnotationProcessor {
      * @param throwableContext throwableContext
      */
     public void conclude(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
         LOGGER.trace(
                 "conclude() class [%s] instance [%s], argument [%s]",
                 testInstance.getClass(),
                 testInstance,
-                testArgument != null ? testArgument.name() : null);
+                testArgument != null ? testArgument.getName() : null);
 
         process(testInstance, testArgument, throwableContext);
     }
@@ -89,7 +89,7 @@ public class ArgumentAnnotationProcessor {
      * @param throwableContext throwableContext
      */
     private void process(
-            Object testInstance, Argument testArgument, ThrowableContext throwableContext) {
+            Object testInstance, Named testArgument, ThrowableContext throwableContext) {
         try {
             List<Field> fields =
                     ReflectionSupport.findFields(

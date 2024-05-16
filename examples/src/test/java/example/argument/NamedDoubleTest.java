@@ -20,18 +20,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedDouble;
 
 /** Example test */
-public class StringArgumentTest {
+public class NamedDoubleTest {
 
-    @TestEngine.Argument protected StringArgument stringArgument;
+    @TestEngine.Argument protected NamedDouble argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
-        Collection<StringArgument> collection = new ArrayList<>();
+    public static Stream<NamedDouble> arguments() {
+        Collection<NamedDouble> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(StringArgument.of("String " + i));
+            collection.add(NamedDouble.of(i + 0.1d));
         }
         return collection.stream();
     }
@@ -43,12 +43,12 @@ public class StringArgumentTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument + ")");
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument + ")");
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll

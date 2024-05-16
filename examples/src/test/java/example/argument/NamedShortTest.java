@@ -20,18 +20,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.DoubleArgument;
+import org.antublue.test.engine.api.support.NamedShort;
 
 /** Example test */
-public class DoubleArgumentTest {
+public class NamedShortTest {
 
-    @TestEngine.Argument protected DoubleArgument doubleArgument;
+    @TestEngine.Argument protected NamedShort argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<DoubleArgument> arguments() {
-        Collection<DoubleArgument> collection = new ArrayList<>();
+    public static Stream<NamedShort> arguments() {
+        Collection<NamedShort> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(DoubleArgument.of(i + 0.1d));
+            collection.add(NamedShort.of((short) i));
         }
         return collection.stream();
     }
@@ -43,12 +43,12 @@ public class DoubleArgumentTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + doubleArgument.value() + ")");
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + doubleArgument.value() + ")");
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll

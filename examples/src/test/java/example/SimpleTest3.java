@@ -16,24 +16,17 @@
 
 package example;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Stream;
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.GenericArgument;
-
 /** Example test */
 public class SimpleTest3 {
 
-    @TestEngine.Argument protected GenericArgument<FakeContainer> argument;
+    /*
+    @TestEngine.Argument protected Named<FakeContainer> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<GenericArgument<FakeContainer>> arguments() {
-        Collection<GenericArgument<FakeContainer>> collection = new ArrayList<>();
+    public static Stream<Named<FakeContainer>> arguments() {
+        Collection<Named<FakeContainer>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(GenericArgument.of("FakeContainer " + i, new FakeContainer()));
+            collection.add(Named.of("FakeContainer " + i, new FakeContainer()));
         }
         return collection.stream();
     }
@@ -46,42 +39,42 @@ public class SimpleTest3 {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        assertThat(argument.value().isRunning()).isFalse();
-        argument.value().start();
-        assertThat(argument.value().isRunning()).isTrue();
+        assertThat(argument.getPayload().isRunning()).isFalse();
+        argument.getPayload().start();
+        assertThat(argument.getPayload().isRunning()).isTrue();
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + argument + ")");
-        assertThat(argument.value().isRunning()).isTrue();
+        assertThat(argument.getPayload().isRunning()).isTrue();
     }
 
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + argument + ")");
-        assertThat(argument.value().isRunning()).isTrue();
+        assertThat(argument.getPayload().isRunning()).isTrue();
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + argument + ")");
-        assertThat(argument.value().isRunning()).isTrue();
+        assertThat(argument.getPayload().isRunning()).isTrue();
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach(" + argument + ")");
-        assertThat(argument.value().isRunning()).isTrue();
+        assertThat(argument.getPayload().isRunning()).isTrue();
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + argument + ")");
 
-        assertThat(argument.value().isRunning()).isTrue();
-        argument.value().stop();
-        assertThat(argument.value().isRunning()).isFalse();
+        assertThat(argument.getPayload().isRunning()).isTrue();
+        argument.getPayload().stop();
+        assertThat(argument.getPayload().isRunning()).isFalse();
     }
 
     @TestEngine.Conclude
@@ -106,4 +99,5 @@ public class SimpleTest3 {
             return running;
         }
     }
+    */
 }

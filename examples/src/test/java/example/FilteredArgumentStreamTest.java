@@ -23,17 +23,17 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 public class FilteredArgumentStreamTest {
 
-    @TestEngine.Argument protected StringArgument stringArgument;
+    @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
+    public static Stream<NamedString> arguments() {
         return ArgumentSupplier.arguments(
-                integerArgument -> !integerArgument.value().contains("b"));
+                integerArgument -> !integerArgument.getPayload().contains("b"));
     }
 
     @TestEngine.BeforeAll
@@ -43,14 +43,14 @@ public class FilteredArgumentStreamTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument + ")");
-        assertThat(stringArgument.value()).isNotEqualTo("b");
+        System.out.println("test1(" + argument + ")");
+        assertThat(argument.getPayload()).isNotEqualTo("b");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument + ")");
-        assertThat(stringArgument.value()).isNotEqualTo("b");
+        System.out.println("test2(" + argument + ")");
+        assertThat(argument.getPayload()).isNotEqualTo("b");
     }
 
     @TestEngine.AfterAll
@@ -66,15 +66,15 @@ public class FilteredArgumentStreamTest {
             // DO NOTHING
         }
 
-        public static Stream<StringArgument> arguments() {
-            Collection<StringArgument> arguments = new ArrayList<>();
+        public static Stream<NamedString> arguments() {
+            Collection<NamedString> arguments = new ArrayList<>();
             for (String value : VALUES) {
-                arguments.add(StringArgument.of(value));
+                arguments.add(NamedString.of(value));
             }
             return arguments.stream();
         }
 
-        public static Stream<StringArgument> arguments(Predicate<StringArgument> predicate) {
+        public static Stream<NamedString> arguments(Predicate<NamedString> predicate) {
             return predicate != null ? arguments().filter(predicate) : arguments();
         }
     }

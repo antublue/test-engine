@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.argument;
+package org.antublue.test.engine.api.support;
 
-import java.math.BigInteger;
 import java.util.Objects;
 
-/** Class to implement a BigIntegerArgument */
-public class BigIntegerArgument extends AbstractArgument {
+/** Class to implement a LongArgument */
+public class NamedLong extends AbstractNamed<Long> {
 
     private final String name;
-    private final BigInteger value;
+    private final long value;
 
     /**
      * Constructor
@@ -31,27 +30,27 @@ public class BigIntegerArgument extends AbstractArgument {
      * @param name name
      * @param value value
      */
-    public BigIntegerArgument(String name, BigInteger value) {
+    public NamedLong(String name, long value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the BigIntegerArgument name
+     * Method to get the LongArgument name
      *
      * @return the return value
      */
     @Override
-    public String name() {
+    public String getName() {
         return name;
     }
 
     /**
-     * Method to get the BigIntegerArgument value
+     * Method to get the LongArgument value
      *
      * @return the return value
      */
-    public BigInteger value() {
+    public Long getPayload() {
         return value;
     }
 
@@ -64,8 +63,8 @@ public class BigIntegerArgument extends AbstractArgument {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BigIntegerArgument that = (BigIntegerArgument) o;
-        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
+        NamedLong that = (NamedLong) o;
+        return value == that.value && Objects.equals(name, that.name);
     }
 
     @Override
@@ -74,16 +73,12 @@ public class BigIntegerArgument extends AbstractArgument {
     }
 
     /**
-     * Method to create a BigIntegerArgument
+     * Method to create a LongArgument
      *
      * @param value value
      * @return the return value
      */
-    public static BigIntegerArgument of(BigInteger value) {
-        if (value == null) {
-            throw new IllegalArgumentException("value is null");
-        }
-
-        return new BigIntegerArgument(String.valueOf(value), value);
+    public static NamedLong of(long value) {
+        return new NamedLong(String.valueOf(value), value);
     }
 }

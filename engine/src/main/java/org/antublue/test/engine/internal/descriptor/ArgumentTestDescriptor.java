@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.ExtensionManager;
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
@@ -67,7 +67,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
     private final Class<?> testClass;
-    private final Argument testArgument;
+    private final Named testArgument;
     private final List<Method> beforeAllMethods;
     private final List<Method> afterAllMethods;
 
@@ -110,7 +110,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         return Type.CONTAINER_AND_TEST;
     }
 
-    public Argument getTestArgument() {
+    public Named getTestArgument() {
         return testArgument;
     }
 
@@ -378,7 +378,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         private Class<?> testClass;
         private int testArgumentIndex;
-        private Argument testArgument;
+        private Named testArgument;
         private List<Method> testMethods;
 
         private UniqueId uniqueId;
@@ -404,7 +404,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
          * @param testArgument testArgument
          * @return this
          */
-        public Builder setTestArgument(int testArgumentIndex, Argument testArgument) {
+        public Builder setTestArgument(int testArgumentIndex, Named testArgument) {
             this.testArgumentIndex = testArgumentIndex;
             this.testArgument = testArgument;
             return this;
@@ -433,9 +433,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                 .getUniqueId()
                                 .append(
                                         ArgumentTestDescriptor.class.getName(),
-                                        testArgumentIndex + "/" + testArgument.name());
+                                        testArgumentIndex + "/" + testArgument.getName());
 
-                displayName = testArgument.name();
+                displayName = testArgument.getName();
 
                 beforeAllMethods =
                         ReflectionSupport.findMethods(

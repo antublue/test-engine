@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.argument;
+package org.antublue.test.engine.api.support;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
-/** Class to implement a ShortArgument */
-public class ShortArgument extends AbstractArgument {
+/** Class to implement a BigDecimalArgument */
+public class NamedBigDecimal extends AbstractNamed<BigDecimal> {
 
     private final String name;
-    private final short value;
+    private final BigDecimal value;
 
     /**
      * Constructor
@@ -30,36 +31,41 @@ public class ShortArgument extends AbstractArgument {
      * @param name name
      * @param value value
      */
-    public ShortArgument(String name, short value) {
+    public NamedBigDecimal(String name, BigDecimal value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the ShortArgument name
+     * Method to get the BigDecimal name
      *
      * @return the return value
      */
     @Override
-    public String name() {
+    public String getName() {
         return name;
     }
 
     /**
-     * Method to get the ShortArgument value
+     * Method to get the BigDecimal value
      *
      * @return the return value
      */
-    public short value() {
+    public BigDecimal getPayload() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ShortArgument that = (ShortArgument) o;
-        return value == that.value && Objects.equals(name, that.name);
+        NamedBigDecimal that = (NamedBigDecimal) o;
+        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
     }
 
     @Override
@@ -68,12 +74,16 @@ public class ShortArgument extends AbstractArgument {
     }
 
     /**
-     * Method to create a ShortArgument
+     * Method to create a BigDecimalArgument
      *
      * @param value value
      * @return the return value
      */
-    public static ShortArgument of(short value) {
-        return new ShortArgument(String.valueOf(value), value);
+    public static NamedBigDecimal of(BigDecimal value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value is null");
+        }
+
+        return new NamedBigDecimal(String.valueOf(value), value);
     }
 }

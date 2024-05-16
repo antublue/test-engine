@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 /**
  * Example test
@@ -30,14 +30,14 @@ import org.antublue.test.engine.api.argument.StringArgument;
  */
 public class TaggedMethodTag2Test {
 
-    @TestEngine.Argument protected StringArgument stringArgument;
+    @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
-        Collection<StringArgument> collection = new ArrayList<>();
+    public static Stream<NamedString> arguments() {
+        Collection<NamedString> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(StringArgument.of(String.valueOf(value)));
+            collection.add(NamedString.of(String.valueOf(value)));
         }
         return collection.stream();
     }
@@ -50,17 +50,17 @@ public class TaggedMethodTag2Test {
     @TestEngine.Test
     @TestEngine.Tag(tag = "/tag2/")
     public void test1() {
-        System.out.println("test1(" + stringArgument + ")");
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument + ")");
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test3() {
-        System.out.println("test3(" + stringArgument + ")");
+        System.out.println("test3(" + argument + ")");
     }
 
     @TestEngine.AfterAll

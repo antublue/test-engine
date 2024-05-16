@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.argument;
+package org.antublue.test.engine.api.support;
 
 import java.util.Objects;
 
-/** Class to implement a BooleanArgument */
-public class BooleanArgument extends AbstractArgument {
+/** Class to implement a StringArgument */
+public class NamedString extends AbstractNamed<String> {
 
     private final String name;
-    private final boolean value;
+    private final String value;
 
     /**
      * Constructor
@@ -30,41 +30,41 @@ public class BooleanArgument extends AbstractArgument {
      * @param name name
      * @param value value
      */
-    public BooleanArgument(String name, boolean value) {
+    public NamedString(String name, String value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the BooleanArgument name
+     * Method to get the StringArgument name
      *
      * @return the return value
      */
     @Override
-    public String name() {
+    public String getName() {
         return name;
     }
 
     /**
-     * Method to get the BooleanArgument value
+     * Method to get the StringArgument value
      *
      * @return the return value
      */
-    public boolean value() {
+    public String getPayload() {
         return value;
     }
 
     @Override
     public String toString() {
-        return String.valueOf(value);
+        return value;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BooleanArgument that = (BooleanArgument) o;
-        return value == that.value && Objects.equals(name, that.name);
+        NamedString that = (NamedString) o;
+        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
     }
 
     @Override
@@ -73,12 +73,19 @@ public class BooleanArgument extends AbstractArgument {
     }
 
     /**
-     * Method to create a BooleanArgument
+     * Method to create a StringArgument
      *
      * @param value value
      * @return the return value
      */
-    public static BooleanArgument of(boolean value) {
-        return new BooleanArgument(String.valueOf(value), value);
+    public static NamedString of(String value) {
+        String name = value;
+        if (name == null) {
+            name = "((null))";
+        } else if (name.isEmpty()) {
+            name = "((empty))";
+        }
+
+        return new NamedString(name, value);
     }
 }

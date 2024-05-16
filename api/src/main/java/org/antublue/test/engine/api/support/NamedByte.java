@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.argument;
+package org.antublue.test.engine.api.support;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
-/** Class to implement a BigDecimalArgument */
-public class BigDecimalArgument extends AbstractArgument {
+/** Class to implement a ByteArgument */
+public class NamedByte extends AbstractNamed<Byte> {
 
     private final String name;
-    private final BigDecimal value;
+    private final byte value;
 
     /**
      * Constructor
@@ -31,27 +30,27 @@ public class BigDecimalArgument extends AbstractArgument {
      * @param name name
      * @param value value
      */
-    public BigDecimalArgument(String name, BigDecimal value) {
+    public NamedByte(String name, byte value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the BigDecimal name
+     * Method to get the ByteArgument name
      *
      * @return the return value
      */
     @Override
-    public String name() {
+    public String getName() {
         return name;
     }
 
     /**
-     * Method to get the BigDecimal value
+     * Method to get the ByteArgument value
      *
      * @return the return value
      */
-    public BigDecimal value() {
+    public Byte getPayload() {
         return value;
     }
 
@@ -64,8 +63,8 @@ public class BigDecimalArgument extends AbstractArgument {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BigDecimalArgument that = (BigDecimalArgument) o;
-        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
+        NamedByte that = (NamedByte) o;
+        return value == that.value && Objects.equals(name, that.name);
     }
 
     @Override
@@ -74,16 +73,12 @@ public class BigDecimalArgument extends AbstractArgument {
     }
 
     /**
-     * Method to create a BigDecimalArgument
+     * Method to create a ByteArgument
      *
      * @param value value
      * @return the return value
      */
-    public static BigDecimalArgument of(BigDecimal value) {
-        if (value == null) {
-            throw new IllegalArgumentException("value is null");
-        }
-
-        return new BigDecimalArgument(String.valueOf(value), value);
+    public static NamedByte of(byte value) {
+        return new NamedByte(String.valueOf(value), value);
     }
 }
