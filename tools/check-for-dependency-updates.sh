@@ -18,4 +18,4 @@
 
 PROJECT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
 
-${PROJECT_ROOT_DIRECTORY}/mvnw versions:display-dependency-updates
+"${PROJECT_ROOT_DIRECTORY}"/mvnw versions:display-dependency-updates
