@@ -20,15 +20,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import org.antublue.test.engine.Configuration;
-import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.api.Context;
+import org.antublue.test.engine.api.internal.configuration.Constants;
 
 /** Class to implement ThrowableUtils */
 public class ThrowableUtils {
 
+    private static final Function<String, Boolean> toBoolean =
+            string -> {
+                if (string == null) {
+                    return false;
+                }
+
+                return string.equalsIgnoreCase("true") || string.equalsIgnoreCase("1");
+            };
+
     private static final boolean STACK_TRACE_PRUNING =
-            Configuration.getInstance().getBoolean(Constants.STACK_TRACE_PRUNE).orElse(true);
+            Context.getInstance()
+                    .getConfiguration()
+                    .getParameter(Constants.STACK_TRACE_PRUNE, toBoolean)
+                    .orElse(true);
 
     private static final Predicate<String> EXCLUDE =
             s -> s.startsWith("org.antublue.test.engine.internal.") || s.startsWith("java.base/");

@@ -19,7 +19,6 @@ package org.antublue.test.engine.testing;
 import static java.lang.String.format;
 
 import java.lang.reflect.Method;
-import java.util.Optional;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.internal.util.StandardStreams;
@@ -131,9 +130,9 @@ public class SystemOutExtension implements Extension {
     }
 
     @Override
-    public void preDestroyCallback(Class<?> clazz, Optional<Object> optionalInstance) {
+    public void preDestroyCallback(Class<?> clazz, Object testInstance) {
         StandardStreams.println(
                 "preDestroyCallback() class [%s] instance is present [%s]",
-                clazz.getName(), optionalInstance.isPresent());
+                clazz.getName(), testInstance != null);
     }
 }

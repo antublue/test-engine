@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.logger;
+package org.antublue.test.engine.api.internal.logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,7 @@ public final class Level {
     /** ALL log level */
     public static final Level ALL = new Level(Integer.MAX_VALUE, "ALL");
 
-    private static Map<String, Level> LEVEL_MAP = new HashMap<>();
+    private static final Map<String, Level> LEVEL_MAP = new HashMap<>();
 
     static {
         LEVEL_MAP.put(ERROR.toString(), ERROR);

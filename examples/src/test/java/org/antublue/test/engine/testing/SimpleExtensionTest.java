@@ -18,7 +18,6 @@ package org.antublue.test.engine.testing;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
@@ -113,10 +112,10 @@ public class SimpleExtensionTest {
         }
 
         @Override
-        public void preDestroyCallback(Class<?> clazz, Optional<Object> optionalInstance) {
+        public void preDestroyCallback(Class<?> clazz, Object testInstance) {
             StandardStreams.println(
                     "preDestroyCallback() class [%s] instance is present [%s]",
-                    clazz.getName(), optionalInstance.isPresent());
+                    clazz.getName(), testInstance != null);
         }
     }
 }

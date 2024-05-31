@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine;
+package org.antublue.test.engine.api.internal.configuration;
 
 import static java.lang.String.format;
 
@@ -30,10 +30,12 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
+import org.antublue.test.engine.api.Configuration;
 
 /** Class to implement Configuration */
 @SuppressWarnings("PMD.EmptyCatchBlock")
-public class Configuration {
+public class ConfigurationImpl implements Configuration {
 
     /** Configuration constant */
     public static final String ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE =
@@ -61,7 +63,7 @@ public class Configuration {
     private Set<String> keySet;
 
     /** Constructor */
-    public Configuration() {
+    private ConfigurationImpl() {
         trace("Configuration()");
 
         properties = new Properties();
@@ -110,8 +112,25 @@ public class Configuration {
      *
      * @return the singleton instance
      */
-    public static Configuration getInstance() {
+    public static ConfigurationImpl getInstance() {
         return SingletonHolder.INSTANCE;
+    }
+
+    @Override
+    public Optional<String> getParameter(String key) {
+        String value = properties.getProperty(key);
+        trace("get key [%s] value [%s]", key, value);
+        return Optional.ofNullable(value);
+    }
+
+    @Override
+    public <T> Optional<T> getParameter(String key, Function<String, T> transformer) {
+        Optional<String> optional = getParameter(key);
+        if (!optional.isPresent()) {
+            return Optional.empty();
+        }
+        String value = optional.get();
+        return Optional.ofNullable(transformer.apply(value));
     }
 
     /**
@@ -121,36 +140,6 @@ public class Configuration {
      */
     public String getPropertiesFilename() {
         return propertiesFilename;
-    }
-
-    /**
-     * Method to get a configuration property
-     *
-     * @param key the key
-     * @return the value
-     */
-    public Optional<String> get(String key) {
-        String value = properties.getProperty(key);
-        trace("get key [%s] value [%s]", key, value);
-        return Optional.ofNullable(value);
-    }
-
-    /**
-     * Method to get a configuration property
-     *
-     * @param key the key
-     * @return the value
-     */
-    public Optional<Boolean> getBoolean(String key) {
-        Optional<String> value = get(key);
-        if (value.isPresent()) {
-            String string = value.get();
-            trace("getBoolean key [%s] value [%s]", key, string);
-            return Optional.of(Boolean.parseBoolean(string));
-        } else {
-            trace("getBoolean key [%s] value [%s]", key, null);
-            return Optional.empty();
-        }
     }
 
     /**
@@ -173,7 +162,8 @@ public class Configuration {
 
     private void trace(String format, Object... objects) {
         if (TRACE) {
-            System.out.println("[TRACE] " + Configuration.class + " " + format(format, objects));
+            System.out.println(
+                    "[TRACE] " + ConfigurationImpl.class + " " + format(format, objects));
             System.out.flush();
         }
     }
@@ -204,6 +194,6 @@ public class Configuration {
     private static final class SingletonHolder {
 
         /** The singleton instance */
-        private static final Configuration INSTANCE = new Configuration();
+        private static final ConfigurationImpl INSTANCE = new ConfigurationImpl();
     }
 }

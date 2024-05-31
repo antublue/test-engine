@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine;
+package org.antublue.test.engine.internal;
 
 import static java.lang.String.format;
 
@@ -29,13 +29,16 @@ import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Configuration;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.internal.configuration.Constants;
+import org.antublue.test.engine.api.internal.logger.Logger;
+import org.antublue.test.engine.api.internal.logger.LoggerFactory;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.ReflectionUtils;
 import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
@@ -47,7 +50,7 @@ public class ExtensionManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionManager.class);
 
-    private static final Configuration CONFIGURATION = Configuration.getInstance();
+    private static final Configuration CONFIGURATION = Context.getInstance().getConfiguration();
 
     private static final List<Extension> EMPTY_EXTENSION_LIST = new ArrayList<>();
 
@@ -100,7 +103,7 @@ public class ExtensionManager {
             lock.lock();
             if (!initialized) {
                 Map<String, Extension> extensionMap = new LinkedHashMap<>();
-                Optional<String> optional = CONFIGURATION.get(Constants.EXTENSIONS);
+                Optional<String> optional = CONFIGURATION.getParameter(Constants.EXTENSIONS);
                 if (optional.isPresent() && !optional.get().trim().isEmpty()) {
                     String[] classNames = optional.get().split("\\s+");
                     for (String className : classNames) {
@@ -475,16 +478,14 @@ public class ExtensionManager {
      * Method to run preDestroy extension methods
      *
      * @param testClass testClass
-     * @param optionalTestInstance optionalTestInstance
+     * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
     public void preDestroyCallback(
-            Class<?> testClass,
-            Optional<Object> optionalTestInstance,
-            ThrowableContext throwableContext) {
+            Class<?> testClass, Object testInstance, ThrowableContext throwableContext) {
         for (Extension testExtension : getTestExtensionsReversed(testClass)) {
             try {
-                testExtension.preDestroyCallback(testClass, optionalTestInstance);
+                testExtension.preDestroyCallback(testClass, testInstance);
             } catch (Throwable t) {
                 throwableContext.add(testClass, t);
             }
