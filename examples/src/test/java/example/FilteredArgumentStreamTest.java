@@ -32,8 +32,7 @@ public class FilteredArgumentStreamTest {
 
     @TestEngine.ArgumentSupplier
     public static Stream<NamedString> arguments() {
-        return ArgumentSupplier.arguments(
-                argument -> !argument.getPayload().contains("b"));
+        return ArgumentSupplier.arguments(argument -> !argument.getPayload().contains("b"));
     }
 
     @TestEngine.BeforeAll
