@@ -17,14 +17,14 @@
 package org.antublue.test.engine.maven.plugin.listener;
 
 import java.lang.reflect.Method;
-import org.antublue.test.engine.Configuration;
-import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.internal.configuration.ConfigurationImpl;
+import org.antublue.test.engine.api.internal.configuration.Constants;
+import org.antublue.test.engine.api.internal.logger.Logger;
+import org.antublue.test.engine.api.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.MetadataSupport;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.internal.util.HumanReadableTimeUtils;
@@ -39,7 +39,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(StatusEngineExecutionListener.class);
 
-    private static final Configuration CONFIGURATION = Configuration.getInstance();
+    private static final ConfigurationImpl CONFIGURATION = ConfigurationImpl.getInstance();
 
     private static final TestUtils TEST_UTILS = TestUtils.getInstance();
 
@@ -49,10 +49,14 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
     private static final String MESSAGE_SKIP;
 
     static {
-        MESSAGE_TEST = CONFIGURATION.get(Constants.CONSOLE_LOG_TEST_MESSAGE).orElse("TEST");
-        MESSAGE_PASS = CONFIGURATION.get(Constants.CONSOLE_LOG_PASS_MESSAGE).orElse("PASS");
-        MESSAGE_FAIL = CONFIGURATION.get(Constants.CONSOLE_LOG_FAIL_MESSAGE).orElse("FAIL");
-        MESSAGE_SKIP = CONFIGURATION.get(Constants.CONSOLE_LOG_SKIP_MESSAGE).orElse("SKIP");
+        MESSAGE_TEST =
+                CONFIGURATION.getParameter(Constants.CONSOLE_LOG_TEST_MESSAGE).orElse("TEST");
+        MESSAGE_PASS =
+                CONFIGURATION.getParameter(Constants.CONSOLE_LOG_PASS_MESSAGE).orElse("PASS");
+        MESSAGE_FAIL =
+                CONFIGURATION.getParameter(Constants.CONSOLE_LOG_FAIL_MESSAGE).orElse("FAIL");
+        MESSAGE_SKIP =
+                CONFIGURATION.getParameter(Constants.CONSOLE_LOG_SKIP_MESSAGE).orElse("SKIP");
     }
 
     private static final String INFO =
@@ -108,7 +112,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
     public StatusEngineExecutionListener() {
         consoleLogTiming =
                 CONFIGURATION
-                        .get(Constants.CONSOLE_LOG_TIMING)
+                        .getParameter(Constants.CONSOLE_LOG_TIMING)
                         .map(
                                 value -> {
                                     try {
@@ -122,7 +126,9 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
         LOGGER.trace("configuration [%s] = [%b]", Constants.CONSOLE_LOG_TIMING, consoleLogTiming);
 
         consoleLogTimingUnits =
-                CONFIGURATION.get(Constants.CONSOLE_LOG_TIMING_UNITS).orElse("milliseconds");
+                CONFIGURATION
+                        .getParameter(Constants.CONSOLE_LOG_TIMING_UNITS)
+                        .orElse("milliseconds");
 
         LOGGER.trace(
                 "configuration [%s] = [%s]",
@@ -130,7 +136,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
         consoleLogTestMessages =
                 CONFIGURATION
-                        .get(Constants.CONSOLE_LOG_TEST_MESSAGES)
+                        .getParameter(Constants.CONSOLE_LOG_TEST_MESSAGES)
                         .map(
                                 value -> {
                                     try {
@@ -147,7 +153,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
         consoleLogPassMessages =
                 CONFIGURATION
-                        .get(Constants.CONSOLE_LOG_PASS_MESSAGES)
+                        .getParameter(Constants.CONSOLE_LOG_PASS_MESSAGES)
                         .map(
                                 value -> {
                                     try {
@@ -164,7 +170,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
         consoleLogSkipMessages =
                 CONFIGURATION
-                        .get(Constants.CONSOLE_LOG_SKIP_MESSAGES)
+                        .getParameter(Constants.CONSOLE_LOG_SKIP_MESSAGES)
                         .map(
                                 value -> {
                                     try {

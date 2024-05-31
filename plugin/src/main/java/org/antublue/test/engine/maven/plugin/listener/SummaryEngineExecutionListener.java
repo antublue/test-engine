@@ -21,8 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.antublue.test.engine.Configuration;
 import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.api.internal.configuration.ConfigurationImpl;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.MetadataSupport;
@@ -94,7 +94,7 @@ public class SummaryEngineExecutionListener
         println(INFO + BANNER);
         println(INFO + SEPARATOR);
 
-        Configuration configuration = Configuration.getInstance();
+        ConfigurationImpl configuration = ConfigurationImpl.getInstance();
         String propertiesFilename = configuration.getPropertiesFilename();
 
         if (propertiesFilename != null) {
@@ -103,7 +103,7 @@ public class SummaryEngineExecutionListener
             Set<String> keySet = configuration.keySet();
             if (!keySet.isEmpty()) {
                 for (String key : configuration.keySet()) {
-                    Optional<String> optional = configuration.get(key);
+                    Optional<String> optional = configuration.getParameter(key);
                     String value = optional.orElse("");
                     println(INFO + "- [" + key + "] = [" + value + "]");
                 }

@@ -25,6 +25,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.antublue.test.engine.api.internal.configuration.ConfigurationImpl;
+import org.antublue.test.engine.api.internal.configuration.Constants;
+import org.antublue.test.engine.api.internal.logger.Logger;
+import org.antublue.test.engine.api.internal.logger.LoggerFactory;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.ConfigurationParameters;
@@ -32,8 +36,6 @@ import org.antublue.test.engine.internal.Executor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.EngineDescriptorFactory;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
@@ -47,7 +49,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
-    private static final Configuration CONFIGURATION = Configuration.getInstance();
+    private static final ConfigurationImpl CONFIGURATION = ConfigurationImpl.getInstance();
 
     /** Configuration constant */
     public static final String ENGINE_ID = "antublue-test-engine";
@@ -155,7 +157,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("filterTestClassesByClassName()");
 
         CONFIGURATION
-                .get(Constants.TEST_CLASS_INCLUDE_REGEX)
+                .getParameter(Constants.TEST_CLASS_INCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -176,7 +178,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         });
 
         CONFIGURATION
-                .get(Constants.TEST_CLASS_EXCLUDE_REGEX)
+                .getParameter(Constants.TEST_CLASS_EXCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -206,7 +208,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("filterTestClassesByTag()");
 
         CONFIGURATION
-                .get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX)
+                .getParameter(Constants.TEST_CLASS_TAG_INCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -232,7 +234,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         });
 
         CONFIGURATION
-                .get(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX)
+                .getParameter(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -265,7 +267,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("filterTestMethodsByMethodName()");
 
         CONFIGURATION
-                .get(Constants.TEST_METHOD_INCLUDE_REGEX)
+                .getParameter(Constants.TEST_METHOD_INCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -286,7 +288,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         });
 
         CONFIGURATION
-                .get(Constants.TEST_METHOD_EXCLUDE_REGEX)
+                .getParameter(Constants.TEST_METHOD_EXCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -316,7 +318,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("filterTestMethodsByTag()");
 
         CONFIGURATION
-                .get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX)
+                .getParameter(Constants.TEST_METHOD_TAG_INCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -342,7 +344,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         });
 
         CONFIGURATION
-                .get(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX)
+                .getParameter(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -403,7 +405,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         testDescriptors.forEach(engineDescriptor::removeChild);
 
         // Shuffle or sort the test descriptor list based on configuration
-        Optional<String> optionalShuffle = CONFIGURATION.get(Constants.TEST_CLASS_SHUFFLE);
+        Optional<String> optionalShuffle = CONFIGURATION.getParameter(Constants.TEST_CLASS_SHUFFLE);
         optionalShuffle.ifPresent(
                 s -> {
                     if (Constants.TRUE.equals(optionalShuffle.get())) {

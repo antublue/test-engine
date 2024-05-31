@@ -17,12 +17,13 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import java.util.Optional;
-import org.antublue.test.engine.Configuration;
-import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.api.Configuration;
+import org.antublue.test.engine.api.Context;
+import org.antublue.test.engine.api.internal.configuration.Constants;
+import org.antublue.test.engine.api.internal.logger.Logger;
+import org.antublue.test.engine.api.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataSupport;
-import org.antublue.test.engine.internal.logger.Logger;
-import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.StopWatch;
 import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.util.Preconditions;
@@ -38,13 +39,13 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecutableTestDescriptor.class);
 
-    private static final Configuration CONFIGURATION = Configuration.getInstance();
+    private static final Configuration CONFIGURATION = Context.getInstance().getConfiguration();
 
     private static long THREAD_THROTTLE_MILLISECONDS = 0;
 
     static {
         CONFIGURATION
-                .get(Constants.THREAD_THROTTLE_MILLISECONDS)
+                .getParameter(Constants.THREAD_THROTTLE_MILLISECONDS)
                 .ifPresent(
                         s -> {
                             try {

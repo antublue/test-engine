@@ -19,13 +19,22 @@ package org.antublue.test.engine.internal;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import org.antublue.test.engine.Configuration;
+import org.antublue.test.engine.api.internal.configuration.ConfigurationImpl;
 
 /** Class to implement ConfigurationParameters */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
-    private static final Configuration CONFIGURATION = Configuration.getInstance();
+    private static final ConfigurationImpl CONFIGURATION = ConfigurationImpl.getInstance();
+
+    private static final Function<String, Boolean> toBoolean =
+            string -> {
+                if (string == null) {
+                    return false;
+                }
+
+                return string.equalsIgnoreCase("true") || string.equalsIgnoreCase("1");
+            };
 
     private ConfigurationParameters() {
         // DO NOTHING
@@ -37,21 +46,19 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
 
     @Override
     public Optional<String> get(String key) {
-        return CONFIGURATION.get(key);
+        return CONFIGURATION.getParameter(key);
     }
 
     @Override
     public Optional<Boolean> getBoolean(String key) {
-        return CONFIGURATION.getBoolean(key);
+        return CONFIGURATION.getParameter(key, toBoolean);
     }
 
     @Override
     public <T> Optional<T> get(String key, Function<String, T> transformer) {
-        Optional<String> value = CONFIGURATION.get(key);
-        return value.map(transformer);
+        return CONFIGURATION.getParameter(key, transformer);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public int size() {
         return CONFIGURATION.size();

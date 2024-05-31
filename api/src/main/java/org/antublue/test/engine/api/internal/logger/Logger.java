@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.logger;
+package org.antublue.test.engine.api.internal.logger;
 
 import static java.lang.String.format;
 
@@ -27,14 +27,14 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.antublue.test.engine.Configuration;
-import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.api.internal.configuration.ConfigurationImpl;
+import org.antublue.test.engine.api.internal.configuration.Constants;
 
 /** Class to implement a Logger */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Logger {
 
-    private static final Configuration CONFIGURATION = Configuration.getInstance();
+    private static final ConfigurationImpl CONFIGURATION = ConfigurationImpl.getInstance();
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd | HH:mm:ss.SSS", Locale.getDefault());
@@ -47,13 +47,13 @@ public class Logger {
      *
      * @param name name
      */
-    public Logger(String name) {
+    Logger(String name) {
         this.name = name;
         this.level = Level.INFO;
 
         String loggerLevel =
-                CONFIGURATION.get(Constants.LOGGER_LEVEL).orElse(Level.INFO.toString());
-        String regex = CONFIGURATION.get(Constants.LOGGER_REGEX).orElse(".*");
+                CONFIGURATION.getParameter(Constants.LOGGER_LEVEL).orElse(Level.INFO.toString());
+        String regex = CONFIGURATION.getParameter(Constants.LOGGER_REGEX).orElse(".*");
 
         try {
             Pattern pattern = Pattern.compile(regex);
