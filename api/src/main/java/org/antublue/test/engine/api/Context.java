@@ -27,6 +27,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
+@SuppressWarnings("unchecked")
 public interface Context {
 
     /**
@@ -239,12 +240,12 @@ public interface Context {
              * @return the existing value
              */
             @Override
-            public Object put(String key, Object value) {
+            public <T> T put(String key, Object value) {
                 String validKey = checkKey(key);
 
                 try {
                     lock();
-                    return map.put(validKey, value);
+                    return (T) map.put(validKey, value);
                 } finally {
                     unlock();
                 }
@@ -259,13 +260,13 @@ public interface Context {
              * @return the existing value, if not found, the Object returned by the Function
              */
             @Override
-            public Object computeIfAbsent(String key, Function<String, Object> function) {
+            public <T> T computeIfAbsent(String key, Function<String, T> function) {
                 String validKey = checkKey(key);
                 checkNotNull(function, "function is null");
 
                 try {
                     lock();
-                    return map.computeIfAbsent(validKey, function);
+                    return (T) map.computeIfAbsent(validKey, function);
                 } finally {
                     unlock();
                 }
@@ -279,12 +280,12 @@ public interface Context {
              *     doesn't exist
              */
             @Override
-            public Object get(String key) {
+            public <T> T get(String key) {
                 String validKey = checkKey(key);
 
                 try {
                     lock();
-                    return map.get(validKey);
+                    return (T) map.get(validKey);
                 } finally {
                     unlock();
                 }
@@ -307,7 +308,9 @@ public interface Context {
                 try {
                     lock();
                     Object object = map.get(validKey);
-                    if (clazz.isInstance(object)) {
+                    if (object == null) {
+                        return null;
+                    } else if (clazz.isInstance(object)) {
                         return clazz.cast(object);
                     } else {
                         throw new StoreException(
@@ -329,12 +332,12 @@ public interface Context {
              *     doesn't exist
              */
             @Override
-            public Object remove(String key) {
+            public <T> T remove(String key) {
                 String validKey = checkKey(key);
 
                 try {
                     lock();
-                    return map.remove(validKey);
+                    return (T) map.remove(validKey);
                 } finally {
                     unlock();
                 }
