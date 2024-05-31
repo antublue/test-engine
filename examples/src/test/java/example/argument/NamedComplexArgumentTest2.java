@@ -23,20 +23,20 @@ import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class CustomArgumentTest2 {
+public class NamedComplexArgumentTest2 {
 
-    @TestEngine.Argument protected Named<CustomArgument> argument;
+    @TestEngine.Argument protected Named<ComplexArgument> argument;
 
-    private CustomArgument customArgument;
+    private ComplexArgument customArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<CustomArgument>> arguments() {
-        Collection<Named<CustomArgument>> collection = new ArrayList<>();
+    public static Stream<Named<ComplexArgument>> arguments() {
+        Collection<Named<ComplexArgument>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             collection.add(
                     Named.of(
                             "CustomArgument(" + i + ")",
-                            CustomArgument.of("FirstName" + i, "LastName" + i)));
+                            ComplexArgument.of("FirstName" + i, "LastName" + i)));
         }
         return collection.stream();
     }
@@ -72,12 +72,12 @@ public class CustomArgumentTest2 {
         System.out.println("afterAll()");
     }
 
-    public static class CustomArgument {
+    public static class ComplexArgument {
 
         private final String firstName;
         private final String lastName;
 
-        private CustomArgument(String firstName, String lastName) {
+        private ComplexArgument(String firstName, String lastName) {
             this.firstName = firstName;
             this.lastName = lastName;
         }
@@ -90,8 +90,8 @@ public class CustomArgumentTest2 {
             return lastName;
         }
 
-        public static CustomArgument of(String firstName, String lastName) {
-            return new CustomArgument(firstName, lastName);
+        public static ComplexArgument of(String firstName, String lastName) {
+            return new ComplexArgument(firstName, lastName);
         }
     }
 }

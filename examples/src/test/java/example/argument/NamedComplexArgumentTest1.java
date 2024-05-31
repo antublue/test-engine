@@ -21,7 +21,7 @@ import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class CustomArgumentTest1 {
+public class NamedComplexArgumentTest1 {
 
     @TestEngine.Argument @TestEngine.AutoClose.AfterAll
     protected Named<ComplexArgument> complexArgument;

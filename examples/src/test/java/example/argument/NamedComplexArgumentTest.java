@@ -21,15 +21,16 @@ import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class CustomNamedArgumentTest {
+public class NamedComplexArgumentTest {
 
-    @TestEngine.Argument @TestEngine.AutoClose.AfterAll protected Named<ComplexArgument> argument;
+    @TestEngine.Argument @TestEngine.AutoClose.AfterAll
+    protected Named<NamedComplexArgument> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<ComplexArgument> arguments() {
+    public static Stream<NamedComplexArgument> arguments() {
         return Stream.of(
-                ComplexArgument.of("A", "http://foo.bar"),
-                ComplexArgument.of("B", "http://bar.foo"));
+                NamedComplexArgument.of("A", "http://foo.bar"),
+                NamedComplexArgument.of("B", "http://bar.foo"));
     }
 
     @TestEngine.Prepare
@@ -73,12 +74,12 @@ public class CustomNamedArgumentTest {
         System.out.println("conclude()");
     }
 
-    public static class ComplexArgument implements Named<ComplexArgument>, AutoCloseable {
+    public static class NamedComplexArgument implements Named<NamedComplexArgument>, AutoCloseable {
 
         private final String name;
         private final String url;
 
-        public ComplexArgument(String name, String url) {
+        public NamedComplexArgument(String name, String url) {
             this.name = name;
             this.url = url;
         }
@@ -89,7 +90,7 @@ public class CustomNamedArgumentTest {
         }
 
         @Override
-        public ComplexArgument getPayload() {
+        public NamedComplexArgument getPayload() {
             return this;
         }
 
@@ -101,8 +102,8 @@ public class CustomNamedArgumentTest {
             System.out.println("close(" + url + ")");
         }
 
-        public static ComplexArgument of(String name, String url) {
-            return new ComplexArgument(name, url);
+        public static NamedComplexArgument of(String name, String url) {
+            return new NamedComplexArgument(name, url);
         }
     }
 }
