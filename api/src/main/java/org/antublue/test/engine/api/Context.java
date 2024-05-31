@@ -18,7 +18,6 @@ package org.antublue.test.engine.api;
 
 import org.antublue.test.engine.api.internal.ContextImpl;
 
-@SuppressWarnings("unchecked")
 public interface Context {
 
     /**
