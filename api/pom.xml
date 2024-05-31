@@ -300,6 +300,7 @@
                         <excludes>
                             <!-- List files or directories to exclude -->
                             <exclude>**/Named.java</exclude>
+                            <exclude>**/Namespace.java</exclude>
                         </excludes>
                     </java>
                 </configuration>
