@@ -16,16 +16,15 @@
 
 package example;
 
-import org.antublue.test.engine.api.Context;
-import org.antublue.test.engine.api.Namespace;
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.antublue.test.engine.api.Context;
+import org.antublue.test.engine.api.Namespace;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 public class NamespaceTest {
