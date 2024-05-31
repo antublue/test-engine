@@ -16,14 +16,13 @@
 
 package example;
 
-import org.antublue.test.engine.api.Named;
-import org.antublue.test.engine.api.TestEngine;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
 public class SimpleTest5 {
