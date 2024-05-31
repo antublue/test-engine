@@ -16,15 +16,15 @@
 
 package org.antublue.test.engine.internal.logger;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.antublue.test.engine.Configuration;
 
 /** Class to implement a LoggerFactory */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public final class LoggerFactory {
 
-    private final Map<String, Logger> loggerMap = new HashMap<>();
+    private final Map<String, Logger> loggerMap = new ConcurrentHashMap<>();
 
     /** Constructor */
     private LoggerFactory() {
@@ -38,14 +38,7 @@ public final class LoggerFactory {
      * @return the return value
      */
     private Logger createLogger(String name) {
-        synchronized (this) {
-            Logger logger = loggerMap.get(name);
-            if (logger == null) {
-                logger = new Logger(name);
-                loggerMap.put(name, logger);
-            }
-            return logger;
-        }
+        return loggerMap.computeIfAbsent(name, Logger::new);
     }
 
     /**
