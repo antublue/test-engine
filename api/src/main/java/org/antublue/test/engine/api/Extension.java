@@ -229,7 +229,7 @@ public interface Extension {
     }
 
     /**
-     * Method to call after all testing
+     * Method to call after all testing. The test instance may be null
      *
      * @param testClass testClass
      * @param testInstance testInstance

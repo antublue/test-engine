@@ -132,7 +132,7 @@ public class SystemOutExtension implements Extension {
     @Override
     public void preDestroyCallback(Class<?> clazz, Object testInstance) {
         StandardStreams.println(
-                "preDestroyCallback() class [%s] instance is present [%s]",
+                "preDestroyCallback() class [%s] instance is not null [%s]",
                 clazz.getName(), testInstance != null);
     }
 }
