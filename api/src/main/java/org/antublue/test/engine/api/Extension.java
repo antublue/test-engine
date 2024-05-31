@@ -18,7 +18,6 @@ package org.antublue.test.engine.api;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Optional;
 
 /** Interface to implement an Extension */
 public interface Extension {
@@ -230,14 +229,13 @@ public interface Extension {
     }
 
     /**
-     * Method to call after all testing
+     * Method to call after all testing. The test instance may be null
      *
      * @param testClass testClass
-     * @param optionalTestInstance optionalTestInstance
+     * @param testInstance testInstance
      * @throws Throwable throwable
      */
-    default void preDestroyCallback(Class<?> testClass, Optional<Object> optionalTestInstance)
-            throws Throwable {
+    default void preDestroyCallback(Class<?> testClass, Object testInstance) throws Throwable {
         // DO NOTHING
     }
 }
