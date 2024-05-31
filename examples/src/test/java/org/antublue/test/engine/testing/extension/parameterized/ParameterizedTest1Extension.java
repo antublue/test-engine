@@ -27,7 +27,6 @@ import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.Named;
 
 /** Example Extension */
-@SuppressWarnings("unchecked")
 public class ParameterizedTest1Extension implements Extension {
 
     private static final List<String> EXPECTED = new ArrayList<>();

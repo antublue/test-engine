@@ -51,7 +51,7 @@ import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a ParameterizedTestDescriptorFactory */
-@SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class EngineDescriptorFactory {
 
     private static final TestUtils TEST_UTILS = TestUtils.getInstance();

@@ -22,7 +22,7 @@ import java.util.function.Function;
 import org.antublue.test.engine.Configuration;
 
 /** Class to implement ConfigurationParameters */
-@SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock"})
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
     private static final Configuration CONFIGURATION = Configuration.getInstance();

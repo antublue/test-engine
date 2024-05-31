@@ -23,7 +23,6 @@ import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.Named;
 
 /** Example Extension */
-@SuppressWarnings("unchecked")
 public class ParameterizedTestExtension1 implements Extension {
 
     @Override
