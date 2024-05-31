@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 /** Example test */
 public class MultipleMethodsLockingTest2 {
@@ -35,11 +35,11 @@ public class MultipleMethodsLockingTest2 {
         Context.getInstance().getStore().computeIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
-    @TestEngine.Argument public IntegerArgument integerArgument;
+    @TestEngine.Argument public NamedInteger argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<IntegerArgument> arguments() {
-        return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
+    public static Stream<NamedInteger> arguments() {
+        return Stream.of(NamedInteger.of(1), NamedInteger.of(2), NamedInteger.of(3));
     }
 
     @TestEngine.Prepare

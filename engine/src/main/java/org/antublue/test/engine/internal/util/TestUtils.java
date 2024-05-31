@@ -23,7 +23,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.ClassUtils;
@@ -58,7 +58,7 @@ public class TestUtils {
             ThrowableContext throwableContext) {
         try {
             method.setAccessible(true);
-            if (ReflectionUtils.acceptsArguments(method, Argument.class)) {
+            if (ReflectionUtils.acceptsArguments(method, Named.class)) {
                 method.invoke(testInstance, testArgument);
             } else {
                 method.invoke(testInstance, (Object[]) null);

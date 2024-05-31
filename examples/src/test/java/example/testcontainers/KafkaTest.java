@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -58,11 +58,11 @@ public class KafkaTest {
     @TestEngine.AutoClose.Conclude private Network network;
 
     @TestEngine.Argument @TestEngine.AutoClose.AfterAll
-    protected KafkaTestContainer kafkaTestContainer;
+    protected KafkaTestEnvironment kafkaTestEnvironment;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<KafkaTestContainer> arguments() {
-        return Stream.of(KafkaTestContainer.of("apache/kafka:3.7.0"));
+    public static Stream<KafkaTestEnvironment> arguments() {
+        return Stream.of(KafkaTestEnvironment.of("apache/kafka:3.7.0"));
     }
 
     @TestEngine.Prepare
@@ -79,7 +79,7 @@ public class KafkaTest {
     public void startTestContainer() {
         info("starting test container ...");
 
-        kafkaTestContainer.start(network);
+        kafkaTestEnvironment.start(network);
 
         info("test container started");
     }
@@ -91,7 +91,7 @@ public class KafkaTest {
 
         message = randomString(16);
 
-        String bootstrapServers = kafkaTestContainer.getBootstrapServers();
+        String bootstrapServers = kafkaTestEnvironment.getPayload().getBootstrapServers();
 
         info("producing message [%s] to [%s] ...", message, bootstrapServers);
 
@@ -102,16 +102,9 @@ public class KafkaTest {
         properties.setProperty(
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
-        KafkaProducer<String, String> producer = null;
-
-        try {
-            producer = new KafkaProducer<>(properties);
+        try (KafkaProducer<String, String> producer = new KafkaProducer<>(properties)) {
             ProducerRecord<String, String> producerRecord = new ProducerRecord<>(TOPIC, message);
             producer.send(producerRecord).get();
-        } finally {
-            if (producer != null) {
-                producer.close();
-            }
         }
 
         System.out.format("message [%s] produced", message).println();
@@ -119,10 +112,10 @@ public class KafkaTest {
 
     @TestEngine.Test
     @TestEngine.Order(order = 2)
-    public void testConsume() {
+    public void testConsume1() {
         info("testing testConsume() ...");
 
-        String bootstrapServers = kafkaTestContainer.getBootstrapServers();
+        String bootstrapServers = kafkaTestEnvironment.getPayload().getBootstrapServers();
 
         info("consuming message from [%s] ...", bootstrapServers);
 
@@ -161,7 +154,7 @@ public class KafkaTest {
     public void testConsume2() {
         info("testing testConsume2() ...");
 
-        String bootstrapServers = kafkaTestContainer.getBootstrapServers();
+        String bootstrapServers = kafkaTestEnvironment.getPayload().getBootstrapServers();
 
         info("consuming message from [%s] ...", bootstrapServers);
 
@@ -196,7 +189,7 @@ public class KafkaTest {
     }
 
     /** Class to implement a TestContext */
-    public static class KafkaTestContainer implements Argument, Closeable {
+    public static class KafkaTestEnvironment implements Named<KafkaContainer>, Closeable {
 
         private final String dockerImageName;
         private KafkaContainer kafkaContainer;
@@ -206,7 +199,7 @@ public class KafkaTest {
          *
          * @param dockerImageName the name
          */
-        public KafkaTestContainer(String dockerImageName) {
+        public KafkaTestEnvironment(String dockerImageName) {
             this.dockerImageName = dockerImageName;
         }
 
@@ -215,12 +208,23 @@ public class KafkaTest {
          *
          * @return the name
          */
-        public String name() {
+        @Override
+        public String getName() {
             return dockerImageName;
         }
 
         /**
-         * Method to start the KafkaTestContainer using a specific network
+         * Method to get the payload (ourself)
+         *
+         * @return the payload
+         */
+        @Override
+        public KafkaContainer getPayload() {
+            return kafkaContainer;
+        }
+
+        /**
+         * Method to start the KafkaTestEnvironment using a specific network
          *
          * @param network the network
          */
@@ -234,16 +238,7 @@ public class KafkaTest {
             info("test container [%s] started", dockerImageName);
         }
 
-        /**
-         * Method to get the Kafka bootstrap servers
-         *
-         * @return the Kafka bootstrap servers
-         */
-        public String getBootstrapServers() {
-            return kafkaContainer.getBootstrapServers();
-        }
-
-        /** Method to close (shutdown) the KafkaTestContainer */
+        /** Method to close (shutdown) the KafkaTestEnvironment */
         public void close() {
             info("test container [%s] stopping ..", dockerImageName);
 
@@ -256,13 +251,13 @@ public class KafkaTest {
         }
 
         /**
-         * Method to create a KafkaTestContainer
+         * Method to create a KafkaTestEnvironment
          *
          * @param dockerImageName the name
-         * @return a KafkaTestContainer
+         * @return a KafkaTestEnvironment
          */
-        public static KafkaTestContainer of(String dockerImageName) {
-            return new KafkaTestContainer(dockerImageName);
+        public static KafkaTestEnvironment of(String dockerImageName) {
+            return new KafkaTestEnvironment(dockerImageName);
         }
     }
 

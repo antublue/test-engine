@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 import org.antublue.test.engine.internal.util.StandardStreams;
 
 /** Example test */
@@ -30,13 +30,13 @@ public class SimpleExtensionTest {
 
     @TestEngine.Random.Long private long randomLong;
 
-    @TestEngine.Argument protected StringArgument stringArgument;
+    @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
-        Collection<StringArgument> collection = new ArrayList<>();
+    public static Stream<NamedString> arguments() {
+        Collection<NamedString> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(StringArgument.of("StringArgument " + i));
+            collection.add(NamedString.of("StringArgument " + i));
         }
         return collection.stream();
     }
@@ -55,48 +55,48 @@ public class SimpleExtensionTest {
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("-> beforeAll(" + stringArgument + ")");
+        System.out.println("-> beforeAll(" + argument + ")");
         System.out.println("-> randomLong = [" + randomLong + "]");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println("-> beforeEach(" + stringArgument + ")");
+        System.out.println("-> beforeEach(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("-> test1(" + stringArgument + ")");
+        System.out.println("-> test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("-> test2(" + stringArgument + ")");
+        System.out.println("-> test2(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test3() {
-        System.out.println("-> test3(" + stringArgument + ")");
+        System.out.println("-> test3(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test4() {
-        System.out.println("-> test4(" + stringArgument + ")");
+        System.out.println("-> test4(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test5() {
-        System.out.println("-> test5(" + stringArgument + ")");
+        System.out.println("-> test5(" + argument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
-        System.out.println("-> afterEach(" + stringArgument + ")");
+        System.out.println("-> afterEach(" + argument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("-> afterAll(" + stringArgument + ")");
+        System.out.println("-> afterAll(" + argument + ")");
     }
 
     @TestEngine.Conclude

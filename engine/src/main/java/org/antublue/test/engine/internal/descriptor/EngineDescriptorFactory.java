@@ -20,6 +20,7 @@ import static java.lang.String.format;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.antublue.test.engine.ExtensionManager;
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
@@ -50,7 +51,7 @@ import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a ParameterizedTestDescriptorFactory */
-@SuppressWarnings({"unchecked", "PMD.AvoidAccessibilityAlteration"})
+@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class EngineDescriptorFactory {
 
     private static final TestUtils TEST_UTILS = TestUtils.getInstance();
@@ -71,7 +72,7 @@ public class EngineDescriptorFactory {
     private void discover(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         Set<Class<?>> classes = new LinkedHashSet<>();
-        Map<Class<?>, List<Argument>> classArgumentMap = new LinkedHashMap<>();
+        Map<Class<?>, List<Named<?>>> classArgumentMap = new LinkedHashMap<>();
         Map<Class<?>, List<Method>> classMethodMap = new LinkedHashMap<>();
 
         List<? extends DiscoverySelector> discoverySelectors =
@@ -89,7 +90,7 @@ public class EngineDescriptorFactory {
 
                 for (Class<?> javaClass : javaClasses) {
                     // Class -> Argument mappings
-                    List<Argument> testArguments = getArguments(javaClass);
+                    List<Named<?>> testArguments = getArguments(javaClass);
 
                     classArgumentMap
                             .computeIfAbsent(javaClass, c -> new ArrayList<>())
@@ -129,7 +130,7 @@ public class EngineDescriptorFactory {
 
                 for (Class<?> javaClass : javaClasses) {
                     // Class -> Argument mappings
-                    List<Argument> testArguments = getArguments(javaClass);
+                    List<Named<?>> testArguments = getArguments(javaClass);
 
                     classArgumentMap
                             .computeIfAbsent(javaClass, c -> new ArrayList<>())
@@ -165,7 +166,7 @@ public class EngineDescriptorFactory {
 
                 if (TestClassPredicate.TEST_CLASS_PREDICATE.test(javaClass)) {
                     // Class -> Argument mappings
-                    List<Argument> testArguments = getArguments(javaClass);
+                    List<Named<?>> testArguments = getArguments(javaClass);
 
                     classArgumentMap
                             .computeIfAbsent(javaClass, c -> new ArrayList<>())
@@ -203,7 +204,7 @@ public class EngineDescriptorFactory {
                 if (TestClassPredicate.TEST_CLASS_PREDICATE.test(javaClass)
                         && TestMethodPredicate.TEST_METHOD_PREDICATE.test(javaMethod)) {
                     // Class -> Argument mappings
-                    List<Argument> testArguments = getArguments(javaClass);
+                    List<Named<?>> testArguments = getArguments(javaClass);
 
                     classArgumentMap
                             .computeIfAbsent(javaClass, c -> new ArrayList<>())
@@ -269,7 +270,7 @@ public class EngineDescriptorFactory {
                 if (javaClass != null) {
                     classes.add(javaClass);
 
-                    List<Argument> testArguments = getArguments(javaClass);
+                    List<Named<?>> testArguments = getArguments(javaClass);
                     if (testArgumentIndex != -1) {
                         classArgumentMap
                                 .computeIfAbsent(javaClass, c -> new ArrayList<>())
@@ -308,7 +309,7 @@ public class EngineDescriptorFactory {
 
         try {
             for (Class<?> clazz : classes) {
-                List<Argument> arguments = classArgumentMap.get(clazz);
+                List<Named<?>> arguments = classArgumentMap.get(clazz);
 
                 ThrowableContext throwableContext = new ThrowableContext();
                 EXTENSION_MANAGER.postTestArgumentDiscoveryCallback(
@@ -348,18 +349,33 @@ public class EngineDescriptorFactory {
         return method;
     }
 
-    private static List<Argument> getArguments(Class<?> testClass) throws Throwable {
-        List<Argument> testArguments = new ArrayList<>();
+    private static List<Named<?>> getArguments(Class<?> testClass) throws Throwable {
+        List<Named<?>> testArguments = new ArrayList<>();
 
         Object object = getArumentSupplierMethod(testClass).invoke(null, (Object[]) null);
-        if (object instanceof Stream) {
-            Stream<Argument> stream = (Stream<Argument>) object;
-            stream.forEach(testArguments::add);
-        } else if (object instanceof Iterable) {
-            ((Iterable<Argument>) object).forEach(testArguments::add);
-        } else {
+        if (!(object instanceof Stream || object instanceof Iterable)) {
             throw new TestClassDefinitionException(
                     format("Exception getting arguments for test class [%s]", testClass.getName()));
+        }
+
+        Iterator<?> iterator;
+        if (object instanceof Stream) {
+            Stream<?> stream = (Stream<?>) object;
+            iterator = stream.iterator();
+        } else {
+            Iterable<?> iterable = (Iterable<?>) object;
+            iterator = iterable.iterator();
+        }
+
+        long index = 0;
+        while (iterator.hasNext()) {
+            Object o = iterator.next();
+            if (o instanceof Named) {
+                testArguments.add((Named<?>) o);
+            } else {
+                testArguments.add(Named.of(String.valueOf(index), o));
+            }
+            index++;
         }
 
         return testArguments;

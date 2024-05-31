@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.ExtensionManager;
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestArgumentFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
@@ -57,7 +57,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
     private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
     private final Class<?> testClass;
-    private final Argument testArgument;
+    private final Named<?> testArgument;
     private final List<Method> beforeEachMethods;
     private final Method testMethod;
     private final List<Method> afterEachMethods;
@@ -192,7 +192,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                             new TestArgumentFailedException(
                                     format(
                                             "Exception testing test argument name [%s]",
-                                            testArgument.name())));
+                                            testArgument.getName())));
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
             executionRequest
                     .getEngineExecutionListener()
@@ -339,7 +339,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
     public static class Builder {
 
         private Class<?> testClass;
-        private Argument testArgument;
+        private Named<?> testArgument;
         private Method testMethod;
 
         private UniqueId uniqueId;
@@ -365,7 +365,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
          * @param testArgument testArgument
          * @return this
          */
-        public Builder setTestArgument(int testArgumentIndex, Argument testArgument) {
+        public Builder setTestArgument(int testArgumentIndex, Named<?> testArgument) {
             this.testArgument = testArgument;
             return this;
         }

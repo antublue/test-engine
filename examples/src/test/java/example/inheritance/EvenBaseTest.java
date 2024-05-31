@@ -18,16 +18,16 @@ package example.inheritance;
 
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 public abstract class EvenBaseTest extends BaseTest {
 
     @TestEngine.ArgumentSupplier
-    protected static Stream<IntegerArgument> arguments() {
+    protected static Stream<NamedInteger> arguments() {
         return BaseTest.arguments()
                 .filter(
                         argument -> {
-                            int value = argument.value();
+                            int value = argument.getPayload();
                             return (value % 2) == 0;
                         });
     }

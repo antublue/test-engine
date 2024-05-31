@@ -113,24 +113,26 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 - Abstract test classes are not executed.
 
-### What is an `Argument`?
+### What is an `Named`?
 
-`Argument` is an interface all argument objects must implement to provide a name.
+`Named` is an interface all argument objects must implement to provide a name.
 
 There are standard argument implementations for common Java data types:
 
--  `BooleanArgument`
--  `ByteArgument`
--  `CharArgument`
--  `ShortArgument`
--  `IntegerArgument`
--  `LongArgument`
--  `BigIntegerArgument`
--  `FloatArgument`
--  `DoubleArgument`
--  `BigDecimalArgument`
--  `StringArgument`
--  `GenericArgument`
+- `NamedBigDecimal`
+- `NamedBigInteger`
+- `NamedBoolean`
+- `NamedByte`
+- `NamedChar`
+- `NamedInteger` 
+- `NamedShort`
+- `NamedChar`
+- `NamedDouble`
+- `NamedFloat`
+- `NamedInteger`
+- `NamedLong`
+- `NamedShort`
+- `NamedString`
 
 ### `Context`
 

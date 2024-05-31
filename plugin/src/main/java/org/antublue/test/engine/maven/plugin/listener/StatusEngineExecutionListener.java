@@ -19,7 +19,7 @@ package org.antublue.test.engine.maven.plugin.listener;
 import java.lang.reflect.Method;
 import org.antublue.test.engine.Configuration;
 import org.antublue.test.engine.Constants;
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.MetadataSupport;
@@ -186,7 +186,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
             Metadata metadata = metadataSupport.getMetadata();
             Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
-            Argument testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
+            Named<?> testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
             Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
 
             AnsiColorStringBuilder ansiColorStringBuilder =
@@ -199,7 +199,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                             .color(AnsiColor.TEXT_RESET);
 
             if (testArgument != null) {
-                ansiColorStringBuilder.append(" | ").append(testArgument.name());
+                ansiColorStringBuilder.append(" | ").append(testArgument.getName());
             }
 
             if (testClass != null) {
@@ -223,7 +223,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
             Metadata metadata = metadataSupport.getMetadata();
             Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
-            Argument testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
+            Named<?> testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
             Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
             Long elapsedTime = metadata.get(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
 
@@ -238,7 +238,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             ansiColorStringBuilder.append(SKIP).color(AnsiColor.TEXT_RESET);
 
             if (testArgument != null) {
-                ansiColorStringBuilder.append(" | ").append(testArgument.name());
+                ansiColorStringBuilder.append(" | ").append(testArgument.getName());
             }
 
             if (testClass != null) {
@@ -271,7 +271,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
             Metadata metadata = metadataSupport.getMetadata();
             Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
-            Argument testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
+            Named<?> testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
             Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
             Long elapsedTime = metadata.get(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
             String testDescriptorStatus = metadata.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
@@ -309,7 +309,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
 
             if (testArgument != null) {
-                ansiColorStringBuilder.append(" | ").append(testArgument.name());
+                ansiColorStringBuilder.append(" | ").append(testArgument.getName());
             }
 
             if (testClass != null) {

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 public class LifecycleTest implements Validation {
@@ -51,13 +51,13 @@ public class LifecycleTest implements Validation {
         EXPECTED.add("conclude()");
     }
 
-    @TestEngine.Argument protected StringArgument stringArgument;
+    @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
-        Collection<StringArgument> collection = new ArrayList<>();
+    public static Stream<NamedString> arguments() {
+        Collection<NamedString> collection = new ArrayList<>();
         for (int i = 0; i < 1; i++) {
-            collection.add(StringArgument.of(String.valueOf(i)));
+            collection.add(NamedString.of(String.valueOf(i)));
         }
         return collection.stream();
     }
@@ -72,7 +72,7 @@ public class LifecycleTest implements Validation {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        assertThat(stringArgument).isNull();
+        assertThat(argument).isNull();
         ACTUAL.add("prepare()");
     }
 
@@ -80,59 +80,59 @@ public class LifecycleTest implements Validation {
     @TestEngine.Order(order = 0)
     public void prepare2() {
         System.out.println("prepare2()");
-        assertThat(stringArgument).isNull();
+        assertThat(argument).isNull();
         ACTUAL.add("prepare2()");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        ACTUAL.add("beforeAll(" + stringArgument + ")");
+        ACTUAL.add("beforeAll(" + argument + ")");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
-        ACTUAL.add("beforeEach(" + stringArgument + ")");
+        ACTUAL.add("beforeEach(" + argument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 1)
     public void test1() {
-        System.out.println("test1(" + stringArgument + ")");
-        ACTUAL.add("test1(" + stringArgument + ")");
+        System.out.println("test1(" + argument + ")");
+        ACTUAL.add("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 0)
     public void test2() {
-        System.out.println("test2(" + stringArgument + ")");
-        ACTUAL.add("test2(" + stringArgument + ")");
+        System.out.println("test2(" + argument + ")");
+        ACTUAL.add("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
-        ACTUAL.add("afterEach(" + stringArgument + ")");
+        ACTUAL.add("afterEach(" + argument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
-        ACTUAL.add("afterAll(" + stringArgument + ")");
+        ACTUAL.add("afterAll(" + argument + ")");
     }
 
     @TestEngine.AfterAll
     @TestEngine.Order(order = 0)
     public void afterAll2() {
         System.out.println("afterAll2()");
-        ACTUAL.add("afterAll2(" + stringArgument + ")");
+        ACTUAL.add("afterAll2(" + argument + ")");
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        assertThat(stringArgument).isNull();
+        assertThat(argument).isNull();
         ACTUAL.add("conclude()");
     }
 

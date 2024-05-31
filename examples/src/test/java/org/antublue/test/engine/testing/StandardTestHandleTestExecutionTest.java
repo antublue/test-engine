@@ -19,8 +19,8 @@ package org.antublue.test.engine.testing;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 
 @TestEngine.Disabled
@@ -41,10 +41,7 @@ public class StandardTestHandleTestExecutionTest {
     public static class HandleTestExecutionTestExtension implements Extension {
 
         public void handleTestException(
-                Object testInstance,
-                Argument testArgument,
-                Method testMethod,
-                Throwable throwable) {
+                Object testInstance, Named testArgument, Method testMethod, Throwable throwable) {
             // Suppress the exception
         }
     }

@@ -23,8 +23,8 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.GenericArgument;
 
 /**
  * Example test
@@ -37,28 +37,28 @@ public class CamelCaseFunctionTest {
 
     private InputOutputArgument inputOutputArgument;
 
-    @TestEngine.Argument protected GenericArgument<InputOutputArgument> GenericArgument;
+    @TestEngine.Argument protected Named<InputOutputArgument> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<GenericArgument<InputOutputArgument>> arguments() {
-        Collection<GenericArgument<InputOutputArgument>> collection = new ArrayList<>();
+    public static Stream<Named<InputOutputArgument>> arguments() {
+        Collection<Named<InputOutputArgument>> collection = new ArrayList<>();
 
         InputOutputArgument inputOutputArgument =
                 new InputOutputArgument(
                         "THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
 
-        collection.add(new GenericArgument<>(inputOutputArgument.input, inputOutputArgument));
+        collection.add(Named.of(inputOutputArgument.input, inputOutputArgument));
 
         inputOutputArgument =
                 new InputOutputArgument(
                         "THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
-        collection.add(new GenericArgument<>(inputOutputArgument.input, inputOutputArgument));
+        collection.add(Named.of(inputOutputArgument.input, inputOutputArgument));
 
         inputOutputArgument = new InputOutputArgument("THIS", "this");
-        collection.add(new GenericArgument<>(inputOutputArgument.input, inputOutputArgument));
+        collection.add(Named.of(inputOutputArgument.input, inputOutputArgument));
 
         inputOutputArgument = new InputOutputArgument("tHis", "this");
-        collection.add(new GenericArgument<>(inputOutputArgument.input, inputOutputArgument));
+        collection.add(Named.of(inputOutputArgument.input, inputOutputArgument));
 
         return collection.stream();
     }
@@ -66,12 +66,13 @@ public class CamelCaseFunctionTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        inputOutputArgument = GenericArgument.value();
+        inputOutputArgument = argument.getPayload();
     }
 
     @TestEngine.Test
     public void test() {
         String actual = FUNCTION.apply(inputOutputArgument.input);
+
         System.out.println(
                 "test() input ["
                         + inputOutputArgument.input
@@ -80,6 +81,7 @@ public class CamelCaseFunctionTest {
                         + "] actual ["
                         + actual
                         + "]");
+
         assertThat(actual).isEqualTo(inputOutputArgument.expected);
     }
 

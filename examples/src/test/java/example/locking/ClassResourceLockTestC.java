@@ -20,26 +20,25 @@ import static java.lang.String.format;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 @TestEngine.ResourceLock(name = "ClassResourceLockTest")
 public class ClassResourceLockTestC {
 
-    @TestEngine.Argument private Argument argument;
+    @TestEngine.Argument private NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Iterable<Argument> arguments() {
-        Collection<Argument> collection = new ArrayList<>();
-        collection.add(StringArgument.of("foo"));
+    public static Iterable<NamedString> arguments() {
+        Collection<NamedString> collection = new ArrayList<>();
+        collection.add(NamedString.of("foo"));
         return collection;
     }
 
     @TestEngine.Test
     public void test() throws InterruptedException {
         System.out.println(
-                format("test() class [%s] testing [%s]", getClass().getName(), argument.name()));
+                format("test() class [%s] testing [%s]", getClass().getName(), argument.getName()));
         Thread.sleep(5000);
     }
 }

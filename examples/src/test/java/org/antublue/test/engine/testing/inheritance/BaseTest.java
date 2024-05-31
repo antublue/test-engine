@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 public abstract class BaseTest {
 
@@ -57,10 +57,10 @@ public abstract class BaseTest {
         EXPECTED.add("b/conclude()");
     }
 
-    public static Stream<IntegerArgument> arguments() {
-        Collection<IntegerArgument> collection = new ArrayList<>();
+    public static Stream<NamedInteger> arguments() {
+        Collection<NamedInteger> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(IntegerArgument.of(i));
+            collection.add(NamedInteger.of(i));
         }
         return collection.stream();
     }
@@ -78,38 +78,38 @@ public abstract class BaseTest {
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(IntegerArgument integerArgument) {
-        System.out.println("b/beforeAll(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("b/beforeAll(" + integerArgument + ")");
+    public void beforeAll(NamedInteger argument) {
+        System.out.println("b/beforeAll(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("b/beforeAll(" + argument + ")");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach(IntegerArgument integerArgument) {
-        System.out.println("b/beforeEach(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("b/beforeEach(" + integerArgument + ")");
+    public void beforeEach(NamedInteger argument) {
+        System.out.println("b/beforeEach(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("b/beforeEach(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void testA(IntegerArgument integerArgument) {
-        System.out.println("b/testA(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("b/testA(" + integerArgument + ")");
+    public void testA(NamedInteger argument) {
+        System.out.println("b/testA(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("b/testA(" + argument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach(IntegerArgument integerArgument) {
-        System.out.println("b/afterEach(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("b/afterEach(" + integerArgument + ")");
+    public void afterEach(NamedInteger argument) {
+        System.out.println("b/afterEach(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("b/afterEach(" + argument + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(IntegerArgument integerArgument) {
-        System.out.println("b/afterAll(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("b/afterAll(" + integerArgument + ")");
+    public void afterAll(NamedInteger argument) {
+        System.out.println("b/afterAll(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("b/afterAll(" + argument + ")");
     }
 
     @TestEngine.Conclude

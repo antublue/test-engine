@@ -20,7 +20,7 @@ import static java.lang.String.format;
 
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 @TestEngine.Disabled
@@ -31,12 +31,12 @@ public class StackTracePruningTest {
     private static final Object[] NO_OBJECT_ARGS = (Object[]) null;
 
     // The stringArgument is required by the test engine, but is not actually used in test methods
-    @TestEngine.Argument protected StringArgument stringArgument;
+    @TestEngine.Argument protected NamedString argument;
 
     // The stringArgument provides a node in the hierarchy, but is not actually used in test methods
     @TestEngine.ArgumentSupplier
-    protected static Stream<StringArgument> arguments() {
-        return Stream.of(StringArgument.of("----"));
+    protected static Stream<NamedString> arguments() {
+        return Stream.of(NamedString.of("----"));
     }
 
     @TestEngine.Test

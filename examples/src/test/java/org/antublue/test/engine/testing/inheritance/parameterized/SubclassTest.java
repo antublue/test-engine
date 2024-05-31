@@ -39,49 +39,49 @@ public class SubclassTest extends BaseTest implements Validation {
     @TestEngine.Prepare
     public void prepare2() {
         System.out.println("prepare2()");
-        assertThat(integerArgument).isNull();
+        assertThat(argument).isNull();
         actual.add("prepare2()");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll2() {
-        System.out.println("beforeAll2(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("beforeAll2(" + integerArgument + ")");
+        System.out.println("beforeAll2(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("beforeAll2(" + argument + ")");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach2() {
-        System.out.println("beforeEach2(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("beforeEach2(" + integerArgument + ")");
+        System.out.println("beforeEach2(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("beforeEach2(" + argument + ")");
     }
 
     @TestEngine.Test
     public void testB() {
-        System.out.println("testB(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("testB(" + integerArgument + ")");
+        System.out.println("testB(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("testB(" + argument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach2() {
-        System.out.println("afterEach2(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("afterEach2(" + integerArgument + ")");
+        System.out.println("afterEach2(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("afterEach2(" + argument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll2() {
-        System.out.println("afterAll2(" + integerArgument + ")");
-        assertThat(integerArgument).isNotNull();
-        actual.add("afterAll2(" + integerArgument + ")");
+        System.out.println("afterAll2(" + argument + ")");
+        assertThat(argument).isNotNull();
+        actual.add("afterAll2(" + argument + ")");
     }
 
     @TestEngine.Conclude
     public void conclude2() {
         System.out.println("conclude2()");
-        assertThat(integerArgument).isNull();
+        assertThat(argument).isNull();
         actual.add("conclude2()");
     }
 

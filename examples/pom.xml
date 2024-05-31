@@ -114,7 +114,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>10.16.0</version>
+                        <version>10.17.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -142,10 +142,6 @@
                             <style>AOSP</style>
                             <reflowLongStrings>true</reflowLongStrings>
                         </googleJavaFormat>
-                        <excludes>
-                            <!-- List files or directories to exclude -->
-                            <exclude>**/KafkaContainer.java</exclude>
-                        </excludes>
                     </java>
                 </configuration>
                 <executions>
@@ -174,12 +170,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.antublue</groupId>
-            <artifactId>test-engine-extras</artifactId>
-            <version>7.x.x-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.10.2</version>
@@ -194,7 +184,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.25.3</version>
+            <version>3.26.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -213,6 +203,18 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>3.7.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mongodb</artifactId>
+            <version>1.19.8</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>5.1.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

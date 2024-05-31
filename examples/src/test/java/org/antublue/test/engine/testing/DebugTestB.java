@@ -21,17 +21,17 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 /** Test used for debugging IntelliJ */
 @TestEngine.Disabled
 public class DebugTestB {
 
-    @TestEngine.Argument public StringArgument stringArgument;
+    @TestEngine.Argument public NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
-        return Stream.of(StringArgument.of("a"), StringArgument.of("b"), StringArgument.of("c"));
+    public static Stream<NamedString> arguments() {
+        return Stream.of(NamedString.of("a"), NamedString.of("b"), NamedString.of("c"));
     }
 
     @TestEngine.BeforeAll
@@ -46,15 +46,15 @@ public class DebugTestB {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument + ")");
-        assertThat(stringArgument.value().getClass()).isEqualTo(String.class);
+        System.out.println("test1(" + argument + ")");
+        assertThat(argument.getPayload().getClass()).isEqualTo(String.class);
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument + ")");
-        assertThat(stringArgument.value().getClass()).isEqualTo(String.class);
-        if (stringArgument.value().equals("b")) {
+        System.out.println("test2(" + argument + ")");
+        assertThat(argument.getPayload().getClass()).isEqualTo(String.class);
+        if (argument.getPayload().equals("b")) {
             fail("FORCED");
         }
     }

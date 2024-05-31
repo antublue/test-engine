@@ -261,7 +261,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>10.16.0</version>
+                        <version>10.17.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -297,6 +297,10 @@
                             <style>AOSP</style>
                             <reflowLongStrings>true</reflowLongStrings>
                         </googleJavaFormat>
+                        <excludes>
+                            <!-- List files or directories to exclude -->
+                            <exclude>**/Named.java</exclude>
+                        </excludes>
                     </java>
                 </configuration>
                 <executions>

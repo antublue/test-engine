@@ -22,18 +22,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 @TestEngine.Order(order = 4)
 public class ConcreteOrderTest2 extends BaseOrderTest {
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
-        Collection<StringArgument> collection = new ArrayList<>();
+    public static Stream<NamedString> arguments() {
+        Collection<NamedString> collection = new ArrayList<>();
         for (int i = 0; i < 1; i++) {
             int value = i * 3;
-            collection.add(StringArgument.of(String.valueOf(value)));
+            collection.add(NamedString.of(String.valueOf(value)));
         }
         return collection.stream();
     }
@@ -54,18 +54,18 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
 
     @TestEngine.Test
     public void testA() {
-        System.out.println("ConcreteOrderTest.testA(" + stringArgument + ")");
+        System.out.println("ConcreteOrderTest.testA(" + argument + ")");
     }
 
     @TestEngine.Test
     public void testB() {
-        System.out.println("ConcreteOrderTest.testB(" + stringArgument + ")");
+        System.out.println("ConcreteOrderTest.testB(" + argument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 2)
     public void test3() {
-        System.out.println("ConcreteOrderTest.test3(" + stringArgument + ")");
+        System.out.println("ConcreteOrderTest.test3(" + argument + ")");
     }
 
     @TestEngine.AfterAll
@@ -79,7 +79,7 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
     @TestEngine.Order(order = 1)
     public void conclude2() {
         System.out.println("ConcreteOrderTest.conclude2()");
-        assertThat(stringArgument).isNull();
+        assertThat(argument).isNull();
         actual.add("ConcreteOrderTest.conclude2()");
     }
 }

@@ -19,22 +19,22 @@ package example;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.GenericArgument;
 
 /** Example test */
 public class ProtectedMethodsArrayTest {
 
     private String[] values;
 
-    @TestEngine.Argument protected GenericArgument<String[]> GenericArgument;
+    @TestEngine.Argument protected Named<String[]> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<GenericArgument<String[]>> arguments() {
-        Collection<GenericArgument<String[]>> collection = new ArrayList<>();
+    public static Stream<Named<String[]>> arguments() {
+        Collection<Named<String[]>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             collection.add(
-                    new GenericArgument<>(
+                    Named.of(
                             "Array [" + i + "]",
                             new String[] {String.valueOf(i), String.valueOf(i * 2)}));
         }
@@ -44,7 +44,7 @@ public class ProtectedMethodsArrayTest {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        values = GenericArgument.value();
+        values = argument.getPayload();
     }
 
     @TestEngine.BeforeEach

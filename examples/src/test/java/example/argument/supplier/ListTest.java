@@ -19,19 +19,19 @@ package example.argument.supplier;
 import java.util.ArrayList;
 import java.util.List;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 /** Example test */
 public class ListTest {
 
-    @TestEngine.Argument protected IntegerArgument integerArgument;
+    @TestEngine.Argument protected NamedInteger argument;
 
     @TestEngine.ArgumentSupplier
-    public static List<IntegerArgument> arguments() {
-        ArrayList<IntegerArgument> arguments = new ArrayList<>();
-        arguments.add(IntegerArgument.of(1));
-        arguments.add(IntegerArgument.of(2));
-        arguments.add(IntegerArgument.of(3));
+    public static List<NamedInteger> arguments() {
+        ArrayList<NamedInteger> arguments = new ArrayList<>();
+        arguments.add(NamedInteger.of(1));
+        arguments.add(NamedInteger.of(2));
+        arguments.add(NamedInteger.of(3));
         return arguments;
     }
 
@@ -47,12 +47,12 @@ public class ListTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + integerArgument + ")");
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument + ")");
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach

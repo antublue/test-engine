@@ -20,8 +20,8 @@ import static java.lang.String.format;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
-import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.internal.util.StandardStreams;
 
 public class SystemOutExtension implements Extension {
@@ -45,7 +45,7 @@ public class SystemOutExtension implements Extension {
     }
 
     @Override
-    public void preBeforeAllMethodsCallback(Object testInstance, Argument testArgument) {
+    public void preBeforeAllMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format(
                         "preBeforeAllMethodsCallback(class [%s])",
@@ -53,13 +53,13 @@ public class SystemOutExtension implements Extension {
     }
 
     @Override
-    public void postBeforeAllMethodsCallback(Object testInstance, Argument testArgument) {
+    public void postBeforeAllMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format("postBeforeAllCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
-    public void preBeforeEachMethodsCallback(Object testInstance, Argument testArgument) {
+    public void preBeforeEachMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format(
                         "preBeforeEachMethodsCallback(class [%s])",
@@ -67,7 +67,7 @@ public class SystemOutExtension implements Extension {
     }
 
     @Override
-    public void postBeforeEachMethodsCallback(Object testInstance, Argument testArgument) {
+    public void postBeforeEachMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format(
                         "postBeforeEachMethodsCallback(class [%s])",
@@ -75,19 +75,19 @@ public class SystemOutExtension implements Extension {
     }
 
     @Override
-    public void preTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
+    public void preTestMethodsCallback(Method method, Object testInstance, Named testArgument) {
         System.out.println(
                 format("preTestCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
-    public void postTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
+    public void postTestMethodsCallback(Method method, Object testInstance, Named testArgument) {
         System.out.println(
                 format("postTestMethodsCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
-    public void preAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
+    public void preAfterEachMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format(
                         "preAfterEachMethodsCallback(class [%s])",
@@ -95,13 +95,13 @@ public class SystemOutExtension implements Extension {
     }
 
     @Override
-    public void postAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
+    public void postAfterEachMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format("postAfterEachCallback(class [%s])", testInstance.getClass().getName()));
     }
 
     @Override
-    public void preAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
+    public void preAfterAllMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format(
                         "preAfterAllMethodsCallback(class [%s])",
@@ -109,7 +109,7 @@ public class SystemOutExtension implements Extension {
     }
 
     @Override
-    public void postAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
+    public void postAfterAllMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format("postAfterAllCallback(class [%s])", testInstance.getClass().getName()));
     }

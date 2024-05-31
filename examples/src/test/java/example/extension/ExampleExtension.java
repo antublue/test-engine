@@ -20,8 +20,8 @@ import static java.lang.String.format;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
-import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.Named;
 
 /** Example Extension */
 public class ExampleExtension implements Extension {
@@ -43,7 +43,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void postBeforeAllMethodsCallback(Object testInstance, Argument testArgument) {
+    public void postBeforeAllMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format(
                         "%s postBeforeAllCallback(class [%s])",
@@ -51,7 +51,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void postBeforeEachMethodsCallback(Object testInstance, Argument testArgument) {
+    public void postBeforeEachMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format(
                         "%s postBeforeEachMethodsCallback(class [%s])",
@@ -59,7 +59,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void preTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
+    public void preTestMethodsCallback(Method method, Object testInstance, Named testArgument) {
         System.out.println(
                 format(
                         "%s preTestCallback(class [%s])",
@@ -67,7 +67,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void postTestMethodsCallback(Method method, Object testInstance, Argument testArgument) {
+    public void postTestMethodsCallback(Method method, Object testInstance, Named testArgument) {
         System.out.println(
                 format(
                         "%s postTestMethodsCallback(class [%s])",
@@ -75,7 +75,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void postAfterEachMethodsCallback(Object testInstance, Argument testArgument) {
+    public void postAfterEachMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format(
                         "%s postAfterEachCallback(class [%s])",
@@ -83,7 +83,7 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void postAfterAllMethodsCallback(Object testInstance, Argument testArgument) {
+    public void postAfterAllMethodsCallback(Object testInstance, Named testArgument) {
         System.out.println(
                 format(
                         "%s postAfterAllCallback(class [%s])",

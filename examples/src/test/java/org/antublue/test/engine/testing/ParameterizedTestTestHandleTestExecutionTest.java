@@ -21,19 +21,19 @@ import static java.lang.String.format;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 @TestEngine.Disabled
 public class ParameterizedTestTestHandleTestExecutionTest {
 
     @TestEngine.ArgumentSupplier
-    public static List<Argument> arguments() {
-        List<Argument> list = new ArrayList<>();
+    public static List<NamedString> arguments() {
+        List<NamedString> list = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            list.add(StringArgument.of("StringArgument " + i));
+            list.add(NamedString.of("StringArgument " + i));
         }
         return list;
     }
@@ -46,31 +46,31 @@ public class ParameterizedTestTestHandleTestExecutionTest {
     }
 
     @TestEngine.Test
-    public void test1(StringArgument stringArgument) {
-        if (stringArgument.name().contains("0")) {
+    public void test1(NamedString argument) {
+        if (argument.getName().contains("0")) {
             throw new RuntimeException("Forced exception");
         }
-        System.out.println(format("test1(" + stringArgument + ")"));
+        System.out.println(format("test1(" + argument + ")"));
     }
 
     @TestEngine.Test
-    public void test2(StringArgument stringArgument) {
-        if (stringArgument.name().contains("1")) {
+    public void test2(NamedString argument) {
+        if (argument.getName().contains("1")) {
             throw new RuntimeException("Forced exception");
         }
-        System.out.println(format("test2(" + stringArgument + ")"));
+        System.out.println(format("test2(" + argument + ")"));
     }
 
     public static class HandleTestExecutionTestExtension implements Extension {
 
         public void handleTestException(
-                Object testInstance, Argument testArgument, Method testMethod, Throwable throwable)
+                Object testInstance, Named testArgument, Method testMethod, Throwable throwable)
                 throws Throwable {
             System.out.println(
                     format(
                             "Exception in testMethod [%s] for testArgument [%s]",
                             testMethod.getName(), testArgument));
-            if (testArgument.name().contains("1")) {
+            if (testArgument.getName().contains("1")) {
                 throw throwable;
             }
         }

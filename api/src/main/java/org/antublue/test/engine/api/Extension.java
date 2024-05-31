@@ -30,7 +30,7 @@ public interface Extension {
      * @param testArguments testArguments
      * @throws Throwable Throwable
      */
-    default void postTestArgumentDiscoveryCallback(Class<?> testClass, List<Argument> testArguments)
+    default void postTestArgumentDiscoveryCallback(Class<?> testClass, List<Named<?>> testArguments)
             throws Throwable {
         // DO NOTHING
     }
@@ -94,7 +94,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void preBeforeAllMethodsCallback(Object testInstance, Argument testArgument)
+    default void preBeforeAllMethodsCallback(Object testInstance, Named<?> testArgument)
             throws Throwable {
         // DO NOTHING
     }
@@ -106,7 +106,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void postBeforeAllMethodsCallback(Object testInstance, Argument testArgument)
+    default void postBeforeAllMethodsCallback(Object testInstance, Named<?> testArgument)
             throws Throwable {
         // DO NOTHING
     }
@@ -118,7 +118,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void preBeforeEachMethodsCallback(Object testInstance, Argument testArgument)
+    default void preBeforeEachMethodsCallback(Object testInstance, Named<?> testArgument)
             throws Throwable {
         // DO NOTHING
     }
@@ -130,7 +130,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void postBeforeEachMethodsCallback(Object testInstance, Argument testArgument)
+    default void postBeforeEachMethodsCallback(Object testInstance, Named<?> testArgument)
             throws Throwable {
         // DO NOTHING
     }
@@ -144,7 +144,7 @@ public interface Extension {
      * @throws Throwable Throwable
      */
     default void preTestMethodsCallback(
-            Method testMethod, Object testInstance, Argument testArgument) throws Throwable {
+            Method testMethod, Object testInstance, Named<?> testArgument) throws Throwable {
         // DO NOTHING
     }
 
@@ -157,7 +157,7 @@ public interface Extension {
      * @throws Throwable Throwable
      */
     default void postTestMethodsCallback(
-            Method testMethod, Object testInstance, Argument testArgument) throws Throwable {
+            Method testMethod, Object testInstance, Named<?> testArgument) throws Throwable {
         // DO NOTHING
     }
 
@@ -168,7 +168,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void preAfterEachMethodsCallback(Object testInstance, Argument testArgument)
+    default void preAfterEachMethodsCallback(Object testInstance, Named<?> testArgument)
             throws Throwable {
         // DO NOTHING
     }
@@ -180,7 +180,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void postAfterEachMethodsCallback(Object testInstance, Argument testArgument)
+    default void postAfterEachMethodsCallback(Object testInstance, Named<?> testArgument)
             throws Throwable {
         // DO NOTHING
     }
@@ -192,7 +192,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void preAfterAllMethodsCallback(Object testInstance, Argument testArgument)
+    default void preAfterAllMethodsCallback(Object testInstance, Named<?> testArgument)
             throws Throwable {
         // DO NOTHING
     }
@@ -204,7 +204,7 @@ public interface Extension {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    default void postAfterAllMethodsCallback(Object testInstance, Argument testArgument)
+    default void postAfterAllMethodsCallback(Object testInstance, Named<?> testArgument)
             throws Throwable {
         // DO NOTHING
     }

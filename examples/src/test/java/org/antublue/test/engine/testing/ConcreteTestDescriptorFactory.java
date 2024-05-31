@@ -19,40 +19,40 @@ package org.antublue.test.engine.testing;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 public class ConcreteTestDescriptorFactory {
 
-    @TestEngine.Argument private IntegerArgument integerArgument;
+    @TestEngine.Argument private NamedInteger argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument> arguments() {
-        List<Argument> arguments = new ArrayList<>();
+    public static Stream<Named<?>> arguments() {
+        List<Named<?>> arguments = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            arguments.add(IntegerArgument.of(i));
+            arguments.add(NamedInteger.of(i));
         }
         return arguments.stream();
     }
 
     @TestEngine.Test
     public void test0() {
-        System.out.println("test0(" + integerArgument + ")");
+        System.out.println("test0(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void test1(IntegerArgument integerArgument) {
-        System.out.println("test1(" + integerArgument + ")");
+    public void test1(NamedInteger argument) {
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void test2(IntegerArgument integerArgument) {
-        System.out.println("test2(" + integerArgument + ")");
+    public void test2(NamedInteger argument) {
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void test3(IntegerArgument integerArgument) {
-        System.out.println("test3(" + integerArgument + ")");
+    public void test3(NamedInteger argument) {
+        System.out.println("test3(" + argument + ")");
     }
 }

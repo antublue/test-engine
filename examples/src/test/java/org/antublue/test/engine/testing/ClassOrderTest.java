@@ -20,52 +20,52 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 @TestEngine.Order(order = 0)
 public class ClassOrderTest {
 
-    public static Stream<StringArgument> arguments() {
+    public static Stream<NamedString> arguments() {
         return StringArgumentSupplier.arguments();
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(StringArgument stringArgument) {
+    public void beforeAll(NamedString argument) {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach(StringArgument stringArgument) {
+    public void beforeEach(NamedString argument) {
         System.out.println("beforeEach()");
     }
 
     @TestEngine.Test
-    public void test1(StringArgument stringArgument) {
-        System.out.println("test1(" + stringArgument + ")");
+    public void test1(NamedString argument) {
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void test2(StringArgument stringArgument) {
-        System.out.println("test2(" + stringArgument + ")");
+    public void test2(NamedString argument) {
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach(StringArgument stringArgument) {
+    public void afterEach(NamedString argument) {
         System.out.println("afterEach()");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(StringArgument stringArgument) {
+    public void afterAll(NamedString argument) {
         System.out.println("afterAll()");
     }
 
     private static class StringArgumentSupplier {
 
-        public static Stream<StringArgument> arguments() {
-            Collection<StringArgument> collection = new ArrayList<>();
+        public static Stream<NamedString> arguments() {
+            Collection<NamedString> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(StringArgument.of(String.valueOf(i)));
+                collection.add(NamedString.of(String.valueOf(i)));
             }
             return collection.stream();
         }

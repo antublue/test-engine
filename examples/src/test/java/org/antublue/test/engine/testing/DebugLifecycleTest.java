@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 public class DebugLifecycleTest {
@@ -30,13 +30,13 @@ public class DebugLifecycleTest {
     // Set exceptionIn to match the method name to simulate an exception
     private static final String exceptionIn = "";
 
-    @TestEngine.Argument protected StringArgument stringArgument;
+    @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
-        Collection<StringArgument> collection = new ArrayList<>();
+    public static Stream<NamedString> arguments() {
+        Collection<NamedString> collection = new ArrayList<>();
         for (int i = 0; i < 1; i++) {
-            collection.add(StringArgument.of("StringArgument " + i));
+            collection.add(NamedString.of("StringArgument " + i));
         }
         return collection.stream();
     }
@@ -44,7 +44,7 @@ public class DebugLifecycleTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        assertThat(stringArgument).isNull();
+        assertThat(argument).isNull();
         if ("prepare()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in prepare()");
         }
@@ -52,8 +52,8 @@ public class DebugLifecycleTest {
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll(" + stringArgument + ")");
-        assertThat(stringArgument).isNotNull();
+        System.out.println("beforeAll(" + argument + ")");
+        assertThat(argument).isNotNull();
         if ("beforeAll()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in beforeAll()");
         }
@@ -61,8 +61,8 @@ public class DebugLifecycleTest {
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println("beforeEach(" + stringArgument + ")");
-        assertThat(stringArgument).isNotNull();
+        System.out.println("beforeEach(" + argument + ")");
+        assertThat(argument).isNotNull();
         if ("beforeEach()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in beforeEach()");
         }
@@ -70,8 +70,8 @@ public class DebugLifecycleTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument + ")");
-        assertThat(stringArgument).isNotNull();
+        System.out.println("test1(" + argument + ")");
+        assertThat(argument).isNotNull();
         if ("test1()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in test1()");
         }
@@ -79,8 +79,8 @@ public class DebugLifecycleTest {
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument + ")");
-        assertThat(stringArgument).isNotNull();
+        System.out.println("test2(" + argument + ")");
+        assertThat(argument).isNotNull();
         if ("test2()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in test2()");
         }
@@ -88,8 +88,8 @@ public class DebugLifecycleTest {
 
     @TestEngine.AfterEach
     public void afterEach() {
-        System.out.println("afterEach(" + stringArgument + ")");
-        assertThat(stringArgument).isNotNull();
+        System.out.println("afterEach(" + argument + ")");
+        assertThat(argument).isNotNull();
         if ("afterEach()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in afterEach()");
         }
@@ -97,8 +97,8 @@ public class DebugLifecycleTest {
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll(" + stringArgument + ")");
-        assertThat(stringArgument).isNotNull();
+        System.out.println("afterAll(" + argument + ")");
+        assertThat(argument).isNotNull();
         if ("afterAll()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in afterAll()");
         }
@@ -107,7 +107,7 @@ public class DebugLifecycleTest {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        assertThat(stringArgument).isNull();
+        assertThat(argument).isNull();
         if ("conclude()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in conclude()");
         }

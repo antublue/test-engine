@@ -20,17 +20,17 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
+import org.antublue.test.engine.api.support.NamedInteger;
 
 /** Test used for debugging IntelliJ */
 @TestEngine.Disabled
 public class DebugTestA {
 
-    @TestEngine.Argument public IntegerArgument integerArgument;
+    @TestEngine.Argument public NamedInteger argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<IntegerArgument> arguments() {
-        return Stream.of(IntegerArgument.of(1), IntegerArgument.of(2), IntegerArgument.of(3));
+    public static Stream<NamedInteger> arguments() {
+        return Stream.of(NamedInteger.of(1), NamedInteger.of(2), NamedInteger.of(3));
     }
 
     @TestEngine.BeforeAll
@@ -45,13 +45,13 @@ public class DebugTestA {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + integerArgument.value() + ")");
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + integerArgument.value() + ")");
-        if (integerArgument.value() == 1) {
+        System.out.println("test2(" + argument.getPayload() + ")");
+        if (argument.getPayload() == 1) {
             fail("FORCED");
         }
     }

@@ -154,7 +154,7 @@ public interface Context {
          *
          * <p>Locking of Objects in the Store is the responsibility of the calling code
          */
-        @SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock", "UnusedMethod"})
+        @SuppressWarnings({"PMD.EmptyCatchBlock", "UnusedMethod"})
         private static class StoreImpl implements Store {
 
             private final String namespace;

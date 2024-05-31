@@ -22,12 +22,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 public class RandomFieldTest {
 
-    @TestEngine.Argument protected StringArgument stringArgument;
+    @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.Random.Boolean protected boolean randomBoolean;
     @TestEngine.Random.Integer protected int randomInteger;
@@ -46,10 +46,10 @@ public class RandomFieldTest {
     protected BigDecimal randomBigDecimal;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<StringArgument> arguments() {
-        Collection<StringArgument> collection = new ArrayList<>();
+    public static Stream<NamedString> arguments() {
+        Collection<NamedString> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(StringArgument.of("StringArgument " + i));
+            collection.add(NamedString.of("StringArgument " + i));
         }
         return collection.stream();
     }
@@ -61,7 +61,7 @@ public class RandomFieldTest {
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll(" + stringArgument + ")");
+        System.out.println("beforeAll(" + argument + ")");
         System.out.println("randomBoolean [" + randomBoolean + "]");
         System.out.println("randomInteger [" + randomInteger + "]");
         System.out.println("randomLong [" + randomLong + "]");
@@ -73,27 +73,27 @@ public class RandomFieldTest {
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println("beforeEach(" + stringArgument + ")");
+        System.out.println("beforeEach(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + stringArgument + ")");
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + stringArgument + ")");
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
-        System.out.println("afterEach(" + stringArgument + ")");
+        System.out.println("afterEach(" + argument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll(" + stringArgument + ")");
+        System.out.println("afterAll(" + argument + ")");
     }
 
     @TestEngine.Conclude

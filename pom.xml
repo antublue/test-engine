@@ -69,7 +69,6 @@
         <module>api</module>
         <module>engine</module>
         <module>plugin</module>
-        <module>extras</module>
         <module>examples</module>
     </modules>
 

@@ -19,51 +19,48 @@ package example.inheritance;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.IntegerArgument;
 
 public class SubclassTest extends BaseTest {
-
-    @TestEngine.Argument protected IntegerArgument integerArgument2;
 
     @TestEngine.Prepare
     public void prepare2() {
         System.out.println("  prepare2()");
-        assertThat(integerArgument).isNull();
+        assertThat(argument).isNull();
     }
 
     @TestEngine.BeforeAll
     public void beforeAll2() {
         System.out.println("  beforeAll2()");
-        assertThat(integerArgument).isNotNull();
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.BeforeEach
     public void beforeEach2() {
         System.out.println("  beforeEach2()");
-        assertThat(integerArgument).isNotNull();
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
     public void testB() {
         System.out.println("  testB()");
-        assertThat(integerArgument).isNotNull();
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterEach
     public void afterEach2() {
         System.out.println("  afterEach2()");
-        assertThat(integerArgument).isNotNull();
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterAll
     public void afterAll2() {
         System.out.println("  afterAll2()");
-        assertThat(integerArgument).isNotNull();
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Conclude
     public void conclude2() {
         System.out.println("  conclude2()");
-        assertThat(integerArgument).isNull();
+        assertThat(argument).isNull();
     }
 }

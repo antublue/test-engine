@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.argument.StringArgument;
+import org.antublue.test.engine.api.support.NamedString;
 
 public abstract class BaseOrderTest {
 
@@ -38,7 +38,7 @@ public abstract class BaseOrderTest {
 
     protected final List<String> actual = new ArrayList<>();
 
-    @TestEngine.Argument protected StringArgument stringArgument;
+    @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 1)
@@ -57,7 +57,7 @@ public abstract class BaseOrderTest {
     @TestEngine.Test
     @TestEngine.Order(order = 1)
     public void test2() {
-        System.out.println("BaseOrderTest.test2(" + stringArgument + ")");
+        System.out.println("BaseOrderTest.test2(" + argument + ")");
     }
 
     @TestEngine.AfterAll
@@ -71,7 +71,7 @@ public abstract class BaseOrderTest {
     @TestEngine.Order(order = 2)
     public final void conclude() {
         System.out.println("BaseOrderTest.conclude()");
-        assertThat(stringArgument).isNull();
+        assertThat(argument).isNull();
         actual.add("BaseOrderTest.conclude()");
     }
 
