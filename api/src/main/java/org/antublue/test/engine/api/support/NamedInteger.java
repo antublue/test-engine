@@ -18,7 +18,7 @@ package org.antublue.test.engine.api.support;
 
 import java.util.Objects;
 
-/** Class to implement a BooleanArgument */
+/** Class to implement a NamedInteger */
 public class NamedInteger extends AbstractNamed<Integer> {
 
     private final String name;
@@ -36,7 +36,7 @@ public class NamedInteger extends AbstractNamed<Integer> {
     }
 
     /**
-     * Method to get the IntegerArgument name
+     * Method to get the NamedInteger name
      *
      * @return the return value
      */
@@ -46,7 +46,7 @@ public class NamedInteger extends AbstractNamed<Integer> {
     }
 
     /**
-     * Method to get the IntegerArgument value
+     * Method to get the NamedInteger value
      *
      * @return the return value
      */
@@ -73,7 +73,7 @@ public class NamedInteger extends AbstractNamed<Integer> {
     }
 
     /**
-     * Method to create a IntegerArgument
+     * Method to create a NamedInteger
      *
      * @param value value
      * @return the return value
