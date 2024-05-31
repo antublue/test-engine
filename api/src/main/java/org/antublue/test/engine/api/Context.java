@@ -18,11 +18,11 @@ package org.antublue.test.engine.api;
 
 import static java.lang.String.format;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -62,7 +62,7 @@ public interface Context {
         /** Constructor */
         private ContextImpl() {
             store = new StoreImpl(Store.GLOBAL);
-            namespacedStores = new HashMap<>();
+            namespacedStores = new ConcurrentHashMap<>();
         }
 
         /**
