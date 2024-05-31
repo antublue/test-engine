@@ -35,7 +35,7 @@ public class NamedComplexArgumentTest2 {
         for (int i = 0; i < 10; i++) {
             collection.add(
                     Named.of(
-                            "CustomArgument(" + i + ")",
+                            "ComplexArgument(" + i + ")",
                             ComplexArgument.of("FirstName" + i, "LastName" + i)));
         }
         return collection.stream();
