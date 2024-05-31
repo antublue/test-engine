@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Extension;
@@ -54,6 +55,7 @@ public class ExtensionManager {
     private final List<Extension> globalExtensionsReversed;
     private final Map<Class<?>, List<Extension>> testExtensionsMap;
     private final Map<Class<?>, List<Extension>> testExtensionsReversedMap;
+    private final ReentrantLock lock;
 
     private boolean initialized;
 
@@ -75,6 +77,7 @@ public class ExtensionManager {
         globalExtensionsReversed = new ArrayList<>();
         testExtensionsMap = new HashMap<>();
         testExtensionsReversedMap = new HashMap<>();
+        lock = new ReentrantLock(true);
     }
 
     /**
@@ -93,30 +96,34 @@ public class ExtensionManager {
      */
     private void initialize() throws Throwable {
         LOGGER.trace("initialize()");
-        synchronized (this) {
-            if (initialized) {
-                return;
-            }
-            Map<String, Extension> extensionMap = new LinkedHashMap<>();
-            Optional<String> optional = CONFIGURATION.get(Constants.EXTENSIONS);
-            if (optional.isPresent() && !optional.get().trim().isEmpty()) {
-                String[] classNames = optional.get().split("\\s+");
-                for (String className : classNames) {
-                    LOGGER.trace("loading extension [%s]", className);
-                    if (!extensionMap.containsKey(className)) {
-                        Class<?> clazz =
-                                Thread.currentThread().getContextClassLoader().loadClass(className);
-                        Object object = ReflectionUtils.newInstance(clazz);
-                        if (object instanceof Extension) {
-                            extensionMap.put(className, (Extension) object);
+        try {
+            lock.lock();
+            if (!initialized) {
+                Map<String, Extension> extensionMap = new LinkedHashMap<>();
+                Optional<String> optional = CONFIGURATION.get(Constants.EXTENSIONS);
+                if (optional.isPresent() && !optional.get().trim().isEmpty()) {
+                    String[] classNames = optional.get().split("\\s+");
+                    for (String className : classNames) {
+                        LOGGER.trace("loading extension [%s]", className);
+                        if (!extensionMap.containsKey(className)) {
+                            Class<?> clazz =
+                                    Thread.currentThread()
+                                            .getContextClassLoader()
+                                            .loadClass(className);
+                            Object object = ReflectionUtils.newInstance(clazz);
+                            if (object instanceof Extension) {
+                                extensionMap.put(className, (Extension) object);
+                            }
                         }
                     }
+                    globalExtensions.addAll(extensionMap.values());
+                    globalExtensionsReversed.addAll(globalExtensions);
+                    Collections.reverse(globalExtensionsReversed);
                 }
-                globalExtensions.addAll(extensionMap.values());
-                globalExtensionsReversed.addAll(globalExtensions);
-                Collections.reverse(globalExtensionsReversed);
+                initialized = true;
             }
-            initialized = true;
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -129,17 +136,16 @@ public class ExtensionManager {
         LOGGER.trace("initialize() test class [%s]", testClass.getName());
 
         try {
+            lock.lock();
             initialize();
-            synchronized (this) {
-                List<Extension> testExtensions = testExtensionsMap.get(testClass);
-                if (testExtensions == null) {
-                    testExtensions = new ArrayList<>(globalExtensions);
-                    testExtensions.addAll(buildTestExtensionList(testClass));
-                    List<Extension> testExtensionReversed = new ArrayList<>(testExtensions);
-                    Collections.reverse(testExtensionReversed);
-                    testExtensionsMap.put(testClass, testExtensions);
-                    testExtensionsReversedMap.put(testClass, testExtensionReversed);
-                }
+            List<Extension> testExtensions = testExtensionsMap.get(testClass);
+            if (testExtensions == null) {
+                testExtensions = new ArrayList<>(globalExtensions);
+                testExtensions.addAll(buildTestExtensionList(testClass));
+                List<Extension> testExtensionReversed = new ArrayList<>(testExtensions);
+                Collections.reverse(testExtensionReversed);
+                testExtensionsMap.put(testClass, testExtensions);
+                testExtensionsReversedMap.put(testClass, testExtensionReversed);
             }
         } catch (Throwable t) {
             throw new TestEngineException(
@@ -147,6 +153,8 @@ public class ExtensionManager {
                             "Exception initializing extensions for test class [%s]",
                             testClass.getName()),
                     t);
+        } finally {
+            lock.unlock();
         }
     }
 
