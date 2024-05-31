@@ -98,7 +98,7 @@ public class StoreExampleTest1 {
         }
 
         assertThat(store.keySet()).doesNotContain(HIDDEN_KEY);
-        assertThat(store.get(HIDDEN_KEY)).isNotNull();
+        assertThat(store.get(HIDDEN_KEY, Object.class)).isNotNull();
 
         Closeable closeable = (Closeable) store.remove(CLOSEABLE_KEY);
         closeable.close();
@@ -106,8 +106,8 @@ public class StoreExampleTest1 {
         AutoCloseable autoCloseable = (AutoCloseable) store.remove(AUTO_CLOSEABLE_KEY);
         autoCloseable.close();
 
-        assertThat(store.get(CLOSEABLE_KEY)).isNull();
-        assertThat(store.get(AUTO_CLOSEABLE_KEY)).isNull();
+        assertThat(store.get(CLOSEABLE_KEY, Object.class)).isNull();
+        assertThat(store.get(AUTO_CLOSEABLE_KEY, Object.class)).isNull();
     }
 
     private static class TestAutoCloseable implements AutoCloseable {

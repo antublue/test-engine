@@ -96,7 +96,7 @@ public class StoreExampleTest3 {
 
         store.remove(TEST_OBJECT_KEY);
 
-        assertThat(store.get(TEST_OBJECT_KEY)).isNull();
+        assertThat(store.get(TEST_OBJECT_KEY, Object.class)).isNull();
     }
 
     private static class TestObject {

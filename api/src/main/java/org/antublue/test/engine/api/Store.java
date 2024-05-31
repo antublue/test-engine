@@ -69,7 +69,7 @@ public interface Store {
      * @param value value
      * @return the existing value
      */
-    Object put(String key, Object value);
+    <T> T put(String key, Object value);
 
     /**
      * Method to put a value into the store. If a value doesn't exist, execute the function to
@@ -79,7 +79,7 @@ public interface Store {
      * @param function function
      * @return the existing value, if not found, the Object returned by the Function
      */
-    Object computeIfAbsent(String key, Function<String, Object> function);
+    <T> T computeIfAbsent(String key, Function<String, T> function);
 
     /**
      * Method to get a value from the store
@@ -88,7 +88,7 @@ public interface Store {
      * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't
      *     exist
      */
-    Object get(String key);
+    <T> T get(String key);
 
     /**
      * Method to get a value from the store, casting it to a specific type
@@ -108,7 +108,7 @@ public interface Store {
      * @return an Optional containing the existing Object, or an empty Optional if an Object doesn't
      *     exist
      */
-    Object remove(String key);
+    <T> T remove(String key);
 
     /**
      * Method to remove a value from the store

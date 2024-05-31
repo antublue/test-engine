@@ -97,8 +97,11 @@ public class StoreExampleTest6 {
                 (TestObject) Context.getInstance().getStore().remove(TEST_OBJECT_KEY);
         testObject.close();
 
-        assertThat(Context.getInstance().getStore().get(TEST_OBJECT_KEY)).isNull();
-        assertThat(Context.getInstance().getStore(StoreExampleTest6.class).get(TEST_OBJECT_KEY))
+        assertThat(Context.getInstance().getStore().get(TEST_OBJECT_KEY, Object.class)).isNull();
+        assertThat(
+                        Context.getInstance()
+                                .getStore(StoreExampleTest6.class)
+                                .get(TEST_OBJECT_KEY, Object.class))
                 .isNotNull();
 
         testObject =
@@ -108,7 +111,10 @@ public class StoreExampleTest6 {
                                 .remove(TEST_OBJECT_KEY);
         testObject.close();
 
-        assertThat(Context.getInstance().getStore(StoreExampleTest6.class).get(TEST_OBJECT_KEY))
+        assertThat(
+                        Context.getInstance()
+                                .getStore(StoreExampleTest6.class)
+                                .get(TEST_OBJECT_KEY, Object.class))
                 .isNull();
     }
 
