@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.Named;
 
@@ -199,11 +198,11 @@ public class ParameterizedTest1Extension implements Extension {
     }
 
     @Override
-    public void preDestroyCallback(Class<?> testClass, Optional<Object> optionalTestInstance) {
+    public void preDestroyCallback(Class<?> testClass, Object testInstance) {
         System.out.println(
                 format(
                         "%s preDestroyCallback(class [%s])",
                         this.getClass().getSimpleName(), testClass.getName()));
-        assertThat((((ParameterizedTest1) optionalTestInstance.get())).ACTUAL).isEqualTo(EXPECTED);
+        assertThat((((ParameterizedTest1) testInstance)).ACTUAL).isEqualTo(EXPECTED);
     }
 }

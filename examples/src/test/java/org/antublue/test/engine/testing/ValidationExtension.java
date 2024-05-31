@@ -16,15 +16,14 @@
 
 package org.antublue.test.engine.testing;
 
-import java.util.Optional;
 import org.antublue.test.engine.api.Extension;
 
 public class ValidationExtension implements Extension {
 
     @Override
-    public void preDestroyCallback(Class<?> testClass, Optional<Object> optionalTestInstance) {
+    public void preDestroyCallback(Class<?> testClass, Object testInstance) {
         try {
-            ((Validation) optionalTestInstance.get()).validate();
+            ((Validation) testInstance).validate();
         } catch (Throwable t) {
             t.printStackTrace(System.err);
         }

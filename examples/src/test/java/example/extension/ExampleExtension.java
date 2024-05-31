@@ -19,7 +19,6 @@ package example.extension;
 import static java.lang.String.format;
 
 import java.lang.reflect.Method;
-import java.util.Optional;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.Named;
 
@@ -99,9 +98,8 @@ public class ExampleExtension implements Extension {
     }
 
     @Override
-    public void preDestroyCallback(Class<?> testClass, Optional<Object> testInstance) {
-        Object value = testInstance.isPresent() ? testInstance.get() : null;
+    public void preDestroyCallback(Class<?> testClass, Object testInstance) {
         System.out.println(
-                format("test class [%s] test instance [%s]", testClass.getName(), value));
+                format("test class [%s] test instance [%s]", testClass.getName(), testInstance));
     }
 }
