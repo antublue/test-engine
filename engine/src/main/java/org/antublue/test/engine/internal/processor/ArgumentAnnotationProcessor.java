@@ -16,10 +16,15 @@
 
 package org.antublue.test.engine.internal.processor;
 
+import static java.lang.String.format;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.predicate.AnnotationFieldPredicate;
@@ -99,11 +104,64 @@ public class ArgumentAnnotationProcessor {
 
             for (Field field : fields) {
                 field.setAccessible(true);
-                field.set(testInstance, testArgument);
+                Class<?> fieldType = field.getType();
+                String fieldTypeName = fieldType.getName();
+                if (fieldTypeName.contains("$")) {
+                    fieldTypeName = fieldTypeName.substring(0, fieldTypeName.indexOf("$"));
+                }
+
+                if (testArgument == null) {
+                    field.set(testInstance, testArgument);
+                } else if (fieldType.isAssignableFrom(testArgument.getClass())) {
+                    field.set(testInstance, testArgument);
+                } else if (fieldType.isAssignableFrom(testArgument.getPayload().getClass())) {
+                    field.set(testInstance, testArgument.getPayload());
+                } else {
+                    Type genericType = field.getGenericType();
+                    if (genericType instanceof ParameterizedType) {
+                        ParameterizedType parameterizedType = (ParameterizedType) genericType;
+                        Type[] typeArguments = parameterizedType.getActualTypeArguments();
+                        for (Type typeArgument : typeArguments) {
+                            System.out.println("Generic Type: " + typeArgument.getTypeName());
+                        }
+                    }
+
+                    throw new TestClassDefinitionException(
+                            format(
+                                    "Class [%s] field [%s] can't be assigned argument type [%s]",
+                                    testInstance.getClass().getName(),
+                                    field.getName(),
+                                    toString(field)));
+                }
             }
         } catch (Throwable t) {
             throwableContext.add(testInstance.getClass(), t);
         }
+    }
+
+    private static String toString(Field field) {
+        StringBuilder result = new StringBuilder();
+
+        // Get the field's type
+        Class<?> fieldType = field.getType();
+        result.append(fieldType.getName());
+
+        // Get the field's generic type if it's parameterized
+        Type genericType = field.getGenericType();
+        if (genericType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) genericType;
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+            result.append("<");
+            int i = 0;
+            for (Type typeArgument : typeArguments) {
+                if (i > 0) {
+                    result.append(", ");
+                }
+                result.append(typeArgument.getTypeName());
+                i++;
+            }
+        }
+        return result.toString();
     }
 
     /** Class to hold the singleton instance */
