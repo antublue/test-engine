@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.api.internal.configuration.ConfigurationImpl;
 import org.antublue.test.engine.internal.Metadata;
@@ -100,13 +99,10 @@ public class SummaryEngineExecutionListener
         if (propertiesFilename != null) {
             println(INFO + "[" + propertiesFilename + "]");
 
-            Set<String> keySet = configuration.keySet();
-            if (!keySet.isEmpty()) {
-                for (String key : configuration.keySet()) {
-                    Optional<String> optional = configuration.getProperty(key);
-                    String value = optional.orElse("");
-                    println(INFO + "- [" + key + "] = [" + value + "]");
-                }
+            for (String property : configuration.getKeySet()) {
+                Optional<String> optional = configuration.getProperty(property);
+                String value = optional.orElse("");
+                println(INFO + "- [" + property + "] = [" + value + "]");
             }
 
             println(INFO + SEPARATOR);

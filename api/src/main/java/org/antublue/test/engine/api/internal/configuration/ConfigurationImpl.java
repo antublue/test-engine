@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -34,6 +35,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import org.antublue.test.engine.api.Configuration;
 import org.antublue.test.engine.api.internal.logger.Level;
 
@@ -141,6 +143,38 @@ public class ConfigurationImpl implements Configuration {
     }
 
     /**
+     * Method to get a Set of configuration keys
+     *
+     * @return a Set of configuration keys
+     */
+    @Override
+    public Set<String> getKeySet() {
+        return keySet;
+    }
+
+    /**
+     * Method to a set of property keys, filtered by a Predicate
+     *
+     * @param predicate predicate
+     * @return a Set of property keys filtered by a Predicate
+     */
+    @Override
+    public Set<String> getKeySet(Predicate<String> predicate) {
+        if (predicate == null) {
+            return getKeySet();
+        }
+
+        Set<String> keySet = new HashSet<>();
+        for (String key : this.keySet) {
+            if (predicate.test(key)) {
+                keySet.add(key);
+            }
+        }
+
+        return keySet;
+    }
+
+    /**
      * Method to the properties filename
      *
      * @return the properties filename
@@ -156,15 +190,6 @@ public class ConfigurationImpl implements Configuration {
      */
     public int size() {
         return properties.size();
-    }
-
-    /**
-     * Method to get a Set of configuration keys
-     *
-     * @return a Set of configuration keys
-     */
-    public Set<String> keySet() {
-        return keySet;
     }
 
     /**

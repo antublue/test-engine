@@ -66,7 +66,7 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
 
     @Override
     public Set<String> keySet() {
-        return CONFIGURATION.keySet();
+        return CONFIGURATION.getKeySet();
     }
 
     /** Class to hold the singleton instance */
