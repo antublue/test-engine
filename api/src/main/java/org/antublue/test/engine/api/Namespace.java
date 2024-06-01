@@ -67,6 +67,28 @@ public class Namespace {
         return new Namespace(list);
     }
 
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder(SEPARATOR);
+        for (Object object : objects) {
+            stringBuilder.append(object.toString()).append(SEPARATOR);
+        }
+        return stringBuilder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Namespace namespace = (Namespace) o;
+        return Objects.equals(objects, namespace.objects);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(objects);
+    }
+
     /**
      * Method to create a new Namespace
      *
@@ -98,27 +120,5 @@ public class Namespace {
                         "objects contains a null object at index [" + i + "]");
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(SEPARATOR);
-        for (Object object : objects) {
-            stringBuilder.append(object.toString()).append(SEPARATOR);
-        }
-        return stringBuilder.toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Namespace namespace = (Namespace) o;
-        return Objects.equals(objects, namespace.objects);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(objects);
     }
 }
