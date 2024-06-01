@@ -78,7 +78,7 @@ public final class Constants {
     public static final String TEST_CLASS_SHUFFLE = PREFIX + ".test.class.shuffle";
 
     /** Configuration constant */
-    public static final String TEST_CLASS_NAMES_SHORT = PREFIX + ".test.class.names.short";
+    public static final String TEST_CLASS_NAME_FORMAT = PREFIX + ".test.class.name.format";
 
     /** Configuration constant */
     public static final String TEST_CLASS_INCLUDE_REGEX = PREFIX + ".test.class.include.regex";

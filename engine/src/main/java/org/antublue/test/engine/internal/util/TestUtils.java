@@ -52,8 +52,8 @@ public class TestUtils {
     private final boolean shortTestClassNames;
 
     private TestUtils() {
-        Optional<String> optional = CONFIGURATION.getProperty(Constants.TEST_CLASS_NAMES_SHORT);
-        shortTestClassNames = optional.filter("true"::equalsIgnoreCase).isPresent();
+        Optional<String> optional = CONFIGURATION.getProperty(Constants.TEST_CLASS_NAME_FORMAT);
+        shortTestClassNames = optional.filter("short"::equalsIgnoreCase).isPresent();
     }
 
     public static TestUtils getInstance() {
