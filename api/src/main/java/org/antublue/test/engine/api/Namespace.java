@@ -9,7 +9,7 @@
  */
 
 /*
- * Copied from JUnit5 project and modified for test engine API import consistency
+ * Copied from JUnit5 project and modified for the test engine API
  */
 
 package org.antublue.test.engine.api;
