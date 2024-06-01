@@ -373,7 +373,7 @@ public class EngineDescriptorFactory {
             if (o instanceof Named) {
                 testArguments.add((Named<?>) o);
             } else {
-                testArguments.add(Named.of(String.valueOf(index), o));
+                testArguments.add(Named.of("[" + index + "]", o));
             }
             index++;
         }
