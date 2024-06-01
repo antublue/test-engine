@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package example;
+package example.context;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +27,9 @@ import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class ConfigurationTest {
+public class ContextTest1 {
+
+    @TestEngine.Context protected static Context context;
 
     @TestEngine.Argument protected String argument;
 
@@ -46,14 +48,17 @@ public class ConfigurationTest {
     public void test() {
         System.out.println("test(" + namedArgument + ")");
 
-        Optional<String> optional = Context.getInstance().getConfiguration().getProperty("foo");
+        assertThat(context).isNotNull();
+        assertThat(namedArgument).isNotNull();
+        assertThat(argument).isNotNull();
+        assertThat(namedArgument.getPayload()).isEqualTo(argument);
+
+        Optional<String> optional = context.getConfiguration().getProperty("foo");
         assertThat(optional).isPresent();
         assertThat(optional.get()).isEqualTo("bar");
 
         Optional<Double> optional2 =
-                Context.getInstance()
-                        .getConfiguration()
-                        .getProperty("number", string -> Double.valueOf(string));
+                context.getConfiguration().getProperty("number", string -> Double.valueOf(string));
         assertThat(optional2).isPresent();
         assertThat(optional2.get()).isEqualTo(10.0D);
     }

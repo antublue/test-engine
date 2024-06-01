@@ -17,10 +17,27 @@
 package org.antublue.test.engine.api;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /** Interface to implement Configuration */
 public interface Configuration {
+
+    /**
+     * Method to get a set of property keys
+     *
+     * @return a Set of property keys
+     */
+    Set<String> getKeySet();
+
+    /**
+     * Method to a set of property keys, filtered by a Predicate
+     *
+     * @param predicate predicate
+     * @return a Set of property keys filtered by a Predicate
+     */
+    Set<String> getKeySet(Predicate<String> predicate);
 
     /**
      * Method to get a configuration property value
