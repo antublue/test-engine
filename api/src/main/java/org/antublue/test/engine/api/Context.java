@@ -37,7 +37,7 @@ public interface Context {
     Store getStore();
 
     /**
-     * Method to get a namespaced Store. The value Store.GLOBAL will reference the global Store.
+     * Method to get a namespaced Store. The value Store.GLOBAL will a reference the global Store.
      *
      * @param namespace namespace
      * @return the namespaced Store
