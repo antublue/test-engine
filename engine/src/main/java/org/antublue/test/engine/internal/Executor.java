@@ -98,7 +98,7 @@ public class Executor {
                             60L,
                             TimeUnit.SECONDS,
                             new ArrayBlockingQueue<>(threadCount * 10),
-                            new NamedThreadFactory("test-engine-%02d"),
+                            new NamedThreadFactory("%02d"),
                             new BlockingRejectedExecutionHandler());
 
             engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
