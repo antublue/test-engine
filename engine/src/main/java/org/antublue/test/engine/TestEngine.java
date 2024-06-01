@@ -157,7 +157,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("filterTestClassesByClassName()");
 
         CONFIGURATION
-                .getParameter(Constants.TEST_CLASS_INCLUDE_REGEX)
+                .getProperty(Constants.TEST_CLASS_INCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -178,7 +178,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         });
 
         CONFIGURATION
-                .getParameter(Constants.TEST_CLASS_EXCLUDE_REGEX)
+                .getProperty(Constants.TEST_CLASS_EXCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -208,7 +208,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("filterTestClassesByTag()");
 
         CONFIGURATION
-                .getParameter(Constants.TEST_CLASS_TAG_INCLUDE_REGEX)
+                .getProperty(Constants.TEST_CLASS_TAG_INCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -234,7 +234,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         });
 
         CONFIGURATION
-                .getParameter(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX)
+                .getProperty(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -267,7 +267,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("filterTestMethodsByMethodName()");
 
         CONFIGURATION
-                .getParameter(Constants.TEST_METHOD_INCLUDE_REGEX)
+                .getProperty(Constants.TEST_METHOD_INCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -288,7 +288,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         });
 
         CONFIGURATION
-                .getParameter(Constants.TEST_METHOD_EXCLUDE_REGEX)
+                .getProperty(Constants.TEST_METHOD_EXCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -318,7 +318,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         LOGGER.trace("filterTestMethodsByTag()");
 
         CONFIGURATION
-                .getParameter(Constants.TEST_METHOD_TAG_INCLUDE_REGEX)
+                .getProperty(Constants.TEST_METHOD_TAG_INCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -344,7 +344,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                         });
 
         CONFIGURATION
-                .getParameter(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX)
+                .getProperty(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX)
                 .ifPresent(
                         s -> {
                             Pattern pattern = Pattern.compile(s);
@@ -405,7 +405,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         testDescriptors.forEach(engineDescriptor::removeChild);
 
         // Shuffle or sort the test descriptor list based on configuration
-        Optional<String> optionalShuffle = CONFIGURATION.getParameter(Constants.TEST_CLASS_SHUFFLE);
+        Optional<String> optionalShuffle = CONFIGURATION.getProperty(Constants.TEST_CLASS_SHUFFLE);
         optionalShuffle.ifPresent(
                 s -> {
                     if (Constants.TRUE.equals(optionalShuffle.get())) {

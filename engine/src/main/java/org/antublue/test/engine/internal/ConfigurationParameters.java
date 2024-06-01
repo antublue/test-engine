@@ -46,17 +46,17 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
 
     @Override
     public Optional<String> get(String key) {
-        return CONFIGURATION.getParameter(key);
+        return CONFIGURATION.getProperty(key);
     }
 
     @Override
     public Optional<Boolean> getBoolean(String key) {
-        return CONFIGURATION.getParameter(key, toBoolean);
+        return CONFIGURATION.getProperty(key, toBoolean);
     }
 
     @Override
     public <T> Optional<T> get(String key, Function<String, T> transformer) {
-        return CONFIGURATION.getParameter(key, transformer);
+        return CONFIGURATION.getProperty(key, transformer);
     }
 
     @Override

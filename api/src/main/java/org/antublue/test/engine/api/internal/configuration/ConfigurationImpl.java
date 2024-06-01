@@ -24,7 +24,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -32,6 +35,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 import org.antublue.test.engine.api.Configuration;
+import org.antublue.test.engine.api.internal.logger.Level;
 
 /** Class to implement Configuration */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -53,8 +57,11 @@ public class ConfigurationImpl implements Configuration {
     private static final String ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME_2 =
             ".antublue-test-engine.properties";
 
-    private static final boolean TRACE =
-            "true".equals(System.getenv(ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE));
+    private static final boolean IS_TRACE_ENABLED =
+            "true".equalsIgnoreCase(System.getenv(ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE));
+
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
+            new SimpleDateFormat("yyyy-MM-dd | HH:mm:ss.SSS", Locale.getDefault());
 
     private String propertiesFilename;
 
@@ -64,7 +71,7 @@ public class ConfigurationImpl implements Configuration {
 
     /** Constructor */
     private ConfigurationImpl() {
-        trace("Configuration()");
+        trace("ConfigurationImpl()");
 
         properties = new Properties();
 
@@ -117,15 +124,15 @@ public class ConfigurationImpl implements Configuration {
     }
 
     @Override
-    public Optional<String> getParameter(String key) {
+    public Optional<String> getProperty(String key) {
         String value = properties.getProperty(key);
-        trace("get key [%s] value [%s]", key, value);
+        trace("getProperty [%s] value [%s]", key, value);
         return Optional.ofNullable(value);
     }
 
     @Override
-    public <T> Optional<T> getParameter(String key, Function<String, T> transformer) {
-        Optional<String> optional = getParameter(key);
+    public <T> Optional<T> getProperty(String key, Function<String, T> transformer) {
+        Optional<String> optional = getProperty(key);
         if (!optional.isPresent()) {
             return Optional.empty();
         }
@@ -160,19 +167,59 @@ public class ConfigurationImpl implements Configuration {
         return keySet;
     }
 
+    /**
+     * Method to load tracing information
+     *
+     * @param format format
+     * @param objects objects
+     */
     private void trace(String format, Object... objects) {
-        if (TRACE) {
-            System.out.println(
-                    "[TRACE] " + ConfigurationImpl.class + " " + format(format, objects));
+        if (IS_TRACE_ENABLED) {
+            System.out.println(createMessage(Level.TRACE, format(format, objects)));
             System.out.flush();
         }
     }
 
+    /**
+     * Method to create a log message
+     *
+     * @param level level
+     * @param message message
+     * @return the return value
+     */
+    private String createMessage(Level level, String message) {
+        String dateTime;
+
+        synchronized (SIMPLE_DATE_FORMAT) {
+            dateTime = SIMPLE_DATE_FORMAT.format(new Date());
+        }
+
+        return dateTime
+                + " | "
+                + Thread.currentThread().getName()
+                + " | "
+                + level.toString()
+                + " | "
+                + ConfigurationImpl.class.getName()
+                + " | "
+                + message
+                + " ";
+    }
+
+    /**
+     * Method to find a properties file, searching the working directory, then parent directories
+     * toward the root
+     *
+     * @param path path
+     * @param filename filename
+     * @return a File
+     */
     private File find(Path path, String filename) {
         Path currentPath = path.toAbsolutePath().normalize();
 
         while (true) {
             trace("searching path [%s]", currentPath);
+
             File propertiesFile =
                     new File(currentPath.toAbsolutePath() + File.separator + filename);
             if (propertiesFile.exists() && propertiesFile.isFile() && propertiesFile.canRead()) {

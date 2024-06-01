@@ -46,14 +46,14 @@ public class ConfigurationTest {
     public void test() {
         System.out.println("test(" + namedArgument + ")");
 
-        Optional<String> optional = Context.getInstance().getConfiguration().getParameter("foo");
+        Optional<String> optional = Context.getInstance().getConfiguration().getProperty("foo");
         assertThat(optional).isPresent();
         assertThat(optional.get()).isEqualTo("bar");
 
         Optional<Double> optional2 =
                 Context.getInstance()
                         .getConfiguration()
-                        .getParameter("number", string -> Double.valueOf(string));
+                        .getProperty("number", string -> Double.valueOf(string));
         assertThat(optional2).isPresent();
         assertThat(optional2.get()).isEqualTo(10.0D);
     }

@@ -62,11 +62,11 @@ public class ContextImpl implements Context {
      */
     @Override
     public Store getStore(Object namespace) {
+        checkNotNull(namespace, "namespace is null");
+
         if (Store.GLOBAL.equals(namespace)) {
             return store;
         }
-
-        checkNotNull(namespace, "namespace is null");
 
         String validNamespace;
         if (namespace instanceof Class) {
@@ -75,7 +75,14 @@ public class ContextImpl implements Context {
             validNamespace = checkKey(namespace.toString());
         }
 
-        return namespacedStores.computeIfAbsent(validNamespace, s -> new StoreImpl(validNamespace));
+        if (!validNamespace.startsWith("/")) {
+            validNamespace = "/" + validNamespace;
+        }
+
+        final String finalValidNamespace = validNamespace;
+
+        return namespacedStores.computeIfAbsent(
+                validNamespace, s -> new StoreImpl(finalValidNamespace));
     }
 
     public Configuration getConfiguration() {

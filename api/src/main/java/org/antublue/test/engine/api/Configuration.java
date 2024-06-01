@@ -23,20 +23,21 @@ import java.util.function.Function;
 public interface Configuration {
 
     /**
-     * Method to get a configuration value
+     * Method to get a configuration property value
      *
      * @param key key
-     * @return an Optional containing the value if it exists, else an empty Optional
+     * @return an Optional
      */
-    Optional<String> getParameter(String key);
+    Optional<String> getProperty(String key);
 
     /**
-     * Method to get a configuration value. If the value exists, execute the transformer Function
+     * Method to get a configuration property value. If the value exists, execute the transformer
+     * Function
      *
      * @param key key
      * @param transformer transformer
-     * @return an Optional containing the value if it exists, else an empty Optional
+     * @return an Optional
      * @param <T> the return type
      */
-    <T> Optional<T> getParameter(String key, Function<String, T> transformer);
+    <T> Optional<T> getProperty(String key, Function<String, T> transformer);
 }

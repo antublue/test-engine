@@ -103,7 +103,7 @@ public class SummaryEngineExecutionListener
             Set<String> keySet = configuration.keySet();
             if (!keySet.isEmpty()) {
                 for (String key : configuration.keySet()) {
-                    Optional<String> optional = configuration.getParameter(key);
+                    Optional<String> optional = configuration.getProperty(key);
                     String value = optional.orElse("");
                     println(INFO + "- [" + key + "] = [" + value + "]");
                 }

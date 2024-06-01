@@ -45,7 +45,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
 
     static {
         CONFIGURATION
-                .getParameter(Constants.THREAD_THROTTLE_MILLISECONDS)
+                .getProperty(Constants.THREAD_THROTTLE_MILLISECONDS)
                 .ifPresent(
                         s -> {
                             try {

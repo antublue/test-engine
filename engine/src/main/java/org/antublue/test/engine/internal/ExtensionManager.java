@@ -103,7 +103,7 @@ public class ExtensionManager {
             lock.lock();
             if (!initialized) {
                 Map<String, Extension> extensionMap = new LinkedHashMap<>();
-                Optional<String> optional = CONFIGURATION.getParameter(Constants.EXTENSIONS);
+                Optional<String> optional = CONFIGURATION.getProperty(Constants.EXTENSIONS);
                 if (optional.isPresent() && !optional.get().trim().isEmpty()) {
                     String[] classNames = optional.get().split("\\s+");
                     for (String className : classNames) {

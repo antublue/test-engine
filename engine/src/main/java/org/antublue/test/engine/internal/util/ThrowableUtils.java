@@ -40,7 +40,7 @@ public class ThrowableUtils {
     private static final boolean STACK_TRACE_PRUNING =
             Context.getInstance()
                     .getConfiguration()
-                    .getParameter(Constants.STACK_TRACE_PRUNE, toBoolean)
+                    .getProperty(Constants.STACK_TRACE_PRUNE, toBoolean)
                     .orElse(true);
 
     private static final Predicate<String> EXCLUDE =
