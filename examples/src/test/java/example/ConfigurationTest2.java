@@ -48,7 +48,7 @@ public class ConfigurationTest2 {
         for (String property :
                 Context.getInstance()
                         .getConfiguration()
-                        .getKeySet(string -> string.startsWith("foo"))) {
+                        .getPropertyNames(string -> string.startsWith("foo"))) {
             assertThat(property).startsWith("foo");
         }
     }

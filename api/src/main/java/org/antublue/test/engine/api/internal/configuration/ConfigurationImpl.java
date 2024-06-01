@@ -148,7 +148,7 @@ public class ConfigurationImpl implements Configuration {
      * @return a Set of configuration keys
      */
     @Override
-    public Set<String> getKeySet() {
+    public Set<String> getPropertyNames() {
         return keySet;
     }
 
@@ -159,9 +159,9 @@ public class ConfigurationImpl implements Configuration {
      * @return a Set of property keys filtered by a Predicate
      */
     @Override
-    public Set<String> getKeySet(Predicate<String> predicate) {
+    public Set<String> getPropertyNames(Predicate<String> predicate) {
         if (predicate == null) {
-            return getKeySet();
+            return getPropertyNames();
         }
 
         Set<String> keySet = new HashSet<>();

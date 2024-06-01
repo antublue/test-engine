@@ -99,7 +99,7 @@ public class SummaryEngineExecutionListener
         if (propertiesFilename != null) {
             println(INFO + "[" + propertiesFilename + "]");
 
-            for (String property : configuration.getKeySet()) {
+            for (String property : configuration.getPropertyNames()) {
                 Optional<String> optional = configuration.getProperty(property);
                 String value = optional.orElse("");
                 println(INFO + "- [" + property + "] = [" + value + "]");

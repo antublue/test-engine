@@ -29,7 +29,7 @@ public interface Configuration {
      *
      * @return a Set of property keys
      */
-    Set<String> getKeySet();
+    Set<String> getPropertyNames();
 
     /**
      * Method to a set of property keys, filtered by a Predicate
@@ -37,7 +37,7 @@ public interface Configuration {
      * @param predicate predicate
      * @return a Set of property keys filtered by a Predicate
      */
-    Set<String> getKeySet(Predicate<String> predicate);
+    Set<String> getPropertyNames(Predicate<String> predicate);
 
     /**
      * Method to get a configuration property value
