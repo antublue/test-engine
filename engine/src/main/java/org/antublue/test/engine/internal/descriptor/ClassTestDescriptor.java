@@ -318,8 +318,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private State end() {
-        EXTENSION_MANAGER.preDestroyCallback(
-                testClass, Optional.ofNullable(getTestInstance()), new ThrowableContext());
+        EXTENSION_MANAGER.preDestroyCallback(testClass, getTestInstance(), new ThrowableContext());
 
         LOCK_ANNOTATION_PROCESSOR.processUnlocks(getTestClass());
 
