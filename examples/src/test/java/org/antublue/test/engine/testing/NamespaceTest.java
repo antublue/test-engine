@@ -25,7 +25,7 @@ public class NamespaceTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1()");
+        System.out.println("test1(" + argument + ")");
 
         Namespace namespace = Namespace.of("1", "2", "3", 4);
 
@@ -35,7 +35,7 @@ public class NamespaceTest {
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test1()");
+        System.out.println("test2(" + argument + ")");
 
         Namespace namespace = Namespace.of("1", "2");
 
