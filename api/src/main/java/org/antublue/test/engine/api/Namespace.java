@@ -61,9 +61,9 @@ public class Namespace {
         if (namespace == null) {
             throw new IllegalArgumentException("namespace is null");
         }
-        List<Object> list = new ArrayList<>(this.objects.size() + namespace.objects.size());
-        list.addAll(this.objects);
-        Collections.addAll(list, objects);
+        List<Object> list = new ArrayList<>(objects.size() + namespace.objects.size());
+        list.addAll(objects);
+        list.addAll(namespace.objects);
         return new Namespace(list);
     }
 
