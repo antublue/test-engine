@@ -23,13 +23,19 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import org.antublue.test.engine.api.Configuration;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.internal.configuration.Constants;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.ClassUtils;
 
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class TestUtils {
+
+    private static final Configuration CONFIGURATION = Context.getInstance().getConfiguration();
 
     private static final DefaultMethodOrderTopDownComparator
             DEFAULT_METHOD_ORDER_TOP_DOWN_COMPARATOR = new DefaultMethodOrderTopDownComparator();
@@ -43,8 +49,11 @@ public class TestUtils {
 
     private static final MethodNameComparator METHOD_NAME_COMPARATOR = new MethodNameComparator();
 
+    private final boolean shortTestClassNames;
+
     private TestUtils() {
-        // DO NOTHING
+        Optional<String> optional = CONFIGURATION.getProperty(Constants.TEST_CLASS_NAMES_SHORT);
+        shortTestClassNames = optional.filter("true"::equalsIgnoreCase).isPresent();
     }
 
     public static TestUtils getInstance() {
@@ -82,6 +91,21 @@ public class TestUtils {
             String name = annotation.name();
             if (name != null && !name.trim().isEmpty()) {
                 displayName = name.trim();
+            }
+        } else if (shortTestClassNames) {
+            String[] tokens = testClass.getName().split("\\.");
+            if (tokens.length < 2) {
+                displayName = testClass.getName();
+            } else {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < tokens.length - 2; i++) {
+                    stringBuilder.append(tokens[i].charAt(0)).append('.');
+                }
+                stringBuilder
+                        .append(tokens[tokens.length - 2])
+                        .append('.')
+                        .append(tokens[tokens.length - 1]);
+                displayName = stringBuilder.toString();
             }
         }
 
