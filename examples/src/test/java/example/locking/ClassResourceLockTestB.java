@@ -20,18 +20,17 @@ import static java.lang.String.format;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.support.NamedString;
 
 @TestEngine.ResourceLock(name = "ClassResourceLockTest")
 public class ClassResourceLockTestB {
 
-    @TestEngine.Argument private Named argument;
+    @TestEngine.Argument private NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Iterable<Named> arguments() {
-        Collection<Named> collection = new ArrayList<>();
+    public static Iterable<NamedString> arguments() {
+        Collection<NamedString> collection = new ArrayList<>();
         collection.add(NamedString.of("foo"));
         return collection;
     }

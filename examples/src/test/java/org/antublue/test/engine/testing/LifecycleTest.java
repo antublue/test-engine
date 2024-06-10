@@ -70,9 +70,8 @@ public class LifecycleTest implements Validation {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
-        assertThat(argument).isNull();
         ACTUAL.add("prepare()");
     }
 
@@ -130,9 +129,8 @@ public class LifecycleTest implements Validation {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
-        assertThat(argument).isNull();
         ACTUAL.add("conclude()");
     }
 

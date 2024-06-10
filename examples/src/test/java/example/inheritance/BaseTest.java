@@ -40,10 +40,8 @@ public abstract class BaseTest {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
-        assertThat(privateNamedInteger).isNull();
-        assertThat(argument).isNull();
     }
 
     @TestEngine.BeforeAll
@@ -82,9 +80,7 @@ public abstract class BaseTest {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
-        assertThat(privateNamedInteger).isNull();
-        assertThat(argument).isNull();
     }
 }

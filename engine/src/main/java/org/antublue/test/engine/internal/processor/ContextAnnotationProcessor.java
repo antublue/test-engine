@@ -20,8 +20,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.internal.logger.Logger;
-import org.antublue.test.engine.api.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.ContextImpl;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.predicate.AnnotationFieldPredicate;
 import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
@@ -65,9 +66,9 @@ public class ContextAnnotationProcessor {
             for (Field field : fields) {
                 field.setAccessible(true);
                 if (Modifier.isStatic(field.getModifiers())) {
-                    field.set(null, org.antublue.test.engine.api.Context.getInstance());
+                    field.set(null, ContextImpl.getInstance());
                 } else {
-                    field.set(testInstance, org.antublue.test.engine.api.Context.getInstance());
+                    field.set(testInstance, ContextImpl.getInstance());
                 }
             }
         } catch (Throwable t) {

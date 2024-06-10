@@ -38,6 +38,8 @@ public class StoreExampleTest1 {
 
     private Store store;
 
+    @TestEngine.Context protected static Context context;
+
     @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.ArgumentSupplier
@@ -50,18 +52,18 @@ public class StoreExampleTest1 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
-
-        store = Context.getInstance().getStore(StoreExampleTest1.class);
-        store.put(CLOSEABLE_KEY, new TestCloseable());
-        store.put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
-        store.put(HIDDEN_KEY, new Object());
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + argument + ")");
+
+        store = context.getStore(StoreExampleTest1.class);
+        store.put(CLOSEABLE_KEY, new TestCloseable());
+        store.put(AUTO_CLOSEABLE_KEY, new TestAutoCloseable());
+        store.put(HIDDEN_KEY, new Object());
     }
 
     @TestEngine.BeforeEach
@@ -85,13 +87,8 @@ public class StoreExampleTest1 {
     }
 
     @TestEngine.AfterAll
-    public void afterAll() {
+    public void afterAll() throws Exception {
         System.out.println("afterAll(" + argument + ")");
-    }
-
-    @TestEngine.Conclude
-    public void conclude() throws Exception {
-        System.out.println("conclude()");
 
         for (String key : store.keySet()) {
             System.out.println("key [" + key + "]");
@@ -108,6 +105,11 @@ public class StoreExampleTest1 {
 
         assertThat(store.get(CLOSEABLE_KEY, Object.class)).isNull();
         assertThat(store.get(AUTO_CLOSEABLE_KEY, Object.class)).isNull();
+    }
+
+    @TestEngine.Conclude
+    public static void conclude() {
+        System.out.println("conclude()");
     }
 
     private static class TestAutoCloseable implements AutoCloseable {

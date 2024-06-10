@@ -32,9 +32,7 @@ public class MethodLockingMultipleLocksTest2 {
     public static final String LOCK_NAME_2 = PREFIX + ".lock2";
     public static final String COUNTER_NAME = PREFIX + ".counter";
 
-    static {
-        Context.getInstance().getStore().computeIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
-    }
+    @TestEngine.Context protected static Context context;
 
     @TestEngine.Argument public NamedInteger argument;
 
@@ -44,8 +42,9 @@ public class MethodLockingMultipleLocksTest2 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
+        context.getStore().computeIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
     @TestEngine.BeforeAll
@@ -66,8 +65,7 @@ public class MethodLockingMultipleLocksTest2 {
     public void test1() {
         System.out.println("test1()");
 
-        AtomicInteger atomicInteger =
-                (AtomicInteger) Context.getInstance().getStore().get(COUNTER_NAME);
+        AtomicInteger atomicInteger = context.getStore().get(COUNTER_NAME);
 
         int count = atomicInteger.incrementAndGet();
         if (count != 1) {
@@ -96,7 +94,7 @@ public class MethodLockingMultipleLocksTest2 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
     }
 }

@@ -45,10 +45,10 @@ public class AutoCloseTest2 {
     private TestObject afterAllTestObject;
 
     @TestEngine.AutoClose.Conclude(method = "destroy")
-    private TestObject afterConcludeTestObject;
+    private static TestObject afterConcludeTestObject;
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
         afterConcludeTestObject = new TestObject("afterConcludeTestObject");
     }
@@ -89,11 +89,8 @@ public class AutoCloseTest2 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
-        assertThat(afterEachTestObject.isDestroyed()).isTrue();
-        assertThat(afterAllTestObject.isDestroyed()).isTrue();
-        assertThat(afterConcludeTestObject.isDestroyed()).isFalse();
     }
 
     private static class TestObject {

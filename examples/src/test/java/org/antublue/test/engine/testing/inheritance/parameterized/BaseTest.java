@@ -29,7 +29,7 @@ import org.antublue.test.engine.api.support.NamedInteger;
 public abstract class BaseTest {
 
     public static final List<String> EXPECTED = new ArrayList<>();
-    protected final List<String> actual = new ArrayList<>();
+    protected static final List<String> actual = new ArrayList<>();
 
     static {
         EXPECTED.add("b/prepare()");
@@ -70,9 +70,8 @@ public abstract class BaseTest {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("b/prepare()");
-        assertThat(argument).isNull();
         actual.add("b/prepare()");
     }
 
@@ -119,9 +118,8 @@ public abstract class BaseTest {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("b/conclude()");
-        assertThat(argument).isNull();
         actual.add("b/conclude()");
     }
 

@@ -33,9 +33,7 @@ public class UserManagedStoreBasedLockingTest2 {
     public static final String LOCK_NAME = "lock";
     public static final String COUNTER_NAME = "counter";
 
-    static {
-        Context.getInstance().getStore(NAMESPACE).computeIfAbsent(COUNTER_NAME, k -> new Counter());
-    }
+    @TestEngine.Context protected static Context context;
 
     @TestEngine.Argument public NamedInteger argument;
 
@@ -45,11 +43,12 @@ public class UserManagedStoreBasedLockingTest2 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
 
-        assertThat(Context.getInstance().getStore(NAMESPACE) != Context.getInstance().getStore())
-                .isTrue();
+        context.getStore(NAMESPACE).computeIfAbsent(COUNTER_NAME, k -> new Counter());
+
+        assertThat(context.getStore(NAMESPACE) != context.getStore()).isTrue();
     }
 
     @TestEngine.BeforeAll
@@ -70,14 +69,12 @@ public class UserManagedStoreBasedLockingTest2 {
 
         try {
             reentrantReadWriteLock =
-                    (ReentrantReadWriteLock)
-                            Context.getInstance()
-                                    .getStore(NAMESPACE)
-                                    .computeIfAbsent(LOCK_NAME, o -> new ReentrantReadWriteLock());
+                    context.getStore(NAMESPACE)
+                            .computeIfAbsent(LOCK_NAME, o -> new ReentrantReadWriteLock());
 
             reentrantReadWriteLock.writeLock().lock();
 
-            Counter counter = (Counter) Context.getInstance().getStore(NAMESPACE).get(COUNTER_NAME);
+            Counter counter = context.getStore(NAMESPACE).get(COUNTER_NAME);
 
             long count = counter.increment();
             if (count != 1) {
@@ -91,7 +88,9 @@ public class UserManagedStoreBasedLockingTest2 {
 
             Thread.sleep(RandomGenerator.getInstance().nextInteger(0, 1000));
         } finally {
-            reentrantReadWriteLock.writeLock().unlock();
+            if (reentrantReadWriteLock != null) {
+                reentrantReadWriteLock.writeLock().unlock();
+            }
         }
     }
 
@@ -106,7 +105,7 @@ public class UserManagedStoreBasedLockingTest2 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
     }
 }

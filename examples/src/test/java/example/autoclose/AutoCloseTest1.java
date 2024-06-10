@@ -42,10 +42,10 @@ public class AutoCloseTest1 {
 
     @TestEngine.AutoClose.AfterAll private TestAutoCloseable afterAllAutoClosable;
 
-    @TestEngine.AutoClose.Conclude private TestAutoCloseable afterConcludeAutoCloseable;
+    @TestEngine.AutoClose.Conclude private static TestAutoCloseable afterConcludeAutoCloseable;
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
         afterConcludeAutoCloseable = new TestAutoCloseable("afterConcludeAutoCloseable");
     }
@@ -81,15 +81,13 @@ public class AutoCloseTest1 {
     public void afterAll() {
         System.out.println("afterAll(" + argument + ")");
         assertThat(afterEachAutoClosable.isClosed()).isTrue();
-        assertThat(afterAllAutoClosable.isClosed()).isFalse();
+        assertThat(afterAllAutoClosable.isClosed()).isTrue();
         assertThat(afterConcludeAutoCloseable.isClosed()).isFalse();
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
-        assertThat(afterAllAutoClosable.isClosed()).isTrue();
-        assertThat(afterAllAutoClosable.isClosed()).isTrue();
         assertThat(afterConcludeAutoCloseable.isClosed()).isFalse();
     }
 

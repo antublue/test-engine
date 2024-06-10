@@ -62,9 +62,8 @@ public class DuplicateArgumentNamesLifecycleTest {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
-        assertThat(argument).isNull();
         actual.add("prepare()");
     }
 
@@ -119,12 +118,12 @@ public class DuplicateArgumentNamesLifecycleTest {
     public void afterAll2() {
         System.out.println("afterAll2()");
         actual.add("afterAll2(" + argument + ")");
+        assertThat(argument).isNull();
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
-        assertThat(argument).isNull();
         actual.add("conclude()");
         assertThat(actual).isEqualTo(EXPECTED);
     }

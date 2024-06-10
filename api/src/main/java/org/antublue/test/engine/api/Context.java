@@ -16,18 +16,7 @@
 
 package org.antublue.test.engine.api;
 
-import org.antublue.test.engine.api.internal.ContextImpl;
-
 public interface Context {
-
-    /**
-     * Method to get the singleton instance
-     *
-     * @return the singleton instance
-     */
-    static Context getInstance() {
-        return ContextImpl.getInstance();
-    }
 
     /**
      * Method to get the global Store

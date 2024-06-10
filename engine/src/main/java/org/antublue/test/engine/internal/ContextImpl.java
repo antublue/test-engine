@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.internal;
+package org.antublue.test.engine.internal;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.antublue.test.engine.api.Configuration;
 import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.Store;
-import org.antublue.test.engine.api.internal.configuration.ConfigurationImpl;
+import org.antublue.test.engine.internal.configuration.ConfigurationImpl;
 
 /** Class to implement a Context */
 public class ContextImpl implements Context {

@@ -18,7 +18,7 @@ package org.antublue.test.engine.internal.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.antublue.test.engine.api.internal.configuration.Constants;
+import org.antublue.test.engine.Constants;
 
 public class ThrowableContext {
 

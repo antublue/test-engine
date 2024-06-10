@@ -28,6 +28,8 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class ConfigurationTest2 {
 
+    @TestEngine.Context protected static Context context;
+
     @TestEngine.Argument protected String argument;
 
     @TestEngine.Argument protected Named<String> namedArgument;
@@ -46,9 +48,7 @@ public class ConfigurationTest2 {
         System.out.println("test(" + namedArgument + ")");
 
         for (String property :
-                Context.getInstance()
-                        .getConfiguration()
-                        .getPropertyNames(string -> string.startsWith("foo"))) {
+                context.getConfiguration().getPropertyNames(string -> string.startsWith("foo"))) {
             assertThat(property).startsWith("foo");
         }
     }

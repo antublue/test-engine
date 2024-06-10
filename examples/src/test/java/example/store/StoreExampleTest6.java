@@ -31,6 +31,8 @@ public class StoreExampleTest6 {
 
     private static final String TEST_OBJECT_KEY = "testObject";
 
+    @TestEngine.Context protected static Context context;
+
     @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.ArgumentSupplier
@@ -43,20 +45,19 @@ public class StoreExampleTest6 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
         System.out.println(format("key [%s]", TEST_OBJECT_KEY));
 
         TestObject testObject1 = new TestObject();
-        Context.getInstance().getStore().put(TEST_OBJECT_KEY, testObject1);
+        context.getStore().put(TEST_OBJECT_KEY, testObject1);
 
         TestObject testObject2 = new TestObject();
-        Context.getInstance().getStore(StoreExampleTest6.class).put(TEST_OBJECT_KEY, testObject2);
+        context.getStore(StoreExampleTest6.class).put(TEST_OBJECT_KEY, testObject2);
 
-        assertThat(Context.getInstance().getStore().get(TEST_OBJECT_KEY) == testObject1);
-        assertThat(
-                Context.getInstance().getStore(StoreExampleTest6.class).get(TEST_OBJECT_KEY)
-                        == testObject2);
+        assertThat(context.getStore().get(TEST_OBJECT_KEY) == testObject1).isTrue();
+        assertThat(context.getStore(StoreExampleTest6.class).get(TEST_OBJECT_KEY) == testObject2)
+                .isTrue();
     }
 
     @TestEngine.BeforeAll
@@ -90,31 +91,20 @@ public class StoreExampleTest6 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
 
-        TestObject testObject =
-                (TestObject) Context.getInstance().getStore().remove(TEST_OBJECT_KEY);
+        TestObject testObject = context.getStore().remove(TEST_OBJECT_KEY);
         testObject.close();
 
-        assertThat(Context.getInstance().getStore().get(TEST_OBJECT_KEY, Object.class)).isNull();
-        assertThat(
-                        Context.getInstance()
-                                .getStore(StoreExampleTest6.class)
-                                .get(TEST_OBJECT_KEY, Object.class))
+        assertThat(context.getStore().get(TEST_OBJECT_KEY, Object.class)).isNull();
+        assertThat(context.getStore(StoreExampleTest6.class).get(TEST_OBJECT_KEY, Object.class))
                 .isNotNull();
 
-        testObject =
-                (TestObject)
-                        Context.getInstance()
-                                .getStore(StoreExampleTest6.class)
-                                .remove(TEST_OBJECT_KEY);
+        testObject = context.getStore(StoreExampleTest6.class).remove(TEST_OBJECT_KEY);
         testObject.close();
 
-        assertThat(
-                        Context.getInstance()
-                                .getStore(StoreExampleTest6.class)
-                                .get(TEST_OBJECT_KEY, Object.class))
+        assertThat(context.getStore(StoreExampleTest6.class).get(TEST_OBJECT_KEY, Object.class))
                 .isNull();
     }
 

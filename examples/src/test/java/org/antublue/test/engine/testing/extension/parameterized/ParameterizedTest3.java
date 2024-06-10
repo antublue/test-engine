@@ -29,7 +29,7 @@ import org.antublue.test.engine.api.support.NamedString;
 /** Example test */
 public class ParameterizedTest3 {
 
-    public final List<String> ACTUAL = new ArrayList<>();
+    public static final List<String> ACTUAL = new ArrayList<>();
 
     @TestEngine.Argument protected NamedString argument;
 
@@ -50,7 +50,7 @@ public class ParameterizedTest3 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
         ACTUAL.add("prepare()");
     }
@@ -92,7 +92,7 @@ public class ParameterizedTest3 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
         ACTUAL.add("conclude()");
     }

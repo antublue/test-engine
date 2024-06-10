@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.internal;
+package org.antublue.test.engine.internal;
 
 import static java.lang.String.format;
 
@@ -36,8 +36,8 @@ import org.antublue.test.engine.api.StoreException;
  *
  * <p>Locking of Objects in the Store is the responsibility of the calling code
  */
-@SuppressWarnings({"PMD.EmptyCatchBlock", "UnusedMethod"})
-public class StoreImpl implements Store {
+@SuppressWarnings({"unchecked", "PMD.EmptyCatchBlock", "UnusedMethod"})
+class StoreImpl implements Store {
 
     private final String namespace;
     private final Lock lock;

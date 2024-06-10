@@ -54,14 +54,14 @@ public class AutoCloseTest1 {
     @TestEngine.AutoClose.Conclude private TestAutoCloseable afterConcludeAutoCloseable;
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
-        afterConcludeAutoCloseable = new TestAutoCloseable("afterConcludeAutoCloseable");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + argument + ")");
+        afterConcludeAutoCloseable = new TestAutoCloseable("afterConcludeAutoCloseable");
         afterAllAutoClosable = new TestAutoCloseable("afterAllAutoCloseable");
     }
 
@@ -92,7 +92,7 @@ public class AutoCloseTest1 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
     }
 

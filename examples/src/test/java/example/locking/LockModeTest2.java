@@ -30,9 +30,7 @@ public class LockModeTest2 {
     public static final String LOCK_NAME = PREFIX + ".lock";
     public static final String COUNTER_NAME = PREFIX + ".counter";
 
-    static {
-        Context.getInstance().getStore().computeIfAbsent(COUNTER_NAME, k -> 0);
-    }
+    @TestEngine.Context protected static Context context;
 
     @TestEngine.Argument public NamedInteger argument;
 
@@ -42,8 +40,9 @@ public class LockModeTest2 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
+        context.getStore().computeIfAbsent(COUNTER_NAME, k -> 0);
     }
 
     @TestEngine.BeforeAll
@@ -62,23 +61,23 @@ public class LockModeTest2 {
     public void test1() {
         System.out.println("test1()");
 
-        int count = (Integer) Context.getInstance().getStore().get(COUNTER_NAME);
+        int count = context.getStore().get(COUNTER_NAME);
         if (count != 0) {
             fail("expected count = 0");
         }
 
         count++;
-        Context.getInstance().getStore().put(COUNTER_NAME, count);
+        context.getStore().put(COUNTER_NAME, count);
 
-        count = (Integer) Context.getInstance().getStore().get(COUNTER_NAME);
+        count = context.getStore().get(COUNTER_NAME);
         if (count != 1) {
             fail("expected count = 1");
         }
 
         count--;
-        Context.getInstance().getStore().put(COUNTER_NAME, count);
+        context.getStore().put(COUNTER_NAME, count);
 
-        count = (Integer) Context.getInstance().getStore().get(COUNTER_NAME);
+        count = context.getStore().get(COUNTER_NAME);
         if (count != 0) {
             fail("expected count = 0");
         }
@@ -89,7 +88,7 @@ public class LockModeTest2 {
     @TestEngine.Unlock(name = LOCK_NAME, mode = TestEngine.LockMode.READ)
     public void test2() {
         System.out.println("test2()");
-        int count = (Integer) Context.getInstance().getStore().get(COUNTER_NAME);
+        int count = context.getStore().get(COUNTER_NAME);
         if (count != 0) {
             fail("expected count = 0");
         }
@@ -106,7 +105,7 @@ public class LockModeTest2 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
     }
 }

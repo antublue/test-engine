@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.internal.logger;
+package org.antublue.test.engine.internal.logger;
 
 import static java.lang.String.format;
 
@@ -27,8 +27,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.antublue.test.engine.api.internal.configuration.ConfigurationImpl;
-import org.antublue.test.engine.api.internal.configuration.Constants;
+import org.antublue.test.engine.internal.configuration.ConfigurationImpl;
+import org.antublue.test.engine.Constants;
 
 /** Class to implement a Logger */
 @SuppressWarnings("PMD.EmptyCatchBlock")

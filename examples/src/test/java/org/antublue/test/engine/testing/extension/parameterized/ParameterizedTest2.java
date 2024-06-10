@@ -27,7 +27,7 @@ import org.antublue.test.engine.api.support.NamedString;
 /** Example test */
 public class ParameterizedTest2 {
 
-    public final List<String> ACTUAL = new ArrayList<>();
+    public static final List<String> ACTUAL = new ArrayList<>();
 
     @TestEngine.ArgumentSupplier
     public static Stream<NamedString> arguments() {
@@ -46,7 +46,7 @@ public class ParameterizedTest2 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
         ACTUAL.add("prepare()");
     }
@@ -88,7 +88,7 @@ public class ParameterizedTest2 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
         ACTUAL.add("conclude()");
     }

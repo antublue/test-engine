@@ -50,9 +50,8 @@ public class DebugLifecycleWithExtensionTest {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
-        assertThat(argument).isNull();
         if ("prepare()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in prepare()");
         }
@@ -113,9 +112,8 @@ public class DebugLifecycleWithExtensionTest {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
-        assertThat(argument).isNull();
         if ("conclude()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in conclude()");
         }

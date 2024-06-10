@@ -25,17 +25,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.antublue.test.engine.api.Configuration;
-import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.internal.configuration.Constants;
+import org.antublue.test.engine.internal.ContextImpl;
+import org.antublue.test.engine.Constants;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.ClassUtils;
 
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class TestUtils {
 
-    private static final Configuration CONFIGURATION = Context.getInstance().getConfiguration();
+    private static final Configuration CONFIGURATION = ContextImpl.getInstance().getConfiguration();
 
     private static final DefaultMethodOrderTopDownComparator
             DEFAULT_METHOD_ORDER_TOP_DOWN_COMPARATOR = new DefaultMethodOrderTopDownComparator();
@@ -58,6 +58,19 @@ public class TestUtils {
 
     public static TestUtils getInstance() {
         return SingletonHolder.INSTANCE;
+    }
+
+    public void invoke(Method method, Object testArgument, ThrowableContext throwableContext) {
+        try {
+            method.setAccessible(true);
+            if (ReflectionUtils.acceptsArguments(method, Named.class)) {
+                method.invoke(null, testArgument);
+            } else {
+                method.invoke(null, (Object[]) null);
+            }
+        } catch (Throwable t) {
+            throwableContext.add(method.getDeclaringClass(), t);
+        }
     }
 
     public void invoke(

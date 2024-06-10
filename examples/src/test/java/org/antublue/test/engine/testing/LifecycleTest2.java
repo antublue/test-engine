@@ -57,7 +57,7 @@ public class LifecycleTest2 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
         ACTUAL_ORDER.add("prepare()");
     }

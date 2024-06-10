@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.internal.logger;
+package org.antublue.test.engine.internal.logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.antublue.test.engine.api.internal.configuration.ConfigurationImpl;
+import org.antublue.test.engine.internal.configuration.ConfigurationImpl;
 
 /** Class to implement a LoggerFactory */
 @SuppressWarnings("PMD.EmptyCatchBlock")

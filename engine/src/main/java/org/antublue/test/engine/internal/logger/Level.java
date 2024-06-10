@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.internal.logger;
+package org.antublue.test.engine.internal.logger;
 
 import java.util.HashMap;
 import java.util.Map;

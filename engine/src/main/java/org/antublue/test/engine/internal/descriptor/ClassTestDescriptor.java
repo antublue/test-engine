@@ -245,7 +245,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         try {
             for (Method method : prepareMethods) {
                 LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-                TEST_UTILS.invoke(method, getTestInstance(), null, getThrowableContext());
+                TEST_UTILS.invoke(method, null, getThrowableContext());
                 LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
@@ -296,7 +296,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         for (Method method : concludeMethods) {
             LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-            TEST_UTILS.invoke(method, getTestInstance(), null, getThrowableContext());
+            TEST_UTILS.invoke(method, null, getThrowableContext());
             LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
         }
 

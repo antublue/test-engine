@@ -37,7 +37,7 @@ public class SimpleTest2 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
     }
 
@@ -78,7 +78,7 @@ public class SimpleTest2 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
     }
 }

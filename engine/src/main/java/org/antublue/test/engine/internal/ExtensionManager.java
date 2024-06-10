@@ -30,15 +30,14 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Configuration;
-import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.internal.configuration.Constants;
-import org.antublue.test.engine.api.internal.logger.Logger;
-import org.antublue.test.engine.api.internal.logger.LoggerFactory;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
+import org.antublue.test.engine.Constants;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.ReflectionUtils;
 import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
@@ -50,7 +49,7 @@ public class ExtensionManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionManager.class);
 
-    private static final Configuration CONFIGURATION = Context.getInstance().getConfiguration();
+    private static final Configuration CONFIGURATION = ContextImpl.getInstance().getConfiguration();
 
     private static final List<Extension> EMPTY_EXTENSION_LIST = new ArrayList<>();
 

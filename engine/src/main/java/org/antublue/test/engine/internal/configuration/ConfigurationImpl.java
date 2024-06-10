@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.internal.configuration;
+package org.antublue.test.engine.internal.configuration;
 
 import static java.lang.String.format;
 
@@ -37,7 +37,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.Configuration;
-import org.antublue.test.engine.api.internal.logger.Level;
+import org.antublue.test.engine.internal.logger.Level;
 
 /** Class to implement Configuration */
 @SuppressWarnings("PMD.EmptyCatchBlock")

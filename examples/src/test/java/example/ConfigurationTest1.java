@@ -29,6 +29,8 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class ConfigurationTest1 {
 
+    @TestEngine.Context protected static Context context;
+
     @TestEngine.Argument protected String argument;
 
     @TestEngine.Argument protected Named<String> namedArgument;
@@ -46,14 +48,12 @@ public class ConfigurationTest1 {
     public void test() {
         System.out.println("test(" + namedArgument + ")");
 
-        Optional<String> optional = Context.getInstance().getConfiguration().getProperty("foo");
+        Optional<String> optional = context.getConfiguration().getProperty("foo");
         assertThat(optional).isPresent();
         assertThat(optional.get()).isEqualTo("bar");
 
         Optional<Double> optional2 =
-                Context.getInstance()
-                        .getConfiguration()
-                        .getProperty("number", string -> Double.valueOf(string));
+                context.getConfiguration().getProperty("number", Double::valueOf);
         assertThat(optional2).isPresent();
         assertThat(optional2.get()).isEqualTo(10.0D);
     }

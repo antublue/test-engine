@@ -28,9 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.internal.logger.Logger;
-import org.antublue.test.engine.api.internal.logger.LoggerFactory;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 
 /** Class to process @TestEngine.Lock, @TestEngine.Unlock, @TestEngine.ResourceLock annotations */
 public class LockAnnotationProcessor {

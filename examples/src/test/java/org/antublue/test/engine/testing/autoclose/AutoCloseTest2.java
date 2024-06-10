@@ -54,10 +54,10 @@ public class AutoCloseTest2 {
     public TestObject afterAllTestObject;
 
     @TestEngine.AutoClose.Conclude(method = "destroy")
-    public TestObject afterConcludeTestObject;
+    public static TestObject afterConcludeTestObject;
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
         afterConcludeTestObject = new TestObject("afterConcludeTestObject");
     }
@@ -95,7 +95,7 @@ public class AutoCloseTest2 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
     }
 

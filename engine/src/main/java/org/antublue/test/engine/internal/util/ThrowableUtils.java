@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import org.antublue.test.engine.api.Context;
-import org.antublue.test.engine.api.internal.configuration.Constants;
+import org.antublue.test.engine.internal.ContextImpl;
+import org.antublue.test.engine.Constants;
 
 /** Class to implement ThrowableUtils */
 public class ThrowableUtils {
@@ -38,7 +38,7 @@ public class ThrowableUtils {
             };
 
     private static final boolean STACK_TRACE_PRUNING =
-            Context.getInstance()
+            ContextImpl.getInstance()
                     .getConfiguration()
                     .getProperty(Constants.STACK_TRACE_PRUNE, toBoolean)
                     .orElse(true);

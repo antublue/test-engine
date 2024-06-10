@@ -31,11 +31,7 @@ public class ClassLockingTest2 {
     public static final String LOCK_NAME = "lock";
     public static final String COUNTER_NAME = "counter";
 
-    static {
-        Context.getInstance()
-                .getStore(NAMESPACE)
-                .computeIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
-    }
+    @TestEngine.Context protected static Context context;
 
     @TestEngine.Argument public NamedInteger argument;
 
@@ -46,8 +42,9 @@ public class ClassLockingTest2 {
 
     @TestEngine.Prepare
     @TestEngine.Lock(name = LOCK_NAME)
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
+        context.getStore(NAMESPACE).computeIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
     }
 
     @TestEngine.BeforeAll
@@ -64,8 +61,7 @@ public class ClassLockingTest2 {
     public void test1() {
         System.out.println("test1()");
 
-        AtomicInteger atomicInteger =
-                (AtomicInteger) Context.getInstance().getStore(NAMESPACE).get(COUNTER_NAME);
+        AtomicInteger atomicInteger = context.getStore(NAMESPACE).get(COUNTER_NAME);
 
         int count = atomicInteger.incrementAndGet();
         if (count != 1) {
@@ -95,7 +91,7 @@ public class ClassLockingTest2 {
 
     @TestEngine.Conclude
     @TestEngine.Unlock(name = LOCK_NAME)
-    public void conclude() {
+    public static void conclude() {
         System.out.println("conclude()");
     }
 }

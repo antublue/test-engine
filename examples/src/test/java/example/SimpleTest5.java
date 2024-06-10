@@ -41,7 +41,7 @@ public class SimpleTest5 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
     }
 
@@ -100,9 +100,7 @@ public class SimpleTest5 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
-        assertThat(argument).isNull();
-        assertThat(namedArgument).isNull();
+    public static void conclude() {
         System.out.println("conclude()");
     }
 }

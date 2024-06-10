@@ -34,6 +34,8 @@ public class StoreExampleTest4 {
 
     private Store store;
 
+    @TestEngine.Context protected static Context context;
+
     @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.ArgumentSupplier
@@ -46,17 +48,17 @@ public class StoreExampleTest4 {
     }
 
     @TestEngine.Prepare
-    public void prepare() {
+    public static void prepare() {
         System.out.println("prepare()");
-        System.out.println(format("key [%s]", TEST_OBJECT_KEY));
-
-        store = Context.getInstance().getStore(StoreExampleTest4.class);
-        store.put(TEST_OBJECT_KEY, new TestObject());
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + argument + ")");
+        System.out.println(format("key [%s]", TEST_OBJECT_KEY));
+
+        store = context.getStore(StoreExampleTest4.class);
+        store.put(TEST_OBJECT_KEY, new TestObject());
     }
 
     @TestEngine.BeforeEach
@@ -82,16 +84,16 @@ public class StoreExampleTest4 {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + argument + ")");
-    }
-
-    @TestEngine.Conclude
-    public void conclude() {
-        System.out.println("conclude()");
 
         TestObject testObject = (TestObject) store.remove(TEST_OBJECT_KEY);
         testObject.close();
 
         assertThat(store.get(TEST_OBJECT_KEY, Object.class)).isNull();
+    }
+
+    @TestEngine.Conclude
+    public static void conclude() {
+        System.out.println("conclude()");
     }
 
     private static class TestObject {

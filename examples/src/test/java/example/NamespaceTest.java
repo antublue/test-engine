@@ -29,6 +29,8 @@ import org.antublue.test.engine.api.support.NamedString;
 /** Example test */
 public class NamespaceTest {
 
+    @TestEngine.Context protected static Context context;
+
     @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.ArgumentSupplier
@@ -46,7 +48,7 @@ public class NamespaceTest {
 
         Namespace namespace = Namespace.of(NamespaceTest.class);
         System.out.println("namespace(" + namespace + ")");
-        Context.getInstance().getStore(namespace).put("foo", "bar");
+        context.getStore(namespace).put("foo", "bar");
     }
 
     @TestEngine.Test
@@ -55,7 +57,7 @@ public class NamespaceTest {
 
         Namespace namespace = Namespace.of(NamespaceTest.class);
         System.out.println("namespace(" + namespace + ")");
-        String value = Context.getInstance().getStore(namespace).remove("foo");
+        String value = context.getStore(namespace).remove("foo");
         assertThat(value).isNotNull();
         assertThat(value).isNotEmpty();
         assertThat(value).isEqualTo("bar");
