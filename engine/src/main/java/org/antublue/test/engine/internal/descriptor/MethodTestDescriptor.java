@@ -28,7 +28,6 @@ import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.ExtensionManager;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
-import org.antublue.test.engine.internal.processor.AutoCloseAnnotationProcessor;
 import org.antublue.test.engine.internal.processor.LockAnnotationProcessor;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.StateMachine;
@@ -47,9 +46,6 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
     private static final TestUtils TEST_UTILS = TestUtils.getInstance();
-
-    private static final AutoCloseAnnotationProcessor AUTO_CLOSE_ANNOTATION_PROCESSOR =
-            AutoCloseAnnotationProcessor.getInstance();
 
     private static final LockAnnotationProcessor LOCK_ANNOTATION_PROCESSOR =
             LockAnnotationProcessor.getInstance();
@@ -73,7 +69,6 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         PRE_AFTER_EACH,
         AFTER_EACH,
         POST_AFTER_EACH,
-        CLOSE_AUTO_CLOSE_FIELDS,
         END
     }
 
@@ -109,6 +104,8 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
     public void execute(ExecutionRequest executionRequest) {
         getStopWatch().reset();
 
+        setExecutionRequest(executionRequest);
+
         Object testInstance = getParent(ExecutableTestDescriptor.class).getTestInstance();
         Preconditions.notNull(testInstance, "testInstance is null");
         setTestInstance(testInstance);
@@ -128,7 +125,6 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
             return;
         }
 
-        setExecutionRequest(executionRequest);
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
         StateMachine<State> stateMachine = new StateMachine<>(getUniqueId().toString());
@@ -152,12 +148,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                             State.AFTER_EACH,
                             State.POST_AFTER_EACH)
                     .definition(State.AFTER_EACH, this::afterEach, State.POST_AFTER_EACH)
-                    .definition(
-                            State.POST_AFTER_EACH,
-                            this::postAfterEach,
-                            State.CLOSE_AUTO_CLOSE_FIELDS)
-                    .definition(
-                            State.CLOSE_AUTO_CLOSE_FIELDS, this::closeAutoCloseFields, State.END)
+                    .definition(State.POST_AFTER_EACH, this::postAfterEach, State.END)
                     .afterEach(
                             () -> {
                                 StandardStreams.flush();
@@ -316,17 +307,6 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
         EXTENSION_MANAGER.postAfterEachMethodsCallback(
                 getTestInstance(), testArgument, getThrowableContext());
-
-        return State.CLOSE_AUTO_CLOSE_FIELDS;
-    }
-
-    private State closeAutoCloseFields() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        AUTO_CLOSE_ANNOTATION_PROCESSOR.conclude(
-                getTestInstance(),
-                AutoCloseAnnotationProcessor.Type.AFTER_EACH,
-                getThrowableContext());
 
         return State.END;
     }

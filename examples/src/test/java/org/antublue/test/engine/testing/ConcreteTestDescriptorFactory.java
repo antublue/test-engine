@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedInteger;
+import org.antublue.test.engine.api.support.named.NamedInteger;
 
 public class ConcreteTestDescriptorFactory {
 

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.api.support.named;
 
 import java.util.Objects;
 
-/** Class to implement a DoubleArgument */
-public class NamedDouble extends AbstractNamed<Double> {
+/** Class to implement a NamedInteger */
+public class NamedInteger extends AbstractNamed<Integer> {
 
     private final String name;
-    private final double value;
+    private final int value;
 
     /**
      * Constructor
@@ -30,13 +30,13 @@ public class NamedDouble extends AbstractNamed<Double> {
      * @param name name
      * @param value value
      */
-    public NamedDouble(String name, double value) {
+    public NamedInteger(String name, int value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the DoubleArgument name
+     * Method to get the NamedInteger name
      *
      * @return the return value
      */
@@ -46,11 +46,11 @@ public class NamedDouble extends AbstractNamed<Double> {
     }
 
     /**
-     * Method to get the DoubleArgument value
+     * Method to get the NamedInteger value
      *
      * @return the return value
      */
-    public Double getPayload() {
+    public Integer getPayload() {
         return value;
     }
 
@@ -63,8 +63,8 @@ public class NamedDouble extends AbstractNamed<Double> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedDouble that = (NamedDouble) o;
-        return Double.compare(that.value, value) == 0 && Objects.equals(name, that.name);
+        NamedInteger that = (NamedInteger) o;
+        return value == that.value && Objects.equals(name, that.name);
     }
 
     @Override
@@ -73,12 +73,12 @@ public class NamedDouble extends AbstractNamed<Double> {
     }
 
     /**
-     * Method to create a DoubleArgument
+     * Method to create a NamedInteger
      *
      * @param value value
      * @return the return value
      */
-    public static NamedDouble of(double value) {
-        return new NamedDouble(String.valueOf(value), value);
+    public static NamedInteger of(int value) {
+        return new NamedInteger(String.valueOf(value), value);
     }
 }

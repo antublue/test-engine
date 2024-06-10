@@ -17,11 +17,11 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import java.util.Optional;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Configuration;
 import org.antublue.test.engine.internal.ContextImpl;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataSupport;
-import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.StopWatch;
@@ -91,7 +91,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         return executionRequest;
     }
 
-    public <T> T getParent(Class<T> clazz) {
+    protected <T> T getParent(Class<T> clazz) {
         Optional<TestDescriptor> optional = getParent();
         Preconditions.condition(optional.isPresent(), "parent is null");
         return clazz.cast(optional.get());
@@ -105,7 +105,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         this.testInstance = testInstance;
     }
 
-    public Object getTestInstance() {
+    protected Object getTestInstance() {
         return testInstance;
     }
 
@@ -124,4 +124,8 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
      * @param executionRequest executionRequest
      */
     public abstract void execute(ExecutionRequest executionRequest);
+
+    public void skip(ExecutionRequest executionRequest) {
+        // DO NOTHING
+    }
 }

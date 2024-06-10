@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.api.support.named;
 
 import java.util.Objects;
 
-/** Class to implement a ByteArgument */
-public class NamedByte extends AbstractNamed<Byte> {
+/** Class to implement a ShortArgument */
+public class NamedShort extends AbstractNamed<Short> {
 
     private final String name;
-    private final byte value;
+    private final short value;
 
     /**
      * Constructor
@@ -30,13 +30,13 @@ public class NamedByte extends AbstractNamed<Byte> {
      * @param name name
      * @param value value
      */
-    public NamedByte(String name, byte value) {
+    public NamedShort(String name, short value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the ByteArgument name
+     * Method to get the ShortArgument name
      *
      * @return the return value
      */
@@ -46,24 +46,19 @@ public class NamedByte extends AbstractNamed<Byte> {
     }
 
     /**
-     * Method to get the ByteArgument value
+     * Method to get the ShortArgument value
      *
      * @return the return value
      */
-    public Byte getPayload() {
+    public Short getPayload() {
         return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedByte that = (NamedByte) o;
+        NamedShort that = (NamedShort) o;
         return value == that.value && Objects.equals(name, that.name);
     }
 
@@ -73,12 +68,12 @@ public class NamedByte extends AbstractNamed<Byte> {
     }
 
     /**
-     * Method to create a ByteArgument
+     * Method to create a ShortArgument
      *
      * @param value value
      * @return the return value
      */
-    public static NamedByte of(byte value) {
-        return new NamedByte(String.valueOf(value), value);
+    public static NamedShort of(short value) {
+        return new NamedShort(String.valueOf(value), value);
     }
 }

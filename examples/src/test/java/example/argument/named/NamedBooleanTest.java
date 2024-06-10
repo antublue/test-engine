@@ -14,46 +14,44 @@
  * limitations under the License.
  */
 
-package example.argument;
+package example.argument.named;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedBigInteger;
+import org.antublue.test.engine.api.support.named.NamedBoolean;
 
 /** Example test */
-public class NamedBigIntegerTest {
-
-    @TestEngine.Argument protected NamedBigInteger argument;
+public class NamedBooleanTest {
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedBigInteger> arguments() {
-        Collection<NamedBigInteger> collection = new ArrayList<>();
+    public static Stream<NamedBoolean> arguments() {
+        Collection<NamedBoolean> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(NamedBigInteger.of(new BigInteger(String.valueOf(i))));
+            boolean value = (i % 2) == 0;
+            collection.add(NamedBoolean.of(value));
         }
         return collection.stream();
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll() {
+    public void beforeAll(NamedBoolean namedBoolean) {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.Test
-    public void test1() {
-        System.out.println("test1(" + argument.getPayload() + ")");
+    public void test1(NamedBoolean namedBoolean) {
+        System.out.println("test1(" + namedBoolean.getPayload() + ")");
     }
 
     @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + argument.getPayload() + ")");
+    public void test2(NamedBoolean namedBoolean) {
+        System.out.println("test2(" + namedBoolean.getPayload() + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll() {
+    public void afterAll(NamedBoolean namedBoolean) {
         System.out.println("afterAll()");
     }
 }

@@ -22,12 +22,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
+import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 public class SimpleTest1 {
 
     @TestEngine.Argument protected NamedString argument;
+
+    @TestEngine.Random.Integer protected Integer randomInteger;
 
     @TestEngine.ArgumentSupplier
     public static Stream<NamedString> arguments() {
@@ -46,7 +48,9 @@ public class SimpleTest1 {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + argument + ")");
+        System.out.println("randomInteger = [" + randomInteger + "]");
         assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.BeforeEach
@@ -76,7 +80,9 @@ public class SimpleTest1 {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + argument + ")");
+        System.out.println("randomInteger = [" + randomInteger + "]");
         assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.Conclude

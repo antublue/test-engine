@@ -16,26 +16,26 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestEngineException;
+import org.antublue.test.engine.internal.ContextImpl;
 import org.antublue.test.engine.internal.ExtensionManager;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
 import org.antublue.test.engine.internal.processor.AutoCloseAnnotationProcessor;
 import org.antublue.test.engine.internal.processor.ContextAnnotationProcessor;
 import org.antublue.test.engine.internal.processor.LockAnnotationProcessor;
-import org.antublue.test.engine.internal.util.ReflectionUtils;
+import org.antublue.test.engine.internal.util.MethodUtils;
 import org.antublue.test.engine.internal.util.StandardStreams;
-import org.antublue.test.engine.internal.util.StateMachine;
 import org.antublue.test.engine.internal.util.TestUtils;
-import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
-import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -44,6 +44,7 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /** Class to implement a ClassTestDescriptor */
+@SuppressWarnings("PMD.UnusedPrivateMethod")
 public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
     private static final TestUtils TEST_UTILS = TestUtils.getInstance();
@@ -62,22 +63,6 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     private final Class<?> testClass;
     private final List<Method> prepareMethods;
     private final List<Method> concludeMethods;
-
-    private enum State {
-        NULL,
-        PRE_INSTANTIATE,
-        INSTANTIATE,
-        POST_INSTANTIATE,
-        PRE_PREPARE,
-        PREPARE,
-        POST_PREPARE,
-        EXECUTE_OR_SKIP,
-        PRE_CONCLUDE,
-        CONCLUDE,
-        POST_CONCLUDE,
-        CLOSE_AUTO_CLOSE_FIELDS,
-        END
-    }
 
     /**
      * Constructor
@@ -118,53 +103,28 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         setExecutionRequest(executionRequest);
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
-        StateMachine<State> stateMachine = new StateMachine<>(getUniqueId().toString());
+        setContextFields();
+        setStaticFields();
+        postSetStaticFields();
+        prepare();
+        // postPrepare();
 
-        try {
-            stateMachine
-                    .definition(State.NULL, this::begin, State.PRE_INSTANTIATE)
-                    .definition(
-                            State.PRE_INSTANTIATE,
-                            this::preInstantiate,
-                            State.INSTANTIATE,
-                            State.POST_INSTANTIATE)
-                    .definition(State.INSTANTIATE, this::instantiate, State.POST_INSTANTIATE)
-                    .definition(
-                            State.POST_INSTANTIATE,
-                            this::postInstantiate,
-                            State.PRE_PREPARE,
-                            State.EXECUTE_OR_SKIP)
-                    .definition(
-                            State.PRE_PREPARE, this::prePrepare, State.PREPARE, State.POST_PREPARE)
-                    .definition(State.PREPARE, this::prepare, State.POST_PREPARE)
-                    .definition(State.POST_PREPARE, this::postPrepare, State.EXECUTE_OR_SKIP)
-                    .definition(State.EXECUTE_OR_SKIP, this::executeOrSkip, State.PRE_CONCLUDE)
-                    .definition(
-                            State.PRE_CONCLUDE,
-                            this::preConclude,
-                            State.CONCLUDE,
-                            State.POST_CONCLUDE)
-                    .definition(State.CONCLUDE, this::conclude, State.POST_CONCLUDE)
-                    .definition(
-                            State.POST_CONCLUDE, this::postConclude, State.CLOSE_AUTO_CLOSE_FIELDS)
-                    .definition(
-                            State.CLOSE_AUTO_CLOSE_FIELDS, this::closeAutoCloseFields, State.END)
-                    .afterEach(
-                            () -> {
-                                StandardStreams.flush();
-                                throttle();
-                                return null;
-                            })
-                    .end(State.END, this::end)
-                    .run(State.NULL);
-        } catch (Throwable t) {
-            getThrowableContext().add(testClass, t);
+        if (getThrowableContext().isEmpty()) {
+            createTestInstance();
         }
 
-        setExecutionRequest(null);
-        setTestInstance(null);
+        if (getThrowableContext().isEmpty()) {
+            execute();
+        }
+
+        // closeAutoCloseableFields();
+        destroyTestInstance();
+        conclude();
+        // postConclude();
+        clearContextFields();
 
         getStopWatch().stop();
+
         getMetadata()
                 .put(
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
@@ -188,64 +148,34 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         StandardStreams.flush();
     }
 
-    private State begin() {
-        return State.PRE_INSTANTIATE;
-    }
+    private void setContextFields() {
+        List<Field> fields =
+                ReflectionSupport.findFields(
+                        getTestClass(),
+                        field ->
+                                Modifier.isStatic(field.getModifiers())
+                                        && field.isAnnotationPresent(TestEngine.Context.class),
+                        HierarchyTraversalMode.TOP_DOWN);
 
-    private State preInstantiate() {
-        LOCK_ANNOTATION_PROCESSOR.processLock(getTestClass());
-
-        EXTENSION_MANAGER.preInstantiateCallback(testClass, getThrowableContext());
-
-        if (getThrowableContext().isEmpty()) {
-            return State.INSTANTIATE;
-        } else {
-            return State.END;
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                field.set(null, ContextImpl.getInstance());
+            } catch (Throwable t) {
+                getThrowableContext().add(getTestClass(), t);
+            }
         }
     }
 
-    private State instantiate() {
-        Preconditions.condition(getThrowableContext().isEmpty(), "Programming error");
+    private void setStaticFields() {}
 
-        try {
-            setTestInstance(ReflectionUtils.newInstance(testClass));
-            CONTEXT_ANNOTATION_PROCESSOR.process(getTestInstance(), getThrowableContext());
-        } catch (Throwable t) {
-            getThrowableContext().add(testClass, t);
-        }
+    private void postSetStaticFields() {}
 
-        return State.POST_INSTANTIATE;
-    }
-
-    private State postInstantiate() {
-        EXTENSION_MANAGER.postInstantiateCallback(getTestInstance(), getThrowableContext());
-
-        if (getThrowableContext().isEmpty()) {
-            return State.PRE_PREPARE;
-        } else {
-            return State.END;
-        }
-    }
-
-    private State prePrepare() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        EXTENSION_MANAGER.prePrepareMethodsCallback(getTestInstance(), getThrowableContext());
-
-        if (getThrowableContext().isEmpty()) {
-            return State.PREPARE;
-        } else {
-            return State.POST_PREPARE;
-        }
-    }
-
-    private State prepare() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
+    private void prepare() {
         try {
             for (Method method : prepareMethods) {
                 LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-                TEST_UTILS.invoke(method, null, getThrowableContext());
+                MethodUtils.invoke(method, getThrowableContext());
                 LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
                 if (!getThrowableContext().isEmpty()) {
                     break;
@@ -254,21 +184,24 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
         }
-
-        return State.POST_PREPARE;
     }
 
-    private State postPrepare() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
+    private void postPrepare() {
         EXTENSION_MANAGER.postPrepareMethodsCallback(getTestInstance(), getThrowableContext());
-
-        return State.EXECUTE_OR_SKIP;
     }
 
-    private State executeOrSkip() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
+    private void createTestInstance() {
+        try {
+            setTestInstance(
+                    getTestClass()
+                            .getDeclaredConstructor((Class<?>[]) null)
+                            .newInstance((Object[]) null));
+        } catch (Throwable t) {
+            getThrowableContext().add(getTestClass(), t);
+        }
+    }
 
+    private void execute() {
         getChildren()
                 .forEach(
                         testDescriptor -> {
@@ -277,57 +210,47 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                                         .execute(getExecutionRequest());
                             }
                         });
-
-        return State.PRE_CONCLUDE;
     }
 
-    private State preConclude() {
-        EXTENSION_MANAGER.preConcludeMethodsCallback(getTestInstance(), getThrowableContext());
-
-        if (getThrowableContext().isEmpty()) {
-            return State.CONCLUDE;
-        } else {
-            return State.POST_CONCLUDE;
-        }
+    private void destroyTestInstance() {
+        setTestInstance(null);
     }
 
-    private State conclude() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
+    private void conclude() {
         for (Method method : concludeMethods) {
             LOCK_ANNOTATION_PROCESSOR.processLocks(method);
             TEST_UTILS.invoke(method, null, getThrowableContext());
             LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
         }
-
-        return State.POST_CONCLUDE;
     }
 
-    private State postConclude() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
+    private void postConclude() {
         EXTENSION_MANAGER.postConcludeMethodsCallback(getTestInstance(), getThrowableContext());
-
-        return State.CLOSE_AUTO_CLOSE_FIELDS;
     }
 
-    private State closeAutoCloseFields() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        AUTO_CLOSE_ANNOTATION_PROCESSOR.conclude(
-                getTestInstance(),
-                AutoCloseAnnotationProcessor.Type.AFTER_CONCLUDE,
-                getThrowableContext());
-
-        return State.END;
-    }
-
-    private State end() {
-        EXTENSION_MANAGER.preDestroyCallback(testClass, getTestInstance(), new ThrowableContext());
-
+    private void closeAutoCloseableFields() {
+        AUTO_CLOSE_ANNOTATION_PROCESSOR.closeAutoCloseableFields(
+                getTestClass(), getThrowableContext());
         LOCK_ANNOTATION_PROCESSOR.processUnlocks(getTestClass());
+    }
 
-        return null;
+    private void clearContextFields() {
+        List<Field> fields =
+                ReflectionSupport.findFields(
+                        getTestClass(),
+                        field ->
+                                Modifier.isStatic(field.getModifiers())
+                                        && field.isAnnotationPresent(TestEngine.Context.class),
+                        HierarchyTraversalMode.BOTTOM_UP);
+
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                field.set(null, null);
+            } catch (Throwable t) {
+                getThrowableContext().add(getTestClass(), t);
+            }
+        }
     }
 
     /** Class to implement a Builder */

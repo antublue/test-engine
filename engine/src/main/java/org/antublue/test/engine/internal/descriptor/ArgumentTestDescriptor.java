@@ -34,7 +34,6 @@ import org.antublue.test.engine.internal.processor.AutoCloseAnnotationProcessor;
 import org.antublue.test.engine.internal.processor.LockAnnotationProcessor;
 import org.antublue.test.engine.internal.processor.RandomAnnotationProcessor;
 import org.antublue.test.engine.internal.util.StandardStreams;
-import org.antublue.test.engine.internal.util.StateMachine;
 import org.antublue.test.engine.internal.util.TestUtils;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -47,7 +46,7 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /** Class to implement a ArgumentTestDescriptor */
-@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
+@SuppressWarnings({"PMD.UnusedPrivateMethod", "PMD.AvoidAccessibilityAlteration"})
 public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
     private static final TestUtils TEST_UTILS = TestUtils.getInstance();
@@ -70,22 +69,6 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private final Named<?> testArgument;
     private final List<Method> beforeAllMethods;
     private final List<Method> afterAllMethods;
-
-    private enum State {
-        NULL,
-        SET_ARGUMENT_FIELDS,
-        SET_RANDOM_FIELDS,
-        PRE_BEFORE_ALL,
-        BEFORE_ALL,
-        POST_BEFORE_ALL,
-        EXECUTE_OR_SKIP,
-        PRE_AFTER_ALL,
-        AFTER_ALL,
-        POST_AFTER_ALL,
-        CLEAR_ARGUMENTS_FIELDS,
-        CLOSE_AUTO_CLOSE_FIELDS,
-        END
-    }
 
     /**
      * Constructor
@@ -118,6 +101,8 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     public void execute(ExecutionRequest executionRequest) {
         getStopWatch().reset();
 
+        setExecutionRequest(executionRequest);
+
         Object testInstance = getParent(ExecutableTestDescriptor.class).getTestInstance();
         Preconditions.notNull(testInstance, "testInstance is null");
         setTestInstance(testInstance);
@@ -125,79 +110,24 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata().put(MetadataConstants.TEST_ARGUMENT, testArgument);
 
-        if (!getThrowableContext().isEmpty()) {
-            getChildren()
-                    .forEach(
-                            (Consumer<TestDescriptor>)
-                                    testDescriptor -> {
-                                        if (testDescriptor instanceof ExecutableTestDescriptor) {
-                                            ((ExecutableTestDescriptor) testDescriptor)
-                                                    .execute(executionRequest);
-                                        }
-                                    });
-
-            getStopWatch().stop();
-            getMetadata()
-                    .put(
-                            MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                            getStopWatch().elapsedNanoseconds());
-            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
-            executionRequest.getEngineExecutionListener().executionSkipped(this, "");
-            return;
-        }
-
-        setExecutionRequest(executionRequest);
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
-        StateMachine<State> stateMachine = new StateMachine<>(getUniqueId().toString());
-
-        try {
-            stateMachine
-                    .definition(State.NULL, this::begin, State.SET_ARGUMENT_FIELDS)
-                    .definition(
-                            State.SET_ARGUMENT_FIELDS,
-                            this::setArgumentFields,
-                            State.SET_RANDOM_FIELDS,
-                            State.EXECUTE_OR_SKIP)
-                    .definition(
-                            State.SET_RANDOM_FIELDS,
-                            this::setRandomFields,
-                            State.PRE_BEFORE_ALL,
-                            State.EXECUTE_OR_SKIP)
-                    .definition(
-                            State.PRE_BEFORE_ALL,
-                            this::preBeforeAll,
-                            State.BEFORE_ALL,
-                            State.POST_BEFORE_ALL)
-                    .definition(State.BEFORE_ALL, this::beforeAll, State.POST_BEFORE_ALL)
-                    .definition(State.POST_BEFORE_ALL, this::postBeforeAll, State.EXECUTE_OR_SKIP)
-                    .definition(State.EXECUTE_OR_SKIP, this::executeOrSkip, State.PRE_AFTER_ALL)
-                    .definition(
-                            State.PRE_AFTER_ALL,
-                            this::preAfterAll,
-                            State.AFTER_ALL,
-                            State.POST_AFTER_ALL)
-                    .definition(State.AFTER_ALL, this::afterAll, State.POST_AFTER_ALL)
-                    .definition(
-                            State.POST_AFTER_ALL, this::postAfterAll, State.CLOSE_AUTO_CLOSE_FIELDS)
-                    .definition(
-                            State.CLOSE_AUTO_CLOSE_FIELDS,
-                            this::closeAutoCloseFields,
-                            State.CLEAR_ARGUMENTS_FIELDS)
-                    .definition(State.CLEAR_ARGUMENTS_FIELDS, this::clearArgumentFields, State.END)
-                    .afterEach(
-                            () -> {
-                                StandardStreams.flush();
-                                throttle();
-                                return null;
-                            })
-                    .end(State.END, this::end)
-                    .run(State.NULL);
-        } catch (Throwable t) {
-            getThrowableContext().add(testClass, t);
+        setArgumentFields();
+        postSetArgumentFields();
+        if (getThrowableContext().isEmpty()) {
+            setRandomFields();
+            if (getThrowableContext().isEmpty()) {
+                beforeAllMethods();
+                if (getThrowableContext().isEmpty()) {
+                    execute();
+                }
+                afterAllMethods();
+                clearRandomFields();
+            }
+            clearArgumentFields();
         }
 
-        setExecutionRequest(null);
+        // postBeforeAllMethods();
 
         getStopWatch().stop();
 
@@ -232,49 +162,24 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         StandardStreams.flush();
     }
 
-    private State begin() {
-        return State.SET_ARGUMENT_FIELDS;
-    }
-
-    private State setArgumentFields() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        ARGUMENT_ANNOTATION_PROCESSOR.prepare(
+    private void setArgumentFields() {
+        ARGUMENT_ANNOTATION_PROCESSOR.setArgumentFields(
                 getTestInstance(), testArgument, getThrowableContext());
-
-        if (!getThrowableContext().isEmpty()) {
-            return State.EXECUTE_OR_SKIP;
-        }
-
-        return State.SET_RANDOM_FIELDS;
     }
 
-    private State setRandomFields() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        RANDOM_ANNOTATION_PROCESSOR.prepare(getTestInstance(), getThrowableContext());
-
-        if (!getThrowableContext().isEmpty()) {
-            return State.EXECUTE_OR_SKIP;
-        }
-
-        return State.PRE_BEFORE_ALL;
+    private void postSetArgumentFields() {
+        // TODO
     }
 
-    private State preBeforeAll() {
-        EXTENSION_MANAGER.preBeforeAllMethodsCallback(
-                getTestInstance(), testArgument, getThrowableContext());
-
-        if (getThrowableContext().isEmpty()) {
-            return State.BEFORE_ALL;
-        } else {
-            return State.POST_BEFORE_ALL;
-        }
+    private void setRandomFields() {
+        RANDOM_ANNOTATION_PROCESSOR.setRandomFields(getTestInstance(), getThrowableContext());
     }
 
-    private State beforeAll() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
+    private void postSetRandomFields() {
+        // TODO
+    }
 
+    private void beforeAllMethods() {
         try {
             for (Method method : beforeAllMethods) {
                 LOCK_ANNOTATION_PROCESSOR.processLocks(method);
@@ -287,22 +192,13 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         } catch (Throwable t) {
             getThrowableContext().add(testClass, t);
         }
-
-        return State.POST_BEFORE_ALL;
     }
 
-    private State postBeforeAll() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        EXTENSION_MANAGER.postBeforeAllMethodsCallback(
-                getTestInstance(), testArgument, getThrowableContext());
-
-        return State.EXECUTE_OR_SKIP;
+    private void postBeforeAllMethods() {
+        // TODO
     }
 
-    private State executeOrSkip() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
+    private void execute() {
         getChildren()
                 .forEach(
                         (Consumer<TestDescriptor>)
@@ -312,66 +208,37 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                                 .execute(getExecutionRequest());
                                     }
                                 });
-
-        return State.PRE_AFTER_ALL;
     }
 
-    private State preAfterAll() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        EXTENSION_MANAGER.preAfterAllMethodsCallback(
-                getTestInstance(), testArgument, getThrowableContext());
-
-        if (getThrowableContext().isEmpty()) {
-            return State.AFTER_ALL;
-        } else {
-            return State.POST_AFTER_ALL;
-        }
-    }
-
-    private State afterAll() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
+    private void afterAllMethods() {
         for (Method method : afterAllMethods) {
             LOCK_ANNOTATION_PROCESSOR.processLocks(method);
             TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
             LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
         }
-
-        return State.POST_AFTER_ALL;
     }
 
-    private State postAfterAll() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        EXTENSION_MANAGER.postAfterAllMethodsCallback(
-                getTestInstance(), testArgument, getThrowableContext());
-
-        return State.CLOSE_AUTO_CLOSE_FIELDS;
+    private void postAfterAllMethods() {
+        // DO NOTHING
     }
 
-    private State closeAutoCloseFields() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        AUTO_CLOSE_ANNOTATION_PROCESSOR.conclude(
-                getTestInstance(),
-                AutoCloseAnnotationProcessor.Type.AFTER_ALL,
-                getThrowableContext());
-
-        return State.CLEAR_ARGUMENTS_FIELDS;
+    private void clearRandomFields() {
+        RANDOM_ANNOTATION_PROCESSOR.clearRandomFields(getTestInstance(), getThrowableContext());
     }
 
-    private State clearArgumentFields() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        ARGUMENT_ANNOTATION_PROCESSOR.conclude(getTestInstance(), null, getThrowableContext());
-
-        return State.END;
+    private void postClearRandomFields() {
+        // TODO
     }
 
-    private State end() {
-        return null;
+    private void clearArgumentFields() {
+        ARGUMENT_ANNOTATION_PROCESSOR.clearArgumentFields(
+                getTestInstance(), null, getThrowableContext());
     }
+
+    private void postClearArgumentFields() {
+        // TODO
+    }
+
 
     /** Class to implement a Builder */
     public static class Builder {

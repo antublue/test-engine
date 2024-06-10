@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.api.support.named;
 
 import java.util.Objects;
 
-/** Class to implement a FloatArgument */
-public class NamedFloat extends AbstractNamed<Float> {
+/** Class to implement a DoubleArgument */
+public class NamedDouble extends AbstractNamed<Double> {
 
     private final String name;
-    private final float value;
+    private final double value;
 
     /**
      * Constructor
@@ -30,13 +30,13 @@ public class NamedFloat extends AbstractNamed<Float> {
      * @param name name
      * @param value value
      */
-    public NamedFloat(String name, float value) {
+    public NamedDouble(String name, double value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the FloatArgument name
+     * Method to get the DoubleArgument name
      *
      * @return the return value
      */
@@ -46,11 +46,11 @@ public class NamedFloat extends AbstractNamed<Float> {
     }
 
     /**
-     * Method to get the FloatArgument value
+     * Method to get the DoubleArgument value
      *
      * @return the return value
      */
-    public Float getPayload() {
+    public Double getPayload() {
         return value;
     }
 
@@ -63,8 +63,8 @@ public class NamedFloat extends AbstractNamed<Float> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedFloat that = (NamedFloat) o;
-        return Float.compare(that.value, value) == 0 && Objects.equals(name, that.name);
+        NamedDouble that = (NamedDouble) o;
+        return Double.compare(that.value, value) == 0 && Objects.equals(name, that.name);
     }
 
     @Override
@@ -73,12 +73,12 @@ public class NamedFloat extends AbstractNamed<Float> {
     }
 
     /**
-     * Method to create a FloatArgument
+     * Method to create a DoubleArgument
      *
      * @param value value
      * @return the return value
      */
-    public static NamedFloat of(float value) {
-        return new NamedFloat(String.valueOf(value), value);
+    public static NamedDouble of(double value) {
+        return new NamedDouble(String.valueOf(value), value);
     }
 }

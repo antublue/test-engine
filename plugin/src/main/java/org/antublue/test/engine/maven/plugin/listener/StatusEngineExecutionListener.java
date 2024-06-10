@@ -17,12 +17,12 @@
 package org.antublue.test.engine.maven.plugin.listener;
 
 import java.lang.reflect.Method;
+import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.MetadataSupport;
 import org.antublue.test.engine.internal.configuration.ConfigurationImpl;
-import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.AnsiColor;

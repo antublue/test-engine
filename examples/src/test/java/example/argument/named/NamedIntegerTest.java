@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package example.argument;
+package example.argument.named;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedInteger;
+import org.antublue.test.engine.api.support.named.NamedInteger;
 
 /** Example test */
 public class NamedIntegerTest {

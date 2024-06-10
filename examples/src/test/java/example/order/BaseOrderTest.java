@@ -16,16 +16,14 @@
 
 package example.order;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
+import org.antublue.test.engine.api.support.named.NamedString;
 
 public abstract class BaseOrderTest {
 
-    protected final List<String> EXPECTED =
+    protected static final List<String> EXPECTED =
             listOf(
                     "BaseOrderTest.prepare()",
                     "ConcreteOrderTest.prepare2()",
@@ -36,13 +34,13 @@ public abstract class BaseOrderTest {
                     "ConcreteOrderTest.conclude2()",
                     "BaseOrderTest.conclude()");
 
-    protected final List<String> actual = new ArrayList<>();
+    protected static final List<String> actual = new ArrayList<>();
 
     @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 1)
-    public final void prepare() {
+    public static final void prepare() {
         System.out.println("BaseOrderTest.prepare()");
         actual.add("BaseOrderTest.prepare()");
     }
@@ -69,9 +67,8 @@ public abstract class BaseOrderTest {
 
     @TestEngine.Conclude
     @TestEngine.Order(order = 2)
-    public final void conclude() {
+    public static final void conclude() {
         System.out.println("BaseOrderTest.conclude()");
-        assertThat(argument).isNull();
         actual.add("BaseOrderTest.conclude()");
     }
 

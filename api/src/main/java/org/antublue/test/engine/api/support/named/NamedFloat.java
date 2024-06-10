@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.api.support.named;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
-/** Class to implement a BigDecimalArgument */
-public class NamedBigDecimal extends AbstractNamed<BigDecimal> {
+/** Class to implement a FloatArgument */
+public class NamedFloat extends AbstractNamed<Float> {
 
     private final String name;
-    private final BigDecimal value;
+    private final float value;
 
     /**
      * Constructor
@@ -31,13 +30,13 @@ public class NamedBigDecimal extends AbstractNamed<BigDecimal> {
      * @param name name
      * @param value value
      */
-    public NamedBigDecimal(String name, BigDecimal value) {
+    public NamedFloat(String name, float value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the BigDecimal name
+     * Method to get the FloatArgument name
      *
      * @return the return value
      */
@@ -47,11 +46,11 @@ public class NamedBigDecimal extends AbstractNamed<BigDecimal> {
     }
 
     /**
-     * Method to get the BigDecimal value
+     * Method to get the FloatArgument value
      *
      * @return the return value
      */
-    public BigDecimal getPayload() {
+    public Float getPayload() {
         return value;
     }
 
@@ -64,8 +63,8 @@ public class NamedBigDecimal extends AbstractNamed<BigDecimal> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedBigDecimal that = (NamedBigDecimal) o;
-        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
+        NamedFloat that = (NamedFloat) o;
+        return Float.compare(that.value, value) == 0 && Objects.equals(name, that.name);
     }
 
     @Override
@@ -74,16 +73,12 @@ public class NamedBigDecimal extends AbstractNamed<BigDecimal> {
     }
 
     /**
-     * Method to create a BigDecimalArgument
+     * Method to create a FloatArgument
      *
      * @param value value
      * @return the return value
      */
-    public static NamedBigDecimal of(BigDecimal value) {
-        if (value == null) {
-            throw new IllegalArgumentException("value is null");
-        }
-
-        return new NamedBigDecimal(String.valueOf(value), value);
+    public static NamedFloat of(float value) {
+        return new NamedFloat(String.valueOf(value), value);
     }
 }

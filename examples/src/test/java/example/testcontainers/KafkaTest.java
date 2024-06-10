@@ -55,10 +55,9 @@ public class KafkaTest {
 
     private String message;
 
-    @TestEngine.AutoClose.Conclude private Network network;
+    @TestEngine.AutoClose private static Network network;
 
-    @TestEngine.Argument @TestEngine.AutoClose.AfterAll
-    protected KafkaTestEnvironment kafkaTestEnvironment;
+    @TestEngine.Argument @TestEngine.AutoClose protected KafkaTestEnvironment kafkaTestEnvironment;
 
     @TestEngine.ArgumentSupplier
     public static Stream<KafkaTestEnvironment> arguments() {

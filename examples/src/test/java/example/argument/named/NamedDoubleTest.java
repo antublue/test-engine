@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package example.argument;
+package example.argument.named;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedBigDecimal;
+import org.antublue.test.engine.api.support.named.NamedDouble;
 
 /** Example test */
-public class NamedBigDecimalTest {
+public class NamedDoubleTest {
 
-    @TestEngine.Argument protected NamedBigDecimal argument;
+    @TestEngine.Argument protected NamedDouble argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedBigDecimal> arguments() {
-        Collection<NamedBigDecimal> collection = new ArrayList<>();
+    public static Stream<NamedDouble> arguments() {
+        Collection<NamedDouble> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(NamedBigDecimal.of(new BigDecimal(i + ".0")));
+            collection.add(NamedDouble.of(i + 0.1d));
         }
         return collection.stream();
     }

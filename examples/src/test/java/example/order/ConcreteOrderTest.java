@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
+import org.antublue.test.engine.api.support.named.NamedString;
 import org.antublue.test.engine.testing.Validation;
 import org.antublue.test.engine.testing.ValidationExtension;
 
@@ -50,7 +50,7 @@ public class ConcreteOrderTest extends BaseOrderTest implements Validation {
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 2)
-    public void prepare2() {
+    public static void prepare2() {
         System.out.println("ConcreteOrderTest.prepare2()");
         actual.add("ConcreteOrderTest.prepare2()");
     }
@@ -87,9 +87,8 @@ public class ConcreteOrderTest extends BaseOrderTest implements Validation {
 
     @TestEngine.Conclude
     @TestEngine.Order(order = 1)
-    public void conclude2() {
+    public static void conclude2() {
         System.out.println("ConcreteOrderTest.conclude2()");
-        assertThat(argument).isNull();
         actual.add("ConcreteOrderTest.conclude2()");
     }
 

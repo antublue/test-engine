@@ -59,7 +59,7 @@ public class ArgumentAnnotationProcessor {
      * @param testArgument testArgument
      * @param throwableContext throwableContext
      */
-    public void prepare(
+    public void setArgumentFields(
             Object testInstance, Named<?> testArgument, ThrowableContext throwableContext) {
         LOGGER.trace(
                 "prepare() class [%s] instance [%s], argument [%s]",
@@ -75,7 +75,7 @@ public class ArgumentAnnotationProcessor {
      * @param testArgument testArgument
      * @param throwableContext throwableContext
      */
-    public void conclude(
+    public void clearArgumentFields(
             Object testInstance, Named<?> testArgument, ThrowableContext throwableContext) {
         LOGGER.trace(
                 "conclude() class [%s] instance [%s], argument [%s]",

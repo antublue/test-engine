@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package example.argument;
+package example.argument.named;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedBoolean;
+import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
-public class RandomNamedBooleanTest {
+public class NamedStringTest {
 
-    @TestEngine.Argument protected NamedBoolean argument;
+    @TestEngine.Argument protected NamedString argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedBoolean> arguments() {
-        Collection<NamedBoolean> collection = new ArrayList<>();
+    public static Stream<NamedString> arguments() {
+        Collection<NamedString> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            boolean value = (i % 2) == 0;
-            collection.add(NamedBoolean.of(value));
+            collection.add(NamedString.of("String " + i));
         }
         return collection.stream();
     }
@@ -44,12 +43,12 @@ public class RandomNamedBooleanTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument.getPayload() + ")");
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + argument.getPayload() + ")");
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterAll

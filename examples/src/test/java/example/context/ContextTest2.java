@@ -29,7 +29,7 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class ContextTest2 {
 
-    @TestEngine.Context protected Context context;
+    @TestEngine.Context private static Context context;
 
     @TestEngine.Argument protected String argument;
 

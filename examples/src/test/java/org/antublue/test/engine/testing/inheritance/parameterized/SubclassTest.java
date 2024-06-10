@@ -37,9 +37,8 @@ public class SubclassTest extends BaseTest implements Validation {
     }
 
     @TestEngine.Prepare
-    public void prepare2() {
+    public static void prepare2() {
         System.out.println("prepare2()");
-        assertThat(argument).isNull();
         actual.add("prepare2()");
     }
 
@@ -79,9 +78,8 @@ public class SubclassTest extends BaseTest implements Validation {
     }
 
     @TestEngine.Conclude
-    public void conclude2() {
+    public static void conclude2() {
         System.out.println("conclude2()");
-        assertThat(argument).isNull();
         actual.add("conclude2()");
     }
 

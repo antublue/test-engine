@@ -127,47 +127,16 @@ public @interface TestEngine {
     }
 
     /** AutoClose meta-annotation */
-    @Target(ElementType.ANNOTATION_TYPE)
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
+    @Retention(RetentionPolicy.RUNTIME)
     @interface AutoClose {
 
-        /** AfterEach annotation */
-        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-        @Retention(RetentionPolicy.RUNTIME)
-        @interface AfterEach {
-
-            /**
-             * Method value
-             *
-             * @return the method name
-             */
-            String method() default "";
-        }
-
-        /** AfterAll annotation */
-        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-        @Retention(RetentionPolicy.RUNTIME)
-        @interface AfterAll {
-
-            /**
-             * Method value
-             *
-             * @return the method name
-             */
-            String method() default "";
-        }
-
-        /** Conclude annotation */
-        @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-        @Retention(RetentionPolicy.RUNTIME)
-        @interface Conclude {
-
-            /**
-             * Method value
-             *
-             * @return the method name
-             */
-            String method() default "";
-        }
+        /**
+         * Method value
+         *
+         * @return the method name
+         */
+        String method() default "";
     }
 
     /** Random meta-annotation */

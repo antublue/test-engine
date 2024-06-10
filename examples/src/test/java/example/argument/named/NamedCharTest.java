@@ -14,44 +14,46 @@
  * limitations under the License.
  */
 
-package example.argument;
+package example.argument.named;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedBoolean;
+import org.antublue.test.engine.api.support.named.NamedChar;
 
 /** Example test */
-public class NamedBooleanTest {
+public class NamedCharTest {
+
+    @TestEngine.Argument protected NamedChar argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedBoolean> arguments() {
-        Collection<NamedBoolean> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            boolean value = (i % 2) == 0;
-            collection.add(NamedBoolean.of(value));
+    public static Stream<NamedChar> arguments() {
+        char[] characters = new char[] {'a', 'b', 'c', 'd', 'e'};
+        Collection<NamedChar> collection = new ArrayList<>();
+        for (int i = 0; i < characters.length; i++) {
+            collection.add(NamedChar.of(characters[i]));
         }
         return collection.stream();
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(NamedBoolean namedBoolean) {
+    public void beforeAll() {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.Test
-    public void test1(NamedBoolean namedBoolean) {
-        System.out.println("test1(" + namedBoolean.getPayload() + ")");
+    public void test1() {
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
-    public void test2(NamedBoolean namedBoolean) {
-        System.out.println("test2(" + namedBoolean.getPayload() + ")");
+    public void test2() {
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(NamedBoolean namedBoolean) {
+    public void afterAll() {
         System.out.println("afterAll()");
     }
 }

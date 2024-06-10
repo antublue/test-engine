@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package example.argument;
+package example.argument.named;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedChar;
+import org.antublue.test.engine.api.support.named.NamedFloat;
 
 /** Example test */
-public class NamedCharTest {
+public class NamedFloatTest {
 
-    @TestEngine.Argument protected NamedChar argument;
+    @TestEngine.Argument protected NamedFloat argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedChar> arguments() {
-        char[] characters = new char[] {'a', 'b', 'c', 'd', 'e'};
-        Collection<NamedChar> collection = new ArrayList<>();
-        for (int i = 0; i < characters.length; i++) {
-            collection.add(NamedChar.of(characters[i]));
+    public static Stream<NamedFloat> arguments() {
+        Collection<NamedFloat> collection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            collection.add(NamedFloat.of(i + 0.1f));
         }
         return collection.stream();
     }

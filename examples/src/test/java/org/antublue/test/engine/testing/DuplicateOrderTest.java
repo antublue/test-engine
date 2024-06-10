@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
+import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 @TestEngine.Disabled
@@ -42,7 +42,7 @@ public class DuplicateOrderTest {
 
     @TestEngine.Order(order = 0)
     @TestEngine.Prepare
-    public void prepare2() {
+    public static void prepare2() {
         System.out.println("prepare2()");
     }
 

@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedInteger;
+import org.antublue.test.engine.api.support.named.NamedInteger;
 
 // @TestEngine.BaseClass
 public abstract class BaseTest {
@@ -76,9 +76,8 @@ public abstract class BaseTest {
     }
 
     @TestEngine.Prepare
-    public void prepare3() {
+    public static void prepare3() {
         System.out.println("b/prepare3()");
-        assertThat(argument).isNull();
         actual.add("b/prepare3()");
     }
 
@@ -124,9 +123,8 @@ public abstract class BaseTest {
     }
 
     @TestEngine.Conclude
-    public void conclude3() {
+    public static void conclude3() {
         System.out.println("b/conclude3()");
-        assertThat(argument).isNull();
         actual.add("b/conclude3()");
     }
 }

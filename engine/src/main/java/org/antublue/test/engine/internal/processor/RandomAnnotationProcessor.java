@@ -22,8 +22,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.support.RandomGenerator;
 import org.antublue.test.engine.internal.predicate.AnnotationFieldPredicate;
-import org.antublue.test.engine.internal.util.RandomGenerator;
 import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -31,8 +31,6 @@ import org.junit.platform.commons.support.ReflectionSupport;
 /** Class to process @TestEngine.Random.X annotations */
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class RandomAnnotationProcessor {
-
-    private static final RandomGenerator RANDOM_GENERATOR = RandomGenerator.getInstance();
 
     /** Constructor */
     private RandomAnnotationProcessor() {
@@ -49,15 +47,32 @@ public class RandomAnnotationProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
-    public void prepare(Object testInstance, ThrowableContext throwableContext) {
-        prepareBooleans(testInstance, throwableContext);
-        prepareIntegers(testInstance, throwableContext);
-        prepareLongs(testInstance, throwableContext);
-        prepareFloats(testInstance, throwableContext);
-        prepareDoubles(testInstance, throwableContext);
-        prepareBigInteger(testInstance, throwableContext);
-        prepareBigDecimal(testInstance, throwableContext);
-        prepareUUID(testInstance, throwableContext);
+    public void setRandomFields(Object testInstance, ThrowableContext throwableContext) {
+        setBooleanFields(testInstance, throwableContext);
+        setIntegerFields(testInstance, throwableContext);
+        setLongFields(testInstance, throwableContext);
+        setFloatFields(testInstance, throwableContext);
+        setDoubleFields(testInstance, throwableContext);
+        setBigIntegerFields(testInstance, throwableContext);
+        setBigDecimalFields(testInstance, throwableContext);
+        setUUIDFields(testInstance, throwableContext);
+    }
+
+    public void clearRandomFields(Object testInstance, ThrowableContext throwableContext) {
+        List<Field> fields =
+                ReflectionSupport.findFields(
+                        testInstance.getClass(),
+                        AnnotationFieldPredicate.of(TestEngine.Random.class),
+                        HierarchyTraversalMode.TOP_DOWN);
+
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                field.set(testInstance, null);
+            } catch (Throwable t) {
+                throwableContext.add(testInstance.getClass(), t);
+            }
+        }
     }
 
     /**
@@ -66,7 +81,7 @@ public class RandomAnnotationProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
-    private void prepareBooleans(Object testInstance, ThrowableContext throwableContext) {
+    private void setBooleanFields(Object testInstance, ThrowableContext throwableContext) {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
@@ -75,7 +90,7 @@ public class RandomAnnotationProcessor {
 
         for (Field field : fields) {
             try {
-                boolean value = RANDOM_GENERATOR.nextBoolean();
+                boolean value = RandomGenerator.nextBoolean();
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -95,7 +110,7 @@ public class RandomAnnotationProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
-    private void prepareIntegers(Object testInstance, ThrowableContext throwableContext) {
+    private void setIntegerFields(Object testInstance, ThrowableContext throwableContext) {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
@@ -107,8 +122,7 @@ public class RandomAnnotationProcessor {
                 TestEngine.Random.Integer annotation =
                         field.getAnnotation(TestEngine.Random.Integer.class);
 
-                int value =
-                        RANDOM_GENERATOR.nextInteger(annotation.minimum(), annotation.maximum());
+                int value = RandomGenerator.nextInteger(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -128,7 +142,7 @@ public class RandomAnnotationProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
-    private void prepareLongs(Object testInstance, ThrowableContext throwableContext) {
+    private void setLongFields(Object testInstance, ThrowableContext throwableContext) {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
@@ -140,7 +154,7 @@ public class RandomAnnotationProcessor {
                 TestEngine.Random.Long annotation =
                         field.getAnnotation(TestEngine.Random.Long.class);
 
-                long value = RANDOM_GENERATOR.nextLong(annotation.minimum(), annotation.maximum());
+                long value = RandomGenerator.nextLong(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -160,7 +174,7 @@ public class RandomAnnotationProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
-    private void prepareFloats(Object testInstance, ThrowableContext throwableContext) {
+    private void setFloatFields(Object testInstance, ThrowableContext throwableContext) {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
@@ -172,8 +186,7 @@ public class RandomAnnotationProcessor {
                 TestEngine.Random.Float annotation =
                         field.getAnnotation(TestEngine.Random.Float.class);
 
-                float value =
-                        RANDOM_GENERATOR.nextFloat(annotation.minimum(), annotation.maximum());
+                float value = RandomGenerator.nextFloat(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -193,7 +206,7 @@ public class RandomAnnotationProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
-    private void prepareDoubles(Object testInstance, ThrowableContext throwableContext) {
+    private void setDoubleFields(Object testInstance, ThrowableContext throwableContext) {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
@@ -206,7 +219,7 @@ public class RandomAnnotationProcessor {
                         field.getAnnotation(TestEngine.Random.Double.class);
 
                 double value =
-                        RANDOM_GENERATOR.nextDouble(annotation.minimum(), annotation.maximum());
+                        RandomGenerator.nextDouble(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -226,7 +239,7 @@ public class RandomAnnotationProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
-    private void prepareBigInteger(Object testInstance, ThrowableContext throwableContext) {
+    private void setBigIntegerFields(Object testInstance, ThrowableContext throwableContext) {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
@@ -239,7 +252,7 @@ public class RandomAnnotationProcessor {
                         field.getAnnotation(TestEngine.Random.BigInteger.class);
 
                 BigInteger value =
-                        RANDOM_GENERATOR.nextBigInteger(annotation.minimum(), annotation.maximum());
+                        RandomGenerator.nextBigInteger(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -259,7 +272,7 @@ public class RandomAnnotationProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
-    private void prepareBigDecimal(Object testInstance, ThrowableContext throwableContext) {
+    private void setBigDecimalFields(Object testInstance, ThrowableContext throwableContext) {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
@@ -272,7 +285,7 @@ public class RandomAnnotationProcessor {
                         field.getAnnotation(TestEngine.Random.BigDecimal.class);
 
                 BigDecimal value =
-                        RANDOM_GENERATOR.nextBigDecimal(annotation.minimum(), annotation.maximum());
+                        RandomGenerator.nextBigDecimal(annotation.minimum(), annotation.maximum());
 
                 field.setAccessible(true);
                 if (field.getType().equals(String.class)) {
@@ -292,7 +305,7 @@ public class RandomAnnotationProcessor {
      * @param testInstance testInstance
      * @param throwableContext throwableContext
      */
-    private void prepareUUID(Object testInstance, ThrowableContext throwableContext) {
+    private void setUUIDFields(Object testInstance, ThrowableContext throwableContext) {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),

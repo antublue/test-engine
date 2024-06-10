@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The AntuBLUE test-engine project authors
+ * Copyright (C) 2024 The AntuBLUE test-engine project authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package example.inheritance;
+package org.antublue.test.engine.internal.util;
 
-import java.util.stream.Stream;
-import org.antublue.test.engine.api.support.named.NamedInteger;
+import java.lang.reflect.Method;
 
-public abstract class OddBaseTest extends BaseTest {
+public class MethodUtils {
 
-    protected static Stream<NamedInteger> arguments() {
-        return BaseTest.arguments()
-                .filter(
-                        argument -> {
-                            int value = argument.getPayload();
-                            return (value % 2) != 0;
-                        });
+    private MethodUtils() {
+        // DO NOTHING
+    }
+
+    public static void invoke(Method method, ThrowableContext throwableContext) {
+        try {
+            method.setAccessible(true);
+            method.invoke(null);
+        } catch (Throwable t) {
+            throwableContext.add(method.getDeclaringClass(), t);
+        }
     }
 }

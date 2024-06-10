@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.api.support.named;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
-/** Class to implement a StringArgument */
-public class NamedString extends AbstractNamed<String> {
+/** Class to implement a BigDecimalArgument */
+public class NamedBigDecimal extends AbstractNamed<BigDecimal> {
 
     private final String name;
-    private final String value;
+    private final BigDecimal value;
 
     /**
      * Constructor
@@ -30,13 +31,13 @@ public class NamedString extends AbstractNamed<String> {
      * @param name name
      * @param value value
      */
-    public NamedString(String name, String value) {
+    public NamedBigDecimal(String name, BigDecimal value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the StringArgument name
+     * Method to get the BigDecimal name
      *
      * @return the return value
      */
@@ -46,24 +47,24 @@ public class NamedString extends AbstractNamed<String> {
     }
 
     /**
-     * Method to get the StringArgument value
+     * Method to get the BigDecimal value
      *
      * @return the return value
      */
-    public String getPayload() {
+    public BigDecimal getPayload() {
         return value;
     }
 
     @Override
     public String toString() {
-        return value;
+        return String.valueOf(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedString that = (NamedString) o;
+        NamedBigDecimal that = (NamedBigDecimal) o;
         return Objects.equals(name, that.name) && Objects.equals(value, that.value);
     }
 
@@ -73,19 +74,16 @@ public class NamedString extends AbstractNamed<String> {
     }
 
     /**
-     * Method to create a StringArgument
+     * Method to create a BigDecimalArgument
      *
      * @param value value
      * @return the return value
      */
-    public static NamedString of(String value) {
-        String name = value;
-        if (name == null) {
-            name = "((null))";
-        } else if (name.isEmpty()) {
-            name = "((empty))";
+    public static NamedBigDecimal of(BigDecimal value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value is null");
         }
 
-        return new NamedString(name, value);
+        return new NamedBigDecimal(String.valueOf(value), value);
     }
 }

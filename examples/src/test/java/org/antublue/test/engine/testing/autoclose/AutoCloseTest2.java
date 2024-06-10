@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
+import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 public class AutoCloseTest2 {
@@ -47,13 +47,10 @@ public class AutoCloseTest2 {
         return collection.stream();
     }
 
-    @TestEngine.AutoClose.AfterEach(method = "destroy")
-    public TestObject afterEachTestObject;
-
-    @TestEngine.AutoClose.AfterAll(method = "destroy")
+    @TestEngine.AutoClose(method = "destroy")
     public TestObject afterAllTestObject;
 
-    @TestEngine.AutoClose.Conclude(method = "destroy")
+    @TestEngine.AutoClose(method = "destroy")
     public static TestObject afterConcludeTestObject;
 
     @TestEngine.Prepare
@@ -71,7 +68,6 @@ public class AutoCloseTest2 {
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + argument + ")");
-        afterEachTestObject = new TestObject("afterEachTestObject");
     }
 
     @TestEngine.Test
@@ -119,12 +115,6 @@ public class AutoCloseTest2 {
     }
 
     public static class TestExtension implements Extension {
-
-        @Override
-        public void postAfterEachMethodsCallback(Object testInstance, Named testArgument) {
-            AutoCloseTest2 autoCloseExampleTest2 = (AutoCloseTest2) testInstance;
-            assertThat(autoCloseExampleTest2.afterEachTestObject.isDestroyed()).isFalse();
-        }
 
         @Override
         public void postAfterAllMethodsCallback(Object testInstance, Named testArgument) {

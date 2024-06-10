@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
+import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 public class AutoCloseTest2 {
@@ -38,13 +38,10 @@ public class AutoCloseTest2 {
         return collection.stream();
     }
 
-    @TestEngine.AutoClose.AfterEach(method = "destroy")
-    private TestObject afterEachTestObject;
-
-    @TestEngine.AutoClose.AfterAll(method = "destroy")
+    @TestEngine.AutoClose(method = "destroy")
     private TestObject afterAllTestObject;
 
-    @TestEngine.AutoClose.Conclude(method = "destroy")
+    @TestEngine.AutoClose(method = "destroy")
     private static TestObject afterConcludeTestObject;
 
     @TestEngine.Prepare
@@ -62,7 +59,6 @@ public class AutoCloseTest2 {
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + argument + ")");
-        afterEachTestObject = new TestObject("afterEachTestObject");
     }
 
     @TestEngine.Test
@@ -83,7 +79,6 @@ public class AutoCloseTest2 {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + argument + ")");
-        assertThat(afterEachTestObject.isDestroyed()).isTrue();
         assertThat(afterAllTestObject.isDestroyed()).isFalse();
         assertThat(afterConcludeTestObject.isDestroyed()).isFalse();
     }

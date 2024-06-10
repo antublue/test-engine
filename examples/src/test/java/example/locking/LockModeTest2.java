@@ -21,7 +21,7 @@ import static org.assertj.core.api.Fail.fail;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedInteger;
+import org.antublue.test.engine.api.support.named.NamedInteger;
 
 /** Example test */
 public class LockModeTest2 {

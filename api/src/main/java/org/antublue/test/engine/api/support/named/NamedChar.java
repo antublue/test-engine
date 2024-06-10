@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.api.support.named;
 
-import java.math.BigInteger;
 import java.util.Objects;
 
-/** Class to implement a BigIntegerArgument */
-public class NamedBigInteger extends AbstractNamed<BigInteger> {
+/** Class to implement a CharArgument */
+public class NamedChar extends AbstractNamed<Character> {
 
     private final String name;
-    private final BigInteger value;
+    private final char value;
 
     /**
      * Constructor
@@ -31,13 +30,13 @@ public class NamedBigInteger extends AbstractNamed<BigInteger> {
      * @param name name
      * @param value value
      */
-    public NamedBigInteger(String name, BigInteger value) {
+    public NamedChar(String name, char value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the BigIntegerArgument name
+     * Method to get the CharArgument name
      *
      * @return the return value
      */
@@ -47,11 +46,11 @@ public class NamedBigInteger extends AbstractNamed<BigInteger> {
     }
 
     /**
-     * Method to get the BigIntegerArgument value
+     * Method to get the CharArgument value
      *
      * @return the return value
      */
-    public BigInteger getPayload() {
+    public Character getPayload() {
         return value;
     }
 
@@ -64,8 +63,8 @@ public class NamedBigInteger extends AbstractNamed<BigInteger> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedBigInteger that = (NamedBigInteger) o;
-        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
+        NamedChar that = (NamedChar) o;
+        return value == that.value && Objects.equals(name, that.name);
     }
 
     @Override
@@ -74,16 +73,12 @@ public class NamedBigInteger extends AbstractNamed<BigInteger> {
     }
 
     /**
-     * Method to create a BigIntegerArgument
+     * Method to create a CharArgument
      *
      * @param value value
      * @return the return value
      */
-    public static NamedBigInteger of(BigInteger value) {
-        if (value == null) {
-            throw new IllegalArgumentException("value is null");
-        }
-
-        return new NamedBigInteger(String.valueOf(value), value);
+    public static NamedChar of(char value) {
+        return new NamedChar(String.valueOf(value), value);
     }
 }

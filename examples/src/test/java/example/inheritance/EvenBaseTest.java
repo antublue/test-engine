@@ -18,7 +18,7 @@ package example.inheritance;
 
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedInteger;
+import org.antublue.test.engine.api.support.named.NamedInteger;
 
 public abstract class EvenBaseTest extends BaseTest {
 

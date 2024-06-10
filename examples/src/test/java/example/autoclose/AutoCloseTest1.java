@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
+import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 public class AutoCloseTest1 {
@@ -38,11 +38,9 @@ public class AutoCloseTest1 {
         return collection.stream();
     }
 
-    @TestEngine.AutoClose.AfterEach private TestAutoCloseable afterEachAutoClosable;
+    @TestEngine.AutoClose private TestAutoCloseable afterAllAutoClosable;
 
-    @TestEngine.AutoClose.AfterAll private TestAutoCloseable afterAllAutoClosable;
-
-    @TestEngine.AutoClose.Conclude private static TestAutoCloseable afterConcludeAutoCloseable;
+    @TestEngine.AutoClose private static TestAutoCloseable afterConcludeAutoCloseable;
 
     @TestEngine.Prepare
     public static void prepare() {
@@ -59,7 +57,6 @@ public class AutoCloseTest1 {
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + argument + ")");
-        afterEachAutoClosable = new TestAutoCloseable("afterEachAutoCloseable");
     }
 
     @TestEngine.Test
@@ -80,8 +77,7 @@ public class AutoCloseTest1 {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + argument + ")");
-        assertThat(afterEachAutoClosable.isClosed()).isTrue();
-        assertThat(afterAllAutoClosable.isClosed()).isTrue();
+        assertThat(afterAllAutoClosable.isClosed()).isFalse();
         assertThat(afterConcludeAutoCloseable.isClosed()).isFalse();
     }
 

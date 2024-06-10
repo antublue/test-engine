@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.util;
+package org.antublue.test.engine.api.support;
 
 import static java.lang.String.format;
 
@@ -24,7 +24,7 @@ import java.math.MathContext;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-/** Class to implement RandomUtils */
+/** Class to implement RandomGenerator */
 public class RandomGenerator {
 
     /** Constructor */
@@ -33,20 +33,11 @@ public class RandomGenerator {
     }
 
     /**
-     * Method to get the singleton instance
-     *
-     * @return the singleton instance
-     */
-    public static RandomGenerator getInstance() {
-        return SingletonHolder.INSTANCE;
-    }
-
-    /**
      * Method to get a random boolean
      *
      * @return a random boolean
      */
-    public boolean nextBoolean() {
+    public static boolean nextBoolean() {
         return ThreadLocalRandom.current().nextBoolean();
     }
 
@@ -57,7 +48,7 @@ public class RandomGenerator {
      * @param maximum maximum
      * @return a random integer
      */
-    public int nextInteger(int minimum, int maximum) {
+    public static int nextInteger(int minimum, int maximum) {
         if (minimum == maximum) {
             return minimum;
         }
@@ -80,7 +71,7 @@ public class RandomGenerator {
      * @param maximum maximum
      * @return a random long
      */
-    public long nextLong(long minimum, long maximum) {
+    public static long nextLong(long minimum, long maximum) {
         if (minimum == maximum) {
             return minimum;
         }
@@ -103,7 +94,7 @@ public class RandomGenerator {
      * @param maximum maximum
      * @return a random float
      */
-    public float nextFloat(float minimum, float maximum) {
+    public static float nextFloat(float minimum, float maximum) {
         if (minimum == maximum) {
             return minimum;
         }
@@ -119,7 +110,7 @@ public class RandomGenerator {
      * @param maximum maximum
      * @return a random double
      */
-    public double nextDouble(double minimum, double maximum) {
+    public static double nextDouble(double minimum, double maximum) {
         if (minimum == maximum) {
             return minimum;
         }
@@ -135,7 +126,7 @@ public class RandomGenerator {
      * @param maximum maximum
      * @return a random BigInteger
      */
-    public BigInteger nextBigInteger(String minimum, String maximum) {
+    public static BigInteger nextBigInteger(String minimum, String maximum) {
         if (minimum.contains(".")) {
             throw new NumberFormatException(format("BigInteger minimum [%s] is invalid ", minimum));
         }
@@ -199,7 +190,7 @@ public class RandomGenerator {
      * @param maximum maximum
      * @return a random BigDecimal
      */
-    public BigDecimal nextBigDecimal(String minimum, String maximum) {
+    public static BigDecimal nextBigDecimal(String minimum, String maximum) {
         BigDecimal minimumBigDecimal;
         BigDecimal maximummBigDecimal;
 
@@ -225,7 +216,7 @@ public class RandomGenerator {
      * @param maximum maximum
      * @return a random BigDecimal
      */
-    private BigDecimal nextBigDecimal(BigDecimal minimum, BigDecimal maximum) {
+    private static BigDecimal nextBigDecimal(BigDecimal minimum, BigDecimal maximum) {
         if (minimum.equals(maximum)) {
             return minimum;
         }
@@ -248,12 +239,5 @@ public class RandomGenerator {
                         .movePointLeft(digitCount);
 
         return minimum.add(maximum.subtract(minimum).multiply(alpha, new MathContext(digitCount)));
-    }
-
-    /** Class to hold the singleton instance */
-    private static final class SingletonHolder {
-
-        /** The singleton instance */
-        private static final RandomGenerator INSTANCE = new RandomGenerator();
     }
 }

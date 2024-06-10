@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package example.argument;
+package example.argument.named;
 
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Named;
@@ -23,8 +23,7 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class NamedComplexArgumentTest {
 
-    @TestEngine.Argument @TestEngine.AutoClose.AfterAll
-    protected Named<NamedComplexArgument> argument;
+    @TestEngine.Argument @TestEngine.AutoClose protected Named<NamedComplexArgument> argument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<NamedComplexArgument> arguments() {

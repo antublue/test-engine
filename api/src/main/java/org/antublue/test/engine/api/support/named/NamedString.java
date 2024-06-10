@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.api.support.named;
 
 import java.util.Objects;
 
-/** Class to implement a CharArgument */
-public class NamedChar extends AbstractNamed<Character> {
+/** Class to implement a StringArgument */
+public class NamedString extends AbstractNamed<String> {
 
     private final String name;
-    private final char value;
+    private final String value;
 
     /**
      * Constructor
@@ -30,13 +30,13 @@ public class NamedChar extends AbstractNamed<Character> {
      * @param name name
      * @param value value
      */
-    public NamedChar(String name, char value) {
+    public NamedString(String name, String value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the CharArgument name
+     * Method to get the StringArgument name
      *
      * @return the return value
      */
@@ -46,25 +46,25 @@ public class NamedChar extends AbstractNamed<Character> {
     }
 
     /**
-     * Method to get the CharArgument value
+     * Method to get the StringArgument value
      *
      * @return the return value
      */
-    public Character getPayload() {
+    public String getPayload() {
         return value;
     }
 
     @Override
     public String toString() {
-        return String.valueOf(value);
+        return value;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedChar that = (NamedChar) o;
-        return value == that.value && Objects.equals(name, that.name);
+        NamedString that = (NamedString) o;
+        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
     }
 
     @Override
@@ -73,12 +73,19 @@ public class NamedChar extends AbstractNamed<Character> {
     }
 
     /**
-     * Method to create a CharArgument
+     * Method to create a StringArgument
      *
      * @param value value
      * @return the return value
      */
-    public static NamedChar of(char value) {
-        return new NamedChar(String.valueOf(value), value);
+    public static NamedString of(String value) {
+        String name = value;
+        if (name == null) {
+            name = "((null))";
+        } else if (name.isEmpty()) {
+            name = "((empty))";
+        }
+
+        return new NamedString(name, value);
     }
 }

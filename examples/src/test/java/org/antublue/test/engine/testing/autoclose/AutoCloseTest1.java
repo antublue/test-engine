@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
+import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 public class AutoCloseTest1 {
@@ -47,28 +47,25 @@ public class AutoCloseTest1 {
         return collection.stream();
     }
 
-    @TestEngine.AutoClose.AfterEach private TestAutoCloseable afterEachAutoClosable;
+    @TestEngine.AutoClose private TestAutoCloseable afterAllAutoClosable;
 
-    @TestEngine.AutoClose.AfterAll private TestAutoCloseable afterAllAutoClosable;
-
-    @TestEngine.AutoClose.Conclude private TestAutoCloseable afterConcludeAutoCloseable;
+    @TestEngine.AutoClose private static TestAutoCloseable afterConcludeAutoCloseable;
 
     @TestEngine.Prepare
     public static void prepare() {
         System.out.println("prepare()");
+        afterConcludeAutoCloseable = new TestAutoCloseable("afterConcludeAutoCloseable");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + argument + ")");
-        afterConcludeAutoCloseable = new TestAutoCloseable("afterConcludeAutoCloseable");
         afterAllAutoClosable = new TestAutoCloseable("afterAllAutoCloseable");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + argument + ")");
-        afterEachAutoClosable = new TestAutoCloseable("afterEachAutoCloseable");
     }
 
     @TestEngine.Test
@@ -118,23 +115,16 @@ public class AutoCloseTest1 {
     public static class TestExtension implements Extension {
 
         @Override
-        public void postAfterEachMethodsCallback(Object testInstance, Named testArgument) {
-            AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
-            assertThat(autoCloseExampleTest1.afterEachAutoClosable.isClosed()).isFalse();
-        }
-
-        @Override
         public void postAfterAllMethodsCallback(Object testInstance, Named testArgument) {
             AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
-            assertThat(autoCloseExampleTest1.afterEachAutoClosable.isClosed()).isTrue();
-            assertThat(autoCloseExampleTest1.afterAllAutoClosable.isClosed()).isFalse();
+            assertThat(autoCloseExampleTest1.afterAllAutoClosable.isClosed()).isTrue();
         }
 
         @Override
         public void postConcludeMethodsCallback(Object testInstance) {
             AutoCloseTest1 autoCloseExampleTest1 = (AutoCloseTest1) testInstance;
             assertThat(autoCloseExampleTest1.afterAllAutoClosable.isClosed()).isTrue();
-            assertThat(autoCloseExampleTest1.afterConcludeAutoCloseable.isClosed()).isFalse();
+            assertThat(autoCloseExampleTest1.afterConcludeAutoCloseable.isClosed()).isTrue();
         }
     }
 }

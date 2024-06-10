@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.api.support.named;
 
 import java.util.Objects;
 
-/** Class to implement a ShortArgument */
-public class NamedShort extends AbstractNamed<Short> {
+/** Class to implement a BooleanArgument */
+public class NamedBoolean extends AbstractNamed<Boolean> {
 
     private final String name;
-    private final short value;
+    private final boolean value;
 
     /**
      * Constructor
@@ -30,13 +30,13 @@ public class NamedShort extends AbstractNamed<Short> {
      * @param name name
      * @param value value
      */
-    public NamedShort(String name, short value) {
+    public NamedBoolean(String name, boolean value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the ShortArgument name
+     * Method to get the BooleanArgument name
      *
      * @return the return value
      */
@@ -46,19 +46,24 @@ public class NamedShort extends AbstractNamed<Short> {
     }
 
     /**
-     * Method to get the ShortArgument value
+     * Method to get the BooleanArgument value
      *
      * @return the return value
      */
-    public Short getPayload() {
+    public Boolean getPayload() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedShort that = (NamedShort) o;
+        NamedBoolean that = (NamedBoolean) o;
         return value == that.value && Objects.equals(name, that.name);
     }
 
@@ -68,12 +73,12 @@ public class NamedShort extends AbstractNamed<Short> {
     }
 
     /**
-     * Method to create a ShortArgument
+     * Method to create a BooleanArgument
      *
      * @param value value
      * @return the return value
      */
-    public static NamedShort of(short value) {
-        return new NamedShort(String.valueOf(value), value);
+    public static NamedBoolean of(boolean value) {
+        return new NamedBoolean(String.valueOf(value), value);
     }
 }

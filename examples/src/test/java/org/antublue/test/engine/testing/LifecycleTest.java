@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
+import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 public class LifecycleTest implements Validation {
@@ -77,9 +77,8 @@ public class LifecycleTest implements Validation {
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 0)
-    public void prepare2() {
+    public static void prepare2() {
         System.out.println("prepare2()");
-        assertThat(argument).isNull();
         ACTUAL.add("prepare2()");
     }
 

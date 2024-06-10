@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package example.argument;
+package example.argument.named;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedLong;
+import org.antublue.test.engine.api.support.named.NamedShort;
 
 /** Example test */
-public class NamedLongTest {
+public class NamedShortTest {
 
-    @TestEngine.Argument protected NamedLong argument;
+    @TestEngine.Argument protected NamedShort argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedLong> arguments() {
-        Collection<NamedLong> collection = new ArrayList<>();
+    public static Stream<NamedShort> arguments() {
+        Collection<NamedShort> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(NamedLong.of((long) i));
+            collection.add(NamedShort.of((short) i));
         }
         return collection.stream();
     }

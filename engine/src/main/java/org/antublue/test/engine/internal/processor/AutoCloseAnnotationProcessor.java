@@ -18,11 +18,11 @@ package org.antublue.test.engine.internal.processor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.predicate.AnnotationFieldPredicate;
 import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -33,12 +33,6 @@ public class AutoCloseAnnotationProcessor {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(AutoCloseAnnotationProcessor.class);
-
-    public enum Type {
-        AFTER_EACH,
-        AFTER_ALL,
-        AFTER_CONCLUDE
-    }
 
     /** Constructor */
     private AutoCloseAnnotationProcessor() {
@@ -54,82 +48,81 @@ public class AutoCloseAnnotationProcessor {
         return SingletonHolder.INSTANCE;
     }
 
-    public void conclude(Object testInstance, Type type, ThrowableContext throwableContext) {
-        LOGGER.trace(
-                "conclude() class [%s] instance [%s] type [%s]",
-                testInstance.getClass(), testInstance, type);
+    /**
+     * Method to process @TestEngine.AutoClose annotation on static fields
+     *
+     * @param testClass testClass
+     * @param throwableContext throwableContext
+     */
+    public void closeAutoCloseableFields(Class<?> testClass, ThrowableContext throwableContext) {
+        List<Field> fields =
+                ReflectionSupport.findFields(
+                        testClass,
+                        field ->
+                                Modifier.isStatic(field.getModifiers())
+                                        && field.getAnnotation(TestEngine.AutoClose.class) != null,
+                        HierarchyTraversalMode.BOTTOM_UP);
 
-        switch (type) {
-            case AFTER_EACH:
-                {
-                    concludeAfterEach(testInstance, throwableContext);
-                    break;
+        for (Field field : fields) {
+            try {
+                field.setAccessible(true);
+                Object value = field.get(null);
+                if (value instanceof AutoCloseable) {
+                    ((AutoCloseable) value).close();
+                } else if (value != null) {
+                    Method method = getMethod(field, value);
+                    method.invoke(null, (Object[]) null);
                 }
-            case AFTER_ALL:
-                {
-                    concludeAfterAll(testInstance, throwableContext);
-                    break;
-                }
-            case AFTER_CONCLUDE:
-                {
-                    concludeAfterConclude(testInstance, throwableContext);
-                    break;
-                }
-            default:
-                {
-                    // DO NOTHING
-                }
+            } catch (Throwable t) {
+                throwableContext.add(testClass, t);
+            }
         }
     }
 
-    private void concludeAfterEach(Object testInstance, ThrowableContext throwableContext) {
-        LOGGER.trace(
-                "concludeAfterEach() class [%s] instance [%s]",
-                testInstance.getClass(), testInstance);
-
+    /**
+     * Method to process @TestEngine.AutoClose annotation on fields
+     *
+     * @param testInstance testInstance
+     * @param throwableContext throwableContext
+     */
+    public void closeAutoCloseableFields(Object testInstance, ThrowableContext throwableContext) {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
-                        AnnotationFieldPredicate.of(TestEngine.AutoClose.AfterEach.class),
-                        HierarchyTraversalMode.TOP_DOWN);
+                        field ->
+                                !Modifier.isStatic(field.getModifiers())
+                                        && field.getAnnotation(TestEngine.AutoClose.class) != null,
+                        HierarchyTraversalMode.BOTTOM_UP);
 
         for (Field field : fields) {
-            close(testInstance, field, throwableContext);
+            try {
+                field.setAccessible(true);
+                Object value = field.get(testInstance);
+                if (value instanceof AutoCloseable) {
+                    ((AutoCloseable) value).close();
+                } else if (value != null) {
+                    Method method = getMethod(field, value);
+                    method.invoke(testInstance, (Object[]) null);
+                }
+            } catch (Throwable t) {
+                throwableContext.add(testInstance.getClass(), t);
+            }
         }
     }
 
-    private void concludeAfterAll(Object testInstance, ThrowableContext throwableContext) {
-        LOGGER.trace(
-                "concludeAfterAll() class [%s] instance [%s]",
-                testInstance.getClass(), testInstance);
-
-        List<Field> fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        AnnotationFieldPredicate.of(TestEngine.AutoClose.AfterAll.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            close(testInstance, field, throwableContext);
+    private static Method getMethod(Field field, Object value) throws NoSuchMethodException {
+        TestEngine.AutoClose autoclose = field.getAnnotation(TestEngine.AutoClose.class);
+        String methodName = autoclose.method();
+        Method method;
+        if (methodName == null || methodName.trim().isEmpty()) {
+            method = value.getClass().getDeclaredMethod("close", (Class<?>[]) null);
+        } else {
+            method = value.getClass().getDeclaredMethod(methodName, (Class<?>[]) null);
         }
+        return method;
     }
 
-    private void concludeAfterConclude(Object testInstance, ThrowableContext throwableContext) {
-        LOGGER.trace(
-                "concludeAfterConclude() class [%s] instance [%s]",
-                testInstance.getClass(), testInstance);
-
-        List<Field> fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        AnnotationFieldPredicate.of(TestEngine.AutoClose.Conclude.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            close(testInstance, field, throwableContext);
-        }
-    }
-
+    /*
     private void close(Object testInstance, Field field, ThrowableContext throwableContext) {
         try {
             String methodName = null;
@@ -174,6 +167,7 @@ public class AutoCloseAnnotationProcessor {
             throwableContext.add(testInstance.getClass(), t);
         }
     }
+    */
 
     /** Class to hold the singleton instance */
     private static final class SingletonHolder {

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.api.support.named;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
-/** Class to implement a BooleanArgument */
-public class NamedBoolean extends AbstractNamed<Boolean> {
+/** Class to implement a BigIntegerArgument */
+public class NamedBigInteger extends AbstractNamed<BigInteger> {
 
     private final String name;
-    private final boolean value;
+    private final BigInteger value;
 
     /**
      * Constructor
@@ -30,13 +31,13 @@ public class NamedBoolean extends AbstractNamed<Boolean> {
      * @param name name
      * @param value value
      */
-    public NamedBoolean(String name, boolean value) {
+    public NamedBigInteger(String name, BigInteger value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the BooleanArgument name
+     * Method to get the BigIntegerArgument name
      *
      * @return the return value
      */
@@ -46,11 +47,11 @@ public class NamedBoolean extends AbstractNamed<Boolean> {
     }
 
     /**
-     * Method to get the BooleanArgument value
+     * Method to get the BigIntegerArgument value
      *
      * @return the return value
      */
-    public Boolean getPayload() {
+    public BigInteger getPayload() {
         return value;
     }
 
@@ -63,8 +64,8 @@ public class NamedBoolean extends AbstractNamed<Boolean> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedBoolean that = (NamedBoolean) o;
-        return value == that.value && Objects.equals(name, that.name);
+        NamedBigInteger that = (NamedBigInteger) o;
+        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
     }
 
     @Override
@@ -73,12 +74,16 @@ public class NamedBoolean extends AbstractNamed<Boolean> {
     }
 
     /**
-     * Method to create a BooleanArgument
+     * Method to create a BigIntegerArgument
      *
      * @param value value
      * @return the return value
      */
-    public static NamedBoolean of(boolean value) {
-        return new NamedBoolean(String.valueOf(value), value);
+    public static NamedBigInteger of(BigInteger value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value is null");
+        }
+
+        return new NamedBigInteger(String.valueOf(value), value);
     }
 }

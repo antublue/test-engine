@@ -45,9 +45,9 @@ public class MongoDBTest {
 
     private String name;
 
-    @TestEngine.AutoClose.Conclude private Network network;
+    @TestEngine.AutoClose private static Network network;
 
-    @TestEngine.Argument @TestEngine.AutoClose.AfterAll
+    @TestEngine.Argument @TestEngine.AutoClose
     protected MongoDBTestEnvironment mongoDBTestEnvironment;
 
     @TestEngine.ArgumentSupplier

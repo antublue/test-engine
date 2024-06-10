@@ -18,7 +18,7 @@ package example.argument.supplier;
 
 import java.util.Stack;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedInteger;
+import org.antublue.test.engine.api.support.named.NamedInteger;
 
 /** Example test */
 public class StackTest {

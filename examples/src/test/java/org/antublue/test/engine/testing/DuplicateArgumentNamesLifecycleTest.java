@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
+import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 public class DuplicateArgumentNamesLifecycleTest {
@@ -69,9 +69,8 @@ public class DuplicateArgumentNamesLifecycleTest {
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 0)
-    public void prepare2() {
+    public static void prepare2() {
         System.out.println("prepare2()");
-        assertThat(argument).isNull();
         actual.add("prepare2()");
     }
 
@@ -118,7 +117,7 @@ public class DuplicateArgumentNamesLifecycleTest {
     public void afterAll2() {
         System.out.println("afterAll2()");
         actual.add("afterAll2(" + argument + ")");
-        assertThat(argument).isNull();
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Conclude
