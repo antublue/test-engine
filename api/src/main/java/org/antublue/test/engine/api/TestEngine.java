@@ -17,7 +17,6 @@
 package org.antublue.test.engine.api;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -124,19 +123,6 @@ public @interface TestEngine {
          * @return the display name value
          */
         String name();
-    }
-
-    /** AutoClose meta-annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface AutoClose {
-
-        /**
-         * Method value
-         *
-         * @return the method name
-         */
-        String method() default "";
     }
 
     /** Random meta-annotation */
@@ -332,117 +318,5 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface UUID {}
-    }
-
-    /** Lock annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @Repeatable(ResourceLock.List.class)
-    @interface ResourceLock {
-
-        /**
-         * Name value
-         *
-         * @return the lock name value
-         */
-        String name();
-
-        /**
-         * Mode value
-         *
-         * @return the lock mode value
-         */
-        LockMode mode() default LockMode.READ_WRITE;
-
-        /** Lock.List annotation */
-        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-        @Retention(RetentionPolicy.RUNTIME)
-        @interface List {
-
-            /**
-             * List values
-             *
-             * @return the list values
-             */
-            ResourceLock[] value();
-        }
-    }
-
-    /** Lock annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @Repeatable(TestEngine.Lock.List.class)
-    @interface Lock {
-
-        /**
-         * Name value
-         *
-         * @return the lock name value
-         */
-        String name();
-
-        /**
-         * Mode value
-         *
-         * @return the lock mode value
-         */
-        LockMode mode() default LockMode.READ_WRITE;
-
-        /** Lock.List annotation */
-        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-        @Retention(RetentionPolicy.RUNTIME)
-        @interface List {
-
-            /**
-             * List values
-             *
-             * @return the list values
-             */
-            TestEngine.Lock[] value();
-        }
-    }
-
-    /** Unlock annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @Repeatable(Unlock.List.class)
-    @interface Unlock {
-
-        /**
-         * Name value
-         *
-         * @return the lock name value
-         */
-        String name();
-
-        /**
-         * Mode value
-         *
-         * @return the lock mode value
-         */
-        LockMode mode() default LockMode.READ_WRITE;
-
-        /** Unlock.List annotation */
-        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-        @Retention(RetentionPolicy.RUNTIME)
-        @interface List {
-
-            /**
-             * List values
-             *
-             * @return the list values
-             */
-            Unlock[] value();
-        }
-    }
-
-    /** Lock modes */
-    enum LockMode {
-
-        /** Read write mode */
-        READ_WRITE,
-
-        /** Read mode */
-        READ
     }
 }

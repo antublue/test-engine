@@ -28,7 +28,10 @@ import org.antublue.test.engine.exception.TestClassFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.annotation.ArgumentAnnotationUtils;
+import org.antublue.test.engine.internal.annotation.ContextAnnotationUtils;
 import org.antublue.test.engine.internal.annotation.RandomAnnotationUtils;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
@@ -45,6 +48,8 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 /** Class to implement a ArgumentTestDescriptor */
 @SuppressWarnings({"PMD.UnusedPrivateMethod", "PMD.AvoidAccessibilityAlteration"})
 public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentTestDescriptor.class);
 
     private final Class<?> testClass;
     private final Named<?> testArgument;
@@ -80,6 +85,8 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
+        LOGGER.trace("execute(ExecutionRequest executionRequest)");
+
         getStopWatch().reset();
 
         setExecutionRequest(executionRequest);
@@ -95,19 +102,23 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         ThrowableCollector throwableCollector = getThrowableCollector();
 
-        throwableCollector.execute(this::setArgumentFields);
+        throwableCollector.execute(this::setContextFields);
         if (throwableCollector.isEmpty()) {
-            throwableCollector.execute(this::setRandomFields);
+            throwableCollector.execute(this::setArgumentFields);
             if (throwableCollector.isEmpty()) {
-                throwableCollector.execute(this::beforeAllMethods);
+                throwableCollector.execute(this::setRandomFields);
                 if (throwableCollector.isEmpty()) {
-                    execute();
+                    throwableCollector.execute(this::beforeAllMethods);
+                    if (throwableCollector.isEmpty()) {
+                        execute();
+                    }
+                    throwableCollector.execute(this::afterAllMethods);
                 }
-                throwableCollector.execute(this::afterAllMethods);
+                throwableCollector.execute(this::clearRandomFields);
             }
-            throwableCollector.execute(this::clearRandomFields);
+            throwableCollector.execute(this::clearArgumentFields);
         }
-        throwableCollector.execute(this::clearArgumentFields);
+        throwableCollector.execute(this::clearContextFields);
 
         getStopWatch().stop();
 
@@ -141,22 +152,50 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         StandardStreams.flush();
     }
 
+    private void setContextFields() throws Throwable {
+        LOGGER.trace(
+                "setContextFields() testClass [%s] testInstance [%s] testArgument [%s]",
+                getTestInstance().getClass().getName(), getTestInstance(), testArgument);
+
+        ContextAnnotationUtils.injectContextFields(getTestInstance());
+    }
+
     private void setArgumentFields() throws Throwable {
+        LOGGER.trace(
+                "setArgumentFields() testClass [%s] testInstance [%s] testArgument [%s]",
+                getTestInstance().getClass().getName(), getTestInstance(), testArgument);
+
         ArgumentAnnotationUtils.injectArgumentFields(getTestInstance(), testArgument);
     }
 
     private void setRandomFields() throws Throwable {
+        LOGGER.trace(
+                "setRandomFields() testClass [%s] testInstance [%s] testArgument [%s]",
+                getTestInstance().getClass().getName(), getTestInstance(), testArgument);
+
         RandomAnnotationUtils.injectRandomFields(getTestInstance());
     }
 
     private void beforeAllMethods() throws Throwable {
+        LOGGER.trace(
+                "beforeAllMethods() testClass [%s] testInstance [%s]",
+                getTestInstance().getClass().getName(), getTestInstance());
+
         for (Method method : beforeAllMethods) {
+            LOGGER.trace(
+                    "beforeAllMethods() testClass [%s] testInstance [%s] method [%s]",
+                    getTestInstance().getClass().getName(), getTestInstance(), method);
+
             method.setAccessible(true);
             method.invoke(getTestInstance());
         }
     }
 
     private void execute() {
+        LOGGER.trace(
+                "execute() testClass [%s] testInstance [%s]",
+                getTestInstance().getClass().getName(), getTestInstance());
+
         getChildren()
                 .forEach(
                         (Consumer<TestDescriptor>)
@@ -169,18 +208,42 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void afterAllMethods() throws Throwable {
+        LOGGER.trace(
+                "afterAllMethods() testClass [%s] testInstance [%s]",
+                getTestInstance().getClass().getName(), getTestInstance());
+
         for (Method method : afterAllMethods) {
+            LOGGER.trace(
+                    "afterAllMethods() testClass [%s] testInstance [%s] method [%s]",
+                    getTestInstance().getClass().getName(), getTestInstance(), method);
+
             method.setAccessible(true);
             method.invoke(getTestInstance());
         }
     }
 
     private void clearRandomFields() throws Throwable {
+        LOGGER.trace(
+                "clearRandomFields() testClass [%s] testInstance [%s]",
+                getTestInstance().getClass().getName(), getTestInstance());
+
         RandomAnnotationUtils.clearRandomFields(getTestInstance());
     }
 
     private void clearArgumentFields() throws Throwable {
+        LOGGER.trace(
+                "clearArgumentFields() testClass [%s] testInstance [%s]",
+                getTestInstance().getClass().getName(), getTestInstance());
+
         ArgumentAnnotationUtils.injectArgumentFields(getTestInstance(), null);
+    }
+
+    private void clearContextFields() throws Throwable {
+        LOGGER.trace(
+                "clearContextFields() testClass [%s] testInstance [%s] testArgument [%s]",
+                getTestInstance().getClass().getName(), getTestInstance(), testArgument);
+
+        ContextAnnotationUtils.clearContextFields(getTestInstance());
     }
 
     /** Class to implement a Builder */

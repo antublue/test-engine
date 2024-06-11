@@ -62,6 +62,14 @@ public class EngineDescriptorFactory {
         return SingletonHolder.INSTANCE;
     }
 
+    /**
+     * Method to create an EngineDescriptor
+     *
+     * @param uniqueId uniqueId
+     * @param name name
+     * @param engineDiscoveryRequest engineDiscoveryRequest
+     * @return an EngineDescriptor
+     */
     public EngineDescriptor createEngineDescriptor(
             UniqueId uniqueId, String name, EngineDiscoveryRequest engineDiscoveryRequest) {
         EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, name);
@@ -370,7 +378,7 @@ public class EngineDescriptorFactory {
         long index = 0;
         while (iterator.hasNext()) {
             Object o = iterator.next();
-            if (o instanceof Named) {
+            if (o instanceof Named<?>) {
                 testArguments.add((Named<?>) o);
             } else {
                 testArguments.add(Named.of("[" + index + "]", o));

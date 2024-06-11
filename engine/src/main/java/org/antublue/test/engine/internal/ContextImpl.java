@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.antublue.test.engine.api.Configuration;
 import org.antublue.test.engine.api.Context;
-import org.antublue.test.engine.api.LockManager;
 import org.antublue.test.engine.api.Store;
 import org.antublue.test.engine.internal.configuration.ConfigurationImpl;
 
@@ -30,16 +29,10 @@ public class ContextImpl implements Context {
     private final Store store;
     private final Map<String, Store> namespacedStores;
 
-    private final LockManager lockManager;
-    private final Map<String, LockManager> namespacedLockManagers;
-
     /** Constructor */
     private ContextImpl() {
         store = new StoreImpl(Store.GLOBAL);
         namespacedStores = new ConcurrentHashMap<>();
-
-        lockManager = new LockManagerImpl(LockManager.GLOBAL);
-        namespacedLockManagers = new ConcurrentHashMap<>();
     }
 
     /**
@@ -49,6 +42,11 @@ public class ContextImpl implements Context {
      */
     public static Context getInstance() {
         return SingletonHolder.INSTANCE;
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+        return ConfigurationImpl.getInstance();
     }
 
     /**
@@ -90,41 +88,6 @@ public class ContextImpl implements Context {
 
         return namespacedStores.computeIfAbsent(
                 validNamespace, s -> new StoreImpl(finalValidNamespace));
-    }
-
-    @Override
-    public LockManager getLockManager() {
-        return lockManager;
-    }
-
-    @Override
-    public LockManager getLockManager(Object namespace) {
-        checkNotNull(namespace, "namespace is null");
-
-        if (LockManager.GLOBAL.equals(namespace)) {
-            return lockManager;
-        }
-
-        String validNamespace;
-        if (namespace instanceof Class) {
-            validNamespace = ((Class<?>) namespace).getName();
-        } else {
-            validNamespace = checkKey(namespace.toString());
-        }
-
-        if (!validNamespace.startsWith("/")) {
-            validNamespace = "/" + validNamespace;
-        }
-
-        final String finalValidNamespace = validNamespace;
-
-        return namespacedLockManagers.computeIfAbsent(
-                validNamespace, s -> new LockManagerImpl(finalValidNamespace));
-    }
-
-    @Override
-    public Configuration getConfiguration() {
-        return ConfigurationImpl.getInstance();
     }
 
     /** Class to hold the singleton instance */

@@ -62,7 +62,7 @@ public class DuplicateArgumentNamesLifecycleTest {
     }
 
     @TestEngine.Prepare
-    public static void prepare() {
+    public void prepare() {
         System.out.println("prepare()");
         actual.add("prepare()");
     }
@@ -121,7 +121,7 @@ public class DuplicateArgumentNamesLifecycleTest {
     }
 
     @TestEngine.Conclude
-    public static void conclude() {
+    public void conclude() {
         System.out.println("conclude()");
         actual.add("conclude()");
         assertThat(actual).isEqualTo(EXPECTED);

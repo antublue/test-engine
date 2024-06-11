@@ -45,10 +45,9 @@ public class MongoDBTest {
 
     private String name;
 
-    @TestEngine.AutoClose private static Network network;
+    private static Network network;
 
-    @TestEngine.Argument @TestEngine.AutoClose
-    protected MongoDBTestEnvironment mongoDBTestEnvironment;
+    @TestEngine.Argument protected MongoDBTestEnvironment mongoDBTestEnvironment;
 
     @TestEngine.ArgumentSupplier
     public static Stream<MongoDBTestEnvironment> arguments() {
@@ -56,7 +55,7 @@ public class MongoDBTest {
     }
 
     @TestEngine.Prepare
-    public void createNetwork() {
+    public static void createNetwork() {
         info("creating network ...");
 
         network = Network.newNetwork();
@@ -118,6 +117,16 @@ public class MongoDBTest {
             assertThat(result).isNotNull();
             assertThat(result.get("name")).isEqualTo(name);
         }
+    }
+
+    @TestEngine.AfterAll
+    public void afterAll() {
+        mongoDBTestEnvironment.close();
+    }
+
+    @TestEngine.Conclude
+    public void conclude() {
+        network.close();
     }
 
     /** Class to implement a TestContext */

@@ -49,7 +49,7 @@ public class ParameterizedTestShuffleTest {
     }
 
     @TestEngine.Prepare
-    public static void prepare() {
+    public void prepare() {
         System.out.println("prepare()");
     }
 
@@ -99,7 +99,7 @@ public class ParameterizedTestShuffleTest {
     }
 
     @TestEngine.Conclude
-    public static void conclude() {
+    public void conclude() {
         System.out.println("conclude()");
     }
 

@@ -36,7 +36,7 @@ public class DuplicateOrderTest {
 
     @TestEngine.Order(order = 0)
     @TestEngine.Prepare
-    public static void prepare() {
+    public void prepare() {
         System.out.println("prepare()");
     }
 
@@ -77,7 +77,7 @@ public class DuplicateOrderTest {
     }
 
     @TestEngine.Conclude
-    public static void conclude() {
+    public void conclude() {
         System.out.println("conclude()");
     }
 }

@@ -42,7 +42,7 @@ public class UUIDAnnotatedFieldTest {
     }
 
     @TestEngine.Prepare
-    public static void prepare() {
+    public void prepare() {
         System.out.println("prepare()");
     }
 
@@ -79,7 +79,7 @@ public class UUIDAnnotatedFieldTest {
     }
 
     @TestEngine.Conclude
-    public static void conclude() {
+    public void conclude() {
         System.out.println("conclude()");
     }
 }

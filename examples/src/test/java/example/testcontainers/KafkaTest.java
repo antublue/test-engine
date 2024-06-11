@@ -55,9 +55,9 @@ public class KafkaTest {
 
     private String message;
 
-    @TestEngine.AutoClose private static Network network;
+    private static Network network;
 
-    @TestEngine.Argument @TestEngine.AutoClose protected KafkaTestEnvironment kafkaTestEnvironment;
+    @TestEngine.Argument protected KafkaTestEnvironment kafkaTestEnvironment;
 
     @TestEngine.ArgumentSupplier
     public static Stream<KafkaTestEnvironment> arguments() {
@@ -65,7 +65,7 @@ public class KafkaTest {
     }
 
     @TestEngine.Prepare
-    public void createNetwork() {
+    public static void createNetwork() {
         info("creating network ...");
 
         network = Network.newNetwork();
@@ -185,6 +185,16 @@ public class KafkaTest {
                 consumer.close();
             }
         }
+    }
+
+    @TestEngine.AfterAll
+    public void afterAll() {
+        kafkaTestEnvironment.close();
+    }
+
+    @TestEngine.Conclude
+    public void conclude() {
+        network.close();
     }
 
     /** Class to implement a TestContext */

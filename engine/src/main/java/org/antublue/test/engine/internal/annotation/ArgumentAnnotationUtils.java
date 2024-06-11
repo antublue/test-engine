@@ -52,7 +52,7 @@ public class ArgumentAnnotationUtils {
     public static void injectArgumentFields(Object testInstance, Named<?> testArgument)
             throws Throwable {
         LOGGER.trace(
-                "injectArgument() testClass [%s] testInstance [%s], testArgument [%s]",
+                "injectArgumentFields() testClass [%s] testInstance [%s], testArgument [%s]",
                 testInstance.getClass(),
                 testInstance,
                 testArgument != null ? testArgument.getName() : "null");

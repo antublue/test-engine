@@ -25,6 +25,8 @@ import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.annotation.ContextAnnotationUtils;
 import org.antublue.test.engine.internal.annotation.RandomAnnotationUtils;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
@@ -40,6 +42,8 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 /** Class to implement a ClassTestDescriptor */
 @SuppressWarnings("PMD.UnusedPrivateMethod")
 public class ClassTestDescriptor extends ExecutableTestDescriptor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassTestDescriptor.class);
 
     private final Class<?> testClass;
     private final List<Method> prepareMethods;
@@ -77,6 +81,8 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
+        LOGGER.trace("execute(ExecutionRequest executionRequest)");
+
         getStopWatch().reset();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
@@ -90,17 +96,17 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         if (throwableCollector.isEmpty()) {
             throwableCollector.execute(this::setRandomFields);
             if (throwableCollector.isEmpty()) {
-                throwableCollector.execute(this::prepare);
+                throwableCollector.execute(this::createTestInstance);
                 if (throwableCollector.isEmpty()) {
-                    throwableCollector.execute(this::createTestInstance);
+                    throwableCollector.execute(this::prepare);
                     if (throwableCollector.isEmpty()) {
                         execute();
                     } else {
                         skip(executionRequest);
                     }
-                    throwableCollector.execute(this::destroyTestInstance);
+                    throwableCollector.execute(this::conclude);
                 }
-                throwableCollector.execute(this::conclude);
+                throwableCollector.execute(this::destroyTestInstance);
             }
             throwableCollector.execute(this::clearRandomFields);
         }
@@ -132,28 +138,48 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void setContextFields() throws Throwable {
+        LOGGER.trace("setContextFields() testClass [%s]", getTestClass().getName());
+
         ContextAnnotationUtils.injectContextFields(getTestClass());
     }
 
     private void setRandomFields() throws Throwable {
+        LOGGER.trace("setRandomFields() testClass [%s]", getTestClass().getName());
+
         RandomAnnotationUtils.injectRandomFields(getTestClass());
     }
 
     private void prepare() throws Throwable {
+        LOGGER.trace(
+                "prepare() testClass [%s] testInstance [%s]",
+                getTestClass().getName(), getTestInstance());
+
         for (Method method : prepareMethods) {
+            LOGGER.trace(
+                    "prepare() testClass [%s] testInstance [%s] method [%s]",
+                    getTestClass().getName(), getTestInstance(), method);
+
             method.setAccessible(true);
-            method.invoke(null);
+            method.invoke(getTestInstance());
         }
     }
 
     private void createTestInstance() throws Throwable {
+        LOGGER.trace("createTestInstance() testClass [%s]", getTestClass().getName());
+
         setTestInstance(
                 getTestClass()
                         .getDeclaredConstructor((Class<?>[]) null)
                         .newInstance((Object[]) null));
+
+        LOGGER.trace(
+                "createTestInstance() testClass [%s] testInstance [%s]",
+                getTestClass().getName(), getTestInstance());
     }
 
     private void execute() {
+        LOGGER.trace("execute() testClass [%s]", getTestClass().getName());
+
         getChildren()
                 .forEach(
                         testDescriptor -> {
@@ -165,6 +191,8 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void skip() {
+        LOGGER.trace("skip() testClass [%s]", getTestClass().getName());
+
         getChildren()
                 .forEach(
                         testDescriptor -> {
@@ -175,19 +203,33 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                         });
     }
 
-    private void destroyTestInstance() {
-        setTestInstance(null);
-    }
-
     private void clearRandomFields() throws Throwable {
+        LOGGER.trace("clearRandomFields() testClass [%s]", getTestClass().getName());
+
         RandomAnnotationUtils.clearRandomFields(getTestClass());
     }
 
     private void conclude() throws Throwable {
+        LOGGER.trace(
+                "conclude() testClass [%s] testInstance [%s]",
+                getTestClass().getName(), getTestInstance());
+
         for (Method method : concludeMethods) {
+            LOGGER.trace(
+                    "conclude() testClass [%s] testInstance [%s] method [%s]",
+                    getTestClass().getName(), getTestInstance(), method);
+
             method.setAccessible(true);
-            method.invoke(null);
+            method.invoke(getTestInstance());
         }
+    }
+
+    private void destroyTestInstance() {
+        LOGGER.trace(
+                "destroyTestInstance() testClass [%s]",
+                getTestClass().getName(), getTestInstance());
+
+        setTestInstance(null);
     }
 
     private void clearContextFields() throws Throwable {

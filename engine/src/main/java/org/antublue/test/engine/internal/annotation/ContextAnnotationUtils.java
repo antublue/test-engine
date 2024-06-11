@@ -48,7 +48,7 @@ public class ContextAnnotationUtils {
      * @throw Throwable
      */
     public static void injectContextFields(Class<?> testClass) throws Throwable {
-        LOGGER.trace("injectContext() testClass [%s]", testClass);
+        LOGGER.trace("injectContextFields() testClass [%s]", testClass);
 
         List<Field> fields =
                 ReflectionSupport.findFields(
@@ -58,6 +58,8 @@ public class ContextAnnotationUtils {
 
         for (Field field : fields) {
             if (Modifier.isStatic(field.getModifiers())) {
+                LOGGER.trace("injectContextFields() testClass [%s] field [%s]", testClass, field);
+
                 field.setAccessible(true);
                 field.set(null, CONTEXT);
             }
@@ -65,7 +67,7 @@ public class ContextAnnotationUtils {
     }
 
     public static void clearContextFields(Class<?> testClass) throws Throwable {
-        LOGGER.trace("clearContext() testClass [%s]", testClass);
+        LOGGER.trace("clearContextFields() testClass [%s]", testClass);
 
         List<Field> fields =
                 ReflectionSupport.findFields(
@@ -75,6 +77,8 @@ public class ContextAnnotationUtils {
 
         for (Field field : fields) {
             if (Modifier.isStatic(field.getModifiers())) {
+                LOGGER.trace("injectContextFields() testClass [%s] field [%s]", testClass, field);
+
                 field.setAccessible(true);
                 field.set(null, null);
             }
@@ -89,7 +93,7 @@ public class ContextAnnotationUtils {
      */
     public static void injectContextFields(Object testInstance) throws Throwable {
         LOGGER.trace(
-                "injectContext() testClass [%s] testInstance [%s]",
+                "injectContextFields() testClass [%s] testInstance [%s]",
                 testInstance.getClass(), testInstance);
 
         List<Field> fields =
@@ -100,10 +104,35 @@ public class ContextAnnotationUtils {
 
         for (Field field : fields) {
             field.setAccessible(true);
-            if (Modifier.isStatic(field.getModifiers())) {
-                field.set(null, CONTEXT);
-            } else {
+            if (!Modifier.isStatic(field.getModifiers())) {
+                LOGGER.trace(
+                        "injectContextFields() testClass [%s] testInstance [%s] field [%s]",
+                        testInstance.getClass().getName(), testInstance, field);
+
                 field.set(testInstance, CONTEXT);
+            }
+        }
+    }
+
+    public static void clearContextFields(Object testInstance) throws Throwable {
+        LOGGER.trace(
+                "clearContextFields() testClass [%s] testInstance [%s]",
+                testInstance.getClass(), testInstance);
+
+        List<Field> fields =
+                ReflectionSupport.findFields(
+                        testInstance.getClass(),
+                        AnnotationFieldPredicate.of(TestEngine.Context.class),
+                        HierarchyTraversalMode.TOP_DOWN);
+
+        for (Field field : fields) {
+            if (!Modifier.isStatic(field.getModifiers())) {
+                LOGGER.trace(
+                        "clearContextFields() testClass [%s] testInstance [%s] field [%s]",
+                        testInstance.getClass(), testInstance, field);
+
+                field.setAccessible(true);
+                field.set(null, null);
             }
         }
     }

@@ -70,7 +70,7 @@ public abstract class BaseTest {
     }
 
     @TestEngine.Prepare
-    public static void prepare() {
+    public void prepare() {
         System.out.println("b/prepare()");
         actual.add("b/prepare()");
     }
@@ -117,7 +117,7 @@ public abstract class BaseTest {
     }
 
     @TestEngine.Conclude
-    public static void conclude() {
+    public void conclude() {
         System.out.println("b/conclude()");
         actual.add("b/conclude()");
     }

@@ -26,6 +26,8 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestArgumentFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.MetadataConstants;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
@@ -41,6 +43,8 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /** Class to implement a MethodTestDescriptor */
 public class MethodTestDescriptor extends ExecutableTestDescriptor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodTestDescriptor.class);
 
     private final Class<?> testClass;
     private final Named<?> testArgument;
@@ -78,6 +82,8 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
     @Override
     public void execute(ExecutionRequest executionRequest) {
+        LOGGER.trace("execute(ExecutionRequest executionRequest)");
+
         getStopWatch().reset();
 
         setExecutionRequest(executionRequest);
@@ -133,19 +139,39 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void beforeEach() throws Throwable {
+        LOGGER.trace(
+                "beforeEach() testClass [%s] testInstance [%s]",
+                getTestInstance().getClass().getName(), getTestInstance());
+
         for (Method method : beforeEachMethods) {
+            LOGGER.trace(
+                    "beforeEach() testClass [%s] testInstance [%s] method [%s]",
+                    getTestInstance().getClass().getName(), getTestInstance(), method);
+
             method.setAccessible(true);
             method.invoke(getTestInstance());
         }
     }
 
     private void test() throws Throwable {
+        LOGGER.trace(
+                "test() testClass [%s] testInstance [%s] method [%s]",
+                getTestInstance().getClass().getName(), getTestInstance(), getTestMethod());
+
         getTestMethod().setAccessible(true);
         getTestMethod().invoke(getTestInstance());
     }
 
     private void afterEach() throws Throwable {
+        LOGGER.trace(
+                "afterEach() testClass [%s] testInstance [%s]",
+                getTestInstance().getClass().getName(), getTestInstance());
+
         for (Method method : afterEachMethods) {
+            LOGGER.trace(
+                    "afterEach() testClass [%s] testInstance [%s] method [%s]",
+                    getTestInstance().getClass().getName(), getTestInstance(), method);
+
             method.setAccessible(true);
             method.invoke(getTestInstance());
         }

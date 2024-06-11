@@ -45,7 +45,7 @@ public class StoreExampleTest6 {
     }
 
     @TestEngine.Prepare
-    public static void prepare() {
+    public void prepare() {
         System.out.println("prepare()");
         System.out.println(format("key [%s]", TEST_OBJECT_KEY));
 
@@ -91,7 +91,7 @@ public class StoreExampleTest6 {
     }
 
     @TestEngine.Conclude
-    public static void conclude() {
+    public void conclude() {
         System.out.println("conclude()");
 
         TestObject testObject = context.getStore().remove(TEST_OBJECT_KEY);

@@ -16,6 +16,8 @@
 
 package example.argument.named;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
@@ -23,70 +25,73 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class NamedComplexArgumentTest1 {
 
-    @TestEngine.Argument @TestEngine.AutoClose protected Named<ComplexArgument> complexArgument;
+    @TestEngine.Argument protected Named<ComplexArgument> argument;
+
+    private ComplexArgument customArgument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<Named<ComplexArgument>> arguments() {
-        return Stream.of(
-                Named.of("A", new ComplexArgument("http://foo.bar")),
-                Named.of("B", new ComplexArgument("http://bar.foo")));
-    }
-
-    @TestEngine.Prepare
-    public static void prepare() {
-        System.out.println("prepare()");
+        Collection<Named<ComplexArgument>> collection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            collection.add(
+                    Named.of(
+                            "ComplexArgument(" + i + ")",
+                            ComplexArgument.of("FirstName" + i, "LastName" + i)));
+        }
+        return collection.stream();
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll(" + complexArgument.getName() + ")");
-        complexArgument.getPayload().initialize();
-    }
-
-    @TestEngine.BeforeEach
-    public void beforeEach() {
-        System.out.println("beforeEach(" + complexArgument.getName() + ")");
+        System.out.println("beforeAll()");
+        customArgument = argument.getPayload();
     }
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + complexArgument.getName() + ")");
+        System.out.println(
+                "test1("
+                        + customArgument.getFirstName()
+                        + " "
+                        + customArgument.getLastName()
+                        + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + complexArgument.getName() + ")");
-    }
-
-    @TestEngine.AfterEach
-    public void afterEach() {
-        System.out.println("afterEach(" + complexArgument.getName() + ")");
+        System.out.println(
+                "test1("
+                        + customArgument.getFirstName()
+                        + " "
+                        + customArgument.getLastName()
+                        + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll(" + complexArgument.getName() + ")");
+        System.out.println("afterAll()");
     }
 
-    @TestEngine.Conclude
-    public static void conclude() {
-        System.out.println("conclude()");
-    }
+    public static class ComplexArgument {
 
-    public static class ComplexArgument implements AutoCloseable {
+        private final String firstName;
+        private final String lastName;
 
-        private final String url;
-
-        public ComplexArgument(String url) {
-            this.url = url;
+        private ComplexArgument(String firstName, String lastName) {
+            this.firstName = firstName;
+            this.lastName = lastName;
         }
 
-        public void initialize() {
-            System.out.println("initialize(" + url + ")");
+        public String getFirstName() {
+            return firstName;
         }
 
-        public void close() {
-            System.out.println("close(" + url + ")");
+        public String getLastName() {
+            return lastName;
+        }
+
+        public static ComplexArgument of(String firstName, String lastName) {
+            return new ComplexArgument(firstName, lastName);
         }
     }
 }

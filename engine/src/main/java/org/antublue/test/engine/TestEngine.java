@@ -138,7 +138,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 throw t;
             }
 
-            System.err.println(t.getMessage());
+            t.printStackTrace(System.err);
+            // System.err.println(t.getMessage());
             System.exit(1);
         } catch (Throwable t) {
             throw new TestEngineException("General exception", t);

@@ -19,6 +19,13 @@ package org.antublue.test.engine.api;
 public interface Context {
 
     /**
+     * Method to get the test engine configuration
+     *
+     * @return the test engine Configuration
+     */
+    Configuration getConfiguration();
+
+    /**
      * Method to get the global Store
      *
      * @return the global Store
@@ -32,15 +39,4 @@ public interface Context {
      * @return the namespaced Store
      */
     Store getStore(Object namespace);
-
-    LockManager getLockManager();
-
-    LockManager getLockManager(Object namespace);
-
-    /**
-     * Method to get the test engine configuration
-     *
-     * @return the test engine Configuration
-     */
-    Configuration getConfiguration();
 }

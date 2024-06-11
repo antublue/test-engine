@@ -124,7 +124,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         return clazz.cast(optional.get());
     }
 
-    public StopWatch getStopWatch() {
+    protected StopWatch getStopWatch() {
         return stopWatch;
     }
 
@@ -136,7 +136,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         return testInstance;
     }
 
-    public ThrowableCollector getThrowableCollector() {
+    protected ThrowableCollector getThrowableCollector() {
         return throwableCollector;
     }
 
