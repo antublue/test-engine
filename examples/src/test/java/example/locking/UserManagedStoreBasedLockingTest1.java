@@ -65,13 +65,10 @@ public class UserManagedStoreBasedLockingTest1 {
     public void lockingTest() throws InterruptedException {
         System.out.println("lockingTest()");
 
-        ReentrantReadWriteLock reentrantReadWriteLock = null;
+        ReentrantReadWriteLock reentrantReadWriteLock = context.getStore(NAMESPACE)
+                .computeIfAbsent(LOCK_NAME, o -> new ReentrantReadWriteLock(true));
 
         try {
-            reentrantReadWriteLock =
-                    context.getStore(NAMESPACE)
-                            .computeIfAbsent(LOCK_NAME, o -> new ReentrantReadWriteLock());
-
             reentrantReadWriteLock.writeLock().lock();
 
             Counter counter = context.getStore(NAMESPACE).get(COUNTER_NAME);
@@ -88,9 +85,7 @@ public class UserManagedStoreBasedLockingTest1 {
 
             Thread.sleep(RandomGenerator.nextInteger(0, 1000));
         } finally {
-            if (reentrantReadWriteLock != null) {
-                reentrantReadWriteLock.writeLock().unlock();
-            }
+            reentrantReadWriteLock.writeLock().unlock();
         }
     }
 

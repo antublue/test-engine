@@ -178,7 +178,7 @@ public class RandomGenerator {
         while (generated.compareTo(range) >= 0) {
             generated = new BigInteger(range.bitLength(), random);
         }
-        
+
         return generated.add(minimumBigInteger);
     }
 
