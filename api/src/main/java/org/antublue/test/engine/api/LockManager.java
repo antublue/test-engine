@@ -45,11 +45,11 @@ public interface LockManager {
 
     interface ReadLockExecutable {
 
-        void inReadLock() throws Throwable;
+        void withReadLock() throws Throwable;
     }
 
     interface WriteLockExecutable {
 
-        void inWriteLock() throws Throwable;
+        void withWriteLock() throws Throwable;
     }
 }

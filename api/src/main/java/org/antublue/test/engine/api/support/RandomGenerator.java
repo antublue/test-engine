@@ -178,8 +178,7 @@ public class RandomGenerator {
         while (generated.compareTo(range) >= 0) {
             generated = new BigInteger(range.bitLength(), random);
         }
-
-        // Add minimum value to generated value
+        
         return generated.add(minimumBigInteger);
     }
 
@@ -233,7 +232,6 @@ public class RandomGenerator {
         int digitCount = Math.max(realMinimum.precision(), realMaximum.precision()) + 10;
         int bitCount = (int) (digitCount / Math.log10(2.0));
 
-        // Convert Random BigInteger to a BigDecimal between 0 and 1
         BigDecimal alpha =
                 new BigDecimal(new BigInteger(bitCount, ThreadLocalRandom.current()))
                         .movePointLeft(digitCount);

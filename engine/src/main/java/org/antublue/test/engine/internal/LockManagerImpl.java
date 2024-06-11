@@ -48,7 +48,7 @@ public class LockManagerImpl implements LockManager {
 
         try {
             reentrantReadWriteLock.readLock().lock();
-            readLockExecutable.inReadLock();
+            readLockExecutable.withReadLock();
         } finally {
             reentrantReadWriteLock.readLock().unlock();
         }
@@ -61,7 +61,7 @@ public class LockManagerImpl implements LockManager {
 
         try {
             reentrantReadWriteLock.writeLock().lock();
-            writeLockExecutable.inWriteLock();
+            writeLockExecutable.withWriteLock();
         } finally {
             reentrantReadWriteLock.writeLock().unlock();
         }
