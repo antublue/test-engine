@@ -16,24 +16,18 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.internal.ContextImpl;
-import org.antublue.test.engine.internal.ExtensionManager;
 import org.antublue.test.engine.internal.MetadataConstants;
+import org.antublue.test.engine.internal.annotation.ContextAnnotationUtils;
+import org.antublue.test.engine.internal.annotation.RandomAnnotationUtils;
 import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
-import org.antublue.test.engine.internal.processor.AutoCloseAnnotationProcessor;
-import org.antublue.test.engine.internal.processor.ContextAnnotationProcessor;
-import org.antublue.test.engine.internal.processor.LockAnnotationProcessor;
-import org.antublue.test.engine.internal.util.MethodUtils;
 import org.antublue.test.engine.internal.util.StandardStreams;
-import org.antublue.test.engine.internal.util.TestUtils;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.ExecutionRequest;
@@ -46,19 +40,6 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 /** Class to implement a ClassTestDescriptor */
 @SuppressWarnings("PMD.UnusedPrivateMethod")
 public class ClassTestDescriptor extends ExecutableTestDescriptor {
-
-    private static final TestUtils TEST_UTILS = TestUtils.getInstance();
-
-    private static final ContextAnnotationProcessor CONTEXT_ANNOTATION_PROCESSOR =
-            ContextAnnotationProcessor.getInstance();
-
-    private static final AutoCloseAnnotationProcessor AUTO_CLOSE_ANNOTATION_PROCESSOR =
-            AutoCloseAnnotationProcessor.getInstance();
-
-    private static final LockAnnotationProcessor LOCK_ANNOTATION_PROCESSOR =
-            LockAnnotationProcessor.getInstance();
-
-    private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
     private final Class<?> testClass;
     private final List<Method> prepareMethods;
@@ -91,7 +72,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     public String getTag() {
-        return TEST_UTILS.getTag(testClass);
+        return getTag(testClass);
     }
 
     @Override
@@ -103,25 +84,27 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         setExecutionRequest(executionRequest);
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
-        setContextFields();
-        setStaticFields();
-        postSetStaticFields();
-        prepare();
-        // postPrepare();
+        ThrowableCollector throwableCollector = getThrowableCollector();
 
-        if (getThrowableContext().isEmpty()) {
-            createTestInstance();
+        throwableCollector.execute(this::setContextFields);
+        if (throwableCollector.isEmpty()) {
+            throwableCollector.execute(this::setRandomFields);
+            if (throwableCollector.isEmpty()) {
+                throwableCollector.execute(this::prepare);
+                if (throwableCollector.isEmpty()) {
+                    throwableCollector.execute(this::createTestInstance);
+                    if (throwableCollector.isEmpty()) {
+                        execute();
+                    } else {
+                        skip(executionRequest);
+                    }
+                    throwableCollector.execute(this::destroyTestInstance);
+                }
+                throwableCollector.execute(this::conclude);
+            }
+            throwableCollector.execute(this::clearRandomFields);
         }
-
-        if (getThrowableContext().isEmpty()) {
-            execute();
-        }
-
-        // closeAutoCloseableFields();
-        destroyTestInstance();
-        conclude();
-        // postConclude();
-        clearContextFields();
+        throwableCollector.execute(this::clearContextFields);
 
         getStopWatch().stop();
 
@@ -130,7 +113,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
                         getStopWatch().elapsedNanoseconds());
 
-        if (getThrowableContext().isEmpty()) {
+        if (getThrowableCollector().isEmpty()) {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
             executionRequest
                     .getEngineExecutionListener()
@@ -142,63 +125,32 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                     .executionFinished(
                             this,
                             TestExecutionResult.failed(
-                                    getThrowableContext().getThrowables().get(0)));
+                                    getThrowableCollector().getThrowables().get(0)));
         }
 
         StandardStreams.flush();
     }
 
-    private void setContextFields() {
-        List<Field> fields =
-                ReflectionSupport.findFields(
-                        getTestClass(),
-                        field ->
-                                Modifier.isStatic(field.getModifiers())
-                                        && field.isAnnotationPresent(TestEngine.Context.class),
-                        HierarchyTraversalMode.TOP_DOWN);
+    private void setContextFields() throws Throwable {
+        ContextAnnotationUtils.injectContextFields(getTestClass());
+    }
 
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true);
-                field.set(null, ContextImpl.getInstance());
-            } catch (Throwable t) {
-                getThrowableContext().add(getTestClass(), t);
-            }
+    private void setRandomFields() throws Throwable {
+        RandomAnnotationUtils.injectRandomFields(getTestClass());
+    }
+
+    private void prepare() throws Throwable {
+        for (Method method : prepareMethods) {
+            method.setAccessible(true);
+            method.invoke(null);
         }
     }
 
-    private void setStaticFields() {}
-
-    private void postSetStaticFields() {}
-
-    private void prepare() {
-        try {
-            for (Method method : prepareMethods) {
-                LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-                MethodUtils.invoke(method, getThrowableContext());
-                LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
-                if (!getThrowableContext().isEmpty()) {
-                    break;
-                }
-            }
-        } catch (Throwable t) {
-            getThrowableContext().add(testClass, t);
-        }
-    }
-
-    private void postPrepare() {
-        EXTENSION_MANAGER.postPrepareMethodsCallback(getTestInstance(), getThrowableContext());
-    }
-
-    private void createTestInstance() {
-        try {
-            setTestInstance(
-                    getTestClass()
-                            .getDeclaredConstructor((Class<?>[]) null)
-                            .newInstance((Object[]) null));
-        } catch (Throwable t) {
-            getThrowableContext().add(getTestClass(), t);
-        }
+    private void createTestInstance() throws Throwable {
+        setTestInstance(
+                getTestClass()
+                        .getDeclaredConstructor((Class<?>[]) null)
+                        .newInstance((Object[]) null));
     }
 
     private void execute() {
@@ -212,45 +164,34 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                         });
     }
 
+    private void skip() {
+        getChildren()
+                .forEach(
+                        testDescriptor -> {
+                            if (testDescriptor instanceof ExecutableTestDescriptor) {
+                                ((ExecutableTestDescriptor) testDescriptor)
+                                        .skip(getExecutionRequest());
+                            }
+                        });
+    }
+
     private void destroyTestInstance() {
         setTestInstance(null);
     }
 
-    private void conclude() {
+    private void clearRandomFields() throws Throwable {
+        RandomAnnotationUtils.clearRandomFields(getTestClass());
+    }
+
+    private void conclude() throws Throwable {
         for (Method method : concludeMethods) {
-            LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-            TEST_UTILS.invoke(method, null, getThrowableContext());
-            LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
+            method.setAccessible(true);
+            method.invoke(null);
         }
     }
 
-    private void postConclude() {
-        EXTENSION_MANAGER.postConcludeMethodsCallback(getTestInstance(), getThrowableContext());
-    }
-
-    private void closeAutoCloseableFields() {
-        AUTO_CLOSE_ANNOTATION_PROCESSOR.closeAutoCloseableFields(
-                getTestClass(), getThrowableContext());
-        LOCK_ANNOTATION_PROCESSOR.processUnlocks(getTestClass());
-    }
-
-    private void clearContextFields() {
-        List<Field> fields =
-                ReflectionSupport.findFields(
-                        getTestClass(),
-                        field ->
-                                Modifier.isStatic(field.getModifiers())
-                                        && field.isAnnotationPresent(TestEngine.Context.class),
-                        HierarchyTraversalMode.BOTTOM_UP);
-
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true);
-                field.set(null, null);
-            } catch (Throwable t) {
-                getThrowableContext().add(getTestClass(), t);
-            }
-        }
+    private void clearContextFields() throws Throwable {
+        ContextAnnotationUtils.clearContextFields(getTestClass());
     }
 
     /** Class to implement a Builder */
@@ -310,7 +251,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                                 .getUniqueId()
                                 .append(ClassTestDescriptor.class.getName(), testClass.getName());
 
-                displayName = TEST_UTILS.getDisplayName(testClass);
+                displayName = getDisplayName(testClass);
 
                 prepareMethods =
                         ReflectionSupport.findMethods(
@@ -318,9 +259,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                                 AnnotationMethodPredicate.of(TestEngine.Prepare.class),
                                 HierarchyTraversalMode.TOP_DOWN);
 
-                prepareMethods =
-                        TEST_UTILS.orderTestMethods(
-                                prepareMethods, HierarchyTraversalMode.TOP_DOWN);
+                prepareMethods = orderTestMethods(prepareMethods, HierarchyTraversalMode.TOP_DOWN);
 
                 concludeMethods =
                         ReflectionSupport.findMethods(
@@ -329,8 +268,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                                 HierarchyTraversalMode.BOTTOM_UP);
 
                 concludeMethods =
-                        TEST_UTILS.orderTestMethods(
-                                concludeMethods, HierarchyTraversalMode.BOTTOM_UP);
+                        orderTestMethods(concludeMethods, HierarchyTraversalMode.BOTTOM_UP);
 
                 TestDescriptor testDescriptor = new ClassTestDescriptor(this);
 

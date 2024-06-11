@@ -60,19 +60,6 @@ public class TestUtils {
         return SingletonHolder.INSTANCE;
     }
 
-    public void invoke(Method method, Object testArgument, ThrowableContext throwableContext) {
-        try {
-            method.setAccessible(true);
-            if (ReflectionUtils.acceptsArguments(method, Named.class)) {
-                method.invoke(null, testArgument);
-            } else {
-                method.invoke(null, (Object[]) null);
-            }
-        } catch (Throwable t) {
-            throwableContext.add(method.getDeclaringClass(), t);
-        }
-    }
-
     public void invoke(
             Method method,
             Object testInstance,

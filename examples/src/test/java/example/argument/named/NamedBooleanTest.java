@@ -25,6 +25,8 @@ import org.antublue.test.engine.api.support.named.NamedBoolean;
 /** Example test */
 public class NamedBooleanTest {
 
+    @TestEngine.Argument protected NamedBoolean argument;
+
     @TestEngine.ArgumentSupplier
     public static Stream<NamedBoolean> arguments() {
         Collection<NamedBoolean> collection = new ArrayList<>();
@@ -36,22 +38,22 @@ public class NamedBooleanTest {
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(NamedBoolean namedBoolean) {
+    public void beforeAll() {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.Test
-    public void test1(NamedBoolean namedBoolean) {
-        System.out.println("test1(" + namedBoolean.getPayload() + ")");
+    public void test1() {
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
-    public void test2(NamedBoolean namedBoolean) {
-        System.out.println("test2(" + namedBoolean.getPayload() + ")");
+    public void test2() {
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(NamedBoolean namedBoolean) {
+    public void afterAll() {
         System.out.println("afterAll()");
     }
 }

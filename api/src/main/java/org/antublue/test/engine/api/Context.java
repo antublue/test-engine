@@ -33,6 +33,10 @@ public interface Context {
      */
     Store getStore(Object namespace);
 
+    LockManager getLockManager();
+
+    LockManager getLockManager(Object namespace);
+
     /**
      * Method to get the test engine configuration
      *

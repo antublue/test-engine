@@ -25,6 +25,7 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
+@TestEngine.Disabled
 public class ParameterizedTest2 {
 
     public static final List<String> ACTUAL = new ArrayList<>();

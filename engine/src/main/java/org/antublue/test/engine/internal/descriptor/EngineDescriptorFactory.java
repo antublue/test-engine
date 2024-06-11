@@ -50,7 +50,7 @@ import org.junit.platform.engine.discovery.PackageSelector;
 import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
-/** Class to implement a ParameterizedTestDescriptorFactory */
+/** Class to implement a EngineDescriptorFactory */
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class EngineDescriptorFactory {
 

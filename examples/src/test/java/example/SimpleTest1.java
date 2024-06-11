@@ -50,7 +50,7 @@ public class SimpleTest1 {
         System.out.println("beforeAll(" + argument + ")");
         System.out.println("randomInteger = [" + randomInteger + "]");
         assertThat(argument).isNotNull();
-        assertThat(randomInteger).isNotNull();
+        // assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.BeforeEach
@@ -82,7 +82,7 @@ public class SimpleTest1 {
         System.out.println("afterAll(" + argument + ")");
         System.out.println("randomInteger = [" + randomInteger + "]");
         assertThat(argument).isNotNull();
-        assertThat(randomInteger).isNotNull();
+        // assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.Conclude

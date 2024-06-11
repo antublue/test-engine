@@ -29,7 +29,7 @@ public interface Store {
     /**
      * Method to get the Store namespace
      *
-     * @return the store namespace
+     * @return the Store namespace
      */
     String getNamespace();
 

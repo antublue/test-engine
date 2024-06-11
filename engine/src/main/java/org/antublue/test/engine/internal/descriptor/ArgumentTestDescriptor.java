@@ -26,15 +26,12 @@ import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.internal.ExtensionManager;
 import org.antublue.test.engine.internal.MetadataConstants;
+import org.antublue.test.engine.internal.annotation.ArgumentAnnotationUtils;
+import org.antublue.test.engine.internal.annotation.RandomAnnotationUtils;
 import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
-import org.antublue.test.engine.internal.processor.ArgumentAnnotationProcessor;
-import org.antublue.test.engine.internal.processor.AutoCloseAnnotationProcessor;
-import org.antublue.test.engine.internal.processor.LockAnnotationProcessor;
-import org.antublue.test.engine.internal.processor.RandomAnnotationProcessor;
 import org.antublue.test.engine.internal.util.StandardStreams;
-import org.antublue.test.engine.internal.util.TestUtils;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -48,22 +45,6 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 /** Class to implement a ArgumentTestDescriptor */
 @SuppressWarnings({"PMD.UnusedPrivateMethod", "PMD.AvoidAccessibilityAlteration"})
 public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
-
-    private static final TestUtils TEST_UTILS = TestUtils.getInstance();
-
-    private static final ArgumentAnnotationProcessor ARGUMENT_ANNOTATION_PROCESSOR =
-            ArgumentAnnotationProcessor.getInstance();
-
-    private static final RandomAnnotationProcessor RANDOM_ANNOTATION_PROCESSOR =
-            RandomAnnotationProcessor.getInstance();
-
-    private static final LockAnnotationProcessor LOCK_ANNOTATION_PROCESSOR =
-            LockAnnotationProcessor.getInstance();
-
-    private static final AutoCloseAnnotationProcessor AUTO_CLOSE_ANNOTATION_PROCESSOR =
-            AutoCloseAnnotationProcessor.getInstance();
-
-    private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
     private final Class<?> testClass;
     private final Named<?> testArgument;
@@ -112,22 +93,21 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
-        setArgumentFields();
-        postSetArgumentFields();
-        if (getThrowableContext().isEmpty()) {
-            setRandomFields();
-            if (getThrowableContext().isEmpty()) {
-                beforeAllMethods();
-                if (getThrowableContext().isEmpty()) {
+        ThrowableCollector throwableCollector = getThrowableCollector();
+
+        throwableCollector.execute(this::setArgumentFields);
+        if (throwableCollector.isEmpty()) {
+            throwableCollector.execute(this::setRandomFields);
+            if (throwableCollector.isEmpty()) {
+                throwableCollector.execute(this::beforeAllMethods);
+                if (throwableCollector.isEmpty()) {
                     execute();
                 }
-                afterAllMethods();
-                clearRandomFields();
+                throwableCollector.execute(this::afterAllMethods);
             }
-            clearArgumentFields();
+            throwableCollector.execute(this::clearRandomFields);
         }
-
-        // postBeforeAllMethods();
+        throwableCollector.execute(this::clearArgumentFields);
 
         getStopWatch().stop();
 
@@ -136,66 +116,44 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
                         getStopWatch().elapsedNanoseconds());
 
-        if (getThrowableContext().isEmpty()) {
+        if (getThrowableCollector().isEmpty()) {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
             getParent(ClassTestDescriptor.class)
-                    .getThrowableContext()
+                    .getThrowableCollector()
                     .add(
-                            getTestInstance().getClass(),
                             new TestClassFailedException(
                                     format(
                                             "Exception testing test class [%s]",
-                                            TEST_UTILS.getDisplayName(testClass))));
+                                            getDisplayName(testClass))));
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(
                             this,
                             TestExecutionResult.failed(
-                                    getThrowableContext().getThrowables().get(0)));
+                                    getThrowableCollector().getThrowables().get(0)));
         }
 
         StandardStreams.flush();
     }
 
-    private void setArgumentFields() {
-        ARGUMENT_ANNOTATION_PROCESSOR.setArgumentFields(
-                getTestInstance(), testArgument, getThrowableContext());
+    private void setArgumentFields() throws Throwable {
+        ArgumentAnnotationUtils.injectArgumentFields(getTestInstance(), testArgument);
     }
 
-    private void postSetArgumentFields() {
-        // TODO
+    private void setRandomFields() throws Throwable {
+        RandomAnnotationUtils.injectRandomFields(getTestInstance());
     }
 
-    private void setRandomFields() {
-        RANDOM_ANNOTATION_PROCESSOR.setRandomFields(getTestInstance(), getThrowableContext());
-    }
-
-    private void postSetRandomFields() {
-        // TODO
-    }
-
-    private void beforeAllMethods() {
-        try {
-            for (Method method : beforeAllMethods) {
-                LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-                TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-                LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
-                if (!getThrowableContext().isEmpty()) {
-                    break;
-                }
-            }
-        } catch (Throwable t) {
-            getThrowableContext().add(testClass, t);
+    private void beforeAllMethods() throws Throwable {
+        for (Method method : beforeAllMethods) {
+            method.setAccessible(true);
+            method.invoke(getTestInstance());
         }
-    }
-
-    private void postBeforeAllMethods() {
-        // TODO
     }
 
     private void execute() {
@@ -210,35 +168,20 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                 });
     }
 
-    private void afterAllMethods() {
+    private void afterAllMethods() throws Throwable {
         for (Method method : afterAllMethods) {
-            LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-            TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-            LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
+            method.setAccessible(true);
+            method.invoke(getTestInstance());
         }
     }
 
-    private void postAfterAllMethods() {
-        // DO NOTHING
+    private void clearRandomFields() throws Throwable {
+        RandomAnnotationUtils.clearRandomFields(getTestInstance());
     }
 
-    private void clearRandomFields() {
-        RANDOM_ANNOTATION_PROCESSOR.clearRandomFields(getTestInstance(), getThrowableContext());
+    private void clearArgumentFields() throws Throwable {
+        ArgumentAnnotationUtils.injectArgumentFields(getTestInstance(), null);
     }
-
-    private void postClearRandomFields() {
-        // TODO
-    }
-
-    private void clearArgumentFields() {
-        ARGUMENT_ANNOTATION_PROCESSOR.clearArgumentFields(
-                getTestInstance(), null, getThrowableContext());
-    }
-
-    private void postClearArgumentFields() {
-        // TODO
-    }
-
 
     /** Class to implement a Builder */
     public static class Builder {
@@ -311,8 +254,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                 HierarchyTraversalMode.TOP_DOWN);
 
                 beforeAllMethods =
-                        TEST_UTILS.orderTestMethods(
-                                beforeAllMethods, HierarchyTraversalMode.TOP_DOWN);
+                        orderTestMethods(beforeAllMethods, HierarchyTraversalMode.TOP_DOWN);
 
                 afterAllMethods =
                         ReflectionSupport.findMethods(
@@ -321,8 +263,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                 HierarchyTraversalMode.BOTTOM_UP);
 
                 afterAllMethods =
-                        TEST_UTILS.orderTestMethods(
-                                afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
+                        orderTestMethods(afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
 
                 TestDescriptor testDescriptor = new ArgumentTestDescriptor(this);
 
@@ -331,7 +272,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 for (Method testMethod : testMethods) {
                     new MethodTestDescriptor.Builder()
                             .setTestClass(testClass)
-                            .setTestArgument(testArgumentIndex, testArgument)
+                            .setTestArgument(testArgument)
                             .setTestMethod(testMethod)
                             .build(testDescriptor);
                 }

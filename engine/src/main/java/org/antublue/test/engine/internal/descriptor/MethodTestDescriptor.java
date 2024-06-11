@@ -25,13 +25,10 @@ import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestArgumentFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.internal.ExtensionManager;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
-import org.antublue.test.engine.internal.processor.LockAnnotationProcessor;
 import org.antublue.test.engine.internal.util.StandardStreams;
-import org.antublue.test.engine.internal.util.StateMachine;
-import org.antublue.test.engine.internal.util.TestUtils;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -45,32 +42,11 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 /** Class to implement a MethodTestDescriptor */
 public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
-    private static final TestUtils TEST_UTILS = TestUtils.getInstance();
-
-    private static final LockAnnotationProcessor LOCK_ANNOTATION_PROCESSOR =
-            LockAnnotationProcessor.getInstance();
-
-    private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
-
     private final Class<?> testClass;
     private final Named<?> testArgument;
     private final List<Method> beforeEachMethods;
     private final Method testMethod;
     private final List<Method> afterEachMethods;
-
-    private enum State {
-        NULL,
-        PRE_BEFORE_EACH,
-        BEFORE_EACH,
-        POST_BEFORE_EACH,
-        PRE_TEST,
-        TEST,
-        POST_TEST,
-        PRE_AFTER_EACH,
-        AFTER_EACH,
-        POST_AFTER_EACH,
-        END
-    }
 
     /** Constructor */
     private MethodTestDescriptor(Builder builder) {
@@ -97,7 +73,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     public String getTag() {
-        return TEST_UTILS.getTag(testMethod);
+        return getTag(testMethod);
     }
 
     @Override
@@ -114,52 +90,13 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata().put(MetadataConstants.TEST_ARGUMENT, testArgument);
         getMetadata().put(MetadataConstants.TEST_METHOD, testMethod);
 
-        if (!getThrowableContext().isEmpty()) {
-            getStopWatch().stop();
-            getMetadata()
-                    .put(
-                            MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                            getStopWatch().elapsedNanoseconds());
-            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
-            executionRequest.getEngineExecutionListener().executionSkipped(this, "");
-            return;
+        ThrowableCollector throwableCollector = getThrowableCollector();
+
+        throwableCollector.execute(this::beforeEach);
+        if (getThrowableCollector().isEmpty()) {
+            throwableCollector.execute(this::test);
         }
-
-        executionRequest.getEngineExecutionListener().executionStarted(this);
-
-        StateMachine<State> stateMachine = new StateMachine<>(getUniqueId().toString());
-
-        try {
-            stateMachine
-                    .definition(State.NULL, this::begin, State.PRE_BEFORE_EACH)
-                    .definition(
-                            State.PRE_BEFORE_EACH,
-                            this::preBeforeEach,
-                            State.BEFORE_EACH,
-                            State.POST_BEFORE_EACH)
-                    .definition(State.BEFORE_EACH, this::beforeEach, State.POST_BEFORE_EACH)
-                    .definition(State.POST_BEFORE_EACH, this::postBeforeEach, State.PRE_TEST)
-                    .definition(State.PRE_TEST, this::preTest, State.TEST, State.POST_TEST)
-                    .definition(State.TEST, this::test, State.POST_TEST)
-                    .definition(State.POST_TEST, this::postTest, State.PRE_AFTER_EACH)
-                    .definition(
-                            State.PRE_AFTER_EACH,
-                            this::preAfterEach,
-                            State.AFTER_EACH,
-                            State.POST_AFTER_EACH)
-                    .definition(State.AFTER_EACH, this::afterEach, State.POST_AFTER_EACH)
-                    .definition(State.POST_AFTER_EACH, this::postAfterEach, State.END)
-                    .afterEach(
-                            () -> {
-                                StandardStreams.flush();
-                                throttle();
-                                return null;
-                            })
-                    .end(State.END, this::end)
-                    .run(State.NULL);
-        } catch (Throwable t) {
-            getThrowableContext().add(testClass, t);
-        }
+        throwableCollector.execute(this::afterEach);
 
         setExecutionRequest(null);
         setTestInstance(null);
@@ -170,16 +107,15 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
                         getStopWatch().elapsedNanoseconds());
 
-        if (getThrowableContext().isEmpty()) {
+        if (getThrowableCollector().isEmpty()) {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
             getParent(ArgumentTestDescriptor.class)
-                    .getThrowableContext()
+                    .getThrowableCollector()
                     .add(
-                            testClass,
                             new TestArgumentFailedException(
                                     format(
                                             "Exception testing test argument name [%s]",
@@ -190,129 +126,29 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                     .executionFinished(
                             this,
                             TestExecutionResult.failed(
-                                    getThrowableContext().getThrowables().get(0)));
+                                    getThrowableCollector().getThrowables().get(0)));
         }
 
         StandardStreams.flush();
     }
 
-    private State begin() {
-        return State.PRE_BEFORE_EACH;
-    }
-
-    private State preBeforeEach() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        EXTENSION_MANAGER.preBeforeEachMethodsCallback(
-                getTestInstance(), testArgument, getThrowableContext());
-
-        if (getThrowableContext().isEmpty()) {
-            return State.BEFORE_EACH;
-        } else {
-            return State.POST_BEFORE_EACH;
+    private void beforeEach() throws Throwable {
+        for (Method method : beforeEachMethods) {
+            method.setAccessible(true);
+            method.invoke(getTestInstance());
         }
     }
 
-    private State beforeEach() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        try {
-            for (Method method : beforeEachMethods) {
-                LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-                TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-                LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
-                if (!getThrowableContext().isEmpty()) {
-                    break;
-                }
-            }
-        } catch (Throwable t) {
-            getThrowableContext().add(testClass, t);
-        }
-
-        return State.POST_BEFORE_EACH;
+    private void test() throws Throwable {
+        getTestMethod().setAccessible(true);
+        getTestMethod().invoke(getTestInstance());
     }
 
-    private State postBeforeEach() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        EXTENSION_MANAGER.postBeforeEachMethodsCallback(
-                getTestInstance(), testArgument, getThrowableContext());
-
-        if (getThrowableContext().isEmpty()) {
-            return State.PRE_TEST;
-        } else {
-            return State.PRE_AFTER_EACH;
-        }
-    }
-
-    private State preTest() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        EXTENSION_MANAGER.preTestMethodsCallback(
-                testMethod, getTestInstance(), testArgument, getThrowableContext());
-
-        if (getThrowableContext().isEmpty()) {
-            return State.TEST;
-        } else {
-            return State.POST_TEST;
-        }
-    }
-
-    private State test() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        LOCK_ANNOTATION_PROCESSOR.processLocks(testMethod);
-        TEST_UTILS.invoke(testMethod, getTestInstance(), testArgument, getThrowableContext());
-        LOCK_ANNOTATION_PROCESSOR.processUnlocks(testMethod);
-
-        return State.POST_TEST;
-    }
-
-    private State postTest() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        EXTENSION_MANAGER.postTestMethodsCallback(
-                testMethod, getTestInstance(), testArgument, getThrowableContext());
-
-        return State.PRE_AFTER_EACH;
-    }
-
-    private State preAfterEach() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        EXTENSION_MANAGER.preAfterEachMethodsCallback(
-                getTestInstance(), testArgument, getThrowableContext());
-
-        if (getThrowableContext().isEmpty()) {
-            return State.AFTER_EACH;
-        } else {
-            return State.POST_AFTER_EACH;
-        }
-    }
-
-    private State afterEach() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
+    private void afterEach() throws Throwable {
         for (Method method : afterEachMethods) {
-            LOCK_ANNOTATION_PROCESSOR.processLocks(method);
-            TEST_UTILS.invoke(method, getTestInstance(), testArgument, getThrowableContext());
-            LOCK_ANNOTATION_PROCESSOR.processUnlocks(method);
+            method.setAccessible(true);
+            method.invoke(getTestInstance());
         }
-
-        return State.POST_AFTER_EACH;
-    }
-
-    private State postAfterEach() {
-        Preconditions.notNull(getTestInstance(), "testInstance is null");
-
-        EXTENSION_MANAGER.postAfterEachMethodsCallback(
-                getTestInstance(), testArgument, getThrowableContext());
-
-        return State.END;
-    }
-
-    private State end() {
-        return null;
     }
 
     /** Class to implement a Builder */
@@ -341,11 +177,10 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         /**
          * Method to set the test argument index and test argument
          *
-         * @param testArgumentIndex testArgumentIndex
          * @param testArgument testArgument
          * @return this
          */
-        public Builder setTestArgument(int testArgumentIndex, Named<?> testArgument) {
+        public Builder setTestArgument(Named<?> testArgument) {
             this.testArgument = testArgument;
             return this;
         }
@@ -373,7 +208,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                                 .getUniqueId()
                                 .append(MethodTestDescriptor.class.getName(), testMethod.getName());
 
-                displayName = TEST_UTILS.getDisplayName(testMethod);
+                displayName = getDisplayName(testMethod);
 
                 beforeEachMethods =
                         ReflectionSupport.findMethods(
@@ -382,8 +217,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                                 HierarchyTraversalMode.TOP_DOWN);
 
                 beforeEachMethods =
-                        TEST_UTILS.orderTestMethods(
-                                beforeEachMethods, HierarchyTraversalMode.TOP_DOWN);
+                        orderTestMethods(beforeEachMethods, HierarchyTraversalMode.TOP_DOWN);
 
                 afterEachMethods =
                         ReflectionSupport.findMethods(
@@ -392,8 +226,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                                 HierarchyTraversalMode.BOTTOM_UP);
 
                 afterEachMethods =
-                        TEST_UTILS.orderTestMethods(
-                                afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
+                        orderTestMethods(afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
 
                 TestDescriptor testDescriptor = new MethodTestDescriptor(this);
 

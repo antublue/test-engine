@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.processor;
+package org.antublue.test.engine.internal.annotation;
 
 import static java.lang.String.format;
 

@@ -24,12 +24,13 @@ public class MethodUtils {
         // DO NOTHING
     }
 
-    public static void invoke(Method method, ThrowableContext throwableContext) {
-        try {
-            method.setAccessible(true);
-            method.invoke(null);
-        } catch (Throwable t) {
-            throwableContext.add(method.getDeclaringClass(), t);
-        }
+    public static void invoke(Method method) throws Throwable {
+        method.setAccessible(true);
+        method.invoke(null);
+    }
+
+    public static void invoke(Method method, Object object) throws Throwable {
+        method.setAccessible(true);
+        method.invoke(object);
     }
 }
