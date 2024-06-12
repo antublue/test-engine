@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.named.NamedString;
+import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 public class StoreExampleTest6 {

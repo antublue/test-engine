@@ -24,7 +24,7 @@ import java.util.function.Function;
 public interface Store {
 
     /** Global Store namespace */
-    String GLOBAL = "__GLOBAL__";
+    String GLOBAL = "__GLOBAL__STORE__";
 
     /**
      * Method to get the Store namespace

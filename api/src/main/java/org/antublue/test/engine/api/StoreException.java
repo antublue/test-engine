@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.api;
 
-/** Class to implement a generic TestEngineException */
+/** Class to implement a generic StoreException */
 public class StoreException extends RuntimeException {
 
     /**
@@ -26,24 +26,5 @@ public class StoreException extends RuntimeException {
      */
     public StoreException(String message) {
         super(message);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param message message
-     * @param throwable throwable
-     */
-    public StoreException(String message, Throwable throwable) {
-        super(message, throwable);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param throwable throwable
-     */
-    public StoreException(Throwable throwable) {
-        super(throwable);
     }
 }
