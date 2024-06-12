@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support.named;
+package org.antublue.test.engine.api.named;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
-/** Class to implement a LongArgument */
-public class NamedLong extends AbstractNamed<Long> {
+/** Class to implement a BigIntegerArgument */
+public class NamedBigInteger extends AbstractNamed<BigInteger> {
 
     private final String name;
-    private final long value;
+    private final BigInteger value;
 
     /**
      * Constructor
@@ -30,13 +31,13 @@ public class NamedLong extends AbstractNamed<Long> {
      * @param name name
      * @param value value
      */
-    public NamedLong(String name, long value) {
+    public NamedBigInteger(String name, BigInteger value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the LongArgument name
+     * Method to get the BigIntegerArgument name
      *
      * @return the return value
      */
@@ -46,11 +47,11 @@ public class NamedLong extends AbstractNamed<Long> {
     }
 
     /**
-     * Method to get the LongArgument value
+     * Method to get the BigIntegerArgument value
      *
      * @return the return value
      */
-    public Long getPayload() {
+    public BigInteger getPayload() {
         return value;
     }
 
@@ -63,8 +64,8 @@ public class NamedLong extends AbstractNamed<Long> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedLong that = (NamedLong) o;
-        return value == that.value && Objects.equals(name, that.name);
+        NamedBigInteger that = (NamedBigInteger) o;
+        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
     }
 
     @Override
@@ -73,12 +74,16 @@ public class NamedLong extends AbstractNamed<Long> {
     }
 
     /**
-     * Method to create a LongArgument
+     * Method to create a BigIntegerArgument
      *
      * @param value value
      * @return the return value
      */
-    public static NamedLong of(long value) {
-        return new NamedLong(String.valueOf(value), value);
+    public static NamedBigInteger of(BigInteger value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value is null");
+        }
+
+        return new NamedBigInteger(String.valueOf(value), value);
     }
 }

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support.named;
+package org.antublue.test.engine.api.named;
 
 import java.util.Objects;
 
-/** Class to implement a StringArgument */
-public class NamedString extends AbstractNamed<String> {
+/** Class to implement a NamedInteger */
+public class NamedInteger extends AbstractNamed<Integer> {
 
     private final String name;
-    private final String value;
+    private final int value;
 
     /**
      * Constructor
@@ -30,13 +30,13 @@ public class NamedString extends AbstractNamed<String> {
      * @param name name
      * @param value value
      */
-    public NamedString(String name, String value) {
+    public NamedInteger(String name, int value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the StringArgument name
+     * Method to get the NamedInteger name
      *
      * @return the return value
      */
@@ -46,25 +46,25 @@ public class NamedString extends AbstractNamed<String> {
     }
 
     /**
-     * Method to get the StringArgument value
+     * Method to get the NamedInteger value
      *
      * @return the return value
      */
-    public String getPayload() {
+    public Integer getPayload() {
         return value;
     }
 
     @Override
     public String toString() {
-        return value;
+        return String.valueOf(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedString that = (NamedString) o;
-        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
+        NamedInteger that = (NamedInteger) o;
+        return value == that.value && Objects.equals(name, that.name);
     }
 
     @Override
@@ -73,19 +73,12 @@ public class NamedString extends AbstractNamed<String> {
     }
 
     /**
-     * Method to create a StringArgument
+     * Method to create a NamedInteger
      *
      * @param value value
      * @return the return value
      */
-    public static NamedString of(String value) {
-        String name = value;
-        if (name == null) {
-            name = "((null))";
-        } else if (name.isEmpty()) {
-            name = "((empty))";
-        }
-
-        return new NamedString(name, value);
+    public static NamedInteger of(int value) {
+        return new NamedInteger(String.valueOf(value), value);
     }
 }

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedFloat;
+import org.antublue.test.engine.api.named.NamedFloat;
 
 /** Example test */
 public class NamedFloatTest {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support.named;
+package org.antublue.test.engine.api.named;
 
 import java.util.Objects;
 

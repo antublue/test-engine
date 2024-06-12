@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedString;
+import org.antublue.test.engine.api.named.NamedString;
 
 /** Example test */
 public class SimpleTest6 {

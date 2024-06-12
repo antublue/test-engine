@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedBigInteger;
+import org.antublue.test.engine.api.named.NamedBigInteger;
 
 /** Example test */
 public class NamedBigIntegerTest {

@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support.named;
+package org.antublue.test.engine.api.named;
 
-import java.math.BigInteger;
 import java.util.Objects;
 
-/** Class to implement a BigIntegerArgument */
-public class NamedBigInteger extends AbstractNamed<BigInteger> {
+/** Class to implement a ShortArgument */
+public class NamedShort extends AbstractNamed<Short> {
 
     private final String name;
-    private final BigInteger value;
+    private final short value;
 
     /**
      * Constructor
@@ -31,13 +30,13 @@ public class NamedBigInteger extends AbstractNamed<BigInteger> {
      * @param name name
      * @param value value
      */
-    public NamedBigInteger(String name, BigInteger value) {
+    public NamedShort(String name, short value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the BigIntegerArgument name
+     * Method to get the ShortArgument name
      *
      * @return the return value
      */
@@ -47,25 +46,20 @@ public class NamedBigInteger extends AbstractNamed<BigInteger> {
     }
 
     /**
-     * Method to get the BigIntegerArgument value
+     * Method to get the ShortArgument value
      *
      * @return the return value
      */
-    public BigInteger getPayload() {
+    public Short getPayload() {
         return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedBigInteger that = (NamedBigInteger) o;
-        return Objects.equals(name, that.name) && Objects.equals(value, that.value);
+        NamedShort that = (NamedShort) o;
+        return value == that.value && Objects.equals(name, that.name);
     }
 
     @Override
@@ -74,16 +68,12 @@ public class NamedBigInteger extends AbstractNamed<BigInteger> {
     }
 
     /**
-     * Method to create a BigIntegerArgument
+     * Method to create a ShortArgument
      *
      * @param value value
      * @return the return value
      */
-    public static NamedBigInteger of(BigInteger value) {
-        if (value == null) {
-            throw new IllegalArgumentException("value is null");
-        }
-
-        return new NamedBigInteger(String.valueOf(value), value);
+    public static NamedShort of(short value) {
+        return new NamedShort(String.valueOf(value), value);
     }
 }

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support.named;
+package org.antublue.test.engine.api.named;
 
 import java.util.Objects;
 
-/** Class to implement a ByteArgument */
-public class NamedByte extends AbstractNamed<Byte> {
+/** Class to implement a FloatArgument */
+public class NamedFloat extends AbstractNamed<Float> {
 
     private final String name;
-    private final byte value;
+    private final float value;
 
     /**
      * Constructor
@@ -30,13 +30,13 @@ public class NamedByte extends AbstractNamed<Byte> {
      * @param name name
      * @param value value
      */
-    public NamedByte(String name, byte value) {
+    public NamedFloat(String name, float value) {
         this.name = validateName(name);
         this.value = value;
     }
 
     /**
-     * Method to get the ByteArgument name
+     * Method to get the FloatArgument name
      *
      * @return the return value
      */
@@ -46,11 +46,11 @@ public class NamedByte extends AbstractNamed<Byte> {
     }
 
     /**
-     * Method to get the ByteArgument value
+     * Method to get the FloatArgument value
      *
      * @return the return value
      */
-    public Byte getPayload() {
+    public Float getPayload() {
         return value;
     }
 
@@ -63,8 +63,8 @@ public class NamedByte extends AbstractNamed<Byte> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        NamedByte that = (NamedByte) o;
-        return value == that.value && Objects.equals(name, that.name);
+        NamedFloat that = (NamedFloat) o;
+        return Float.compare(that.value, value) == 0 && Objects.equals(name, that.name);
     }
 
     @Override
@@ -73,12 +73,12 @@ public class NamedByte extends AbstractNamed<Byte> {
     }
 
     /**
-     * Method to create a ByteArgument
+     * Method to create a FloatArgument
      *
      * @param value value
      * @return the return value
      */
-    public static NamedByte of(byte value) {
-        return new NamedByte(String.valueOf(value), value);
+    public static NamedFloat of(float value) {
+        return new NamedFloat(String.valueOf(value), value);
     }
 }

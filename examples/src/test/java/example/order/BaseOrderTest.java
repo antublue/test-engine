@@ -19,7 +19,7 @@ package example.order;
 import java.util.ArrayList;
 import java.util.List;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedString;
+import org.antublue.test.engine.api.named.NamedString;
 
 public abstract class BaseOrderTest {
 
