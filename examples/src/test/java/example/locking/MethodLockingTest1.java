@@ -32,7 +32,7 @@ public class MethodLockingTest1 {
     private static final String NAMESPACE = "MethodLockingTest";
     private static final String LOCK_NAME = "Lock";
 
-    @TestEngine.Context protected Context context;
+    @TestEngine.Context protected static Context context;
 
     @TestEngine.Argument protected NamedString argument;
 
