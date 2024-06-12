@@ -32,19 +32,19 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 |--------------------------------|--------|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `@TestEngine.ArgumentSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments();`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments();`</nobr> |
 | `@TestEngine.Argument`         | no     | field  | no       | `public Argument argument;`                                                                                                                                                        |
-| `@TestEngine.Prepare`          | no     | method | no       | `public static void prepare();`                                                                                                                                                           |
+| `@TestEngine.Prepare`          | no     | method | no       | `public void prepare();`                                                                                                                                                           |
 | `@TestEngine.BeforeAll`        | no     | method | no       | `public void beforeAll();`                                                                                                                                                         |
 | `@TestEngine.BeforeEach`       | no     | method | no       | `public void beforeEach();`                                                                                                                                                        |
-| `@TestEngine.Test`             | no     | method | yes      | `public void test();` or `public void test(Argument argument)`                                                                                                                     |
+| `@TestEngine.Test`             | no     | method | yes      | `public void test();`                                                                                                                                                              |
 | `@TestEngine.AfterEach`        | no     | method | no       | `public void afterEach();`                                                                                                                                                         |
 | `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                          |
-| `@TestEngine.Conclude`         | no     | method | no       | `public static void conclude();`                                                                                                                                                          |
+| `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                          |
 
 Reference the [Design](https://github.com/antublue/test-engine#design) for the test engine execution flow.
 
 **Notes**
 
-- `public` and `protected` methods are supported for `@TestEngine.X` annotations.
+- `public`, `protected`, and `private` methods are supported for `@TestEngine.X` annotations.
 
 - `@TestEngine.Order` can be used to control test class order / test method order of execution.
   - Classes/methods are sorted by the order annotation value first, then alphabetically by the class name/method name.
@@ -54,29 +54,25 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 ### Additional Test Annotations
 
-| Annotation                                             | Scope            | Required | Usage                                                                                                                              |
-|--------------------------------------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
-| `@TestEngine.Disabled`                                 | class<br/>method | no       | Marks a test class or method disabled                                                                                              |
-| `@TestEngine.Order(order = <int>)`                     | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
-| `@TestEngine.Tag(tag = "<string>")`                    | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
-| `@TestEngine.DisplayName(name = "<string>")`           | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
-| `@TestEngine.Lock(name = "<string>")`                  | method           | no       | Provides a way to acquire a named lock, and lock it before method execution                                                        |
-| `@TestEngine.Unlock(name = "<string>")`                | method           | no       | Provides a way to acquire a named lock, and unlock it after method execution                                                       |
-| `@TestEngine.ResourceLock(name = "<string>")`          | method           | no       | Provides a way to acquire a named lock, locking it before method execution and unlocking it after method execution                 |
-| `@TestEngine.AutoClose.AfterEach(method = "<string>")` | field            | no       | Provides a way to close `AutoCloseable` field                                                                                      |
-| `@TestEngine.AutoClose.AfterAll(method = "<string>")`  | field            | no       | Provides a way to close `AutoCloseable` field                                                                                      |
-| `@TestEngine.AutoClose.Conclude(method = "<string>")`  | field            | no       | Provides a way to close `AutoCloseable` field                                                                                      |
-| `@TestEngine.Random.Boolean`                           | field            | no       | Provides a way to inject a random boolean value                                                                                    |
-| `@TestEngine.Random.Integer`                           | field            | no       | Provides a way to inject a random integer value                                                                                    |
-| `@TestEngine.Random.Long`                              | field            | no       | Provides a way to inject a random long value                                                                                       |
-| `@TestEngine.Random.Float`                             | field            | no       | Provides a way to inject a random double value                                                                                     |
-| `@TestEngine.Random.Double`                            | field            | no       | Provides a way to inject a random float value                                                                                      |
-| `@TestEngine.Random.BigInteger`                        | field            | no       | Provides a way to inject a random BigInteger value                                                                                 |
-| `@TestEngine.Random.BigDecimal`                        | field            | no       | Provides a way to inject a random BigDecimal value                                                                                 |
-| `@TestEngine.Random.UUID`                              | field            | no       | Provides a way to inject a `UUID`                                                                                                  |
+| Annotation                                   | Scope            | Required | Usage                                                                                                                              |
+|----------------------------------------------|------------------|----------|------------------------------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.Disabled`                       | class<br/>method | no       | Marks a test class or method disabled                                                                                              |
+| `@TestEngine.Order(order = <int>)`           | class<br/>method | no       | Provides a way to specify class execution order and/or method execution order (relative to other methods with the same annotation) |
+| `@TestEngine.Tag(tag = "<string>")`          | class            | no       | Provides a way to tag a test class or test method                                                                                  | 
+| `@TestEngine.DisplayName(name = "<string>")` | class<br/>method | no       | Provides a way to override a test class or test method name display name                                                           |
+| `@TestEngine.Random.Boolean`                 | field            | no       | Provides a way to inject a random boolean value                                                                                    |
+| `@TestEngine.Random.Byte`                    | field            | no       | Provides a way to inject a random byte value                                                                                       |
+| `@TestEngine.Random.Short`                   | field            | no       | Provides a way to inject a random short value                                                                                      |
+| `@TestEngine.Random.Character`               | field            | no       | Provides a way to inject a random char value                                                                                       |
+| `@TestEngine.Random.Integer`                 | field            | no       | Provides a way to inject a random integer value                                                                                    |
+| `@TestEngine.Random.Long`                    | field            | no       | Provides a way to inject a random long value                                                                                       |
+| `@TestEngine.Random.Float`                   | field            | no       | Provides a way to inject a random double value                                                                                     |
+| `@TestEngine.Random.Double`                  | field            | no       | Provides a way to inject a random float value                                                                                      |
+| `@TestEngine.Random.BigInteger`              | field            | no       | Provides a way to inject a random BigInteger value                                                                                 |
+| `@TestEngine.Random.BigDecimal`              | field            | no       | Provides a way to inject a random BigDecimal value                                                                                 |
+| `@TestEngine.Random.UUID`                    | field            | no       | Provides a way to inject a `UUID`                                                                                                  |
 
 **Notes**
-
 
 - Additional test annotations require non-static fields/methods
 
@@ -89,27 +85,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - For `@TestEngine.Tag(tag = "<string>")` annotations, it's recommended to use a tag string format of `/tag1/tag2/tag3/`.
 
 
-- By default, `@TestEngine.Lock`, `@TestEngine.Unlock`, and `@TestEngine.ResourceLock` use a `ReentrantReadWriteLock`, locking the write lock.
-  - You can add `mode = TestEngine.LockMode.READ` to use a read lock.
-
-
-- `@TestEngine.Lock`, `@TestEngine.Unlock`, and `@TestEngine.ResourceLock` are all repeatable.
-
-
-- `@TestEngine.AutoClose.AfterEach`, `@TestEngine.AutoClose.AfterAll`, and `@TestEngine.AutoClose.Conclude`
-  - The annotations have optional value `method` (Object method name) to call a method of an Object that doesn't implement `AutoCloseable`.
-
-
-- `@TestEngine.Random.UUID` can be used for either `UUID` or `String` field. 
-
-- `@TestEngine.Random.Integer`, `@TestEngine.Random.Long`, `@TestEngine.Random.Float`, and `@TestEngine.Random.Double` all have optional minimum and maximum values.
-  - The `minimum` and `maximum` values are inclusive.
-  - If `minimum` is greater than `maximum`, then the values are swapped to create a valid range.
-
-
-- `@TestEngine.Random.BigInteger` and `@TestEngine.Random.BigDecimal` have required `minimum` and `maximum` values.
-  - The `minimum` and `maximum` values are inclusive.
-  - If `minimum` is greater than `maximum`, then the values are swapped to create a valid range.
+- `@TestEngine.Random.X` annotated fields can be auto-converted to `String` values. 
 
 - Abstract test classes are not executed.
 
@@ -140,27 +116,15 @@ A `Context` Object provide a common singleton instance to access shared resource
 
 It's primary use is to get either the global `Store`...
 
-java
-```
-Context.getInstance().getStore()
-```
-... or a namespaced `Store`...
-
-java 
-```
-Context.getInstance().getStore("some namespace")
+```java
+public class Test {
+    
+    @TestEngine.Context static protected Context context;
+}
 ```
 
 - [Context.java](/api/src/main/java/org/antublue/test/engine/api/Context.java)
 - [Store.java](/api/src/main/java/org/antublue/test/engine/api/Store.java)
-
-## Extras
-
-The extras project provides classes to help with testing beyond the core API.
-
-### `LockManager`
-
-The `LockManager` is a thread-safe convenience class to work with cross test class/threads to allow locking when working with shared resources that require synchronization.
 
 ## Code Examples
 
@@ -267,7 +231,6 @@ current directory `.antublue-test-engine.properties`
 | Property                                           | Type    | Default value                    |
 |----------------------------------------------------|---------|----------------------------------|
 | antublue.test.engine.thread.count                  | integer | Max(1, number of processors - 2) |
-| antublue.test.engine.stack.trace.pruning           | boolean | true                             |
 | antublue.test.engine.test.class.include.regex      | string  |                                  |
 | antublue.test.engine.test.class.exclude.regex      | string  |                                  |
 | antublue.test.engine.test.method.include.regex     | string  |                                  |
@@ -340,7 +303,6 @@ IntelliJ doesn't properly display the correct test class display name when a sin
 IntelliJ doesn't properly display `System.out` / `System.err` for running tests.
 
 - Various reports on https://youtrack.jetbrains.com
-
 
 - The output can be misleading and should not be used as a source of truth.
 
