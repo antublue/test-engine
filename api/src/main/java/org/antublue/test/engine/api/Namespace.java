@@ -12,7 +12,7 @@
  * Copied from JUnit5 project and modified for the test engine API
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.api;
 
 import java.util.ArrayList;
 import java.util.Arrays;

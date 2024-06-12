@@ -35,11 +35,6 @@ public @interface TestEngine {
     @Retention(RetentionPolicy.RUNTIME)
     @interface ArgumentSupplier {}
 
-    /** Extension annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface ExtensionSupplier {}
-
     /** Argument annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
     @Retention(RetentionPolicy.RUNTIME)

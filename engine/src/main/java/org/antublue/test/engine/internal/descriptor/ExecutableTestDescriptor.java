@@ -100,16 +100,6 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         stopWatch = new StopWatch();
     }
 
-    protected void throttle() {
-        if (THREAD_THROTTLE_MILLISECONDS > 0) {
-            try {
-                Thread.sleep(THREAD_THROTTLE_MILLISECONDS);
-            } catch (Throwable t) {
-                // DO NOTHING
-            }
-        }
-    }
-
     protected void setExecutionRequest(ExecutionRequest executionRequest) {
         this.executionRequest = executionRequest;
     }
@@ -153,7 +143,13 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
     public abstract void execute(ExecutionRequest executionRequest);
 
     public void skip(ExecutionRequest executionRequest) {
-        // DO NOTHING
+        getChildren()
+                .forEach(
+                        testDescriptor -> {
+                            if (testDescriptor instanceof ExecutableTestDescriptor) {
+                                ((ExecutableTestDescriptor) testDescriptor).skip(executionRequest);
+                            }
+                        });
     }
 
     // Common static methods

@@ -14,21 +14,31 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.testing.extension.parameterized;
+package example.locking;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Extension;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
-@TestEngine.Disabled
-public class ParameterizedTest2 {
+public class ClassLockingTest1 {
 
-    public static final List<String> ACTUAL = new ArrayList<>();
+    private static final String NAMESPACE = "ClassLockingTest";
+    private static final String LOCK_NAME = "Lock";
+
+    private ReentrantLock reentrantLock;
+
+    @TestEngine.Context protected static Context context;
+
+    @TestEngine.Argument protected NamedString argument;
+
+    @TestEngine.Random.Integer protected Integer randomInteger;
 
     @TestEngine.ArgumentSupplier
     public static Stream<NamedString> arguments() {
@@ -39,58 +49,60 @@ public class ParameterizedTest2 {
         return collection.stream();
     }
 
-    @TestEngine.ExtensionSupplier
-    public static Stream<Extension> extensions() {
-        Collection<Extension> collection = new ArrayList<>();
-        collection.add(new ParameterizedTest2Extension());
-        return collection.stream();
-    }
-
     @TestEngine.Prepare
     public void prepare() {
+        reentrantLock =
+                context.getStore(NAMESPACE)
+                        .computeIfAbsent(LOCK_NAME, s -> new ReentrantLock(true));
+        reentrantLock.lock();
         System.out.println("prepare()");
-        ACTUAL.add("prepare()");
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(NamedString argument) {
+    public void beforeAll() {
         System.out.println("beforeAll(" + argument + ")");
-        ACTUAL.add("beforeAll(" + argument + ")");
+        System.out.println("randomInteger = [" + randomInteger + "]");
+        assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach(NamedString argument) {
+    public void beforeEach() {
         System.out.println("beforeEach(" + argument + ")");
-        ACTUAL.add("beforeEach(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
-    public void test1(NamedString argument) {
+    public void test1() throws Throwable {
         System.out.println("test1(" + argument + ")");
-        ACTUAL.add("test1(" + argument + ")");
+        System.out.println("sleeping 1000");
+        Thread.sleep(1000);
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
-    public void test2(NamedString argument) {
+    public void test2() {
         System.out.println("test2(" + argument + ")");
-        ACTUAL.add("test2(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterEach
-    public void afterEach(NamedString argument) {
+    public void afterEach() {
         System.out.println("afterEach(" + argument + ")");
-        ACTUAL.add("afterEach(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterAll
-    public void afterAll(NamedString argument) {
+    public void afterAll() {
         System.out.println("afterAll(" + argument + ")");
-        ACTUAL.add("afterAll(" + argument + ")");
+        System.out.println("randomInteger = [" + randomInteger + "]");
+        assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        ACTUAL.add("conclude()");
+        reentrantLock.unlock();
     }
 }

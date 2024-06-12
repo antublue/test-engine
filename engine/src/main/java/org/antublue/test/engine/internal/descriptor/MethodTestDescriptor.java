@@ -16,14 +16,11 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import static java.lang.String.format;
-
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.exception.TestArgumentFailedException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -108,6 +105,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         setTestInstance(null);
 
         getStopWatch().stop();
+
         getMetadata()
                 .put(
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
@@ -119,6 +117,9 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
+            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
+
+            /*
             getParent(ArgumentTestDescriptor.class)
                     .getThrowableCollector()
                     .add(
@@ -126,13 +127,12 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                                     format(
                                             "Exception testing test argument name [%s]",
                                             testArgument.getName())));
-            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
+             */
+
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(
-                            this,
-                            TestExecutionResult.failed(
-                                    getThrowableCollector().getThrowables().get(0)));
+                            this, TestExecutionResult.failed(getThrowableCollector().getFirst()));
         }
 
         StandardStreams.flush();
@@ -150,6 +150,8 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
             method.setAccessible(true);
             method.invoke(getTestInstance());
+
+            StandardStreams.flush();
         }
     }
 
@@ -160,6 +162,8 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
         getTestMethod().setAccessible(true);
         getTestMethod().invoke(getTestInstance());
+
+        StandardStreams.flush();
     }
 
     private void afterEach() throws Throwable {
@@ -174,6 +178,8 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
             method.setAccessible(true);
             method.invoke(getTestInstance());
+
+            StandardStreams.flush();
         }
     }
 

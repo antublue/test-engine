@@ -32,6 +32,14 @@ public class ThrowableCollector {
         return throwables;
     }
 
+    public Throwable getFirst() {
+        if (isEmpty()) {
+            return null;
+        } else {
+            return throwables.get(0);
+        }
+    }
+
     public boolean isEmpty() {
         return throwables.isEmpty();
     }

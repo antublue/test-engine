@@ -21,11 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.support.named.NamedString;
 import org.antublue.test.engine.testing.Validation;
-import org.antublue.test.engine.testing.ValidationExtension;
 
 /** Example test */
 @TestEngine.Order(order = 3)
@@ -38,13 +36,6 @@ public class ConcreteOrderTest extends BaseOrderTest implements Validation {
             int value = i * 3;
             collection.add(NamedString.of(String.valueOf(value)));
         }
-        return collection.stream();
-    }
-
-    @TestEngine.ExtensionSupplier
-    public static Stream<Extension> extensions() {
-        Collection<Extension> collection = new ArrayList<>();
-        collection.add(new ValidationExtension());
         return collection.stream();
     }
 

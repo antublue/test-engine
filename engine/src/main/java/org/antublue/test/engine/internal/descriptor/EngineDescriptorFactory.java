@@ -31,12 +31,10 @@ import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.internal.ExtensionManager;
 import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
 import org.antublue.test.engine.internal.predicate.TestClassPredicate;
 import org.antublue.test.engine.internal.predicate.TestMethodPredicate;
 import org.antublue.test.engine.internal.util.TestUtils;
-import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -55,8 +53,6 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 public class EngineDescriptorFactory {
 
     private static final TestUtils TEST_UTILS = TestUtils.getInstance();
-
-    private static final ExtensionManager EXTENSION_MANAGER = ExtensionManager.getInstance();
 
     public static EngineDescriptorFactory getInstance() {
         return SingletonHolder.INSTANCE;
@@ -317,20 +313,6 @@ public class EngineDescriptorFactory {
 
         try {
             for (Class<?> clazz : classes) {
-                List<Named<?>> arguments = classArgumentMap.get(clazz);
-
-                ThrowableContext throwableContext = new ThrowableContext();
-                EXTENSION_MANAGER.postTestArgumentDiscoveryCallback(
-                        clazz, arguments, throwableContext);
-                throwableContext.throwFirst();
-
-                List<Method> testMethods = classMethodMap.get(clazz);
-
-                throwableContext.clear();
-                EXTENSION_MANAGER.postTestMethodDiscoveryCallback(
-                        clazz, testMethods, throwableContext);
-                throwableContext.throwFirst();
-
                 new ClassTestDescriptor.Builder()
                         .setTestClass(clazz)
                         .setTestArguments(classArgumentMap.get(clazz))

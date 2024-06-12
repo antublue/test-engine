@@ -88,7 +88,12 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
 
         setExecutionRequest(executionRequest);
-        executionRequest.getEngineExecutionListener().executionStarted(this);
+
+        // IntelliJ workaround to only show the status if there is more
+        // than on ClassTestDescriptor or the test window output is incorrect
+        if (getParent().get().getChildren().size() > 1) {
+            executionRequest.getEngineExecutionListener().executionStarted(this);
+        }
 
         ThrowableCollector throwableCollector = getThrowableCollector();
 
@@ -121,17 +126,27 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         if (getThrowableCollector().isEmpty()) {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
-            executionRequest
-                    .getEngineExecutionListener()
-                    .executionFinished(this, TestExecutionResult.successful());
+
+            // IntelliJ workaround to only show the status if there is more
+            // than on ClassTestDescriptor or the test window output is incorrect
+            if (getParent().get().getChildren().size() > 1) {
+                executionRequest
+                        .getEngineExecutionListener()
+                        .executionFinished(this, TestExecutionResult.successful());
+            }
         } else {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
-            executionRequest
-                    .getEngineExecutionListener()
-                    .executionFinished(
-                            this,
-                            TestExecutionResult.failed(
-                                    getThrowableCollector().getThrowables().get(0)));
+
+            // IntelliJ workaround to only show the status if there is more
+            // than on ClassTestDescriptor or the test window output is incorrect
+            if (getParent().get().getChildren().size() > 1) {
+                executionRequest
+                        .getEngineExecutionListener()
+                        .executionFinished(
+                                this,
+                                TestExecutionResult.failed(
+                                        getThrowableCollector().getThrowables().get(0)));
+            }
         }
 
         StandardStreams.flush();
@@ -186,19 +201,6 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                             if (testDescriptor instanceof ExecutableTestDescriptor) {
                                 ((ExecutableTestDescriptor) testDescriptor)
                                         .execute(getExecutionRequest());
-                            }
-                        });
-    }
-
-    private void skip() {
-        LOGGER.trace("skip() testClass [%s]", getTestClass().getName());
-
-        getChildren()
-                .forEach(
-                        testDescriptor -> {
-                            if (testDescriptor instanceof ExecutableTestDescriptor) {
-                                ((ExecutableTestDescriptor) testDescriptor)
-                                        .skip(getExecutionRequest());
                             }
                         });
     }

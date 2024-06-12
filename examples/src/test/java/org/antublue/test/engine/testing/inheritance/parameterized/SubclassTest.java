@@ -18,23 +18,11 @@ package org.antublue.test.engine.testing.inheritance.parameterized;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Stream;
-import org.antublue.test.engine.api.Extension;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.testing.Validation;
-import org.antublue.test.engine.testing.ValidationExtension;
 
 /** Example test */
 public class SubclassTest extends BaseTest implements Validation {
-
-    @TestEngine.ExtensionSupplier
-    public static Stream<Extension> extensions() {
-        Collection<Extension> collection = new ArrayList<>();
-        collection.add(new ValidationExtension());
-        return collection.stream();
-    }
 
     @TestEngine.Prepare
     public static void prepare2() {

@@ -438,7 +438,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     .execute(
                             ExecutionRequest.create(
                                     executionRequest.getRootTestDescriptor(),
-                                    executionRequest.getEngineExecutionListener(),
+                                    engineExecutionListener,
                                     ConfigurationParameters.getInstance()));
         } finally {
             engineExecutionListener.executionFinished(
