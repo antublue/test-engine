@@ -28,38 +28,92 @@ import org.junit.platform.commons.util.Preconditions;
  */
 public interface Argument<T> {
 
+    /**
+     * Method to create an Argument of type boolean
+     *
+     * @param value value
+     * @return an Argument
+     */
     static Argument<Boolean> ofBoolean(boolean value) {
         return of(String.valueOf(value), value);
     }
 
+    /**
+     * Method to create an Argument of type byte
+     *
+     * @param value value
+     * @return an Argument
+     */
     static Argument<Byte> ofByte(byte value) {
         return of(String.valueOf(value), value);
     }
 
+    /**
+     * Method to create an Argument of type char
+     *
+     * @param value value
+     * @return an Argument
+     */
     static Argument<Character> ofChar(char value) {
         return of(String.valueOf(value), value);
     }
 
+    /**
+     * Method to create an Argument of type short
+     *
+     * @param value value
+     * @return an Argument
+     */
     static Argument<Short> ofShort(short value) {
         return of(String.valueOf(value), value);
     }
 
+    /**
+     * Method to create an Argument of type int
+     *
+     * @param value value
+     * @return an Argument
+     */
     static Argument<Integer> ofInt(int value) {
         return of(String.valueOf(value), value);
     }
 
+    /**
+     * Method to create an Argument of type long
+     *
+     * @param value value
+     * @return an Argument
+     */
     static Argument<Long> ofLong(long value) {
         return of(String.valueOf(value), value);
     }
 
+    /**
+     * Method to create an Argument of type float
+     *
+     * @param value value
+     * @return an Argument
+     */
     static Argument<Float> ofFloat(float value) {
         return of(String.valueOf(value), value);
     }
 
+    /**
+     * Method to create an Argument of type double
+     *
+     * @param value value
+     * @return an Argument
+     */
     static Argument<Double> ofDouble(double value) {
         return of(String.valueOf(value), value);
     }
 
+    /**
+     * Method to create an Argument of type String
+     *
+     * @param value value
+     * @return an Argument
+     */
     static Argument<String> ofString(String value) {
         if (value == null) {
             return of("String=/null/", value);
@@ -70,6 +124,12 @@ public interface Argument<T> {
         }
     }
 
+    /**
+     * Method to create an Argument of type BigInteger
+     *
+     * @param value value
+     * @return an Argument
+     */
     static Argument<BigInteger> ofBigInteger(BigInteger value) {
         if (value == null) {
             return of("BigInteger=/null/", value);
@@ -78,6 +138,12 @@ public interface Argument<T> {
         }
     }
 
+    /**
+     * Method to create an Argument of type BigDecimal
+     *
+     * @param value value
+     * @return an Argument
+     */
     static Argument<BigDecimal> ofBigDecimal(BigDecimal value) {
         if (value == null) {
             return of("BigDecimal=/null/", value);
@@ -86,6 +152,14 @@ public interface Argument<T> {
         }
     }
 
+    /**
+     * Method to create an Argument of type T
+     *
+     * @param name name
+     * @param payload payload
+     * @return an Argument
+     * @param <T> type T
+     */
     static <T> Argument<T> of(String name, T payload) {
         Preconditions.notBlank(name, "name must not be null or blank");
 
@@ -108,16 +182,16 @@ public interface Argument<T> {
     }
 
     /**
-     * Get the name of the payload.
+     * Method to get the Argument name
      *
-     * @return the name of the payload; never {@code null} or blank
+     * @return the Argument name
      */
     String getName();
 
     /**
-     * Get the payload.
+     * Method to get the Argument payload
      *
-     * @return the payload; may be {@code null} depending on the use case
+     * @return the Argument payload
      */
     T getPayload();
 }
