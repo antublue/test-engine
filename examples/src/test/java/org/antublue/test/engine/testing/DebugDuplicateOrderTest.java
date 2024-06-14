@@ -19,41 +19,41 @@ package org.antublue.test.engine.testing;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedInteger;
 
 /** Example test */
 public class DebugDuplicateOrderTest {
 
-    public static Stream<NamedInteger> arguments() {
-        Collection<NamedInteger> collection = new ArrayList<>();
+    public static Stream<Named<Integer>> arguments() {
+        Collection<Named<Integer>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(NamedInteger.of(i));
+            collection.add(Named.ofInt(i));
         }
         return collection.stream();
     }
 
     @TestEngine.BeforeAll
     @TestEngine.Order(order = 0)
-    public void beforeAll(NamedInteger argument) {
+    public void beforeAll(Named<Integer> argument) {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 0)
-    public void test1(NamedInteger argument) {
+    public void test1(Named<Integer> argument) {
         System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 1)
     // Switch to @TestEngine.Order(0) to test duplicate @TestEngine.Order detection
-    public void test2(NamedInteger argument) {
+    public void test2(Named<Integer> argument) {
         System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(NamedInteger argument) {
+    public void afterAll(Named<Integer> argument) {
         System.out.println("afterAll()");
     }
 }

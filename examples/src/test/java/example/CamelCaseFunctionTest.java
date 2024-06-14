@@ -37,7 +37,7 @@ public class CamelCaseFunctionTest {
 
     private InputOutputArgument inputOutputArgument;
 
-    @TestEngine.Argument protected Named<InputOutputArgument> argument;
+    @TestEngine.Argument public Named<InputOutputArgument> argument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<Named<InputOutputArgument>> arguments() {

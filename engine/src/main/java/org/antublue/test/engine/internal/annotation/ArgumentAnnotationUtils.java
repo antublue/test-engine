@@ -23,11 +23,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import org.antublue.test.engine.api.Named;
-import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
+import org.antublue.test.engine.internal.Predicates;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.predicate.AnnotationFieldPredicate;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
@@ -60,11 +59,10 @@ public class ArgumentAnnotationUtils {
         List<Field> fields =
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
-                        AnnotationFieldPredicate.of(TestEngine.Argument.class),
+                        Predicates.ARGUMENT_FIELD,
                         HierarchyTraversalMode.TOP_DOWN);
 
         for (Field field : fields) {
-            field.setAccessible(true);
             Class<?> fieldType = field.getType();
             if (testArgument == null) {
                 field.set(testInstance, null);

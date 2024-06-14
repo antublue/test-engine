@@ -19,19 +19,19 @@ package example.arguments.named;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedShort;
 
 /** Example test */
 public class NamedShortTest {
 
-    @TestEngine.Argument protected NamedShort argument;
+    @TestEngine.Argument public Named<Short> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedShort> arguments() {
-        Collection<NamedShort> collection = new ArrayList<>();
+    public static Stream<Named<Short>> arguments() {
+        Collection<Named<Short>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(NamedShort.of((short) i));
+            collection.add(Named.ofShort((short) i));
         }
         return collection.stream();
     }

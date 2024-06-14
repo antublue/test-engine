@@ -69,7 +69,7 @@ public class ContextImpl implements Context {
     public Store getStore(Object namespace) {
         checkNotNull(namespace, "namespace is null");
 
-        if (Store.GLOBAL.equals(namespace)) {
+        if (Store.GLOBAL == namespace) {
             return store;
         }
 

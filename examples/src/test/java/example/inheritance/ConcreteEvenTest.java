@@ -19,13 +19,13 @@ package example.inheritance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedInteger;
 
 public class ConcreteEvenTest extends EvenBaseTest {
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedInteger> arguments() {
+    public static Stream<Named<Integer>> arguments() {
         return EvenBaseTest.arguments();
     }
 

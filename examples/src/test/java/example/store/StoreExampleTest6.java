@@ -23,23 +23,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Context;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 public class StoreExampleTest6 {
 
     private static final String TEST_OBJECT_KEY = "testObject";
 
-    @TestEngine.Context protected static Context context;
+    @TestEngine.Context public static Context context;
 
-    @TestEngine.Argument protected NamedString argument;
+    @TestEngine.Argument public Named<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Named<String>> arguments() {
+        Collection<Named<String>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(NamedString.of("StringArgument " + i));
+            collection.add(Named.ofString("StringArgument " + i));
         }
         return collection.stream();
     }

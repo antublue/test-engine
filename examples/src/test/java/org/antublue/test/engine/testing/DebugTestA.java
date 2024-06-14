@@ -19,18 +19,18 @@ package org.antublue.test.engine.testing;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedInteger;
 
 /** Test used for debugging IntelliJ */
 @TestEngine.Disabled
 public class DebugTestA {
 
-    @TestEngine.Argument public NamedInteger argument;
+    @TestEngine.Argument public Named<Integer> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedInteger> arguments() {
-        return Stream.of(NamedInteger.of(1), NamedInteger.of(2), NamedInteger.of(3));
+    public static Stream<Named<Integer>> arguments() {
+        return Stream.of(Named.ofInt(1), Named.ofInt(2), Named.ofInt(3));
     }
 
     @TestEngine.BeforeAll

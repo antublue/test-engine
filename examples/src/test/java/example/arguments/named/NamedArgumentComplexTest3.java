@@ -23,9 +23,9 @@ import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class NamedComplexArgumentTest3 {
+public class NamedArgumentComplexTest3 {
 
-    @TestEngine.Argument protected Named<ComplexArgument> argument;
+    @TestEngine.Argument public Named<ComplexArgument> argument;
 
     private ComplexArgument customArgument;
 

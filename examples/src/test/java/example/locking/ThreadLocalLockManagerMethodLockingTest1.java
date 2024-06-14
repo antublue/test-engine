@@ -14,28 +14,35 @@
  * limitations under the License.
  */
 
-package example;
+package example.locking;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Context;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedString;
+import org.antublue.test.engine.api.support.lock.LockManager;
 
 /** Example test */
-public class SimpleTest6 {
+public class ThreadLocalLockManagerMethodLockingTest1 {
 
-    @TestEngine.Argument protected NamedString argument;
+    private static final String LOCK_MANAGER = "LockManager";
+    private static final String LOCK_NAME = "Lock";
 
-    @TestEngine.Random.Integer protected Integer randomInteger;
+    @TestEngine.Context public static Context context;
+
+    @TestEngine.Argument public Named<String> argument;
+
+    @TestEngine.Random.Integer public Integer randomInteger;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Named<String>> arguments() {
+        Collection<Named<String>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(NamedString.of("StringArgument " + i));
+            collection.add(Named.ofString("StringArgument " + i));
         }
         return collection.stream();
     }
@@ -60,9 +67,20 @@ public class SimpleTest6 {
     }
 
     @TestEngine.Test
-    public void test1() {
-        System.out.println("test1(" + argument + ")");
-        assertThat(argument).isNotNull();
+    public void test1() throws Throwable {
+        LockManager lockManager =
+                context.getStore(Thread.currentThread())
+                        .computeIfAbsent(LOCK_MANAGER, s -> new LockManager());
+
+        lockManager.executeInLock(
+                LOCK_NAME,
+                () -> {
+                    System.out.println("test1(" + argument + ")");
+                    System.out.println("sleeping 1000");
+                    Thread.sleep(1000);
+                    assertThat(argument).isNotNull();
+                    System.out.println("continuing");
+                });
     }
 
     @TestEngine.Test
@@ -88,22 +106,5 @@ public class SimpleTest6 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-    }
-
-    public static class TestObject {
-
-        private final String name;
-        private final boolean throwException;
-
-        public TestObject(String name, boolean throwException) {
-            this.name = name;
-            this.throwException = throwException;
-        }
-
-        public void close() {
-            if (throwException) {
-                throw new RuntimeException("exception in close for " + name);
-            }
-        }
     }
 }

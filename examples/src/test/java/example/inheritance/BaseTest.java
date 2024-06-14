@@ -21,20 +21,20 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedInteger;
 
 public abstract class BaseTest {
 
-    @TestEngine.Argument private NamedInteger privateNamedInteger;
+    @TestEngine.Argument public Named<Integer> privateNamedInteger;
 
-    @TestEngine.Argument protected NamedInteger argument;
+    @TestEngine.Argument public Named<Integer> argument;
 
     @TestEngine.ArgumentSupplier
-    protected static Stream<NamedInteger> arguments() {
-        Collection<NamedInteger> collection = new ArrayList<>();
+    public static Stream<Named<Integer>> arguments() {
+        Collection<Named<Integer>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(NamedInteger.of(i));
+            collection.add(Named.ofInt(i));
         }
         return collection.stream();
     }

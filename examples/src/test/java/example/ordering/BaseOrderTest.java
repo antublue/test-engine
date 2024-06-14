@@ -18,8 +18,8 @@ package example.ordering;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedString;
 
 public abstract class BaseOrderTest {
 
@@ -34,22 +34,22 @@ public abstract class BaseOrderTest {
                     "ConcreteOrderTest.conclude2()",
                     "BaseOrderTest.conclude()");
 
-    protected static final List<String> actual = new ArrayList<>();
+    protected static final List<String> ACTUAL = new ArrayList<>();
 
-    @TestEngine.Argument protected NamedString argument;
+    @TestEngine.Argument public Named<String> argument;
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 1)
     public static final void prepare() {
         System.out.println("BaseOrderTest.prepare()");
-        actual.add("BaseOrderTest.prepare()");
+        ACTUAL.add("BaseOrderTest.prepare()");
     }
 
     @TestEngine.BeforeAll
     @TestEngine.Order(order = 1)
     public void beforeAll() {
         System.out.println("BaseOrderTest.beforeAll()");
-        actual.add("BaseOrderTest.beforeAll()");
+        ACTUAL.add("BaseOrderTest.beforeAll()");
     }
 
     @TestEngine.Test
@@ -62,14 +62,14 @@ public abstract class BaseOrderTest {
     @TestEngine.Order(order = 2)
     public void afterAll() {
         System.out.println("BaseOrderTest.afterAll()");
-        actual.add("BaseOrderTest.afterAll()");
+        ACTUAL.add("BaseOrderTest.afterAll()");
     }
 
     @TestEngine.Conclude
     @TestEngine.Order(order = 2)
     public static final void conclude() {
         System.out.println("BaseOrderTest.conclude()");
-        actual.add("BaseOrderTest.conclude()");
+        ACTUAL.add("BaseOrderTest.conclude()");
     }
 
     private static List<String> listOf(String... strings) {

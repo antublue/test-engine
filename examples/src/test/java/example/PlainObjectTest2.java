@@ -27,7 +27,7 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class PlainObjectTest2 {
 
-    @TestEngine.Argument protected Named<CustomArgument> argument;
+    @TestEngine.Argument public Named<CustomArgument> argument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<CustomArgument> arguments() {

@@ -18,8 +18,8 @@ package org.antublue.test.engine.testing.inheritance;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedInteger;
 
 /** Example test */
 public class SubclassTest extends BaseTest {
@@ -27,68 +27,68 @@ public class SubclassTest extends BaseTest {
     @TestEngine.Prepare
     public static void prepare2() {
         System.out.println("prepare2()");
-        actual.add("prepare2()");
+        ACTUAL.add("prepare2()");
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll2(NamedInteger argument) {
+    public void beforeAll2(Named<Integer> argument) {
         System.out.println("beforeAll2(" + argument + ")");
         assertThat(argument).isNotNull();
-        actual.add("beforeAll2(" + argument + ")");
+        ACTUAL.add("beforeAll2(" + argument + ")");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach2(NamedInteger argument) {
+    public void beforeEach2(Named<Integer> argument) {
         System.out.println("beforeEach2(" + argument + ")");
         assertThat(argument).isNotNull();
-        actual.add("beforeEach2(" + argument + ")");
+        ACTUAL.add("beforeEach2(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void testB(NamedInteger argument) {
+    public void testB(Named<Integer> argument) {
         System.out.println("testB(" + argument + ")");
         assertThat(argument).isNotNull();
-        actual.add("testB(" + argument + ")");
+        ACTUAL.add("testB(" + argument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach2(NamedInteger argument) {
+    public void afterEach2(Named<Integer> argument) {
         System.out.println("afterEach2(" + argument + ")");
         assertThat(argument).isNotNull();
-        actual.add("afterEach2(" + argument + ")");
+        ACTUAL.add("afterEach2(" + argument + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll2(NamedInteger argument) {
+    public void afterAll2(Named<Integer> argument) {
         System.out.println("afterAll2(" + argument + ")");
         assertThat(argument).isNotNull();
-        actual.add("afterAll2(" + argument + ")");
+        ACTUAL.add("afterAll2(" + argument + ")");
     }
 
     @TestEngine.Conclude
     public void conclude2() {
         System.out.println("conclude2()");
-        actual.add("conclude2()");
+        ACTUAL.add("conclude2()");
     }
 
     public void validate() {
-        assertThat(actual.size()).isEqualTo(EXPECTED.size());
+        assertThat(ACTUAL.size()).isEqualTo(EXPECTED.size());
 
-        for (int i = 0; i < actual.size(); i++) {
-            if (!actual.get(i).equals(EXPECTED.get(i))) {
+        for (int i = 0; i < ACTUAL.size(); i++) {
+            if (!ACTUAL.get(i).equals(EXPECTED.get(i))) {
                 System.out.println(
                         "equal ["
-                                + actual.get(i).equals(EXPECTED.get(i))
+                                + ACTUAL.get(i).equals(EXPECTED.get(i))
                                 + "] index "
                                 + i
                                 + " actual ["
-                                + actual.get(i)
+                                + ACTUAL.get(i)
                                 + "] expected ["
                                 + EXPECTED.get(i)
                                 + "]");
             }
         }
 
-        assertThat(actual).isEqualTo(EXPECTED);
+        assertThat(ACTUAL).isEqualTo(EXPECTED);
     }
 }

@@ -21,18 +21,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
-@TestEngine.Disabled
 public class SimpleTest2 {
 
+    @TestEngine.Argument public Named<String> argument;
+
+    @TestEngine.Random.Integer public Integer randomInteger;
+
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Named<String>> arguments() {
+        Collection<Named<String>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(NamedString.of("StringArgument " + i));
+            collection.add(Named.ofString("StringArgument " + i));
         }
         return collection.stream();
     }
@@ -43,43 +46,64 @@ public class SimpleTest2 {
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(NamedString argument) {
+    public void beforeAll() {
         System.out.println("beforeAll(" + argument + ")");
+        System.out.println("randomInteger = [" + randomInteger + "]");
         assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach(NamedString argument) {
+    public void beforeEach() {
         System.out.println("beforeEach(" + argument + ")");
         assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
-    public void test1(NamedString argument) {
+    public void test1() {
         System.out.println("test1(" + argument + ")");
         assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
-    public void test2(NamedString argument) {
+    public void test2() {
         System.out.println("test2(" + argument + ")");
         assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterEach
-    public void afterEach(NamedString argument) {
+    public void afterEach() {
         System.out.println("afterEach(" + argument + ")");
         assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterAll
-    public void afterAll(NamedString argument) {
+    public void afterAll() {
         System.out.println("afterAll(" + argument + ")");
+        System.out.println("randomInteger = [" + randomInteger + "]");
         assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
+    }
+
+    public static class TestObject {
+
+        private final String name;
+        private final boolean throwException;
+
+        public TestObject(String name, boolean throwException) {
+            this.name = name;
+            this.throwException = throwException;
+        }
+
+        public void close() {
+            if (throwException) {
+                throw new RuntimeException("exception in close for " + name);
+            }
+        }
     }
 }

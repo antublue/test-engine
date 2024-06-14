@@ -19,20 +19,19 @@ package example.arguments.named;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedBoolean;
 
 /** Example test */
 public class NamedBooleanTest {
 
-    @TestEngine.Argument protected NamedBoolean argument;
+    @TestEngine.Argument public Named<Boolean> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedBoolean> arguments() {
-        Collection<NamedBoolean> collection = new ArrayList<>();
+    public static Stream<Named<Boolean>> arguments() {
+        Collection<Named<Boolean>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            boolean value = (i % 2) == 0;
-            collection.add(NamedBoolean.of(value));
+            collection.add(Named.ofBoolean((i % 2) == 0));
         }
         return collection.stream();
     }

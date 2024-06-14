@@ -25,12 +25,10 @@ public class MethodUtils {
     }
 
     public static void invoke(Method method) throws Throwable {
-        method.setAccessible(true);
         method.invoke(null);
     }
 
     public static void invoke(Method method, Object object) throws Throwable {
-        method.setAccessible(true);
         method.invoke(object);
     }
 }

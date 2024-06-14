@@ -19,53 +19,53 @@ package org.antublue.test.engine.testing;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 @TestEngine.Order(order = 1)
 public class ClassOrderTest2 {
 
-    public static Stream<NamedString> arguments() {
+    public static Stream<Named<String>> arguments() {
         return StringArgumentSupplier.arguments();
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(NamedString argument) {
+    public void beforeAll(Named<String> argument) {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach(NamedString argument) {
+    public void beforeEach(Named<String> argument) {
         System.out.println("beforeEach()");
     }
 
     @TestEngine.Test
-    public void test1(NamedString argument) {
+    public void test1(Named<String> argument) {
         System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void test2(NamedString argument) {
+    public void test2(Named<String> argument) {
         System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach(NamedString argument) {
+    public void afterEach(Named<String> argument) {
         System.out.println("afterEach()");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(NamedString argument) {
+    public void afterAll(Named<String> argument) {
         System.out.println("afterAll()");
     }
 
     private static class StringArgumentSupplier {
 
-        public static Stream<NamedString> arguments() {
-            Collection<NamedString> collection = new ArrayList<>();
+        public static Stream<Named<String>> arguments() {
+            Collection<Named<String>> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(NamedString.of(String.valueOf(i)));
+                collection.add(Named.ofString(String.valueOf(i)));
             }
             return collection.stream();
         }

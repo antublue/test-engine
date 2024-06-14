@@ -19,19 +19,19 @@ package example.ordering;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 @TestEngine.Order(order = 4)
 public class ConcreteOrderTest2 extends BaseOrderTest {
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Named<String>> arguments() {
+        Collection<Named<String>> collection = new ArrayList<>();
         for (int i = 0; i < 1; i++) {
             int value = i * 3;
-            collection.add(NamedString.of(String.valueOf(value)));
+            collection.add(Named.ofString(String.valueOf(value)));
         }
         return collection.stream();
     }
@@ -40,14 +40,14 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
     @TestEngine.Order(order = 2)
     public static void prepare2() {
         System.out.println("ConcreteOrderTest.prepare2()");
-        actual.add("ConcreteOrderTest.prepare2()");
+        ACTUAL.add("ConcreteOrderTest.prepare2()");
     }
 
     @TestEngine.BeforeAll
     @TestEngine.Order(order = 2)
     public void beforeAll2() {
         System.out.println("ConcreteOrderTest.beforeAll2()");
-        actual.add("ConcreteOrderTest.beforeAll2()");
+        ACTUAL.add("ConcreteOrderTest.beforeAll2()");
     }
 
     @TestEngine.Test
@@ -70,13 +70,13 @@ public class ConcreteOrderTest2 extends BaseOrderTest {
     @TestEngine.Order(order = 1)
     public void afterAll2() {
         System.out.println("ConcreteOrderTest.afterAll2()");
-        actual.add("ConcreteOrderTest.afterAll2()");
+        ACTUAL.add("ConcreteOrderTest.afterAll2()");
     }
 
     @TestEngine.Conclude
     @TestEngine.Order(order = 1)
     public static void conclude2() {
         System.out.println("ConcreteOrderTest.conclude2()");
-        actual.add("ConcreteOrderTest.conclude2()");
+        ACTUAL.add("ConcreteOrderTest.conclude2()");
     }
 }

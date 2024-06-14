@@ -29,11 +29,11 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class ConfigurationTest1 {
 
-    @TestEngine.Context protected static Context context;
+    @TestEngine.Context public static Context context;
 
-    @TestEngine.Argument protected String argument;
+    @TestEngine.Argument public String argument;
 
-    @TestEngine.Argument protected Named<String> namedArgument;
+    @TestEngine.Argument public Named<String> named;
 
     @TestEngine.ArgumentSupplier
     public static Stream<String> arguments() {
@@ -46,7 +46,7 @@ public class ConfigurationTest1 {
 
     @TestEngine.Test
     public void test() {
-        System.out.println("test(" + namedArgument + ")");
+        System.out.println("test(" + named + ")");
 
         Optional<String> optional = context.getConfiguration().getProperty("foo");
         assertThat(optional).isPresent();

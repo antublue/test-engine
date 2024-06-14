@@ -17,21 +17,22 @@
 package example.arguments.supplier;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedInteger;
 
 /** Example test */
 public class IterableTest {
 
-    @TestEngine.Argument protected NamedInteger argument;
+    @TestEngine.Argument public Named<Integer> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Iterable<NamedInteger> arguments() {
-        ArrayList<NamedInteger> arguments = new ArrayList<>();
-        arguments.add(NamedInteger.of(1));
-        arguments.add(NamedInteger.of(2));
-        arguments.add(NamedInteger.of(3));
-        return arguments;
+    public static Iterable<Named<Integer>> arguments() {
+        Collection<Named<Integer>> collection = new ArrayList<>();
+        collection.add(Named.ofInt(1));
+        collection.add(Named.ofInt(2));
+        collection.add(Named.ofInt(3));
+        return collection;
     }
 
     @TestEngine.BeforeAll

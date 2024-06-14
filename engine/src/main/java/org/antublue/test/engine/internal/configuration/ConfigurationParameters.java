@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 /** Class to implement ConfigurationParameters */
-@SuppressWarnings({"deprecation", "PMD.EmptyCatchBlock"})
+@SuppressWarnings({"Deprecation", "PMD.EmptyCatchBlock"})
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
     private static final ConfigurationImpl CONFIGURATION = ConfigurationImpl.getInstance();

@@ -47,7 +47,7 @@ public class MongoDBTest {
 
     private static Network network;
 
-    @TestEngine.Argument protected MongoDBTestEnvironment mongoDBTestEnvironment;
+    @TestEngine.Argument public MongoDBTestEnvironment mongoDBTestEnvironment;
 
     @TestEngine.ArgumentSupplier
     public static Stream<MongoDBTestEnvironment> arguments() {

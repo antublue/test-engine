@@ -17,21 +17,21 @@
 package example.arguments.supplier;
 
 import java.util.Stack;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedInteger;
 
 /** Example test */
 public class StackTest {
 
-    @TestEngine.Argument protected NamedInteger argument;
+    @TestEngine.Argument public Named<Integer> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stack<NamedInteger> arguments() {
-        Stack<NamedInteger> arguments = new Stack<>();
-        arguments.add(NamedInteger.of(1));
-        arguments.add(NamedInteger.of(2));
-        arguments.add(NamedInteger.of(3));
-        return arguments;
+    public static Stack<Named<Integer>> arguments() {
+        Stack<Named<Integer>> stack = new Stack<>();
+        stack.add(Named.ofInt(1));
+        stack.add(Named.ofInt(2));
+        stack.add(Named.ofInt(3));
+        return stack;
     }
 
     @TestEngine.BeforeAll

@@ -18,21 +18,21 @@ package example.arguments.supplier;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedInteger;
 
 /** Example test */
 public class SetTest {
 
-    @TestEngine.Argument protected NamedInteger argument;
+    @TestEngine.Argument public Named<Integer> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Set<NamedInteger> arguments() {
-        Set<NamedInteger> arguments = new LinkedHashSet<>();
-        arguments.add(NamedInteger.of(1));
-        arguments.add(NamedInteger.of(2));
-        arguments.add(NamedInteger.of(3));
-        return arguments;
+    public static Set<Named<Integer>> arguments() {
+        Set<Named<Integer>> set = new LinkedHashSet<>();
+        set.add(Named.ofInt(1));
+        set.add(Named.ofInt(2));
+        set.add(Named.ofInt(3));
+        return set;
     }
 
     @TestEngine.BeforeAll

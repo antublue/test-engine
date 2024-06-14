@@ -12,14 +12,12 @@
  * Copied from JUnit5 project for test engine API import consistency
  */
 
-//package org.junit.jupiter.api;
-
 package org.antublue.test.engine.api;
 
-//import static org.apiguardian.api.API.Status.STABLE;
-
-//import org.apiguardian.api.API;
 import org.junit.platform.commons.util.Preconditions;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * {@code Named} is a container that associates a name with a given payload.
@@ -27,20 +25,66 @@ import org.junit.platform.commons.util.Preconditions;
  * @param <T> the type of the payload
  * @since 5.8
  */
-//@API(status = STABLE, since = "5.8")
 public interface Named<T> {
 
-    /**
-     * Factory method for creating an instance of {@code Named} based on a {@code name} and a {@code
-     * payload}.
-     *
-     * @param name the name associated with the payload; never {@code null} or blank
-     * @param payload the object that serves as the payload; may be {@code null} depending on the
-     *     use case
-     * @param <T> the type of the payload
-     * @return an instance of {@code Named}; never {@code null}
-     * @see #named(String, java.lang.Object)
-     */
+    static Named<Boolean> ofBoolean(boolean value) {
+        return of(String.valueOf(value), value);
+    }
+
+    static Named<Byte> ofByte(byte value) {
+        return of(String.valueOf(value), value);
+    }
+
+    static Named<Character> ofChar(char value) {
+        return of(String.valueOf(value), value);
+    }
+
+    static Named<Short> ofShort(short value) {
+        return of(String.valueOf(value), value);
+    }
+
+    static Named<Integer> ofInt(int value) {
+        return of(String.valueOf(value), value);
+    }
+
+    static Named<Long> ofLong(long value) {
+        return of(String.valueOf(value), value);
+    }
+
+    static Named<Float> ofFloat(float value) {
+        return of(String.valueOf(value), value);
+    }
+
+    static Named<Double> ofDouble(double value) {
+        return of(String.valueOf(value), value);
+    }
+
+    static Named<String> ofString(String value) {
+        if (value == null) {
+            return of("String=/null/", value);
+        } else if (value.isEmpty()) {
+            return of("String=/empty/", value);
+        } else {
+            return of(value, value);
+        }
+    }
+
+    static Named<BigInteger> ofBigInteger(BigInteger value) {
+        if (value == null) {
+            return of("BigInteger=/null/", value);
+        } else {
+            return of(value.toString(), value);
+        }
+    }
+
+    static Named<BigDecimal> ofBigDecimal(BigDecimal value) {
+        if (value == null) {
+            return of("BigDecimal=/null/", value);
+        } else {
+            return of(value.toString(), value);
+        }
+    }
+
     static <T> Named<T> of(String name, T payload) {
         Preconditions.notBlank(name, "name must not be null or blank");
 
@@ -60,24 +104,6 @@ public interface Named<T> {
                 return name;
             }
         };
-    }
-
-    /**
-     * Factory method for creating an instance of {@code Named} based on a {@code name} and a {@code
-     * payload}.
-     *
-     * <p>This method is an <em>alias</em> for {@link Named#of} and is intended to be used when
-     * statically imported &mdash; for example, via: {@code import static
-     * org.junit.jupiter.api.Named.named;}
-     *
-     * @param name the name associated with the payload; never {@code null} or blank
-     * @param payload the object that serves as the payload; may be {@code null} depending on the
-     *     use case
-     * @param <T> the type of the payload
-     * @return an instance of {@code Named}; never {@code null}
-     */
-    static <T> Named<T> named(String name, T payload) {
-        return of(name, payload);
     }
 
     /**

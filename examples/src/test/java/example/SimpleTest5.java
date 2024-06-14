@@ -27,9 +27,9 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class SimpleTest5 {
 
-    @TestEngine.Argument protected String argument;
+    @TestEngine.Argument public String argument;
 
-    @TestEngine.Argument protected Named<String> namedArgument;
+    @TestEngine.Argument public Named<String> named;
 
     @TestEngine.ArgumentSupplier
     public static Stream<String> arguments() {
@@ -48,54 +48,54 @@ public class SimpleTest5 {
     @TestEngine.BeforeAll
     public void beforeAll() {
         assertThat(argument).isNotNull();
-        assertThat(namedArgument).isNotNull();
-        assertThat(namedArgument.getPayload()).isNotNull();
-        assertThat(namedArgument.getPayload().equals(argument)).isNotNull();
+        assertThat(named).isNotNull();
+        assertThat(named.getPayload()).isNotNull();
+        assertThat(named.getPayload().equals(argument)).isNotNull();
         System.out.println("beforeAll(" + argument + ")");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         assertThat(argument).isNotNull();
-        assertThat(namedArgument).isNotNull();
-        assertThat(namedArgument.getPayload()).isNotNull();
-        assertThat(namedArgument.getPayload().equals(argument)).isNotNull();
+        assertThat(named).isNotNull();
+        assertThat(named.getPayload()).isNotNull();
+        assertThat(named.getPayload().equals(argument)).isNotNull();
         System.out.println("beforeEach(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test1() {
         assertThat(argument).isNotNull();
-        assertThat(namedArgument).isNotNull();
-        assertThat(namedArgument.getPayload()).isNotNull();
-        assertThat(namedArgument.getPayload().equals(argument)).isNotNull();
+        assertThat(named).isNotNull();
+        assertThat(named.getPayload()).isNotNull();
+        assertThat(named.getPayload().equals(argument)).isNotNull();
         System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
         assertThat(argument).isNotNull();
-        assertThat(namedArgument).isNotNull();
-        assertThat(namedArgument.getPayload()).isNotNull();
-        assertThat(namedArgument.getPayload().equals(argument)).isNotNull();
+        assertThat(named).isNotNull();
+        assertThat(named.getPayload()).isNotNull();
+        assertThat(named.getPayload().equals(argument)).isNotNull();
         System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         assertThat(argument).isNotNull();
-        assertThat(namedArgument).isNotNull();
-        assertThat(namedArgument.getPayload()).isNotNull();
-        assertThat(namedArgument.getPayload().equals(argument)).isNotNull();
+        assertThat(named).isNotNull();
+        assertThat(named.getPayload()).isNotNull();
+        assertThat(named.getPayload().equals(argument)).isNotNull();
         System.out.println("afterEach(" + argument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         assertThat(argument).isNotNull();
-        assertThat(namedArgument).isNotNull();
-        assertThat(namedArgument.getPayload()).isNotNull();
-        assertThat(namedArgument.getPayload().equals(argument)).isNotNull();
+        assertThat(named).isNotNull();
+        assertThat(named.getPayload()).isNotNull();
+        assertThat(named.getPayload().equals(argument)).isNotNull();
         System.out.println("afterAll(" + argument + ")");
     }
 

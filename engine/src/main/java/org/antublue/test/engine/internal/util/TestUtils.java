@@ -66,7 +66,6 @@ public class TestUtils {
             Object testArgument,
             ThrowableContext throwableContext) {
         try {
-            method.setAccessible(true);
             if (ReflectionUtils.acceptsArguments(method, Named.class)) {
                 method.invoke(testInstance, testArgument);
             } else {

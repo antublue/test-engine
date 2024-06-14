@@ -24,8 +24,6 @@ import java.util.concurrent.locks.ReentrantLock;
 /** Class to implement LockManager */
 public class LockManager {
 
-    public static final String GLOBAL = "__GLOBAL__LOCK__MANAGER__";
-
     private final ConcurrentHashMap<String, InternalLockReference> lockMap;
 
     /** Constructor */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The AntuBLUE test-engine project authors
+ * Copyright (C) 2024 The AntuBLUE test-engine project authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-package example.inheritance;
+package example.locking;
 
-import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
-
-public abstract class OddBaseTest extends BaseTest {
-
-    public static Stream<Named<Integer>> arguments() {
-        return BaseTest.arguments()
-                .filter(
-                        argument -> {
-                            int value = argument.getPayload();
-                            return (value % 2) != 0;
-                        });
-    }
-}
+public class SubClassLockingTest1 extends AbstractLockingTest {}

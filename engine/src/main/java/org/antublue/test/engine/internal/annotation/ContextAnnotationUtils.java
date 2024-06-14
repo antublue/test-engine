@@ -20,11 +20,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import org.antublue.test.engine.api.Context;
-import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.ContextImpl;
+import org.antublue.test.engine.internal.Predicates;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.predicate.AnnotationFieldPredicate;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
@@ -52,15 +51,11 @@ public class ContextAnnotationUtils {
 
         List<Field> fields =
                 ReflectionSupport.findFields(
-                        testClass,
-                        AnnotationFieldPredicate.of(TestEngine.Context.class),
-                        HierarchyTraversalMode.TOP_DOWN);
+                        testClass, Predicates.CONTEXT_FIELD, HierarchyTraversalMode.TOP_DOWN);
 
         for (Field field : fields) {
             if (Modifier.isStatic(field.getModifiers())) {
                 LOGGER.trace("injectContextFields() testClass [%s] field [%s]", testClass, field);
-
-                field.setAccessible(true);
                 field.set(null, CONTEXT);
             }
         }
@@ -71,15 +66,11 @@ public class ContextAnnotationUtils {
 
         List<Field> fields =
                 ReflectionSupport.findFields(
-                        testClass,
-                        AnnotationFieldPredicate.of(TestEngine.Context.class),
-                        HierarchyTraversalMode.TOP_DOWN);
+                        testClass, Predicates.CONTEXT_FIELD, HierarchyTraversalMode.TOP_DOWN);
 
         for (Field field : fields) {
             if (Modifier.isStatic(field.getModifiers())) {
                 LOGGER.trace("injectContextFields() testClass [%s] field [%s]", testClass, field);
-
-                field.setAccessible(true);
                 field.set(null, null);
             }
         }

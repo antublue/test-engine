@@ -17,47 +17,47 @@
 package example;
 
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedInteger;
 
 /** Example test */
 public class MethodOrderAndDisplayNameTest {
 
-    public static Stream<NamedInteger> arguments() {
-        return Stream.of(NamedInteger.of(1), NamedInteger.of(2), NamedInteger.of(3));
+    public static Stream<Named<Integer>> arguments() {
+        return Stream.of(Named.ofInt(1), Named.ofInt(2), Named.ofInt(3));
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(NamedInteger argument) {
+    public void beforeAll(Named<Integer> argument) {
         System.out.println("beforeAll()");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach(NamedInteger argument) {
+    public void beforeEach(Named<Integer> argument) {
         System.out.println("beforeEach()");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 2)
     @TestEngine.DisplayName(name = "Test A")
-    public void testA(NamedInteger argument) {
+    public void testA(Named<Integer> argument) {
         System.out.println("testA(" + argument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 1)
     @TestEngine.DisplayName(name = "Test B")
-    public void testB(NamedInteger argument) {
+    public void testB(Named<Integer> argument) {
         System.out.println("testB(" + argument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach(NamedInteger argument) {
+    public void afterEach(Named<Integer> argument) {
         System.out.println("afterEach()");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(NamedInteger argument) {
+    public void afterAll(Named<Integer> argument) {
         System.out.println("afterAll()");
     }
 }

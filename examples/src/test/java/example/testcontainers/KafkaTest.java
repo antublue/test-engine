@@ -57,7 +57,7 @@ public class KafkaTest {
 
     private static Network network;
 
-    @TestEngine.Argument protected KafkaTestEnvironment kafkaTestEnvironment;
+    @TestEngine.Argument public KafkaTestEnvironment kafkaTestEnvironment;
 
     @TestEngine.ArgumentSupplier
     public static Stream<KafkaTestEnvironment> arguments() {

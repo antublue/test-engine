@@ -21,14 +21,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.Named;
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.MetadataConstants;
+import org.antublue.test.engine.internal.Predicates;
 import org.antublue.test.engine.internal.annotation.ArgumentAnnotationUtils;
 import org.antublue.test.engine.internal.annotation.RandomAnnotationUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.predicate.AnnotationMethodPredicate;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
@@ -52,17 +50,18 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> beforeAllMethods;
     private final List<Method> afterAllMethods;
 
-    /**
-     * Constructor
-     *
-     * @param builder builder
-     */
-    private ArgumentTestDescriptor(Builder builder) {
-        super(builder.uniqueId, builder.displayName);
-        this.testClass = builder.testClass;
-        this.testArgument = builder.testArgument;
-        this.beforeAllMethods = builder.beforeAllMethods;
-        this.afterAllMethods = builder.afterAllMethods;
+    public ArgumentTestDescriptor(
+            UniqueId uniqueId,
+            String displayName,
+            Class<?> testClass,
+            Named<?> testArgument,
+            List<Method> beforeAllMethods,
+            List<Method> afterAllMethods) {
+        super(uniqueId, displayName);
+        this.testClass = testClass;
+        this.testArgument = testArgument;
+        this.beforeAllMethods = beforeAllMethods;
+        this.afterAllMethods = afterAllMethods;
     }
 
     @Override
@@ -171,8 +170,6 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
             LOGGER.trace(
                     "beforeAllMethods() testClass [%s] testInstance [%s] method [%s]",
                     getTestInstance().getClass().getName(), getTestInstance(), method);
-
-            method.setAccessible(true);
             method.invoke(getTestInstance());
         }
     }
@@ -202,8 +199,6 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
             LOGGER.trace(
                     "afterAllMethods() testClass [%s] testInstance [%s] method [%s]",
                     getTestInstance().getClass().getName(), getTestInstance(), method);
-
-            method.setAccessible(true);
             method.invoke(getTestInstance());
         }
     }
@@ -224,104 +219,52 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         ArgumentAnnotationUtils.injectArgumentFields(getTestInstance(), null);
     }
 
-    /** Class to implement a Builder */
-    public static class Builder {
+    /**
+     * Method to create an ArgumentTestDescriptor
+     *
+     * @param parentUniqueId parentUniqueId
+     * @param testClass testClass
+     * @param testArgument testArgument
+     * @param testArgumentIndex testArgumentIndex
+     * @return an ArgumentTestDescriptor
+     */
+    public static ArgumentTestDescriptor of(
+            UniqueId parentUniqueId,
+            Class<?> testClass,
+            Named<?> testArgument,
+            int testArgumentIndex) {
+        UniqueId uniqueId =
+                parentUniqueId.append(
+                        ArgumentTestDescriptor.class.getName(),
+                        testArgumentIndex + "/" + testArgument.getName());
 
-        private Class<?> testClass;
-        private int testArgumentIndex;
-        private Named<?> testArgument;
-        private List<Method> testMethods;
+        LOGGER.info("uniqueId [%s]", uniqueId);
 
-        private UniqueId uniqueId;
-        private String displayName;
-        private List<Method> beforeAllMethods;
-        private List<Method> afterAllMethods;
+        String displayName = testArgument.getName();
 
-        /**
-         * Method to set the test class
-         *
-         * @param testClass testClass
-         * @return this
-         */
-        public Builder setTestClass(Class<?> testClass) {
-            this.testClass = testClass;
-            return this;
+        LOGGER.info("displayName [%s]", displayName);
+
+        List<Method> beforeAllMethods =
+                ReflectionSupport.findMethods(
+                        testClass, Predicates.BEFORE_ALL, HierarchyTraversalMode.TOP_DOWN);
+
+        if (!beforeAllMethods.isEmpty()) {
+            beforeAllMethods.forEach(method -> LOGGER.info("beforeAll method [%s]", method));
         }
 
-        /**
-         * Method to set the test argument
-         *
-         * @param testArgumentIndex testArgumentIndex
-         * @param testArgument testArgument
-         * @return this
-         */
-        public Builder setTestArgument(int testArgumentIndex, Named<?> testArgument) {
-            this.testArgumentIndex = testArgumentIndex;
-            this.testArgument = testArgument;
-            return this;
+        beforeAllMethods = orderTestMethods(beforeAllMethods, HierarchyTraversalMode.TOP_DOWN);
+
+        List<Method> afterAllMethods =
+                ReflectionSupport.findMethods(
+                        testClass, Predicates.AFTER_ALL, HierarchyTraversalMode.BOTTOM_UP);
+
+        if (!afterAllMethods.isEmpty()) {
+            afterAllMethods.forEach(method -> LOGGER.info("afterAll method [%s]", method));
         }
 
-        /**
-         * Method to set the list of test methods
-         *
-         * @param testMethods testMethods
-         * @return this
-         */
-        public Builder setTestMethods(List<Method> testMethods) {
-            this.testMethods = testMethods;
-            return this;
-        }
+        afterAllMethods = orderTestMethods(afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
 
-        /**
-         * Method to build the test descriptor and any children
-         *
-         * @param parentTestDescriptor parentTestDescriptor
-         */
-        public void build(TestDescriptor parentTestDescriptor) {
-            try {
-                uniqueId =
-                        parentTestDescriptor
-                                .getUniqueId()
-                                .append(
-                                        ArgumentTestDescriptor.class.getName(),
-                                        testArgumentIndex + "/" + testArgument.getName());
-
-                displayName = testArgument.getName();
-
-                beforeAllMethods =
-                        ReflectionSupport.findMethods(
-                                testClass,
-                                AnnotationMethodPredicate.of(TestEngine.BeforeAll.class),
-                                HierarchyTraversalMode.TOP_DOWN);
-
-                beforeAllMethods =
-                        orderTestMethods(beforeAllMethods, HierarchyTraversalMode.TOP_DOWN);
-
-                afterAllMethods =
-                        ReflectionSupport.findMethods(
-                                testClass,
-                                AnnotationMethodPredicate.of(TestEngine.AfterAll.class),
-                                HierarchyTraversalMode.BOTTOM_UP);
-
-                afterAllMethods =
-                        orderTestMethods(afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
-
-                TestDescriptor testDescriptor = new ArgumentTestDescriptor(this);
-
-                parentTestDescriptor.addChild(testDescriptor);
-
-                for (Method testMethod : testMethods) {
-                    new MethodTestDescriptor.Builder()
-                            .setTestClass(testClass)
-                            .setTestArgument(testArgument)
-                            .setTestMethod(testMethod)
-                            .build(testDescriptor);
-                }
-            } catch (RuntimeException e) {
-                throw e;
-            } catch (Throwable t) {
-                throw new TestEngineException(t);
-            }
-        }
+        return new ArgumentTestDescriptor(
+                uniqueId, displayName, testClass, testArgument, beforeAllMethods, afterAllMethods);
     }
 }

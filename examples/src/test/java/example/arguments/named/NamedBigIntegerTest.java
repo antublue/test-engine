@@ -20,19 +20,19 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedBigInteger;
 
 /** Example test */
 public class NamedBigIntegerTest {
 
-    @TestEngine.Argument protected NamedBigInteger argument;
+    @TestEngine.Argument public Named<BigInteger> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedBigInteger> arguments() {
-        Collection<NamedBigInteger> collection = new ArrayList<>();
+    public static Stream<Named<BigInteger>> arguments() {
+        Collection<Named<BigInteger>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(NamedBigInteger.of(new BigInteger(String.valueOf(i))));
+            collection.add(Named.ofBigInteger(new BigInteger(String.valueOf(i))));
         }
         return collection.stream();
     }

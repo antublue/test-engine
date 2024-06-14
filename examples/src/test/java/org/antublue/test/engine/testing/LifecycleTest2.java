@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.named.NamedString;
 
 /** Example test */
 public class LifecycleTest2 {
@@ -52,7 +52,7 @@ public class LifecycleTest2 {
         EXPECTED_ORDER.add("conclude()");
     }
 
-    public static Stream<NamedString> arguments() {
+    public static Stream<Named<String>> arguments() {
         return StringArgumentSupplier.arguments();
     }
 
@@ -70,52 +70,52 @@ public class LifecycleTest2 {
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(NamedString argument) {
+    public void beforeAll(Named<String> argument) {
         System.out.println("beforeAll()");
         ACTUAL_ORDER.add(argument + ".beforeAll()");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach(NamedString argument) {
+    public void beforeEach(Named<String> argument) {
         System.out.println("beforeEach()");
         ACTUAL_ORDER.add(argument + ".beforeEach()");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 1)
-    public void test1(NamedString argument) {
+    public void test1(Named<String> argument) {
         System.out.println("test1(" + argument + ")");
         ACTUAL_ORDER.add(argument + ".test1()");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 0)
-    public void test2(NamedString argument) {
+    public void test2(Named<String> argument) {
         System.out.println("test2(" + argument + ")");
         ACTUAL_ORDER.add(argument + ".test2()");
     }
 
     @TestEngine.AfterEach
-    public void afterEach(NamedString argument) {
+    public void afterEach(Named<String> argument) {
         System.out.println("afterEach()");
         ACTUAL_ORDER.add(argument + ".afterEach()");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(NamedString argument) {
+    public void afterAll(Named<String> argument) {
         System.out.println("afterAll()");
         ACTUAL_ORDER.add(argument + ".afterAll()");
     }
 
     @TestEngine.AfterAll
     @TestEngine.Order(order = 0)
-    public void afterAll2(NamedString argument) {
+    public void afterAll2(Named<String> argument) {
         System.out.println("afterAll2()");
         ACTUAL_ORDER.add(argument + ".afterAll2()");
     }
 
     @TestEngine.Conclude
-    public void conclude(NamedString argument) {
+    public void conclude(Named<String> argument) {
         System.out.println("conclude()");
         assertThat(argument).isNull();
         ACTUAL_ORDER.add("conclude()");
@@ -124,10 +124,10 @@ public class LifecycleTest2 {
 
     private static class StringArgumentSupplier {
 
-        public static Stream<NamedString> arguments() {
-            Collection<NamedString> collection = new ArrayList<>();
+        public static Stream<Named<String>> arguments() {
+            Collection<Named<String>> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(NamedString.of(String.valueOf(i)));
+                collection.add(Named.ofString(String.valueOf(i)));
             }
             return collection.stream();
         }

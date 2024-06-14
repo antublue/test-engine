@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.testing;
+package example.locking;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.Named;
-import org.antublue.test.engine.api.Namespace;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.support.lock.LockManager;
 
-public class NamespaceTest {
+public abstract class AbstractLockingTest {
+
+    private static final String NAMESPACE = "AbstractLockingTest";
+    private static final String LOCK_MANAGER = "LockManager";
+    private static final String LOCK_NAME = "Lock";
+
+    @TestEngine.Context public static Context context;
 
     @TestEngine.Argument public Named<String> argument;
 
@@ -39,32 +46,20 @@ public class NamespaceTest {
     }
 
     @TestEngine.Test
-    public void test1() {
-        System.out.println("test1(" + argument + ")");
+    public void test() throws Throwable {
+        final String className = getClass().getName();
 
-        Namespace namespace = Namespace.of("1", "2", "3", 4);
+        LockManager lockManager =
+                context.getStore(NAMESPACE).computeIfAbsent(LOCK_MANAGER, s -> new LockManager());
 
-        assertThat(namespace).isNotNull();
-        assertThat(namespace.toString()).isEqualTo("/1/2/3/4/");
-    }
-
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + argument + ")");
-
-        Namespace namespace = Namespace.of("1", "2");
-
-        assertThat(namespace).isNotNull();
-        assertThat(namespace.toString()).isEqualTo("/1/2/");
-
-        namespace = namespace.append(3, 4);
-
-        assertThat(namespace).isNotNull();
-        assertThat(namespace.toString()).isEqualTo("/1/2/3/4/");
-
-        namespace = namespace.append(Namespace.of(5, 6));
-
-        assertThat(namespace).isNotNull();
-        assertThat(namespace.toString()).isEqualTo("/1/2/3/4/5/6/");
+        lockManager.executeInLock(
+                LOCK_NAME,
+                () -> {
+                    System.out.println(className + ".test1(" + argument + ")");
+                    System.out.println("sleeping 1000");
+                    Thread.sleep(5000);
+                    assertThat(argument).isNotNull();
+                    System.out.println(className + ".continuing");
+                });
     }
 }

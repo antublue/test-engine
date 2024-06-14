@@ -27,7 +27,7 @@ public class ProtectedMethodsArrayTest {
 
     private String[] values;
 
-    @TestEngine.Argument protected Named<String[]> argument;
+    @TestEngine.Argument public Named<String[]> argument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<Named<String[]>> arguments() {
@@ -48,32 +48,32 @@ public class ProtectedMethodsArrayTest {
     }
 
     @TestEngine.BeforeEach
-    protected void beforeEach() {
+    public void beforeEach() {
         System.out.println("beforeEach()");
     }
 
     @TestEngine.Test
-    protected void test1() {
+    public void test1() {
         System.out.println("test1(" + values[0] + ", " + values[1] + ")");
     }
 
     @TestEngine.Test
-    protected void test2() {
+    public void test2() {
         System.out.println("test2(" + values[0] + ", " + values[1] + ")");
     }
 
     @TestEngine.Test
-    protected void test3() {
+    public void test3() {
         System.out.println("test3(" + values[0] + ", " + values[1] + ")");
     }
 
     @TestEngine.AfterEach
-    protected void afterEach() {
+    public void afterEach() {
         System.out.println("afterEach()");
     }
 
     @TestEngine.AfterAll
-    protected void afterAll() {
+    public void afterAll() {
         System.out.println("afterAll()");
     }
 }
