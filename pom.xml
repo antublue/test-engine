@@ -68,7 +68,7 @@
     <modules>
         <module>api</module>
         <module>engine</module>
-        <module>plugin</module>
+        <module>maven-plugin</module>
         <module>examples</module>
     </modules>
 
