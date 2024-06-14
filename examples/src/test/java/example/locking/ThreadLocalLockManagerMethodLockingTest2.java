@@ -22,9 +22,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Context;
+import org.antublue.test.engine.api.Lock;
 import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Namespace;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.lock.LockManager;
 
 /** Example test */
 public class ThreadLocalLockManagerMethodLockingTest2 {
@@ -68,12 +69,8 @@ public class ThreadLocalLockManagerMethodLockingTest2 {
 
     @TestEngine.Test
     public void test1() throws Throwable {
-        LockManager lockManager =
-                context.getStore(Thread.currentThread())
-                        .computeIfAbsent(LOCK_MANAGER, s -> new LockManager());
-
-        lockManager.executeInLock(
-                LOCK_NAME,
+        Lock.execute(
+                Namespace.of(Thread.currentThread(), LOCK_NAME),
                 () -> {
                     System.out.println("test1(" + argument + ")");
                     System.out.println("sleeping 1000");

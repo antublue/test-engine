@@ -23,8 +23,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.RandomGenerator;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.RandomGenerator;
 
 public abstract class RandomGeneratorTest {
 

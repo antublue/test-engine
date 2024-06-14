@@ -22,10 +22,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Context;
+import org.antublue.test.engine.api.Lock;
 import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Namespace;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.lock.LockManager;
-import org.antublue.test.engine.api.support.lock.LockReference;
 
 /** Example test */
 public class LockManagerClassLockingTest1 {
@@ -34,7 +34,7 @@ public class LockManagerClassLockingTest1 {
     private static final String LOCK_MANAGER = "LockManager";
     private static final String LOCK_NAME = "Lock";
 
-    private LockReference lockReference;
+    private Lock lock;
 
     @TestEngine.Context public static Context context;
 
@@ -53,10 +53,7 @@ public class LockManagerClassLockingTest1 {
 
     @TestEngine.Prepare
     public void prepare() {
-        lockReference =
-                context.getStore(NAMESPACE)
-                        .computeIfAbsent(LOCK_MANAGER, o -> new LockManager())
-                        .acquire(LOCK_NAME);
+        lock = Lock.get(Namespace.of(NAMESPACE, LOCK_NAME)).lock();
         System.out.println("prepare()");
     }
 
@@ -105,6 +102,6 @@ public class LockManagerClassLockingTest1 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        lockReference.release();
+        lock.release();
     }
 }

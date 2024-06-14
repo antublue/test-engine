@@ -33,7 +33,7 @@ public class DuplicateArgumentNamesLifecycleTest {
 
     static {
         EXPECTED.add("prepare2()");
-        EXPECTED.add("prepare1()");
+        EXPECTED.add("prepare()");
         arguments()
                 .forEach(
                         stringArgument -> {
