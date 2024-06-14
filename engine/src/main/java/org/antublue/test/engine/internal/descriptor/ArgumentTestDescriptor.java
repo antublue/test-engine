@@ -30,7 +30,6 @@ import org.antublue.test.engine.internal.util.DisplayNameUtils;
 import org.antublue.test.engine.internal.util.OrdererUtils;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StandardStreams;
-import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -40,6 +39,7 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
+import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement a ArgumentTestDescriptor */
 @SuppressWarnings({"PMD.UnusedPrivateMethod", "PMD.AvoidAccessibilityAlteration"})
@@ -140,8 +140,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                     .getEngineExecutionListener()
                     .executionFinished(
                             this,
-                            TestExecutionResult.failed(
-                                    getThrowableCollector().getThrowables().get(0)));
+                            TestExecutionResult.failed(getThrowableCollector().getThrowable()));
         }
 
         StandardStreams.flush();

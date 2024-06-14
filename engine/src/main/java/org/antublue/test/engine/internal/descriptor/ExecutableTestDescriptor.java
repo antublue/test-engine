@@ -22,12 +22,12 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataSupport;
 import org.antublue.test.engine.internal.util.StopWatch;
-import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
+import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Abstract class to implement an ExecutableTestDescriptor */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -43,7 +43,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
     protected ExecutableTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
 
-        throwableCollector = new ThrowableCollector();
+        throwableCollector = new ThrowableCollector(throwable -> true);
         metadata = new Metadata();
         stopWatch = new StopWatch();
     }

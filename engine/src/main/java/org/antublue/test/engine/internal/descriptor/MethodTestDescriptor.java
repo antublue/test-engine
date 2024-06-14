@@ -26,7 +26,6 @@ import org.antublue.test.engine.internal.util.DisplayNameUtils;
 import org.antublue.test.engine.internal.util.OrdererUtils;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StandardStreams;
-import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -35,6 +34,7 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.MethodSource;
+import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement a MethodTestDescriptor */
 public class MethodTestDescriptor extends ExecutableTestDescriptor {
@@ -137,7 +137,8 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(
-                            this, TestExecutionResult.failed(getThrowableCollector().getFirst()));
+                            this,
+                            TestExecutionResult.failed(getThrowableCollector().getThrowable()));
         }
 
         StandardStreams.flush();
