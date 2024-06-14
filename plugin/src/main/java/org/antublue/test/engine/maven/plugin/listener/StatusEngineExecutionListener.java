@@ -46,10 +46,10 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
     private static final String MESSAGE_SKIP;
 
     static {
-        MESSAGE_TEST = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_TEST_MESSAGE).orElse("T");
-        MESSAGE_PASS = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_PASS_MESSAGE).orElse("P");
-        MESSAGE_FAIL = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_FAIL_MESSAGE).orElse("F");
-        MESSAGE_SKIP = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_SKIP_MESSAGE).orElse("S");
+        MESSAGE_TEST = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_TEST_MESSAGE).orElse("TEST");
+        MESSAGE_PASS = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_PASS_MESSAGE).orElse("PASS");
+        MESSAGE_FAIL = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_FAIL_MESSAGE).orElse("FAIL");
+        MESSAGE_SKIP = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_SKIP_MESSAGE).orElse("SKIP");
     }
 
     private static final String INFO =
