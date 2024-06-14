@@ -26,16 +26,6 @@ import org.junit.platform.commons.support.ReflectionSupport;
 
 public class Predicates {
 
-    public static final Predicate<Field> CONTEXT_FIELD =
-            field -> {
-                int modifiers = field.getModifiers();
-                return Modifier.isPublic(modifiers)
-                        && !Modifier.isAbstract(modifiers)
-                        && Modifier.isStatic(modifiers)
-                        && !Modifier.isFinal(modifiers)
-                        && field.isAnnotationPresent(TestEngine.Context.class);
-            };
-
     public static final Predicate<Field> ARGUMENT_FIELD =
             field -> {
                 int modifiers = field.getModifiers();

@@ -36,12 +36,11 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import org.antublue.test.engine.api.Configuration;
 import org.antublue.test.engine.internal.logger.Level;
 
 /** Class to implement Configuration */
 @SuppressWarnings("PMD.EmptyCatchBlock")
-public class ConfigurationImpl implements Configuration {
+public class Configuration {
 
     /** Configuration constant */
     public static final String ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE =
@@ -72,7 +71,7 @@ public class ConfigurationImpl implements Configuration {
     private Set<String> keySet;
 
     /** Constructor */
-    private ConfigurationImpl() {
+    private Configuration() {
         trace("ConfigurationImpl()");
 
         properties = new Properties();
@@ -121,18 +120,22 @@ public class ConfigurationImpl implements Configuration {
      *
      * @return the singleton instance
      */
-    public static ConfigurationImpl getInstance() {
+    public static Configuration getInstance() {
         return SingletonHolder.INSTANCE;
     }
 
-    @Override
+    /**
+     * Method to get a property
+     *
+     * @param key key
+     * @return an Optional
+     */
     public Optional<String> getProperty(String key) {
         String value = properties.getProperty(key);
         trace("getProperty [%s] value [%s]", key, value);
         return Optional.ofNullable(value);
     }
 
-    @Override
     public <T> Optional<T> getProperty(String key, Function<String, T> transformer) {
         Optional<String> optional = getProperty(key);
         if (!optional.isPresent()) {
@@ -147,7 +150,6 @@ public class ConfigurationImpl implements Configuration {
      *
      * @return a Set of configuration keys
      */
-    @Override
     public Set<String> getPropertyNames() {
         return keySet;
     }
@@ -158,7 +160,6 @@ public class ConfigurationImpl implements Configuration {
      * @param predicate predicate
      * @return a Set of property keys filtered by a Predicate
      */
-    @Override
     public Set<String> getPropertyNames(Predicate<String> predicate) {
         if (predicate == null) {
             return getPropertyNames();
@@ -225,7 +226,7 @@ public class ConfigurationImpl implements Configuration {
                 + " | "
                 + level.toString()
                 + " | "
-                + ConfigurationImpl.class.getName()
+                + Configuration.class.getName()
                 + " | "
                 + message
                 + " ";
@@ -266,6 +267,6 @@ public class ConfigurationImpl implements Configuration {
     private static final class SingletonHolder {
 
         /** The singleton instance */
-        private static final ConfigurationImpl INSTANCE = new ConfigurationImpl();
+        private static final Configuration INSTANCE = new Configuration();
     }
 }

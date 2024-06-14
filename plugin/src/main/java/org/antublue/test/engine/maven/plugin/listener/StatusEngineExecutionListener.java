@@ -22,7 +22,7 @@ import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.MetadataSupport;
-import org.antublue.test.engine.internal.configuration.ConfigurationImpl;
+import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.AnsiColor;
@@ -39,7 +39,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(StatusEngineExecutionListener.class);
 
-    private static final ConfigurationImpl CONFIGURATION = ConfigurationImpl.getInstance();
+    private static final Configuration CONFIGURATION = Configuration.getInstance();
 
     private static final TestUtils TEST_UTILS = TestUtils.getInstance();
 

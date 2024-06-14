@@ -14,29 +14,27 @@
  * limitations under the License.
  */
 
-package example.store;
+package example.locking;
 
-import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Context;
+import org.antublue.test.engine.api.Lock;
 import org.antublue.test.engine.api.Named;
-import org.antublue.test.engine.api.Store;
+import org.antublue.test.engine.api.Namespace;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class StoreExampleTest5 {
+public class MethodLockingTest3 {
 
-    private static final String TEST_OBJECT_KEY = "testObject";
-
-    private Store store;
-
-    @TestEngine.Context public static Context context;
+    private static final String NAMESPACE = "MethodLockingTest";
+    private static final String LOCK_NAME = "Lock";
 
     @TestEngine.Argument public Named<String> argument;
+
+    @TestEngine.Random.Integer public Integer randomInteger;
 
     @TestEngine.ArgumentSupplier
     public static Stream<Named<String>> arguments() {
@@ -55,55 +53,51 @@ public class StoreExampleTest5 {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + argument + ")");
-        System.out.println(format("key [%s]", TEST_OBJECT_KEY));
-
-        store = context.getStore(StoreExampleTest5.class);
-        store.put(TEST_OBJECT_KEY, new TestObject());
+        System.out.println("randomInteger = [" + randomInteger + "]");
+        assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
-    public void test1() {
-        System.out.println("test1(" + argument + ")");
+    public void test1() throws Throwable {
+        Lock.execute(
+                Namespace.of(NAMESPACE, LOCK_NAME),
+                () -> {
+                    System.out.println("test1(" + argument + ")");
+                    System.out.println("sleeping 1000");
+                    Thread.sleep(1000);
+                    assertThat(argument).isNotNull();
+                });
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + argument + ")");
-
-        TestObject testObject = (TestObject) store.remove(TEST_OBJECT_KEY);
-        testObject.close();
-
-        assertThat(store.get(TEST_OBJECT_KEY, Object.class)).isNull();
+        System.out.println("randomInteger = [" + randomInteger + "]");
+        assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-    }
-
-    private static class TestObject {
-
-        public TestObject() {
-            // DO NOTHING
-        }
-
-        public void close() {
-            System.out.println(getClass().getName() + ".close()");
-        }
     }
 }

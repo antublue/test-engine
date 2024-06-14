@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.internal.ContextImpl;
 import org.antublue.test.engine.internal.configuration.ConfigurationParameters;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;

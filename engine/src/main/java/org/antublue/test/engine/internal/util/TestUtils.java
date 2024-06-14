@@ -25,17 +25,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.antublue.test.engine.Constants;
-import org.antublue.test.engine.api.Configuration;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.internal.ContextImpl;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.ClassUtils;
+import org.antublue.test.engine.internal.configuration.Configuration;
 
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class TestUtils {
 
-    private static final Configuration CONFIGURATION = ContextImpl.getInstance().getConfiguration();
+    private static final Configuration CONFIGURATION = Configuration.getInstance();
 
     private static final DefaultMethodOrderTopDownComparator
             DEFAULT_METHOD_ORDER_TOP_DOWN_COMPARATOR = new DefaultMethodOrderTopDownComparator();

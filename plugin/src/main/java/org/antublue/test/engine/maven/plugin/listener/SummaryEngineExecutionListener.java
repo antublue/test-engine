@@ -24,7 +24,7 @@ import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.MetadataSupport;
-import org.antublue.test.engine.internal.configuration.ConfigurationImpl;
+import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
@@ -93,7 +93,7 @@ public class SummaryEngineExecutionListener
         println(INFO + BANNER);
         println(INFO + SEPARATOR);
 
-        ConfigurationImpl configuration = ConfigurationImpl.getInstance();
+        Configuration configuration = Configuration.getInstance();
         String propertiesFilename = configuration.getPropertiesFilename();
 
         if (propertiesFilename != null) {

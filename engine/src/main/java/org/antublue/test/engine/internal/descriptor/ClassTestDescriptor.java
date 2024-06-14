@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.internal.MetadataConstants;
-import org.antublue.test.engine.internal.annotation.ContextAnnotationUtils;
 import org.antublue.test.engine.internal.annotation.RandomAnnotationUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -91,25 +90,21 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         ThrowableCollector throwableCollector = getThrowableCollector();
 
-        throwableCollector.execute(this::setContextFields);
+        throwableCollector.execute(this::setRandomFields);
         if (throwableCollector.isEmpty()) {
-            throwableCollector.execute(this::setRandomFields);
+            throwableCollector.execute(this::createTestInstance);
             if (throwableCollector.isEmpty()) {
-                throwableCollector.execute(this::createTestInstance);
+                throwableCollector.execute(this::prepare);
                 if (throwableCollector.isEmpty()) {
-                    throwableCollector.execute(this::prepare);
-                    if (throwableCollector.isEmpty()) {
-                        execute();
-                    } else {
-                        skip(executionRequest);
-                    }
-                    throwableCollector.execute(this::conclude);
+                    execute();
+                } else {
+                    skip(executionRequest);
                 }
-                throwableCollector.execute(this::destroyTestInstance);
+                throwableCollector.execute(this::conclude);
             }
-            throwableCollector.execute(this::clearRandomFields);
+            throwableCollector.execute(this::destroyTestInstance);
         }
-        throwableCollector.execute(this::clearContextFields);
+        throwableCollector.execute(this::clearRandomFields);
 
         getStopWatch().stop();
 
@@ -136,12 +131,6 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         }
 
         StandardStreams.flush();
-    }
-
-    private void setContextFields() throws Throwable {
-        LOGGER.trace("setContextFields() testClass [%s]", getTestClass().getName());
-
-        ContextAnnotationUtils.injectContextFields(getTestClass());
     }
 
     private void setRandomFields() throws Throwable {
@@ -214,10 +203,6 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                 getTestClass().getName(), getTestInstance());
 
         setTestInstance(null);
-    }
-
-    private void clearContextFields() throws Throwable {
-        ContextAnnotationUtils.clearContextFields(getTestClass());
     }
 
     /**

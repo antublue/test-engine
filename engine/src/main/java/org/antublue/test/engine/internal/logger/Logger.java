@@ -28,13 +28,13 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.antublue.test.engine.Constants;
-import org.antublue.test.engine.internal.configuration.ConfigurationImpl;
+import org.antublue.test.engine.internal.configuration.Configuration;
 
 /** Class to implement a Logger */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Logger {
 
-    private static final ConfigurationImpl CONFIGURATION = ConfigurationImpl.getInstance();
+    private static final Configuration CONFIGURATION = Configuration.getInstance();
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd | HH:mm:ss.SSS", Locale.getDefault());

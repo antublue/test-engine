@@ -24,7 +24,7 @@ import java.util.function.Function;
 @SuppressWarnings({"Deprecation", "PMD.EmptyCatchBlock"})
 public class ConfigurationParameters implements org.junit.platform.engine.ConfigurationParameters {
 
-    private static final ConfigurationImpl CONFIGURATION = ConfigurationImpl.getInstance();
+    private static final Configuration CONFIGURATION = Configuration.getInstance();
 
     private static final Function<String, Boolean> toBoolean =
             string -> {

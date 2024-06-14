@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
-import org.antublue.test.engine.internal.configuration.ConfigurationImpl;
+import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
@@ -67,7 +67,7 @@ public class EngineDiscoveryRequestResolver {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(EngineDiscoveryRequestResolver.class);
 
-    private static final ConfigurationImpl CONFIGURATION = ConfigurationImpl.getInstance();
+    private static final Configuration CONFIGURATION = Configuration.getInstance();
 
     public void resolveSelector(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor)

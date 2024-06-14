@@ -20,10 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Context;
+import org.antublue.test.engine.api.Lock;
 import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Namespace;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
@@ -31,10 +31,6 @@ public class ClassLockingTest2 {
 
     private static final String NAMESPACE = "ClassLockingTest";
     private static final String LOCK_NAME = "Lock";
-
-    private ReentrantLock reentrantLock;
-
-    @TestEngine.Context public static Context context;
 
     @TestEngine.Argument public Named<String> argument;
 
@@ -51,10 +47,7 @@ public class ClassLockingTest2 {
 
     @TestEngine.Prepare
     public void prepare() {
-        reentrantLock =
-                context.getStore(NAMESPACE)
-                        .computeIfAbsent(LOCK_NAME, s -> new ReentrantLock(true));
-        reentrantLock.lock();
+        Lock.get(Namespace.of(NAMESPACE, LOCK_NAME)).lock();
         System.out.println("prepare()");
     }
 
@@ -103,6 +96,6 @@ public class ClassLockingTest2 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        reentrantLock.unlock();
+        Lock.get(Namespace.of(NAMESPACE, LOCK_NAME)).lock();
     }
 }

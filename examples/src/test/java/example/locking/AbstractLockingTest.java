@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.api.Lock;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.api.Namespace;
@@ -31,8 +30,6 @@ public abstract class AbstractLockingTest {
 
     private static final String NAMESPACE = "AbstractLockingTest";
     private static final String LOCK_NAME = "Lock";
-
-    @TestEngine.Context public static Context context;
 
     @TestEngine.Argument public Named<String> argument;
 

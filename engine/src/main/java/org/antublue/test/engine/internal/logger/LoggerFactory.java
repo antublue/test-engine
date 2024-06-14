@@ -18,7 +18,7 @@ package org.antublue.test.engine.internal.logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.antublue.test.engine.internal.configuration.ConfigurationImpl;
+import org.antublue.test.engine.internal.configuration.Configuration;
 
 /** Class to implement a LoggerFactory */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -58,7 +58,7 @@ public final class LoggerFactory {
      * @return the return value
      */
     public static Logger getLogger(String name) {
-        synchronized (ConfigurationImpl.getInstance()) {
+        synchronized (Configuration.getInstance()) {
             return SingletonHolder.INSTANCE.createLogger(name);
         }
     }
