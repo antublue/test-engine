@@ -33,7 +33,7 @@ public class DuplicateArgumentNamesLifecycleTest {
 
     static {
         EXPECTED.add("prepare2()");
-        EXPECTED.add("prepare()");
+        EXPECTED.add("prepare1()");
         arguments()
                 .forEach(
                         stringArgument -> {
@@ -69,7 +69,7 @@ public class DuplicateArgumentNamesLifecycleTest {
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 0)
-    public static void prepare2() {
+    public void prepare2() {
         System.out.println("prepare2()");
         ACTUAL.add("prepare2()");
     }

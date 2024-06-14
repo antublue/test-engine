@@ -20,9 +20,11 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.internal.MetadataConstants;
-import org.antublue.test.engine.internal.Predicates;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.DisplayNameUtil;
+import org.antublue.test.engine.internal.util.OrdererUtil;
+import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
@@ -185,19 +187,21 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         UniqueId uniqueId =
                 parentUniqueId.append(MethodTestDescriptor.class.getName(), testMethod.getName());
 
-        String displayName = getDisplayName(testMethod);
+        String displayName = DisplayNameUtil.getDisplayName(testMethod);
 
         List<Method> beforeEachMethods =
                 ReflectionSupport.findMethods(
                         testClass, Predicates.BEFORE_EACH_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
-        beforeEachMethods = orderTestMethods(beforeEachMethods, HierarchyTraversalMode.TOP_DOWN);
+        beforeEachMethods =
+                OrdererUtil.orderTestMethods(beforeEachMethods, HierarchyTraversalMode.TOP_DOWN);
 
         List<Method> afterEachMethods =
                 ReflectionSupport.findMethods(
                         testClass, Predicates.AFTER_EACH_METHOD, HierarchyTraversalMode.BOTTOM_UP);
 
-        afterEachMethods = orderTestMethods(afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
+        afterEachMethods =
+                OrdererUtil.orderTestMethods(afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
 
         return new MethodTestDescriptor(
                 uniqueId, displayName, testClass, beforeEachMethods, testMethod, afterEachMethods);

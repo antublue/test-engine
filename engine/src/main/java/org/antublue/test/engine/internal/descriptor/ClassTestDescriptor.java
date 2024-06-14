@@ -20,11 +20,13 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.internal.MetadataConstants;
-import org.antublue.test.engine.internal.Predicates;
 import org.antublue.test.engine.internal.annotation.ContextAnnotationUtils;
 import org.antublue.test.engine.internal.annotation.RandomAnnotationUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.DisplayNameUtil;
+import org.antublue.test.engine.internal.util.OrdererUtil;
+import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
@@ -85,11 +87,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         setExecutionRequest(executionRequest);
 
-        // IntelliJ workaround to only show the status if there is more
-        // than on ClassTestDescriptor or the test window output is incorrect
-        if (getParent().get().getChildren().size() > 1) {
-            executionRequest.getEngineExecutionListener().executionStarted(this);
-        }
+        executionRequest.getEngineExecutionListener().executionStarted(this);
 
         ThrowableCollector throwableCollector = getThrowableCollector();
 
@@ -123,26 +121,18 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         if (getThrowableCollector().isEmpty()) {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
 
-            // IntelliJ workaround to only show the status if there is more
-            // than on ClassTestDescriptor or the test window output is incorrect
-            if (getParent().get().getChildren().size() > 1) {
-                executionRequest
-                        .getEngineExecutionListener()
-                        .executionFinished(this, TestExecutionResult.successful());
-            }
+            executionRequest
+                    .getEngineExecutionListener()
+                    .executionFinished(this, TestExecutionResult.successful());
         } else {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
 
-            // IntelliJ workaround to only show the status if there is more
-            // than on ClassTestDescriptor or the test window output is incorrect
-            if (getParent().get().getChildren().size() > 1) {
-                executionRequest
-                        .getEngineExecutionListener()
-                        .executionFinished(
-                                this,
-                                TestExecutionResult.failed(
-                                        getThrowableCollector().getThrowables().get(0)));
-            }
+            executionRequest
+                    .getEngineExecutionListener()
+                    .executionFinished(
+                            this,
+                            TestExecutionResult.failed(
+                                    getThrowableCollector().getThrowables().get(0)));
         }
 
         StandardStreams.flush();
@@ -241,26 +231,32 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         UniqueId uniqueId =
                 parentUniqueId.append(ClassTestDescriptor.class.getName(), testClass.getName());
 
-        LOGGER.info("uniqueId [%s]", uniqueId);
+        LOGGER.trace("uniqueId [%s]", uniqueId);
 
-        String displayName = testClass.getName();
+        String displayName = DisplayNameUtil.getDisplayName(testClass);
 
-        LOGGER.info("displayName [%s]", displayName);
+        LOGGER.trace("displayName [%s]", displayName);
 
         List<Method> prepareMethods =
                 ReflectionSupport.findMethods(
                         testClass, Predicates.PREPARE_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
-        if (!prepareMethods.isEmpty()) {
-            prepareMethods.forEach(method -> LOGGER.info("prepare method [%s]", method));
+        prepareMethods =
+                OrdererUtil.orderTestMethods(prepareMethods, HierarchyTraversalMode.TOP_DOWN);
+
+        if (!prepareMethods.isEmpty() && LOGGER.isTraceEnabled()) {
+            prepareMethods.forEach(method -> LOGGER.trace("prepare method [%s]", method));
         }
 
         List<Method> concludeMethods =
                 ReflectionSupport.findMethods(
                         testClass, Predicates.CONCLUDE_METHOD, HierarchyTraversalMode.BOTTOM_UP);
 
-        if (!concludeMethods.isEmpty()) {
-            concludeMethods.forEach(method -> LOGGER.info("conclude method [%s]", method));
+        concludeMethods =
+                OrdererUtil.orderTestMethods(concludeMethods, HierarchyTraversalMode.TOP_DOWN);
+
+        if (!concludeMethods.isEmpty() && LOGGER.isTraceEnabled()) {
+            concludeMethods.forEach(method -> LOGGER.trace("conclude method [%s]", method));
         }
 
         return new ClassTestDescriptor(

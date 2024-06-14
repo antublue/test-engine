@@ -21,9 +21,9 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import org.antublue.test.engine.api.Context;
 import org.antublue.test.engine.internal.ContextImpl;
-import org.antublue.test.engine.internal.Predicates;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 

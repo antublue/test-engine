@@ -36,16 +36,16 @@ import java.util.stream.Stream;
 import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
-import org.antublue.test.engine.internal.Predicates;
 import org.antublue.test.engine.internal.configuration.ConfigurationImpl;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.OrdererUtil;
+import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
-import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.DiscoveryFilter;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -99,7 +99,7 @@ public class EngineDiscoveryRequestResolver {
 
     private static void buildClassTestDescriptor(
             Class<?> testClass, TestDescriptor parentTestDescriptor) throws Throwable {
-        LOGGER.info("buildClassTestDescriptor() testClass [%s]", testClass.getName());
+        LOGGER.trace("buildClassTestDescriptor() testClass [%s]", testClass.getName());
 
         ClassTestDescriptor classTestDescriptor =
                 ClassTestDescriptor.of(parentTestDescriptor.getUniqueId(), testClass);
@@ -119,7 +119,7 @@ public class EngineDiscoveryRequestResolver {
             Named<?> testArgument,
             int testArgumentIndex,
             TestDescriptor parentTestDescriptor) {
-        LOGGER.info(
+        LOGGER.trace(
                 "buildArgumentTestDescriptor() testClass [%s] testArgument [%s] testArgumentIndex",
                 testClass.getName(), testArgument.getName(), testArgumentIndex);
 
@@ -136,11 +136,14 @@ public class EngineDiscoveryRequestResolver {
 
     public static void buildMethodTestDescriptor(
             Class<?> testClass, TestDescriptor parentTestDescriptor) {
-        LOGGER.info("buildMethodTestDescriptor() testClass [%s]", testClass.getName());
+        LOGGER.trace("buildMethodTestDescriptor() testClass [%s]", testClass.getName());
 
         List<Method> testMethods =
                 ReflectionSupport.findMethods(
                         testClass, Predicates.TEST_METHOD, HierarchyTraversalMode.TOP_DOWN);
+
+        testMethods = OrdererUtil.orderTestMethods(testMethods, HierarchyTraversalMode.TOP_DOWN);
+
         for (Method testMethod : testMethods) {
             MethodTestDescriptor methodTestDescriptor =
                     MethodTestDescriptor.of(
@@ -224,8 +227,6 @@ public class EngineDiscoveryRequestResolver {
             List<UniqueId.Segment> segments = uniqueId.getSegments();
 
             Class<?> javaClass = null;
-            int testArgumentIndex = -1;
-            Method javaMethod = null;
 
             for (UniqueId.Segment segment : segments) {
                 String segmentType = segment.getType();
@@ -234,28 +235,6 @@ public class EngineDiscoveryRequestResolver {
                     String javaClassName = segment.getValue();
                     javaClass =
                             Thread.currentThread().getContextClassLoader().loadClass(javaClassName);
-                } else if (segmentType.equals(ArgumentTestDescriptor.class.getName())) {
-                    String value = segment.getValue();
-                    if (value.indexOf("/") > 0) {
-                        testArgumentIndex =
-                                Integer.parseInt(value.substring(0, value.indexOf("/")));
-                    }
-                } else if (segmentType.equals(MethodTestDescriptor.class.getName())) {
-                    Preconditions.notNull(javaClass, "javaClass is null, uniqueId errors");
-
-                    String javaMethodName = segment.getValue();
-                    List<Method> javaMethods =
-                            ReflectionSupport.findMethods(
-                                    javaClass,
-                                    Predicates.TEST_METHOD,
-                                    HierarchyTraversalMode.BOTTOM_UP);
-
-                    for (Method method : javaMethods) {
-                        if (method.getName().equals(javaMethodName)) {
-                            javaMethod = method;
-                            break;
-                        }
-                    }
                 }
             }
 
@@ -266,6 +245,9 @@ public class EngineDiscoveryRequestResolver {
 
         List<Class<?>> testClassList = new ArrayList<>(testClassSet);
         testClassList.sort(Comparator.comparing(Class::getName));
+
+        // TODO sort by class Order annotation
+
         testClassSet = new LinkedHashSet<>(testClassList);
 
         return testClassSet;

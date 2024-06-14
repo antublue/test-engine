@@ -56,6 +56,7 @@ public class ThrowableCollector {
         try {
             executable.execute();
         } catch (Throwable t) {
+            t.printStackTrace();
             throwables.add(t);
         }
     }

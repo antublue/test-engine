@@ -22,11 +22,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.Named;
 import org.antublue.test.engine.internal.MetadataConstants;
-import org.antublue.test.engine.internal.Predicates;
 import org.antublue.test.engine.internal.annotation.ArgumentAnnotationUtils;
 import org.antublue.test.engine.internal.annotation.RandomAnnotationUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.OrdererUtil;
+import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
@@ -238,31 +239,33 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                         ArgumentTestDescriptor.class.getName(),
                         testArgumentIndex + "/" + testArgument.getName());
 
-        LOGGER.info("uniqueId [%s]", uniqueId);
+        LOGGER.trace("uniqueId [%s]", uniqueId);
 
         String displayName = testArgument.getName();
 
-        LOGGER.info("displayName [%s]", displayName);
+        LOGGER.trace("displayName [%s]", displayName);
 
         List<Method> beforeAllMethods =
                 ReflectionSupport.findMethods(
                         testClass, Predicates.BEFORE_ALL, HierarchyTraversalMode.TOP_DOWN);
 
-        if (!beforeAllMethods.isEmpty()) {
-            beforeAllMethods.forEach(method -> LOGGER.info("beforeAll method [%s]", method));
+        if (!beforeAllMethods.isEmpty() && LOGGER.isTraceEnabled()) {
+            beforeAllMethods.forEach(method -> LOGGER.trace("beforeAll method [%s]", method));
         }
 
-        beforeAllMethods = orderTestMethods(beforeAllMethods, HierarchyTraversalMode.TOP_DOWN);
+        beforeAllMethods =
+                OrdererUtil.orderTestMethods(beforeAllMethods, HierarchyTraversalMode.TOP_DOWN);
 
         List<Method> afterAllMethods =
                 ReflectionSupport.findMethods(
                         testClass, Predicates.AFTER_ALL, HierarchyTraversalMode.BOTTOM_UP);
 
-        if (!afterAllMethods.isEmpty()) {
-            afterAllMethods.forEach(method -> LOGGER.info("afterAll method [%s]", method));
+        if (!afterAllMethods.isEmpty() && LOGGER.isTraceEnabled()) {
+            afterAllMethods.forEach(method -> LOGGER.trace("afterAll method [%s]", method));
         }
 
-        afterAllMethods = orderTestMethods(afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
+        afterAllMethods =
+                OrdererUtil.orderTestMethods(afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
 
         return new ArgumentTestDescriptor(
                 uniqueId, displayName, testClass, testArgument, beforeAllMethods, afterAllMethods);

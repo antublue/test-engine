@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal;
+package org.antublue.test.engine.internal.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.internal.util.ReflectionUtils;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
@@ -54,7 +53,7 @@ public class Predicates {
                 return Modifier.isPublic(modifiers)
                         && Modifier.isStatic(modifiers)
                         // TODO check return type
-                        && (method.getParameterCount() == 0)
+                        && method.getParameterCount() == 0
                         && method.isAnnotationPresent(TestEngine.ArgumentSupplier.class);
             };
 
@@ -83,7 +82,7 @@ public class Predicates {
                 return !ReflectionUtils.isAbstract(method)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
-                        && (method.getParameterCount() == 0)
+                        && method.getParameterCount() == 0
                         && !method.isAnnotationPresent(TestEngine.Disabled.class)
                         && method.isAnnotationPresent(TestEngine.Prepare.class);
             };
@@ -95,7 +94,7 @@ public class Predicates {
                 return !ReflectionUtils.isAbstract(method)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
-                        && (method.getParameterCount() == 0)
+                        && method.getParameterCount() == 0
                         && !method.isAnnotationPresent(TestEngine.Disabled.class)
                         && method.isAnnotationPresent(TestEngine.BeforeAll.class);
             };
@@ -107,7 +106,7 @@ public class Predicates {
                 return !ReflectionUtils.isAbstract(method)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
-                        && (method.getParameterCount() == 0)
+                        && method.getParameterCount() == 0
                         && !method.isAnnotationPresent(TestEngine.Disabled.class)
                         && method.isAnnotationPresent(TestEngine.BeforeEach.class);
             };
@@ -119,7 +118,7 @@ public class Predicates {
                 return !ReflectionUtils.isAbstract(method)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
-                        && (method.getParameterCount() == 0)
+                        && method.getParameterCount() == 0
                         && !method.isAnnotationPresent(TestEngine.Disabled.class)
                         && method.isAnnotationPresent(TestEngine.Test.class);
             };
@@ -131,7 +130,7 @@ public class Predicates {
                 return !ReflectionUtils.isAbstract(method)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
-                        && (method.getParameterCount() == 0)
+                        && method.getParameterCount() == 0
                         && !method.isAnnotationPresent(TestEngine.Disabled.class)
                         && method.isAnnotationPresent(TestEngine.AfterEach.class);
             };
@@ -143,7 +142,7 @@ public class Predicates {
                 return !ReflectionUtils.isAbstract(method)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
-                        && (method.getParameterCount() == 0)
+                        && method.getParameterCount() == 0
                         && !method.isAnnotationPresent(TestEngine.Disabled.class)
                         && method.isAnnotationPresent(TestEngine.AfterAll.class);
             };
@@ -155,7 +154,7 @@ public class Predicates {
                 return !ReflectionUtils.isAbstract(method)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
-                        && (method.getParameterCount() == 0)
+                        && method.getParameterCount() == 0
                         && !method.isAnnotationPresent(TestEngine.Disabled.class)
                         && method.isAnnotationPresent(TestEngine.Conclude.class);
             };
