@@ -19,7 +19,7 @@ package example.tag;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /**
@@ -31,14 +31,14 @@ import org.antublue.test.engine.api.TestEngine;
 @TestEngine.Tag(tag = "/tag1/tag2/")
 public class TaggedClassTag1and2Test {
 
-    @TestEngine.Argument public Named<String> argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<String>> arguments() {
-        Collection<Named<String>> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(Named.ofString(String.valueOf(value)));
+            collection.add(Argument.ofString(String.valueOf(value)));
         }
         return collection.stream();
     }

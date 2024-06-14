@@ -19,10 +19,9 @@ package org.antublue.test.engine.testing.inheritance.parameterized;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.testing.Validation;
 
 /** Example test */
-public class SubclassTest extends BaseTest implements Validation {
+public class SubclassTest extends BaseTest {
 
     @TestEngine.Prepare
     public static void prepare2() {
@@ -69,10 +68,7 @@ public class SubclassTest extends BaseTest implements Validation {
     public static void conclude2() {
         System.out.println("conclude2()");
         ACTUAL.add("conclude2()");
-    }
 
-    @Override
-    public void validate() {
         assertThat(ACTUAL.size()).isEqualTo(EXPECTED.size());
 
         for (int i = 0; i < ACTUAL.size(); i++) {

@@ -17,17 +17,17 @@
 package example;
 
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
 public class MethodDisplayNameTest {
 
-    @TestEngine.Argument public Named<Integer> argument;
+    @TestEngine.Argument public Argument<Integer> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<Integer>> arguments() {
-        return Stream.of(Named.ofInt(1), Named.ofInt(2), Named.ofInt(3));
+    public static Stream<Argument<Integer>> arguments() {
+        return Stream.of(Argument.ofInt(1), Argument.ofInt(2), Argument.ofInt(3));
     }
 
     @TestEngine.BeforeAll

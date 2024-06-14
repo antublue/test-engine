@@ -44,7 +44,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 **Notes**
 
-- `public`, `protected`, and `private` methods are supported for `@TestEngine.X` annotations.
+- Only `public` methods are supported for `@TestEngine.X` annotations.
 
 - `@TestEngine.Order` can be used to control test class order / test method order of execution.
   - Classes/methods are sorted by the order annotation value first, then alphabetically by the class name/method name.
@@ -93,46 +93,9 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 `Named` is an interface all argument objects must implement to provide a name.
 
-There are standard argument implementations for common Java data types:
-
-- `NamedBigDecimal`
-- `NamedBigInteger`
-- `NamedBoolean`
-- `NamedByte`
-- `NamedChar`
-- `NamedInteger` 
-- `NamedShort`
-- `NamedChar`
-- `NamedDouble`
-- `NamedFloat`
-- `NamedInteger`
-- `NamedLong`
-- `NamedShort`
-- `NamedString`
-
-### `Context`
-
-A `Context` Object provide a common singleton instance to access shared resources between tests during runtime execution.
-
-It's primary use is to get either the global `Store`...
-
-```java
-public class Test {
-    
-    @TestEngine.Context static protected Context context;
-}
-```
-
-- [Context.java](/api/src/main/java/org/antublue/test/engine/api/Context.java)
-- [Store.java](/api/src/main/java/org/antublue/test/engine/api/Store.java)
-
 ## Code Examples
 
-Very simple example.
-
-- [SimpleTestExample.java](/examples/src/test/java/example/SimpleExampleTest.java)
-
-The `examples` project contains various testing examples and scenarios.
+The `examples` modueld contains various testing examples and scenarios.
 
 - [examples](/examples/src/test/java/example)
 
@@ -243,12 +206,12 @@ current directory `.antublue-test-engine.properties`
 | antublue.test.engine.console.log.timing            | boolean | true                             |
 | antublue.test.engine.console.log.timing.units      | string  | milliseconds                     |
 | antublue.test.engine.console.log.test.messages     | boolean | true                             |
-| antublue.test.engine.console.log.test.message      | string  | TEST                             |
+| antublue.test.engine.console.log.test.message      | string  | T                                |
 | antublue.test.engine.console.log.skip.messages     | boolean | true                             |
-| antublue.test.engine.console.log.skip.message      | string  | SKIP                             |
+| antublue.test.engine.console.log.skip.message      | string  | S                                |
 | antublue.test.engine.console.log.pass.messages     | boolean | true                             |
-| antublue.test.engine.console.log.pass.message      | string  | PASS                             |
-| antublue.test.engine.console.log.fail.message      | string  | FAIL                             |
+| antublue.test.engine.console.log.pass.message      | string  | P                                |
+| antublue.test.engine.console.log.fail.message      | string  | F                                |
 
 **Notes**
 
@@ -314,7 +277,9 @@ To allow parameterized testing at the test class level, targeting integration te
 
 ### Non-Goals
 
-The test engine is not meant to replace JUnit 5 for unit tests, but can be used.
+The test engine is not meant to replace JUnit 5 for unit tests.
+
+While it could be used, it's not recommend.
 
 ### Logical Flow (without extensions)
 

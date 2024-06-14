@@ -20,18 +20,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Test used for debugging IntelliJ */
 @TestEngine.Disabled
 public class DebugTestB {
 
-    @TestEngine.Argument public Named<String> argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<String>> arguments() {
-        return Stream.of(Named.ofString("a"), Named.ofString("b"), Named.ofString("c"));
+    public static Stream<Argument<String>> arguments() {
+        return Stream.of(Argument.ofString("a"), Argument.ofString("b"), Argument.ofString("c"));
     }
 
     @TestEngine.BeforeAll

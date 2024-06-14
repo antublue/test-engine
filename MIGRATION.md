@@ -217,11 +217,7 @@ public class Test {
 
 ### Arguments
 
-**The argument paradigm has changed.**
-
-The `Named` generic interface has been introduced as a replacement.
-
-`@TestEngine.Argument` annotated member variables are required to use `Named`.
+The `Named` generic interface allows for naming arguments. 
 
 Example:
 
@@ -254,7 +250,7 @@ Example:
 public class SimpleTest1 {
 
     @TestEngine.Argument
-    protected Named<String> argument;
+    protected String argument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<String> arguments() {
@@ -271,35 +267,14 @@ public class SimpleTest1 {
 
 ### Store
 
-`Store` has been moved into `Context`
+`Store` has been removed.
 
-To get the global `Store`...
+### Locking
 
-```java
-Store store = Context.getInstance().getStore();
-```
+`@TestEngine.ResourceLock`, `@TestEngine.Lock`, and `@TestEngine.Unlock` have been removed and replaced with a `Lock` class.
 
-To get a namespaced `Store`
+Why?
 
-```java
-Store store = Context.getInstance().getStore("some namespace")
-```
-
-### Extras
-
-The `Extras` project has been removed from the core test engine.
-
-While the `Extras` project was meant to contain "helper" `Named<X>` factories, etc., trying to support all of various end user scenarios is difficult.
-
-Example - "I want a JSON object":
-
-The end user most likely wants a specific library implementation of the JSON object...
-
-- Gson
-- Jackson
-- JsonPath
-- JSON.simple
-- org.json (Java JSON)
-- Json-B (JSON Binding API)
-
-... etc.
+- Code clarity
+- Code logic via annotation seems like an anti-pattern
+- `Lock` allows for more complex and robust scenarios

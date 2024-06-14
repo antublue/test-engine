@@ -27,8 +27,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.internal.configuration.Configuration;
+import org.antublue.test.engine.internal.configuration.Constants;
 
 /** Class to implement a Logger */
 @SuppressWarnings("PMD.EmptyCatchBlock")

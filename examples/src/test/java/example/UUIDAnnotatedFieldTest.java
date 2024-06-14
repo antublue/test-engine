@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
@@ -30,13 +30,13 @@ public class UUIDAnnotatedFieldTest {
 
     @TestEngine.Random.UUID public String uuid2;
 
-    @TestEngine.Argument public Named<String> argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<String>> arguments() {
-        Collection<Named<String>> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(Named.ofString("StringArgument " + i));
+            collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
     }

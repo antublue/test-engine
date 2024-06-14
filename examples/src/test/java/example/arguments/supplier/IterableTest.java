@@ -18,20 +18,20 @@ package example.arguments.supplier;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
 public class IterableTest {
 
-    @TestEngine.Argument public Named<Integer> argument;
+    @TestEngine.Argument public Argument<Integer> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Iterable<Named<Integer>> arguments() {
-        Collection<Named<Integer>> collection = new ArrayList<>();
-        collection.add(Named.ofInt(1));
-        collection.add(Named.ofInt(2));
-        collection.add(Named.ofInt(3));
+    public static Iterable<Argument<Integer>> arguments() {
+        Collection<Argument<Integer>> collection = new ArrayList<>();
+        collection.add(Argument.ofInt(1));
+        collection.add(Argument.ofInt(2));
+        collection.add(Argument.ofInt(3));
         return collection;
     }
 

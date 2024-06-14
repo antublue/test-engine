@@ -21,13 +21,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
 public class PlainObjectTest2 {
 
-    @TestEngine.Argument public Named<CustomArgument> argument;
+    @TestEngine.Argument public Argument<CustomArgument> argument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<CustomArgument> arguments() {

@@ -22,8 +22,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
-import org.antublue.test.engine.api.RandomGenerator;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.util.RandomUtils;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
@@ -47,7 +47,7 @@ public class RandomAnnotationUtils {
                         HierarchyTraversalMode.TOP_DOWN);
 
         for (Field field : fields) {
-            field.set(null, RandomGenerator.nextBoolean());
+            field.set(null, RandomUtils.randomBoolean());
         }
 
         fields =
@@ -62,7 +62,7 @@ public class RandomAnnotationUtils {
             TestEngine.Random.Byte annotation = field.getAnnotation(TestEngine.Random.Byte.class);
             byte minimum = annotation.minimum();
             byte maximum = annotation.maximum();
-            byte random = (byte) RandomGenerator.nextInteger(minimum, maximum);
+            byte random = (byte) RandomUtils.randomInt(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(null, String.valueOf(random));
             } else {
@@ -84,7 +84,7 @@ public class RandomAnnotationUtils {
                     field.getAnnotation(TestEngine.Random.Character.class);
             char minimum = annotation.minimum();
             char maximum = annotation.maximum();
-            char random = (char) RandomGenerator.nextInteger(minimum, maximum);
+            char random = (char) RandomUtils.randomInt(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(null, String.valueOf(random));
             } else {
@@ -104,7 +104,7 @@ public class RandomAnnotationUtils {
             TestEngine.Random.Short annotation = field.getAnnotation(TestEngine.Random.Short.class);
             short minimum = annotation.minimum();
             short maximum = annotation.maximum();
-            short random = (short) RandomGenerator.nextInteger(minimum, maximum);
+            short random = (short) RandomUtils.randomInt(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(null, String.valueOf(random));
             } else {
@@ -126,7 +126,7 @@ public class RandomAnnotationUtils {
                     field.getAnnotation(TestEngine.Random.Integer.class);
             int minimum = annotation.minimum();
             int maximum = annotation.maximum();
-            int random = RandomGenerator.nextInteger(minimum, maximum);
+            int random = RandomUtils.randomInt(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(null, String.valueOf(random));
             } else {
@@ -146,7 +146,7 @@ public class RandomAnnotationUtils {
             TestEngine.Random.Long annotation = field.getAnnotation(TestEngine.Random.Long.class);
             long minimum = annotation.minimum();
             long maximum = annotation.maximum();
-            long random = RandomGenerator.nextLong(minimum, maximum);
+            long random = RandomUtils.randomLong(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(null, String.valueOf(random));
             } else {
@@ -166,7 +166,7 @@ public class RandomAnnotationUtils {
             TestEngine.Random.Float annotation = field.getAnnotation(TestEngine.Random.Float.class);
             float minimum = annotation.minimum();
             float maximum = annotation.maximum();
-            float random = RandomGenerator.nextFloat(minimum, maximum);
+            float random = RandomUtils.randomFloat(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(null, String.valueOf(random));
             } else {
@@ -188,7 +188,7 @@ public class RandomAnnotationUtils {
                     field.getAnnotation(TestEngine.Random.Double.class);
             double minimum = annotation.minimum();
             double maximum = annotation.maximum();
-            double random = RandomGenerator.nextDouble(minimum, maximum);
+            double random = RandomUtils.randomDouble(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(null, String.valueOf(random));
             } else {
@@ -210,7 +210,7 @@ public class RandomAnnotationUtils {
                     field.getAnnotation(TestEngine.Random.BigInteger.class);
             String minimum = annotation.minimum();
             String maximum = annotation.maximum();
-            BigInteger random = RandomGenerator.nextBigInteger(minimum, maximum);
+            BigInteger random = RandomUtils.randomBigInteger(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(null, String.valueOf(random));
             } else {
@@ -232,7 +232,7 @@ public class RandomAnnotationUtils {
                     field.getAnnotation(TestEngine.Random.BigDecimal.class);
             String minimum = annotation.minimum();
             String maximum = annotation.maximum();
-            BigDecimal random = RandomGenerator.nextBigDecimal(minimum, maximum);
+            BigDecimal random = RandomUtils.randomBigDecimal(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(null, String.valueOf(random));
             } else {
@@ -440,7 +440,7 @@ public class RandomAnnotationUtils {
                         HierarchyTraversalMode.TOP_DOWN);
 
         for (Field field : fields) {
-            boolean random = RandomGenerator.nextBoolean();
+            boolean random = RandomUtils.randomBoolean();
             if (field.getType().equals(String.class)) {
                 field.set(testInstance, String.valueOf(random));
             } else {
@@ -460,7 +460,7 @@ public class RandomAnnotationUtils {
             TestEngine.Random.Byte annotation = field.getAnnotation(TestEngine.Random.Byte.class);
             byte minimum = annotation.minimum();
             byte maximum = annotation.maximum();
-            byte random = (byte) RandomGenerator.nextInteger(minimum, maximum);
+            byte random = (byte) RandomUtils.randomInt(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(testInstance, String.valueOf(random));
             } else {
@@ -482,7 +482,7 @@ public class RandomAnnotationUtils {
                     field.getAnnotation(TestEngine.Random.Character.class);
             char minimum = annotation.minimum();
             char maximum = annotation.maximum();
-            char random = (char) RandomGenerator.nextInteger(minimum, maximum);
+            char random = (char) RandomUtils.randomInt(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(testInstance, String.valueOf(random));
             } else {
@@ -502,7 +502,7 @@ public class RandomAnnotationUtils {
             TestEngine.Random.Short annotation = field.getAnnotation(TestEngine.Random.Short.class);
             short minimum = annotation.minimum();
             short maximum = annotation.maximum();
-            short random = (short) RandomGenerator.nextInteger(minimum, maximum);
+            short random = (short) RandomUtils.randomInt(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(testInstance, String.valueOf(random));
             } else {
@@ -524,7 +524,7 @@ public class RandomAnnotationUtils {
                     field.getAnnotation(TestEngine.Random.Integer.class);
             int minimum = annotation.minimum();
             int maximum = annotation.maximum();
-            int random = RandomGenerator.nextInteger(minimum, maximum);
+            int random = RandomUtils.randomInt(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(testInstance, String.valueOf(random));
             } else {
@@ -544,7 +544,7 @@ public class RandomAnnotationUtils {
             TestEngine.Random.Long annotation = field.getAnnotation(TestEngine.Random.Long.class);
             long minimum = annotation.minimum();
             long maximum = annotation.maximum();
-            long random = RandomGenerator.nextLong(minimum, maximum);
+            long random = RandomUtils.randomLong(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(testInstance, String.valueOf(random));
             } else {
@@ -564,7 +564,7 @@ public class RandomAnnotationUtils {
             TestEngine.Random.Float annotation = field.getAnnotation(TestEngine.Random.Float.class);
             float minimum = annotation.minimum();
             float maximum = annotation.maximum();
-            float random = RandomGenerator.nextFloat(minimum, maximum);
+            float random = RandomUtils.randomFloat(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(testInstance, String.valueOf(random));
             } else {
@@ -586,7 +586,7 @@ public class RandomAnnotationUtils {
                     field.getAnnotation(TestEngine.Random.Double.class);
             double minimum = annotation.minimum();
             double maximum = annotation.maximum();
-            double random = RandomGenerator.nextDouble(minimum, maximum);
+            double random = RandomUtils.randomDouble(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(testInstance, String.valueOf(random));
             } else {
@@ -608,7 +608,7 @@ public class RandomAnnotationUtils {
                     field.getAnnotation(TestEngine.Random.BigInteger.class);
             String minimum = annotation.minimum();
             String maximum = annotation.maximum();
-            BigInteger random = RandomGenerator.nextBigInteger(minimum, maximum);
+            BigInteger random = RandomUtils.randomBigInteger(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(testInstance, String.valueOf(random));
             } else {
@@ -630,7 +630,7 @@ public class RandomAnnotationUtils {
                     field.getAnnotation(TestEngine.Random.BigDecimal.class);
             String minimum = annotation.minimum();
             String maximum = annotation.maximum();
-            BigDecimal random = RandomGenerator.nextBigDecimal(minimum, maximum);
+            BigDecimal random = RandomUtils.randomBigDecimal(minimum, maximum);
             if (field.getType().equals(String.class)) {
                 field.set(testInstance, String.valueOf(random));
             } else {

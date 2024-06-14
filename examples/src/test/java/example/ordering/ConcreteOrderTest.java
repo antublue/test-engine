@@ -21,20 +21,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.testing.Validation;
 
 /** Example test */
 @TestEngine.Order(order = 3)
-public class ConcreteOrderTest extends BaseOrderTest implements Validation {
+public class ConcreteOrderTest extends BaseOrderTest {
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<String>> arguments() {
-        Collection<Named<String>> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 1; i++) {
             int value = i * 3;
-            collection.add(Named.ofString(String.valueOf(value)));
+            collection.add(Argument.ofString(String.valueOf(value)));
         }
         return collection.stream();
     }
@@ -81,10 +80,6 @@ public class ConcreteOrderTest extends BaseOrderTest implements Validation {
     public static void conclude2() {
         System.out.println("ConcreteOrderTest.conclude2()");
         ACTUAL.add("ConcreteOrderTest.conclude2()");
-    }
-
-    @Override
-    public void validate() {
         assertThat(ACTUAL).isEqualTo(EXPECTED);
     }
 }

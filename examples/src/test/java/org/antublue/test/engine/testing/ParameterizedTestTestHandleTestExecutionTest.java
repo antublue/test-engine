@@ -20,23 +20,23 @@ import static java.lang.String.format;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 @TestEngine.Disabled
 public class ParameterizedTestTestHandleTestExecutionTest {
 
     @TestEngine.ArgumentSupplier
-    public static List<Named<String>> arguments() {
-        List<Named<String>> list = new ArrayList<>();
+    public static List<Argument<String>> arguments() {
+        List<Argument<String>> list = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            list.add(Named.ofString("StringArgument " + i));
+            list.add(Argument.ofString("StringArgument " + i));
         }
         return list;
     }
 
     @TestEngine.Test
-    public void test1(Named<String> argument) {
+    public void test1(Argument<String> argument) {
         if (argument.getName().contains("0")) {
             throw new RuntimeException("Forced exception");
         }
@@ -44,7 +44,7 @@ public class ParameterizedTestTestHandleTestExecutionTest {
     }
 
     @TestEngine.Test
-    public void test2(Named<String> argument) {
+    public void test2(Argument<String> argument) {
         if (argument.getName().contains("1")) {
             throw new RuntimeException("Forced exception");
         }

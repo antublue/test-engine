@@ -28,7 +28,7 @@ import com.mongodb.client.MongoDatabase;
 import java.io.Closeable;
 import java.util.Random;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.bson.Document;
 import org.testcontainers.containers.MongoDBContainer;
@@ -130,7 +130,7 @@ public class MongoDBTest {
     }
 
     /** Class to implement a TestContext */
-    public static class MongoDBTestEnvironment implements Named<MongoDBContainer>, Closeable {
+    public static class MongoDBTestEnvironment implements Argument<MongoDBContainer>, Closeable {
 
         private final String dockerImageName;
         private MongoDBContainer mongoDBContainer;

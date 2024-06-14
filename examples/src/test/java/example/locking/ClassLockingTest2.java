@@ -21,9 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Lock;
-import org.antublue.test.engine.api.Named;
-import org.antublue.test.engine.api.Namespace;
+import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Locks;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
@@ -32,22 +31,22 @@ public class ClassLockingTest2 {
     private static final String NAMESPACE = "ClassLockingTest";
     private static final String LOCK_NAME = "Lock";
 
-    @TestEngine.Argument public Named<String> argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.Random.Integer public Integer randomInteger;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<String>> arguments() {
-        Collection<Named<String>> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(Named.ofString("StringArgument " + i));
+            collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
     }
 
     @TestEngine.Prepare
     public void prepare() {
-        Lock.get(Namespace.of(NAMESPACE, LOCK_NAME)).lock();
+        Locks.get(NAMESPACE + "/" + LOCK_NAME).lock();
         System.out.println("prepare()");
     }
 
@@ -96,6 +95,6 @@ public class ClassLockingTest2 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        Lock.get(Namespace.of(NAMESPACE, LOCK_NAME)).lock();
+        Locks.get(NAMESPACE + "/" + LOCK_NAME).unlock();
     }
 }

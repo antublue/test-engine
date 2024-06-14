@@ -18,7 +18,7 @@ package example.ordering;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 public abstract class BaseOrderTest {
@@ -36,7 +36,7 @@ public abstract class BaseOrderTest {
 
     protected static final List<String> ACTUAL = new ArrayList<>();
 
-    @TestEngine.Argument public Named<String> argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 1)

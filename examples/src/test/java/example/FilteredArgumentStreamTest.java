@@ -22,16 +22,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
 public class FilteredArgumentStreamTest {
 
-    @TestEngine.Argument public Named<String> argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<String>> arguments() {
+    public static Stream<Argument<String>> arguments() {
         return ArgumentSupplier.arguments(argument -> !argument.getPayload().contains("b"));
     }
 
@@ -65,15 +65,15 @@ public class FilteredArgumentStreamTest {
             // DO NOTHING
         }
 
-        public static Stream<Named<String>> arguments() {
-            Collection<Named<String>> arguments = new ArrayList<>();
+        public static Stream<Argument<String>> arguments() {
+            Collection<Argument<String>> arguments = new ArrayList<>();
             for (String value : VALUES) {
-                arguments.add(Named.ofString(value));
+                arguments.add(Argument.ofString(value));
             }
             return arguments.stream();
         }
 
-        public static Stream<Named<String>> arguments(Predicate<Named<String>> predicate) {
+        public static Stream<Argument<String>> arguments(Predicate<Argument<String>> predicate) {
             return predicate != null ? arguments().filter(predicate) : arguments();
         }
     }

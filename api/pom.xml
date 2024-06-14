@@ -297,11 +297,6 @@
                             <style>AOSP</style>
                             <reflowLongStrings>true</reflowLongStrings>
                         </googleJavaFormat>
-                        <excludes>
-                            <!-- List files or directories to exclude -->
-                            <exclude>**/Named.java</exclude>
-                            <exclude>**/Namespace.java</exclude>
-                        </excludes>
                     </java>
                 </configuration>
                 <executions>

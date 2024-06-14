@@ -16,23 +16,22 @@
 
 package example.arguments.named;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class NamedBigDecimalTest {
+public class ArgumentIntegerTest {
 
-    @TestEngine.Argument public Named<BigDecimal> argument;
+    @TestEngine.Argument public Argument<Integer> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<BigDecimal>> arguments() {
-        Collection<Named<BigDecimal>> collection = new ArrayList<>();
+    public static Stream<Argument<Integer>> arguments() {
+        Collection<Argument<Integer>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(Named.ofBigDecimal(new BigDecimal(i + ".0")));
+            collection.add(Argument.ofInt(i));
         }
         return collection.stream();
     }
@@ -44,12 +43,12 @@ public class NamedBigDecimalTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument.getPayload() + ")");
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + argument.getPayload() + ")");
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterAll

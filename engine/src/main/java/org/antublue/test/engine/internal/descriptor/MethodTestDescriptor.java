@@ -22,8 +22,8 @@ import java.util.Optional;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.DisplayNameUtil;
-import org.antublue.test.engine.internal.util.OrdererUtil;
+import org.antublue.test.engine.internal.util.DisplayNameUtils;
+import org.antublue.test.engine.internal.util.OrdererUtils;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
@@ -91,7 +91,12 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         setTestInstance(testInstance);
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
+        getMetadata()
+                .put(
+                        MetadataConstants.TEST_CLASS_DISPLAY_NAME,
+                        DisplayNameUtils.getDisplayName(testClass));
         getMetadata().put(MetadataConstants.TEST_METHOD, testMethod);
+        getMetadata().put(MetadataConstants.TEST_METHOD_DISPLAY_NAME, getDisplayName());
 
         ThrowableCollector throwableCollector = getThrowableCollector();
 
@@ -187,21 +192,21 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         UniqueId uniqueId =
                 parentUniqueId.append(MethodTestDescriptor.class.getName(), testMethod.getName());
 
-        String displayName = DisplayNameUtil.getDisplayName(testMethod);
+        String displayName = DisplayNameUtils.getDisplayName(testMethod);
 
         List<Method> beforeEachMethods =
                 ReflectionSupport.findMethods(
                         testClass, Predicates.BEFORE_EACH_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
         beforeEachMethods =
-                OrdererUtil.orderTestMethods(beforeEachMethods, HierarchyTraversalMode.TOP_DOWN);
+                OrdererUtils.orderTestMethods(beforeEachMethods, HierarchyTraversalMode.TOP_DOWN);
 
         List<Method> afterEachMethods =
                 ReflectionSupport.findMethods(
                         testClass, Predicates.AFTER_EACH_METHOD, HierarchyTraversalMode.BOTTOM_UP);
 
         afterEachMethods =
-                OrdererUtil.orderTestMethods(afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
+                OrdererUtils.orderTestMethods(afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
 
         return new MethodTestDescriptor(
                 uniqueId, displayName, testClass, beforeEachMethods, testMethod, afterEachMethods);

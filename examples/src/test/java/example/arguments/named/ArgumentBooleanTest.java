@@ -16,23 +16,22 @@
 
 package example.arguments.named;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class NamedBigIntegerTest {
+public class ArgumentBooleanTest {
 
-    @TestEngine.Argument public Named<BigInteger> argument;
+    @TestEngine.Argument public Argument<Boolean> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<BigInteger>> arguments() {
-        Collection<Named<BigInteger>> collection = new ArrayList<>();
+    public static Stream<Argument<Boolean>> arguments() {
+        Collection<Argument<Boolean>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(Named.ofBigInteger(new BigInteger(String.valueOf(i))));
+            collection.add(Argument.ofBoolean((i % 2) == 0));
         }
         return collection.stream();
     }

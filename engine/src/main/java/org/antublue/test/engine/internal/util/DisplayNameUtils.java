@@ -19,9 +19,9 @@ package org.antublue.test.engine.internal.util;
 import java.lang.reflect.Method;
 import org.antublue.test.engine.api.TestEngine;
 
-public class DisplayNameUtil {
+public class DisplayNameUtils {
 
-    private DisplayNameUtil() {
+    private DisplayNameUtils() {
         // DO NOTHING
     }
 

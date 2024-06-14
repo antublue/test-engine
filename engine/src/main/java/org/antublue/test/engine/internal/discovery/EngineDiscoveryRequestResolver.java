@@ -33,16 +33,16 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import org.antublue.test.engine.Constants;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.internal.configuration.Configuration;
+import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.OrdererUtil;
+import org.antublue.test.engine.internal.util.OrdererUtils;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -106,8 +106,8 @@ public class EngineDiscoveryRequestResolver {
         parentTestDescriptor.addChild(classTestDescriptor);
 
         int testArgumentIndex = 0;
-        List<Named<?>> testArguments = getArguments(testClass);
-        for (Named<?> testArgument : testArguments) {
+        List<Argument<?>> testArguments = getArguments(testClass);
+        for (Argument<?> testArgument : testArguments) {
             buildArgumentTestDescriptor(
                     testClass, testArgument, testArgumentIndex, classTestDescriptor);
             testArgumentIndex++;
@@ -116,7 +116,7 @@ public class EngineDiscoveryRequestResolver {
 
     private static void buildArgumentTestDescriptor(
             Class<?> testClass,
-            Named<?> testArgument,
+            Argument<?> testArgument,
             int testArgumentIndex,
             TestDescriptor parentTestDescriptor) {
         LOGGER.trace(
@@ -142,7 +142,7 @@ public class EngineDiscoveryRequestResolver {
                 ReflectionSupport.findMethods(
                         testClass, Predicates.TEST_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
-        testMethods = OrdererUtil.orderTestMethods(testMethods, HierarchyTraversalMode.TOP_DOWN);
+        testMethods = OrdererUtils.orderTestMethods(testMethods, HierarchyTraversalMode.TOP_DOWN);
 
         for (Method testMethod : testMethods) {
             MethodTestDescriptor methodTestDescriptor =
@@ -263,8 +263,8 @@ public class EngineDiscoveryRequestResolver {
         return methods.get(0);
     }
 
-    private static List<Named<?>> getArguments(Class<?> testClass) throws Throwable {
-        List<Named<?>> testArguments = new ArrayList<>();
+    private static List<Argument<?>> getArguments(Class<?> testClass) throws Throwable {
+        List<Argument<?>> testArguments = new ArrayList<>();
 
         Object object = getArumentSupplierMethod(testClass).invoke(null, (Object[]) null);
         if (!(object instanceof Stream || object instanceof Iterable)) {
@@ -284,10 +284,10 @@ public class EngineDiscoveryRequestResolver {
         long index = 0;
         while (iterator.hasNext()) {
             Object o = iterator.next();
-            if (o instanceof Named<?>) {
-                testArguments.add((Named<?>) o);
+            if (o instanceof Argument<?>) {
+                testArguments.add((Argument<?>) o);
             } else {
-                testArguments.add(Named.of("[" + index + "]", o));
+                testArguments.add(Argument.of("[" + index + "]", o));
             }
             index++;
         }

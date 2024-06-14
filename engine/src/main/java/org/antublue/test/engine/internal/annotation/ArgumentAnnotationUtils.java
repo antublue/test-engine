@@ -22,7 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -48,7 +48,7 @@ public class ArgumentAnnotationUtils {
      * @param testArgument testArgument
      * @throw Throwable
      */
-    public static void injectArgumentFields(Object testInstance, Named<?> testArgument)
+    public static void injectArgumentFields(Object testInstance, Argument<?> testArgument)
             throws Throwable {
         LOGGER.trace(
                 "injectArgumentFields() testClass [%s] testInstance [%s], testArgument [%s]",

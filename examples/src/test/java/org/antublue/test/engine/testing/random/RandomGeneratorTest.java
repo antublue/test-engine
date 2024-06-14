@@ -22,22 +22,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
-import org.antublue.test.engine.api.RandomGenerator;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.util.RandomUtils;
 
 public abstract class RandomGeneratorTest {
 
     public static final int ITERATIONS = 1000000;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<String>> arguments() {
-        return Stream.of(Named.ofString("----"));
+    public static Stream<Argument<String>> arguments() {
+        return Stream.of(Argument.ofString("----"));
     }
 
     protected void testInteger(int minimum, int maximum) {
         System.out.format("testInteger() minimum %s maximum %s", minimum, maximum).println();
-        int random = RandomGenerator.nextInteger(minimum, maximum);
+        int random = RandomUtils.randomInt(minimum, maximum);
         System.out.println(
                 format(
                         "testInteger() minimum %s maximum %s -> random %s",
@@ -53,7 +53,7 @@ public abstract class RandomGeneratorTest {
         for (int i = 0; i < interations; i++) {
             int random;
             do {
-                random = RandomGenerator.nextInteger(minimum, maximum);
+                random = RandomUtils.randomInt(minimum, maximum);
             } while (random != until);
             assertThat(random).isEqualTo(until);
         }
@@ -61,7 +61,7 @@ public abstract class RandomGeneratorTest {
 
     protected void testLong(long minimum, long maximum) {
         System.out.format("testLong() minimum %s maximum %s", minimum, maximum).println();
-        long random = RandomGenerator.nextLong(minimum, maximum);
+        long random = RandomUtils.randomLong(minimum, maximum);
         System.out.println(
                 format("testLong() minimum %s maximum %s -> random %s", minimum, maximum, random));
         assertThat(random).isBetween(minimum, maximum);
@@ -76,7 +76,7 @@ public abstract class RandomGeneratorTest {
         for (int i = 0; i < iterations; i++) {
             long random;
             do {
-                random = RandomGenerator.nextLong(minimum, maximum);
+                random = RandomUtils.randomLong(minimum, maximum);
             } while (random != until);
             assertThat(random).isEqualTo(until);
         }
@@ -84,7 +84,7 @@ public abstract class RandomGeneratorTest {
 
     protected void testFloat(float minimum, float maximum) {
         System.out.format("testFloat() minimum %s maximum %s", minimum, maximum).println();
-        float random = RandomGenerator.nextFloat(minimum, maximum);
+        float random = RandomUtils.randomFloat(minimum, maximum);
         System.out.println(
                 format("testFloat() minimum %s maximum %s -> random %s", minimum, maximum, random));
         assertThat(random).isBetween(minimum, maximum);
@@ -98,7 +98,7 @@ public abstract class RandomGeneratorTest {
         for (int i = 0; i < iterations; i++) {
             float random;
             do {
-                random = RandomGenerator.nextFloat(minimum, maximum);
+                random = RandomUtils.randomFloat(minimum, maximum);
             } while (random != until);
             assertThat(random).isEqualTo(until);
         }
@@ -106,7 +106,7 @@ public abstract class RandomGeneratorTest {
 
     protected void testDouble(double minimum, double maximum) {
         System.out.format("testDouble() minimum %s maximum %s", minimum, maximum).println();
-        double random = RandomGenerator.nextDouble(minimum, maximum);
+        double random = RandomUtils.randomDouble(minimum, maximum);
         System.out.println(
                 format(
                         "testDouble() minimum %s maximum %s -> random %s",
@@ -122,7 +122,7 @@ public abstract class RandomGeneratorTest {
         for (int i = 0; i < iterations; i++) {
             double random;
             do {
-                random = RandomGenerator.nextDouble(minimum, maximum);
+                random = RandomUtils.randomDouble(minimum, maximum);
             } while (random != until);
             assertThat(random).isEqualTo(until);
         }
@@ -130,7 +130,7 @@ public abstract class RandomGeneratorTest {
 
     protected void testBigInteger(String minimum, String maximum) {
         System.out.format("testBigInteger() minimum %s maximum %s", minimum, maximum).println();
-        BigInteger random = RandomGenerator.nextBigInteger(minimum, maximum);
+        BigInteger random = RandomUtils.randomBigInteger(minimum, maximum);
         System.out.println(
                 format(
                         "testBigInteger() minimum %s maximum %s -> random %s",
@@ -148,7 +148,7 @@ public abstract class RandomGeneratorTest {
         for (int i = 0; i < iterations; i++) {
             BigInteger random;
             do {
-                random = RandomGenerator.nextBigInteger(minimum, maximum);
+                random = RandomUtils.randomBigInteger(minimum, maximum);
             } while (untilBigInteger.compareTo(random) != 0);
             assertThat(random.toString()).isEqualTo(untilBigInteger.toString());
         }
@@ -156,7 +156,7 @@ public abstract class RandomGeneratorTest {
 
     protected void testBigDecimal(String minimum, String maximum) {
         System.out.format("testBigDecimal() minimum %s maximum %s", minimum, maximum).println();
-        BigDecimal random = RandomGenerator.nextBigDecimal(minimum, maximum);
+        BigDecimal random = RandomUtils.randomBigDecimal(minimum, maximum);
         System.out.println(
                 format(
                         "testBigDecimal() minimum %s maximum %s -> random %s",
@@ -174,7 +174,7 @@ public abstract class RandomGeneratorTest {
         for (int i = 0; i < iterations; i++) {
             BigDecimal random;
             do {
-                random = RandomGenerator.nextBigDecimal(minimum, maximum);
+                random = RandomUtils.randomBigDecimal(minimum, maximum);
             } while (untilBigDecimal.compareTo(random) != 0);
             assertThat(random.toPlainString()).isEqualTo(untilBigDecimal.toPlainString());
         }

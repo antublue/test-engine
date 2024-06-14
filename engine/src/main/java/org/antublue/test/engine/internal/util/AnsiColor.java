@@ -21,7 +21,7 @@ public class AnsiColor {
 
     /*
      * Configuration constants must be in sync with values in
-     * org.antublue.test.engine.Constants
+     * org.antublue.test.engine.internal.configuration.Constants
      *
      * They are declared here to prevent a cyclic dependency
      * on the engine project

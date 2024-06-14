@@ -19,17 +19,17 @@ package org.antublue.test.engine.testing;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
 @TestEngine.Disabled
 public class DuplicateOrderTest {
 
-    public static Stream<Named<String>> arguments() {
-        Collection<Named<String>> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(Named.ofString("StringArgument " + i));
+            collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
     }
@@ -47,32 +47,32 @@ public class DuplicateOrderTest {
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(Named<String> argument) {
+    public void beforeAll(Argument<String> argument) {
         System.out.println("beforeAll(" + argument + ")");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach(Named<String> argument) {
+    public void beforeEach(Argument<String> argument) {
         System.out.println("beforeEach(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void test1(Named<String> argument) {
+    public void test1(Argument<String> argument) {
         System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void test2(Named<String> argument) {
+    public void test2(Argument<String> argument) {
         System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach(Named<String> argument) {
+    public void afterEach(Argument<String> argument) {
         System.out.println("afterEach(" + argument + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(Named<String> argument) {
+    public void afterAll(Argument<String> argument) {
         System.out.println("afterAll(" + argument + ")");
     }
 

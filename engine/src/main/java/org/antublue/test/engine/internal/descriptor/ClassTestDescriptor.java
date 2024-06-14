@@ -23,8 +23,8 @@ import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.annotation.RandomAnnotationUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.DisplayNameUtil;
-import org.antublue.test.engine.internal.util.OrdererUtil;
+import org.antublue.test.engine.internal.util.DisplayNameUtils;
+import org.antublue.test.engine.internal.util.OrdererUtils;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
@@ -83,6 +83,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         getStopWatch().reset();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
+        getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
 
         setExecutionRequest(executionRequest);
 
@@ -218,7 +219,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         LOGGER.trace("uniqueId [%s]", uniqueId);
 
-        String displayName = DisplayNameUtil.getDisplayName(testClass);
+        String displayName = DisplayNameUtils.getDisplayName(testClass);
 
         LOGGER.trace("displayName [%s]", displayName);
 
@@ -227,7 +228,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                         testClass, Predicates.PREPARE_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
         prepareMethods =
-                OrdererUtil.orderTestMethods(prepareMethods, HierarchyTraversalMode.TOP_DOWN);
+                OrdererUtils.orderTestMethods(prepareMethods, HierarchyTraversalMode.TOP_DOWN);
 
         if (!prepareMethods.isEmpty() && LOGGER.isTraceEnabled()) {
             prepareMethods.forEach(method -> LOGGER.trace("prepare method [%s]", method));
@@ -238,7 +239,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                         testClass, Predicates.CONCLUDE_METHOD, HierarchyTraversalMode.BOTTOM_UP);
 
         concludeMethods =
-                OrdererUtil.orderTestMethods(concludeMethods, HierarchyTraversalMode.TOP_DOWN);
+                OrdererUtils.orderTestMethods(concludeMethods, HierarchyTraversalMode.TOP_DOWN);
 
         if (!concludeMethods.isEmpty() && LOGGER.isTraceEnabled()) {
             concludeMethods.forEach(method -> LOGGER.trace("conclude method [%s]", method));

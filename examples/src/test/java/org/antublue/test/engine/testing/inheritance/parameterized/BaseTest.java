@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 // @TestEngine.BaseClass
@@ -58,13 +58,13 @@ public abstract class BaseTest {
         EXPECTED.add("b/conclude()");
     }
 
-    @TestEngine.Argument public Named<Integer> argument;
+    @TestEngine.Argument public Argument<Integer> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<Integer>> arguments() {
-        Collection<Named<Integer>> collection = new ArrayList<>();
+    public static Stream<Argument<Integer>> arguments() {
+        Collection<Argument<Integer>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(Named.ofInt(i));
+            collection.add(Argument.ofInt(i));
         }
         return collection.stream();
     }

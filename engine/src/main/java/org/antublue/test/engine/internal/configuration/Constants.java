@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine;
+package org.antublue.test.engine.internal.configuration;
 
 /** Class that contains Test Engine configuration constants */
 public final class Constants {
@@ -27,13 +27,6 @@ public final class Constants {
 
     /** Configuration constant */
     public static final String THREAD_COUNT = PREFIX + ".thread.count";
-
-    /** Configuration constant */
-    public static final String THREAD_THROTTLE_MILLISECONDS =
-            PREFIX + ".thread.throttle.milliseconds";
-
-    /** Configuration constant */
-    public static final String EXTENSIONS = PREFIX + ".extensions";
 
     /** Configuration constant */
     public static final String STACK_TRACE_PRUNE = PREFIX + ".stack.trace.pruning";
@@ -76,9 +69,6 @@ public final class Constants {
 
     /** Configuration constant */
     public static final String TEST_CLASS_SHUFFLE = PREFIX + ".test.class.shuffle";
-
-    /** Configuration constant */
-    public static final String TEST_CLASS_NAME_FORMAT = PREFIX + ".test.class.name.format";
 
     /** Configuration constant */
     public static final String TEST_CLASS_INCLUDE_REGEX = PREFIX + ".test.class.include.regex";

@@ -18,20 +18,20 @@ package example.arguments.supplier;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
 public class ListTest {
 
-    @TestEngine.Argument public Named<Integer> argument;
+    @TestEngine.Argument public Argument<Integer> argument;
 
     @TestEngine.ArgumentSupplier
-    public static List<Named<Integer>> arguments() {
-        List<Named<Integer>> list = new ArrayList<>();
-        list.add(Named.ofInt(1));
-        list.add(Named.ofInt(2));
-        list.add(Named.ofInt(3));
+    public static List<Argument<Integer>> arguments() {
+        List<Argument<Integer>> list = new ArrayList<>();
+        list.add(Argument.ofInt(1));
+        list.add(Argument.ofInt(2));
+        list.add(Argument.ofInt(3));
         return list;
     }
 

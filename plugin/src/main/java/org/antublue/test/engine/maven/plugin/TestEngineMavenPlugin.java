@@ -28,9 +28,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.antublue.test.engine.Constants;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.internal.configuration.ConfigurationParameters;
+import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;
 import org.antublue.test.engine.maven.plugin.listener.StatusEngineExecutionListener;
@@ -65,10 +65,6 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     private static final String ARTIFACT_ID = "test-engine-maven-plugin";
 
     private static final String VERSION = Information.getInstance().getVersion();
-
-    static {
-        ContextImpl.getInstance();
-    }
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;

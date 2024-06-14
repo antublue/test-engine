@@ -17,11 +17,11 @@
 package example.inheritance;
 
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 
 public abstract class OddBaseTest extends BaseTest {
 
-    public static Stream<Named<Integer>> arguments() {
+    public static Stream<Argument<Integer>> arguments() {
         return BaseTest.arguments()
                 .filter(
                         argument -> {

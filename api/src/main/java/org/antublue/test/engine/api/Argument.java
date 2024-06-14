@@ -1,23 +1,24 @@
 /*
- * Copyright 2015-2024 the original author or authors.
+ * Copyright (C) 2015-2024 The AntuBLUE test-engine project authors
  *
- * All rights reserved. This program and the accompanying materials are
- * made available under the terms of the Eclipse Public License v2.0 which
- * accompanies this distribution and is available at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * https://www.eclipse.org/legal/epl-v20.html
- */
-
-/*
- * Copied from JUnit5 project for test engine API import consistency
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.antublue.test.engine.api;
 
-import org.junit.platform.commons.util.Preconditions;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import org.junit.platform.commons.util.Preconditions;
 
 /**
  * {@code Named} is a container that associates a name with a given payload.
@@ -25,41 +26,41 @@ import java.math.BigInteger;
  * @param <T> the type of the payload
  * @since 5.8
  */
-public interface Named<T> {
+public interface Argument<T> {
 
-    static Named<Boolean> ofBoolean(boolean value) {
+    static Argument<Boolean> ofBoolean(boolean value) {
         return of(String.valueOf(value), value);
     }
 
-    static Named<Byte> ofByte(byte value) {
+    static Argument<Byte> ofByte(byte value) {
         return of(String.valueOf(value), value);
     }
 
-    static Named<Character> ofChar(char value) {
+    static Argument<Character> ofChar(char value) {
         return of(String.valueOf(value), value);
     }
 
-    static Named<Short> ofShort(short value) {
+    static Argument<Short> ofShort(short value) {
         return of(String.valueOf(value), value);
     }
 
-    static Named<Integer> ofInt(int value) {
+    static Argument<Integer> ofInt(int value) {
         return of(String.valueOf(value), value);
     }
 
-    static Named<Long> ofLong(long value) {
+    static Argument<Long> ofLong(long value) {
         return of(String.valueOf(value), value);
     }
 
-    static Named<Float> ofFloat(float value) {
+    static Argument<Float> ofFloat(float value) {
         return of(String.valueOf(value), value);
     }
 
-    static Named<Double> ofDouble(double value) {
+    static Argument<Double> ofDouble(double value) {
         return of(String.valueOf(value), value);
     }
 
-    static Named<String> ofString(String value) {
+    static Argument<String> ofString(String value) {
         if (value == null) {
             return of("String=/null/", value);
         } else if (value.isEmpty()) {
@@ -69,7 +70,7 @@ public interface Named<T> {
         }
     }
 
-    static Named<BigInteger> ofBigInteger(BigInteger value) {
+    static Argument<BigInteger> ofBigInteger(BigInteger value) {
         if (value == null) {
             return of("BigInteger=/null/", value);
         } else {
@@ -77,7 +78,7 @@ public interface Named<T> {
         }
     }
 
-    static Named<BigDecimal> ofBigDecimal(BigDecimal value) {
+    static Argument<BigDecimal> ofBigDecimal(BigDecimal value) {
         if (value == null) {
             return of("BigDecimal=/null/", value);
         } else {
@@ -85,10 +86,10 @@ public interface Named<T> {
         }
     }
 
-    static <T> Named<T> of(String name, T payload) {
+    static <T> Argument<T> of(String name, T payload) {
         Preconditions.notBlank(name, "name must not be null or blank");
 
-        return new Named<T>() {
+        return new Argument<T>() {
             @Override
             public String getName() {
                 return name;

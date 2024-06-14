@@ -20,13 +20,14 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.annotation.ArgumentAnnotationUtils;
 import org.antublue.test.engine.internal.annotation.RandomAnnotationUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.OrdererUtil;
+import org.antublue.test.engine.internal.util.DisplayNameUtils;
+import org.antublue.test.engine.internal.util.OrdererUtils;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
@@ -47,7 +48,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentTestDescriptor.class);
 
     private final Class<?> testClass;
-    private final Named<?> testArgument;
+    private final Argument<?> testArgument;
     private final List<Method> beforeAllMethods;
     private final List<Method> afterAllMethods;
 
@@ -55,7 +56,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
             UniqueId uniqueId,
             String displayName,
             Class<?> testClass,
-            Named<?> testArgument,
+            Argument<?> testArgument,
             List<Method> beforeAllMethods,
             List<Method> afterAllMethods) {
         super(uniqueId, displayName);
@@ -75,10 +76,6 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         return Type.CONTAINER_AND_TEST;
     }
 
-    public Named<?> getTestArgument() {
-        return testArgument;
-    }
-
     @Override
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest executionRequest)");
@@ -92,6 +89,10 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         setTestInstance(testInstance);
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
+        getMetadata()
+                .put(
+                        MetadataConstants.TEST_CLASS_DISPLAY_NAME,
+                        DisplayNameUtils.getDisplayName(testClass));
         getMetadata().put(MetadataConstants.TEST_ARGUMENT, testArgument);
 
         executionRequest.getEngineExecutionListener().executionStarted(this);
@@ -232,7 +233,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     public static ArgumentTestDescriptor of(
             UniqueId parentUniqueId,
             Class<?> testClass,
-            Named<?> testArgument,
+            Argument<?> testArgument,
             int testArgumentIndex) {
         UniqueId uniqueId =
                 parentUniqueId.append(
@@ -254,7 +255,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         }
 
         beforeAllMethods =
-                OrdererUtil.orderTestMethods(beforeAllMethods, HierarchyTraversalMode.TOP_DOWN);
+                OrdererUtils.orderTestMethods(beforeAllMethods, HierarchyTraversalMode.TOP_DOWN);
 
         List<Method> afterAllMethods =
                 ReflectionSupport.findMethods(
@@ -265,7 +266,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         }
 
         afterAllMethods =
-                OrdererUtil.orderTestMethods(afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
+                OrdererUtils.orderTestMethods(afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
 
         return new ArgumentTestDescriptor(
                 uniqueId, displayName, testClass, testArgument, beforeAllMethods, afterAllMethods);

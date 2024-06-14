@@ -26,9 +26,13 @@ public class MetadataConstants {
 
     public static final String TEST_CLASS = "testClass";
 
+    public static final String TEST_CLASS_DISPLAY_NAME = "testClass.displayName";
+
     public static final String TEST_ARGUMENT = "testArgument";
 
     public static final String TEST_METHOD = "testMethod";
+
+    public static final String TEST_METHOD_DISPLAY_NAME = "testMethod.displayName";
 
     public static final String TEST_DESCRIPTOR_STATUS = "testDescriptorStatus";
 

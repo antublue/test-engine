@@ -19,19 +19,19 @@ package example.arguments.named;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class NamedIntegerTest {
+public class ArgumentDoubleTest {
 
-    @TestEngine.Argument public Named<Integer> argument;
+    @TestEngine.Argument public Argument<Double> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<Integer>> arguments() {
-        Collection<Named<Integer>> collection = new ArrayList<>();
+    public static Stream<Argument<Double>> arguments() {
+        Collection<Argument<Double>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(Named.ofInt(i));
+            collection.add(Argument.ofDouble(i + 0.1d));
         }
         return collection.stream();
     }
@@ -43,12 +43,12 @@ public class NamedIntegerTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument + ")");
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + argument + ")");
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll

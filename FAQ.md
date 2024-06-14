@@ -54,15 +54,11 @@ Use a `Store`
 
 ### I want to use the Test Engine in place of JUnit 5
 
-You can use the test engine in place of Junit 5 in somes scenarios where you don't really have parameterized test classes or need to mix testing of parameterized classes and standard classes 
+You could use the test engine in place of Junit 5 for some test scenarios.
 
 - **It's not a "drop in" replacement.**
 - **Most JUnit 5 features are missing (by design.)**
 - **Reference the [Design](/MANUAL.md#design) for the state machine flow.**
-
-Example:
-
-- [Junit5LikeTest.java](/examples/src/test/java/example/Junit5LikeTest.java)
 
 ---
 

@@ -19,22 +19,22 @@ package example.arguments.named;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class NamedArgumentComplexTest1 {
+public class ArgumentComplexTest1 {
 
-    @TestEngine.Argument public Named<ComplexArgument> argument;
+    @TestEngine.Argument public Argument<ComplexArgument> argument;
 
     private ComplexArgument customArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<ComplexArgument>> arguments() {
-        Collection<Named<ComplexArgument>> collection = new ArrayList<>();
+    public static Stream<Argument<ComplexArgument>> arguments() {
+        Collection<Argument<ComplexArgument>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             collection.add(
-                    Named.of(
+                    Argument.of(
                             "ComplexArgument(" + i + ")",
                             ComplexArgument.of("FirstName" + i, "LastName" + i)));
         }

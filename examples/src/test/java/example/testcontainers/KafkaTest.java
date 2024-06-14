@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -198,7 +198,7 @@ public class KafkaTest {
     }
 
     /** Class to implement a TestContext */
-    public static class KafkaTestEnvironment implements Named<KafkaContainer>, Closeable {
+    public static class KafkaTestEnvironment implements Argument<KafkaContainer>, Closeable {
 
         private final String dockerImageName;
         private KafkaContainer kafkaContainer;

@@ -18,7 +18,7 @@ package org.antublue.test.engine.testing.inheritance;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
@@ -31,35 +31,35 @@ public class SubclassTest extends BaseTest {
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll2(Named<Integer> argument) {
+    public void beforeAll2(Argument<Integer> argument) {
         System.out.println("beforeAll2(" + argument + ")");
         assertThat(argument).isNotNull();
         ACTUAL.add("beforeAll2(" + argument + ")");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach2(Named<Integer> argument) {
+    public void beforeEach2(Argument<Integer> argument) {
         System.out.println("beforeEach2(" + argument + ")");
         assertThat(argument).isNotNull();
         ACTUAL.add("beforeEach2(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void testB(Named<Integer> argument) {
+    public void testB(Argument<Integer> argument) {
         System.out.println("testB(" + argument + ")");
         assertThat(argument).isNotNull();
         ACTUAL.add("testB(" + argument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach2(Named<Integer> argument) {
+    public void afterEach2(Argument<Integer> argument) {
         System.out.println("afterEach2(" + argument + ")");
         assertThat(argument).isNotNull();
         ACTUAL.add("afterEach2(" + argument + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll2(Named<Integer> argument) {
+    public void afterAll2(Argument<Integer> argument) {
         System.out.println("afterAll2(" + argument + ")");
         assertThat(argument).isNotNull();
         ACTUAL.add("afterAll2(" + argument + ")");

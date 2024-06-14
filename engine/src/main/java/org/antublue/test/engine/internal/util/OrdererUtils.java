@@ -26,7 +26,7 @@ import org.antublue.test.engine.api.TestEngine;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.ClassUtils;
 
-public class OrdererUtil {
+public class OrdererUtils {
 
     private static final DefaultMethodOrderTopDownComparator
             DEFAULT_METHOD_ORDER_TOP_DOWN_COMPARATOR = new DefaultMethodOrderTopDownComparator();
@@ -40,7 +40,7 @@ public class OrdererUtil {
 
     private static final MethodNameComparator METHOD_NAME_COMPARATOR = new MethodNameComparator();
 
-    private OrdererUtil() {
+    private OrdererUtils() {
         // DO NOTHING
     }
 
