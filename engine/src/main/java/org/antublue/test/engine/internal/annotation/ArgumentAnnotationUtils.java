@@ -46,7 +46,7 @@ public class ArgumentAnnotationUtils {
      *
      * @param testInstance testInstance
      * @param testArgument testArgument
-     * @throw Throwable
+     * @throws Throwable Throwable
      */
     public static void injectArgumentFields(Object testInstance, Argument<?> testArgument)
             throws Throwable {
@@ -89,6 +89,12 @@ public class ArgumentAnnotationUtils {
         }
     }
 
+    /**
+     * Method to get a String representation of a Field
+     *
+     * @param field field
+     * @return a String
+     */
     private static String toString(Field field) {
         StringBuilder result = new StringBuilder();
 

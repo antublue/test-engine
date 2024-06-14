@@ -24,8 +24,10 @@ import org.antublue.test.engine.api.TestEngine;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
+/** Class to implement Predicates */
 public class Predicates {
 
+    /** Predicate to filter argument fields */
     public static final Predicate<Field> ARGUMENT_FIELD =
             field -> {
                 int modifiers = field.getModifiers();
@@ -36,6 +38,7 @@ public class Predicates {
                         && field.isAnnotationPresent(TestEngine.Argument.class);
             };
 
+    /** Predicate to filter argument supplier methods */
     public static final Predicate<Method> ARGUMENT_SUPPLIER_METHOD =
             method -> {
                 int modifiers = method.getModifiers();
@@ -47,6 +50,7 @@ public class Predicates {
                         && method.isAnnotationPresent(TestEngine.ArgumentSupplier.class);
             };
 
+    /** Predicate to filter static member fields */
     public static final Predicate<Field> GENERIC_STATIC_FIELD =
             field -> {
                 int modifiers = field.getModifiers();
@@ -56,6 +60,7 @@ public class Predicates {
                         && !Modifier.isFinal(modifiers);
             };
 
+    /** Predicate to filter member fields */
     public static final Predicate<Field> GENERIC_FIELD =
             field -> {
                 int modifiers = field.getModifiers();
@@ -65,6 +70,7 @@ public class Predicates {
                         && !Modifier.isFinal(modifiers);
             };
 
+    /** Predicate to filter test classes */
     public static final Predicate<Class<?>> TEST_CLASS =
             clazz -> {
                 int modifiers = clazz.getModifiers();
@@ -83,11 +89,12 @@ public class Predicates {
                                 .isEmpty();
             };
 
+    /** Predicate to filter prepare methods */
     public static final Predicate<Method> PREPARE_METHOD =
             method -> {
                 int modifiers = method.getModifiers();
 
-                return !ReflectionUtils.isAbstract(method)
+                return !Modifier.isAbstract(modifiers)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
                         && method.getParameterCount() == 0
@@ -95,11 +102,12 @@ public class Predicates {
                         && method.isAnnotationPresent(TestEngine.Prepare.class);
             };
 
+    /** Predicate to filter before all methods */
     public static final Predicate<Method> BEFORE_ALL =
             method -> {
                 int modifiers = method.getModifiers();
 
-                return !ReflectionUtils.isAbstract(method)
+                return !Modifier.isAbstract(modifiers)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
                         && method.getParameterCount() == 0
@@ -107,11 +115,12 @@ public class Predicates {
                         && method.isAnnotationPresent(TestEngine.BeforeAll.class);
             };
 
+    /** Predicate to filter before each methods */
     public static final Predicate<Method> BEFORE_EACH_METHOD =
             method -> {
                 int modifiers = method.getModifiers();
 
-                return !ReflectionUtils.isAbstract(method)
+                return !Modifier.isAbstract(modifiers)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
                         && method.getParameterCount() == 0
@@ -119,11 +128,12 @@ public class Predicates {
                         && method.isAnnotationPresent(TestEngine.BeforeEach.class);
             };
 
+    /** Predicate to filter test methods */
     public static final Predicate<Method> TEST_METHOD =
             method -> {
                 int modifiers = method.getModifiers();
 
-                return !ReflectionUtils.isAbstract(method)
+                return !Modifier.isAbstract(modifiers)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
                         && method.getParameterCount() == 0
@@ -131,11 +141,12 @@ public class Predicates {
                         && method.isAnnotationPresent(TestEngine.Test.class);
             };
 
+    /** Predicate to filter after each methods */
     public static final Predicate<Method> AFTER_EACH_METHOD =
             method -> {
                 int modifiers = method.getModifiers();
 
-                return !ReflectionUtils.isAbstract(method)
+                return !Modifier.isAbstract(modifiers)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
                         && method.getParameterCount() == 0
@@ -143,11 +154,12 @@ public class Predicates {
                         && method.isAnnotationPresent(TestEngine.AfterEach.class);
             };
 
+    /** Predicate to filter after all methods */
     public static final Predicate<Method> AFTER_ALL =
             method -> {
                 int modifiers = method.getModifiers();
 
-                return !ReflectionUtils.isAbstract(method)
+                return !Modifier.isAbstract(modifiers)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
                         && method.getParameterCount() == 0
@@ -155,11 +167,12 @@ public class Predicates {
                         && method.isAnnotationPresent(TestEngine.AfterAll.class);
             };
 
+    /** Predicate to filter conclude methods */
     public static final Predicate<Method> CONCLUDE_METHOD =
             method -> {
                 int modifiers = method.getModifiers();
 
-                return !ReflectionUtils.isAbstract(method)
+                return !Modifier.isAbstract(modifiers)
                         && Modifier.isPublic(modifiers)
                         && !Modifier.isStatic(modifiers)
                         && method.getParameterCount() == 0
