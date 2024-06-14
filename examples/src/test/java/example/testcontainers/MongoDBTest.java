@@ -40,7 +40,7 @@ import org.testcontainers.utility.DockerImageName;
  *
  * <p>Disabled by default since users may not have Docker installed
  */
-@TestEngine.Disabled
+//@TestEngine.Disabled
 public class MongoDBTest {
 
     private String name;
@@ -55,7 +55,7 @@ public class MongoDBTest {
     }
 
     @TestEngine.Prepare
-    public static void createNetwork() {
+    public void createNetwork() {
         info("creating network ...");
 
         network = Network.newNetwork();
