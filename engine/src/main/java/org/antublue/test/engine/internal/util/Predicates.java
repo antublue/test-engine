@@ -47,6 +47,24 @@ public class Predicates {
                         && method.isAnnotationPresent(TestEngine.ArgumentSupplier.class);
             };
 
+    public static final Predicate<Field> GENERIC_STATIC_FIELD =
+            field -> {
+                int modifiers = field.getModifiers();
+                return Modifier.isPublic(modifiers)
+                        && !Modifier.isAbstract(modifiers)
+                        && Modifier.isStatic(modifiers)
+                        && !Modifier.isFinal(modifiers);
+            };
+
+    public static final Predicate<Field> GENERIC_FIELD =
+            field -> {
+                int modifiers = field.getModifiers();
+                return Modifier.isPublic(modifiers)
+                        && !Modifier.isAbstract(modifiers)
+                        && !Modifier.isStatic(modifiers)
+                        && !Modifier.isFinal(modifiers);
+            };
+
     public static final Predicate<Class<?>> TEST_CLASS =
             clazz -> {
                 int modifiers = clazz.getModifiers();

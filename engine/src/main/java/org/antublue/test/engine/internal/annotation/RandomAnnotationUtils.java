@@ -17,12 +17,12 @@
 package org.antublue.test.engine.internal.annotation;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.RandomUtils;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -41,7 +41,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Boolean.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -54,7 +54,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Byte.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -74,7 +74,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Character.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -96,7 +96,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Short.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -116,7 +116,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Integer.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -138,7 +138,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Long.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -158,7 +158,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Float.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -178,7 +178,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Double.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -200,7 +200,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.BigInteger.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -222,7 +222,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.BigDecimal.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -244,7 +244,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.UUID.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -263,7 +263,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Boolean.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -280,7 +280,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Byte.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -296,7 +296,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Character.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -313,7 +313,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Short.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -329,7 +329,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Integer.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -345,7 +345,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Long.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -361,7 +361,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Float.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -377,7 +377,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Double.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -394,7 +394,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.BigInteger.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -407,7 +407,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.BigDecimal.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -420,7 +420,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testClass,
                         field ->
-                                Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_STATIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.UUID.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -434,7 +434,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Boolean.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -452,7 +452,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Byte.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -472,7 +472,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Character.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -494,7 +494,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Short.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -514,7 +514,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Integer.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -536,7 +536,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Long.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -556,7 +556,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Float.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -576,7 +576,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Double.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -598,7 +598,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.BigInteger.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -620,7 +620,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.BigDecimal.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -642,7 +642,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.UUID.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -661,7 +661,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Boolean.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -678,7 +678,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Byte.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -694,7 +694,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Character.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -711,7 +711,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Short.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -727,7 +727,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Integer.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -744,7 +744,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Long.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -760,7 +760,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.Float.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -776,7 +776,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.Double.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -793,7 +793,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.BigInteger.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -806,7 +806,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(
                                                 TestEngine.Random.BigDecimal.class),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -819,7 +819,7 @@ public class RandomAnnotationUtils {
                 ReflectionSupport.findFields(
                         testInstance.getClass(),
                         field ->
-                                !Modifier.isStatic(field.getModifiers())
+                                Predicates.GENERIC_FIELD.test(field)
                                         && field.isAnnotationPresent(TestEngine.Random.UUID.class),
                         HierarchyTraversalMode.TOP_DOWN);
 
