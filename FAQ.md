@@ -65,9 +65,13 @@ Use a `Locks` to get a `LockReference` or use `Locks.executeInLock()`
 
 You could use the test engine in place of Junit 5 for some test scenarios.
 
-- **It's not a "drop in" replacement.**
-- **Most JUnit 5 features are missing (by design.)**
-- **Reference the [Design](/MANUAL.md#design) for the state machine flow.**
+- **It's not a "drop in" replacement**
+
+
+- **Most JUnit 5 features are missing (by design)**
+
+
+- **Reference the [Design](/MANUAL.md#design) for the state machine flow**
 
 ---
 
