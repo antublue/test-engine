@@ -95,7 +95,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 ## Code Examples
 
-The `examples` modueld contains various testing examples and scenarios.
+The `examples` module contains various testing examples and scenarios.
 
 - [examples](/examples/src/test/java/example)
 

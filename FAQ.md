@@ -48,7 +48,16 @@ Parameterized integration testing is most common when you...
 
 ### How to lock shared resources?
 
-Use a `Store`
+Use a `Locks` to get a `LockReference` or use `Locks.executeInLock()`
+
+- [examples](/examples/src/test/java/example/locking)
+
+### Why is there no `TestEngine.ResourceLock` annotation?
+
+- Scoping/inheritance is complex
+
+
+- Annotations don't allow dynamic values
 
 ---
 
