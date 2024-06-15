@@ -27,6 +27,15 @@ import org.junit.platform.commons.support.ReflectionSupport;
 /** Class to implement Predicates */
 public class Predicates {
 
+    public static final Predicate<Class<?>> INITIALIZER_CLASS =
+            clazz -> {
+                int modifiers = clazz.getModifiers();
+                return Modifier.isPublic(modifiers)
+                        && !Modifier.isAbstract(modifiers)
+                        && !Modifier.isStatic(modifiers)
+                        && clazz.isAnnotationPresent(TestEngine.Lifecycle.class);
+            };
+
     /** Predicate to filter argument fields */
     public static final Predicate<Field> ARGUMENT_FIELD =
             field -> {

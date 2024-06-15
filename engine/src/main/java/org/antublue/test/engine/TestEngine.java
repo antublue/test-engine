@@ -16,6 +16,11 @@
 
 package org.antublue.test.engine;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
@@ -25,6 +30,9 @@ import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.discovery.EngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.Predicates;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
+import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
@@ -131,6 +139,23 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute()");
 
+        try {
+            for (URI uri : getClasspathURIs()) {
+                List<Class<?>> initializerClasses = ReflectionSupport.findAllClassesInClasspathRoot(uri, Predicates.INITIALIZER_CLASS, s -> true);
+                for (Class<?> initializerClass : initializerClasses) {
+                    Object object = initializerClass.getConstructor().newInstance();
+                    List<Method> prepareMethods = ReflectionSupport.findMethods(initializerClass, Predicates.PREPARE_METHOD, HierarchyTraversalMode.TOP_DOWN);
+                    for (Method prepareMethod : prepareMethods) {
+                        prepareMethod.invoke(object);
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            // TODO
+            t.printStackTrace();
+        }
+
+
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();
 
@@ -146,6 +171,46 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         } finally {
             engineExecutionListener.executionFinished(
                     executionRequest.getRootTestDescriptor(), TestExecutionResult.successful());
+
+            try {
+                for (URI uri : getClasspathURIs()) {
+                    List<Class<?>> initializerClasses = ReflectionSupport.findAllClassesInClasspathRoot(uri, Predicates.INITIALIZER_CLASS, s -> true);
+                    for (Class<?> initializerClass : initializerClasses) {
+                        Object object = initializerClass.getConstructor().newInstance();
+                        List<Method> concludeMethods = ReflectionSupport.findMethods(initializerClass, Predicates.CONCLUDE_METHOD, HierarchyTraversalMode.BOTTOM_UP);
+                        for (Method concludeMethod : concludeMethods) {
+                            concludeMethod.invoke(object);
+                        }
+                    }
+                }
+            } catch (Throwable t) {
+                // TODO
+                t.printStackTrace();
+            }
         }
+    }
+
+    public static List<URI> getClasspathURIs() {
+        // Retrieve the classpath system property
+        String classpath = System.getProperty("java.class.path");
+
+        // Split the classpath into individual paths
+        String[] paths = classpath.split(File.pathSeparator);
+
+        // List to hold the URIs
+        List<URI> uris = new ArrayList<>();
+
+        // Convert each path to a URI
+        for (String path : paths) {
+            try {
+                URI uri = new File(path).toURI();
+                uris.add(uri);
+            } catch (Exception e) {
+                System.err.println("Error converting path to URI: " + path);
+                e.printStackTrace();
+            }
+        }
+
+        return uris;
     }
 }
