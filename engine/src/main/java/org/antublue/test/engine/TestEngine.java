@@ -141,10 +141,16 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         try {
             for (URI uri : getClasspathURIs()) {
-                List<Class<?>> initializerClasses = ReflectionSupport.findAllClassesInClasspathRoot(uri, Predicates.INITIALIZER_CLASS, s -> true);
+                List<Class<?>> initializerClasses =
+                        ReflectionSupport.findAllClassesInClasspathRoot(
+                                uri, Predicates.INITIALIZER_CLASS, s -> true);
                 for (Class<?> initializerClass : initializerClasses) {
                     Object object = initializerClass.getConstructor().newInstance();
-                    List<Method> prepareMethods = ReflectionSupport.findMethods(initializerClass, Predicates.PREPARE_METHOD, HierarchyTraversalMode.TOP_DOWN);
+                    List<Method> prepareMethods =
+                            ReflectionSupport.findMethods(
+                                    initializerClass,
+                                    Predicates.PREPARE_METHOD,
+                                    HierarchyTraversalMode.TOP_DOWN);
                     for (Method prepareMethod : prepareMethods) {
                         prepareMethod.invoke(object);
                     }
@@ -154,7 +160,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             // TODO
             t.printStackTrace();
         }
-
 
         EngineExecutionListener engineExecutionListener =
                 executionRequest.getEngineExecutionListener();
@@ -174,10 +179,16 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             try {
                 for (URI uri : getClasspathURIs()) {
-                    List<Class<?>> initializerClasses = ReflectionSupport.findAllClassesInClasspathRoot(uri, Predicates.INITIALIZER_CLASS, s -> true);
+                    List<Class<?>> initializerClasses =
+                            ReflectionSupport.findAllClassesInClasspathRoot(
+                                    uri, Predicates.INITIALIZER_CLASS, s -> true);
                     for (Class<?> initializerClass : initializerClasses) {
                         Object object = initializerClass.getConstructor().newInstance();
-                        List<Method> concludeMethods = ReflectionSupport.findMethods(initializerClass, Predicates.CONCLUDE_METHOD, HierarchyTraversalMode.BOTTOM_UP);
+                        List<Method> concludeMethods =
+                                ReflectionSupport.findMethods(
+                                        initializerClass,
+                                        Predicates.CONCLUDE_METHOD,
+                                        HierarchyTraversalMode.BOTTOM_UP);
                         for (Method concludeMethod : concludeMethods) {
                             concludeMethod.invoke(object);
                         }
