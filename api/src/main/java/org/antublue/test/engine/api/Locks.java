@@ -17,27 +17,90 @@
 package org.antublue.test.engine.api;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Class to implement a LockReference */
 public class Locks {
 
-    private static final Map<Object, ReentrantLock> LOCKS = new ConcurrentHashMap<>();
+    private static final LockManager LOCK_MANAGER = new LockManager();
 
-    /** Constructor */
-    private Locks() {
-        // DO NOTHING
+    public static LockReference getReference(Object name) {
+        return new LockReference(name);
     }
 
-    /**
-     * Method to get a ReentrantLock
-     *
-     * @param name name
-     * @return a ReentrantLock
-     */
-    public static ReentrantLock get(Object name) {
-        return LOCKS.computeIfAbsent(name, k -> new ReentrantLock(true));
+    private static class LockManager {
+
+        private final ReentrantLock LOCK = new ReentrantLock(true);
+        private final Map<Object, ReferenceCountingReentrantLock> MAP = new ConcurrentHashMap<>();
+
+        private void lock(Object name) {
+            try {
+                LOCK.lock();
+                ReferenceCountingReentrantLock referenceCountingReentrantLock = MAP.get(name);
+                if (referenceCountingReentrantLock == null) {
+                    referenceCountingReentrantLock = new ReferenceCountingReentrantLock();
+                    MAP.put(name, referenceCountingReentrantLock);
+                } else {
+                    referenceCountingReentrantLock.incrementCount();
+                }
+            } finally {
+                LOCK.unlock();
+            }
+        }
+
+        private void unlock(Object name) {
+            try {
+                LOCK.lock();
+                ReferenceCountingReentrantLock referenceCountingReentrantLock = MAP.get(name);
+                if (referenceCountingReentrantLock == null) {
+                    throw new IllegalStateException("lock [" + name + "] is not locked");
+                } else {
+                    referenceCountingReentrantLock.decrementCount();
+                    if (referenceCountingReentrantLock.getCount() == 0) {
+                        MAP.remove(name);
+                    }
+                }
+            } finally {
+                LOCK.unlock();
+            }
+        }
+    }
+
+    public static class LockReference {
+
+        private final Object name;
+
+        private LockReference(Object name) {
+            this.name = name;
+        }
+
+        public void lock() {
+            LOCK_MANAGER.lock(name);
+        }
+
+        public void unlock() {
+            LOCK_MANAGER.unlock(name);
+        }
+
+        @Override
+        public String toString() {
+            return name.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            LockReference that = (LockReference) o;
+            return Objects.equals(name, that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(name);
+        }
     }
 
     /**
@@ -56,13 +119,13 @@ public class Locks {
             throw new IllegalArgumentException("executable is null");
         }
 
-        ReentrantLock reentrantLock = Locks.get(name);
+        LockReference lockReference = Locks.getReference(name);
 
         try {
-            reentrantLock.lock();
+            lockReference.lock();
             executable.execute();
         } finally {
-            reentrantLock.unlock();
+            lockReference.unlock();
         }
     }
 
@@ -75,5 +138,27 @@ public class Locks {
          * @throws Throwable Throwable
          */
         void execute() throws Throwable;
+    }
+
+    static class ReferenceCountingReentrantLock extends ReentrantLock {
+
+        private int count;
+
+        public ReferenceCountingReentrantLock() {
+            super(true);
+            count = 1;
+        }
+
+        public void incrementCount() {
+            count++;
+        }
+
+        public void decrementCount() {
+            count--;
+        }
+
+        public int getCount() {
+            return count;
+        }
     }
 }

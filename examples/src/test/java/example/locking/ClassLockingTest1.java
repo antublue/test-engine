@@ -46,7 +46,7 @@ public class ClassLockingTest1 {
 
     @TestEngine.Prepare
     public void prepare() {
-        Locks.get(NAMESPACE + "/" + LOCK_NAME).lock();
+        Locks.getReference(NAMESPACE + "/" + LOCK_NAME).lock();
         System.out.println("prepare()");
     }
 
@@ -95,6 +95,6 @@ public class ClassLockingTest1 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        Locks.get(NAMESPACE + "/" + LOCK_NAME).unlock();
+        Locks.getReference(NAMESPACE + "/" + LOCK_NAME).unlock();
     }
 }

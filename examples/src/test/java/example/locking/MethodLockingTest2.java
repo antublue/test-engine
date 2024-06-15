@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Locks;
@@ -66,17 +65,28 @@ public class MethodLockingTest2 {
 
     @TestEngine.Test
     public void test1() throws Throwable {
-        ReentrantLock reentrantLock = Locks.get(NAMESPACE + "/" + LOCK_NAME);
-        reentrantLock.lock();
+        Locks.LockReference lockReference = Locks.getReference(NAMESPACE + "/" + LOCK_NAME);
+        lockReference.lock();
 
         try {
-            System.out.println("test1(" + argument + ")");
-            System.out.println("sleeping 1000");
+            System.out.println(getClass().getName() + ".test1(" + argument + ")");
+            System.out.println(getClass().getName() + ".sleeping 1000");
             Thread.sleep(1000);
             assertThat(argument).isNotNull();
         } finally {
-            System.out.println("continuing");
-            reentrantLock.unlock();
+            System.out.println(getClass().getName() + ".continuing");
+            lockReference.unlock();
+        }
+
+        lockReference.lock();
+        try {
+            System.out.println(getClass().getName() + ".test1(" + argument + ")");
+            System.out.println(getClass().getName() + ".sleeping 1000");
+            Thread.sleep(1000);
+            assertThat(argument).isNotNull();
+        } finally {
+            System.out.println(getClass().getName() + ".continuing");
+            lockReference.unlock();
         }
     }
 
