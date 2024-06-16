@@ -149,18 +149,16 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         if (executionRequest.getRootTestDescriptor().getChildren().isEmpty()) {
             return;
         }
-
-        // Find @TestEngine.LifeCycle classes
+        
         Set<Class<?>> lifeCycleClasses = new LinkedHashSet<>();
         for (URI uri : getClasspathURIs()) {
             lifeCycleClasses.addAll(
                     ReflectionSupport.findAllClassesInClasspathRoot(
                             uri, Predicates.LIFE_CYCLE_CLASS, s -> true));
         }
-        
+
         Set<Object> lifeCycleInstances = new LinkedHashSet<>();
 
-        // Build the Set of LifeCycle instances and call the @TestEngine.Prepare methods
         try {
             for (Class<?> lifecyleClass : lifeCycleClasses) {
                 Object lifeCycleInstance = lifecyleClass.getConstructor().newInstance();
