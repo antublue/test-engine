@@ -67,6 +67,10 @@ public class Locks {
                                 });
 
                 referenceCountingReentrantLock.unlock();
+
+                if (referenceCountingReentrantLock.getCount() == 0) {
+                    MAP.remove(name);
+                }
             } catch (IllegalStateException e) {
                 throw new IllegalStateException(e.getMessage());
             }
