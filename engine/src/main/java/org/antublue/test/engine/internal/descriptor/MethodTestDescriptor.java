@@ -84,9 +84,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
 
         getStopWatch().reset();
 
-        executionRequest
-                .getEngineExecutionListener()
-                .executionStarted(this);
+        executionRequest.getEngineExecutionListener().executionStarted(this);
 
         setExecutionRequest(executionRequest);
 
