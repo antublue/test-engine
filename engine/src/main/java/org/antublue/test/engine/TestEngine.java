@@ -19,8 +19,11 @@ package org.antublue.test.engine;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
@@ -37,12 +40,12 @@ import org.antublue.test.engine.internal.util.StandardStreams;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.EngineDiscoveryRequest;
-import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
+import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement the AntuBLUE Test Engine */
 public class TestEngine implements org.junit.platform.engine.TestEngine {
@@ -150,81 +153,114 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             return;
         }
 
-        Set<Class<?>> lifeCycleClasses = new LinkedHashSet<>();
-        for (URI uri : getClasspathURIs()) {
-            lifeCycleClasses.addAll(
-                    ReflectionSupport.findAllClassesInClasspathRoot(
-                            uri, Predicates.LIFE_CYCLE_CLASS, s -> true));
-        }
+        executionRequest
+                .getEngineExecutionListener()
+                .executionStarted(executionRequest.getRootTestDescriptor());
 
         Set<Object> lifeCycleInstances = new LinkedHashSet<>();
+        Map<Object, List<Method>> lifeCyclePrepareMethods = new LinkedHashMap<>();
+        Map<Object, List<Method>> lifeCycleConcludeMethods = new LinkedHashMap<>();
 
-        try {
-            for (Class<?> lifecyleClass : lifeCycleClasses) {
-                Object lifeCycleInstance = lifecyleClass.getConstructor().newInstance();
-                lifeCycleInstances.add(lifeCycleInstance);
+        ThrowableCollector throwableCollector = new ThrowableCollector(throwable -> true);
+        throwableCollector.execute(
+                () -> {
+                    Set<Class<?>> lifeCycleClasses = new LinkedHashSet<>();
+                    for (URI uri : getClasspathURIs()) {
+                        lifeCycleClasses.addAll(
+                                ReflectionSupport.findAllClassesInClasspathRoot(
+                                        uri, Predicates.LIFE_CYCLE_CLASS, s -> true));
+                    }
 
-                List<Method> prepareMethods =
-                        ReflectionSupport.findMethods(
-                                lifecyleClass,
-                                Predicates.PREPARE_METHOD,
-                                HierarchyTraversalMode.TOP_DOWN);
+                    for (Class<?> lifecyleClass : lifeCycleClasses) {
+                        Object lifeCycleInstance = lifecyleClass.getConstructor().newInstance();
+                        lifeCycleInstances.add(lifeCycleInstance);
 
-                prepareMethods =
-                        OrdererUtils.orderTestMethods(
-                                prepareMethods, HierarchyTraversalMode.TOP_DOWN);
+                        List<Method> prepareMethods =
+                                ReflectionSupport.findMethods(
+                                        lifecyleClass,
+                                        Predicates.PREPARE_METHOD,
+                                        HierarchyTraversalMode.TOP_DOWN);
 
-                for (Method prepareMethod : prepareMethods) {
-                    prepareMethod.invoke(lifeCycleInstance);
-                }
-            }
-        } catch (Throwable t) {
-            // TODO handle
-            t.printStackTrace();
+                        prepareMethods =
+                                OrdererUtils.orderTestMethods(
+                                        prepareMethods, HierarchyTraversalMode.TOP_DOWN);
+
+                        lifeCyclePrepareMethods.put(lifeCycleInstance, prepareMethods);
+
+                        List<Method> concludeMethods =
+                                ReflectionSupport.findMethods(
+                                        lifecyleClass,
+                                        Predicates.CONCLUDE_METHOD,
+                                        HierarchyTraversalMode.BOTTOM_UP);
+
+                        concludeMethods =
+                                OrdererUtils.orderTestMethods(
+                                        concludeMethods, HierarchyTraversalMode.BOTTOM_UP);
+
+                        lifeCycleConcludeMethods.put(lifeCycleInstance, concludeMethods);
+                    }
+                });
+
+        if (throwableCollector.isEmpty()) {
+            throwableCollector.execute(
+                    () -> {
+                        for (Object lifeCycleInstance : lifeCycleInstances) {
+                            for (Method lifeCyclePrepareMethod :
+                                    lifeCyclePrepareMethods.get(lifeCycleInstance)) {
+                                lifeCyclePrepareMethod.invoke(lifeCycleInstance);
+                            }
+                        }
+                    });
         }
 
-        EngineExecutionListener engineExecutionListener =
-                executionRequest.getEngineExecutionListener();
+        if (throwableCollector.isEmpty()) {
+            throwableCollector.execute(
+                    () -> {
+                        Executor executor = new Executor();
 
-        try {
-            engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
+                        executor.execute(
+                                ExecutionRequest.create(
+                                        executionRequest.getRootTestDescriptor(),
+                                        executionRequest.getEngineExecutionListener(),
+                                        ConfigurationParameters.getInstance()));
 
-            Executor executor = new Executor();
+                        executor.await();
+                    });
+        }
 
-            executor.execute(
-                    ExecutionRequest.create(
-                            executionRequest.getRootTestDescriptor(),
-                            engineExecutionListener,
-                            ConfigurationParameters.getInstance()));
+        List<Throwable> throwables = new ArrayList<>();
 
-            executor.await();
-        } finally {
-            for (Object lifeCycleInstance : lifeCycleInstances) {
-                List<Method> concludeMethods =
-                        ReflectionSupport.findMethods(
-                                lifeCycleInstance.getClass(),
-                                Predicates.CONCLUDE_METHOD,
-                                HierarchyTraversalMode.BOTTOM_UP);
-
-                concludeMethods =
-                        OrdererUtils.orderTestMethods(
-                                concludeMethods, HierarchyTraversalMode.TOP_DOWN);
-
-                for (Method concludeMethod : concludeMethods) {
-                    try {
-                        concludeMethod.invoke(lifeCycleInstance);
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
+        for (Object lifeCycleInstance : lifeCycleInstances) {
+            for (Method lifeCycleConcludeMethod : lifeCycleConcludeMethods.get(lifeCycleInstance)) {
+                try {
+                    lifeCycleConcludeMethod.invoke(lifeCycleInstance);
+                } catch (Throwable t) {
+                    throwables.add(t);
                 }
             }
+        }
 
-            StandardStreams.flush();
+        StandardStreams.flush();
 
-            // TODO handle exception if LifeCycle failure
+        if (throwableCollector.isEmpty() && throwables.isEmpty()) {
+            executionRequest
+                    .getEngineExecutionListener()
+                    .executionFinished(
+                            executionRequest.getRootTestDescriptor(),
+                            TestExecutionResult.successful());
+        } else {
+            Throwable throwable;
+            if (throwableCollector.isNotEmpty()) {
+                throwable = throwableCollector.getThrowable();
+            } else {
+                throwable = throwables.get(0);
+            }
 
-            engineExecutionListener.executionFinished(
-                    executionRequest.getRootTestDescriptor(), TestExecutionResult.successful());
+            executionRequest
+                    .getEngineExecutionListener()
+                    .executionFinished(
+                            executionRequest.getRootTestDescriptor(),
+                            TestExecutionResult.failed(throwable));
         }
     }
 
