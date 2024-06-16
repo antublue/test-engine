@@ -14,37 +14,25 @@
  * limitations under the License.
  */
 
-package example.conditions;
+package example.signals;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Signals;
 import org.antublue.test.engine.api.TestEngine;
 
-public class SignalAwaitTest1 {
+public class SignalTest {
 
-    @TestEngine.Argument public Argument<String> argument;
+    @TestEngine.Argument public Argument<Boolean> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument<String>> arguments() {
-        Collection<Argument<String>> collection = new ArrayList<>();
-
-        for (int i = 0; i < 5; i++) {
-            collection.add(Argument.ofString("String " + i));
-        }
-
-        return collection.stream();
-    }
-
-    @TestEngine.Prepare
-    public void prepare() {
-        Signals.await("Signal");
+    public static Stream<Argument<Boolean>> arguments() {
+        return Stream.of(Argument.ofBoolean(true));
     }
 
     @TestEngine.Test
     public void test() throws Throwable {
-        System.out.println("test(" + argument + ")");
+        Thread.sleep(5000);
+        Signals.signal(getClass());
     }
 }

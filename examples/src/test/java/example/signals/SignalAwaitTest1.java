@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package example.conditions;
+package example.signals;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +23,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.Signals;
 import org.antublue.test.engine.api.TestEngine;
 
-public class SignalAwaitTest2 {
+public class SignalAwaitTest1 {
 
     @TestEngine.Argument public Argument<String> argument;
 
@@ -40,7 +40,7 @@ public class SignalAwaitTest2 {
 
     @TestEngine.Prepare
     public void prepare() {
-        Signals.await("Signal");
+        Signals.await(SignalTest.class);
     }
 
     @TestEngine.Test
