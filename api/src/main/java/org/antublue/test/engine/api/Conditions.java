@@ -49,7 +49,6 @@ public class Conditions {
                             if (v == null) {
                                 v = new CountDownLatch(1);
                             }
-
                             return v;
                         });
 
