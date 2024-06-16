@@ -32,38 +32,43 @@ public class Locks {
 
     private static class LockManager {
 
-        private final ReentrantLock LOCK = new ReentrantLock(true);
         private final Map<Object, ReferenceCountingReentrantLock> MAP = new ConcurrentHashMap<>();
 
         private void lock(Object name) {
-            try {
-                LOCK.lock();
-                ReferenceCountingReentrantLock referenceCountingReentrantLock = MAP.get(name);
-                if (referenceCountingReentrantLock == null) {
-                    referenceCountingReentrantLock = new ReferenceCountingReentrantLock();
-                    MAP.put(name, referenceCountingReentrantLock);
-                } else {
-                    referenceCountingReentrantLock.incrementCount();
-                }
-            } finally {
-                LOCK.unlock();
-            }
+            ReferenceCountingReentrantLock referenceCountingReentrantLock =
+                    MAP.compute(
+                            name,
+                            (o, referenceCountingReentrantLock1) -> {
+                                if (referenceCountingReentrantLock1 == null) {
+                                    referenceCountingReentrantLock1 =
+                                            new ReferenceCountingReentrantLock();
+                                } else {
+                                    referenceCountingReentrantLock1.incrementCount();
+                                }
+                                return referenceCountingReentrantLock1;
+                            });
+
+            referenceCountingReentrantLock.lock();
         }
 
         private void unlock(Object name) {
             try {
-                LOCK.lock();
-                ReferenceCountingReentrantLock referenceCountingReentrantLock = MAP.get(name);
-                if (referenceCountingReentrantLock == null) {
-                    throw new IllegalStateException("lock [" + name + "] is not locked");
-                } else {
-                    referenceCountingReentrantLock.decrementCount();
-                    if (referenceCountingReentrantLock.getCount() == 0) {
-                        MAP.remove(name);
-                    }
-                }
-            } finally {
-                LOCK.unlock();
+                ReferenceCountingReentrantLock referenceCountingReentrantLock =
+                        MAP.compute(
+                                name,
+                                (o, referenceCountingReentrantLock1) -> {
+                                    if (referenceCountingReentrantLock1 == null) {
+                                        throw new IllegalStateException(
+                                                "lock [" + name + "] is not locked");
+                                    } else {
+                                        referenceCountingReentrantLock1.decrementCount();
+                                    }
+                                    return referenceCountingReentrantLock1;
+                                });
+
+                referenceCountingReentrantLock.unlock();
+            } catch (IllegalStateException e) {
+                throw new IllegalStateException(e.getMessage());
             }
         }
     }
