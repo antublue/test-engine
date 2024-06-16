@@ -71,7 +71,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 | `@TestEngine.Random.BigInteger`              | field            | no       | Provides a way to inject a random BigInteger value                                                                                 |
 | `@TestEngine.Random.BigDecimal`              | field            | no       | Provides a way to inject a random BigDecimal value                                                                                 |
 | `@TestEngine.Random.UUID`                    | field            | no       | Provides a way to inject a `UUID`                                                                                                  |
-
+| `@TestEngine.LifeCycle`                      | class            | no       | Provides a way to execute code before all tests or after all tests at the test engine level                                        |
 **Notes**
 
 - Additional test annotations require non-static fields/methods
