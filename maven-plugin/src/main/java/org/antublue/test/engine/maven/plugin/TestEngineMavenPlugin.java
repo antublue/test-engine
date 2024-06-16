@@ -19,6 +19,7 @@ package org.antublue.test.engine.maven.plugin;
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -182,6 +183,11 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                 urls.putIfAbsent(url.getPath(), url);
             }
 
+            Set<URI> uriSet = new LinkedHashSet<>();
+            for (URL url : urls.values()) {
+                uriSet.add(url.toURI());
+            }
+
             ClassLoader classLoader =
                     new URLClassLoader(
                             urls.values().toArray(new URL[0]),
@@ -208,6 +214,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             .build();
 
             TestEngine testEngine = new TestEngine();
+            testEngine.setURIs(uriSet);
 
             TestDescriptor testDescriptor = null;
 

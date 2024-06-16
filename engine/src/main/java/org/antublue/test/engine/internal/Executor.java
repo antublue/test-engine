@@ -26,6 +26,7 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import org.antublue.test.engine.api.Conditions;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.descriptor.ExecutableTestDescriptor;
@@ -53,93 +54,102 @@ public class Executor {
      * @param executionRequest the execution request
      */
     public void execute(ExecutionRequest executionRequest) {
-        LOGGER.trace("execute()");
-
-        EngineExecutionListener engineExecutionListener =
-                executionRequest.getEngineExecutionListener();
-
-        TestDescriptor rootTestDescriptor = executionRequest.getRootTestDescriptor();
-
-        ExecutorService executorService = null;
-        AtomicReference<CountDownLatch> countDownLatch = new AtomicReference<>();
-
         try {
-            ConfigurationParameters configurationParameters =
-                    executionRequest.getConfigurationParameters();
+            LOGGER.trace("execute()");
 
-            int threadCount =
-                    configurationParameters
-                            .get(Constants.THREAD_COUNT)
-                            .map(
-                                    value -> {
-                                        int intValue;
-                                        try {
-                                            intValue = Integer.parseInt(value);
-                                            if (intValue < 1) {
+            EngineExecutionListener engineExecutionListener =
+                    executionRequest.getEngineExecutionListener();
+
+            TestDescriptor rootTestDescriptor = executionRequest.getRootTestDescriptor();
+
+            ExecutorService executorService = null;
+            AtomicReference<CountDownLatch> countDownLatch = new AtomicReference<>();
+
+            try {
+                ConfigurationParameters configurationParameters =
+                        executionRequest.getConfigurationParameters();
+
+                int threadCount =
+                        configurationParameters
+                                .get(Constants.THREAD_COUNT)
+                                .map(
+                                        value -> {
+                                            int intValue;
+                                            try {
+                                                intValue = Integer.parseInt(value);
+                                                if (intValue < 1) {
+                                                    throw new TestEngineException(
+                                                            format(
+                                                                    "Invalid thread count [%d]",
+                                                                    intValue));
+                                                }
+                                                return intValue;
+                                            } catch (NumberFormatException e) {
                                                 throw new TestEngineException(
-                                                        format(
-                                                                "Invalid thread count [%d]",
-                                                                intValue));
+                                                        format("Invalid thread count [%s]", value),
+                                                        e);
                                             }
-                                            return intValue;
-                                        } catch (NumberFormatException e) {
-                                            throw new TestEngineException(
-                                                    format("Invalid thread count [%s]", value), e);
-                                        }
-                                    })
-                            .orElse(MAX_THREAD_COUNT);
+                                        })
+                                .orElse(MAX_THREAD_COUNT);
 
-            LOGGER.trace("[%s] = [%d]", Constants.THREAD_COUNT, threadCount);
+                LOGGER.trace("[%s] = [%d]", Constants.THREAD_COUNT, threadCount);
 
-            executorService =
-                    new ThreadPoolExecutor(
-                            threadCount,
-                            threadCount,
-                            60L,
-                            TimeUnit.SECONDS,
-                            new ArrayBlockingQueue<>(threadCount * 10),
-                            new NamedThreadFactory("test-engine-%02d"),
-                            new BlockingRejectedExecutionHandler());
+                executorService =
+                        new ThreadPoolExecutor(
+                                threadCount,
+                                threadCount,
+                                60L,
+                                TimeUnit.SECONDS,
+                                new ArrayBlockingQueue<>(threadCount * 10),
+                                new NamedThreadFactory("test-engine-%02d"),
+                                new BlockingRejectedExecutionHandler());
 
-            engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
+                engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
 
-            Set<? extends TestDescriptor> testDescriptors = rootTestDescriptor.getChildren();
+                Set<? extends TestDescriptor> testDescriptors = rootTestDescriptor.getChildren();
 
-            countDownLatch.set(new CountDownLatch(testDescriptors.size()));
+                countDownLatch.set(new CountDownLatch(testDescriptors.size()));
 
-            for (TestDescriptor testDescriptor : testDescriptors) {
-                if (testDescriptor instanceof ExecutableTestDescriptor) {
-                    ExecutableTestDescriptor executableTestDescriptor =
-                            (ExecutableTestDescriptor) testDescriptor;
-                    executorService.submit(
-                            () -> {
-                                try {
-                                    executableTestDescriptor.execute(executionRequest);
-                                } catch (Throwable t) {
-                                    t.printStackTrace(System.err);
-                                    StandardStreams.flush();
-                                } finally {
-                                    countDownLatch.get().countDown();
-                                }
-                            });
+                for (TestDescriptor testDescriptor : testDescriptors) {
+                    if (testDescriptor instanceof ExecutableTestDescriptor) {
+                        ExecutableTestDescriptor executableTestDescriptor =
+                                (ExecutableTestDescriptor) testDescriptor;
+                        executorService.submit(
+                                () -> {
+                                    try {
+                                        executableTestDescriptor.execute(executionRequest);
+                                    } catch (Throwable t) {
+                                        t.printStackTrace(System.err);
+                                        StandardStreams.flush();
+                                    } finally {
+                                        countDownLatch.get().countDown();
+                                    }
+                                });
+                    }
+                }
+            } finally {
+                if (countDownLatch.get() != null) {
+                    try {
+                        countDownLatch.get().await();
+                    } catch (InterruptedException e) {
+                        // DO NOTHING
+                    }
+                }
+
+                if (executorService != null) {
+                    executorService.shutdown();
                 }
             }
+
+            engineExecutionListener.executionFinished(
+                    rootTestDescriptor, TestExecutionResult.successful());
         } finally {
-            if (countDownLatch.get() != null) {
-                try {
-                    countDownLatch.get().await();
-                } catch (InterruptedException e) {
-                    // DO NOTHING
-                }
-            }
-
-            if (executorService != null) {
-                executorService.shutdown();
-            }
+            Conditions.signal("__TEST_ENGINE__EXECUTOR__");
         }
+    }
 
-        engineExecutionListener.executionFinished(
-                rootTestDescriptor, TestExecutionResult.successful());
+    public void await() {
+        Conditions.await("__TEST_ENGINE__EXECUTOR__");
     }
 
     /** Class to handle a submit rejection, adding the Runnable using blocking semantics */

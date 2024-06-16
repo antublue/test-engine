@@ -20,8 +20,10 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.Executor;
@@ -57,6 +59,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     /** Configuration constant */
     public static final String VERSION = Information.getInstance().getVersion();
+
+    private Set<URI> uriSet;
 
     /**
      * Method to get the test engine id
@@ -98,6 +102,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         return Optional.of(VERSION);
     }
 
+    public void setURIs(Set<URI> uriSet) {
+        this.uriSet = uriSet;
+    }
+
     /**
      * Method to discover test classes
      *
@@ -108,7 +116,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     @Override
     public TestDescriptor discover(
             EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
-        LOGGER.trace("discover()");
+        LOGGER.trace("discover(" + uniqueId + ")");
 
         try {
             EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
@@ -137,18 +145,34 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      */
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        LOGGER.trace("execute()");
+        LOGGER.trace(
+                "execute() rootTestDescriptor children [%d]",
+                executionRequest.getRootTestDescriptor().getChildren().size());
+
+        if (executionRequest.getRootTestDescriptor().getChildren().isEmpty()) {
+            return;
+        }
+
+        List<Object> objects = new ArrayList<>();
 
         try {
-            for (URI uri : getClasspathURIs()) {
-                List<Class<?>> initializerClasses =
+            Set<URI> uriSet = new LinkedHashSet<>();
+            if (this.uriSet != null) {
+                uriSet.addAll(this.uriSet);
+            }
+            uriSet.addAll(getClasspathURIs());
+
+            for (URI uri : uriSet) {
+                List<Class<?>> lifecycleClasses =
                         ReflectionSupport.findAllClassesInClasspathRoot(
-                                uri, Predicates.INITIALIZER_CLASS, s -> true);
-                for (Class<?> initializerClass : initializerClasses) {
-                    Object object = initializerClass.getConstructor().newInstance();
+                                uri, Predicates.LIFECYCLE_CLASS, s -> true);
+
+                for (Class<?> lifecyleClass : lifecycleClasses) {
+                    Object object = lifecyleClass.getConstructor().newInstance();
+                    objects.add(object);
                     List<Method> prepareMethods =
                             ReflectionSupport.findMethods(
-                                    initializerClass,
+                                    lifecyleClass,
                                     Predicates.PREPARE_METHOD,
                                     HierarchyTraversalMode.TOP_DOWN);
                     for (Method prepareMethod : prepareMethods) {
@@ -157,7 +181,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 }
             }
         } catch (Throwable t) {
-            // TODO
+            // TODO handle
             t.printStackTrace();
         }
 
@@ -167,51 +191,44 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         try {
             engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
 
-            new Executor()
-                    .execute(
-                            ExecutionRequest.create(
-                                    executionRequest.getRootTestDescriptor(),
-                                    engineExecutionListener,
-                                    ConfigurationParameters.getInstance()));
-        } finally {
-            engineExecutionListener.executionFinished(
-                    executionRequest.getRootTestDescriptor(), TestExecutionResult.successful());
+            Executor executor = new Executor();
 
-            try {
-                for (URI uri : getClasspathURIs()) {
-                    List<Class<?>> initializerClasses =
-                            ReflectionSupport.findAllClassesInClasspathRoot(
-                                    uri, Predicates.INITIALIZER_CLASS, s -> true);
-                    for (Class<?> initializerClass : initializerClasses) {
-                        Object object = initializerClass.getConstructor().newInstance();
-                        List<Method> concludeMethods =
-                                ReflectionSupport.findMethods(
-                                        initializerClass,
-                                        Predicates.CONCLUDE_METHOD,
-                                        HierarchyTraversalMode.BOTTOM_UP);
-                        for (Method concludeMethod : concludeMethods) {
-                            concludeMethod.invoke(object);
-                        }
+            executor.execute(
+                    ExecutionRequest.create(
+                            executionRequest.getRootTestDescriptor(),
+                            engineExecutionListener,
+                            ConfigurationParameters.getInstance()));
+
+            executor.await();
+        } finally {
+            for (Object object : objects) {
+                List<Method> concludeMethods =
+                        ReflectionSupport.findMethods(
+                                object.getClass(),
+                                Predicates.CONCLUDE_METHOD,
+                                HierarchyTraversalMode.BOTTOM_UP);
+
+                for (Method concludeMethod : concludeMethods) {
+                    try {
+                        concludeMethod.invoke(object);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
                     }
                 }
-            } catch (Throwable t) {
-                // TODO
-                t.printStackTrace();
             }
+
+            engineExecutionListener.executionFinished(
+                    executionRequest.getRootTestDescriptor(), TestExecutionResult.successful());
         }
     }
 
-    public static List<URI> getClasspathURIs() {
-        // Retrieve the classpath system property
-        String classpath = System.getProperty("java.class.path");
+    public static Set<URI> getClasspathURIs() {
+        LOGGER.trace("getClasspathURIs()");
 
-        // Split the classpath into individual paths
+        Set<URI> uris = new LinkedHashSet<>();
+        String classpath = System.getProperty("java.class.path");
         String[] paths = classpath.split(File.pathSeparator);
 
-        // List to hold the URIs
-        List<URI> uris = new ArrayList<>();
-
-        // Convert each path to a URI
         for (String path : paths) {
             try {
                 URI uri = new File(path).toURI();

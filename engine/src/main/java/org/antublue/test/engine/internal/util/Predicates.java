@@ -27,7 +27,7 @@ import org.junit.platform.commons.support.ReflectionSupport;
 /** Class to implement Predicates */
 public class Predicates {
 
-    public static final Predicate<Class<?>> INITIALIZER_CLASS =
+    public static final Predicate<Class<?>> LIFECYCLE_CLASS =
             clazz -> {
                 int modifiers = clazz.getModifiers();
                 return Modifier.isPublic(modifiers)
