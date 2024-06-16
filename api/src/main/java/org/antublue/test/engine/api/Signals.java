@@ -21,14 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 /** Class to implement Conditions */
-public class Conditions {
+public class Signals {
 
     private static final Map<Object, CountDownLatch> MAP = new ConcurrentHashMap<>();
 
-    /**
-     * Constructor
-     */
-    private Conditions() {
+    /** Constructor */
+    private Signals() {
         // DO NOTHING
     }
 

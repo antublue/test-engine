@@ -18,10 +18,10 @@ package example.conditions;
 
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.Conditions;
+import org.antublue.test.engine.api.Signals;
 import org.antublue.test.engine.api.TestEngine;
 
-public class ConditionSignalTest {
+public class SignalTest {
 
     @TestEngine.Argument public Argument<Boolean> argument;
 
@@ -33,6 +33,6 @@ public class ConditionSignalTest {
     @TestEngine.Test
     public void test() throws Throwable {
         Thread.sleep(5000);
-        Conditions.signal("ExampleCondition");
+        Signals.signal("Signal");
     }
 }

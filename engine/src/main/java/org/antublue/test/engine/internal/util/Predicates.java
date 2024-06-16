@@ -27,6 +27,7 @@ import org.junit.platform.commons.support.ReflectionSupport;
 /** Class to implement Predicates */
 public class Predicates {
 
+    /** Predicate to filter life cycle classes */
     public static final Predicate<Class<?>> LIFE_CYCLE_CLASS =
             clazz -> {
                 int modifiers = clazz.getModifiers();
