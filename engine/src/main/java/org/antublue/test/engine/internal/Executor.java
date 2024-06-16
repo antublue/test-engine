@@ -26,7 +26,6 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import org.antublue.test.engine.api.Conditions;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.descriptor.ExecutableTestDescriptor;
@@ -47,6 +46,12 @@ public class Executor {
 
     private static final int MAX_THREAD_COUNT =
             Math.max(1, Runtime.getRuntime().availableProcessors() - 2);
+
+    private final CountDownLatch countDownLatch;
+
+    public Executor() {
+        countDownLatch = new CountDownLatch(1);
+    }
 
     /**
      * Method to execute the ExecutionRequest
@@ -144,12 +149,16 @@ public class Executor {
             engineExecutionListener.executionFinished(
                     rootTestDescriptor, TestExecutionResult.successful());
         } finally {
-            Conditions.signal("__TEST_ENGINE__EXECUTOR__");
+            countDownLatch.countDown();
         }
     }
 
     public void await() {
-        Conditions.await("__TEST_ENGINE__EXECUTOR__");
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            // DO NOTHING
+        }
     }
 
     /** Class to handle a submit rejection, adding the Runnable using blocking semantics */

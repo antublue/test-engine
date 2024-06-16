@@ -149,7 +149,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         if (executionRequest.getRootTestDescriptor().getChildren().isEmpty()) {
             return;
         }
-        
+
         Set<Class<?>> lifeCycleClasses = new LinkedHashSet<>();
         for (URI uri : getClasspathURIs()) {
             lifeCycleClasses.addAll(
