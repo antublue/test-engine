@@ -33,6 +33,7 @@ import org.antublue.test.engine.internal.discovery.EngineDiscoveryRequestResolve
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Predicates;
+import org.antublue.test.engine.internal.util.StandardStreams;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -218,6 +219,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     }
                 }
             }
+
+            StandardStreams.flush();
 
             engineExecutionListener.executionFinished(
                     executionRequest.getRootTestDescriptor(), TestExecutionResult.successful());
