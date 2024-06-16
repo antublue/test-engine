@@ -20,14 +20,23 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
+/** Class to implement Conditions */
 public class Conditions {
 
     private static final Map<Object, CountDownLatch> MAP = new ConcurrentHashMap<>();
 
+    /**
+     * Constructor
+     */
     private Conditions() {
         // DO NOTHING
     }
 
+    /**
+     * Method to signal a Condition
+     *
+     * @param name name
+     */
     public static void signal(Object name) {
         CountDownLatch countDownLatch =
                 MAP.compute(
@@ -38,9 +47,19 @@ public class Conditions {
                             }
                             return v;
                         });
+
+        if (countDownLatch.getCount() == 0) {
+            throw new IllegalStateException("Condiition [%s] already signaled");
+        }
+
         countDownLatch.countDown();
     }
 
+    /**
+     * Method to wait for a Condition
+     *
+     * @param name name
+     */
     public static void await(Object name) {
         CountDownLatch countDownLatch =
                 MAP.compute(
