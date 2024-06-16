@@ -49,7 +49,7 @@ public class Conditions {
                         });
 
         if (countDownLatch.getCount() == 0) {
-            throw new IllegalStateException("Condiition [%s] already signaled");
+            throw new IllegalStateException("Condition [%s] already signaled");
         }
 
         countDownLatch.countDown();
