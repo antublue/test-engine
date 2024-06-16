@@ -19,17 +19,17 @@ package org.antublue.test.engine.testing;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 @TestEngine.Disabled
 public class DuplicateOrderTest {
 
-    public static Stream<NamedString> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(NamedString.of("StringArgument " + i));
+            collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
     }
@@ -42,37 +42,37 @@ public class DuplicateOrderTest {
 
     @TestEngine.Order(order = 0)
     @TestEngine.Prepare
-    public void prepare2() {
+    public static void prepare2() {
         System.out.println("prepare2()");
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll(NamedString argument) {
+    public void beforeAll(Argument<String> argument) {
         System.out.println("beforeAll(" + argument + ")");
     }
 
     @TestEngine.BeforeEach
-    public void beforeEach(NamedString argument) {
+    public void beforeEach(Argument<String> argument) {
         System.out.println("beforeEach(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void test1(NamedString argument) {
+    public void test1(Argument<String> argument) {
         System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
-    public void test2(NamedString argument) {
+    public void test2(Argument<String> argument) {
         System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach
-    public void afterEach(NamedString argument) {
+    public void afterEach(Argument<String> argument) {
         System.out.println("afterEach(" + argument + ")");
     }
 
     @TestEngine.AfterAll
-    public void afterAll(NamedString argument) {
+    public void afterAll(Argument<String> argument) {
         System.out.println("afterAll(" + argument + ")");
     }
 

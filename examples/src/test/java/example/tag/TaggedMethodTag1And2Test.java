@@ -19,8 +19,8 @@ package example.tag;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
 
 /**
  * Example test
@@ -30,14 +30,14 @@ import org.antublue.test.engine.api.support.NamedString;
  */
 public class TaggedMethodTag1And2Test {
 
-    @TestEngine.Argument protected NamedString argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             int value = i * 3;
-            collection.add(NamedString.of(String.valueOf(value)));
+            collection.add(Argument.ofString(String.valueOf(value)));
         }
         return collection.stream();
     }

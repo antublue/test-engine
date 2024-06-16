@@ -28,7 +28,7 @@ import com.mongodb.client.MongoDatabase;
 import java.io.Closeable;
 import java.util.Random;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.bson.Document;
 import org.testcontainers.containers.MongoDBContainer;
@@ -45,10 +45,9 @@ public class MongoDBTest {
 
     private String name;
 
-    @TestEngine.AutoClose.Conclude private Network network;
+    private static Network network;
 
-    @TestEngine.Argument @TestEngine.AutoClose.AfterAll
-    protected MongoDBTestEnvironment mongoDBTestEnvironment;
+    @TestEngine.Argument public MongoDBTestEnvironment mongoDBTestEnvironment;
 
     @TestEngine.ArgumentSupplier
     public static Stream<MongoDBTestEnvironment> arguments() {
@@ -120,8 +119,18 @@ public class MongoDBTest {
         }
     }
 
+    @TestEngine.AfterAll
+    public void afterAll() {
+        mongoDBTestEnvironment.close();
+    }
+
+    @TestEngine.Conclude
+    public void conclude() {
+        network.close();
+    }
+
     /** Class to implement a TestContext */
-    public static class MongoDBTestEnvironment implements Named<MongoDBContainer>, Closeable {
+    public static class MongoDBTestEnvironment implements Argument<MongoDBContainer>, Closeable {
 
         private final String dockerImageName;
         private MongoDBContainer mongoDBContainer;

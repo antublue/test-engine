@@ -8,7 +8,7 @@
     <artifactId>test-engine-api</artifactId>
     <version>7.x.x-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>AntuBLUE Test Engine API</name>
+    <name>AntuBLUE Test Engine / API</name>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -297,11 +297,6 @@
                             <style>AOSP</style>
                             <reflowLongStrings>true</reflowLongStrings>
                         </googleJavaFormat>
-                        <excludes>
-                            <!-- List files or directories to exclude -->
-                            <exclude>**/Named.java</exclude>
-                            <exclude>**/Namespace.java</exclude>
-                        </excludes>
                     </java>
                 </configuration>
                 <executions>

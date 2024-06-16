@@ -19,29 +19,29 @@ package org.antublue.test.engine.testing;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 @TestEngine.Disabled
 public class BadTest {
 
-    @TestEngine.Argument protected NamedString argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(NamedString.of("StringArgument " + i));
+            collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
     }
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments2() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments2() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(NamedString.of("StringArgument " + i));
+            collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
     }

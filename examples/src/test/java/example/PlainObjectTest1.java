@@ -21,13 +21,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
 public class PlainObjectTest1 {
 
-    @TestEngine.Argument protected Named<String> argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<Object> arguments() {
@@ -82,6 +82,5 @@ public class PlainObjectTest1 {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        assertThat(argument).isNull();
     }
 }

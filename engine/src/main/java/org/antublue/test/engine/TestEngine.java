@@ -16,40 +16,41 @@
 
 package org.antublue.test.engine;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.antublue.test.engine.api.internal.configuration.ConfigurationImpl;
-import org.antublue.test.engine.api.internal.configuration.Constants;
-import org.antublue.test.engine.api.internal.logger.Logger;
-import org.antublue.test.engine.api.internal.logger.LoggerFactory;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.internal.ConfigurationParameters;
 import org.antublue.test.engine.internal.Executor;
-import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.EngineDescriptorFactory;
-import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
+import org.antublue.test.engine.internal.configuration.ConfigurationParameters;
+import org.antublue.test.engine.internal.configuration.Constants;
+import org.antublue.test.engine.internal.discovery.EngineDiscoveryRequestResolver;
+import org.antublue.test.engine.internal.logger.Logger;
+import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.OrdererUtils;
+import org.antublue.test.engine.internal.util.Predicates;
+import org.antublue.test.engine.internal.util.StandardStreams;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
+import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.EngineDiscoveryRequest;
-import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
+import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement the AntuBLUE Test Engine */
 public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
-
-    private static final ConfigurationImpl CONFIGURATION = ConfigurationImpl.getInstance();
 
     /** Configuration constant */
     public static final String ENGINE_ID = "antublue-test-engine";
@@ -108,30 +109,18 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
      *
      * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param uniqueId uniqueId
-     * @return the return value
+     * @return the root TestDescriptor
      */
     @Override
     public TestDescriptor discover(
             EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
-        LOGGER.trace("discover()");
+        LOGGER.trace("discover(" + uniqueId + ")");
 
         try {
-            // Create the engine descriptor with test descriptors
-            EngineDescriptor engineDescriptor =
-                    EngineDescriptorFactory.getInstance()
-                            .createEngineDescriptor(uniqueId, getId(), engineDiscoveryRequest);
+            EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
-            // Filter the engine descriptor
-            filterTestClassesByClassName(engineDescriptor);
-            filterTestClassesByTag(engineDescriptor);
-            filterTestMethodsByMethodName(engineDescriptor);
-            filterTestMethodsByTag(engineDescriptor);
-
-            // Prune the engine descriptor
-            prune(engineDescriptor);
-
-            // Shuffle or sort then engine descriptor's children
-            shuffleOrSortTestDescriptors(engineDescriptor);
+            new EngineDiscoveryRequestResolver()
+                    .resolveSelector(engineDiscoveryRequest, engineDescriptor);
 
             return engineDescriptor;
         } catch (TestClassDefinitionException | TestEngineException t) {
@@ -139,7 +128,8 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 throw t;
             }
 
-            System.err.println(t.getMessage());
+            t.printStackTrace(System.err);
+            // System.err.println(t.getMessage());
             System.exit(1);
         } catch (Throwable t) {
             throw new TestEngineException("General exception", t);
@@ -149,300 +139,153 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
     }
 
     /**
-     * Method to filter test classes
-     *
-     * @param engineDescriptor engineDescriptor
-     */
-    private void filterTestClassesByClassName(EngineDescriptor engineDescriptor) {
-        LOGGER.trace("filterTestClassesByClassName()");
-
-        CONFIGURATION
-                .getProperty(Constants.TEST_CLASS_INCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
-
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof ClassTestDescriptor) {
-                                    ClassTestDescriptor classTestDescriptor =
-                                            (ClassTestDescriptor) testDescriptor;
-                                    matcher.reset(classTestDescriptor.getTestClass().getName());
-                                    if (!matcher.find()) {
-                                        classTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
-
-        CONFIGURATION
-                .getProperty(Constants.TEST_CLASS_EXCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
-
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof ClassTestDescriptor) {
-                                    ClassTestDescriptor classTestDescriptor =
-                                            (ClassTestDescriptor) testDescriptor;
-                                    matcher.reset(classTestDescriptor.getTestClass().getName());
-                                    if (matcher.find()) {
-                                        classTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
-    }
-
-    /**
-     * Method to filter test classes
-     *
-     * @param engineDescriptor engineDescriptor
-     */
-    private void filterTestClassesByTag(EngineDescriptor engineDescriptor) {
-        LOGGER.trace("filterTestClassesByTag()");
-
-        CONFIGURATION
-                .getProperty(Constants.TEST_CLASS_TAG_INCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
-
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof ClassTestDescriptor) {
-                                    ClassTestDescriptor classTestDescriptor =
-                                            (ClassTestDescriptor) testDescriptor;
-                                    String tag = classTestDescriptor.getTag();
-                                    if (tag != null) {
-                                        matcher.reset(tag);
-                                        if (!matcher.find()) {
-                                            classTestDescriptor.removeFromHierarchy();
-                                        }
-                                    } else {
-                                        classTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
-
-        CONFIGURATION
-                .getProperty(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
-
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof ClassTestDescriptor) {
-                                    ClassTestDescriptor classTestDescriptor =
-                                            (ClassTestDescriptor) testDescriptor;
-                                    String tag = classTestDescriptor.getTag();
-                                    if (tag != null) {
-                                        matcher.reset(tag);
-                                        if (matcher.find()) {
-                                            classTestDescriptor.removeFromHierarchy();
-                                        }
-                                    }
-                                }
-                            }
-                        });
-    }
-
-    /**
-     * Method to filter test methods by test method name
-     *
-     * @param engineDescriptor engineDescriptor
-     */
-    private void filterTestMethodsByMethodName(EngineDescriptor engineDescriptor) {
-        LOGGER.trace("filterTestMethodsByMethodName()");
-
-        CONFIGURATION
-                .getProperty(Constants.TEST_METHOD_INCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
-
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor =
-                                            (MethodTestDescriptor) testDescriptor;
-                                    matcher.reset(methodTestDescriptor.getTestMethod().getName());
-                                    if (!matcher.find()) {
-                                        methodTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
-
-        CONFIGURATION
-                .getProperty(Constants.TEST_METHOD_EXCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
-
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor =
-                                            (MethodTestDescriptor) testDescriptor;
-                                    matcher.reset(methodTestDescriptor.getTestMethod().getName());
-                                    if (matcher.find()) {
-                                        methodTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
-    }
-
-    /**
-     * Method to filter test methods by tag
-     *
-     * @param engineDescriptor engineDescriptor
-     */
-    private void filterTestMethodsByTag(EngineDescriptor engineDescriptor) {
-        LOGGER.trace("filterTestMethodsByTag()");
-
-        CONFIGURATION
-                .getProperty(Constants.TEST_METHOD_TAG_INCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
-
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor =
-                                            (MethodTestDescriptor) testDescriptor;
-                                    String tag = methodTestDescriptor.getTag();
-                                    if (tag != null) {
-                                        matcher.reset(tag);
-                                        if (!matcher.find()) {
-                                            methodTestDescriptor.removeFromHierarchy();
-                                        }
-                                    } else {
-                                        methodTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
-
-        CONFIGURATION
-                .getProperty(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
-
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor =
-                                            (MethodTestDescriptor) testDescriptor;
-                                    String tag = methodTestDescriptor.getTag();
-                                    if (tag != null) {
-                                        matcher.reset(tag);
-                                        if (matcher.find()) {
-                                            methodTestDescriptor.removeFromHierarchy();
-                                        }
-                                    }
-                                }
-                            }
-                        });
-    }
-
-    /**
-     * Method to prune a test descriptor depth first
-     *
-     * @param testDescriptor testDescriptor
-     */
-    private void prune(TestDescriptor testDescriptor) {
-        // Prune child test descriptors
-        Set<? extends TestDescriptor> children = new LinkedHashSet<>(testDescriptor.getChildren());
-        for (TestDescriptor child : children) {
-            prune(child);
-        }
-
-        // If we are the root, ignore pruning
-        if (testDescriptor.isRoot()) {
-            return;
-        }
-
-        // If test descriptor doesn't have children, remove it
-        if (testDescriptor.isContainer() && testDescriptor.getChildren().isEmpty()) {
-            testDescriptor.removeFromHierarchy();
-        }
-    }
-
-    /**
-     * Method to shuffle or sort an engine descriptor's children
-     *
-     * <p>Workaround for the fact that the engine descriptor returns an unmodifiable Set which can't
-     * be sorted
-     *
-     * @param engineDescriptor engineDescriptor
-     */
-    private void shuffleOrSortTestDescriptors(EngineDescriptor engineDescriptor) {
-        // Get the test descriptors and remove them from the engine descriptor
-        List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
-        testDescriptors.forEach(engineDescriptor::removeChild);
-
-        // Shuffle or sort the test descriptor list based on configuration
-        Optional<String> optionalShuffle = CONFIGURATION.getProperty(Constants.TEST_CLASS_SHUFFLE);
-        optionalShuffle.ifPresent(
-                s -> {
-                    if (Constants.TRUE.equals(optionalShuffle.get())) {
-                        Collections.shuffle(testDescriptors);
-                    } else {
-                        testDescriptors.sort(Comparator.comparing(TestDescriptor::getDisplayName));
-                    }
-                });
-
-        // Add the shuffled or sorted test descriptors to the engine descriptor
-        testDescriptors.forEach(engineDescriptor::addChild);
-    }
-
-    /**
      * Method to execute an ExecutionRequest
      *
      * @param executionRequest executionRequest
      */
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        LOGGER.trace("execute()");
+        LOGGER.trace(
+                "execute() rootTestDescriptor children [%d]",
+                executionRequest.getRootTestDescriptor().getChildren().size());
 
-        EngineExecutionListener engineExecutionListener =
-                executionRequest.getEngineExecutionListener();
-
-        try {
-            engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
-
-            new Executor()
-                    .execute(
-                            ExecutionRequest.create(
-                                    executionRequest.getRootTestDescriptor(),
-                                    executionRequest.getEngineExecutionListener(),
-                                    ConfigurationParameters.getInstance()));
-        } finally {
-            engineExecutionListener.executionFinished(
-                    executionRequest.getRootTestDescriptor(), TestExecutionResult.successful());
+        if (executionRequest.getRootTestDescriptor().getChildren().isEmpty()) {
+            return;
         }
+
+        executionRequest
+                .getEngineExecutionListener()
+                .executionStarted(executionRequest.getRootTestDescriptor());
+
+        Set<Object> lifeCycleInstances = new LinkedHashSet<>();
+        Map<Object, List<Method>> lifeCyclePrepareMethods = new LinkedHashMap<>();
+        Map<Object, List<Method>> lifeCycleConcludeMethods = new LinkedHashMap<>();
+
+        ThrowableCollector throwableCollector = new ThrowableCollector(throwable -> true);
+        throwableCollector.execute(
+                () -> {
+                    Set<Class<?>> lifeCycleClasses = new LinkedHashSet<>();
+                    for (URI uri : getClasspathURIs()) {
+                        lifeCycleClasses.addAll(
+                                ReflectionSupport.findAllClassesInClasspathRoot(
+                                        uri, Predicates.LIFE_CYCLE_CLASS, s -> true));
+                    }
+
+                    for (Class<?> lifecyleClass : lifeCycleClasses) {
+                        Object lifeCycleInstance = lifecyleClass.getConstructor().newInstance();
+                        lifeCycleInstances.add(lifeCycleInstance);
+
+                        List<Method> prepareMethods =
+                                ReflectionSupport.findMethods(
+                                        lifecyleClass,
+                                        Predicates.PREPARE_METHOD,
+                                        HierarchyTraversalMode.TOP_DOWN);
+
+                        prepareMethods =
+                                OrdererUtils.orderTestMethods(
+                                        prepareMethods, HierarchyTraversalMode.TOP_DOWN);
+
+                        lifeCyclePrepareMethods.put(lifeCycleInstance, prepareMethods);
+
+                        List<Method> concludeMethods =
+                                ReflectionSupport.findMethods(
+                                        lifecyleClass,
+                                        Predicates.CONCLUDE_METHOD,
+                                        HierarchyTraversalMode.BOTTOM_UP);
+
+                        concludeMethods =
+                                OrdererUtils.orderTestMethods(
+                                        concludeMethods, HierarchyTraversalMode.BOTTOM_UP);
+
+                        lifeCycleConcludeMethods.put(lifeCycleInstance, concludeMethods);
+                    }
+                });
+
+        if (throwableCollector.isEmpty()) {
+            throwableCollector.execute(
+                    () -> {
+                        for (Object lifeCycleInstance : lifeCycleInstances) {
+                            for (Method lifeCyclePrepareMethod :
+                                    lifeCyclePrepareMethods.get(lifeCycleInstance)) {
+                                lifeCyclePrepareMethod.invoke(lifeCycleInstance);
+                            }
+                        }
+                    });
+        }
+
+        if (throwableCollector.isEmpty()) {
+            throwableCollector.execute(
+                    () -> {
+                        Executor executor = new Executor();
+
+                        executor.execute(
+                                ExecutionRequest.create(
+                                        executionRequest.getRootTestDescriptor(),
+                                        executionRequest.getEngineExecutionListener(),
+                                        ConfigurationParameters.getInstance()));
+
+                        executor.await();
+                    });
+        }
+
+        List<Throwable> throwables = new ArrayList<>();
+
+        for (Object lifeCycleInstance : lifeCycleInstances) {
+            for (Method lifeCycleConcludeMethod : lifeCycleConcludeMethods.get(lifeCycleInstance)) {
+                try {
+                    lifeCycleConcludeMethod.invoke(lifeCycleInstance);
+                } catch (Throwable t) {
+                    throwables.add(t);
+                }
+            }
+        }
+
+        StandardStreams.flush();
+
+        if (throwableCollector.isEmpty() && throwables.isEmpty()) {
+            executionRequest
+                    .getEngineExecutionListener()
+                    .executionFinished(
+                            executionRequest.getRootTestDescriptor(),
+                            TestExecutionResult.successful());
+        } else {
+            Throwable throwable;
+            if (throwableCollector.isNotEmpty()) {
+                throwable = throwableCollector.getThrowable();
+            } else {
+                throwable = throwables.get(0);
+            }
+
+            executionRequest
+                    .getEngineExecutionListener()
+                    .executionFinished(
+                            executionRequest.getRootTestDescriptor(),
+                            TestExecutionResult.failed(throwable));
+        }
+    }
+
+    /**
+     * Method to get a Set of classpath URIs
+     *
+     * @return a Set of classpath URIs
+     */
+    private static Set<URI> getClasspathURIs() {
+        LOGGER.trace("getClasspathURIs()");
+
+        String classpath = System.getProperty("java.class.path");
+        Set<URI> uris = new LinkedHashSet<>();
+
+        String[] paths = classpath.split(File.pathSeparator);
+        for (String path : paths) {
+            try {
+                URI uri = new File(path).toURI();
+                uris.add(uri);
+            } catch (Exception e) {
+                System.err.println("Error converting path to URI [" + path + "]");
+                e.printStackTrace();
+            }
+        }
+
+        return uris;
     }
 }

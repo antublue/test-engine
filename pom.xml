@@ -8,7 +8,7 @@
     <artifactId>test-engine-parent</artifactId>
     <version>7.x.x-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>AntuBLUE Test Engine Parent</name>
+    <name>AntuBLUE Test Engine / Parent</name>
 
     <build>
         <plugins>
@@ -68,7 +68,7 @@
     <modules>
         <module>api</module>
         <module>engine</module>
-        <module>plugin</module>
+        <module>maven-plugin</module>
         <module>examples</module>
     </modules>
 

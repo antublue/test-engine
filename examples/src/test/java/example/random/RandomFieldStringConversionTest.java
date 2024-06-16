@@ -19,35 +19,35 @@ package example.random;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 public class RandomFieldStringConversionTest {
 
-    @TestEngine.Argument protected NamedString argument;
+    @TestEngine.Argument public Argument<String> argument;
 
-    @TestEngine.Random.Boolean protected String randomBoolean;
-    @TestEngine.Random.Integer protected String randomInteger;
-    @TestEngine.Random.Long protected String randomLong;
-    @TestEngine.Random.Float protected String randomFloat;
-    @TestEngine.Random.Double protected String randomDouble;
+    @TestEngine.Random.Boolean public String randomBoolean;
+    @TestEngine.Random.Integer public String randomInteger;
+    @TestEngine.Random.Long public String randomLong;
+    @TestEngine.Random.Float public String randomFloat;
+    @TestEngine.Random.Double public String randomDouble;
 
     @TestEngine.Random.BigInteger(
             minimum = "-10000000000000000000",
             maximum = "10000000000000000000")
-    protected String randomBigInteger;
+    public String randomBigInteger;
 
     @TestEngine.Random.BigDecimal(
             minimum = "-10000000000000000000",
             maximum = "10000000000000000000")
-    protected String randomBigDecimal;
+    public String randomBigDecimal;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(NamedString.of("StringArgument " + i));
+            collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
     }

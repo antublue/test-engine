@@ -16,86 +16,85 @@
 
 package example.locking;
 
-import static org.assertj.core.api.Fail.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Context;
+import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.Locks;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedInteger;
 
 /** Example test */
 public class ClassLockingTest1 {
 
-    public static final String NAMESPACE = "ClassLockingTest";
-    public static final String LOCK_NAME = "lock";
-    public static final String COUNTER_NAME = "counter";
+    private static final String NAMESPACE = "ClassLockingTest";
+    private static final String LOCK_NAME = "Lock";
 
-    static {
-        Context.getInstance()
-                .getStore(NAMESPACE)
-                .computeIfAbsent(COUNTER_NAME, k -> new AtomicInteger());
-    }
+    @TestEngine.Argument public Argument<String> argument;
 
-    @TestEngine.Argument public NamedInteger argument;
+    @TestEngine.Random.Integer public Integer randomInteger;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedInteger> arguments() {
-        return Stream.of(NamedInteger.of(1), NamedInteger.of(2), NamedInteger.of(3));
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            collection.add(Argument.ofString("StringArgument " + i));
+        }
+        return collection.stream();
     }
 
     @TestEngine.Prepare
-    @TestEngine.Lock(name = LOCK_NAME)
     public void prepare() {
+        Locks.getReference(NAMESPACE + "/" + LOCK_NAME).lock();
         System.out.println("prepare()");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll()");
+        System.out.println("beforeAll(" + argument + ")");
+        System.out.println("randomInteger = [" + randomInteger + "]");
+        assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println("beforeEach()");
+        System.out.println("beforeEach(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
-    public void test1() {
-        System.out.println("test1()");
-
-        AtomicInteger atomicInteger =
-                (AtomicInteger) Context.getInstance().getStore(NAMESPACE).get(COUNTER_NAME);
-
-        int count = atomicInteger.incrementAndGet();
-        if (count != 1) {
-            fail("expected count = 1");
-        }
-
-        count = atomicInteger.decrementAndGet();
-        if (count != 0) {
-            fail("expected count = 0");
-        }
+    public void test1() throws Throwable {
+        System.out.println("test1(" + argument + ")");
+        System.out.println("sleeping 1000");
+        Thread.sleep(1000);
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2()");
+        System.out.println("test2(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
-        System.out.println("afterEach()");
+        System.out.println("afterEach(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll()");
+        System.out.println("afterAll(" + argument + ")");
+        System.out.println("randomInteger = [" + randomInteger + "]");
+        assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.Conclude
-    @TestEngine.Unlock(name = LOCK_NAME)
     public void conclude() {
         System.out.println("conclude()");
+        Locks.getReference(NAMESPACE + "/" + LOCK_NAME).unlock();
     }
 }

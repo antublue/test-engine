@@ -19,7 +19,7 @@ package example;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
@@ -27,14 +27,14 @@ public class ProtectedMethodsArrayTest {
 
     private String[] values;
 
-    @TestEngine.Argument protected Named<String[]> argument;
+    @TestEngine.Argument public Argument<String[]> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<String[]>> arguments() {
-        Collection<Named<String[]>> collection = new ArrayList<>();
+    public static Stream<Argument<String[]>> arguments() {
+        Collection<Argument<String[]>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             collection.add(
-                    Named.of(
+                    Argument.of(
                             "Array [" + i + "]",
                             new String[] {String.valueOf(i), String.valueOf(i * 2)}));
         }
@@ -48,32 +48,32 @@ public class ProtectedMethodsArrayTest {
     }
 
     @TestEngine.BeforeEach
-    protected void beforeEach() {
+    public void beforeEach() {
         System.out.println("beforeEach()");
     }
 
     @TestEngine.Test
-    protected void test1() {
+    public void test1() {
         System.out.println("test1(" + values[0] + ", " + values[1] + ")");
     }
 
     @TestEngine.Test
-    protected void test2() {
+    public void test2() {
         System.out.println("test2(" + values[0] + ", " + values[1] + ")");
     }
 
     @TestEngine.Test
-    protected void test3() {
+    public void test3() {
         System.out.println("test3(" + values[0] + ", " + values[1] + ")");
     }
 
     @TestEngine.AfterEach
-    protected void afterEach() {
+    public void afterEach() {
         System.out.println("afterEach()");
     }
 
     @TestEngine.AfterAll
-    protected void afterAll() {
+    public void afterAll() {
         System.out.println("afterAll()");
     }
 }

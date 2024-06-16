@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /**
@@ -37,28 +37,28 @@ public class CamelCaseFunctionTest {
 
     private InputOutputArgument inputOutputArgument;
 
-    @TestEngine.Argument protected Named<InputOutputArgument> argument;
+    @TestEngine.Argument public Argument<InputOutputArgument> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<InputOutputArgument>> arguments() {
-        Collection<Named<InputOutputArgument>> collection = new ArrayList<>();
+    public static Stream<Argument<InputOutputArgument>> arguments() {
+        Collection<Argument<InputOutputArgument>> collection = new ArrayList<>();
 
         InputOutputArgument inputOutputArgument =
                 new InputOutputArgument(
                         "THIS STRING SHOULD BE IN CAMEL CASE", "thisStringShouldBeInCamelCase");
 
-        collection.add(Named.of(inputOutputArgument.input, inputOutputArgument));
+        collection.add(Argument.of(inputOutputArgument.input, inputOutputArgument));
 
         inputOutputArgument =
                 new InputOutputArgument(
                         "THIS string SHOULD be IN camel CASE", "thisStringShouldBeInCamelCase");
-        collection.add(Named.of(inputOutputArgument.input, inputOutputArgument));
+        collection.add(Argument.of(inputOutputArgument.input, inputOutputArgument));
 
         inputOutputArgument = new InputOutputArgument("THIS", "this");
-        collection.add(Named.of(inputOutputArgument.input, inputOutputArgument));
+        collection.add(Argument.of(inputOutputArgument.input, inputOutputArgument));
 
         inputOutputArgument = new InputOutputArgument("tHis", "this");
-        collection.add(Named.of(inputOutputArgument.input, inputOutputArgument));
+        collection.add(Argument.of(inputOutputArgument.input, inputOutputArgument));
 
         return collection.stream();
     }

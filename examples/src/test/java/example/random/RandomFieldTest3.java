@@ -21,33 +21,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 public class RandomFieldTest3 {
 
-    @TestEngine.Argument protected NamedString argument;
+    @TestEngine.Argument public Argument<String> argument;
 
-    @TestEngine.Random.Boolean protected Boolean randomBoolean;
+    @TestEngine.Random.Boolean public Boolean randomBoolean;
 
     @TestEngine.Random.Integer(minimum = 0, maximum = 1)
-    protected Integer randomInteger;
+    public Integer randomInteger;
 
     @TestEngine.Random.Long(minimum = 0L, maximum = 1L)
-    protected Long randomLong;
+    public Long randomLong;
 
     @TestEngine.Random.Float(minimum = 0F, maximum = 1F)
-    protected Float randomFloat;
+    public Float randomFloat;
 
     @TestEngine.Random.Double(minimum = 0D, maximum = 1D)
-    protected Double randomDouble;
+    public Double randomDouble;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(NamedString.of("StringArgument " + i));
+            collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
     }

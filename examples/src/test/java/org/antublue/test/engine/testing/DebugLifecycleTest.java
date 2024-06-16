@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 public class DebugLifecycleTest {
@@ -30,13 +30,13 @@ public class DebugLifecycleTest {
     // Set exceptionIn to match the method name to simulate an exception
     private static final String exceptionIn = "";
 
-    @TestEngine.Argument protected NamedString argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 1; i++) {
-            collection.add(NamedString.of("StringArgument " + i));
+            collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
     }
@@ -44,7 +44,6 @@ public class DebugLifecycleTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        assertThat(argument).isNull();
         if ("prepare()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in prepare()");
         }
@@ -107,7 +106,6 @@ public class DebugLifecycleTest {
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        assertThat(argument).isNull();
         if ("conclude()".equals(exceptionIn)) {
             throw new RuntimeException("Exception in conclude()");
         }

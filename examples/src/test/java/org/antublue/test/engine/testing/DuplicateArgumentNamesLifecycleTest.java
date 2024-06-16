@@ -22,14 +22,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 public class DuplicateArgumentNamesLifecycleTest {
 
     private static final List<String> EXPECTED = new ArrayList<>();
-    private static final List<String> actual = new ArrayList<>();
+    private static final List<String> ACTUAL = new ArrayList<>();
 
     static {
         EXPECTED.add("prepare2()");
@@ -50,13 +50,13 @@ public class DuplicateArgumentNamesLifecycleTest {
         EXPECTED.add("conclude()");
     }
 
-    @TestEngine.Argument protected NamedString argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            collection.add(NamedString.of("StringArgument"));
+            collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
     }
@@ -64,68 +64,66 @@ public class DuplicateArgumentNamesLifecycleTest {
     @TestEngine.Prepare
     public void prepare() {
         System.out.println("prepare()");
-        assertThat(argument).isNull();
-        actual.add("prepare()");
+        ACTUAL.add("prepare()");
     }
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 0)
     public void prepare2() {
         System.out.println("prepare2()");
-        assertThat(argument).isNull();
-        actual.add("prepare2()");
+        ACTUAL.add("prepare2()");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
-        actual.add("beforeAll(" + argument + ")");
+        ACTUAL.add("beforeAll(" + argument + ")");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach()");
-        actual.add("beforeEach(" + argument + ")");
+        ACTUAL.add("beforeEach(" + argument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 1)
     public void test1() {
         System.out.println("test1(" + argument + ")");
-        actual.add("test1(" + argument + ")");
+        ACTUAL.add("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 0)
     public void test2() {
         System.out.println("test2(" + argument + ")");
-        actual.add("test2(" + argument + ")");
+        ACTUAL.add("test2(" + argument + ")");
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach()");
-        actual.add("afterEach(" + argument + ")");
+        ACTUAL.add("afterEach(" + argument + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
-        actual.add("afterAll(" + argument + ")");
+        ACTUAL.add("afterAll(" + argument + ")");
     }
 
     @TestEngine.AfterAll
     @TestEngine.Order(order = 0)
     public void afterAll2() {
         System.out.println("afterAll2()");
-        actual.add("afterAll2(" + argument + ")");
+        ACTUAL.add("afterAll2(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Conclude
     public void conclude() {
         System.out.println("conclude()");
-        assertThat(argument).isNull();
-        actual.add("conclude()");
-        assertThat(actual).isEqualTo(EXPECTED);
+        ACTUAL.add("conclude()");
+        assertThat(ACTUAL).isEqualTo(EXPECTED);
     }
 }

@@ -19,17 +19,17 @@ package example;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
 
 /** Example test */
 @TestEngine.Disabled
 public class DisabledTest {
 
-    @TestEngine.Argument private NamedString argument;
+    @TestEngine.Argument private Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<NamedString> arguments() {
+    public static Stream<Argument<String>> arguments() {
         return StringArgumentSupplier.arguments();
     }
 
@@ -65,10 +65,10 @@ public class DisabledTest {
 
     private static class StringArgumentSupplier {
 
-        public static Stream<NamedString> arguments() {
-            Collection<NamedString> collection = new ArrayList<>();
+        public static Stream<Argument<String>> arguments() {
+            Collection<Argument<String>> collection = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
-                collection.add(NamedString.of(String.valueOf(i)));
+                collection.add(Argument.ofString(String.valueOf(i)));
             }
             return collection.stream();
         }

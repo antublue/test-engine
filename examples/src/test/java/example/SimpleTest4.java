@@ -26,7 +26,7 @@ import org.antublue.test.engine.api.TestEngine;
 /** Example test */
 public class SimpleTest4 {
 
-    @TestEngine.Argument protected String argument;
+    @TestEngine.Argument public String argument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<String> arguments() {
@@ -80,7 +80,6 @@ public class SimpleTest4 {
 
     @TestEngine.Conclude
     public void conclude() {
-        assertThat(argument).isNull();
         System.out.println("conclude()");
     }
 }

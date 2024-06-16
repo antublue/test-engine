@@ -16,50 +16,25 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
-import org.antublue.test.engine.api.Configuration;
-import org.antublue.test.engine.api.Context;
-import org.antublue.test.engine.api.internal.configuration.Constants;
-import org.antublue.test.engine.api.internal.logger.Logger;
-import org.antublue.test.engine.api.internal.logger.LoggerFactory;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataSupport;
 import org.antublue.test.engine.internal.util.StopWatch;
-import org.antublue.test.engine.internal.util.ThrowableContext;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
+import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Abstract class to implement an ExecutableTestDescriptor */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         implements MetadataSupport {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutableTestDescriptor.class);
-
-    private static final Configuration CONFIGURATION = Context.getInstance().getConfiguration();
-
-    private static long THREAD_THROTTLE_MILLISECONDS = 0;
-
-    static {
-        CONFIGURATION
-                .getProperty(Constants.THREAD_THROTTLE_MILLISECONDS)
-                .ifPresent(
-                        s -> {
-                            try {
-                                THREAD_THROTTLE_MILLISECONDS = Long.parseLong(s);
-                            } catch (Throwable t) {
-                                LOGGER.warn(
-                                        Constants.THREAD_THROTTLE_MILLISECONDS
-                                                + " [%s] is invalid, ignoring",
-                                        s);
-                            }
-                        });
-    }
-
-    private final ThrowableContext throwableContext;
+    private final ThrowableCollector throwableCollector;
     private final Metadata metadata;
     private final StopWatch stopWatch;
     private ExecutionRequest executionRequest;
@@ -68,19 +43,9 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
     protected ExecutableTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
 
-        stopWatch = new StopWatch();
-        throwableContext = new ThrowableContext();
+        throwableCollector = new ThrowableCollector(throwable -> true);
         metadata = new Metadata();
-    }
-
-    protected void throttle() {
-        if (THREAD_THROTTLE_MILLISECONDS > 0) {
-            try {
-                Thread.sleep(THREAD_THROTTLE_MILLISECONDS);
-            } catch (Throwable t) {
-                // DO NOTHING
-            }
-        }
+        stopWatch = new StopWatch();
     }
 
     protected void setExecutionRequest(ExecutionRequest executionRequest) {
@@ -91,13 +56,13 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         return executionRequest;
     }
 
-    public <T> T getParent(Class<T> clazz) {
+    protected <T> T getParent(Class<T> clazz) {
         Optional<TestDescriptor> optional = getParent();
         Preconditions.condition(optional.isPresent(), "parent is null");
         return clazz.cast(optional.get());
     }
 
-    public StopWatch getStopWatch() {
+    protected StopWatch getStopWatch() {
         return stopWatch;
     }
 
@@ -105,12 +70,12 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         this.testInstance = testInstance;
     }
 
-    public Object getTestInstance() {
+    protected Object getTestInstance() {
         return testInstance;
     }
 
-    public ThrowableContext getThrowableContext() {
-        return throwableContext;
+    protected ThrowableCollector getThrowableCollector() {
+        return throwableCollector;
     }
 
     @Override
@@ -124,4 +89,36 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
      * @param executionRequest executionRequest
      */
     public abstract void execute(ExecutionRequest executionRequest);
+
+    public void skip(ExecutionRequest executionRequest) {
+        getChildren()
+                .forEach(
+                        testDescriptor -> {
+                            if (testDescriptor instanceof ExecutableTestDescriptor) {
+                                ((ExecutableTestDescriptor) testDescriptor).skip(executionRequest);
+                            }
+                        });
+    }
+
+    // Common static methods
+
+    /**
+     * Method to get a test class tag value
+     *
+     * @param annotatedElement annotatedElement
+     * @return the tag value
+     */
+    protected static String getTag(AnnotatedElement annotatedElement) {
+        String tagValue = null;
+
+        TestEngine.Tag annotation = annotatedElement.getAnnotation(TestEngine.Tag.class);
+        if (annotation != null) {
+            String tag = annotation.tag();
+            if (tag != null && !tag.trim().isEmpty()) {
+                tagValue = tag.trim();
+            }
+        }
+
+        return tagValue;
+    }
 }

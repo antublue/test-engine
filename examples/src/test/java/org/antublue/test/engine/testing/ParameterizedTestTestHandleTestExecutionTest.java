@@ -18,35 +18,25 @@ package org.antublue.test.engine.testing;
 
 import static java.lang.String.format;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import org.antublue.test.engine.api.Extension;
-import org.antublue.test.engine.api.Named;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.NamedString;
 
 @TestEngine.Disabled
 public class ParameterizedTestTestHandleTestExecutionTest {
 
     @TestEngine.ArgumentSupplier
-    public static List<NamedString> arguments() {
-        List<NamedString> list = new ArrayList<>();
+    public static List<Argument<String>> arguments() {
+        List<Argument<String>> list = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            list.add(NamedString.of("StringArgument " + i));
+            list.add(Argument.ofString("StringArgument " + i));
         }
         return list;
     }
 
-    @TestEngine.ExtensionSupplier
-    public static List<Extension> extensions() {
-        List<Extension> list = new ArrayList<>();
-        list.add(new HandleTestExecutionTestExtension());
-        return list;
-    }
-
     @TestEngine.Test
-    public void test1(NamedString argument) {
+    public void test1(Argument<String> argument) {
         if (argument.getName().contains("0")) {
             throw new RuntimeException("Forced exception");
         }
@@ -54,25 +44,10 @@ public class ParameterizedTestTestHandleTestExecutionTest {
     }
 
     @TestEngine.Test
-    public void test2(NamedString argument) {
+    public void test2(Argument<String> argument) {
         if (argument.getName().contains("1")) {
             throw new RuntimeException("Forced exception");
         }
         System.out.println(format("test2(" + argument + ")"));
-    }
-
-    public static class HandleTestExecutionTestExtension implements Extension {
-
-        public void handleTestException(
-                Object testInstance, Named testArgument, Method testMethod, Throwable throwable)
-                throws Throwable {
-            System.out.println(
-                    format(
-                            "Exception in testMethod [%s] for testArgument [%s]",
-                            testMethod.getName(), testArgument));
-            if (testArgument.getName().contains("1")) {
-                throw throwable;
-            }
-        }
     }
 }
