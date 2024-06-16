@@ -17,7 +17,6 @@
 package example;
 
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.internal.util.StandardStreams;
 
 @TestEngine.LifeCycle
 public class TestEngineLifecycle {
@@ -25,12 +24,10 @@ public class TestEngineLifecycle {
     @TestEngine.Prepare
     public void prepare() throws Throwable {
         System.out.println(getClass().getName() + ".prepare()");
-        StandardStreams.flush();
     }
 
     @TestEngine.Conclude
     public void conclude() throws Throwable {
         System.out.println(getClass().getName() + ".conclude()");
-        StandardStreams.flush();
     }
 }

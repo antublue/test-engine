@@ -19,7 +19,6 @@ package org.antublue.test.engine;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +31,7 @@ import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.discovery.EngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.OrdererUtils;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StandardStreams;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
@@ -60,8 +60,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
     /** Configuration constant */
     public static final String VERSION = Information.getInstance().getVersion();
-
-    private Set<URI> uriSet;
 
     /**
      * Method to get the test engine id
@@ -103,10 +101,6 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
         return Optional.of(VERSION);
     }
 
-    public void setURIs(Set<URI> uriSet) {
-        this.uriSet = uriSet;
-    }
-
     /**
      * Method to discover test classes
      *
@@ -121,8 +115,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         try {
             EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
+
             new EngineDiscoveryRequestResolver()
                     .resolveSelector(engineDiscoveryRequest, engineDescriptor);
+
             return engineDescriptor;
         } catch (TestClassDefinitionException | TestEngineException t) {
             if (Constants.TRUE.equals(System.getProperty(Constants.MAVEN_PLUGIN))) {
@@ -154,33 +150,34 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             return;
         }
 
-        List<Object> objects = new ArrayList<>();
+        // Find @TestEngine.LifeCycle classes
+        Set<Class<?>> lifeCycleClasses = new LinkedHashSet<>();
+        for (URI uri : getClasspathURIs()) {
+            lifeCycleClasses.addAll(
+                    ReflectionSupport.findAllClassesInClasspathRoot(
+                            uri, Predicates.LIFE_CYCLE_CLASS, s -> true));
+        }
+        
+        Set<Object> lifeCycleInstances = new LinkedHashSet<>();
 
+        // Build the Set of LifeCycle instances and call the @TestEngine.Prepare methods
         try {
-            Set<URI> uriSet = new LinkedHashSet<>();
-            if (this.uriSet != null) {
-                uriSet.addAll(this.uriSet);
-            }
-            uriSet.addAll(getClasspathURIs());
+            for (Class<?> lifecyleClass : lifeCycleClasses) {
+                Object lifeCycleInstance = lifecyleClass.getConstructor().newInstance();
+                lifeCycleInstances.add(lifeCycleInstance);
 
-            // TODO find first, then create and call prepare methods (use set)
+                List<Method> prepareMethods =
+                        ReflectionSupport.findMethods(
+                                lifecyleClass,
+                                Predicates.PREPARE_METHOD,
+                                HierarchyTraversalMode.TOP_DOWN);
 
-            for (URI uri : uriSet) {
-                List<Class<?>> lifecycleClasses =
-                        ReflectionSupport.findAllClassesInClasspathRoot(
-                                uri, Predicates.LIFE_CYCLE_CLASS, s -> true);
+                prepareMethods =
+                        OrdererUtils.orderTestMethods(
+                                prepareMethods, HierarchyTraversalMode.TOP_DOWN);
 
-                for (Class<?> lifecyleClass : lifecycleClasses) {
-                    Object object = lifecyleClass.getConstructor().newInstance();
-                    objects.add(object);
-                    List<Method> prepareMethods =
-                            ReflectionSupport.findMethods(
-                                    lifecyleClass,
-                                    Predicates.PREPARE_METHOD,
-                                    HierarchyTraversalMode.TOP_DOWN);
-                    for (Method prepareMethod : prepareMethods) {
-                        prepareMethod.invoke(object);
-                    }
+                for (Method prepareMethod : prepareMethods) {
+                    prepareMethod.invoke(lifeCycleInstance);
                 }
             }
         } catch (Throwable t) {
@@ -204,16 +201,20 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             executor.await();
         } finally {
-            for (Object object : objects) {
+            for (Object lifeCycleInstance : lifeCycleInstances) {
                 List<Method> concludeMethods =
                         ReflectionSupport.findMethods(
-                                object.getClass(),
+                                lifeCycleInstance.getClass(),
                                 Predicates.CONCLUDE_METHOD,
                                 HierarchyTraversalMode.BOTTOM_UP);
 
+                concludeMethods =
+                        OrdererUtils.orderTestMethods(
+                                concludeMethods, HierarchyTraversalMode.TOP_DOWN);
+
                 for (Method concludeMethod : concludeMethods) {
                     try {
-                        concludeMethod.invoke(object);
+                        concludeMethod.invoke(lifeCycleInstance);
                     } catch (Throwable t) {
                         t.printStackTrace();
                     }
@@ -222,24 +223,31 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
             StandardStreams.flush();
 
+            // TODO handle exception if LifeCycle failure
+
             engineExecutionListener.executionFinished(
                     executionRequest.getRootTestDescriptor(), TestExecutionResult.successful());
         }
     }
 
-    public static Set<URI> getClasspathURIs() {
+    /**
+     * Method to get a Set of classpath URIs
+     *
+     * @return a Set of classpath URIs
+     */
+    private static Set<URI> getClasspathURIs() {
         LOGGER.trace("getClasspathURIs()");
 
-        Set<URI> uris = new LinkedHashSet<>();
         String classpath = System.getProperty("java.class.path");
-        String[] paths = classpath.split(File.pathSeparator);
+        Set<URI> uris = new LinkedHashSet<>();
 
+        String[] paths = classpath.split(File.pathSeparator);
         for (String path : paths) {
             try {
                 URI uri = new File(path).toURI();
                 uris.add(uri);
             } catch (Exception e) {
-                System.err.println("Error converting path to URI: " + path);
+                System.err.println("Error converting path to URI [" + path + "]");
                 e.printStackTrace();
             }
         }

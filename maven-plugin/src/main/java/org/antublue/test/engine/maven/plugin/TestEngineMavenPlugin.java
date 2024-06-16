@@ -19,16 +19,17 @@ package org.antublue.test.engine.maven.plugin;
 import static org.junit.platform.engine.discovery.ClassNameFilter.includeClassNamePatterns;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.internal.configuration.ConfigurationParameters;
 import org.antublue.test.engine.internal.configuration.Constants;
@@ -183,10 +184,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                 urls.putIfAbsent(url.getPath(), url);
             }
 
-            Set<URI> uriSet = new LinkedHashSet<>();
-            for (URL url : urls.values()) {
-                uriSet.add(url.toURI());
-            }
+            System.setProperty("java.class.path", buildClasspath(urls.values()));
 
             ClassLoader classLoader =
                     new URLClassLoader(
@@ -214,8 +212,6 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             .build();
 
             TestEngine testEngine = new TestEngine();
-            testEngine.setURIs(uriSet);
-
             TestDescriptor testDescriptor = null;
 
             try {
@@ -269,5 +265,13 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         } catch (Throwable t) {
             throw new MojoExecutionException(t);
         }
+    }
+
+    private static String buildClasspath(Collection<URL> urls) {
+        StringJoiner stringJoiner = new StringJoiner(File.pathSeparator);
+        for (URL url : urls) {
+            stringJoiner.add(url.getPath());
+        }
+        return stringJoiner.toString();
     }
 }
