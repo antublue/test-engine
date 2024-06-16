@@ -27,7 +27,7 @@ public @interface TestEngine {
 
     @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Lifecycle {}
+    @interface LifeCycle {}
 
     /** ArgumentSupplier annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})

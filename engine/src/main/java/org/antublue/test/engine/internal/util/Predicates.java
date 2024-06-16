@@ -27,13 +27,13 @@ import org.junit.platform.commons.support.ReflectionSupport;
 /** Class to implement Predicates */
 public class Predicates {
 
-    public static final Predicate<Class<?>> LIFECYCLE_CLASS =
+    public static final Predicate<Class<?>> LIFE_CYCLE_CLASS =
             clazz -> {
                 int modifiers = clazz.getModifiers();
                 return Modifier.isPublic(modifiers)
                         && !Modifier.isAbstract(modifiers)
                         && !Modifier.isStatic(modifiers)
-                        && clazz.isAnnotationPresent(TestEngine.Lifecycle.class);
+                        && clazz.isAnnotationPresent(TestEngine.LifeCycle.class);
             };
 
     /** Predicate to filter argument fields */

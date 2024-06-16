@@ -162,10 +162,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
             }
             uriSet.addAll(getClasspathURIs());
 
+            // TODO find first, then create and call prepare methods (use set)
+
             for (URI uri : uriSet) {
                 List<Class<?>> lifecycleClasses =
                         ReflectionSupport.findAllClassesInClasspathRoot(
-                                uri, Predicates.LIFECYCLE_CLASS, s -> true);
+                                uri, Predicates.LIFE_CYCLE_CLASS, s -> true);
 
                 for (Class<?> lifecyleClass : lifecycleClasses) {
                     Object object = lifecyleClass.getConstructor().newInstance();
