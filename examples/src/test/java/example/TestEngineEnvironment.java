@@ -18,8 +18,8 @@ package example;
 
 import org.antublue.test.engine.api.TestEngine;
 
-@TestEngine.LifeCycle
-public class TestEngineLifecycle {
+@TestEngine.Environment
+public class TestEngineEnvironment {
 
     @TestEngine.Prepare
     public void prepare() throws Throwable {

@@ -27,14 +27,14 @@ import org.junit.platform.commons.support.ReflectionSupport;
 /** Class to implement Predicates */
 public class Predicates {
 
-    /** Predicate to filter life cycle classes */
-    public static final Predicate<Class<?>> LIFE_CYCLE_CLASS =
+    /** Predicate to filter test environment classes */
+    public static final Predicate<Class<?>> ENVIRONMENT_CLASS =
             clazz -> {
                 int modifiers = clazz.getModifiers();
                 return Modifier.isPublic(modifiers)
                         && !Modifier.isAbstract(modifiers)
                         && !Modifier.isStatic(modifiers)
-                        && clazz.isAnnotationPresent(TestEngine.LifeCycle.class);
+                        && clazz.isAnnotationPresent(TestEngine.Environment.class);
             };
 
     /** Predicate to filter argument fields */
@@ -87,6 +87,7 @@ public class Predicates {
 
                 return !Modifier.isAbstract(modifiers)
                         && !clazz.isAnnotationPresent(TestEngine.Disabled.class)
+                        && !clazz.isAnnotationPresent(TestEngine.Environment.class)
                         && !ReflectionSupport.findMethods(
                                         clazz,
                                         Predicates.TEST_METHOD,

@@ -71,7 +71,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 | `@TestEngine.Random.BigInteger`              | field            | no       | Provides a way to inject a random BigInteger value                                                                                 |
 | `@TestEngine.Random.BigDecimal`              | field            | no       | Provides a way to inject a random BigDecimal value                                                                                 |
 | `@TestEngine.Random.UUID`                    | field            | no       | Provides a way to inject a `UUID`                                                                                                  |
-| `@TestEngine.LifeCycle`                      | class            | no       | Provides a way to execute code before all tests or after all tests at the test engine level                                        |
+| `@TestEngine.Environment`                    | class            | no       | Provides a way to execute code before all tests or after all tests at the test engine level                                        |
 **Notes**
 
 - Additional test annotations require non-static fields/methods
@@ -89,9 +89,9 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 - Abstract test classes are not executed.
 
-### What is an `Named`?
+### What is an `Argument`?
 
-`Named` is an interface all argument objects must implement to provide a name.
+`Argument` is an interface all argument objects must implement to provide a name.
 
 ## Code Examples
 
@@ -109,16 +109,21 @@ The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses t
 
 ### Maven Configuration
 
-Disable the Maven Surefire plugin...
+Set up the Maven Surefire plugin to only run JUnit 5 tests...
 
 ```xml
 <plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-surefire-plugin</artifactId>
-  <version>3.1.0</version>
-  <configuration>
-    <skipTests>true</skipTests>
-  </configuration>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>3.2.5</version>
+    <configuration>
+        <includes>
+            <include>%regex[.*JUnit5Test.*]</include>
+        </includes>
+        <systemPropertyVariables>
+            <junit.jupiter.extensions.autodetection.enabled>true</junit.jupiter.extensions.autodetection.enabled>
+        </systemPropertyVariables>
+    </configuration>
 </plugin>
 ```
 
@@ -126,17 +131,17 @@ Add the AntuBLUE Test Engine Maven Plugin...
 
 ```xml
 <plugin>
-  <groupId>org.antublue</groupId>
-  <artifactId>test-engine-maven-plugin</artifactId>
-  <version>TEST-ENGINE-VERSION</version>
-  <executions>
-    <execution>
-      <phase>integration-test</phase>
-      <goals>
-        <goal>test</goal>
-      </goals>
-    </execution>
-  </executions>
+    <groupId>org.antublue</groupId>
+    <artifactId>test-engine-maven-plugin</artifactId>
+    <version>7.x.x-SNAPSHOT</version>
+    <executions>
+        <execution>
+            <phase>integration-test</phase>
+            <goals>
+                <goal>test</goal>
+            </goals>
+        </execution>
+    </executions>
 </plugin>
 ```
 
@@ -165,7 +170,7 @@ Add the AntuBLUE Test Engine jars...
 Build and test your project...
 
 ```bash
-./mvnw clean package integration-test
+./mvnw clean verify
 ```
 
 ### Test Engine Configuration

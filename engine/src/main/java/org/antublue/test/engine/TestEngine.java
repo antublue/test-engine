@@ -157,27 +157,27 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 .getEngineExecutionListener()
                 .executionStarted(executionRequest.getRootTestDescriptor());
 
-        Set<Object> lifeCycleInstances = new LinkedHashSet<>();
-        Map<Object, List<Method>> lifeCyclePrepareMethods = new LinkedHashMap<>();
-        Map<Object, List<Method>> lifeCycleConcludeMethods = new LinkedHashMap<>();
+        Set<Object> environmentInstances = new LinkedHashSet<>();
+        Map<Object, List<Method>> environmentPrepareMethods = new LinkedHashMap<>();
+        Map<Object, List<Method>> environmentConcludeMethods = new LinkedHashMap<>();
 
         ThrowableCollector throwableCollector = new ThrowableCollector(throwable -> true);
         throwableCollector.execute(
                 () -> {
-                    Set<Class<?>> lifeCycleClasses = new LinkedHashSet<>();
+                    Set<Class<?>> environmentClasses = new LinkedHashSet<>();
                     for (URI uri : getClasspathURIs()) {
-                        lifeCycleClasses.addAll(
+                        environmentClasses.addAll(
                                 ReflectionSupport.findAllClassesInClasspathRoot(
-                                        uri, Predicates.LIFE_CYCLE_CLASS, s -> true));
+                                        uri, Predicates.ENVIRONMENT_CLASS, s -> true));
                     }
 
-                    for (Class<?> lifecyleClass : lifeCycleClasses) {
-                        Object lifeCycleInstance = lifecyleClass.getConstructor().newInstance();
-                        lifeCycleInstances.add(lifeCycleInstance);
+                    for (Class<?> enviromentClass : environmentClasses) {
+                        Object environmentInstance = enviromentClass.getConstructor().newInstance();
+                        environmentInstances.add(environmentInstance);
 
                         List<Method> prepareMethods =
                                 ReflectionSupport.findMethods(
-                                        lifecyleClass,
+                                        enviromentClass,
                                         Predicates.PREPARE_METHOD,
                                         HierarchyTraversalMode.TOP_DOWN);
 
@@ -185,11 +185,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                 OrdererUtils.orderTestMethods(
                                         prepareMethods, HierarchyTraversalMode.TOP_DOWN);
 
-                        lifeCyclePrepareMethods.put(lifeCycleInstance, prepareMethods);
+                        environmentPrepareMethods.put(environmentInstance, prepareMethods);
 
                         List<Method> concludeMethods =
                                 ReflectionSupport.findMethods(
-                                        lifecyleClass,
+                                        enviromentClass,
                                         Predicates.CONCLUDE_METHOD,
                                         HierarchyTraversalMode.BOTTOM_UP);
 
@@ -197,17 +197,17 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                                 OrdererUtils.orderTestMethods(
                                         concludeMethods, HierarchyTraversalMode.BOTTOM_UP);
 
-                        lifeCycleConcludeMethods.put(lifeCycleInstance, concludeMethods);
+                        environmentConcludeMethods.put(environmentInstance, concludeMethods);
                     }
                 });
 
         if (throwableCollector.isEmpty()) {
             throwableCollector.execute(
                     () -> {
-                        for (Object lifeCycleInstance : lifeCycleInstances) {
-                            for (Method lifeCyclePrepareMethod :
-                                    lifeCyclePrepareMethods.get(lifeCycleInstance)) {
-                                lifeCyclePrepareMethod.invoke(lifeCycleInstance);
+                        for (Object environmentInstance : environmentInstances) {
+                            for (Method environmentPrepareMethod :
+                                    environmentPrepareMethods.get(environmentInstance)) {
+                                environmentPrepareMethod.invoke(environmentInstance);
                             }
                         }
                     });
@@ -230,10 +230,11 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
 
         List<Throwable> throwables = new ArrayList<>();
 
-        for (Object lifeCycleInstance : lifeCycleInstances) {
-            for (Method lifeCycleConcludeMethod : lifeCycleConcludeMethods.get(lifeCycleInstance)) {
+        for (Object environmentInstance : environmentInstances) {
+            for (Method environmentConcludeMethod :
+                    environmentConcludeMethods.get(environmentInstance)) {
                 try {
-                    lifeCycleConcludeMethod.invoke(lifeCycleInstance);
+                    environmentConcludeMethod.invoke(environmentInstance);
                 } catch (Throwable t) {
                     throwables.add(t);
                 }

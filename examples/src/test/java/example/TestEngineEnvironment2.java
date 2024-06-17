@@ -19,8 +19,8 @@ package example;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.util.StandardStreams;
 
-@TestEngine.LifeCycle
-public class TestEngineLifecycle2 {
+@TestEngine.Environment
+public class TestEngineEnvironment2 {
 
     @TestEngine.Prepare
     public void prepare() throws Throwable {
