@@ -186,10 +186,10 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             Metadata metadata = metadataSupport.getMetadata();
             Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
             String testClassDisplayName = metadata.get(MetadataConstants.TEST_CLASS_DISPLAY_NAME);
-            Argument<?> testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
             Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
             String testMethodDisplayName =
                     metadata.get(MetadataConstants.TEST_METHOD_DISPLAY_NAME) + "()";
+            Argument<?> testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
 
             AnsiColorStringBuilder ansiColorStringBuilder =
                     new AnsiColorStringBuilder()

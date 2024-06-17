@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.Locks;
+import org.antublue.test.engine.extras.Locks;
 
 /** Example test */
 public class ThreadLocalMethodLockingTest2 {

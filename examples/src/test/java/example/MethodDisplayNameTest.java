@@ -41,13 +41,13 @@ public class MethodDisplayNameTest {
     }
 
     @TestEngine.Test
-    @TestEngine.DisplayName(name = "Test 2")
+    @TestEngine.DisplayName(name = "test2")
     public void testA() {
         System.out.println("testA(" + argument + ")");
     }
 
     @TestEngine.Test
-    @TestEngine.DisplayName(name = "Test 1")
+    @TestEngine.DisplayName(name = "test1")
     public void testB() {
         System.out.println("testB(" + argument + ")");
     }

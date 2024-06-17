@@ -16,9 +16,7 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
-import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.Metadata;
 import org.antublue.test.engine.internal.MetadataSupport;
 import org.antublue.test.engine.internal.util.StopWatch;
@@ -46,6 +44,28 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         throwableCollector = new ThrowableCollector(throwable -> true);
         metadata = new Metadata();
         stopWatch = new StopWatch();
+    }
+
+    /**
+     * Method to execute the test descriptor
+     *
+     * @param executionRequest executionRequest
+     */
+    public abstract void execute(ExecutionRequest executionRequest);
+
+    public void skip(ExecutionRequest executionRequest) {
+        getChildren()
+                .forEach(
+                        testDescriptor -> {
+                            if (testDescriptor instanceof ExecutableTestDescriptor) {
+                                ((ExecutableTestDescriptor) testDescriptor).skip(executionRequest);
+                            }
+                        });
+    }
+
+    @Override
+    public Metadata getMetadata() {
+        return metadata;
     }
 
     protected void setExecutionRequest(ExecutionRequest executionRequest) {
@@ -76,49 +96,5 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
 
     protected ThrowableCollector getThrowableCollector() {
         return throwableCollector;
-    }
-
-    @Override
-    public Metadata getMetadata() {
-        return metadata;
-    }
-
-    /**
-     * Method to execute the test descriptor
-     *
-     * @param executionRequest executionRequest
-     */
-    public abstract void execute(ExecutionRequest executionRequest);
-
-    public void skip(ExecutionRequest executionRequest) {
-        getChildren()
-                .forEach(
-                        testDescriptor -> {
-                            if (testDescriptor instanceof ExecutableTestDescriptor) {
-                                ((ExecutableTestDescriptor) testDescriptor).skip(executionRequest);
-                            }
-                        });
-    }
-
-    // Common static methods
-
-    /**
-     * Method to get a test class tag value
-     *
-     * @param annotatedElement annotatedElement
-     * @return the tag value
-     */
-    protected static String getTag(AnnotatedElement annotatedElement) {
-        String tagValue = null;
-
-        TestEngine.Tag annotation = annotatedElement.getAnnotation(TestEngine.Tag.class);
-        if (annotation != null) {
-            String tag = annotation.tag();
-            if (tag != null && !tag.trim().isEmpty()) {
-                tagValue = tag.trim();
-            }
-        }
-
-        return tagValue;
     }
 }

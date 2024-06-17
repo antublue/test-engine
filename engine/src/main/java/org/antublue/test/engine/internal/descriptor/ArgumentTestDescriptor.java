@@ -92,6 +92,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 .put(
                         MetadataConstants.TEST_CLASS_DISPLAY_NAME,
                         DisplayNameUtils.getDisplayName(testClass));
+
         getMetadata().put(MetadataConstants.TEST_ARGUMENT, testArgument);
 
         executionRequest.getEngineExecutionListener().executionStarted(this);
@@ -231,6 +232,10 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
             Class<?> testClass,
             Argument<?> testArgument,
             int testArgumentIndex) {
+        Preconditions.notNull(parentUniqueId, "parentUniqueId is null");
+        Preconditions.notNull(testClass, "testClass is null");
+        Preconditions.notNull(testArgument, "testArgument is null");
+
         UniqueId uniqueId =
                 parentUniqueId.append(
                         ArgumentTestDescriptor.class.getName(),

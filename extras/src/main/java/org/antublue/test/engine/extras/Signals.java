@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.extras;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

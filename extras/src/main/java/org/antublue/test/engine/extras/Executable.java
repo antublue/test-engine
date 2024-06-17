@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api.support;
+package org.antublue.test.engine.extras;
 
 /** Interface to implement an Executable */
 public interface Executable {

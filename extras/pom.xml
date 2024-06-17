@@ -6,10 +6,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.antublue</groupId>
-    <artifactId>test-engine-examples</artifactId>
+    <artifactId>test-engine-extras</artifactId>
     <version>7.x.x-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>AntuBLUE Test Engine / Examples</name>
+    <name>AntuBLUE Test Engine / Extras</name>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -59,32 +59,6 @@
                 <executions>
                     <execution>
                         <phase>package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
-                <configuration>
-                    <includes>
-                        <include>%regex[.*JUnit5Test.*]</include>
-                    </includes>
-                    <systemPropertyVariables>
-                        <junit.jupiter.extensions.autodetection.enabled>true</junit.jupiter.extensions.autodetection.enabled>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.antublue</groupId>
-                <artifactId>test-engine-maven-plugin</artifactId>
-                <version>7.x.x-SNAPSHOT</version>
-                <executions>
-                    <execution>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -155,73 +129,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.antublue</groupId>
-            <artifactId>test-engine-extras</artifactId>
-            <version>7.x.x-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.antublue</groupId>
-            <artifactId>test-engine-api</artifactId>
-            <version>7.x.x-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.antublue</groupId>
-            <artifactId>test-engine</artifactId>
-            <version>7.x.x-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.10.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.10.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.26.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId>
-            <version>1.19.8</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>kafka</artifactId>
-            <version>1.19.8</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
-            <version>3.7.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>mongodb</artifactId>
-            <version>1.19.8</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-sync</artifactId>
-            <version>5.1.0</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
 </project>

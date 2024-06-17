@@ -28,6 +28,7 @@ import org.antublue.test.engine.internal.reflection.OrdererUtils;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
+import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -71,20 +72,16 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         return testClass;
     }
 
-    public String getTag() {
-        return getTag(testClass);
-    }
-
     @Override
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest executionRequest)");
 
         getStopWatch().reset();
 
+        setExecutionRequest(executionRequest);
+
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
-
-        setExecutionRequest(executionRequest);
 
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
@@ -210,6 +207,9 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
      * @return a ClassTestDescriptor
      */
     public static ClassTestDescriptor of(UniqueId parentUniqueId, Class<?> testClass) {
+        Preconditions.notNull(parentUniqueId, "parentUniqueId is null");
+        Preconditions.notNull(testClass, "testClass is null");
+
         UniqueId uniqueId =
                 parentUniqueId.append(ClassTestDescriptor.class.getName(), testClass.getName());
 
