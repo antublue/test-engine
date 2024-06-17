@@ -61,9 +61,9 @@ Use a `Locks` to get a `LockReference` or use `Locks.executeInLock()`
 
 ---
 
-### I want to use the Test Engine in place of JUnit 5
+### I want to use the AntuBLUE test engine in place of JUnit 5
 
-You could use the test engine in place of Junit 5 for some test scenarios.
+You *could* use the AntuBLUE test engine in place of Junit 5 for some test scenarios, but that's not the projects goal.
 
 - **It's not a "drop in" replacement**
 
@@ -73,13 +73,16 @@ You could use the test engine in place of Junit 5 for some test scenarios.
 
 - **Reference the [Design](/MANUAL.md#design) for the state machine flow**
 
+**Use JUnit5 when appropriate.**
+
 ---
 
-### Where is the `Extension` model/paradigm?
+### Where is the test extension model/paradigm?
 
-Currently, there is no `Extension` model/paradigm.
+The AntuBLUE test engine does have a global test engine extension model to execute code before and after execution of all tests, but currently, there is no test extension model/paradigm.
 
-Preliminary work has been done, but it hasn't been required/requested.
+- Preliminary work has been done on a test extension mode, but it hasn't been required/requested.
 
-Any implementation will most likely not be able to use Junit 5 extensions.
+
+- Any implementation will most likely not be able to use Junit 5 extensions.
 

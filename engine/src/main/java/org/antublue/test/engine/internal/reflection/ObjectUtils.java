@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.util;
+package org.antublue.test.engine.internal.reflection;
 
-import java.lang.reflect.Method;
+public class ObjectUtils {
 
-public class MethodUtils {
-
-    private MethodUtils() {
+    private ObjectUtils() {
         // DO NOTHING
     }
 
-    public static void invoke(Method method) throws Throwable {
-        method.invoke(null);
-    }
-
-    public static void invoke(Method method, Object object) throws Throwable {
-        method.invoke(object);
+    public static Object createObject(Class<?> clazz) throws Throwable {
+        return clazz.getConstructor().newInstance();
     }
 }

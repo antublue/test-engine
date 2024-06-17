@@ -18,16 +18,16 @@ package example;
 
 import org.antublue.test.engine.api.TestEngine;
 
-@TestEngine.Environment
-public class TestEngineEnvironment {
+@TestEngine.EngineExtension
+public class TestEngineExtension1 {
 
-    @TestEngine.Prepare
-    public void prepare() throws Throwable {
-        System.out.println(getClass().getName() + ".prepare()");
+    @TestEngine.EngineExtension.Initialize
+    public void initialize() throws Throwable {
+        System.out.println(getClass().getName() + ".initialize()");
     }
 
-    @TestEngine.Conclude
-    public void conclude() throws Throwable {
-        System.out.println(getClass().getName() + ".conclude()");
+    @TestEngine.EngineExtension.Cleanup
+    public void cleanup() throws Throwable {
+        System.out.println(getClass().getName() + ".cleanup()");
     }
 }

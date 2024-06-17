@@ -32,7 +32,6 @@ import org.antublue.test.engine.internal.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.NamedThreadFactory;
-import org.antublue.test.engine.internal.util.StandardStreams;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
@@ -125,7 +124,6 @@ public class Executor {
                                         executableTestDescriptor.execute(executionRequest);
                                     } catch (Throwable t) {
                                         t.printStackTrace(System.err);
-                                        StandardStreams.flush();
                                     } finally {
                                         countDownLatch.get().countDown();
                                     }

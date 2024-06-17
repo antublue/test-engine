@@ -22,10 +22,9 @@ import java.util.Optional;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.reflection.OrdererUtils;
 import org.antublue.test.engine.internal.util.DisplayNameUtils;
-import org.antublue.test.engine.internal.util.OrdererUtils;
 import org.antublue.test.engine.internal.util.Predicates;
-import org.antublue.test.engine.internal.util.StandardStreams;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -142,8 +141,6 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                             this,
                             TestExecutionResult.failed(getThrowableCollector().getThrowable()));
         }
-
-        StandardStreams.flush();
     }
 
     private void beforeEach() throws Throwable {
@@ -156,7 +153,6 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                     "beforeEach() testClass [%s] testInstance [%s] method [%s]",
                     getTestInstance().getClass().getName(), getTestInstance(), method);
             method.invoke(getTestInstance());
-            StandardStreams.flush();
         }
     }
 
@@ -165,7 +161,6 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                 "test() testClass [%s] testInstance [%s] method [%s]",
                 getTestInstance().getClass().getName(), getTestInstance(), getTestMethod());
         getTestMethod().invoke(getTestInstance());
-        StandardStreams.flush();
     }
 
     private void afterEach() throws Throwable {
@@ -178,7 +173,6 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                     "afterEach() testClass [%s] testInstance [%s] method [%s]",
                     getTestInstance().getClass().getName(), getTestInstance(), method);
             method.invoke(getTestInstance());
-            StandardStreams.flush();
         }
     }
 

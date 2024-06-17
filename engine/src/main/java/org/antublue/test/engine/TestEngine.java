@@ -16,29 +16,17 @@
 
 package org.antublue.test.engine;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.Executor;
 import org.antublue.test.engine.internal.configuration.ConfigurationParameters;
 import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.discovery.EngineDiscoveryRequestResolver;
+import org.antublue.test.engine.internal.extension.TestEngineExtensionManager;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.OrdererUtils;
-import org.antublue.test.engine.internal.util.Predicates;
-import org.antublue.test.engine.internal.util.StandardStreams;
-import org.junit.platform.commons.support.HierarchyTraversalMode;
-import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -157,60 +145,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 .getEngineExecutionListener()
                 .executionStarted(executionRequest.getRootTestDescriptor());
 
-        Set<Object> environmentInstances = new LinkedHashSet<>();
-        Map<Object, List<Method>> environmentPrepareMethods = new LinkedHashMap<>();
-        Map<Object, List<Method>> environmentConcludeMethods = new LinkedHashMap<>();
+        TestEngineExtensionManager testEngineExtensionManager = new TestEngineExtensionManager();
+        testEngineExtensionManager.load();
 
         ThrowableCollector throwableCollector = new ThrowableCollector(throwable -> true);
-        throwableCollector.execute(
-                () -> {
-                    Set<Class<?>> environmentClasses = new LinkedHashSet<>();
-                    for (URI uri : getClasspathURIs()) {
-                        environmentClasses.addAll(
-                                ReflectionSupport.findAllClassesInClasspathRoot(
-                                        uri, Predicates.ENVIRONMENT_CLASS, s -> true));
-                    }
-
-                    for (Class<?> enviromentClass : environmentClasses) {
-                        Object environmentInstance = enviromentClass.getConstructor().newInstance();
-                        environmentInstances.add(environmentInstance);
-
-                        List<Method> prepareMethods =
-                                ReflectionSupport.findMethods(
-                                        enviromentClass,
-                                        Predicates.PREPARE_METHOD,
-                                        HierarchyTraversalMode.TOP_DOWN);
-
-                        prepareMethods =
-                                OrdererUtils.orderTestMethods(
-                                        prepareMethods, HierarchyTraversalMode.TOP_DOWN);
-
-                        environmentPrepareMethods.put(environmentInstance, prepareMethods);
-
-                        List<Method> concludeMethods =
-                                ReflectionSupport.findMethods(
-                                        enviromentClass,
-                                        Predicates.CONCLUDE_METHOD,
-                                        HierarchyTraversalMode.BOTTOM_UP);
-
-                        concludeMethods =
-                                OrdererUtils.orderTestMethods(
-                                        concludeMethods, HierarchyTraversalMode.BOTTOM_UP);
-
-                        environmentConcludeMethods.put(environmentInstance, concludeMethods);
-                    }
-                });
-
         if (throwableCollector.isEmpty()) {
-            throwableCollector.execute(
-                    () -> {
-                        for (Object environmentInstance : environmentInstances) {
-                            for (Method environmentPrepareMethod :
-                                    environmentPrepareMethods.get(environmentInstance)) {
-                                environmentPrepareMethod.invoke(environmentInstance);
-                            }
-                        }
-                    });
+            throwableCollector.execute(() -> testEngineExtensionManager.initialize());
         }
 
         if (throwableCollector.isEmpty()) {
@@ -228,20 +168,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     });
         }
 
-        List<Throwable> throwables = new ArrayList<>();
-
-        for (Object environmentInstance : environmentInstances) {
-            for (Method environmentConcludeMethod :
-                    environmentConcludeMethods.get(environmentInstance)) {
-                try {
-                    environmentConcludeMethod.invoke(environmentInstance);
-                } catch (Throwable t) {
-                    throwables.add(t);
-                }
-            }
-        }
-
-        StandardStreams.flush();
+        List<Throwable> throwables = testEngineExtensionManager.cleanup();
 
         if (throwableCollector.isEmpty() && throwables.isEmpty()) {
             executionRequest
@@ -250,12 +177,10 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                             executionRequest.getRootTestDescriptor(),
                             TestExecutionResult.successful());
         } else {
-            Throwable throwable;
-            if (throwableCollector.isNotEmpty()) {
-                throwable = throwableCollector.getThrowable();
-            } else {
-                throwable = throwables.get(0);
-            }
+            Throwable throwable =
+                    throwableCollector.isNotEmpty()
+                            ? throwableCollector.getThrowable()
+                            : throwables.get(0);
 
             executionRequest
                     .getEngineExecutionListener()
@@ -263,30 +188,5 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                             executionRequest.getRootTestDescriptor(),
                             TestExecutionResult.failed(throwable));
         }
-    }
-
-    /**
-     * Method to get a Set of classpath URIs
-     *
-     * @return a Set of classpath URIs
-     */
-    private static Set<URI> getClasspathURIs() {
-        LOGGER.trace("getClasspathURIs()");
-
-        String classpath = System.getProperty("java.class.path");
-        Set<URI> uris = new LinkedHashSet<>();
-
-        String[] paths = classpath.split(File.pathSeparator);
-        for (String path : paths) {
-            try {
-                URI uri = new File(path).toURI();
-                uris.add(uri);
-            } catch (Exception e) {
-                System.err.println("Error converting path to URI [" + path + "]");
-                e.printStackTrace();
-            }
-        }
-
-        return uris;
     }
 }

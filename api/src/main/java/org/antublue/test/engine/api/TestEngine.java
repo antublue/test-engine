@@ -25,10 +25,6 @@ import org.junit.platform.commons.annotation.Testable;
 /** Interface that contains all TestEngine annotations */
 public @interface TestEngine {
 
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface Environment {}
-
     /** ArgumentSupplier annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
@@ -312,5 +308,18 @@ public @interface TestEngine {
         @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
         @Retention(RetentionPolicy.RUNTIME)
         @interface UUID {}
+    }
+
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface EngineExtension {
+
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Initialize {}
+
+        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+        @Retention(RetentionPolicy.RUNTIME)
+        @interface Cleanup {}
     }
 }
