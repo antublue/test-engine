@@ -6,7 +6,7 @@
 
 # Test Engine
 
-The AntuBLUE Test Engine is a JUnit 5 based test engine designed specifically for parameterized testing at the test class level.
+The AntuBLUE test engine is a JUnit 5 based test engine designed specifically for parameterized testing at the test class level.
 
 ## API
 
@@ -71,7 +71,7 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 | `@TestEngine.Random.BigInteger`              | field            | no       | Provides a way to inject a random BigInteger value                                                                                 |
 | `@TestEngine.Random.BigDecimal`              | field            | no       | Provides a way to inject a random BigDecimal value                                                                                 |
 | `@TestEngine.Random.UUID`                    | field            | no       | Provides a way to inject a `UUID`                                                                                                  |
-| `@TestEngine.Environment`                    | class            | no       | Provides a way to execute code before all tests or after all tests at the test engine level                                        |
+
 **Notes**
 
 - Additional test annotations require non-static fields/methods
@@ -89,6 +89,28 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 - Abstract test classes are not executed.
 
+## TestEngine Extension Annotations
+
+The test engine has the ability to initialize/cleanup global resources before executing any tests.
+
+```java
+import org.antublue.test.engine.api.TestEngine;
+
+@TestEngine.EngineExtension
+public class TestEngineExtension1 {
+
+    @TestEngine.EngineExtension.Initialize
+    public void initialize() throws Throwable {
+        System.out.println(getClass().getName() + ".initialize()");
+    }
+
+    @TestEngine.EngineExtension.Cleanup
+    public void cleanup() throws Throwable {
+        System.out.println(getClass().getName() + ".cleanup()");
+    }
+}
+```
+
 ### What is an `Argument`?
 
 `Argument` is an interface all argument objects must implement to provide a name.
@@ -101,7 +123,7 @@ The `examples` module contains various testing examples and scenarios.
 
 ### Usage in a project
 
-The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses the AntuBLUE Test Engine for integration testing.
+The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses the AntuBLUE test engine for integration testing.
 
 - Prometheus JMX Exporter [integration_test_suite](https://github.com/prometheus/jmx_exporter/tree/main/integration_test_suite)
 
@@ -127,7 +149,7 @@ Set up the Maven Surefire plugin to only run JUnit 5 tests...
 </plugin>
 ```
 
-Add the AntuBLUE Test Engine Maven Plugin...
+Add the AntuBLUE test engine Maven Plugin...
 
 ```xml
 <plugin>
@@ -145,7 +167,7 @@ Add the AntuBLUE Test Engine Maven Plugin...
 </plugin>
 ```
 
-Add the AntuBLUE Test Engine jars...
+Add the AntuBLUE test engine jars...
 
 ```xml
 <dependencies>

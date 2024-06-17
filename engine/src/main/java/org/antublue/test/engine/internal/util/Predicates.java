@@ -27,14 +27,40 @@ import org.junit.platform.commons.support.ReflectionSupport;
 /** Class to implement Predicates */
 public class Predicates {
 
-    /** Predicate to filter test environment classes */
-    public static final Predicate<Class<?>> ENVIRONMENT_CLASS =
+    /** Predicate to filter test engine extension classes */
+    public static final Predicate<Class<?>> ENGINE_EXTENSION_CLASS =
             clazz -> {
                 int modifiers = clazz.getModifiers();
                 return Modifier.isPublic(modifiers)
                         && !Modifier.isAbstract(modifiers)
                         && !Modifier.isStatic(modifiers)
-                        && clazz.isAnnotationPresent(TestEngine.Environment.class);
+                        && clazz.isAnnotationPresent(TestEngine.EngineExtension.class);
+            };
+
+    /** Predicate to filter engine extension initialize methods */
+    public static final Predicate<Method> ENGINE_EXTENSION_INITIALIZE_METHOD =
+            method -> {
+                int modifiers = method.getModifiers();
+
+                return !Modifier.isAbstract(modifiers)
+                        && Modifier.isPublic(modifiers)
+                        && !Modifier.isStatic(modifiers)
+                        && method.getParameterCount() == 0
+                        && !method.isAnnotationPresent(TestEngine.Disabled.class)
+                        && method.isAnnotationPresent(TestEngine.EngineExtension.Initialize.class);
+            };
+
+    /** Predicate to filter engine extension initialize methods */
+    public static final Predicate<Method> ENGINE_EXTENSION_CLEANUP_METHOD =
+            method -> {
+                int modifiers = method.getModifiers();
+
+                return !Modifier.isAbstract(modifiers)
+                        && Modifier.isPublic(modifiers)
+                        && !Modifier.isStatic(modifiers)
+                        && method.getParameterCount() == 0
+                        && !method.isAnnotationPresent(TestEngine.Disabled.class)
+                        && method.isAnnotationPresent(TestEngine.EngineExtension.Cleanup.class);
             };
 
     /** Predicate to filter argument fields */
@@ -87,7 +113,6 @@ public class Predicates {
 
                 return !Modifier.isAbstract(modifiers)
                         && !clazz.isAnnotationPresent(TestEngine.Disabled.class)
-                        && !clazz.isAnnotationPresent(TestEngine.Environment.class)
                         && !ReflectionSupport.findMethods(
                                         clazz,
                                         Predicates.TEST_METHOD,

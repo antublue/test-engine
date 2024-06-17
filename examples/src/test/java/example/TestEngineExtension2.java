@@ -17,20 +17,17 @@
 package example;
 
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.internal.util.StandardStreams;
 
-@TestEngine.Environment
-public class TestEngineEnvironment2 {
+@TestEngine.EngineExtension
+public class TestEngineExtension2 {
 
-    @TestEngine.Prepare
-    public void prepare() throws Throwable {
-        System.out.println(getClass().getName() + ".prepare()");
-        StandardStreams.flush();
+    @TestEngine.EngineExtension.Initialize
+    public void initialize() throws Throwable {
+        System.out.println(getClass().getName() + ".initialize()");
     }
 
-    @TestEngine.Conclude
-    public void conclude() throws Throwable {
-        System.out.println(getClass().getName() + ".conclude()");
-        StandardStreams.flush();
+    @TestEngine.EngineExtension.Cleanup
+    public void cleanup() throws Throwable {
+        System.out.println(getClass().getName() + ".cleanup()");
     }
 }

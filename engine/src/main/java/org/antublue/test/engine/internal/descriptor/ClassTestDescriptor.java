@@ -23,10 +23,9 @@ import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.annotation.RandomAnnotationUtils;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.reflection.OrdererUtils;
 import org.antublue.test.engine.internal.util.DisplayNameUtils;
-import org.antublue.test.engine.internal.util.OrdererUtils;
 import org.antublue.test.engine.internal.util.Predicates;
-import org.antublue.test.engine.internal.util.StandardStreams;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.ExecutionRequest;
@@ -129,8 +128,6 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                             this,
                             TestExecutionResult.failed(getThrowableCollector().getThrowable()));
         }
-
-        StandardStreams.flush();
     }
 
     private void setRandomFields() throws Throwable {
