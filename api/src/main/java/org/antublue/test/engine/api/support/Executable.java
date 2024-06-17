@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-package example.signals;
+package org.antublue.test.engine.api.support;
 
-import java.util.stream.Stream;
-import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.Signals;
+/** Interface to implement an Executable */
+public interface Executable {
 
-public class SignalTest {
-
-    @TestEngine.Argument public Argument<Boolean> argument;
-
-    @TestEngine.ArgumentSupplier
-    public static Stream<Argument<Boolean>> arguments() {
-        return Stream.of(Argument.ofBoolean(true));
-    }
-
-    @TestEngine.Test
-    public void test() throws Throwable {
-        Thread.sleep(5000);
-        Signals.signal(getClass());
-    }
+    /**
+     * Method to execute
+     *
+     * @throws Throwable Throwable
+     */
+    void execute() throws Throwable;
 }

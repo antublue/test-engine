@@ -72,11 +72,14 @@ public class EngineDiscoveryRequestResolver {
     public void resolveSelector(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor)
             throws Throwable {
-        // Find test classes
-        Set<Class<?>> testClasses = findTestClasses(engineDiscoveryRequest);
+        // Resolve test classes
+        List<Class<?>> testClasses = resolveTestClasses(engineDiscoveryRequest);
+
+        // Order test classes
+        OrdererUtils.orderTestClasses(testClasses);
 
         if (LOGGER.isTraceEnabled()) {
-            testClasses.forEach(aClass -> LOGGER.trace("testClass [%s]", aClass.getName()));
+            testClasses.forEach(c -> LOGGER.trace("testClass [%s]", c.getName()));
         }
 
         // Build the class test descriptors
@@ -152,7 +155,7 @@ public class EngineDiscoveryRequestResolver {
         }
     }
 
-    private static Set<Class<?>> findTestClasses(EngineDiscoveryRequest engineDiscoveryRequest)
+    private static List<Class<?>> resolveTestClasses(EngineDiscoveryRequest engineDiscoveryRequest)
             throws Throwable {
         Set<Class<?>> testClassSet = new HashSet<>();
 
@@ -248,9 +251,7 @@ public class EngineDiscoveryRequestResolver {
 
         // TODO sort by class Order annotation
 
-        testClassSet = new LinkedHashSet<>(testClassList);
-
-        return testClassSet;
+        return testClassList;
     }
 
     private static Method getArumentSupplierMethod(Class<?> testClass) {

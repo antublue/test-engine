@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package example.locking;
+package example;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,13 +23,10 @@ import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.support.Locks;
+import org.antublue.test.engine.api.support.Timed;
 
 /** Example test */
-public class MethodLockingTest2 {
-
-    private static final String NAMESPACE = "MethodLockingTest";
-    private static final String LOCK_NAME = "Lock";
+public class TimedTest {
 
     @TestEngine.Argument public Argument<String> argument;
 
@@ -65,35 +62,12 @@ public class MethodLockingTest2 {
 
     @TestEngine.Test
     public void test1() throws Throwable {
-        Locks.LockReference lockReference = Locks.getReference(NAMESPACE + "/" + LOCK_NAME);
-        lockReference.lock();
-
-        try {
-            System.out.println(getClass().getName() + ".test1(" + argument + ")");
-            System.out.println(getClass().getName() + ".sleeping 1000");
-            Thread.sleep(1000);
-            assertThat(argument).isNotNull();
-        } finally {
-            System.out.println(getClass().getName() + ".continuing");
-            lockReference.unlock();
-        }
-
-        lockReference.lock();
-        try {
-            System.out.println(getClass().getName() + ".test1(" + argument + ")");
-            System.out.println(getClass().getName() + ".sleeping 1000");
-            Thread.sleep(1000);
-            assertThat(argument).isNotNull();
-        } finally {
-            System.out.println(getClass().getName() + ".continuing");
-            lockReference.unlock();
-        }
-    }
-
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + argument + ")");
+        System.out.println("test1(" + argument + ")");
         assertThat(argument).isNotNull();
+
+        double time = Timed.execute(() -> Thread.sleep(1000), Timed.Units.SECONDS);
+
+        System.out.println("internal time [" + time + "]");
     }
 
     @TestEngine.AfterEach

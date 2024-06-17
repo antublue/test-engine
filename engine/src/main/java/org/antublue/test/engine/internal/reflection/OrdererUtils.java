@@ -44,6 +44,10 @@ public class OrdererUtils {
         // DO NOTHING
     }
 
+    public static void orderTestClasses(List<Class<?>> testClasses) {
+        testClasses.sort(Comparator.comparing(DisplayNameUtils::getDisplayName));
+    }
+
     /**
      * Method to order test methods within the hierarchy, keeping the groups by component type /
      * declaring class
