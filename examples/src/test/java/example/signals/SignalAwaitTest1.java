@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.Signals;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.extras.Signals;
 
 public class SignalAwaitTest1 {
 
@@ -40,11 +40,12 @@ public class SignalAwaitTest1 {
 
     @TestEngine.Prepare
     public void prepare() {
+        System.out.println(getClass().getName() + ".prepare()");
         Signals.await(SignalTest.class);
     }
 
     @TestEngine.Test
     public void test() throws Throwable {
-        System.out.println("test(" + argument + ")");
+        System.out.println(getClass().getName() + ".test(" + argument + ")");
     }
 }

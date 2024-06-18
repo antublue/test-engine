@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api;
+package org.antublue.test.engine.extras;
 
 import java.util.Map;
 import java.util.Objects;
@@ -136,17 +136,6 @@ public class Locks {
         } finally {
             lockReference.unlock();
         }
-    }
-
-    /** Interface to implement an Executable */
-    public interface Executable {
-
-        /**
-         * Method to execute
-         *
-         * @throws Throwable Throwable
-         */
-        void execute() throws Throwable;
     }
 
     static class ReferenceCountingReentrantLock extends ReentrantLock {

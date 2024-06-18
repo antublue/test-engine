@@ -19,11 +19,12 @@ package org.antublue.test.engine.internal.descriptor;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.MetadataConstants;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.reflection.DisplayNameUtils;
 import org.antublue.test.engine.internal.reflection.OrdererUtils;
-import org.antublue.test.engine.internal.util.DisplayNameUtils;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -41,6 +42,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodTestDescriptor.class);
 
     private final Class<?> testClass;
+    private final Argument<?> testArgument;
     private final List<Method> beforeEachMethods;
     private final Method testMethod;
     private final List<Method> afterEachMethods;
@@ -51,12 +53,14 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
             Class<?> testClass,
             List<Method> beforeEachMethods,
             Method testMethod,
-            List<Method> afterEachMethods) {
+            List<Method> afterEachMethods,
+            Argument testArgument) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.beforeEachMethods = beforeEachMethods;
         this.testMethod = testMethod;
         this.afterEachMethods = afterEachMethods;
+        this.testArgument = testArgument;
     }
 
     @Override
@@ -73,17 +77,11 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         return testMethod;
     }
 
-    public String getTag() {
-        return getTag(testMethod);
-    }
-
     @Override
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest executionRequest)");
 
         getStopWatch().reset();
-
-        executionRequest.getEngineExecutionListener().executionStarted(this);
 
         setExecutionRequest(executionRequest);
 
@@ -96,8 +94,13 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                 .put(
                         MetadataConstants.TEST_CLASS_DISPLAY_NAME,
                         DisplayNameUtils.getDisplayName(testClass));
+
+        getMetadata().put(MetadataConstants.TEST_ARGUMENT, testArgument);
+
         getMetadata().put(MetadataConstants.TEST_METHOD, testMethod);
         getMetadata().put(MetadataConstants.TEST_METHOD_DISPLAY_NAME, getDisplayName());
+
+        executionRequest.getEngineExecutionListener().executionStarted(this);
 
         ThrowableCollector throwableCollector = getThrowableCollector();
 
@@ -182,10 +185,19 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
      * @param parentUniqueId parentUniqueId
      * @param testClass testClass
      * @param testMethod testMethod
+     * @param testArgument testArgument
      * @return a MethodTestDescriptor
      */
     public static MethodTestDescriptor of(
-            UniqueId parentUniqueId, Class<?> testClass, Method testMethod) {
+            UniqueId parentUniqueId,
+            Class<?> testClass,
+            Method testMethod,
+            Argument<?> testArgument) {
+        Preconditions.notNull(parentUniqueId, "parentUniqueId is null");
+        Preconditions.notNull(testClass, "testClass is null");
+        Preconditions.notNull(testMethod, "testMethod is null");
+        Preconditions.notNull(testArgument, "testArgument is null");
+
         UniqueId uniqueId =
                 parentUniqueId.append(MethodTestDescriptor.class.getName(), testMethod.getName());
 
@@ -206,6 +218,12 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
                 OrdererUtils.orderTestMethods(afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
 
         return new MethodTestDescriptor(
-                uniqueId, displayName, testClass, beforeEachMethods, testMethod, afterEachMethods);
+                uniqueId,
+                displayName,
+                testClass,
+                beforeEachMethods,
+                testMethod,
+                afterEachMethods,
+                testArgument);
     }
 }

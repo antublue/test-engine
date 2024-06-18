@@ -44,6 +44,23 @@ public class OrdererUtils {
         // DO NOTHING
     }
 
+    public static void orderTestClasses(List<Class<?>> testClasses) {
+        testClasses.sort(Comparator.comparing(DisplayNameUtils::getDisplayName));
+        testClasses.sort(
+                (o1, o2) -> Integer.compare(getOrderAnnotation(o1), getOrderAnnotation(o2)));
+    }
+
+    public static int getOrderAnnotation(Class<?> clazz) {
+        int order = Integer.MAX_VALUE;
+
+        TestEngine.Order annotation = clazz.getAnnotation(TestEngine.Order.class);
+        if (annotation != null) {
+            order = annotation.order();
+        }
+
+        return order;
+    }
+
     /**
      * Method to order test methods within the hierarchy, keeping the groups by component type /
      * declaring class

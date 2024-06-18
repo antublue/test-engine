@@ -42,7 +42,9 @@ import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.reflection.DisplayNameUtils;
 import org.antublue.test.engine.internal.reflection.OrdererUtils;
+import org.antublue.test.engine.internal.reflection.TagUtils;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -72,28 +74,23 @@ public class EngineDiscoveryRequestResolver {
     public void resolveSelector(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor)
             throws Throwable {
-        // Find test classes
-        Set<Class<?>> testClasses = findTestClasses(engineDiscoveryRequest);
+        List<Class<?>> testClasses = resolveEngineDiscoveryRequest(engineDiscoveryRequest);
+
+        filterTestClassesByClassName(testClasses);
+        filterTestClassesByTags(testClasses);
+
+        OrdererUtils.orderTestClasses(testClasses);
 
         if (LOGGER.isTraceEnabled()) {
-            testClasses.forEach(aClass -> LOGGER.trace("testClass [%s]", aClass.getName()));
+            testClasses.forEach(c -> LOGGER.trace("testClass [%s]", c.getName()));
         }
 
-        // Build the class test descriptors
         for (Class<?> testClass : testClasses) {
             buildClassTestDescriptor(testClass, engineDescriptor);
         }
 
-        // Filter the engine descriptor
-        filterTestClassesByClassName(engineDescriptor);
-        filterTestClassesByTag(engineDescriptor);
-        filterTestMethodsByMethodName(engineDescriptor);
-        filterTestMethodsByTag(engineDescriptor);
-
-        // Prune the engine descriptor
         prune(engineDescriptor);
 
-        // Shuffle or sort then engine descriptor's children
         shuffleOrSortTestDescriptors(engineDescriptor);
     }
 
@@ -131,12 +128,14 @@ public class EngineDiscoveryRequestResolver {
                         testArgumentIndex);
         parentTestDescriptor.addChild(argumentTestDescriptor);
 
-        buildMethodTestDescriptor(testClass, argumentTestDescriptor);
+        buildMethodTestDescriptor(testClass, testArgument, argumentTestDescriptor);
     }
 
     public static void buildMethodTestDescriptor(
-            Class<?> testClass, TestDescriptor parentTestDescriptor) {
-        LOGGER.trace("buildMethodTestDescriptor() testClass [%s]", testClass.getName());
+            Class<?> testClass, Argument<?> testArgument, TestDescriptor parentTestDescriptor) {
+        LOGGER.trace(
+                "buildMethodTestDescriptor() testClass [%s] testArgument [%s]",
+                testClass.getName(), testArgument.getName());
 
         List<Method> testMethods =
                 ReflectionSupport.findMethods(
@@ -144,16 +143,22 @@ public class EngineDiscoveryRequestResolver {
 
         testMethods = OrdererUtils.orderTestMethods(testMethods, HierarchyTraversalMode.TOP_DOWN);
 
+        filterTestMethodsByMethodName(testMethods);
+        filterTestMethodsByTags(testMethods);
+
         for (Method testMethod : testMethods) {
             MethodTestDescriptor methodTestDescriptor =
                     MethodTestDescriptor.of(
-                            parentTestDescriptor.getUniqueId(), testClass, testMethod);
+                            parentTestDescriptor.getUniqueId(),
+                            testClass,
+                            testMethod,
+                            testArgument);
             parentTestDescriptor.addChild(methodTestDescriptor);
         }
     }
 
-    private static Set<Class<?>> findTestClasses(EngineDiscoveryRequest engineDiscoveryRequest)
-            throws Throwable {
+    private static List<Class<?>> resolveEngineDiscoveryRequest(
+            EngineDiscoveryRequest engineDiscoveryRequest) throws Throwable {
         Set<Class<?>> testClassSet = new HashSet<>();
 
         Predicate<String> predicate = null;
@@ -246,11 +251,7 @@ public class EngineDiscoveryRequestResolver {
         List<Class<?>> testClassList = new ArrayList<>(testClassSet);
         testClassList.sort(Comparator.comparing(Class::getName));
 
-        // TODO sort by class Order annotation
-
-        testClassSet = new LinkedHashSet<>(testClassList);
-
-        return testClassSet;
+        return testClassList;
     }
 
     private static Method getArumentSupplierMethod(Class<?> testClass) {
@@ -296,223 +297,177 @@ public class EngineDiscoveryRequestResolver {
     }
 
     /**
-     * Method to filter test classes
+     * Method to filter test classes by name
      *
-     * @param engineDescriptor engineDescriptor
+     * @param testClasses testClasses
      */
-    private static void filterTestClassesByClassName(EngineDescriptor engineDescriptor) {
-        LOGGER.trace("filterTestClassesByClassName()");
+    private void filterTestClassesByClassName(List<Class<?>> testClasses) {
+        LOGGER.trace("filterTestClassesByName()");
 
-        CONFIGURATION
-                .getProperty(Constants.TEST_CLASS_INCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
+        Optional<String> optional = CONFIGURATION.getProperty(Constants.TEST_CLASS_INCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
 
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof ClassTestDescriptor) {
-                                    ClassTestDescriptor classTestDescriptor =
-                                            (ClassTestDescriptor) testDescriptor;
-                                    matcher.reset(classTestDescriptor.getTestClass().getName());
-                                    if (!matcher.find()) {
-                                        classTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
+            Iterator<Class<?>> iterator = testClasses.iterator();
+            while (iterator.hasNext()) {
+                Class<?> clazz = iterator.next();
+                matcher.reset(clazz.getName());
+                if (!matcher.find()) {
+                    iterator.remove();
+                }
+            }
+        }
 
-        CONFIGURATION
-                .getProperty(Constants.TEST_CLASS_EXCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
+        optional = CONFIGURATION.getProperty(Constants.TEST_CLASS_EXCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
 
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof ClassTestDescriptor) {
-                                    ClassTestDescriptor classTestDescriptor =
-                                            (ClassTestDescriptor) testDescriptor;
-                                    matcher.reset(classTestDescriptor.getTestClass().getName());
-                                    if (matcher.find()) {
-                                        classTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
+            Iterator<Class<?>> iterator = testClasses.iterator();
+            while (iterator.hasNext()) {
+                Class<?> clazz = iterator.next();
+                matcher.reset(clazz.getName());
+                if (matcher.find()) {
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     /**
-     * Method to filter test classes
+     * Method to filter test classes by tags
      *
-     * @param engineDescriptor engineDescriptor
+     * @param testClasses testClasses
      */
-    private static void filterTestClassesByTag(EngineDescriptor engineDescriptor) {
-        LOGGER.trace("filterTestClassesByTag()");
+    private void filterTestClassesByTags(List<Class<?>> testClasses) {
+        LOGGER.trace("filterTestClassesByTags()");
 
-        CONFIGURATION
-                .getProperty(Constants.TEST_CLASS_TAG_INCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
+        Optional<String> optional =
+                CONFIGURATION.getProperty(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
 
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof ClassTestDescriptor) {
-                                    ClassTestDescriptor classTestDescriptor =
-                                            (ClassTestDescriptor) testDescriptor;
-                                    String tag = classTestDescriptor.getTag();
-                                    if (tag != null) {
-                                        matcher.reset(tag);
-                                        if (!matcher.find()) {
-                                            classTestDescriptor.removeFromHierarchy();
-                                        }
-                                    } else {
-                                        classTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
+            Iterator<Class<?>> iterator = testClasses.iterator();
+            while (iterator.hasNext()) {
+                Class<?> clazz = iterator.next();
+                String tag = TagUtils.getTag(clazz);
+                if (tag == null) {
+                    iterator.remove();
+                } else {
+                    matcher.reset(tag);
+                    if (!matcher.find()) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
 
-        CONFIGURATION
-                .getProperty(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
+        optional = CONFIGURATION.getProperty(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
 
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof ClassTestDescriptor) {
-                                    ClassTestDescriptor classTestDescriptor =
-                                            (ClassTestDescriptor) testDescriptor;
-                                    String tag = classTestDescriptor.getTag();
-                                    if (tag != null) {
-                                        matcher.reset(tag);
-                                        if (matcher.find()) {
-                                            classTestDescriptor.removeFromHierarchy();
-                                        }
-                                    }
-                                }
-                            }
-                        });
+            Iterator<Class<?>> iterator = testClasses.iterator();
+            while (iterator.hasNext()) {
+                Class<?> clazz = iterator.next();
+                String tag = TagUtils.getTag(clazz);
+                if (tag != null) {
+                    matcher.reset(tag);
+                    if (matcher.find()) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
     }
 
     /**
      * Method to filter test methods by test method name
      *
-     * @param engineDescriptor engineDescriptor
+     * @param testMethods testMethods
      */
-    private static void filterTestMethodsByMethodName(EngineDescriptor engineDescriptor) {
+    private static void filterTestMethodsByMethodName(List<Method> testMethods) {
         LOGGER.trace("filterTestMethodsByMethodName()");
 
-        CONFIGURATION
-                .getProperty(Constants.TEST_METHOD_INCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
+        Optional<String> optional = CONFIGURATION.getProperty(Constants.TEST_METHOD_INCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
 
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor =
-                                            (MethodTestDescriptor) testDescriptor;
-                                    matcher.reset(methodTestDescriptor.getTestMethod().getName());
-                                    if (!matcher.find()) {
-                                        methodTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
+            Iterator<Method> iterator = testMethods.iterator();
+            while (iterator.hasNext()) {
+                Method testMethod = iterator.next();
+                matcher.reset(DisplayNameUtils.getDisplayName(testMethod));
+                if (!matcher.find()) {
+                    iterator.remove();
+                }
+            }
+        }
 
-        CONFIGURATION
-                .getProperty(Constants.TEST_METHOD_EXCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
+        optional = CONFIGURATION.getProperty(Constants.TEST_METHOD_EXCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
 
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor =
-                                            (MethodTestDescriptor) testDescriptor;
-                                    matcher.reset(methodTestDescriptor.getTestMethod().getName());
-                                    if (matcher.find()) {
-                                        methodTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
+            Iterator<Method> iterator = testMethods.iterator();
+            while (iterator.hasNext()) {
+                Method testMethod = iterator.next();
+                matcher.reset(DisplayNameUtils.getDisplayName(testMethod));
+                if (matcher.find()) {
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     /**
-     * Method to filter test methods by tag
+     * Method to filter test methods by tags
      *
-     * @param engineDescriptor engineDescriptor
+     * @param testMethods testMethods
      */
-    private static void filterTestMethodsByTag(EngineDescriptor engineDescriptor) {
+    private static void filterTestMethodsByTags(List<Method> testMethods) {
         LOGGER.trace("filterTestMethodsByTag()");
 
-        CONFIGURATION
-                .getProperty(Constants.TEST_METHOD_TAG_INCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
+        Optional<String> optional =
+                CONFIGURATION.getProperty(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
 
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor =
-                                            (MethodTestDescriptor) testDescriptor;
-                                    String tag = methodTestDescriptor.getTag();
-                                    if (tag != null) {
-                                        matcher.reset(tag);
-                                        if (!matcher.find()) {
-                                            methodTestDescriptor.removeFromHierarchy();
-                                        }
-                                    } else {
-                                        methodTestDescriptor.removeFromHierarchy();
-                                    }
-                                }
-                            }
-                        });
+            Iterator<Method> iterator = testMethods.iterator();
+            while (iterator.hasNext()) {
+                Method testMethod = iterator.next();
+                String tag = TagUtils.getTag(testMethod);
+                if (tag == null) {
+                    iterator.remove();
+                } else {
+                    matcher.reset(tag);
+                    if (!matcher.find()) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
 
-        CONFIGURATION
-                .getProperty(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX)
-                .ifPresent(
-                        s -> {
-                            Pattern pattern = Pattern.compile(s);
-                            Matcher matcher = pattern.matcher("");
+        optional = CONFIGURATION.getProperty(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX);
+        if (optional.isPresent()) {
+            Pattern pattern = Pattern.compile(optional.get());
+            Matcher matcher = pattern.matcher("");
 
-                            Set<? extends TestDescriptor> children =
-                                    new LinkedHashSet<>(engineDescriptor.getDescendants());
-                            for (TestDescriptor testDescriptor : children) {
-                                if (testDescriptor instanceof MethodTestDescriptor) {
-                                    MethodTestDescriptor methodTestDescriptor =
-                                            (MethodTestDescriptor) testDescriptor;
-                                    String tag = methodTestDescriptor.getTag();
-                                    if (tag != null) {
-                                        matcher.reset(tag);
-                                        if (matcher.find()) {
-                                            methodTestDescriptor.removeFromHierarchy();
-                                        }
-                                    }
-                                }
-                            }
-                        });
+            Iterator<Method> iterator = testMethods.iterator();
+            while (iterator.hasNext()) {
+                Method testMethod = iterator.next();
+                String tag = TagUtils.getTag(testMethod);
+                if (tag != null) {
+                    matcher.reset(tag);
+                    if (matcher.find()) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
     }
 
     /**

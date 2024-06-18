@@ -10,6 +10,13 @@
     <packaging>pom</packaging>
     <name>AntuBLUE Test Engine / Parent</name>
 
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -69,6 +76,7 @@
         <module>api</module>
         <module>engine</module>
         <module>maven-plugin</module>
+        <module>extras</module>
         <module>examples</module>
     </modules>
 

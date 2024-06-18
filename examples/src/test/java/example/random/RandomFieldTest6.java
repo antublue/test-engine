@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package example.locking;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package example.random;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.extras.Locks;
 
 /** Example test */
-public class MethodLockingTest1 {
+public class RandomFieldTest6 {
 
-    private static final String NAMESPACE = "MethodLockingTest";
-    private static final String LOCK_NAME = "Lock";
+    @TestEngine.Random.UUID public UUID uuid1;
+
+    @TestEngine.Random.UUID public String uuid2;
 
     @TestEngine.Argument public Argument<String> argument;
-
-    @TestEngine.Random.Integer public Integer randomInteger;
 
     @TestEngine.ArgumentSupplier
     public static Stream<Argument<String>> arguments() {
@@ -52,62 +49,33 @@ public class MethodLockingTest1 {
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll(" + argument + ")");
-        System.out.println("randomInteger = [" + randomInteger + "]");
-        assertThat(argument).isNotNull();
-        assertThat(randomInteger).isNotNull();
+        System.out.println("uuid1 " + uuid1);
+        System.out.println("uuid2 " + uuid2);
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + argument + ")");
-        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
-    public void test1() throws Throwable {
-        Locks.LockReference lockReference = Locks.getReference(NAMESPACE + "/" + LOCK_NAME);
-        lockReference.lock();
-
-        try {
-            System.out.println(getClass().getName() + ".test1(" + argument + ")");
-            System.out.println(getClass().getName() + ".sleeping 1000");
-            Thread.sleep(1000);
-            assertThat(argument).isNotNull();
-        } finally {
-            System.out.println(getClass().getName() + ".continuing");
-            lockReference.unlock();
-        }
-
-        lockReference.lock();
-        try {
-            System.out.println(getClass().getName() + ".test1(" + argument + ")");
-            System.out.println(getClass().getName() + ".sleeping 1000");
-            Thread.sleep(1000);
-            assertThat(argument).isNotNull();
-        } finally {
-            System.out.println(getClass().getName() + ".continuing");
-            lockReference.unlock();
-        }
+    public void test1() {
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + argument + ")");
-        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach(" + argument + ")");
-        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + argument + ")");
-        System.out.println("randomInteger = [" + randomInteger + "]");
-        assertThat(argument).isNotNull();
-        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.Conclude

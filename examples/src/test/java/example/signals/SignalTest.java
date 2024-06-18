@@ -18,9 +18,10 @@ package example.signals;
 
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.Signals;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.extras.Signals;
 
+@TestEngine.Order(order = 0)
 public class SignalTest {
 
     @TestEngine.Argument public Argument<Boolean> argument;
@@ -33,6 +34,8 @@ public class SignalTest {
     @TestEngine.Test
     public void test() throws Throwable {
         Thread.sleep(5000);
-        Signals.signal(getClass());
+        Class<?> clazz = SignalTest.class;
+        System.out.println("test(" + clazz + ")");
+        Signals.signal(clazz);
     }
 }
