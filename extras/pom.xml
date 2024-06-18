@@ -70,7 +70,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-enforcer-plugin</artifactId>
-                        <version>3.4.1</version>
+                        <version>3.5.0</version>
                         <executions>
                             <execution>
                                 <id>enforce-maven</id>
@@ -117,7 +117,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.6.3</version>
+                        <version>3.7.0</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -130,7 +130,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-deploy-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>3.1.2</version>
                         <executions>
                             <execution>
                                 <id>default-deploy</id>
@@ -151,7 +151,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <id>enforce-maven</id>
@@ -231,7 +231,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.21.2</version>
+                <version>3.23.0</version>
                 <configuration>
                     <linkXRef>false</linkXRef>
                     <format>txt</format>
@@ -249,7 +249,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
@@ -294,10 +294,10 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
                         <phase>compile</phase>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

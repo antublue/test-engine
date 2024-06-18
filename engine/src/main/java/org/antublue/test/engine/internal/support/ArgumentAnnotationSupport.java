@@ -31,7 +31,6 @@ import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to process @TestEngine.Argument annotations */
-@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class ArgumentAnnotationSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentAnnotationSupport.class);

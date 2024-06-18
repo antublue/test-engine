@@ -128,7 +128,7 @@ public class Locks {
             throw new IllegalArgumentException("executable is null");
         }
 
-        LockReference lockReference = Locks.getReference(name);
+        LockReference lockReference = getReference(name);
 
         try {
             lockReference.lock();

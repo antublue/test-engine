@@ -63,7 +63,6 @@ import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a EngineDiscoveryRequestResolver */
-@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class EngineDiscoveryRequestResolver {
 
     private static final Logger LOGGER =

@@ -38,6 +38,7 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 
 /** Method to execute an ExecutionRequest */
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public class Executor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Executor.class);

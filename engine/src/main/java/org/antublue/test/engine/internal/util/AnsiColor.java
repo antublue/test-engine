@@ -259,7 +259,7 @@ public class AnsiColor {
      */
     public String wrap(Object object) {
         if (ANSI_COLOR_SUPPORTED) {
-            return escapeSequence + object + AnsiColor.TEXT_RESET;
+            return escapeSequence + object + TEXT_RESET;
         } else {
             return String.valueOf(object);
         }
