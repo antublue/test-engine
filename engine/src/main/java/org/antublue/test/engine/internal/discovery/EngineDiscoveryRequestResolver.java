@@ -42,9 +42,9 @@ import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.reflection.DisplayNameUtils;
-import org.antublue.test.engine.internal.reflection.OrdererUtils;
-import org.antublue.test.engine.internal.reflection.TagUtils;
+import org.antublue.test.engine.internal.support.DisplayNameSupport;
+import org.antublue.test.engine.internal.support.OrdererSupport;
+import org.antublue.test.engine.internal.support.TagSupport;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
@@ -79,7 +79,7 @@ public class EngineDiscoveryRequestResolver {
         filterTestClassesByClassName(testClasses);
         filterTestClassesByTags(testClasses);
 
-        OrdererUtils.orderTestClasses(testClasses);
+        OrdererSupport.orderTestClasses(testClasses);
 
         if (LOGGER.isTraceEnabled()) {
             testClasses.forEach(c -> LOGGER.trace("testClass [%s]", c.getName()));
@@ -141,7 +141,7 @@ public class EngineDiscoveryRequestResolver {
                 ReflectionSupport.findMethods(
                         testClass, Predicates.TEST_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
-        testMethods = OrdererUtils.orderTestMethods(testMethods, HierarchyTraversalMode.TOP_DOWN);
+        testMethods = OrdererSupport.orderTestMethods(testMethods, HierarchyTraversalMode.TOP_DOWN);
 
         filterTestMethodsByMethodName(testMethods);
         filterTestMethodsByTags(testMethods);
@@ -359,7 +359,7 @@ public class EngineDiscoveryRequestResolver {
             Iterator<Class<?>> iterator = testClasses.iterator();
             while (iterator.hasNext()) {
                 Class<?> clazz = iterator.next();
-                String tag = TagUtils.getTag(clazz);
+                String tag = TagSupport.getTag(clazz);
                 if (tag == null) {
                     iterator.remove();
                 } else {
@@ -379,7 +379,7 @@ public class EngineDiscoveryRequestResolver {
             Iterator<Class<?>> iterator = testClasses.iterator();
             while (iterator.hasNext()) {
                 Class<?> clazz = iterator.next();
-                String tag = TagUtils.getTag(clazz);
+                String tag = TagSupport.getTag(clazz);
                 if (tag != null) {
                     matcher.reset(tag);
                     if (matcher.find()) {
@@ -406,7 +406,7 @@ public class EngineDiscoveryRequestResolver {
             Iterator<Method> iterator = testMethods.iterator();
             while (iterator.hasNext()) {
                 Method testMethod = iterator.next();
-                matcher.reset(DisplayNameUtils.getDisplayName(testMethod));
+                matcher.reset(DisplayNameSupport.getDisplayName(testMethod));
                 if (!matcher.find()) {
                     iterator.remove();
                 }
@@ -421,7 +421,7 @@ public class EngineDiscoveryRequestResolver {
             Iterator<Method> iterator = testMethods.iterator();
             while (iterator.hasNext()) {
                 Method testMethod = iterator.next();
-                matcher.reset(DisplayNameUtils.getDisplayName(testMethod));
+                matcher.reset(DisplayNameSupport.getDisplayName(testMethod));
                 if (matcher.find()) {
                     iterator.remove();
                 }
@@ -446,7 +446,7 @@ public class EngineDiscoveryRequestResolver {
             Iterator<Method> iterator = testMethods.iterator();
             while (iterator.hasNext()) {
                 Method testMethod = iterator.next();
-                String tag = TagUtils.getTag(testMethod);
+                String tag = TagSupport.getTag(testMethod);
                 if (tag == null) {
                     iterator.remove();
                 } else {
@@ -466,7 +466,7 @@ public class EngineDiscoveryRequestResolver {
             Iterator<Method> iterator = testMethods.iterator();
             while (iterator.hasNext()) {
                 Method testMethod = iterator.next();
-                String tag = TagUtils.getTag(testMethod);
+                String tag = TagSupport.getTag(testMethod);
                 if (tag != null) {
                     matcher.reset(tag);
                     if (matcher.find()) {

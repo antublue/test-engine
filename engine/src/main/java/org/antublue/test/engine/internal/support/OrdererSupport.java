@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.reflection;
+package org.antublue.test.engine.internal.support;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import org.antublue.test.engine.api.TestEngine;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.ClassUtils;
 
-public class OrdererUtils {
+public class OrdererSupport {
 
     private static final DefaultMethodOrderTopDownComparator
             DEFAULT_METHOD_ORDER_TOP_DOWN_COMPARATOR = new DefaultMethodOrderTopDownComparator();
@@ -40,13 +40,13 @@ public class OrdererUtils {
 
     private static final MethodNameComparator METHOD_NAME_COMPARATOR = new MethodNameComparator();
 
-    private OrdererUtils() {
+    private OrdererSupport() {
         // DO NOTHING
     }
 
     public static void orderTestClasses(List<Class<?>> testClasses) {
-        testClasses.sort(Comparator.comparing(DisplayNameUtils::getDisplayName));
-        testClasses.sort(Comparator.comparingInt(OrdererUtils::getOrderAnnotation));
+        testClasses.sort(Comparator.comparing(DisplayNameSupport::getDisplayName));
+        testClasses.sort(Comparator.comparingInt(OrdererSupport::getOrderAnnotation));
     }
 
     public static int getOrderAnnotation(Class<?> clazz) {

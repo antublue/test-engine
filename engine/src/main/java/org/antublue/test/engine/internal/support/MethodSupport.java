@@ -14,28 +14,33 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.reflection;
+package org.antublue.test.engine.internal.support;
 
-import java.net.URI;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
-public class ClassUtils {
+public class MethodSupport {
 
-    private ClassUtils() {
+    private MethodSupport() {
         // DO NOTHING
     }
 
-    public static List<Class<?>> discoverClasses(Predicate<Class<?>> predicate) {
-        Set<Class<?>> set = new LinkedHashSet<>();
-        for (URI uri : ClassPathUtils.getClasspathURIs()) {
-            set.addAll(
-                    ReflectionSupport.findAllClassesInClasspathRoot(uri, predicate, name -> true));
-        }
-        return new ArrayList<>(set);
+    public static List<Method> getMethods(
+            Class<?> clazz,
+            Predicate<Method> predicate,
+            HierarchyTraversalMode hierarchyTraversalMode) {
+        List<Method> methods =
+                new ArrayList<>(
+                        ReflectionSupport.findMethods(clazz, predicate, hierarchyTraversalMode));
+
+        methods.sort(Comparator.comparing(Method::getName));
+        // TODO sort by @TestEngine.Order
+
+        return methods;
     }
 }

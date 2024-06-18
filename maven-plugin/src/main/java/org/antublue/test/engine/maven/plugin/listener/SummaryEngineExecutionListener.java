@@ -20,14 +20,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.antublue.test.engine.TestEngine;
-import org.antublue.test.engine.internal.Metadata;
-import org.antublue.test.engine.internal.MetadataConstants;
-import org.antublue.test.engine.internal.MetadataSupport;
+import org.antublue.test.engine.Engine;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
+import org.antublue.test.engine.internal.metadata.Metadata;
+import org.antublue.test.engine.internal.metadata.MetadataConstants;
+import org.antublue.test.engine.internal.metadata.MetadataInformation;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.internal.util.HumanReadableTimeUtils;
@@ -47,7 +47,7 @@ public class SummaryEngineExecutionListener
                     .append("BLUE")
                     .color(AnsiColor.TEXT_WHITE_BRIGHT)
                     .append(" Test Engine ")
-                    .append(TestEngine.VERSION)
+                    .append(Engine.VERSION)
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
@@ -176,11 +176,11 @@ public class SummaryEngineExecutionListener
         long methodTestDescriptorSkipped = 0;
 
         for (TestDescriptor testDescriptor : testDescriptors) {
-            if (testDescriptor instanceof MetadataSupport) {
-                MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
-                Metadata metadata = metadataSupport.getMetadata();
+            if (testDescriptor instanceof Metadata) {
+                Metadata metadata = (Metadata) testDescriptor;
+                MetadataInformation metadataInformation = metadata.getMetadata();
                 String testDescriptorStatus =
-                        metadata.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
+                        metadataInformation.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
 
                 if (testDescriptor instanceof MethodTestDescriptor) {
                     methodTestDescriptorFound++;
