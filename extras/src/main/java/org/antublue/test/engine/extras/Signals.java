@@ -46,11 +46,10 @@ public class Signals {
                             return v;
                         });
 
+        countDownLatch.countDown();
         if (countDownLatch.getCount() == 0) {
             throw new IllegalStateException("Condition [%s] already signaled");
         }
-
-        countDownLatch.countDown();
     }
 
     /**
