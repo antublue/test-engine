@@ -92,6 +92,10 @@ public class EngineDiscoveryRequestResolver {
         prune(engineDescriptor);
 
         shuffleOrSortTestDescriptors(engineDescriptor);
+
+        for (TestDescriptor testDescriptor : engineDescriptor.getChildren()) {
+            LOGGER.info("testDescriptor() name [%s", testDescriptor.getDisplayName());
+        }
     }
 
     private static void buildClassTestDescriptor(
