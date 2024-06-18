@@ -130,7 +130,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     private void setRandomFields() throws Throwable {
         LOGGER.trace("setRandomFields() testClass [%s]", getTestClass().getName());
 
-        RandomAnnotationSupport.injectRandomFields(getTestClass());
+        RandomAnnotationSupport.setRandomFields(getTestClass());
     }
 
     private void prepare() throws Throwable {

@@ -149,7 +149,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 "setArgumentFields() testClass [%s] testInstance [%s] testArgument [%s]",
                 getTestInstance().getClass().getName(), getTestInstance(), testArgument);
 
-        ArgumentAnnotationSupport.injectArgumentFields(getTestInstance(), testArgument);
+        ArgumentAnnotationSupport.setArgumentFields(getTestInstance(), testArgument);
     }
 
     private void setRandomFields() throws Throwable {
@@ -157,7 +157,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 "setRandomFields() testClass [%s] testInstance [%s] testArgument [%s]",
                 getTestInstance().getClass().getName(), getTestInstance(), testArgument);
 
-        RandomAnnotationSupport.injectRandomFields(getTestInstance());
+        RandomAnnotationSupport.setRandomFields(getTestInstance());
     }
 
     private void beforeAllMethods() throws Throwable {
@@ -215,7 +215,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 "clearArgumentFields() testClass [%s] testInstance [%s]",
                 getTestInstance().getClass().getName(), getTestInstance());
 
-        ArgumentAnnotationSupport.injectArgumentFields(getTestInstance(), null);
+        ArgumentAnnotationSupport.setArgumentFields(getTestInstance(), null);
     }
 
     /**
@@ -249,7 +249,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         List<Method> beforeAllMethods =
                 ReflectionSupport.findMethods(
-                        testClass, Predicates.BEFORE_ALL, HierarchyTraversalMode.TOP_DOWN);
+                        testClass, Predicates.BEFORE_ALL_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
         if (!beforeAllMethods.isEmpty() && LOGGER.isTraceEnabled()) {
             beforeAllMethods.forEach(method -> LOGGER.trace("beforeAll method [%s]", method));
@@ -260,7 +260,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         List<Method> afterAllMethods =
                 ReflectionSupport.findMethods(
-                        testClass, Predicates.AFTER_ALL, HierarchyTraversalMode.BOTTOM_UP);
+                        testClass, Predicates.AFTER_ALL_METHOD, HierarchyTraversalMode.BOTTOM_UP);
 
         if (!afterAllMethods.isEmpty() && LOGGER.isTraceEnabled()) {
             afterAllMethods.forEach(method -> LOGGER.trace("afterAll method [%s]", method));
