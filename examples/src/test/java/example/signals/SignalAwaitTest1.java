@@ -23,7 +23,6 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.extras.Signals;
 
-@TestEngine.Disabled
 public class SignalAwaitTest1 {
 
     @TestEngine.Argument public Argument<String> argument;
