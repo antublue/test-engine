@@ -81,8 +81,8 @@ public class EngineDiscoveryRequestResolver {
 
         OrdererUtils.orderTestClasses(testClasses);
 
-        if (LOGGER.isTraceEnabled()) {
-            testClasses.forEach(c -> LOGGER.trace("testClass [%s]", c.getName()));
+        if (LOGGER.isInfoEnabled()) {
+            testClasses.forEach(c -> LOGGER.info("testClass [%s]", c.getName()));
         }
 
         for (Class<?> testClass : testClasses) {
