@@ -51,6 +51,10 @@ public class Timed {
                     t0 = System.nanoTime();
                     break;
                 }
+            default:
+                {
+                    throw new IllegalStateException("Invalid units");
+                }
         }
 
         executable.execute();
@@ -72,6 +76,10 @@ public class Timed {
                 {
                     t1 = System.nanoTime();
                     break;
+                }
+            default:
+                {
+                    throw new IllegalStateException("Invaild units");
                 }
         }
 
