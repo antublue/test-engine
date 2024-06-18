@@ -4,9 +4,9 @@
 
 ![AntuBLUE logo](assets/logo.png)
 
-# Test Engine
+# AntuBLUE Test Engine
 
-The AntuBLUE test engine is a JUnit 5 based test engine designed specifically for parameterized testing at the test class level.
+The AntuBLUE test engine is a JUnit5 based test engine designed specifically for parameterized testing at the test class level.
 
 ## API
 
@@ -195,7 +195,7 @@ Build and test your project...
 ./mvnw clean verify
 ```
 
-### Test Engine Configuration
+### AntuBLUE Test Engine Configuration
 
 The test engine uses a properties file for configuration.
 
@@ -216,7 +216,7 @@ current directory `.antublue-test-engine.properties`
   parent directory `.antublue-test-engine.properties`
     parent directory `.antublue-test-engine.properties`
 
-### Standard Test Engine properties
+### Standard AntuBLUE Test Engine properties
 
 | Property                                           | Type    | Default value                    |
 |----------------------------------------------------|---------|----------------------------------|
