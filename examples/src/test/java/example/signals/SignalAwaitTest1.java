@@ -40,7 +40,9 @@ public class SignalAwaitTest1 {
 
     @TestEngine.Prepare
     public void prepare() {
-        Signals.await(SignalTest.class);
+        Class<?> clazz = SignalTest.class;
+        System.out.println("prepare(" + clazz + ")");
+        Signals.await(clazz);
     }
 
     @TestEngine.Test

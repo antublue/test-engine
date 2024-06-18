@@ -33,6 +33,8 @@ public class SignalTest {
     @TestEngine.Test
     public void test() throws Throwable {
         Thread.sleep(5000);
-        Signals.signal(getClass());
+        Class<?> clazz = SignalTest.class;
+        System.out.println("test(" + clazz + ")");
+        Signals.signal(clazz);
     }
 }
