@@ -217,7 +217,7 @@ public class Test {
 
 ### Arguments
 
-The `Named` generic interface allows for naming arguments. 
+The `Argument` generic interface allows for naming arguments. 
 
 Example:
 
@@ -225,13 +225,13 @@ Example:
 public class SimpleTest1 {
 
     @TestEngine.Argument
-    protected Named<String> argument;
+    protected Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Named<String>> arguments() {
-        Collection<NamedString> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument> collection = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
-            collection.add(Named.of("StringArgument " + i, "string value " + i));
+            collection.add(Argument.of("StringArgument " + i, "string value " + i));
         }
         return collection.stream();
     }
@@ -269,12 +269,12 @@ public class SimpleTest1 {
 
 `Store` has been removed.
 
-### Locking
+### Locking Semantics
 
-`@TestEngine.ResourceLock`, `@TestEngine.Lock`, and `@TestEngine.Unlock` have been removed and replaced with a `Lock` class.
+`@TestEngine.ResourceLock`, `@TestEngine.Lock`, and `@TestEngine.Unlock` have been removed and replaced with a `Locks` class in the `extras` module.
 
 Why?
 
 - Code clarity
 - Code logic via annotation seems like an anti-pattern
-- `Lock` allows for more complex and robust scenarios
+- `Locks` allows for more complex and robust scenarios
