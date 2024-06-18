@@ -22,6 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Class to implement Conditions */
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public class Signals {
 
     private static final ReentrantLock LOCK = new ReentrantLock(true);

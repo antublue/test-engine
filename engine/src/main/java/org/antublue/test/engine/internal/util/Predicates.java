@@ -106,6 +106,19 @@ public class Predicates {
                         && !Modifier.isFinal(modifiers);
             };
 
+    /** Predicate to filter test methods */
+    public static final Predicate<Method> TEST_METHOD =
+            method -> {
+                int modifiers = method.getModifiers();
+
+                return !Modifier.isAbstract(modifiers)
+                        && Modifier.isPublic(modifiers)
+                        && !Modifier.isStatic(modifiers)
+                        && method.getParameterCount() == 0
+                        && !method.isAnnotationPresent(TestEngine.Disabled.class)
+                        && method.isAnnotationPresent(TestEngine.Test.class);
+            };
+
     /** Predicate to filter test classes */
     public static final Predicate<Class<?>> TEST_CLASS =
             clazz -> {
@@ -114,13 +127,11 @@ public class Predicates {
                 return !Modifier.isAbstract(modifiers)
                         && !clazz.isAnnotationPresent(TestEngine.Disabled.class)
                         && !ReflectionSupport.findMethods(
-                                        clazz,
-                                        Predicates.TEST_METHOD,
-                                        HierarchyTraversalMode.TOP_DOWN)
+                                        clazz, TEST_METHOD, HierarchyTraversalMode.TOP_DOWN)
                                 .isEmpty()
                         && !ReflectionSupport.findMethods(
                                         clazz,
-                                        Predicates.ARGUMENT_SUPPLIER_METHOD,
+                                        ARGUMENT_SUPPLIER_METHOD,
                                         HierarchyTraversalMode.TOP_DOWN)
                                 .isEmpty();
             };
@@ -162,19 +173,6 @@ public class Predicates {
                         && method.getParameterCount() == 0
                         && !method.isAnnotationPresent(TestEngine.Disabled.class)
                         && method.isAnnotationPresent(TestEngine.BeforeEach.class);
-            };
-
-    /** Predicate to filter test methods */
-    public static final Predicate<Method> TEST_METHOD =
-            method -> {
-                int modifiers = method.getModifiers();
-
-                return !Modifier.isAbstract(modifiers)
-                        && Modifier.isPublic(modifiers)
-                        && !Modifier.isStatic(modifiers)
-                        && method.getParameterCount() == 0
-                        && !method.isAnnotationPresent(TestEngine.Disabled.class)
-                        && method.isAnnotationPresent(TestEngine.Test.class);
             };
 
     /** Predicate to filter after each methods */

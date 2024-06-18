@@ -30,7 +30,6 @@ import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
 
 /** Class to process @TestEngine.Random.X annotations */
-@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class RandomAnnotationSupport {
 
     private static final Predicate<Field> HAS_RANDOM_ANNOTATION =

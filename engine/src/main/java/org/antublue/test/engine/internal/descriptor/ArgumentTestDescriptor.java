@@ -41,7 +41,6 @@ import org.junit.platform.engine.support.descriptor.ClassSource;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement a ArgumentTestDescriptor */
-@SuppressWarnings({"PMD.UnusedPrivateMethod", "PMD.AvoidAccessibilityAlteration"})
 public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentTestDescriptor.class);
