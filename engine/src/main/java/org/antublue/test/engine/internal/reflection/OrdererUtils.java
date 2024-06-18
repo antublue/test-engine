@@ -46,8 +46,7 @@ public class OrdererUtils {
 
     public static void orderTestClasses(List<Class<?>> testClasses) {
         testClasses.sort(Comparator.comparing(DisplayNameUtils::getDisplayName));
-        testClasses.sort(
-                (o1, o2) -> Integer.compare(getOrderAnnotation(o1), getOrderAnnotation(o2)));
+        testClasses.sort(Comparator.comparingInt(OrdererUtils::getOrderAnnotation));
     }
 
     public static int getOrderAnnotation(Class<?> clazz) {
@@ -115,6 +114,7 @@ public class OrdererUtils {
         }
     }
 
+    /** Class to order methods based on @TestEngine.Order annotation */
     private static class DefaultMethodOrderBottomUpComparator implements Comparator<Method> {
 
         @Override
