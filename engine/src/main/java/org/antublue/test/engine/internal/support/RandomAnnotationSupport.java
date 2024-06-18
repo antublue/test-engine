@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.annotation;
+package org.antublue.test.engine.internal.support;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -29,10 +29,10 @@ import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to process @TestEngine.Random.X annotations */
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
-public class RandomAnnotationUtils {
+public class RandomAnnotationSupport {
 
     /** Constructor */
-    private RandomAnnotationUtils() {
+    private RandomAnnotationSupport() {
         // DO NOTHING
     }
 

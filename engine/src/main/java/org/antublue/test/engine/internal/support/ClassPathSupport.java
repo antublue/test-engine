@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.reflection;
+package org.antublue.test.engine.internal.support;
 
 import java.io.File;
 import java.net.URI;
@@ -25,13 +25,13 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Class to implement ClassPathURIUtils */
-public class ClassPathUtils {
+public class ClassPathSupport {
 
     private static final ReentrantLock LOCK = new ReentrantLock(true);
     private static List<URI> URIS;
 
     /** Constructor */
-    private ClassPathUtils() {
+    private ClassPathSupport() {
         // DO NOTHING
     }
 

@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.internal.Executor;
 import org.antublue.test.engine.internal.configuration.ConfigurationParameters;
 import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.discovery.EngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.extension.TestEngineExtensionManager;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.Executor;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -36,9 +36,9 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement the AntuBLUE Test Engine */
-public class TestEngine implements org.junit.platform.engine.TestEngine {
+public class Engine implements org.junit.platform.engine.TestEngine {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
 
     /** Configuration constant */
     public static final String ENGINE_ID = "antublue-test-engine";

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal;
+package org.antublue.test.engine.internal.util;
 
 import static java.lang.String.format;
 
@@ -31,7 +31,6 @@ import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.NamedThreadFactory;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;

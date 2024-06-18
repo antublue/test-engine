@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import org.antublue.test.engine.internal.reflection.ClassUtils;
+import org.antublue.test.engine.internal.support.ClassSupport;
 import org.antublue.test.engine.internal.util.Predicates;
 
 /** Class to implement TestEngineExtensionManager */
@@ -35,7 +35,7 @@ public class TestEngineExtensionManager {
 
     /** Method to load test engine extensions */
     public void load() {
-        List<Class<?>> classes = ClassUtils.discoverClasses(Predicates.ENGINE_EXTENSION_CLASS);
+        List<Class<?>> classes = ClassSupport.discoverClasses(Predicates.ENGINE_EXTENSION_CLASS);
 
         classes.sort(Comparator.comparing(Class::getName));
 

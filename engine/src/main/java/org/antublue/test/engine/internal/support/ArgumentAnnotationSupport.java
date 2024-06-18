@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.annotation;
+package org.antublue.test.engine.internal.support;
 
 import static java.lang.String.format;
 
@@ -32,12 +32,12 @@ import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to process @TestEngine.Argument annotations */
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
-public class ArgumentAnnotationUtils {
+public class ArgumentAnnotationSupport {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentAnnotationUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentAnnotationSupport.class);
 
     /** Constructor */
-    private ArgumentAnnotationUtils() {
+    private ArgumentAnnotationSupport() {
         // DO NOTHING
     }
 

@@ -18,13 +18,13 @@ package org.antublue.test.engine.maven.plugin.listener;
 
 import java.lang.reflect.Method;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.internal.Metadata;
-import org.antublue.test.engine.internal.MetadataConstants;
-import org.antublue.test.engine.internal.MetadataSupport;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.metadata.Metadata;
+import org.antublue.test.engine.internal.metadata.MetadataConstants;
+import org.antublue.test.engine.internal.metadata.MetadataInformation;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.internal.util.HumanReadableTimeUtils;
@@ -181,15 +181,16 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
     @Override
     public void executionStarted(TestDescriptor testDescriptor) {
-        if (consoleLogTestMessages && testDescriptor instanceof MetadataSupport) {
-            MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
-            Metadata metadata = metadataSupport.getMetadata();
-            Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
-            String testClassDisplayName = metadata.get(MetadataConstants.TEST_CLASS_DISPLAY_NAME);
-            Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
+        if (consoleLogTestMessages && testDescriptor instanceof Metadata) {
+            Metadata metadata = (Metadata) testDescriptor;
+            MetadataInformation metadataInformation = metadata.getMetadata();
+            Class<?> testClass = metadataInformation.get(MetadataConstants.TEST_CLASS);
+            String testClassDisplayName =
+                    metadataInformation.get(MetadataConstants.TEST_CLASS_DISPLAY_NAME);
+            Method testMethod = metadataInformation.get(MetadataConstants.TEST_METHOD);
             String testMethodDisplayName =
-                    metadata.get(MetadataConstants.TEST_METHOD_DISPLAY_NAME) + "()";
-            Argument<?> testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
+                    metadataInformation.get(MetadataConstants.TEST_METHOD_DISPLAY_NAME) + "()";
+            Argument<?> testArgument = metadataInformation.get(MetadataConstants.TEST_ARGUMENT);
 
             AnsiColorStringBuilder ansiColorStringBuilder =
                     new AnsiColorStringBuilder()
@@ -221,16 +222,18 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
     @Override
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-        if (consoleLogSkipMessages && testDescriptor instanceof MetadataSupport) {
-            MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
-            Metadata metadata = metadataSupport.getMetadata();
-            Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
-            String testClassDisplayName = metadata.get(MetadataConstants.TEST_CLASS_DISPLAY_NAME);
-            Argument<?> testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
-            Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
+        if (consoleLogSkipMessages && testDescriptor instanceof Metadata) {
+            Metadata metadata = (Metadata) testDescriptor;
+            MetadataInformation metadataInformation = metadata.getMetadata();
+            Class<?> testClass = metadataInformation.get(MetadataConstants.TEST_CLASS);
+            String testClassDisplayName =
+                    metadataInformation.get(MetadataConstants.TEST_CLASS_DISPLAY_NAME);
+            Argument<?> testArgument = metadataInformation.get(MetadataConstants.TEST_ARGUMENT);
+            Method testMethod = metadataInformation.get(MetadataConstants.TEST_METHOD);
             String testMethodDisplayName =
-                    metadata.get(MetadataConstants.TEST_METHOD_DISPLAY_NAME) + "()";
-            Long elapsedTime = metadata.get(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
+                    metadataInformation.get(MetadataConstants.TEST_METHOD_DISPLAY_NAME) + "()";
+            Long elapsedTime =
+                    metadataInformation.get(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
 
             AnsiColorStringBuilder ansiColorStringBuilder =
                     new AnsiColorStringBuilder()
@@ -272,17 +275,20 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
     @Override
     public void executionFinished(
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-        if (consoleLogPassMessages && testDescriptor instanceof MetadataSupport) {
-            MetadataSupport metadataSupport = (MetadataSupport) testDescriptor;
-            Metadata metadata = metadataSupport.getMetadata();
-            Class<?> testClass = metadata.get(MetadataConstants.TEST_CLASS);
-            String testClassDisplayName = metadata.get(MetadataConstants.TEST_CLASS_DISPLAY_NAME);
-            Argument<?> testArgument = metadata.get(MetadataConstants.TEST_ARGUMENT);
-            Method testMethod = metadata.get(MetadataConstants.TEST_METHOD);
+        if (consoleLogPassMessages && testDescriptor instanceof Metadata) {
+            Metadata metadata = (Metadata) testDescriptor;
+            MetadataInformation metadataInformation = metadata.getMetadata();
+            Class<?> testClass = metadataInformation.get(MetadataConstants.TEST_CLASS);
+            String testClassDisplayName =
+                    metadataInformation.get(MetadataConstants.TEST_CLASS_DISPLAY_NAME);
+            Argument<?> testArgument = metadataInformation.get(MetadataConstants.TEST_ARGUMENT);
+            Method testMethod = metadataInformation.get(MetadataConstants.TEST_METHOD);
             String testMethodDisplayName =
-                    metadata.get(MetadataConstants.TEST_METHOD_DISPLAY_NAME) + "()";
-            Long elapsedTime = metadata.get(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
-            String testDescriptorStatus = metadata.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
+                    metadataInformation.get(MetadataConstants.TEST_METHOD_DISPLAY_NAME) + "()";
+            Long elapsedTime =
+                    metadataInformation.get(MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
+            String testDescriptorStatus =
+                    metadataInformation.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
 
             AnsiColorStringBuilder ansiColorStringBuilder =
                     new AnsiColorStringBuilder()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The AntuBLUE test-engine project authors
+ * Copyright (C) 2024 The AntuBLUE test-engine project authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,36 +14,22 @@
  * limitations under the License.
  */
 
-package example.random;
+package org.antublue.test.engine.testing;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
 
-/** Example test */
-public class RandomFieldTest {
+public class RandomUtilsTest {
 
     @TestEngine.Argument public Argument<String> argument;
 
-    @TestEngine.Random.Boolean public boolean randomBoolean;
-    @TestEngine.Random.Integer public int randomInteger;
-    @TestEngine.Random.Long public long randomLong;
-    @TestEngine.Random.Float public float randomFloat;
-    @TestEngine.Random.Double public double randomDouble;
-
-    @TestEngine.Random.BigInteger(
-            minimum = "-10000000000000000000",
-            maximum = "10000000000000000000")
-    public BigInteger randomBigInteger;
-
-    @TestEngine.Random.BigDecimal(
-            minimum = "-10000000000000000000",
-            maximum = "10000000000000000000")
-    public BigDecimal randomBigDecimal;
+    @TestEngine.Random.Integer public Integer randomInteger;
 
     @TestEngine.ArgumentSupplier
     public static Stream<Argument<String>> arguments() {
@@ -60,40 +46,47 @@ public class RandomFieldTest {
     }
 
     @TestEngine.BeforeAll
-    public void beforeAll() {
+    public void beforeAll() throws Throwable {
         System.out.println("beforeAll(" + argument + ")");
-        System.out.println("randomBoolean [" + randomBoolean + "]");
-        System.out.println("randomInteger [" + randomInteger + "]");
-        System.out.println("randomLong [" + randomLong + "]");
-        System.out.println("randomFloat [" + randomFloat + "]");
-        System.out.println("randomDouble [" + randomDouble + "]");
-        System.out.println("randomBigInteger [" + randomBigInteger + "]");
-        System.out.println("randomBigDecimal [" + randomBigDecimal.toPlainString() + "]");
+        System.out.println("randomInteger = [" + randomInteger + "]");
+        assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
+
+        RandomAnnotationSupport.injectRandomFields(this);
+
+        System.out.println("randomInteger = [" + randomInteger + "]");
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
         System.out.println("beforeEach(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
         System.out.println("afterEach(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll(" + argument + ")");
+        System.out.println("randomInteger = [" + randomInteger + "]");
+        assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.Conclude

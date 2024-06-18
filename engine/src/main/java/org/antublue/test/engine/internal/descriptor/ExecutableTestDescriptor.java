@@ -17,8 +17,8 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import java.util.Optional;
-import org.antublue.test.engine.internal.Metadata;
-import org.antublue.test.engine.internal.MetadataSupport;
+import org.antublue.test.engine.internal.metadata.Metadata;
+import org.antublue.test.engine.internal.metadata.MetadataInformation;
 import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
@@ -29,11 +29,10 @@ import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Abstract class to implement an ExecutableTestDescriptor */
 @SuppressWarnings("PMD.EmptyCatchBlock")
-public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
-        implements MetadataSupport {
+public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor implements Metadata {
 
     private final ThrowableCollector throwableCollector;
-    private final Metadata metadata;
+    private final MetadataInformation metadataInformation;
     private final StopWatch stopWatch;
     private ExecutionRequest executionRequest;
     private Object testInstance;
@@ -42,7 +41,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         super(uniqueId, displayName);
 
         throwableCollector = new ThrowableCollector(throwable -> true);
-        metadata = new Metadata();
+        metadataInformation = new MetadataInformation();
         stopWatch = new StopWatch();
     }
 
@@ -64,8 +63,8 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
     }
 
     @Override
-    public Metadata getMetadata() {
-        return metadata;
+    public MetadataInformation getMetadata() {
+        return metadataInformation;
     }
 
     @Override

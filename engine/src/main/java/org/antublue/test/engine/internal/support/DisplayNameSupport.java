@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.reflection;
+package org.antublue.test.engine.internal.support;
 
 import java.lang.reflect.Method;
 import org.antublue.test.engine.api.TestEngine;
 
-public class DisplayNameUtils {
+public class DisplayNameSupport {
 
-    private DisplayNameUtils() {
+    private DisplayNameSupport() {
         // DO NOTHING
     }
 

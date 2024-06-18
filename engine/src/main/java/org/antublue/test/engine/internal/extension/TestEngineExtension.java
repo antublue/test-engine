@@ -19,8 +19,8 @@ package org.antublue.test.engine.internal.extension;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.List;
-import org.antublue.test.engine.internal.reflection.MethodUtils;
-import org.antublue.test.engine.internal.reflection.ObjectUtils;
+import org.antublue.test.engine.internal.support.MethodSupport;
+import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 
@@ -54,7 +54,7 @@ public class TestEngineExtension {
      */
     public void initialize() throws Throwable {
         if (object == null) {
-            object = ObjectUtils.createObject(clazz);
+            object = ObjectSupport.createObject(clazz);
         }
 
         for (Method method : initializeMethods) {
@@ -81,7 +81,7 @@ public class TestEngineExtension {
      */
     public static TestEngineExtension createExtension(Class<?> clazz) {
         List<Method> initializeMethods =
-                MethodUtils.getMethods(
+                MethodSupport.getMethods(
                         clazz,
                         Predicates.ENGINE_EXTENSION_INITIALIZE_METHOD,
                         HierarchyTraversalMode.TOP_DOWN);
@@ -91,7 +91,7 @@ public class TestEngineExtension {
         // TODO sort by @TestEngine.Order
 
         List<Method> cleanupMethods =
-                MethodUtils.getMethods(
+                MethodSupport.getMethods(
                         clazz,
                         Predicates.ENGINE_EXTENSION_CLEANUP_METHOD,
                         HierarchyTraversalMode.BOTTOM_UP);

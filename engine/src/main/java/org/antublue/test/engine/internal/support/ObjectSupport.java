@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The AntuBLUE test-engine project authors
+ * Copyright (C) 2024 The AntuBLUE test-engine project authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal;
+package org.antublue.test.engine.internal.support;
 
-/** Interface to implement ExecutableTestDescriptorMetadataSupport */
-public interface MetadataSupport {
+public class ObjectSupport {
 
-    Metadata getMetadata();
+    private ObjectSupport() {
+        // DO NOTHING
+    }
+
+    public static Object createObject(Class<?> clazz) throws Throwable {
+        return clazz.getConstructor().newInstance();
+    }
 }

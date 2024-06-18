@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal;
+package org.antublue.test.engine.internal.metadata;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unchecked")
-public class Metadata {
+public class MetadataInformation {
 
     private final Map<String, Object> map;
 
-    public Metadata() {
+    public MetadataInformation() {
         map = new ConcurrentHashMap<>();
     }
 
