@@ -52,7 +52,7 @@ public class RandomUtilsTest {
         assertThat(argument).isNotNull();
         assertThat(randomInteger).isNotNull();
 
-        RandomAnnotationSupport.injectRandomFields(this);
+        RandomAnnotationSupport.setRandomFields(this);
 
         System.out.println("randomInteger = [" + randomInteger + "]");
     }

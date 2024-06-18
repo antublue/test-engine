@@ -87,7 +87,7 @@ public class Predicates {
             };
 
     /** Predicate to filter static member fields */
-    public static final Predicate<Field> GENERIC_STATIC_FIELD =
+    public static final Predicate<Field> STATIC_FIELD =
             field -> {
                 int modifiers = field.getModifiers();
                 return Modifier.isPublic(modifiers)
@@ -97,7 +97,7 @@ public class Predicates {
             };
 
     /** Predicate to filter member fields */
-    public static final Predicate<Field> GENERIC_FIELD =
+    public static final Predicate<Field> FIELD =
             field -> {
                 int modifiers = field.getModifiers();
                 return Modifier.isPublic(modifiers)
@@ -139,7 +139,7 @@ public class Predicates {
             };
 
     /** Predicate to filter before all methods */
-    public static final Predicate<Method> BEFORE_ALL =
+    public static final Predicate<Method> BEFORE_ALL_METHOD =
             method -> {
                 int modifiers = method.getModifiers();
 
@@ -191,7 +191,7 @@ public class Predicates {
             };
 
     /** Predicate to filter after all methods */
-    public static final Predicate<Method> AFTER_ALL =
+    public static final Predicate<Method> AFTER_ALL_METHOD =
             method -> {
                 int modifiers = method.getModifiers();
 

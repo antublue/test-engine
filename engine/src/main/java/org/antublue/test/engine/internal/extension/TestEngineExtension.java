@@ -17,8 +17,10 @@
 package org.antublue.test.engine.internal.extension;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.support.MethodSupport;
 import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.util.Predicates;
@@ -26,6 +28,9 @@ import org.junit.platform.commons.support.HierarchyTraversalMode;
 
 /** Class to implement TestEngineExtension */
 public class TestEngineExtension {
+
+    private static Comparator<Method> ORDER_ANNOTATION_METHOD_COMPARATOR =
+            new TestEngineOrderAnnotationMethodComparator();
 
     private final Class<?> clazz;
     private final List<Method> initializeMethods;
@@ -87,8 +92,7 @@ public class TestEngineExtension {
                         HierarchyTraversalMode.TOP_DOWN);
 
         initializeMethods.sort(Comparator.comparing(Method::getName));
-
-        // TODO sort by @TestEngine.Order
+        initializeMethods.sort(ORDER_ANNOTATION_METHOD_COMPARATOR);
 
         List<Method> cleanupMethods =
                 MethodSupport.getMethods(
@@ -97,9 +101,32 @@ public class TestEngineExtension {
                         HierarchyTraversalMode.BOTTOM_UP);
 
         cleanupMethods.sort(Comparator.comparing(Method::getName));
-
-        // TODO sort by @TestEngine.Order
+        cleanupMethods.sort(ORDER_ANNOTATION_METHOD_COMPARATOR);
+        Collections.reverse(cleanupMethods);
 
         return new TestEngineExtension(clazz, initializeMethods, cleanupMethods);
+    }
+
+    /** Class to order methods based on @TestEngine.Order annotation */
+    private static class TestEngineOrderAnnotationMethodComparator implements Comparator<Method> {
+
+        private static final int DEFAULT_ORDER = Integer.MAX_VALUE;
+
+        @Override
+        public int compare(Method o1, Method o2) {
+            int o1Order = DEFAULT_ORDER;
+            TestEngine.Order o1Annotation = o1.getAnnotation(TestEngine.Order.class);
+            if (o1Annotation != null) {
+                o1Order = o1Annotation.order();
+            }
+
+            int o2Order = DEFAULT_ORDER;
+            TestEngine.Order o2Annotation = o2.getAnnotation(TestEngine.Order.class);
+            if (o2Annotation != null) {
+                o2Order = o2Annotation.order();
+            }
+
+            return Integer.compare(o1Order, o2Order);
+        }
     }
 }

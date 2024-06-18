@@ -21,16 +21,31 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.RandomUtils;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
+import org.junit.platform.commons.util.Preconditions;
 
-// TODO refactor
 /** Class to process @TestEngine.Random.X annotations */
 @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
 public class RandomAnnotationSupport {
+
+    private static final Predicate<Field> HAS_RANDOM_ANNOTATION =
+            field ->
+                    field.isAnnotationPresent(TestEngine.Random.Boolean.class)
+                            || field.isAnnotationPresent(TestEngine.Random.Byte.class)
+                            || field.isAnnotationPresent(TestEngine.Random.Character.class)
+                            || field.isAnnotationPresent(TestEngine.Random.Short.class)
+                            || field.isAnnotationPresent(TestEngine.Random.Integer.class)
+                            || field.isAnnotationPresent(TestEngine.Random.Long.class)
+                            || field.isAnnotationPresent(TestEngine.Random.Float.class)
+                            || field.isAnnotationPresent(TestEngine.Random.Double.class)
+                            || field.isAnnotationPresent(TestEngine.Random.BigInteger.class)
+                            || field.isAnnotationPresent(TestEngine.Random.BigDecimal.class)
+                            || field.isAnnotationPresent(TestEngine.Random.UUID.class);
 
     /** Constructor */
     private RandomAnnotationSupport() {
@@ -43,186 +58,20 @@ public class RandomAnnotationSupport {
      * @param testClass testClass
      * @throws Throwable Throwable
      */
-    public static void injectRandomFields(Class<?> testClass) throws Throwable {
-        List<Field> fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Boolean.class),
-                        HierarchyTraversalMode.TOP_DOWN);
+    public static void setRandomFields(Class<?> testClass) throws Throwable {
+        Preconditions.notNull(testClass, "testClass is null");
+        setRandomFields(testClass, null, Predicates.STATIC_FIELD);
+    }
 
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, RandomUtils.randomBoolean());
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Byte.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Byte annotation = field.getAnnotation(TestEngine.Random.Byte.class);
-            byte minimum = annotation.minimum();
-            byte maximum = annotation.maximum();
-            byte random = (byte) RandomUtils.randomInt(minimum, maximum);
-            FieldSupport.setField(null, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Character.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Character annotation =
-                    field.getAnnotation(TestEngine.Random.Character.class);
-            char minimum = annotation.minimum();
-            char maximum = annotation.maximum();
-            char random = (char) RandomUtils.randomInt(minimum, maximum);
-            FieldSupport.setField(null, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Short.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Short annotation = field.getAnnotation(TestEngine.Random.Short.class);
-            short minimum = annotation.minimum();
-            short maximum = annotation.maximum();
-            short random = (short) RandomUtils.randomInt(minimum, maximum);
-            FieldSupport.setField(null, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Integer.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Integer annotation =
-                    field.getAnnotation(TestEngine.Random.Integer.class);
-            int minimum = annotation.minimum();
-            int maximum = annotation.maximum();
-            int random = RandomUtils.randomInt(minimum, maximum);
-            FieldSupport.setField(null, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Long.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Long annotation = field.getAnnotation(TestEngine.Random.Long.class);
-            long minimum = annotation.minimum();
-            long maximum = annotation.maximum();
-            long random = RandomUtils.randomLong(minimum, maximum);
-            FieldSupport.setField(null, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Float.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Float annotation = field.getAnnotation(TestEngine.Random.Float.class);
-            float minimum = annotation.minimum();
-            float maximum = annotation.maximum();
-            float random = RandomUtils.randomFloat(minimum, maximum);
-            FieldSupport.setField(null, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Double.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Double annotation =
-                    field.getAnnotation(TestEngine.Random.Double.class);
-            double minimum = annotation.minimum();
-            double maximum = annotation.maximum();
-            double random = RandomUtils.randomDouble(minimum, maximum);
-            FieldSupport.setField(null, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.BigInteger.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.BigInteger annotation =
-                    field.getAnnotation(TestEngine.Random.BigInteger.class);
-            String minimum = annotation.minimum();
-            String maximum = annotation.maximum();
-            BigInteger random = RandomUtils.randomBigInteger(minimum, maximum);
-            FieldSupport.setField(null, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.BigDecimal.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.BigDecimal annotation =
-                    field.getAnnotation(TestEngine.Random.BigDecimal.class);
-            String minimum = annotation.minimum();
-            String maximum = annotation.maximum();
-            BigDecimal random = RandomUtils.randomBigDecimal(minimum, maximum);
-            FieldSupport.setField(null, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.UUID.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            UUID random = UUID.randomUUID();
-            FieldSupport.setField(null, field, random);
-        }
+    /**
+     * Method to inject random values into member fields
+     *
+     * @param testInstance testInstance
+     * @throws Throwable Throwable
+     */
+    public static void setRandomFields(Object testInstance) throws Throwable {
+        Preconditions.notNull(testInstance, "testInstance is null");
+        setRandomFields(testInstance.getClass(), testInstance, Predicates.FIELD);
     }
 
     /**
@@ -232,476 +81,152 @@ public class RandomAnnotationSupport {
      * @throws Throwable Throwable
      */
     public static void clearRandomFields(Class<?> testClass) throws Throwable {
-        List<Field> fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Boolean.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Byte.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Character.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Short.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Integer.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, null);
-        }
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Long.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Float.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Double.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.BigInteger.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.BigDecimal.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testClass,
-                        field ->
-                                Predicates.GENERIC_STATIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.UUID.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(null, field, null);
-        }
+        Preconditions.notNull(testClass, "testClass is null");
+        clearRandomFields(testClass, null, Predicates.STATIC_FIELD);
     }
 
     /**
-     * Method to inject member variable fields
-     *
-     * @param testInstance testInstance
-     * @throws Throwable Throwable
-     */
-    public static void injectRandomFields(Object testInstance) throws Throwable {
-        List<Field> fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Boolean.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            boolean random = RandomUtils.randomBoolean();
-            FieldSupport.setField(testInstance, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Byte.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Byte annotation = field.getAnnotation(TestEngine.Random.Byte.class);
-            byte minimum = annotation.minimum();
-            byte maximum = annotation.maximum();
-            byte random = (byte) RandomUtils.randomInt(minimum, maximum);
-            FieldSupport.setField(testInstance, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Character.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Character annotation =
-                    field.getAnnotation(TestEngine.Random.Character.class);
-            char minimum = annotation.minimum();
-            char maximum = annotation.maximum();
-            char random = (char) RandomUtils.randomInt(minimum, maximum);
-            FieldSupport.setField(testInstance, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Short.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Short annotation = field.getAnnotation(TestEngine.Random.Short.class);
-            short minimum = annotation.minimum();
-            short maximum = annotation.maximum();
-            short random = (short) RandomUtils.randomInt(minimum, maximum);
-            FieldSupport.setField(testInstance, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Integer.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Integer annotation =
-                    field.getAnnotation(TestEngine.Random.Integer.class);
-            int minimum = annotation.minimum();
-            int maximum = annotation.maximum();
-            int random = RandomUtils.randomInt(minimum, maximum);
-            FieldSupport.setField(testInstance, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Long.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Long annotation = field.getAnnotation(TestEngine.Random.Long.class);
-            long minimum = annotation.minimum();
-            long maximum = annotation.maximum();
-            long random = RandomUtils.randomLong(minimum, maximum);
-            FieldSupport.setField(testInstance, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Float.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Float annotation = field.getAnnotation(TestEngine.Random.Float.class);
-            float minimum = annotation.minimum();
-            float maximum = annotation.maximum();
-            float random = RandomUtils.randomFloat(minimum, maximum);
-            FieldSupport.setField(testInstance, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Double.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.Double annotation =
-                    field.getAnnotation(TestEngine.Random.Double.class);
-            double minimum = annotation.minimum();
-            double maximum = annotation.maximum();
-            double random = RandomUtils.randomDouble(minimum, maximum);
-            FieldSupport.setField(testInstance, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.BigInteger.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.BigInteger annotation =
-                    field.getAnnotation(TestEngine.Random.BigInteger.class);
-            String minimum = annotation.minimum();
-            String maximum = annotation.maximum();
-            BigInteger random = RandomUtils.randomBigInteger(minimum, maximum);
-            FieldSupport.setField(testInstance, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.BigDecimal.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            TestEngine.Random.BigDecimal annotation =
-                    field.getAnnotation(TestEngine.Random.BigDecimal.class);
-            String minimum = annotation.minimum();
-            String maximum = annotation.maximum();
-            BigDecimal random = RandomUtils.randomBigDecimal(minimum, maximum);
-            FieldSupport.setField(testInstance, field, random);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.UUID.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            UUID random = UUID.randomUUID();
-            FieldSupport.setField(testInstance, field, random);
-        }
-    }
-
-    /**
-     * Method to clear random member fields
+     * Method to clear random values in member fields
      *
      * @param testInstance testInstance
      * @throws Throwable Throwable
      */
     public static void clearRandomFields(Object testInstance) throws Throwable {
+        Preconditions.notNull(testInstance, "testInstance is null");
+        clearRandomFields(testInstance.getClass(), testInstance, Predicates.FIELD);
+    }
+
+    /**
+     * Method to inject random values in to member fields
+     *
+     * @param testClass testClass
+     * @param testInstance testInstance
+     * @param fieldPredicate fieldPredicate
+     * @throws Throwable Throwable
+     */
+    private static void setRandomFields(
+            Class<?> testClass, Object testInstance, Predicate<Field> fieldPredicate)
+            throws Throwable {
         List<Field> fields =
                 ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Boolean.class),
+                        testClass,
+                        field -> fieldPredicate.test(field) && HAS_RANDOM_ANNOTATION.test(field),
                         HierarchyTraversalMode.TOP_DOWN);
 
         for (Field field : fields) {
-            FieldSupport.setField(testInstance, field, null);
+            if (field.isAnnotationPresent(TestEngine.Random.Boolean.class)) {
+                FieldSupport.setField(testInstance, field, RandomUtils.randomBoolean());
+            } else if (field.isAnnotationPresent(TestEngine.Random.Byte.class)) {
+                TestEngine.Random.Byte annotation =
+                        field.getAnnotation(TestEngine.Random.Byte.class);
+                byte minimum = annotation.minimum();
+                byte maximum = annotation.maximum();
+                byte random = (byte) RandomUtils.randomInt(minimum, maximum);
+                FieldSupport.setField(testInstance, field, random);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Character.class)) {
+                TestEngine.Random.Character annotation =
+                        field.getAnnotation(TestEngine.Random.Character.class);
+                char minimum = annotation.minimum();
+                char maximum = annotation.maximum();
+                char random = (char) RandomUtils.randomInt(minimum, maximum);
+                FieldSupport.setField(testInstance, field, random);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Short.class)) {
+                TestEngine.Random.Short annotation =
+                        field.getAnnotation(TestEngine.Random.Short.class);
+                short minimum = annotation.minimum();
+                short maximum = annotation.maximum();
+                short random = (short) RandomUtils.randomInt(minimum, maximum);
+                FieldSupport.setField(testInstance, field, random);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Integer.class)) {
+                TestEngine.Random.Integer annotation =
+                        field.getAnnotation(TestEngine.Random.Integer.class);
+                int minimum = annotation.minimum();
+                int maximum = annotation.maximum();
+                int random = RandomUtils.randomInt(minimum, maximum);
+                FieldSupport.setField(testInstance, field, random);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Long.class)) {
+                TestEngine.Random.Long annotation =
+                        field.getAnnotation(TestEngine.Random.Long.class);
+                long minimum = annotation.minimum();
+                long maximum = annotation.maximum();
+                long random = RandomUtils.randomLong(minimum, maximum);
+                FieldSupport.setField(testInstance, field, random);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Float.class)) {
+                TestEngine.Random.Float annotation =
+                        field.getAnnotation(TestEngine.Random.Float.class);
+                float minimum = annotation.minimum();
+                float maximum = annotation.maximum();
+                float random = RandomUtils.randomFloat(minimum, maximum);
+                FieldSupport.setField(testInstance, field, random);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Double.class)) {
+                TestEngine.Random.Double annotation =
+                        field.getAnnotation(TestEngine.Random.Double.class);
+                double minimum = annotation.minimum();
+                double maximum = annotation.maximum();
+                double random = RandomUtils.randomDouble(minimum, maximum);
+                FieldSupport.setField(testInstance, field, random);
+            } else if (field.isAnnotationPresent(TestEngine.Random.BigInteger.class)) {
+                TestEngine.Random.BigInteger annotation =
+                        field.getAnnotation(TestEngine.Random.BigInteger.class);
+                String minimum = annotation.minimum();
+                String maximum = annotation.maximum();
+                BigInteger random = RandomUtils.randomBigInteger(minimum, maximum);
+                FieldSupport.setField(testInstance, field, random);
+            } else if (field.isAnnotationPresent(TestEngine.Random.BigDecimal.class)) {
+                TestEngine.Random.BigDecimal annotation =
+                        field.getAnnotation(TestEngine.Random.BigDecimal.class);
+                String minimum = annotation.minimum();
+                String maximum = annotation.maximum();
+                BigDecimal random = RandomUtils.randomBigDecimal(minimum, maximum);
+                FieldSupport.setField(testInstance, field, random);
+            } else if (field.isAnnotationPresent(TestEngine.Random.UUID.class)) {
+                UUID random = UUID.randomUUID();
+                FieldSupport.setField(testInstance, field, random);
+            }
         }
+    }
 
-        fields =
+    /**
+     * Method to clear random values in to member fields
+     *
+     * @param testClass testClass
+     * @param testInstance testInstance
+     * @param fieldPredicate fieldPredicate
+     * @throws Throwable Throwable
+     */
+    private static void clearRandomFields(
+            Class<?> testClass, Object testInstance, Predicate<Field> fieldPredicate)
+            throws Throwable {
+        List<Field> fields =
                 ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Byte.class),
+                        testClass,
+                        field -> fieldPredicate.test(field) && HAS_RANDOM_ANNOTATION.test(field),
                         HierarchyTraversalMode.TOP_DOWN);
 
         for (Field field : fields) {
-            FieldSupport.setField(testInstance, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Character.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(testInstance, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Short.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(testInstance, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Integer.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(testInstance, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Long.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(testInstance, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.Float.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(testInstance, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.Double.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(testInstance, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.BigInteger.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(testInstance, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(
-                                                TestEngine.Random.BigDecimal.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(testInstance, field, null);
-        }
-
-        fields =
-                ReflectionSupport.findFields(
-                        testInstance.getClass(),
-                        field ->
-                                Predicates.GENERIC_FIELD.test(field)
-                                        && field.isAnnotationPresent(TestEngine.Random.UUID.class),
-                        HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : fields) {
-            FieldSupport.setField(testInstance, field, null);
+            if (field.isAnnotationPresent(TestEngine.Random.Boolean.class)) {
+                FieldSupport.setField(testInstance, field, Boolean.FALSE);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Byte.class)) {
+                FieldSupport.setField(testInstance, field, (byte) 0);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Character.class)) {
+                FieldSupport.setField(testInstance, field, (char) 0);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Short.class)) {
+                FieldSupport.setField(testInstance, field, (short) 0);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Integer.class)) {
+                FieldSupport.setField(testInstance, field, 0);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Long.class)) {
+                FieldSupport.setField(testInstance, field, 0L);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Float.class)) {
+                FieldSupport.setField(testInstance, field, 0F);
+            } else if (field.isAnnotationPresent(TestEngine.Random.Double.class)) {
+                FieldSupport.setField(testInstance, field, 0D);
+            } else if (field.isAnnotationPresent(TestEngine.Random.BigInteger.class)) {
+                FieldSupport.setField(testInstance, field, null);
+            } else if (field.isAnnotationPresent(TestEngine.Random.BigDecimal.class)) {
+                FieldSupport.setField(testInstance, field, null);
+            } else if (field.isAnnotationPresent(TestEngine.Random.UUID.class)) {
+                FieldSupport.setField(testInstance, field, null);
+            }
         }
     }
 }

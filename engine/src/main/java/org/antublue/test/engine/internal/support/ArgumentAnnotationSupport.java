@@ -48,7 +48,7 @@ public class ArgumentAnnotationSupport {
      * @param testArgument testArgument
      * @throws Throwable Throwable
      */
-    public static void injectArgumentFields(Object testInstance, Argument<?> testArgument)
+    public static void setArgumentFields(Object testInstance, Argument<?> testArgument)
             throws Throwable {
         LOGGER.trace(
                 "injectArgumentFields() testClass [%s] testInstance [%s], testArgument [%s]",
