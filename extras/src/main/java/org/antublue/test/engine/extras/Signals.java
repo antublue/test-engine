@@ -16,14 +16,16 @@
 
 package org.antublue.test.engine.extras;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.ReentrantLock;
 
 /** Class to implement Conditions */
 public class Signals {
 
-    private static final Map<Object, CountDownLatch> MAP = new ConcurrentHashMap<>();
+    private static final ReentrantLock LOCK = new ReentrantLock(true);
+    private static final Map<Object, CountDownLatch> MAP = new HashMap<>();
 
     /** Constructor */
     private Signals() {
@@ -36,19 +38,12 @@ public class Signals {
      * @param name name
      */
     public static void signal(Object name) {
-        CountDownLatch countDownLatch =
-                MAP.compute(
-                        name,
-                        (k, v) -> {
-                            if (v == null) {
-                                v = new CountDownLatch(1);
-                            }
-                            return v;
-                        });
-
-        countDownLatch.countDown();
-        if (countDownLatch.getCount() == 0) {
-            throw new IllegalStateException("Condition [%s] already signaled");
+        try {
+            LOCK.lock();
+            CountDownLatch countDownLatch = MAP.computeIfAbsent(name, o -> new CountDownLatch(1));
+            countDownLatch.countDown();
+        } finally {
+            LOCK.unlock();
         }
     }
 
@@ -58,20 +53,24 @@ public class Signals {
      * @param name name
      */
     public static void await(Object name) {
-        CountDownLatch countDownLatch =
-                MAP.compute(
-                        name,
-                        (k, v) -> {
-                            if (v == null) {
-                                v = new CountDownLatch(1);
-                            }
-                            return v;
-                        });
+        CountDownLatch countDownLatch;
+        try {
+            LOCK.lock();
+            countDownLatch = MAP.computeIfAbsent(name, k -> new CountDownLatch(1));
+        } finally {
+            LOCK.unlock();
+        }
 
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
             // DO NOTHING
+        }
+
+        if (countDownLatch.getCount() == 0) {
+            synchronized (MAP) {
+                MAP.remove(name);
+            }
         }
     }
 }
