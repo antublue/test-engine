@@ -26,29 +26,46 @@ import org.antublue.test.engine.api.TestEngine;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.ClassUtils;
 
+/** Class to implement OrderSupport */
 public class OrdererSupport {
 
+    /** DefaultMethodOrderTopDownComparator */
     private static final DefaultMethodOrderTopDownComparator
             DEFAULT_METHOD_ORDER_TOP_DOWN_COMPARATOR = new DefaultMethodOrderTopDownComparator();
 
+    /** DefaultMethodOrderBottomUpComparator */
     private static final DefaultMethodOrderBottomUpComparator
             DEFAULT_METHOD_ORDER_BOTTOM_UP_COMPARATOR = new DefaultMethodOrderBottomUpComparator();
 
+    /** TestEngineOrderAnnotationMethodComparator */
     private static final TestEngineOrderAnnotationMethodComparator
             TEST_ENGINE_ORDER_ANNOTATION_COMPARATOR =
                     new TestEngineOrderAnnotationMethodComparator();
 
+    /** MethodNameComparator */
     private static final MethodNameComparator METHOD_NAME_COMPARATOR = new MethodNameComparator();
 
+    /** Constructor */
     private OrdererSupport() {
         // DO NOTHING
     }
 
+    /**
+     * Method to order a list of Classes
+     *
+     * @param testClasses testClasses
+     */
     public static void orderTestClasses(List<Class<?>> testClasses) {
         testClasses.sort(Comparator.comparing(DisplayNameSupport::getDisplayName));
         testClasses.sort(Comparator.comparingInt(OrdererSupport::getOrderAnnotation));
     }
 
+    /**
+     * Method to get the order annotation value
+     *
+     * @param clazz clazz
+     * @return the order annotation value
+     */
     public static int getOrderAnnotation(Class<?> clazz) {
         int order = Integer.MAX_VALUE;
 
@@ -102,6 +119,7 @@ public class OrdererSupport {
         return orderedMethods;
     }
 
+    /** Class to order methods first by order annotation then by method name */
     private static class DefaultMethodOrderTopDownComparator implements Comparator<Method> {
 
         @Override

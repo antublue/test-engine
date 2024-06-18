@@ -24,12 +24,20 @@ import java.util.Set;
 import java.util.function.Predicate;
 import org.junit.platform.commons.support.ReflectionSupport;
 
+/** Class to implement ClassSupport */
 public class ClassSupport {
 
+    /** Constructor */
     private ClassSupport() {
         // DO NOTHING
     }
 
+    /**
+     * Method to scan the Java classpath and return Classes matching the Predicate
+     *
+     * @param predicate predicate
+     * @return a list of Classes
+     */
     public static List<Class<?>> discoverClasses(Predicate<Class<?>> predicate) {
         Set<Class<?>> set = new LinkedHashSet<>();
         for (URI uri : ClasspathSupport.getClasspathURIs()) {

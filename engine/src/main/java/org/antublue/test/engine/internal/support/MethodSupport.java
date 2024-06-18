@@ -18,29 +18,32 @@ package org.antublue.test.engine.internal.support;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
+/** Class to implement MethodSupport */
 public class MethodSupport {
 
+    /** Constructor */
     private MethodSupport() {
         // DO NOTHING
     }
 
+    /**
+     * Method to get a Methods for a Class matching the Predicate
+     *
+     * @param clazz clazz
+     * @param predicate predicate
+     * @param hierarchyTraversalMode hierarchyTraversalMode
+     * @return a list of Methods
+     */
     public static List<Method> getMethods(
             Class<?> clazz,
             Predicate<Method> predicate,
             HierarchyTraversalMode hierarchyTraversalMode) {
-        List<Method> methods =
-                new ArrayList<>(
-                        ReflectionSupport.findMethods(clazz, predicate, hierarchyTraversalMode));
-
-        methods.sort(Comparator.comparing(Method::getName));
-        // TODO sort by @TestEngine.Order
-
-        return methods;
+        return new ArrayList<>(
+                ReflectionSupport.findMethods(clazz, predicate, hierarchyTraversalMode));
     }
 }

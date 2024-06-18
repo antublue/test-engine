@@ -16,12 +16,21 @@
 
 package org.antublue.test.engine.internal.support;
 
+/** Class to implement ObjectSupport */
 public class ObjectSupport {
 
+    /** Constructor */
     private ObjectSupport() {
         // DO NOTHING
     }
 
+    /**
+     * Method to create an instance of a Class
+     *
+     * @param clazz clazz
+     * @return an instance of the Class
+     * @throws Throwable
+     */
     public static Object createObject(Class<?> clazz) throws Throwable {
         return clazz.getConstructor().newInstance();
     }
