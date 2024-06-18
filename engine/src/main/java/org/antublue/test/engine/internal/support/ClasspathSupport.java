@@ -25,13 +25,13 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Class to implement ClassPathURIUtils */
-public class ClassPathSupport {
+public class ClasspathSupport {
 
     private static final ReentrantLock LOCK = new ReentrantLock(true);
     private static List<URI> URIS;
 
     /** Constructor */
-    private ClassPathSupport() {
+    private ClasspathSupport() {
         // DO NOTHING
     }
 

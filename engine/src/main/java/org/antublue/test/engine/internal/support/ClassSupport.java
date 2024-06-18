@@ -32,7 +32,7 @@ public class ClassSupport {
 
     public static List<Class<?>> discoverClasses(Predicate<Class<?>> predicate) {
         Set<Class<?>> set = new LinkedHashSet<>();
-        for (URI uri : ClassPathSupport.getClasspathURIs()) {
+        for (URI uri : ClasspathSupport.getClasspathURIs()) {
             set.addAll(
                     ReflectionSupport.findAllClassesInClasspathRoot(uri, predicate, name -> true));
         }
