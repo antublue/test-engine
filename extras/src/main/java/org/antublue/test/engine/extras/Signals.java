@@ -18,14 +18,14 @@ package org.antublue.test.engine.extras;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 /** Class to implement Conditions */
 public class Signals {
 
     private static final ReentrantLock LOCK = new ReentrantLock(true);
-    private static final Map<Object, CountDownLatch> MAP = new HashMap<>();
+    private static final Map<Object, LinkedBlockingQueue<Boolean>> MAP = new HashMap<>();
 
     /** Constructor */
     private Signals() {
@@ -38,12 +38,23 @@ public class Signals {
      * @param name name
      */
     public static void signal(Object name) {
+        LinkedBlockingQueue<Boolean> linkedBlockingQueue;
+
         try {
             LOCK.lock();
-            CountDownLatch countDownLatch = MAP.computeIfAbsent(name, o -> new CountDownLatch(1));
-            countDownLatch.countDown();
+            linkedBlockingQueue = MAP.get(name);
+            if (linkedBlockingQueue == null) {
+                linkedBlockingQueue = new LinkedBlockingQueue<>();
+                MAP.put(name, linkedBlockingQueue);
+            }
         } finally {
             LOCK.unlock();
+        }
+
+        try {
+            linkedBlockingQueue.put(Boolean.TRUE);
+        } catch (InterruptedException e) {
+            // DO NOTHING
         }
     }
 
@@ -53,24 +64,23 @@ public class Signals {
      * @param name name
      */
     public static void await(Object name) {
-        CountDownLatch countDownLatch;
+        LinkedBlockingQueue<Boolean> linkedBlockingQueue;
+
         try {
             LOCK.lock();
-            countDownLatch = MAP.computeIfAbsent(name, k -> new CountDownLatch(1));
+            linkedBlockingQueue = MAP.get(name);
+            if (linkedBlockingQueue == null) {
+                linkedBlockingQueue = new LinkedBlockingQueue<>();
+                MAP.put(name, linkedBlockingQueue);
+            }
         } finally {
             LOCK.unlock();
         }
 
         try {
-            countDownLatch.await();
+            linkedBlockingQueue.add(linkedBlockingQueue.take());
         } catch (InterruptedException e) {
             // DO NOTHING
-        }
-
-        if (countDownLatch.getCount() == 0) {
-            synchronized (MAP) {
-                MAP.remove(name);
-            }
         }
     }
 }

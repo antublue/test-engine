@@ -40,13 +40,12 @@ public class SignalAwaitTest1 {
 
     @TestEngine.Prepare
     public void prepare() {
-        Class<?> clazz = SignalTest.class;
-        System.out.println("prepare(" + clazz + ")");
-        Signals.await(clazz);
+        System.out.println(getClass().getName() + ".prepare()");
+        Signals.await(SignalTest.class);
     }
 
     @TestEngine.Test
     public void test() throws Throwable {
-        System.out.println("test(" + argument + ")");
+        System.out.println(getClass().getName() + ".test(" + argument + ")");
     }
 }

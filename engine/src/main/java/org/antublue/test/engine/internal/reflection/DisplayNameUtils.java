@@ -26,7 +26,7 @@ public class DisplayNameUtils {
     }
 
     /**
-     * Method to get a test class display name
+     * Method to get a test class display name. If no name is declared, use the Class name
      *
      * @param clazz clazz
      * @return the display name
@@ -46,7 +46,7 @@ public class DisplayNameUtils {
     }
 
     /**
-     * Method to get a method display name
+     * Method to get a method display name. If no name is declared, use the Method name
      *
      * @param method method
      * @return the display name

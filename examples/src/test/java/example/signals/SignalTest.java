@@ -21,6 +21,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.extras.Signals;
 
+@TestEngine.Order(order = 0)
 public class SignalTest {
 
     @TestEngine.Argument public Argument<Boolean> argument;

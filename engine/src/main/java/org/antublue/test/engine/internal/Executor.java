@@ -96,7 +96,7 @@ public class Executor {
                                         })
                                 .orElse(MAX_THREAD_COUNT);
 
-                LOGGER.info("[%s] = [%d]", Constants.THREAD_COUNT, threadCount);
+                LOGGER.trace("[%s] = [%d]", Constants.THREAD_COUNT, threadCount);
 
                 executorService =
                         new ThreadPoolExecutor(
