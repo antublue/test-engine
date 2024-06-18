@@ -268,9 +268,16 @@ public class EngineDiscoveryRequestResolver {
         List<Argument<?>> testArguments = new ArrayList<>();
 
         Object object = getArumentSupplierMethod(testClass).invoke(null, (Object[]) null);
+        if (object == null) {
+            return testArguments;
+        }
+
         if (!(object instanceof Stream || object instanceof Iterable)) {
             throw new TestClassDefinitionException(
-                    format("Exception getting arguments for test class [%s]", testClass.getName()));
+                    format(
+                            "testClass [%s] @TestEngine.ArgumentSupplier must return a"
+                                    + " Stream<Argument> or Iterable<Argument>, type returned [%s]",
+                            testClass.getName(), object.getClass().getName()));
         }
 
         Iterator<?> iterator;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package example.arguments.named;
+package example.arguments;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,15 +23,15 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class ArgumentIntegerTest {
+public class ArgumentShortTest {
 
-    @TestEngine.Argument public Argument<Integer> argument;
+    @TestEngine.Argument public Argument<Short> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument<Integer>> arguments() {
-        Collection<Argument<Integer>> collection = new ArrayList<>();
+    public static Stream<Argument<Short>> arguments() {
+        Collection<Argument<Short>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(Argument.ofInt(i));
+            collection.add(Argument.ofShort((short) i));
         }
         return collection.stream();
     }
@@ -43,12 +43,12 @@ public class ArgumentIntegerTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument + ")");
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + argument + ")");
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll

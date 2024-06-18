@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package example.arguments.named;
+package example.arguments;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,15 +23,16 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class ArgumentByteTest {
+public class ArgumentCharTest {
 
-    @TestEngine.Argument public Argument<Byte> argument;
+    @TestEngine.Argument public Argument<Character> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument<Byte>> arguments() {
-        Collection<Argument<Byte>> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            collection.add(Argument.ofByte((byte) i));
+    public static Stream<Argument<Character>> arguments() {
+        char[] characters = new char[] {'a', 'b', 'c', 'd', 'e'};
+        Collection<Argument<Character>> collection = new ArrayList<>();
+        for (char value : characters) {
+            collection.add(Argument.ofChar(value));
         }
         return collection.stream();
     }

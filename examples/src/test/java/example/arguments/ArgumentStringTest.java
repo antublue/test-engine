@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package example.arguments.named;
+package example.arguments;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -24,15 +23,15 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class ArgumentBigIntegerTest {
+public class ArgumentStringTest {
 
-    @TestEngine.Argument public Argument<BigInteger> argument;
+    @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument<BigInteger>> arguments() {
-        Collection<Argument<BigInteger>> collection = new ArrayList<>();
+    public static Stream<Argument<String>> arguments() {
+        Collection<Argument<String>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(Argument.ofBigInteger(new BigInteger(String.valueOf(i))));
+            collection.add(Argument.ofString("String " + i));
         }
         return collection.stream();
     }
@@ -44,12 +43,12 @@ public class ArgumentBigIntegerTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument.getPayload() + ")");
+        System.out.println("test1(" + argument + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + argument.getPayload() + ")");
+        System.out.println("test2(" + argument + ")");
     }
 
     @TestEngine.AfterAll

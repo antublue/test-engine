@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-package example.arguments.named;
+package example.arguments;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.math.BigDecimal;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class ArgumentShortTest {
+public class EmptyArgumentsTest {
 
-    @TestEngine.Argument public Argument<Short> argument;
+    @TestEngine.Argument public Argument<BigDecimal> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument<Short>> arguments() {
-        Collection<Argument<Short>> collection = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            collection.add(Argument.ofShort((short) i));
-        }
-        return collection.stream();
+    public static Stream<Argument<BigDecimal>> arguments() {
+        return Stream.of();
     }
 
     @TestEngine.BeforeAll

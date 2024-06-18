@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package example.arguments.named;
+package example.arguments;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,15 +23,15 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class ArgumentFloatTest {
+public class ArgumentByteTest {
 
-    @TestEngine.Argument public Argument<Float> argument;
+    @TestEngine.Argument public Argument<Byte> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument<Float>> arguments() {
-        Collection<Argument<Float>> collection = new ArrayList<>();
+    public static Stream<Argument<Byte>> arguments() {
+        Collection<Argument<Byte>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(Argument.ofFloat(i + 0.1f));
+            collection.add(Argument.ofByte((byte) i));
         }
         return collection.stream();
     }

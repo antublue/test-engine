@@ -46,9 +46,14 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 - Only `public` methods are supported for `@TestEngine.X` annotations.
 
+
+- If `@TestEngine.ArgumentSupplier` returns an empty `Stream<Argument>`, `Iterable<Argument>`, or null, the test will be skipped.
+
+
 - `@TestEngine.Order` can be used to control test class order / test method order of execution.
   - Classes/methods are sorted by the order annotation value first, then alphabetically by the class name/method name.
   - The test class / test method names can be changed by using the `@TestEngine.DisplayName` annotation.
+
 
 - **Class execution order can't be guaranteed unless the test engine is configured to use a single thread.**
 

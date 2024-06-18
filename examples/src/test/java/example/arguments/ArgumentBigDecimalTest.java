@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package example.arguments.named;
+package example.arguments;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -23,15 +24,15 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class ArgumentStringTest {
+public class ArgumentBigDecimalTest {
 
-    @TestEngine.Argument public Argument<String> argument;
+    @TestEngine.Argument public Argument<BigDecimal> argument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument<String>> arguments() {
-        Collection<Argument<String>> collection = new ArrayList<>();
+    public static Stream<Argument<BigDecimal>> arguments() {
+        Collection<Argument<BigDecimal>> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(Argument.ofString("String " + i));
+            collection.add(Argument.ofBigDecimal(new BigDecimal(i + ".0")));
         }
         return collection.stream();
     }
@@ -43,12 +44,12 @@ public class ArgumentStringTest {
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument + ")");
+        System.out.println("test1(" + argument.getPayload() + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + argument + ")");
+        System.out.println("test2(" + argument.getPayload() + ")");
     }
 
     @TestEngine.AfterAll

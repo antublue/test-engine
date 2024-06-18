@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package example.arguments.named;
+package example.arguments;
 
 import java.util.ArrayList;
 import java.util.Collection;

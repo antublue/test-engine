@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package example.arguments.named;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package example.arguments;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,55 +23,53 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class ArgumentComplexTest2 {
+public class ArgumentComplexTest3 {
 
-    @TestEngine.Argument public ComplexArgument argument;
+    @TestEngine.Argument public Argument<ComplexArgument> argument;
+
+    private ComplexArgument customArgument;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument<ComplexArgument>> arguments() {
-        Collection<Argument<ComplexArgument>> collection = new ArrayList<>();
+    public static Stream<ComplexArgument> arguments() {
+        Collection<ComplexArgument> collection = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            collection.add(
-                    Argument.of(
-                            "ComplexArgument(" + i + ")",
-                            ComplexArgument.of("FirstName" + i, "LastName" + i)));
+            collection.add(ComplexArgument.of("FirstName" + i, "LastName" + i));
         }
         return collection.stream();
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll(" + argument + ")");
-        assertThat(argument).isNotNull();
-        assertThat(argument.getFirstName()).isNotNull();
-        assertThat(argument.getLastName()).isNotNull();
+        System.out.println("beforeAll()");
+        customArgument = argument.getPayload();
     }
 
     @TestEngine.Test
     public void test1() {
-        System.out.println("test1(" + argument + ")");
-        assertThat(argument).isNotNull();
-        assertThat(argument.getFirstName()).isNotNull();
-        assertThat(argument.getLastName()).isNotNull();
+        System.out.println(
+                "test1("
+                        + customArgument.getFirstName()
+                        + " "
+                        + customArgument.getLastName()
+                        + ")");
     }
 
     @TestEngine.Test
     public void test2() {
-        System.out.println("test2(" + argument + ")");
-        assertThat(argument).isNotNull();
-        assertThat(argument.getFirstName()).isNotNull();
-        assertThat(argument.getLastName()).isNotNull();
+        System.out.println(
+                "test1("
+                        + customArgument.getFirstName()
+                        + " "
+                        + customArgument.getLastName()
+                        + ")");
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll(" + argument + ")");
-        assertThat(argument).isNotNull();
-        assertThat(argument.getFirstName()).isNotNull();
-        assertThat(argument.getLastName()).isNotNull();
+        System.out.println("afterAll()");
     }
 
-    public static class ComplexArgument {
+    public static class ComplexArgument implements Argument<ComplexArgument> {
 
         private final String firstName;
         private final String lastName;
@@ -92,8 +88,13 @@ public class ArgumentComplexTest2 {
         }
 
         @Override
-        public String toString() {
-            return "firstName [" + firstName + "] lastName [" + lastName + "]";
+        public String getName() {
+            return "ComplexArgument{" + firstName + " " + lastName + "}";
+        }
+
+        @Override
+        public ComplexArgument getPayload() {
+            return this;
         }
 
         public static ComplexArgument of(String firstName, String lastName) {
