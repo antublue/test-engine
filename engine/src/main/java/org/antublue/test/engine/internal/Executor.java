@@ -121,6 +121,7 @@ public class Executor {
                         executorService.submit(
                                 () -> {
                                     try {
+                                        LOGGER.info("testDescriptor(%s)", executableTestDescriptor.getDisplayName());
                                         executableTestDescriptor.execute(executionRequest);
                                     } catch (Throwable t) {
                                         t.printStackTrace(System.err);

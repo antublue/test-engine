@@ -68,6 +68,11 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         return metadata;
     }
 
+    @Override
+    public String toString() {
+        return getDisplayName();
+    }
+
     protected void setExecutionRequest(ExecutionRequest executionRequest) {
         this.executionRequest = executionRequest;
     }

@@ -81,8 +81,8 @@ public class EngineDiscoveryRequestResolver {
 
         OrdererUtils.orderTestClasses(testClasses);
 
-        if (LOGGER.isInfoEnabled()) {
-            testClasses.forEach(c -> LOGGER.info("testClass [%s]", c.getName()));
+        if (LOGGER.isTraceEnabled()) {
+            testClasses.forEach(c -> LOGGER.trace("testClass [%s]", c.getName()));
         }
 
         for (Class<?> testClass : testClasses) {
@@ -92,10 +92,6 @@ public class EngineDiscoveryRequestResolver {
         prune(engineDescriptor);
 
         shuffleOrSortTestDescriptors(engineDescriptor);
-
-        for (TestDescriptor testDescriptor : engineDescriptor.getChildren()) {
-            LOGGER.info("testDescriptor() name [%s", testDescriptor.getDisplayName());
-        }
     }
 
     private static void buildClassTestDescriptor(
