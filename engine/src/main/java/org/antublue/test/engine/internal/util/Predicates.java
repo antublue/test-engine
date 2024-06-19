@@ -20,7 +20,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.function.Predicate;
-
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.TestEngineExtension;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
