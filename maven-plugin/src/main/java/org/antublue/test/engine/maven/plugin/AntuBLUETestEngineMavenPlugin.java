@@ -60,7 +60,7 @@ import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
         name = "test",
         threadSafe = true,
         requiresDependencyResolution = ResolutionScope.TEST)
-public class TestEngineMavenPlugin extends AbstractMojo {
+public class AntuBLUETestEngineMavenPlugin extends AbstractMojo {
 
     private static final String GROUP_ID = "org.antublue";
 
@@ -78,7 +78,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
     private Map<String, String> properties;
 
     /** Constructor */
-    public TestEngineMavenPlugin() {
+    public AntuBLUETestEngineMavenPlugin() {
         super();
     }
 
