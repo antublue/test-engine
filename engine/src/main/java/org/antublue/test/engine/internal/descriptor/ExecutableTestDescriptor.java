@@ -37,6 +37,12 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor im
     private ExecutionRequest executionRequest;
     private Object testInstance;
 
+    /**
+     * Constructor
+     *
+     * @param uniqueId uniqueId
+     * @param displayName displayName
+     */
     protected ExecutableTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
 

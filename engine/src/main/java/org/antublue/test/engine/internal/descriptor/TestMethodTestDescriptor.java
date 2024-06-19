@@ -47,6 +47,17 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     private final Method testMethod;
     private final List<Method> afterEachMethods;
 
+    /**
+     * Constructor
+     *
+     * @param uniqueId uniqueId
+     * @param displayName displayName
+     * @param testClass testClass
+     * @param beforeEachMethods beforeEachMethods
+     * @param testMethod testMethod
+     * @param afterEachMethods afterEachMethods
+     * @param testArgument testArgument
+     */
     public TestMethodTestDescriptor(
             UniqueId uniqueId,
             String displayName,

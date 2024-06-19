@@ -50,13 +50,23 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> beforeAllMethods;
     private final List<Method> afterAllMethods;
 
+    /**
+     * Constructor
+     *
+     * @param uniqueId uniqueId
+     * @param displayName displayName
+     * @param testClass testClass
+     * @param beforeAllMethods beforeAllMethods
+     * @param afterAllMethods afterAllMethods
+     * @param testArgument testArgument
+     */
     public ArgumentTestDescriptor(
             UniqueId uniqueId,
             String displayName,
             Class<?> testClass,
-            Argument<?> testArgument,
             List<Method> beforeAllMethods,
-            List<Method> afterAllMethods) {
+            List<Method> afterAllMethods,
+            Argument<?> testArgument) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testArgument = testArgument;
@@ -269,6 +279,6 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 OrdererSupport.orderTestMethods(afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
 
         return new ArgumentTestDescriptor(
-                uniqueId, displayName, testClass, testArgument, beforeAllMethods, afterAllMethods);
+                uniqueId, displayName, testClass, beforeAllMethods, afterAllMethods, testArgument);
     }
 }

@@ -46,6 +46,15 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> prepareMethods;
     private final List<Method> concludeMethods;
 
+    /**
+     * Constructor
+     *
+     * @param uniqueId uniqueId
+     * @param displayName displayName
+     * @param testClass testClass
+     * @param prepareMethods prepareMethods
+     * @param concludeMethods concludeMethods
+     */
     private ClassTestDescriptor(
             UniqueId uniqueId,
             String displayName,
