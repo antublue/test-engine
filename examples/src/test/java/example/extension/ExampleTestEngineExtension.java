@@ -17,9 +17,15 @@
 package example.extension;
 
 import java.util.List;
+import org.antublue.test.engine.api.TestEngineExtension;
 
 /** Example TestEngineExtensions */
-public class TestEngineExtension implements org.antublue.test.engine.api.TestEngineExtension {
+public class ExampleTestEngineExtension implements TestEngineExtension {
+
+    @Override
+    public void instantiateCallback() {
+        System.out.println(getClass().getName() + ".instantiateCallback()");
+    }
 
     @Override
     public void discoveryCallback(List<Class<?>> testClasses) {
@@ -29,12 +35,12 @@ public class TestEngineExtension implements org.antublue.test.engine.api.TestEng
     }
 
     @Override
-    public void prepareCallback() throws Throwable {
+    public void prepareCallback() {
         System.out.println(getClass().getName() + ".prepare()");
     }
 
     @Override
-    public void concludeCallback() throws Throwable {
+    public void concludeCallback() {
         System.out.println(getClass().getName() + ".conclude()");
     }
 }

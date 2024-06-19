@@ -59,6 +59,20 @@ public class TestEngineExtensionManager {
         }
     }
 
+    /** Method to call instantiate callbacks */
+    public void instantiateCallback() {
+        initialize();
+
+        for (TestEngineExtension testEngineExtension : testEngineExtensions) {
+            testEngineExtension.instantiateCallback();
+        }
+    }
+
+    /**
+     * Method to call discovery callbacks
+     *
+     * @param testClasses testClasses
+     */
     public void discoveryCallback(List<Class<?>> testClasses) {
         initialize();
 
@@ -104,12 +118,19 @@ public class TestEngineExtensionManager {
         return throwables;
     }
 
+    /**
+     * Method to get a singleton instance
+     *
+     * @return the singleton instance
+     */
     public static TestEngineExtensionManager getInstance() {
         return SingletonHolder.SINGLETON;
     }
 
+    /** Class to hold the singleton instance */
     private static class SingletonHolder {
 
+        /** The singleton instance */
         public static final TestEngineExtensionManager SINGLETON = new TestEngineExtensionManager();
     }
 }

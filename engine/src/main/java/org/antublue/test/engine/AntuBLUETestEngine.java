@@ -101,6 +101,8 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
     @Override
     public TestDescriptor discover(
             EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
+        TestEngineExtensionManager.getInstance().instantiateCallback();
+
         LOGGER.trace("discover(" + uniqueId + ")");
 
         try {
