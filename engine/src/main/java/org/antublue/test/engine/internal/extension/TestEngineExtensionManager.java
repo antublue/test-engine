@@ -20,62 +20,96 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.antublue.test.engine.api.TestEngineExtension;
+import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.support.ClassSupport;
+import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.util.Predicates;
 
 /** Class to implement TestEngineExtensionManager */
 public class TestEngineExtensionManager {
 
-    private final List<TestEngineExtension> engineExtensions;
+    private final List<TestEngineExtension> testEngineExtensions;
+    private boolean initialized;
 
     /** Constructor */
-    public TestEngineExtensionManager() {
-        engineExtensions = new ArrayList<>();
+    private TestEngineExtensionManager() {
+        testEngineExtensions = new ArrayList<>();
     }
 
     /** Method to load test engine extensions */
-    public void load() {
-        List<Class<?>> classes = ClassSupport.discoverClasses(Predicates.ENGINE_EXTENSION_CLASS);
+    private synchronized void initialize() {
+        if (!initialized) {
+            List<Class<?>> classes =
+                    ClassSupport.discoverClasses(Predicates.TEST_ENGINE_EXTENSION_CLASS);
 
-        classes.sort(Comparator.comparing(Class::getName));
-        OrdererSupport.orderTestClasses(classes);
+            classes.sort(Comparator.comparing(Class::getName));
+            OrdererSupport.orderTestClasses(classes);
 
-        for (Class<?> clazz : classes) {
-            engineExtensions.add(TestEngineExtension.createExtension(clazz));
+            for (Class<?> clazz : classes) {
+                try {
+                    testEngineExtensions.add(ObjectSupport.createObject(clazz));
+                } catch (Throwable t) {
+                    throw new TestEngineException(t);
+                }
+            }
+
+            initialized = true;
+        }
+    }
+
+    public void discoveryCallback(List<Class<?>> testClasses) {
+        initialize();
+
+        for (TestEngineExtension testEngineExtension : testEngineExtensions) {
+            testEngineExtension.discoveryCallback(testClasses);
         }
     }
 
     /**
-     * Method to initialize test engine extensions
+     * Method to prepare test engine extensions
      *
      * @throws Throwable Throwable
      */
-    public void initialize() throws Throwable {
-        for (TestEngineExtension engineExtension : engineExtensions) {
-            engineExtension.initialize();
+    public void prepare() throws Throwable {
+        initialize();
+
+        for (TestEngineExtension testEngineExtension : testEngineExtensions) {
+            testEngineExtension.prepareCallback();
         }
     }
 
     /**
-     * Method to cleanup test engine extensions
+     * Method to conclude test engine extensions
      *
-     * @return
+     * @return a list of Throwables
      */
-    public List<Throwable> cleanup() {
+    public List<Throwable> conclude() {
+        initialize();
+
         List<Throwable> throwables = new ArrayList<>();
 
-        List<TestEngineExtension> engineExtensions = new ArrayList<>(this.engineExtensions);
-        Collections.reverse(engineExtensions);
+        List<TestEngineExtension> testEngineExtensions = new ArrayList<>(this.testEngineExtensions);
+        Collections.reverse(testEngineExtensions);
 
-        for (TestEngineExtension engineExtension : engineExtensions) {
+        for (TestEngineExtension testEngineExtension : testEngineExtensions) {
             try {
-                engineExtension.cleanup();
+                testEngineExtension.concludeCallback();
             } catch (Throwable t) {
                 throwables.add(t);
             }
         }
 
         return throwables;
+    }
+
+    public static TestEngineExtensionManager getInstance() {
+        return SingletonHolder.SINGLETON;
+    }
+
+    private static class SingletonHolder {
+
+        public static final TestEngineExtensionManager SINGLETON = new TestEngineExtensionManager();
     }
 }
