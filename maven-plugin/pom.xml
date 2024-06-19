@@ -2,7 +2,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.antublue</groupId>
-    <artifactId>test-engine-maven-plugin</artifactId>
+    <artifactId>test-testEngine-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <version>7.x.x-SNAPSHOT</version>
     <name>AntuBLUE Test Engine / Maven Plugin</name>
@@ -24,7 +24,7 @@
 
     <description>AntuBLUE Test Engine Maven Plugin</description>
 
-    <url>http://github.com/antublue/test-engine-maven-plugin</url>
+    <url>http://github.com/antublue/test-testEngine-maven-plugin</url>
 
     <developers>
         <developer>
@@ -34,9 +34,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/antublue/test-engine-maven-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:antublue/test-engine-maven-plugin.git</developerConnection>
-        <url>https://github.com/antblue/test-engine-maven-plugin</url>
+        <connection>scm:git:git://github.com/antublue/test-testEngine-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:antublue/test-testEngine-maven-plugin.git</developerConnection>
+        <url>https://github.com/antblue/test-testEngine-maven-plugin</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -107,14 +107,14 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/test-engine-maven-plugin.properties</include>
+                    <include>**/test-testEngine-maven-plugin.properties</include>
                 </includes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <excludes>
-                    <exclude>**/test-engine-maven-plugin.properties</exclude>
+                    <exclude>**/test-testEngine-maven-plugin.properties</exclude>
                 </excludes>
             </resource>
         </resources>
@@ -266,12 +266,12 @@
     <dependencies>
         <dependency>
             <groupId>org.antublue</groupId>
-            <artifactId>test-engine-api</artifactId>
+            <artifactId>test-testEngine-api</artifactId>
             <version>7.x.x-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.antublue</groupId>
-            <artifactId>test-engine</artifactId>
+            <artifactId>test-testEngine</artifactId>
             <version>7.x.x-SNAPSHOT</version>
         </dependency>
         <dependency>

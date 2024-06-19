@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.antublue.test.engine.Engine;
+import org.antublue.test.engine.TestEngine;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
@@ -47,7 +47,7 @@ public class SummaryEngineExecutionListener
                     .append("BLUE")
                     .color(AnsiColor.TEXT_WHITE_BRIGHT)
                     .append(" Test Engine ")
-                    .append(Engine.VERSION)
+                    .append(TestEngine.VERSION)
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 

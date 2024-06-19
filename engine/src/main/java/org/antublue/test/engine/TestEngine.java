@@ -36,9 +36,9 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement the AntuBLUE Test Engine */
-public class Engine implements org.junit.platform.engine.TestEngine {
+public class TestEngine implements org.junit.platform.engine.TestEngine {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
 
     /** Configuration constant */
     public static final String ENGINE_ID = "antublue-test-engine";

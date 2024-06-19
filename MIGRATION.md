@@ -242,7 +242,7 @@ public class SimpleTest1 {
 
 Plain Objects:
 
-If the `@TestEngine.ArgumentSupplier` returns a `Stream` or `Iterable` containing non-`Named` objects, then the test engine will wrap each object with a `Named` using the objects position in the stream/iterable as the name.
+If the `@TestEngine.ArgumentSupplier` returns a `Stream` or `Iterable` containing non-`Named` objects, then the test testEngine will wrap each object with a `Named` using the objects position in the stream/iterable as the name.
 
 Example:
 
