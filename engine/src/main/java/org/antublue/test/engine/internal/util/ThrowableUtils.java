@@ -38,9 +38,7 @@ public class ThrowableUtils {
             };
 
     private static final boolean STACK_TRACE_PRUNING =
-            Configuration.getInstance()
-                    .getProperty(Constants.STACK_TRACE_PRUNE, toBoolean)
-                    .orElse(true);
+            Configuration.getInstance().get(Constants.STACK_TRACE_PRUNE, toBoolean).orElse(true);
 
     private static final Predicate<String> EXCLUDE =
             s -> s.startsWith("org.antublue.test.engine.internal.") || s.startsWith("java.base/");

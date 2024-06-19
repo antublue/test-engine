@@ -17,10 +17,7 @@
 package org.antublue.test.engine;
 
 import java.util.Optional;
-import org.antublue.test.engine.exception.TestClassDefinitionException;
-import org.antublue.test.engine.exception.TestEngineException;
-import org.antublue.test.engine.internal.configuration.ConfigurationParameters;
-import org.antublue.test.engine.internal.configuration.Constants;
+import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.discovery.EngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.extension.TestEngineExtensionManager;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -43,13 +40,16 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
     public static final String ENGINE_ID = "antublue-test-engine";
 
     /** Configuration constant */
-    public static final String GROUP_ID = "org.antublue";
+    private static final String GROUP_ID = "org.antublue";
 
     /** Configuration constant */
-    public static final String ARTIFACT_ID = "test-engine";
+    private static final String ARTIFACT_ID = "test-engine";
 
     /** Configuration constant */
     public static final String VERSION = Information.getInstance().getVersion();
+
+    /** UniqueId constant */
+    private static final String UNIQUE_ID = "[engine:" + ENGINE_ID + "]";
 
     /**
      * Method to get the test engine id
@@ -101,29 +101,20 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
     @Override
     public TestDescriptor discover(
             EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
-        TestEngineExtensionManager.getInstance().instantiateCallback();
+        if (!UNIQUE_ID.equals(uniqueId.toString())) {
+            return null;
+        }
+
+        Configuration.getInstance();
 
         LOGGER.trace("discover(" + uniqueId + ")");
 
-        try {
-            EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
+        EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
-            new EngineDiscoveryRequestResolver()
-                    .resolveSelector(engineDiscoveryRequest, engineDescriptor);
+        new EngineDiscoveryRequestResolver()
+                .resolveSelector(engineDiscoveryRequest, engineDescriptor);
 
-            return engineDescriptor;
-        } catch (TestClassDefinitionException | TestEngineException t) {
-            if (Constants.TRUE.equals(System.getProperty(Constants.MAVEN_PLUGIN))) {
-                throw t;
-            }
-
-            t.printStackTrace(System.err);
-            System.exit(1);
-        } catch (Throwable t) {
-            throw new TestEngineException("General exception", t);
-        }
-
-        return null;
+        return engineDescriptor;
     }
 
     /**
@@ -133,13 +124,13 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
      */
     @Override
     public void execute(ExecutionRequest executionRequest) {
-        LOGGER.trace(
-                "execute() rootTestDescriptor children [%d]",
-                executionRequest.getRootTestDescriptor().getChildren().size());
-
         if (executionRequest.getRootTestDescriptor().getChildren().isEmpty()) {
             return;
         }
+
+        LOGGER.trace(
+                "execute() rootTestDescriptor children [%d]",
+                executionRequest.getRootTestDescriptor().getChildren().size());
 
         executionRequest
                 .getEngineExecutionListener()
@@ -159,7 +150,7 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
                                 ExecutionRequest.create(
                                         executionRequest.getRootTestDescriptor(),
                                         executionRequest.getEngineExecutionListener(),
-                                        ConfigurationParameters.getInstance()));
+                                        Configuration.getInstance()));
 
                         executor.await();
                     });

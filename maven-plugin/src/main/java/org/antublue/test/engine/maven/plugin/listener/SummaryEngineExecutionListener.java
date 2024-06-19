@@ -19,9 +19,7 @@ package org.antublue.test.engine.maven.plugin.listener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.antublue.test.engine.AntuBLUETestEngine;
-import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestMethodTestDescriptor;
@@ -114,6 +112,7 @@ public class SummaryEngineExecutionListener
         println(INFO + SEPARATOR);
         */
 
+        /*
         Configuration configuration = Configuration.getInstance();
         String propertiesFilename = configuration.getPropertiesFilename();
 
@@ -128,6 +127,7 @@ public class SummaryEngineExecutionListener
 
             println(INFO + SEPARATOR);
         }
+        */
     }
 
     @Override

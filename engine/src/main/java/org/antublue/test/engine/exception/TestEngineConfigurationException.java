@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The AntuBLUE test-engine project authors
+ * Copyright (C) 2024 The AntuBLUE test-engine project authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,8 @@
 
 package org.antublue.test.engine.exception;
 
-/** Class to implement a generic TestEngineException */
-public class TestClassMethodFailedException extends RuntimeException {
-
-    /**
-     * Constructor
-     *
-     * @param message message
-     */
-    public TestClassMethodFailedException(String message) {
-        super(message);
-    }
+/** Class to implement ConfigurationParametersException */
+public class TestEngineConfigurationException extends RuntimeException {
 
     /**
      * Constructor
@@ -34,16 +25,7 @@ public class TestClassMethodFailedException extends RuntimeException {
      * @param message message
      * @param throwable throwable
      */
-    public TestClassMethodFailedException(String message, Throwable throwable) {
+    public TestEngineConfigurationException(String message, Throwable throwable) {
         super(message, throwable);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param throwable throwable
-     */
-    public TestClassMethodFailedException(Throwable throwable) {
-        super(throwable);
     }
 }

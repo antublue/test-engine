@@ -16,23 +16,10 @@
 
 package example.extension;
 
-import java.util.List;
 import org.antublue.test.engine.api.TestEngineExtension;
 
 /** Example TestEngineExtensions */
 public class ExampleTestEngineExtension implements TestEngineExtension {
-
-    @Override
-    public void instantiateCallback() {
-        System.out.println(getClass().getName() + ".instantiateCallback()");
-    }
-
-    @Override
-    public void discoveryCallback(List<Class<?>> testClasses) {
-        System.out.println(getClass().getName() + ".discoveryCallback()");
-        testClasses.forEach(
-                testClass -> System.out.println("testClass [" + testClass.getName() + "]"));
-    }
 
     @Override
     public void prepareCallback() {

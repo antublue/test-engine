@@ -99,19 +99,19 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 The test engine has the ability to initialize/cleanup global resources before executing any tests.
 
 ```java
-import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.TestEngineExtension;
 
-@TestEngine.EngineExtension
-public class TestEngineExtension1 {
+/** Example TestEngineExtensions */
+public class ExampleTestEngineExtension implements TestEngineExtension {
 
-    @TestEngine.EngineExtension.Initialize
-    public void initialize() throws Throwable {
-        System.out.println(getClass().getName() + ".initialize()");
+    @Override
+    public void prepareCallback() {
+        System.out.println(getClass().getName() + ".prepare()");
     }
 
-    @TestEngine.EngineExtension.Cleanup
-    public void cleanup() throws Throwable {
-        System.out.println(getClass().getName() + ".cleanup()");
+    @Override
+    public void concludeCallback() {
+        System.out.println(getClass().getName() + ".conclude()");
     }
 }
 ```
@@ -202,24 +202,30 @@ Build and test your project...
 
 ### AntuBLUE Test Engine Configuration
 
-The test engine uses a properties file for configuration.
+The test engine uses a properties file (`antublue-test-engine.properties`) for configuration.
 
-The properties filename is resolved using the following in order:
-
-- Environment variable `ANTUBLUE_TEST_ENGINE_PROPERTIES`
-- System property `antublue.test.engine.properties`
-
-If these aren't defined, then the test engine will recursively search...
+A recursive search is performed...
 
 current directory `antublue-test-engine.properties`
- parent directory `antublue-test-engine.properties`
-  parent directory `antublue-test-engine.properties`
 
-If no file named `antublue-test-engine.properties` is found, then the test engine will recursively search...
+-- parent directory `antublue-test-engine.properties`
 
-current directory `.antublue-test-engine.properties`
-  parent directory `.antublue-test-engine.properties`
-    parent directory `.antublue-test-engine.properties`
+---- parent directory `antublue-test-engine.properties`
+      ...
+
+Test engine properties can be overridden via environment variables.
+
+Example:
+
+`antublue-test-engine.properties` contains `antublue.test.engine.thread.count=10`
+
+Export the property as an environment variable...
+
+```bash
+export ANTUBLUE_TEST_ENGINE_THREAD_COUNT=4
+```
+
+The test engine will use `4` threads.
 
 ### Standard AntuBLUE Test Engine properties
 
