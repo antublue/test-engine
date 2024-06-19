@@ -1,6 +1,6 @@
 # Extras
 
-The AntuBLUE test testEngine extras module contains to help with various testing aspects.
+The AntuBLUE test engine extras module contains to help with various testing aspects.
 
 ## `Locking`
 

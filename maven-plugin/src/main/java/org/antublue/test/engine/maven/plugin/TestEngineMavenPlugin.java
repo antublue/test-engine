@@ -211,14 +211,14 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             .configurationParameters(Collections.emptyMap())
                             .build();
 
-            TestEngine testEngine = new TestEngine();
+            TestEngine engine = new TestEngine();
             TestDescriptor testDescriptor = null;
 
             try {
                 summaryEngineExecutionListener.begin();
 
                 testDescriptor =
-                        testEngine.discover(
+                        engine.discover(
                                 launcherDiscoveryRequest, UniqueId.forEngine(TestEngine.ENGINE_ID));
             } catch (Throwable t) {
                 summaryMessage = AnsiColor.TEXT_RED_BOLD_BRIGHT.wrap("EXCEPTION DURING DISCOVERY");
@@ -235,7 +235,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                                     delegatingEngineExecutionListener,
                                     ConfigurationParameters.getInstance());
 
-                    testEngine.execute(executionRequest);
+                    engine.execute(executionRequest);
 
                     if (summaryEngineExecutionListener.hasTests()) {
                         if (summaryEngineExecutionListener.hasFailures()) {

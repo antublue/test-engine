@@ -1,4 +1,4 @@
-[![Build](https://github.com/antublue/test-testEngine/actions/workflows/build.yml/badge.svg)](https://github.com/antublue/test-testEngine/actions/workflows/build.yml)
+[![Build](https://github.com/antublue/test-engine/actions/workflows/build.yml/badge.svg)](https://github.com/antublue/test-engine/actions/workflows/build.yml)
 
 <br/>
 
@@ -6,7 +6,7 @@
 
 # AntuBLUE Test Engine
 
-The AntuBLUE test testEngine is a JUnit5 based test testEngine designed specifically for parameterized testing at the test class level.
+The AntuBLUE test engine is a JUnit5 based test engine designed specifically for parameterized testing at the test class level.
 
 ## API
 
@@ -40,7 +40,7 @@ Test classes support both `Argument` injection (`@TestEngine.Argument` annotated
 | `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                          |
 | `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                          |
 
-Reference the [Design](https://github.com/antublue/test-testEngine#design) for the test testEngine execution flow.
+Reference the [Design](https://github.com/antublue/test-engine#design) for the test engine execution flow.
 
 **Notes**
 
@@ -55,7 +55,7 @@ Reference the [Design](https://github.com/antublue/test-testEngine#design) for t
   - The test class / test method names can be changed by using the `@TestEngine.DisplayName` annotation.
 
 
-- **Class execution order can't be guaranteed unless the test testEngine is configured to use a single thread.**
+- **Class execution order can't be guaranteed unless the test engine is configured to use a single thread.**
 
 ### Additional Test Annotations
 
@@ -96,10 +96,10 @@ Reference the [Design](https://github.com/antublue/test-testEngine#design) for t
 
 ## TestEngine Extension Annotations
 
-The test testEngine has the ability to initialize/cleanup global resources before executing any tests.
+The test engine has the ability to initialize/cleanup global resources before executing any tests.
 
 ```java
-import org.antublue.test.testEngine.api.TestEngine;
+import org.antublue.test.engine.api.TestEngine;
 
 @TestEngine.EngineExtension
 public class TestEngineExtension1 {
@@ -128,7 +128,7 @@ The `examples` module contains various testing examples and scenarios.
 
 ### Usage in a project
 
-The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses the AntuBLUE test testEngine for integration testing.
+The [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter) uses the AntuBLUE test engine for integration testing.
 
 - Prometheus JMX Exporter [integration_test_suite](https://github.com/prometheus/jmx_exporter/tree/main/integration_test_suite)
 
@@ -154,12 +154,12 @@ Set up the Maven Surefire plugin to only run JUnit 5 tests...
 </plugin>
 ```
 
-Add the AntuBLUE test testEngine Maven Plugin...
+Add the AntuBLUE test engine Maven Plugin...
 
 ```xml
 <plugin>
     <groupId>org.antublue</groupId>
-    <artifactId>test-testEngine-maven-plugin</artifactId>
+    <artifactId>test-engine-maven-plugin</artifactId>
     <version>7.x.x-SNAPSHOT</version>
     <executions>
         <execution>
@@ -172,18 +172,18 @@ Add the AntuBLUE test testEngine Maven Plugin...
 </plugin>
 ```
 
-Add the AntuBLUE test testEngine jars...
+Add the AntuBLUE test engine jars...
 
 ```xml
 <dependencies>
   <dependency>
     <groupId>org.antublue</groupId>
-    <artifactId>test-testEngine-api</artifactId>
+    <artifactId>test-engine-api</artifactId>
     <version>TEST-ENGINE-VERSION</version>
   </dependency>
   <dependency>
     <groupId>org.antublue</groupId>
-    <artifactId>test-testEngine</artifactId>
+    <artifactId>test-engine</artifactId>
     <version>TEST-ENGINE-VERSION</version>
     <scope>test</scope>
   </dependency>
@@ -192,7 +192,7 @@ Add the AntuBLUE test testEngine jars...
 
 **Notes**
 
-- The `test-testEngine-api`, `test-testEngine`, and `test-testEngine-maven-plugin` versions must match.
+- The `test-engine-api`, `test-engine`, and `test-engine-maven-plugin` versions must match.
 
 Build and test your project...
 
@@ -202,52 +202,52 @@ Build and test your project...
 
 ### AntuBLUE Test Engine Configuration
 
-The test testEngine uses a properties file for configuration.
+The test engine uses a properties file for configuration.
 
 The properties filename is resolved using the following in order:
 
 - Environment variable `ANTUBLUE_TEST_ENGINE_PROPERTIES`
-- System property `antublue.test.testEngine.properties`
+- System property `antublue.test.engine.properties`
 
-If these aren't defined, then the test testEngine will recursively search...
+If these aren't defined, then the test engine will recursively search...
 
-current directory `antublue-test-testEngine.properties`
- parent directory `antublue-test-testEngine.properties`
-  parent directory `antublue-test-testEngine.properties`
+current directory `antublue-test-engine.properties`
+ parent directory `antublue-test-engine.properties`
+  parent directory `antublue-test-engine.properties`
 
-If no file named `antublue-test-testEngine.properties` is found, then the test testEngine will recursively search...
+If no file named `antublue-test-engine.properties` is found, then the test engine will recursively search...
 
-current directory `.antublue-test-testEngine.properties`
-  parent directory `.antublue-test-testEngine.properties`
-    parent directory `.antublue-test-testEngine.properties`
+current directory `.antublue-test-engine.properties`
+  parent directory `.antublue-test-engine.properties`
+    parent directory `.antublue-test-engine.properties`
 
 ### Standard AntuBLUE Test Engine properties
 
 | Property                                           | Type    | Default value                    |
 |----------------------------------------------------|---------|----------------------------------|
-| antublue.test.testEngine.thread.count                  | integer | Max(1, number of processors - 2) |
-| antublue.test.testEngine.test.class.include.regex      | string  |                                  |
-| antublue.test.testEngine.test.class.exclude.regex      | string  |                                  |
-| antublue.test.testEngine.test.method.include.regex     | string  |                                  |
-| antublue.test.testEngine.test.method.exclude.regex     | string  |                                  |
-| antublue.test.testEngine.test.class.tag.include.regex  | string  |                                  |
-| antublue.test.testEngine.test.class.tag.exclude.regex  | string  |                                  |
-| antublue.test.testEngine.test.method.tag.include.regex | string  |                                  |
-| antublue.test.testEngine.test.method.tag.exclude.regex | string  |                                  |
-| antublue.test.testEngine.test.class.shuffle            | boolean | false                            |
-| antublue.test.testEngine.console.log.timing            | boolean | true                             |
-| antublue.test.testEngine.console.log.timing.units      | string  | milliseconds                     |
-| antublue.test.testEngine.console.log.test.messages     | boolean | true                             |
-| antublue.test.testEngine.console.log.test.message      | string  | T                                |
-| antublue.test.testEngine.console.log.skip.messages     | boolean | true                             |
-| antublue.test.testEngine.console.log.skip.message      | string  | S                                |
-| antublue.test.testEngine.console.log.pass.messages     | boolean | true                             |
-| antublue.test.testEngine.console.log.pass.message      | string  | P                                |
-| antublue.test.testEngine.console.log.fail.message      | string  | F                                |
+| antublue.test.engine.thread.count                  | integer | Max(1, number of processors - 2) |
+| antublue.test.engine.test.class.include.regex      | string  |                                  |
+| antublue.test.engine.test.class.exclude.regex      | string  |                                  |
+| antublue.test.engine.test.method.include.regex     | string  |                                  |
+| antublue.test.engine.test.method.exclude.regex     | string  |                                  |
+| antublue.test.engine.test.class.tag.include.regex  | string  |                                  |
+| antublue.test.engine.test.class.tag.exclude.regex  | string  |                                  |
+| antublue.test.engine.test.method.tag.include.regex | string  |                                  |
+| antublue.test.engine.test.method.tag.exclude.regex | string  |                                  |
+| antublue.test.engine.test.class.shuffle            | boolean | false                            |
+| antublue.test.engine.console.log.timing            | boolean | true                             |
+| antublue.test.engine.console.log.timing.units      | string  | milliseconds                     |
+| antublue.test.engine.console.log.test.messages     | boolean | true                             |
+| antublue.test.engine.console.log.test.message      | string  | T                                |
+| antublue.test.engine.console.log.skip.messages     | boolean | true                             |
+| antublue.test.engine.console.log.skip.message      | string  | S                                |
+| antublue.test.engine.console.log.pass.messages     | boolean | true                             |
+| antublue.test.engine.console.log.pass.message      | string  | P                                |
+| antublue.test.engine.console.log.fail.message      | string  | F                                |
 
 **Notes**
 
-`antublue.test.testEngine.console.log.timing.units` supports the following values:
+`antublue.test.engine.console.log.timing.units` supports the following values:
 
 - `nanoseconds`
 - `microseconds`
@@ -257,7 +257,7 @@ current directory `.antublue-test-testEngine.properties`
 
 ## Test Engine Summary
 
-When running via Maven in a Linux console, the test testEngine will report a summaryEngineExecutionListener.
+When running via Maven in a Linux console, the test engine will report a summaryEngineExecutionListener.
 
 Example
 
@@ -309,7 +309,7 @@ To allow parameterized testing at the test class level, targeting integration te
 
 ### Non-Goals
 
-The test testEngine is not meant to replace JUnit 5 for unit tests.
+The test engine is not meant to replace JUnit 5 for unit tests.
 
 While it could be used, it's not recommend.
 

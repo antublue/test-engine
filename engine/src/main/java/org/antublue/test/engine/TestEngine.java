@@ -144,12 +144,12 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 .getEngineExecutionListener()
                 .executionStarted(executionRequest.getRootTestDescriptor());
 
-        TestEngineExtensionManager testEngineExtensionManager = new TestEngineExtensionManager();
-        testEngineExtensionManager.load();
+        TestEngineExtensionManager engineExtensionManager = new TestEngineExtensionManager();
+        engineExtensionManager.load();
 
         ThrowableCollector throwableCollector = new ThrowableCollector(throwable -> true);
         if (throwableCollector.isEmpty()) {
-            throwableCollector.execute(() -> testEngineExtensionManager.initialize());
+            throwableCollector.execute(() -> engineExtensionManager.initialize());
         }
 
         if (throwableCollector.isEmpty()) {
@@ -167,7 +167,7 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     });
         }
 
-        List<Throwable> throwables = testEngineExtensionManager.cleanup();
+        List<Throwable> throwables = engineExtensionManager.cleanup();
 
         if (throwableCollector.isEmpty() && throwables.isEmpty()) {
             executionRequest

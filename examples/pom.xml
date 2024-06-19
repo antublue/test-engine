@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.antublue</groupId>
-    <artifactId>test-testEngine-examples</artifactId>
+    <artifactId>test-engine-examples</artifactId>
     <version>7.x.x-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>AntuBLUE Test Engine / Examples</name>
@@ -77,7 +77,7 @@
             </plugin>
             <plugin>
                 <groupId>org.antublue</groupId>
-                <artifactId>test-testEngine-maven-plugin</artifactId>
+                <artifactId>test-engine-maven-plugin</artifactId>
                 <version>7.x.x-SNAPSHOT</version>
                 <executions>
                     <execution>
@@ -159,18 +159,18 @@
     <dependencies>
         <dependency>
             <groupId>org.antublue</groupId>
-            <artifactId>test-testEngine-extras</artifactId>
+            <artifactId>test-engine-extras</artifactId>
             <version>7.x.x-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.antublue</groupId>
-            <artifactId>test-testEngine-api</artifactId>
+            <artifactId>test-engine-api</artifactId>
             <version>7.x.x-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.antublue</groupId>
-            <artifactId>test-testEngine</artifactId>
+            <artifactId>test-engine</artifactId>
             <version>7.x.x-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
@@ -182,7 +182,7 @@
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-testEngine</artifactId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <version>5.10.2</version>
             <scope>test</scope>
         </dependency>

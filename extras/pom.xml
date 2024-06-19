@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.antublue</groupId>
-    <artifactId>test-testEngine-extras</artifactId>
+    <artifactId>test-engine-extras</artifactId>
     <version>7.x.x-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>AntuBLUE Test Engine / Extras</name>
@@ -28,7 +28,7 @@
 
     <description>AntuBLUE Test Engine</description>
 
-    <url>http://github.com/antublue/test-testEngine</url>
+    <url>http://github.com/antublue/test-engine</url>
     <developers>
         <developer>
             <name>AntuBLUE</name>
@@ -37,9 +37,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/antublue/test-testEngine.git</connection>
-        <developerConnection>scm:git:git@github.com:antublue/test-testEngine.git</developerConnection>
-        <url>https://github.com/antblue/test-testEngine</url>
+        <connection>scm:git:git://github.com/antublue/test-engine.git</connection>
+        <developerConnection>scm:git:git@github.com:antublue/test-engine.git</developerConnection>
+        <url>https://github.com/antblue/test-engine</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -219,7 +219,7 @@
                                     <exclude>org.apiguardian:apiguardian-api</exclude>
                                     <exclude>org.junit.jupiter:junit-jupiter-api</exclude>
                                     <exclude>org.junit.platform:junit-platform-commons</exclude>
-                                    <exclude>org.junit.platform:junit-platform-testEngine</exclude>
+                                    <exclude>org.junit.platform:junit-platform-engine</exclude>
                                     <exclude>org.junit.platform:junit-platform-launcher</exclude>
                                     <exclude>org.opentest4j:opentest4j</exclude>
                                 </excludes>
@@ -307,7 +307,7 @@
     <dependencies>
         <dependency>
             <groupId>org.antublue</groupId>
-            <artifactId>test-testEngine-api</artifactId>
+            <artifactId>test-engine-api</artifactId>
             <version>7.x.x-SNAPSHOT</version>
         </dependency>
     </dependencies>

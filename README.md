@@ -1,4 +1,4 @@
-[![Build](https://github.com/antublue/test-testEngine/actions/workflows/build.yml/badge.svg)](https://github.com/antublue/test-testEngine/actions/workflows/build.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/06036e5d592b46238f98025f297add26)](https://app.codacy.com/gh/antublue/test-testEngine/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Build](https://github.com/antublue/test-engine/actions/workflows/build.yml/badge.svg)](https://github.com/antublue/test-engine/actions/workflows/build.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/06036e5d592b46238f98025f297add26)](https://app.codacy.com/gh/antublue/test-engine/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 <br/>
 
@@ -6,7 +6,7 @@
 
 # AntuBLUE Test Engine
 
-The AntuBLUE test testEngine is a [JUnit 5](https://junit.org/junit5/)-based test testEngine designed specifically for parameterized container (class) testing.
+The AntuBLUE test engine is a [JUnit 5](https://junit.org/junit5/)-based test engine designed specifically for parameterized container (class) testing.
 
 Common usage scenarios
 
@@ -15,11 +15,11 @@ Common usage scenarios
 
 # Releases
 
-The AntuBLUE test testEngine is published to Maven Central.
+The AntuBLUE test engine is published to Maven Central.
 
 Release information can be found in GitHub Releases
 
-- [Releases](https://github.com/antublue/test-testEngine/releases)
+- [Releases](https://github.com/antublue/test-engine/releases)
 
 **Test classes may **require** migration between major releases.**
 
@@ -39,7 +39,7 @@ For a specific release, reference the `release-<VERSION>` branch for relevant do
 
 GitHub's Discussions is the current mechanism for help / support.
 
-- [Discussions](https://github.com/antublue/test-testEngine/discussions)
+- [Discussions](https://github.com/antublue/test-engine/discussions)
 
 # FAQ
 
@@ -50,14 +50,14 @@ GitHub's Discussions is the current mechanism for help / support.
 Java 8 or greater is required to build the project. The project targets Java 8 as a baseline.
 
 ```shell
-git clone https://github.com/antublue/test-testEngine
-cd test-testEngine
+git clone https://github.com/antublue/test-engine
+cd test-engine
 ./mvnw clean install
 ```
 
 # Contributing
 
-Contributions to the AntuBLUE test testEngine are both welcomed and appreciated.
+Contributions to the AntuBLUE test engine are both welcomed and appreciated.
 
 The project uses a [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) branching strategy, with release branches for versioned documentation.
 

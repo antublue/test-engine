@@ -27,11 +27,11 @@ import org.antublue.test.engine.internal.util.Predicates;
 /** Class to implement TestEngineExtensionManager */
 public class TestEngineExtensionManager {
 
-    private final List<TestEngineExtension> testEngineExtensions;
+    private final List<TestEngineExtension> engineExtensions;
 
     /** Constructor */
     public TestEngineExtensionManager() {
-        testEngineExtensions = new ArrayList<>();
+        engineExtensions = new ArrayList<>();
     }
 
     /** Method to load test engine extensions */
@@ -42,7 +42,7 @@ public class TestEngineExtensionManager {
         OrdererSupport.orderTestClasses(classes);
 
         for (Class<?> clazz : classes) {
-            testEngineExtensions.add(TestEngineExtension.createExtension(clazz));
+            engineExtensions.add(TestEngineExtension.createExtension(clazz));
         }
     }
 
@@ -52,8 +52,8 @@ public class TestEngineExtensionManager {
      * @throws Throwable Throwable
      */
     public void initialize() throws Throwable {
-        for (TestEngineExtension testEngineExtension : testEngineExtensions) {
-            testEngineExtension.initialize();
+        for (TestEngineExtension engineExtension : engineExtensions) {
+            engineExtension.initialize();
         }
     }
 
@@ -65,12 +65,12 @@ public class TestEngineExtensionManager {
     public List<Throwable> cleanup() {
         List<Throwable> throwables = new ArrayList<>();
 
-        List<TestEngineExtension> testEngineExtensions = new ArrayList<>(this.testEngineExtensions);
-        Collections.reverse(testEngineExtensions);
+        List<TestEngineExtension> engineExtensions = new ArrayList<>(this.engineExtensions);
+        Collections.reverse(engineExtensions);
 
-        for (TestEngineExtension testEngineExtension : testEngineExtensions) {
+        for (TestEngineExtension engineExtension : engineExtensions) {
             try {
-                testEngineExtension.cleanup();
+                engineExtension.cleanup();
             } catch (Throwable t) {
                 throwables.add(t);
             }

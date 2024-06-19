@@ -1,5 +1,5 @@
 /*
- * Copyright (C) $YEAR The AntuBLUE test-testEngine project authors
+ * Copyright (C) $YEAR The AntuBLUE test-engine project authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
