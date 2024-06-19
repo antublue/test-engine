@@ -18,8 +18,9 @@ package example.arguments.supplier;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import org.antublue.test.engine.api.Argument;
+
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.Argument;
 
 /** Example test */
 public class SetTest {

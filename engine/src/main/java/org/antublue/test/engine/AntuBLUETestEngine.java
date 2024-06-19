@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine;
 
-import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
@@ -36,9 +35,9 @@ import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement the AntuBLUE Test Engine */
-public class TestEngine implements org.junit.platform.engine.TestEngine {
+public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestEngine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AntuBLUETestEngine.class);
 
     /** Configuration constant */
     public static final String ENGINE_ID = "antublue-test-engine";
@@ -144,12 +143,9 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                 .getEngineExecutionListener()
                 .executionStarted(executionRequest.getRootTestDescriptor());
 
-        TestEngineExtensionManager engineExtensionManager = new TestEngineExtensionManager();
-        engineExtensionManager.load();
-
         ThrowableCollector throwableCollector = new ThrowableCollector(throwable -> true);
         if (throwableCollector.isEmpty()) {
-            throwableCollector.execute(() -> engineExtensionManager.initialize());
+            throwableCollector.execute(() -> TestEngineExtensionManager.getInstance().prepare());
         }
 
         if (throwableCollector.isEmpty()) {
@@ -167,25 +163,23 @@ public class TestEngine implements org.junit.platform.engine.TestEngine {
                     });
         }
 
-        List<Throwable> throwables = engineExtensionManager.cleanup();
+        throwableCollector.execute(
+                () -> {
+                    TestEngineExtensionManager.getInstance().conclude();
+                });
 
-        if (throwableCollector.isEmpty() && throwables.isEmpty()) {
+        if (throwableCollector.isEmpty()) {
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(
                             executionRequest.getRootTestDescriptor(),
                             TestExecutionResult.successful());
         } else {
-            Throwable throwable =
-                    throwableCollector.isNotEmpty()
-                            ? throwableCollector.getThrowable()
-                            : throwables.get(0);
-
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(
                             executionRequest.getRootTestDescriptor(),
-                            TestExecutionResult.failed(throwable));
+                            TestExecutionResult.failed(throwableCollector.getThrowable()));
         }
     }
 }

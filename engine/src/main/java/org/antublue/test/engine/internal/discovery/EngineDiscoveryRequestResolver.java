@@ -40,6 +40,7 @@ import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestMethodTestDescriptor;
+import org.antublue.test.engine.internal.extension.TestEngineExtensionManager;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
@@ -90,6 +91,8 @@ public class EngineDiscoveryRequestResolver {
         if (LOGGER.isTraceEnabled()) {
             testClasses.forEach(c -> LOGGER.trace("testClass [%s]", c.getName()));
         }
+
+        TestEngineExtensionManager.getInstance().discoveryCallback(testClasses);
 
         for (Class<?> testClass : testClasses) {
             buildClassTestDescriptor(engineDescriptor, testClass);

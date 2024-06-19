@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
-import org.antublue.test.engine.TestEngine;
+import org.antublue.test.engine.AntuBLUETestEngine;
 import org.antublue.test.engine.internal.configuration.ConfigurationParameters;
 import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.util.AnsiColor;
@@ -211,7 +211,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             .configurationParameters(Collections.emptyMap())
                             .build();
 
-            TestEngine engine = new TestEngine();
+            AntuBLUETestEngine engine = new AntuBLUETestEngine();
             TestDescriptor testDescriptor = null;
 
             try {
@@ -219,7 +219,8 @@ public class TestEngineMavenPlugin extends AbstractMojo {
 
                 testDescriptor =
                         engine.discover(
-                                launcherDiscoveryRequest, UniqueId.forEngine(TestEngine.ENGINE_ID));
+                                launcherDiscoveryRequest,
+                                UniqueId.forEngine(AntuBLUETestEngine.ENGINE_ID));
             } catch (Throwable t) {
                 summaryMessage = AnsiColor.TEXT_RED_BOLD_BRIGHT.wrap("EXCEPTION DURING DISCOVERY");
 

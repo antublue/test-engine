@@ -309,20 +309,4 @@ public @interface TestEngine {
         @Retention(RetentionPolicy.RUNTIME)
         @interface UUID {}
     }
-
-    /** EngineExtension annotation */
-    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface EngineExtension {
-
-        /** Initialize annotation */
-        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-        @Retention(RetentionPolicy.RUNTIME)
-        @interface Initialize {}
-
-        /** Cleanup annotation */
-        @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-        @Retention(RetentionPolicy.RUNTIME)
-        @interface Cleanup {}
-    }
 }

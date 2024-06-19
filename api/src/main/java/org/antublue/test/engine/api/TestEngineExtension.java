@@ -14,25 +14,37 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.support;
+package org.antublue.test.engine.api;
 
-/** Class to implement ObjectSupport */
-@SuppressWarnings("unchecked")
-public class ObjectSupport {
+import java.util.List;
 
-    /** Constructor */
-    private ObjectSupport() {
+/** Interface to implement TestEngineExtension */
+public interface TestEngineExtension {
+
+    /**
+     * Method to process list of test classes
+     *
+     * @param testClasses testClasses
+     */
+    default void discoveryCallback(List<Class<?>> testClasses) {
         // DO NOTHING
     }
 
     /**
-     * Method to create an instance of a Class
+     * Method to prepare the environment
      *
-     * @param clazz clazz
-     * @return an instance of the Class
      * @throws Throwable Throwable
      */
-    public static <T> T createObject(Class<?> clazz) throws Throwable {
-        return (T) clazz.getConstructor().newInstance();
+    default void prepareCallback() throws Throwable {
+        // DO NOTHING
+    }
+
+    /**
+     * Method to conclude the environment
+     *
+     * @throws Throwable Throwable
+     */
+    default void concludeCallback() throws Throwable {
+        // DO NOTHING
     }
 }

@@ -20,7 +20,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.function.Predicate;
+
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.api.TestEngineExtension;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 
@@ -28,39 +30,14 @@ import org.junit.platform.commons.support.ReflectionSupport;
 public class Predicates {
 
     /** Predicate to filter test engine extension classes */
-    public static final Predicate<Class<?>> ENGINE_EXTENSION_CLASS =
+    public static final Predicate<Class<?>> TEST_ENGINE_EXTENSION_CLASS =
             clazz -> {
                 int modifiers = clazz.getModifiers();
                 return Modifier.isPublic(modifiers)
                         && !Modifier.isAbstract(modifiers)
                         && !Modifier.isStatic(modifiers)
-                        && clazz.isAnnotationPresent(TestEngine.EngineExtension.class);
-            };
-
-    /** Predicate to filter engine extension initialize methods */
-    public static final Predicate<Method> ENGINE_EXTENSION_INITIALIZE_METHOD =
-            method -> {
-                int modifiers = method.getModifiers();
-
-                return !Modifier.isAbstract(modifiers)
-                        && Modifier.isPublic(modifiers)
-                        && !Modifier.isStatic(modifiers)
-                        && method.getParameterCount() == 0
-                        && !method.isAnnotationPresent(TestEngine.Disabled.class)
-                        && method.isAnnotationPresent(TestEngine.EngineExtension.Initialize.class);
-            };
-
-    /** Predicate to filter engine extension initialize methods */
-    public static final Predicate<Method> ENGINE_EXTENSION_CLEANUP_METHOD =
-            method -> {
-                int modifiers = method.getModifiers();
-
-                return !Modifier.isAbstract(modifiers)
-                        && Modifier.isPublic(modifiers)
-                        && !Modifier.isStatic(modifiers)
-                        && method.getParameterCount() == 0
-                        && !method.isAnnotationPresent(TestEngine.Disabled.class)
-                        && method.isAnnotationPresent(TestEngine.EngineExtension.Cleanup.class);
+                        && !clazz.isAnnotationPresent(TestEngine.Disabled.class)
+                        && TestEngineExtension.class.isAssignableFrom(clazz);
             };
 
     /** Predicate to filter argument fields */
