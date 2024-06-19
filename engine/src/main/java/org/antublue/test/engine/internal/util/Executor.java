@@ -122,7 +122,7 @@ public class Executor {
                         executorService.submit(
                                 () -> {
                                     try {
-                                        executableTestDescriptor.execute(executionRequest);
+                                        executableTestDescriptor.execute(executionRequest, null);
                                     } catch (Throwable t) {
                                         t.printStackTrace(System.err);
                                     } finally {
@@ -152,9 +152,7 @@ public class Executor {
         }
     }
 
-    /**
-     * Method to wait for the executor to finish
-     */
+    /** Method to wait for the executor to finish */
     public void await() {
         try {
             countDownLatch.await();

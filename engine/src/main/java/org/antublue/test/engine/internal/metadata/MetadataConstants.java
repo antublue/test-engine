@@ -37,7 +37,7 @@ public class MetadataConstants {
     public static final String TEST_CLASS = "testClass";
 
     /** Constant */
-    public final static String TEST_CLASS_DISPLAY_NAME = "testClass.displayName";
+    public static final String TEST_CLASS_DISPLAY_NAME = "testClass.displayName";
 
     /** Constant */
     public static final String TEST_ARGUMENT = "testArgument";

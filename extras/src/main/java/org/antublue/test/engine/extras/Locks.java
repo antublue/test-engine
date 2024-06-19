@@ -30,10 +30,21 @@ public class Locks {
         return new LockReference(name);
     }
 
+    /** Constructor */
+    private Locks() {
+        // DO NOTHING
+    }
+
+    /** Class to implement LockManager */
     private static class LockManager {
 
         private final Map<Object, ReferenceCountingReentrantLock> MAP = new ConcurrentHashMap<>();
 
+        /**
+         * Method to lock
+         *
+         * @param name name
+         */
         private void lock(Object name) {
             ReferenceCountingReentrantLock referenceCountingReentrantLock =
                     MAP.compute(
@@ -51,6 +62,11 @@ public class Locks {
             referenceCountingReentrantLock.lock();
         }
 
+        /**
+         * Method to unlock
+         *
+         * @param name name
+         */
         private void unlock(Object name) {
             try {
                 ReferenceCountingReentrantLock referenceCountingReentrantLock =
@@ -91,16 +107,12 @@ public class Locks {
             this.name = name;
         }
 
-        /**
-         * Method to lock
-         */
+        /** Method to lock */
         public void lock() {
             LOCK_MANAGER.lock(name);
         }
 
-        /**
-         * Method to unlock
-         */
+        /** Method to unlock */
         public void unlock() {
             LOCK_MANAGER.unlock(name);
         }
@@ -150,8 +162,7 @@ public class Locks {
         }
     }
 
-    /**
-     * Class to implement ReferenceCountingReentrantLock */
+    /** Class to implement ReferenceCountingReentrantLock */
     static class ReferenceCountingReentrantLock extends ReentrantLock {
 
         private int count;
@@ -162,16 +173,12 @@ public class Locks {
             count = 1;
         }
 
-        /**
-         * Method to increment the reference count
-         */
+        /** Method to increment the reference count */
         public void incrementCount() {
             count++;
         }
 
-        /**
-         * Method to decrement the reference count
-         */
+        /** Method to decrement the reference count */
         public void decrementCount() {
             count--;
         }

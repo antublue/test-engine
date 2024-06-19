@@ -17,7 +17,6 @@
 package org.antublue.test.engine.internal.metadata;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Class to implement MetadataInformation\ */

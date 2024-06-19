@@ -45,8 +45,8 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     private final Class<?> testClass;
     private final List<Method> prepareMethods;
     private final List<Method> concludeMethods;
-
     private ExecutionRequest executionRequest;
+    private Object testInstance;
 
     /**
      * Constructor
@@ -78,9 +78,9 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     public Type getType() {
         return Type.CONTAINER_AND_TEST;
     }
-    
+
     @Override
-    public void execute(ExecutionRequest executionRequest) {
+    public void execute(ExecutionRequest executionRequest, Object testInstance) {
         LOGGER.trace("execute(ExecutionRequest executionRequest)");
 
         getStopWatch().reset();
@@ -89,6 +89,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
 
         this.executionRequest = executionRequest;
+
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
         ThrowableCollector throwableCollector = getThrowableCollector();
@@ -101,7 +102,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                 if (throwableCollector.isEmpty()) {
                     execute();
                 } else {
-                    skip(executionRequest);
+                    skip(executionRequest, testInstance);
                 }
                 throwableCollector.execute(this::conclude);
             }
@@ -141,28 +142,25 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
     private void prepare() throws Throwable {
         LOGGER.trace(
-                "prepare() testClass [%s] testInstance [%s]",
-                testClass.getName(), getTestInstance());
+                "prepare() testClass [%s] testInstance [%s]", testClass.getName(), testInstance);
 
         for (Method method : prepareMethods) {
             LOGGER.trace(
                     "prepare() testClass [%s] testInstance [%s] method [%s]",
-                    testClass.getName(), getTestInstance(), method);
-            method.invoke(getTestInstance());
+                    testClass.getName(), testInstance, method);
+            method.invoke(testInstance);
         }
     }
 
     private void createTestInstance() throws Throwable {
         LOGGER.trace("createTestInstance() testClass [%s]", testClass.getName());
 
-        setTestInstance(
-                testClass
-                        .getDeclaredConstructor((Class<?>[]) null)
-                        .newInstance((Object[]) null));
+        testInstance =
+                testClass.getDeclaredConstructor((Class<?>[]) null).newInstance((Object[]) null);
 
         LOGGER.trace(
                 "createTestInstance() testClass [%s] testInstance [%s]",
-                testClass.getName(), getTestInstance());
+                testClass.getName(), testInstance);
     }
 
     private void execute() {
@@ -173,7 +171,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                         testDescriptor -> {
                             if (testDescriptor instanceof ExecutableTestDescriptor) {
                                 ((ExecutableTestDescriptor) testDescriptor)
-                                        .execute(executionRequest);
+                                        .execute(executionRequest, testInstance);
                             }
                         });
     }
@@ -186,23 +184,20 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
     private void conclude() throws Throwable {
         LOGGER.trace(
-                "conclude() testClass [%s] testInstance [%s]",
-                testClass.getName(), getTestInstance());
+                "conclude() testClass [%s] testInstance [%s]", testClass.getName(), testInstance);
 
         for (Method method : concludeMethods) {
             LOGGER.trace(
                     "conclude() testClass [%s] testInstance [%s] method [%s]",
-                    testClass.getName(), getTestInstance(), method);
-            method.invoke(getTestInstance());
+                    testClass.getName(), testInstance, method);
+            method.invoke(testInstance);
         }
     }
 
     private void destroyTestInstance() {
-        LOGGER.trace(
-                "destroyTestInstance() testClass [%s]",
-                testClass.getName(), getTestInstance());
+        LOGGER.trace("destroyTestInstance() testClass [%s]", testClass.getName(), testInstance);
 
-        setTestInstance(null);
+        testInstance = null;
     }
 
     /**

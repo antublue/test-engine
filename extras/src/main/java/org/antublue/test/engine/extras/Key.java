@@ -29,7 +29,7 @@ public class Key {
     /**
      * Method to create a key from a Collection of Objects
      *
-     * @param collection
+     * @param collection collection
      * @return a key
      */
     public static Object of(Collection<Object> collection) {

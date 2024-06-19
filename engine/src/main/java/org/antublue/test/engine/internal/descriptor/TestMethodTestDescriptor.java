@@ -46,7 +46,6 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> beforeEachMethods;
     private final Method testMethod;
     private final List<Method> afterEachMethods;
-    private ExecutionRequest executionRequest;
     private Object testInstance;
 
     /**
@@ -85,15 +84,15 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     public Optional<TestSource> getSource() {
         return Optional.of(MethodSource.from(testMethod));
     }
-    
+
     @Override
-    public void execute(ExecutionRequest executionRequest) {
+    public void execute(ExecutionRequest executionRequest, Object testInstance) {
         LOGGER.trace("execute(ExecutionRequest executionRequest)");
+        Preconditions.notNull(testInstance, "testInstance is null");
+
+        this.testInstance = testInstance;
 
         getStopWatch().reset();
-
-        testInstance = getParent(ExecutableTestDescriptor.class).getTestInstance();
-        Preconditions.notNull(testInstance, "testInstance is null");
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata()
@@ -106,7 +105,6 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata().put(MetadataConstants.TEST_METHOD, testMethod);
         getMetadata().put(MetadataConstants.TEST_METHOD_DISPLAY_NAME, getDisplayName());
 
-        this.executionRequest = executionRequest;
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
         ThrowableCollector throwableCollector = getThrowableCollector();

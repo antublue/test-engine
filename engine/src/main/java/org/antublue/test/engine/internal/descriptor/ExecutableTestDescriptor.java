@@ -34,8 +34,6 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor im
     private final ThrowableCollector throwableCollector;
     private final MetadataInformation metadataInformation;
     private final StopWatch stopWatch;
-    private ExecutionRequest executionRequest;
-    private Object testInstance;
 
     /**
      * Constructor
@@ -56,19 +54,20 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor im
      *
      * @param executionRequest executionRequest
      */
-    public abstract void execute(ExecutionRequest executionRequest);
+    public abstract void execute(ExecutionRequest executionRequest, Object testInstance);
 
     /**
      * Method to skip child test descriptors
      *
      * @param executionRequest executionRequest
      */
-    public void skip(ExecutionRequest executionRequest) {
+    public void skip(ExecutionRequest executionRequest, Object testInstance) {
         getChildren()
                 .forEach(
                         testDescriptor -> {
                             if (testDescriptor instanceof ExecutableTestDescriptor) {
-                                ((ExecutableTestDescriptor) testDescriptor).skip(executionRequest);
+                                ((ExecutableTestDescriptor) testDescriptor)
+                                        .skip(executionRequest, testInstance);
                             }
                         });
     }
@@ -103,15 +102,6 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor im
      */
     protected StopWatch getStopWatch() {
         return stopWatch;
-    }
-
-    /**
-     * Method to get the test instance
-     *
-     * @return the test instance
-     */
-    protected Object getTestInstance() {
-        return testInstance;
     }
 
     /**
