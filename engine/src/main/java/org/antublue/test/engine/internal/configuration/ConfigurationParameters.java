@@ -40,7 +40,7 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
     }
 
     public static ConfigurationParameters getInstance() {
-        return SingletonHolder.INSTANCE;
+        return SingletonHolder.SINGLETON;
     }
 
     @Override
@@ -72,6 +72,6 @@ public class ConfigurationParameters implements org.junit.platform.engine.Config
     private static final class SingletonHolder {
 
         /** The singleton instance */
-        private static final ConfigurationParameters INSTANCE = new ConfigurationParameters();
+        private static final ConfigurationParameters SINGLETON = new ConfigurationParameters();
     }
 }

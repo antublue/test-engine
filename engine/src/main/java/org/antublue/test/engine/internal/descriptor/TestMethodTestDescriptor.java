@@ -37,9 +37,9 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement a MethodTestDescriptor */
-public class MethodTestDescriptor extends ExecutableTestDescriptor {
+public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodTestDescriptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestMethodTestDescriptor.class);
 
     private final Class<?> testClass;
     private final Argument<?> testArgument;
@@ -47,7 +47,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
     private final Method testMethod;
     private final List<Method> afterEachMethods;
 
-    public MethodTestDescriptor(
+    public TestMethodTestDescriptor(
             UniqueId uniqueId,
             String displayName,
             Class<?> testClass,
@@ -188,7 +188,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
      * @param testArgument testArgument
      * @return a MethodTestDescriptor
      */
-    public static MethodTestDescriptor of(
+    public static TestMethodTestDescriptor create(
             UniqueId parentUniqueId,
             Class<?> testClass,
             Method testMethod,
@@ -199,7 +199,8 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         Preconditions.notNull(testArgument, "testArgument is null");
 
         UniqueId uniqueId =
-                parentUniqueId.append(MethodTestDescriptor.class.getName(), testMethod.getName());
+                parentUniqueId.append(
+                        TestMethodTestDescriptor.class.getName(), testMethod.getName());
 
         String displayName = DisplayNameSupport.getDisplayName(testMethod);
 
@@ -217,7 +218,7 @@ public class MethodTestDescriptor extends ExecutableTestDescriptor {
         afterEachMethods =
                 OrdererSupport.orderTestMethods(afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
 
-        return new MethodTestDescriptor(
+        return new TestMethodTestDescriptor(
                 uniqueId,
                 displayName,
                 testClass,

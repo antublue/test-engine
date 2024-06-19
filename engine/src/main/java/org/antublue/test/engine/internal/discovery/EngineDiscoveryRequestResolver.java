@@ -39,7 +39,7 @@ import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.TestMethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
@@ -70,6 +70,13 @@ public class EngineDiscoveryRequestResolver {
 
     private static final Configuration CONFIGURATION = Configuration.getInstance();
 
+    /**
+     * Method to resolve the engine discovery request, building an engine descriptor
+     *
+     * @param engineDiscoveryRequest engineDiscoveryRequest
+     * @param engineDescriptor engineDescriptor
+     * @throws Throwable Throwable
+     */
     public void resolveSelector(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor)
             throws Throwable {
@@ -85,7 +92,7 @@ public class EngineDiscoveryRequestResolver {
         }
 
         for (Class<?> testClass : testClasses) {
-            buildClassTestDescriptor(testClass, engineDescriptor);
+            buildClassTestDescriptor(engineDescriptor, testClass);
         }
 
         prune(engineDescriptor);
@@ -93,47 +100,71 @@ public class EngineDiscoveryRequestResolver {
         shuffleOrSortTestDescriptors(engineDescriptor);
     }
 
+    /**
+     * Method to build a class test descriptor
+     *
+     * @param parentTestDescriptor parentTestDescriptor
+     * @param testClass testClass
+     * @throws Throwable Throwable
+     */
     private static void buildClassTestDescriptor(
-            Class<?> testClass, TestDescriptor parentTestDescriptor) throws Throwable {
+            TestDescriptor parentTestDescriptor, Class<?> testClass) throws Throwable {
         LOGGER.trace("buildClassTestDescriptor() testClass [%s]", testClass.getName());
 
         ClassTestDescriptor classTestDescriptor =
-                ClassTestDescriptor.of(parentTestDescriptor.getUniqueId(), testClass);
+                ClassTestDescriptor.create(parentTestDescriptor.getUniqueId(), testClass);
+
         parentTestDescriptor.addChild(classTestDescriptor);
 
         int testArgumentIndex = 0;
         List<Argument<?>> testArguments = getArguments(testClass);
         for (Argument<?> testArgument : testArguments) {
             buildArgumentTestDescriptor(
-                    testClass, testArgument, testArgumentIndex, classTestDescriptor);
+                    classTestDescriptor, testClass, testArgument, testArgumentIndex);
             testArgumentIndex++;
         }
     }
 
+    /**
+     * Method to build an argument test descriptor
+     *
+     * @param parentTestDescriptor parentTestDescriptor
+     * @param testClass testClass
+     * @param testArgument testArgument
+     * @param testArgumentIndex testArgumentIndex
+     */
     private static void buildArgumentTestDescriptor(
+            TestDescriptor parentTestDescriptor,
             Class<?> testClass,
             Argument<?> testArgument,
-            int testArgumentIndex,
-            TestDescriptor parentTestDescriptor) {
+            int testArgumentIndex) {
         LOGGER.trace(
                 "buildArgumentTestDescriptor() testClass [%s] testArgument [%s] testArgumentIndex",
                 testClass.getName(), testArgument.getName(), testArgumentIndex);
 
         ArgumentTestDescriptor argumentTestDescriptor =
-                ArgumentTestDescriptor.of(
+                ArgumentTestDescriptor.create(
                         parentTestDescriptor.getUniqueId(),
                         testClass,
                         testArgument,
                         testArgumentIndex);
+
         parentTestDescriptor.addChild(argumentTestDescriptor);
 
-        buildMethodTestDescriptor(testClass, testArgument, argumentTestDescriptor);
+        buildTestMethodTestDescriptor(argumentTestDescriptor, testClass, testArgument);
     }
 
-    public static void buildMethodTestDescriptor(
-            Class<?> testClass, Argument<?> testArgument, TestDescriptor parentTestDescriptor) {
+    /**
+     * Method to build a test method test descriptor
+     *
+     * @param parentTestDescriptor parentTestDescriptor
+     * @param testClass testClass
+     * @param testArgument testArgument
+     */
+    private static void buildTestMethodTestDescriptor(
+            TestDescriptor parentTestDescriptor, Class<?> testClass, Argument<?> testArgument) {
         LOGGER.trace(
-                "buildMethodTestDescriptor() testClass [%s] testArgument [%s]",
+                "buildTestMethodTestDescriptor() testClass [%s] testArgument [%s]",
                 testClass.getName(), testArgument.getName());
 
         List<Method> testMethods =
@@ -146,16 +177,22 @@ public class EngineDiscoveryRequestResolver {
         filterTestMethodsByTags(testMethods);
 
         for (Method testMethod : testMethods) {
-            MethodTestDescriptor methodTestDescriptor =
-                    MethodTestDescriptor.of(
+            parentTestDescriptor.addChild(
+                    TestMethodTestDescriptor.create(
                             parentTestDescriptor.getUniqueId(),
                             testClass,
                             testMethod,
-                            testArgument);
-            parentTestDescriptor.addChild(methodTestDescriptor);
+                            testArgument));
         }
     }
 
+    /**
+     * Method to resolve a list of test classes
+     *
+     * @param engineDiscoveryRequest engineDiscoveryRequest
+     * @return a list of classes
+     * @throws Throwable Throwable
+     */
     private static List<Class<?>> resolveEngineDiscoveryRequest(
             EngineDiscoveryRequest engineDiscoveryRequest) throws Throwable {
         Set<Class<?>> testClassSet = new HashSet<>();
@@ -253,16 +290,13 @@ public class EngineDiscoveryRequestResolver {
         return testClassList;
     }
 
-    private static Method getArumentSupplierMethod(Class<?> testClass) {
-        List<Method> methods =
-                ReflectionSupport.findMethods(
-                        testClass,
-                        Predicates.ARGUMENT_SUPPLIER_METHOD,
-                        HierarchyTraversalMode.BOTTOM_UP);
-
-        return methods.get(0);
-    }
-
+    /**
+     * Method to get argument for a test class
+     *
+     * @param testClass testClass
+     * @return a list of arguments
+     * @throws Throwable Throwable
+     */
     private static List<Argument<?>> getArguments(Class<?> testClass) throws Throwable {
         List<Argument<?>> testArguments = new ArrayList<>();
 
@@ -300,6 +334,22 @@ public class EngineDiscoveryRequestResolver {
         }
 
         return testArguments;
+    }
+
+    /**
+     * Method to get a test class argument supplier method
+     *
+     * @param testClass testClass
+     * @return the argument supplier method
+     */
+    private static Method getArumentSupplierMethod(Class<?> testClass) {
+        List<Method> methods =
+                ReflectionSupport.findMethods(
+                        testClass,
+                        Predicates.ARGUMENT_SUPPLIER_METHOD,
+                        HierarchyTraversalMode.BOTTOM_UP);
+
+        return methods.get(0);
     }
 
     /**

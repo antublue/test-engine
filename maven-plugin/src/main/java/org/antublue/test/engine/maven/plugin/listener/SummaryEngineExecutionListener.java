@@ -24,7 +24,7 @@ import org.antublue.test.engine.Engine;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
-import org.antublue.test.engine.internal.descriptor.MethodTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.TestMethodTestDescriptor;
 import org.antublue.test.engine.internal.metadata.Metadata;
 import org.antublue.test.engine.internal.metadata.MetadataConstants;
 import org.antublue.test.engine.internal.metadata.MetadataInformation;
@@ -182,7 +182,7 @@ public class SummaryEngineExecutionListener
                 String testDescriptorStatus =
                         metadataInformation.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
 
-                if (testDescriptor instanceof MethodTestDescriptor) {
+                if (testDescriptor instanceof TestMethodTestDescriptor) {
                     methodTestDescriptorFound++;
                     switch (testDescriptorStatus) {
                         case "PASS":

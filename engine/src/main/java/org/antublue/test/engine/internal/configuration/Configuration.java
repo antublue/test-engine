@@ -121,7 +121,7 @@ public class Configuration {
      * @return the singleton instance
      */
     public static Configuration getInstance() {
-        return SingletonHolder.INSTANCE;
+        return SingletonHolder.SINGLETON;
     }
 
     /**
@@ -194,7 +194,7 @@ public class Configuration {
     }
 
     /**
-     * Method to load tracing information
+     * Method to log a TRACE message. We can't use a Logger since the Logger requires Configuration.
      *
      * @param format format
      * @param objects objects
@@ -267,6 +267,6 @@ public class Configuration {
     private static final class SingletonHolder {
 
         /** The singleton instance */
-        private static final Configuration INSTANCE = new Configuration();
+        private static final Configuration SINGLETON = new Configuration();
     }
 }

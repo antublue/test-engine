@@ -1,6 +1,6 @@
 # Contributing
 
-Contributions to the Test Engine are both welcomed and appreciated.
+Contributions to the AntuBLUE test enginee are both welcomed and appreciated.
 
 The project uses a [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow) branching strategy, with release branches for versioned documentation.
 

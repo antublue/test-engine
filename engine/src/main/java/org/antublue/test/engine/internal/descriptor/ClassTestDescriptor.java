@@ -206,7 +206,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
      * @param testClass testClass
      * @return a ClassTestDescriptor
      */
-    public static ClassTestDescriptor of(UniqueId parentUniqueId, Class<?> testClass) {
+    public static ClassTestDescriptor create(UniqueId parentUniqueId, Class<?> testClass) {
         Preconditions.notNull(parentUniqueId, "parentUniqueId is null");
         Preconditions.notNull(testClass, "testClass is null");
 

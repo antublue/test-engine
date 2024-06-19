@@ -39,7 +39,7 @@ public class Information {
      * @return the singleton instance
      */
     public static Information getInstance() {
-        return SingletonHolder.INSTANCE;
+        return SingletonHolder.SINGLETON;
     }
 
     /**
@@ -78,6 +78,6 @@ public class Information {
     private static final class SingletonHolder {
 
         /** The singleton instance */
-        private static final Information INSTANCE = new Information();
+        private static final Information SINGLETON = new Information();
     }
 }

@@ -226,7 +226,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
      * @param testArgumentIndex testArgumentIndex
      * @return an ArgumentTestDescriptor
      */
-    public static ArgumentTestDescriptor of(
+    public static ArgumentTestDescriptor create(
             UniqueId parentUniqueId,
             Class<?> testClass,
             Argument<?> testArgument,

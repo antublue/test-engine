@@ -59,7 +59,7 @@ public final class LoggerFactory {
      */
     public static Logger getLogger(String name) {
         synchronized (Configuration.getInstance()) {
-            return SingletonHolder.INSTANCE.createLogger(name);
+            return SingletonHolder.SINGLETON.createLogger(name);
         }
     }
 
@@ -67,6 +67,6 @@ public final class LoggerFactory {
     private static final class SingletonHolder {
 
         /** The singleton instance */
-        private static final LoggerFactory INSTANCE = new LoggerFactory();
+        private static final LoggerFactory SINGLETON = new LoggerFactory();
     }
 }
