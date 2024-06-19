@@ -23,6 +23,11 @@ public class StopWatch {
     private long startNanoTime;
     private Long stopNanoTime;
 
+    /** Constructor */
+    public StopWatch() {
+        // DO NOTHING
+    }
+
     /**
      * Constructor
      *

@@ -49,7 +49,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private final Argument<?> testArgument;
     private final List<Method> beforeAllMethods;
     private final List<Method> afterAllMethods;
-
+    private ExecutionRequest executionRequest;
+    private Object testInstance;
+    
     /**
      * Constructor
      *
@@ -90,11 +92,8 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         getStopWatch().reset();
 
-        setExecutionRequest(executionRequest);
-
-        Object testInstance = getParent(ExecutableTestDescriptor.class).getTestInstance();
+        testInstance = getParent(ExecutableTestDescriptor.class).getTestInstance();
         Preconditions.notNull(testInstance, "testInstance is null");
-        setTestInstance(testInstance);
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata()
@@ -104,6 +103,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         getMetadata().put(MetadataConstants.TEST_ARGUMENT, testArgument);
 
+        this.executionRequest = executionRequest;
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
         ThrowableCollector throwableCollector = getThrowableCollector();
@@ -156,7 +156,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void setArgumentFields() throws Throwable {
         LOGGER.trace(
                 "setArgumentFields() testClass [%s] testInstance [%s] testArgument [%s]",
-                getTestInstance().getClass().getName(), getTestInstance(), testArgument);
+                testInstance.getClass().getName(), testInstance, testArgument);
 
         ArgumentAnnotationSupport.setArgumentFields(getTestInstance(), testArgument);
     }
@@ -164,7 +164,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void setRandomFields() throws Throwable {
         LOGGER.trace(
                 "setRandomFields() testClass [%s] testInstance [%s] testArgument [%s]",
-                getTestInstance().getClass().getName(), getTestInstance(), testArgument);
+                testInstance.getClass().getName(), testInstance, testArgument);
 
         RandomAnnotationSupport.setRandomFields(getTestInstance());
     }
@@ -172,12 +172,12 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void beforeAllMethods() throws Throwable {
         LOGGER.trace(
                 "beforeAllMethods() testClass [%s] testInstance [%s]",
-                getTestInstance().getClass().getName(), getTestInstance());
+                testInstance.getClass().getName(), getTestInstance());
 
         for (Method method : beforeAllMethods) {
             LOGGER.trace(
                     "beforeAllMethods() testClass [%s] testInstance [%s] method [%s]",
-                    getTestInstance().getClass().getName(), getTestInstance(), method);
+                    testInstance.getClass().getName(), testInstance, method);
             method.invoke(getTestInstance());
         }
     }
@@ -185,7 +185,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void execute() {
         LOGGER.trace(
                 "execute() testClass [%s] testInstance [%s]",
-                getTestInstance().getClass().getName(), getTestInstance());
+                testInstance.getClass().getName(), getTestInstance());
 
         getChildren()
                 .forEach(
@@ -193,7 +193,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                 testDescriptor -> {
                                     if (testDescriptor instanceof ExecutableTestDescriptor) {
                                         ((ExecutableTestDescriptor) testDescriptor)
-                                                .execute(getExecutionRequest());
+                                                .execute(executionRequest);
                                     }
                                 });
     }
@@ -201,12 +201,12 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void afterAllMethods() throws Throwable {
         LOGGER.trace(
                 "afterAllMethods() testClass [%s] testInstance [%s]",
-                getTestInstance().getClass().getName(), getTestInstance());
+                testInstance.getClass().getName(), getTestInstance());
 
         for (Method method : afterAllMethods) {
             LOGGER.trace(
                     "afterAllMethods() testClass [%s] testInstance [%s] method [%s]",
-                    getTestInstance().getClass().getName(), getTestInstance(), method);
+                    testInstance.getClass().getName(), testInstance, method);
             method.invoke(getTestInstance());
         }
     }
@@ -214,7 +214,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void clearRandomFields() throws Throwable {
         LOGGER.trace(
                 "clearRandomFields() testClass [%s] testInstance [%s]",
-                getTestInstance().getClass().getName(), getTestInstance());
+                testInstance.getClass().getName(), getTestInstance());
 
         RandomAnnotationSupport.clearRandomFields(getTestInstance());
     }
@@ -222,9 +222,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void clearArgumentFields() throws Throwable {
         LOGGER.trace(
                 "clearArgumentFields() testClass [%s] testInstance [%s]",
-                getTestInstance().getClass().getName(), getTestInstance());
+                testInstance.getClass().getName(), getTestInstance());
 
-        ArgumentAnnotationSupport.setArgumentFields(getTestInstance(), null);
+        ArgumentAnnotationSupport.setArgumentFields(testInstance, null);
     }
 
     /**

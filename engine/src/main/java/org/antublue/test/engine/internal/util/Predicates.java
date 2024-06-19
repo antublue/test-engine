@@ -28,6 +28,11 @@ import org.junit.platform.commons.support.ReflectionSupport;
 /** Class to implement Predicates */
 public class Predicates {
 
+    /** Constructor */
+    private Predicates() {
+        // DO NOTHING
+    }
+
     /** Predicate to filter test engine extension classes */
     public static final Predicate<Class<?>> TEST_ENGINE_EXTENSION_CLASS =
             clazz -> {

@@ -29,7 +29,8 @@ public class ObjectSupport {
      * Method to create an instance of a Class
      *
      * @param clazz clazz
-     * @return an instance of the Class
+     * @param <T> T
+     * @return an Object of type T
      * @throws Throwable Throwable
      */
     public static <T> T createObject(Class<?> clazz) throws Throwable {

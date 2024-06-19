@@ -91,6 +91,11 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
         return Optional.of(VERSION);
     }
 
+    /** Constructor */
+    public AntuBLUETestEngine() {
+        // DO NOTHING
+    }
+
     /**
      * Method to discover test classes
      *

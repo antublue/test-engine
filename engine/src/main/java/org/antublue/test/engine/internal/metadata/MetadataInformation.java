@@ -20,33 +20,36 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/** Class to implement MetadataInformation\ */
 @SuppressWarnings("unchecked")
 public class MetadataInformation {
 
     private final Map<String, Object> map;
 
+    /** Constructor */
     public MetadataInformation() {
         map = new ConcurrentHashMap<>();
     }
 
+    /**
+     * Method to set a metadata key / value
+     *
+     * @param key key
+     * @param value value
+     */
     public void put(String key, Object value) {
         map.put(key, value);
     }
 
+    /**
+     * Method to get a metadata value
+     *
+     * @param key key
+     * @return a metadata value
+     * @param <T> T
+     */
     public <T> T get(String key) {
         return (T) map.get(key);
-    }
-
-    public <T> T getOrDefault(String key, T defaultValue) {
-        return (T) map.getOrDefault(key, defaultValue);
-    }
-
-    public void remove(String key) {
-        map.remove(key);
-    }
-
-    public Set<String> keySet() {
-        return map.keySet();
     }
 
     @Override

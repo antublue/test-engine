@@ -71,12 +71,16 @@ public class EngineDiscoveryRequestResolver {
 
     private static final Configuration CONFIGURATION = Configuration.getInstance();
 
+    /** Constructor */
+    public EngineDiscoveryRequestResolver() {
+        // DO NOTHING
+    }
+
     /**
      * Method to resolve the engine discovery request, building an engine descriptor
      *
      * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param engineDescriptor engineDescriptor
-     * @throws Throwable Throwable
      */
     public void resolveSelector(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {

@@ -19,5 +19,10 @@ package org.antublue.test.engine.internal.metadata;
 /** Interface to implement ExecutableTestDescriptorMetadataSupport */
 public interface Metadata {
 
+    /**
+     * Method to get metadata information
+     *
+     * @return metadata information
+     */
     MetadataInformation getMetadata();
 }

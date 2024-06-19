@@ -36,7 +36,8 @@ import java.util.function.Function;
 import org.antublue.test.engine.exception.TestEngineConfigurationException;
 import org.junit.platform.commons.util.Preconditions;
 
-@SuppressWarnings("deprection")
+/** Class to implement Configuration */
+@SuppressWarnings("deprecation")
 public class Configuration implements org.junit.platform.engine.ConfigurationParameters {
 
     private static final String ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE =
@@ -198,6 +199,11 @@ public class Configuration implements org.junit.platform.engine.ConfigurationPar
         return Optional.empty();
     }
 
+    /**
+     * Method to load a TRACE message
+     *
+     * @param message message
+     */
     private static void trace(String message) {
         if (IS_TRACE_ENABLED) {
             String dateTime;

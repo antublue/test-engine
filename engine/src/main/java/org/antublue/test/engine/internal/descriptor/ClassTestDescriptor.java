@@ -46,6 +46,8 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> prepareMethods;
     private final List<Method> concludeMethods;
 
+    private ExecutionRequest executionRequest;
+
     /**
      * Constructor
      *
@@ -76,22 +78,17 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     public Type getType() {
         return Type.CONTAINER_AND_TEST;
     }
-
-    public Class<?> getTestClass() {
-        return testClass;
-    }
-
+    
     @Override
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest executionRequest)");
 
         getStopWatch().reset();
 
-        setExecutionRequest(executionRequest);
-
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
 
+        this.executionRequest = executionRequest;
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
         ThrowableCollector throwableCollector = getThrowableCollector();
@@ -137,65 +134,65 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void setRandomFields() throws Throwable {
-        LOGGER.trace("setRandomFields() testClass [%s]", getTestClass().getName());
+        LOGGER.trace("setRandomFields() testClass [%s]", testClass.getName());
 
-        RandomAnnotationSupport.setRandomFields(getTestClass());
+        RandomAnnotationSupport.setRandomFields(testClass);
     }
 
     private void prepare() throws Throwable {
         LOGGER.trace(
                 "prepare() testClass [%s] testInstance [%s]",
-                getTestClass().getName(), getTestInstance());
+                testClass.getName(), getTestInstance());
 
         for (Method method : prepareMethods) {
             LOGGER.trace(
                     "prepare() testClass [%s] testInstance [%s] method [%s]",
-                    getTestClass().getName(), getTestInstance(), method);
+                    testClass.getName(), getTestInstance(), method);
             method.invoke(getTestInstance());
         }
     }
 
     private void createTestInstance() throws Throwable {
-        LOGGER.trace("createTestInstance() testClass [%s]", getTestClass().getName());
+        LOGGER.trace("createTestInstance() testClass [%s]", testClass.getName());
 
         setTestInstance(
-                getTestClass()
+                testClass
                         .getDeclaredConstructor((Class<?>[]) null)
                         .newInstance((Object[]) null));
 
         LOGGER.trace(
                 "createTestInstance() testClass [%s] testInstance [%s]",
-                getTestClass().getName(), getTestInstance());
+                testClass.getName(), getTestInstance());
     }
 
     private void execute() {
-        LOGGER.trace("execute() testClass [%s]", getTestClass().getName());
+        LOGGER.trace("execute() testClass [%s]", testClass.getName());
 
         getChildren()
                 .forEach(
                         testDescriptor -> {
                             if (testDescriptor instanceof ExecutableTestDescriptor) {
                                 ((ExecutableTestDescriptor) testDescriptor)
-                                        .execute(getExecutionRequest());
+                                        .execute(executionRequest);
                             }
                         });
     }
 
     private void clearRandomFields() throws Throwable {
-        LOGGER.trace("clearRandomFields() testClass [%s]", getTestClass().getName());
+        LOGGER.trace("clearRandomFields() testClass [%s]", testClass.getName());
 
-        RandomAnnotationSupport.clearRandomFields(getTestClass());
+        RandomAnnotationSupport.clearRandomFields(testClass);
     }
 
     private void conclude() throws Throwable {
         LOGGER.trace(
                 "conclude() testClass [%s] testInstance [%s]",
-                getTestClass().getName(), getTestInstance());
+                testClass.getName(), getTestInstance());
 
         for (Method method : concludeMethods) {
             LOGGER.trace(
                     "conclude() testClass [%s] testInstance [%s] method [%s]",
-                    getTestClass().getName(), getTestInstance(), method);
+                    testClass.getName(), getTestInstance(), method);
             method.invoke(getTestInstance());
         }
     }
@@ -203,7 +200,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     private void destroyTestInstance() {
         LOGGER.trace(
                 "destroyTestInstance() testClass [%s]",
-                getTestClass().getName(), getTestInstance());
+                testClass.getName(), getTestInstance());
 
         setTestInstance(null);
     }

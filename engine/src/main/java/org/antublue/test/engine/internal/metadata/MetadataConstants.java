@@ -16,29 +16,41 @@
 
 package org.antublue.test.engine.internal.metadata;
 
+/** Class to implement MetadataConstants */
 public class MetadataConstants {
 
-    public static String PASS = "PASS";
-
-    public static String FAIL = "FAIL";
-
-    public static String SKIP = "SKIP";
-
-    public static final String TEST_CLASS = "testClass";
-
-    public static final String TEST_CLASS_DISPLAY_NAME = "testClass.displayName";
-
-    public static final String TEST_ARGUMENT = "testArgument";
-
-    public static final String TEST_METHOD = "testMethod";
-
-    public static final String TEST_METHOD_DISPLAY_NAME = "testMethod.displayName";
-
-    public static final String TEST_DESCRIPTOR_STATUS = "testDescriptorStatus";
-
-    public static final String TEST_DESCRIPTOR_ELAPSED_TIME = "testDescriptorElapsedTime";
-
+    /** Constructor */
     private MetadataConstants() {
         // DO NOTHING
     }
+
+    /** Constant */
+    public static final String PASS = "PASS";
+
+    /** Constant */
+    public static final String FAIL = "FAIL";
+
+    /** Constant */
+    public static final String SKIP = "SKIP";
+
+    /** Constant */
+    public static final String TEST_CLASS = "testClass";
+
+    /** Constant */
+    public final static String TEST_CLASS_DISPLAY_NAME = "testClass.displayName";
+
+    /** Constant */
+    public static final String TEST_ARGUMENT = "testArgument";
+
+    /** Constant */
+    public static final String TEST_METHOD = "testMethod";
+
+    /** Constant */
+    public static final String TEST_METHOD_DISPLAY_NAME = "testMethod.displayName";
+
+    /** Constant */
+    public static final String TEST_DESCRIPTOR_STATUS = "testDescriptorStatus";
+
+    /** Constant */
+    public static final String TEST_DESCRIPTOR_ELAPSED_TIME = "testDescriptorElapsedTime";
 }

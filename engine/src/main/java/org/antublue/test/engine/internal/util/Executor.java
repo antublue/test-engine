@@ -48,6 +48,7 @@ public class Executor {
 
     private final CountDownLatch countDownLatch;
 
+    /** Constructor */
     public Executor() {
         countDownLatch = new CountDownLatch(1);
     }
@@ -151,6 +152,9 @@ public class Executor {
         }
     }
 
+    /**
+     * Method to wait for the executor to finish
+     */
     public void await() {
         try {
             countDownLatch.await();

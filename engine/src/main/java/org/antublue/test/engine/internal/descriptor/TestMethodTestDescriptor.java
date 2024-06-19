@@ -46,6 +46,8 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> beforeEachMethods;
     private final Method testMethod;
     private final List<Method> afterEachMethods;
+    private ExecutionRequest executionRequest;
+    private Object testInstance;
 
     /**
      * Constructor
@@ -83,22 +85,15 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     public Optional<TestSource> getSource() {
         return Optional.of(MethodSource.from(testMethod));
     }
-
-    public Method getTestMethod() {
-        return testMethod;
-    }
-
+    
     @Override
     public void execute(ExecutionRequest executionRequest) {
         LOGGER.trace("execute(ExecutionRequest executionRequest)");
 
         getStopWatch().reset();
 
-        setExecutionRequest(executionRequest);
-
-        Object testInstance = getParent(ExecutableTestDescriptor.class).getTestInstance();
+        testInstance = getParent(ExecutableTestDescriptor.class).getTestInstance();
         Preconditions.notNull(testInstance, "testInstance is null");
-        setTestInstance(testInstance);
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata()
@@ -111,6 +106,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata().put(MetadataConstants.TEST_METHOD, testMethod);
         getMetadata().put(MetadataConstants.TEST_METHOD_DISPLAY_NAME, getDisplayName());
 
+        this.executionRequest = executionRequest;
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
         ThrowableCollector throwableCollector = getThrowableCollector();
@@ -120,9 +116,6 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
             throwableCollector.execute(this::test);
         }
         throwableCollector.execute(this::afterEach);
-
-        setExecutionRequest(null);
-        setTestInstance(null);
 
         getStopWatch().stop();
 
@@ -160,33 +153,33 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     private void beforeEach() throws Throwable {
         LOGGER.trace(
                 "beforeEach() testClass [%s] testInstance [%s]",
-                getTestInstance().getClass().getName(), getTestInstance());
+                testInstance.getClass().getName(), testInstance);
 
         for (Method method : beforeEachMethods) {
             LOGGER.trace(
                     "beforeEach() testClass [%s] testInstance [%s] method [%s]",
-                    getTestInstance().getClass().getName(), getTestInstance(), method);
-            method.invoke(getTestInstance());
+                    testInstance.getClass().getName(), testInstance, method);
+            method.invoke(testInstance);
         }
     }
 
     private void test() throws Throwable {
         LOGGER.trace(
                 "test() testClass [%s] testInstance [%s] method [%s]",
-                getTestInstance().getClass().getName(), getTestInstance(), getTestMethod());
-        getTestMethod().invoke(getTestInstance());
+                testInstance.getClass().getName(), testInstance, testMethod);
+        testMethod.invoke(testInstance);
     }
 
     private void afterEach() throws Throwable {
         LOGGER.trace(
                 "afterEach() testClass [%s] testInstance [%s]",
-                getTestInstance().getClass().getName(), getTestInstance());
+                testInstance.getClass().getName(), testInstance);
 
         for (Method method : afterEachMethods) {
             LOGGER.trace(
                     "afterEach() testClass [%s] testInstance [%s] method [%s]",
-                    getTestInstance().getClass().getName(), getTestInstance(), method);
-            method.invoke(getTestInstance());
+                    testInstance.getClass().getName(), testInstance, method);
+            method.invoke(testInstance);
         }
     }
 

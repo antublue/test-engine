@@ -77,18 +77,30 @@ public class Locks {
         }
     }
 
+    /** Class to implement LockReference */
     public static class LockReference {
 
         private final Object name;
 
+        /**
+         * Constructor
+         *
+         * @param name name
+         */
         private LockReference(Object name) {
             this.name = name;
         }
 
+        /**
+         * Method to lock
+         */
         public void lock() {
             LOCK_MANAGER.lock(name);
         }
 
+        /**
+         * Method to unlock
+         */
         public void unlock() {
             LOCK_MANAGER.unlock(name);
         }
@@ -113,7 +125,7 @@ public class Locks {
     }
 
     /**
-     * Method to execute an Executable in a ReentrantLock
+     * Method to execute an Executable in a named lock
      *
      * @param name name
      * @param executable executable
@@ -138,23 +150,37 @@ public class Locks {
         }
     }
 
+    /**
+     * Class to implement ReferenceCountingReentrantLock */
     static class ReferenceCountingReentrantLock extends ReentrantLock {
 
         private int count;
 
+        /** Constructor */
         public ReferenceCountingReentrantLock() {
             super(true);
             count = 1;
         }
 
+        /**
+         * Method to increment the reference count
+         */
         public void incrementCount() {
             count++;
         }
 
+        /**
+         * Method to decrement the reference count
+         */
         public void decrementCount() {
             count--;
         }
 
+        /**
+         * Method to get the reference count
+         *
+         * @return the reference count
+         */
         public int getCount() {
             return count;
         }
