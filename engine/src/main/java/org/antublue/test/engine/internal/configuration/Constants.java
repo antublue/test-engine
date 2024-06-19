@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.configuration;
 
+// TODO change to environment variable names
+
 /** Class that contains Test Engine configuration constants */
 public final class Constants {
 

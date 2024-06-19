@@ -16,24 +16,8 @@
 
 package org.antublue.test.engine.api;
 
-import java.util.List;
-
 /** Interface to implement TestEngineExtension */
 public interface TestEngineExtension {
-
-    /** Method to call after test engine creation */
-    default void instantiateCallback() {
-        // DO NOTHING
-    }
-
-    /**
-     * Method to process list of test classes
-     *
-     * @param testClasses testClasses
-     */
-    default void discoveryCallback(List<Class<?>> testClasses) {
-        // DO NOTHING
-    }
 
     /**
      * Method to prepare the environment

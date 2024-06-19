@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import org.antublue.test.engine.AntuBLUETestEngine;
-import org.antublue.test.engine.internal.configuration.ConfigurationParameters;
+import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.maven.plugin.listener.DelegatingEngineExecutionListener;
@@ -91,16 +91,18 @@ public class TestEngineMavenPlugin extends AbstractMojo {
         Logger logger = Logger.from(getLog());
 
         try {
-            System.setProperty(Constants.MAVEN_PLUGIN, Constants.TRUE);
+            Configuration configuration = Configuration.getInstance();
+
+            configuration.set(Constants.MAVEN_PLUGIN, Constants.TRUE);
             logger.debug("property [%s] = [%s]", Constants.MAVEN_PLUGIN, Constants.TRUE);
 
             if (mavenSession.getRequest().isInteractiveMode()) {
-                System.setProperty(Constants.MAVEN_PLUGIN_MODE, Constants.MAVEN_PLUGIN_INTERACTIVE);
+                configuration.set(Constants.MAVEN_PLUGIN_MODE, Constants.MAVEN_PLUGIN_INTERACTIVE);
                 logger.debug(
                         "property [%s] = [%s]",
                         Constants.MAVEN_PLUGIN_MODE, Constants.MAVEN_PLUGIN_INTERACTIVE);
             } else {
-                System.setProperty(Constants.MAVEN_PLUGIN_MODE, Constants.MAVEN_PLUGIN_BATCH);
+                configuration.set(Constants.MAVEN_PLUGIN_MODE, Constants.MAVEN_PLUGIN_BATCH);
                 logger.debug(
                         "property [%s] = [%s]",
                         Constants.MAVEN_PLUGIN_MODE, Constants.MAVEN_PLUGIN_MODE);
@@ -234,7 +236,7 @@ public class TestEngineMavenPlugin extends AbstractMojo {
                             new ExecutionRequest(
                                     testDescriptor,
                                     delegatingEngineExecutionListener,
-                                    ConfigurationParameters.getInstance());
+                                    Configuration.getInstance());
 
                     engine.execute(executionRequest);
 

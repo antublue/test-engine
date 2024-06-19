@@ -38,20 +38,6 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(StatusEngineExecutionListener.class);
 
-    private static final Configuration CONFIGURATION = Configuration.getInstance();
-
-    private static final String MESSAGE_TEST;
-    private static final String MESSAGE_PASS;
-    private static final String MESSAGE_FAIL;
-    private static final String MESSAGE_SKIP;
-
-    static {
-        MESSAGE_TEST = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_TEST_MESSAGE).orElse("TEST");
-        MESSAGE_PASS = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_PASS_MESSAGE).orElse("PASS");
-        MESSAGE_FAIL = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_FAIL_MESSAGE).orElse("FAIL");
-        MESSAGE_SKIP = CONFIGURATION.getProperty(Constants.CONSOLE_LOG_SKIP_MESSAGE).orElse("SKIP");
-    }
-
     private static final String INFO =
             new AnsiColorStringBuilder()
                     .color(AnsiColor.TEXT_WHITE)
@@ -63,120 +49,99 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                     .color(AnsiColor.TEXT_RESET)
                     .toString();
 
-    private static final String TEST =
-            new AnsiColorStringBuilder()
-                    .append(AnsiColor.TEXT_WHITE_BRIGHT)
-                    .append(MESSAGE_TEST)
-                    .color(AnsiColor.TEXT_RESET)
-                    .toString();
-
-    private static final String PASS =
-            new AnsiColorStringBuilder()
-                    .color(AnsiColor.TEXT_GREEN_BOLD_BRIGHT)
-                    .append(MESSAGE_PASS)
-                    .color(AnsiColor.TEXT_RESET)
-                    .toString();
-
-    private static final String FAIL =
-            new AnsiColorStringBuilder()
-                    .color(AnsiColor.TEXT_RED_BOLD_BRIGHT)
-                    .append(MESSAGE_FAIL)
-                    .color(AnsiColor.TEXT_RESET)
-                    .toString();
-
-    private static final String SKIP =
-            new AnsiColorStringBuilder()
-                    .color(AnsiColor.TEXT_YELLOW_BOLD_BRIGHT)
-                    .append(MESSAGE_SKIP)
-                    .color(AnsiColor.TEXT_RESET)
-                    .toString();
-
     private final boolean consoleLogTiming;
 
     private final String consoleLogTimingUnits;
 
     private final boolean consoleLogTestMessages;
 
+    private final String consoleTestMessage;
+
     private final boolean consoleLogSkipMessages;
+
+    private final String consoleSkipMessage;
 
     private final boolean consoleLogPassMessages;
 
+    private final String consolePassMessage;
+
+    private final String consoleFailMessage;
+
     /** Constructor */
     public StatusEngineExecutionListener() {
-        consoleLogTiming =
-                CONFIGURATION
-                        .getProperty(Constants.CONSOLE_LOG_TIMING)
-                        .map(
-                                value -> {
-                                    try {
-                                        return Boolean.parseBoolean(value);
-                                    } catch (NumberFormatException e) {
-                                        return true;
-                                    }
-                                })
-                        .orElse(true);
+        Configuration configuration = Configuration.getInstance();
+
+        consoleLogTiming = configuration.getBoolean(Constants.CONSOLE_LOG_TIMING).orElse(true);
 
         LOGGER.trace("configuration [%s] = [%b]", Constants.CONSOLE_LOG_TIMING, consoleLogTiming);
 
         consoleLogTimingUnits =
-                CONFIGURATION
-                        .getProperty(Constants.CONSOLE_LOG_TIMING_UNITS)
-                        .orElse("milliseconds");
+                configuration.get(Constants.CONSOLE_LOG_TIMING_UNITS).orElse("milliseconds");
 
         LOGGER.trace(
                 "configuration [%s] = [%s]",
                 Constants.CONSOLE_LOG_TIMING_UNITS, consoleLogTimingUnits);
 
         consoleLogTestMessages =
-                CONFIGURATION
-                        .getProperty(Constants.CONSOLE_LOG_TEST_MESSAGES)
-                        .map(
-                                value -> {
-                                    try {
-                                        return Boolean.parseBoolean(value);
-                                    } catch (NumberFormatException e) {
-                                        return true;
-                                    }
-                                })
-                        .orElse(true);
+                configuration.getBoolean(Constants.CONSOLE_LOG_TEST_MESSAGES).orElse(true);
 
         LOGGER.trace(
                 "configuration [%s] = [%b]",
                 Constants.CONSOLE_LOG_TEST_MESSAGES, consoleLogTestMessages);
 
         consoleLogPassMessages =
-                CONFIGURATION
-                        .getProperty(Constants.CONSOLE_LOG_PASS_MESSAGES)
-                        .map(
-                                value -> {
-                                    try {
-                                        return Boolean.parseBoolean(value);
-                                    } catch (NumberFormatException e) {
-                                        return true;
-                                    }
-                                })
-                        .orElse(true);
+                configuration.getBoolean(Constants.CONSOLE_LOG_PASS_MESSAGES).orElse(true);
 
         LOGGER.trace(
                 "configuration [%s] = [%b]",
                 Constants.CONSOLE_LOG_PASS_MESSAGES, consoleLogPassMessages);
 
         consoleLogSkipMessages =
-                CONFIGURATION
-                        .getProperty(Constants.CONSOLE_LOG_SKIP_MESSAGES)
-                        .map(
-                                value -> {
-                                    try {
-                                        return Boolean.parseBoolean(value);
-                                    } catch (NumberFormatException e) {
-                                        return true;
-                                    }
-                                })
-                        .orElse(true);
+                configuration.getBoolean(Constants.CONSOLE_LOG_SKIP_MESSAGES).orElse(true);
 
         LOGGER.trace(
                 "configuration [%s] = [%b]",
                 Constants.CONSOLE_LOG_SKIP_MESSAGES, consoleLogSkipMessages);
+
+        consoleTestMessage =
+                new AnsiColorStringBuilder()
+                        .append(AnsiColor.TEXT_WHITE_BRIGHT)
+                        .append(
+                                configuration
+                                        .get(Constants.CONSOLE_LOG_TEST_MESSAGE)
+                                        .orElse("TEST"))
+                        .color(AnsiColor.TEXT_RESET)
+                        .toString();
+
+        consolePassMessage =
+                new AnsiColorStringBuilder()
+                        .color(AnsiColor.TEXT_GREEN_BOLD_BRIGHT)
+                        .append(
+                                configuration
+                                        .get(Constants.CONSOLE_LOG_PASS_MESSAGE)
+                                        .orElse("PASS"))
+                        .color(AnsiColor.TEXT_RESET)
+                        .toString();
+
+        consoleSkipMessage =
+                new AnsiColorStringBuilder()
+                        .color(AnsiColor.TEXT_GREEN_BOLD_BRIGHT)
+                        .append(
+                                configuration
+                                        .get(Constants.CONSOLE_LOG_SKIP_MESSAGE)
+                                        .orElse("SKIP"))
+                        .color(AnsiColor.TEXT_RESET)
+                        .toString();
+
+        consoleFailMessage =
+                new AnsiColorStringBuilder()
+                        .color(AnsiColor.TEXT_GREEN_BOLD_BRIGHT)
+                        .append(
+                                configuration
+                                        .get(Constants.CONSOLE_LOG_FAIL_MESSAGE)
+                                        .orElse("FAIL"))
+                        .color(AnsiColor.TEXT_RESET)
+                        .toString();
     }
 
     @Override
@@ -198,7 +163,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                             .append(" ")
                             .append(Thread.currentThread().getName())
                             .append(" | ")
-                            .append(TEST)
+                            .append(consoleTestMessage)
                             .color(AnsiColor.TEXT_RESET);
 
             if (testArgument != null) {
@@ -243,7 +208,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                             .append(" | ")
                             .append(AnsiColor.TEXT_WHITE_BRIGHT);
 
-            ansiColorStringBuilder.append(SKIP).color(AnsiColor.TEXT_RESET);
+            ansiColorStringBuilder.append(consoleSkipMessage).color(AnsiColor.TEXT_RESET);
 
             if (testArgument != null) {
                 ansiColorStringBuilder.append(" | ").append(testArgument.getName());
@@ -301,17 +266,17 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             switch (testDescriptorStatus) {
                 case "PASS":
                     {
-                        ansiColorStringBuilder.append(PASS);
+                        ansiColorStringBuilder.append(consolePassMessage);
                         break;
                     }
                 case "FAIL":
                     {
-                        ansiColorStringBuilder.append(FAIL);
+                        ansiColorStringBuilder.append(consoleFailMessage);
                         break;
                     }
                 case "SKIP":
                     {
-                        ansiColorStringBuilder.append(SKIP);
+                        ansiColorStringBuilder.append(consoleSkipMessage);
                         break;
                     }
                 default:

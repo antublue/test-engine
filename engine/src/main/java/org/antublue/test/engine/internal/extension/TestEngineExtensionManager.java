@@ -59,28 +59,6 @@ public class TestEngineExtensionManager {
         }
     }
 
-    /** Method to call instantiate callbacks */
-    public void instantiateCallback() {
-        initialize();
-
-        for (TestEngineExtension testEngineExtension : testEngineExtensions) {
-            testEngineExtension.instantiateCallback();
-        }
-    }
-
-    /**
-     * Method to call discovery callbacks
-     *
-     * @param testClasses testClasses
-     */
-    public void discoveryCallback(List<Class<?>> testClasses) {
-        initialize();
-
-        for (TestEngineExtension testEngineExtension : testEngineExtensions) {
-            testEngineExtension.discoveryCallback(testClasses);
-        }
-    }
-
     /**
      * Method to prepare test engine extensions
      *

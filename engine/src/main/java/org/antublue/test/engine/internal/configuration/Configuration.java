@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 The AntuBLUE test-engine project authors
+ * Copyright (C) 2024 The AntuBLUE test-engine project authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,16 @@
 
 package org.antublue.test.engine.internal.configuration;
 
-import static java.lang.String.format;
-
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -35,84 +33,120 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import org.antublue.test.engine.internal.logger.Level;
+import org.antublue.test.engine.exception.TestEngineConfigurationException;
+import org.junit.platform.commons.util.Preconditions;
 
-/** Class to implement Configuration */
-@SuppressWarnings("PMD.EmptyCatchBlock")
-public class Configuration {
+@SuppressWarnings("deprection")
+public class Configuration implements org.junit.platform.engine.ConfigurationParameters {
 
-    /** Configuration constant */
-    public static final String ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE =
+    private static final String ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE =
             "ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE";
 
-    private static final String ANTUBLUE_TEST_ENGINE_PROPERTIES_ENVIRONMENT_VARIABLE =
-            "ANTUBLUE_TEST_ENGINE_PROPERTIES";
-
-    private static final String ANTUBLUE_TEST_ENGINE_PROPERTIES_SYSTEM_PROPERTY =
-            "antublue.test.engine.properties";
-
-    private static final String ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME_1 =
+    private static final String ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME =
             "antublue-test-engine.properties";
-
-    private static final String ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME_2 =
-            ".antublue-test-engine.properties";
-
-    private static final boolean IS_TRACE_ENABLED =
-            "true".equalsIgnoreCase(System.getenv(ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE));
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd | HH:mm:ss.SSS", Locale.getDefault());
 
-    private String propertiesFilename;
+    private static final boolean IS_TRACE_ENABLED =
+            Constants.TRUE.equals(System.getenv().get(ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE));
 
-    private final Properties properties;
-
-    private Set<String> keySet;
+    private final Map<String, String> map;
 
     /** Constructor */
-    private Configuration() {
-        trace("ConfigurationImpl()");
+    public Configuration() {
+        trace("Constructor()");
 
-        properties = new Properties();
+        map = Collections.synchronizedMap(new TreeMap<>());
 
-        String value = System.getenv(ANTUBLUE_TEST_ENGINE_PROPERTIES_ENVIRONMENT_VARIABLE);
-        if (value != null && !value.trim().isEmpty()) {
-            propertiesFilename = value.trim();
-        }
-
-        if (propertiesFilename == null) {
-            value = System.getProperty(ANTUBLUE_TEST_ENGINE_PROPERTIES_SYSTEM_PROPERTY);
-            if (value != null && !value.trim().isEmpty()) {
-                propertiesFilename = value.trim();
-            }
-        }
-
-        File propertiesFile = find(Paths.get("."), ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME_1);
-        if (propertiesFile == null) {
-            propertiesFile = find(Paths.get("."), ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME_2);
-        }
-
-        if (propertiesFile != null) {
-            propertiesFilename = propertiesFile.getAbsolutePath();
-            trace("loading properties [%s]", propertiesFilename);
-            try (Reader reader = new FileReader(propertiesFile)) {
-                properties.load(reader);
-
-                Map<String, Boolean> map = new TreeMap<>();
-                for (Object key : properties.keySet()) {
-                    map.put((String) key, true);
+        try {
+            Optional<File> optional =
+                    find(Paths.get("."), ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME);
+            if (optional.isPresent()) {
+                if (IS_TRACE_ENABLED) {
+                    trace(
+                            "antublue.test.engine.properties ["
+                                    + optional.get().getAbsolutePath()
+                                    + "]");
                 }
-                keySet = map.keySet();
-                trace("properties loaded [%s]", propertiesFilename);
-            } catch (IOException e) {
-                // TODO ?
+
+                Properties properties = new Properties();
+                try (Reader reader =
+                        Files.newBufferedReader(optional.get().toPath(), StandardCharsets.UTF_8)) {
+                    properties.load(reader);
+                }
+                properties.forEach(
+                        (key, value) -> {
+                            set(toEnvironmentVariable((String) key), (String) value);
+                        });
+                properties.put(
+                        ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME, optional.get().getAbsolutePath());
             }
+        } catch (IOException e) {
+            throw new TestEngineConfigurationException("Exception loading properties", e);
         }
 
-        if (keySet == null) {
-            keySet = new LinkedHashSet<>();
+        System.getenv().forEach(this::set);
+
+        if (IS_TRACE_ENABLED) {
+            map.forEach((key, value) -> trace(key + " = [" + value + "]"));
         }
+    }
+
+    /**
+     * Method to set a configuration value
+     *
+     * @param key key
+     * @param value value
+     */
+    public void set(String key, String value) {
+        Preconditions.notNull(key, "key is null");
+        Preconditions.notNull(value, "value is null");
+        map.put(toEnvironmentVariable(key), value);
+    }
+
+    @Override
+    public Optional<String> get(String key) {
+        Preconditions.notNull(key, "key is null");
+        return Optional.ofNullable(map.get(toEnvironmentVariable(key)));
+    }
+
+    @Override
+    public Optional<Boolean> getBoolean(String key) {
+        Preconditions.notNull(key, "key is null");
+        Optional<String> optional = get(key);
+        return optional.map("true"::equals);
+    }
+
+    @Override
+    public <T> Optional<T> get(String key, Function<String, T> transformer) {
+        Preconditions.notNull(key, "key is null");
+        Preconditions.notNull(transformer, "transformer is null");
+        String value = map.get(toEnvironmentVariable(key));
+        if (value != null) {
+            return Optional.ofNullable(transformer.apply(value));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public int size() {
+        return keySet().size();
+    }
+
+    @Override
+    public Set<String> keySet() {
+        return map.keySet();
+    }
+
+    /**
+     * Method to get the entry set
+     *
+     * @return the entry set
+     */
+    public Set<Map.Entry<String, String>> entrySet() {
+        return map.entrySet();
     }
 
     /**
@@ -125,111 +159,15 @@ public class Configuration {
     }
 
     /**
-     * Method to get a property
+     * Method to convert a Java system property to environment variable
      *
      * @param key key
-     * @return an Optional
+     * @return the key as an environment variable key
      */
-    public Optional<String> getProperty(String key) {
-        String value = properties.getProperty(key);
-        trace("getProperty [%s] value [%s]", key, value);
-        return Optional.ofNullable(value);
-    }
-
-    public <T> Optional<T> getProperty(String key, Function<String, T> transformer) {
-        Optional<String> optional = getProperty(key);
-        if (!optional.isPresent()) {
-            return Optional.empty();
-        }
-        String value = optional.get();
-        return Optional.ofNullable(transformer.apply(value));
-    }
-
-    /**
-     * Method to get a Set of configuration keys
-     *
-     * @return a Set of configuration keys
-     */
-    public Set<String> getPropertyNames() {
-        return keySet;
-    }
-
-    /**
-     * Method to a set of property keys, filtered by a Predicate
-     *
-     * @param predicate predicate
-     * @return a Set of property keys filtered by a Predicate
-     */
-    public Set<String> getPropertyNames(Predicate<String> predicate) {
-        if (predicate == null) {
-            return getPropertyNames();
-        }
-
-        Set<String> keySet = new HashSet<>();
-        for (String key : this.keySet) {
-            if (predicate.test(key)) {
-                keySet.add(key);
-            }
-        }
-
-        return keySet;
-    }
-
-    /**
-     * Method to the properties filename
-     *
-     * @return the properties filename
-     */
-    public String getPropertiesFilename() {
-        return propertiesFilename;
-    }
-
-    /**
-     * Method to get the number of configuration properties
-     *
-     * @return the number of configuration properties
-     */
-    public int size() {
-        return properties.size();
-    }
-
-    /**
-     * Method to log a TRACE message. We can't use a Logger since the Logger requires Configuration.
-     *
-     * @param format format
-     * @param objects objects
-     */
-    private void trace(String format, Object... objects) {
-        if (IS_TRACE_ENABLED) {
-            System.out.println(createMessage(Level.TRACE, format(format, objects)));
-            System.out.flush();
-        }
-    }
-
-    /**
-     * Method to create a log message
-     *
-     * @param level level
-     * @param message message
-     * @return the return value
-     */
-    private String createMessage(Level level, String message) {
-        String dateTime;
-
-        synchronized (SIMPLE_DATE_FORMAT) {
-            dateTime = SIMPLE_DATE_FORMAT.format(new Date());
-        }
-
-        return dateTime
-                + " | "
-                + Thread.currentThread().getName()
-                + " | "
-                + level.toString()
-                + " | "
-                + Configuration.class.getName()
-                + " | "
-                + message
-                + " ";
+    private static String toEnvironmentVariable(String key) {
+        String environmentVariable = key.toUpperCase(Locale.ENGLISH).replace('.', '_');
+        trace("key [" + key + "] environment variable [" + environmentVariable + "]");
+        return environmentVariable;
     }
 
     /**
@@ -238,18 +176,15 @@ public class Configuration {
      *
      * @param path path
      * @param filename filename
-     * @return a File
+     * @return a optional containing a File
      */
-    private File find(Path path, String filename) {
+    private static Optional<File> find(Path path, String filename) {
         Path currentPath = path.toAbsolutePath().normalize();
 
         while (true) {
-            trace("searching path [%s]", currentPath);
-
-            File propertiesFile =
-                    new File(currentPath.toAbsolutePath() + File.separator + filename);
-            if (propertiesFile.exists() && propertiesFile.isFile() && propertiesFile.canRead()) {
-                return propertiesFile;
+            File file = new File(currentPath.toAbsolutePath() + File.separator + filename);
+            if (file.exists() && file.isFile() && file.canRead()) {
+                return Optional.of(file);
             }
 
             currentPath = currentPath.getParent();
@@ -260,13 +195,35 @@ public class Configuration {
             currentPath = currentPath.toAbsolutePath().normalize();
         }
 
-        return null;
+        return Optional.empty();
+    }
+
+    private static void trace(String message) {
+        if (IS_TRACE_ENABLED) {
+            String dateTime;
+
+            synchronized (SIMPLE_DATE_FORMAT) {
+                dateTime = SIMPLE_DATE_FORMAT.format(new Date());
+            }
+
+            System.out.println(
+                    dateTime
+                            + " | "
+                            + Thread.currentThread().getName()
+                            + " | "
+                            + "TRACE"
+                            + " | "
+                            + Configuration.class.getName()
+                            + " | "
+                            + message
+                            + " ");
+        }
     }
 
     /** Class to hold the singleton instance */
-    private static final class SingletonHolder {
+    private static class SingletonHolder {
 
         /** The singleton instance */
-        private static final Configuration SINGLETON = new Configuration();
+        public static final Configuration SINGLETON = new Configuration();
     }
 }

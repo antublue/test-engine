@@ -35,12 +35,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
+import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestMethodTestDescriptor;
-import org.antublue.test.engine.internal.extension.TestEngineExtensionManager;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
@@ -79,28 +79,31 @@ public class EngineDiscoveryRequestResolver {
      * @throws Throwable Throwable
      */
     public void resolveSelector(
-            EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor)
-            throws Throwable {
-        List<Class<?>> testClasses = resolveEngineDiscoveryRequest(engineDiscoveryRequest);
+            EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
+        try {
+            List<Class<?>> testClasses = resolveEngineDiscoveryRequest(engineDiscoveryRequest);
 
-        filterTestClassesByClassName(testClasses);
-        filterTestClassesByTags(testClasses);
+            filterTestClassesByClassName(testClasses);
+            filterTestClassesByTags(testClasses);
 
-        OrdererSupport.orderTestClasses(testClasses);
+            OrdererSupport.orderTestClasses(testClasses);
 
-        if (LOGGER.isTraceEnabled()) {
-            testClasses.forEach(c -> LOGGER.trace("testClass [%s]", c.getName()));
+            if (LOGGER.isTraceEnabled()) {
+                testClasses.forEach(c -> LOGGER.trace("testClass [%s]", c.getName()));
+            }
+
+            for (Class<?> testClass : testClasses) {
+                buildClassTestDescriptor(engineDescriptor, testClass);
+            }
+
+            prune(engineDescriptor);
+
+            shuffleOrSortTestDescriptors(engineDescriptor);
+        } catch (TestEngineException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new TestEngineException(t);
         }
-
-        TestEngineExtensionManager.getInstance().discoveryCallback(testClasses);
-
-        for (Class<?> testClass : testClasses) {
-            buildClassTestDescriptor(engineDescriptor, testClass);
-        }
-
-        prune(engineDescriptor);
-
-        shuffleOrSortTestDescriptors(engineDescriptor);
     }
 
     /**
@@ -363,7 +366,7 @@ public class EngineDiscoveryRequestResolver {
     private void filterTestClassesByClassName(List<Class<?>> testClasses) {
         LOGGER.trace("filterTestClassesByName()");
 
-        Optional<String> optional = CONFIGURATION.getProperty(Constants.TEST_CLASS_INCLUDE_REGEX);
+        Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_INCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -378,7 +381,7 @@ public class EngineDiscoveryRequestResolver {
             }
         }
 
-        optional = CONFIGURATION.getProperty(Constants.TEST_CLASS_EXCLUDE_REGEX);
+        optional = CONFIGURATION.get(Constants.TEST_CLASS_EXCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -402,8 +405,7 @@ public class EngineDiscoveryRequestResolver {
     private void filterTestClassesByTags(List<Class<?>> testClasses) {
         LOGGER.trace("filterTestClassesByTags()");
 
-        Optional<String> optional =
-                CONFIGURATION.getProperty(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
+        Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -423,7 +425,7 @@ public class EngineDiscoveryRequestResolver {
             }
         }
 
-        optional = CONFIGURATION.getProperty(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX);
+        optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -450,7 +452,7 @@ public class EngineDiscoveryRequestResolver {
     private static void filterTestMethodsByMethodName(List<Method> testMethods) {
         LOGGER.trace("filterTestMethodsByMethodName()");
 
-        Optional<String> optional = CONFIGURATION.getProperty(Constants.TEST_METHOD_INCLUDE_REGEX);
+        Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_INCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -465,7 +467,7 @@ public class EngineDiscoveryRequestResolver {
             }
         }
 
-        optional = CONFIGURATION.getProperty(Constants.TEST_METHOD_EXCLUDE_REGEX);
+        optional = CONFIGURATION.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -489,8 +491,7 @@ public class EngineDiscoveryRequestResolver {
     private static void filterTestMethodsByTags(List<Method> testMethods) {
         LOGGER.trace("filterTestMethodsByTag()");
 
-        Optional<String> optional =
-                CONFIGURATION.getProperty(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
+        Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -510,7 +511,7 @@ public class EngineDiscoveryRequestResolver {
             }
         }
 
-        optional = CONFIGURATION.getProperty(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX);
+        optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX);
         if (optional.isPresent()) {
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -561,22 +562,19 @@ public class EngineDiscoveryRequestResolver {
      * @param engineDescriptor engineDescriptor
      */
     private static void shuffleOrSortTestDescriptors(EngineDescriptor engineDescriptor) {
-        // Get the test descriptors and remove them from the engine descriptor
         List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
         testDescriptors.forEach(engineDescriptor::removeChild);
 
-        // Shuffle or sort the test descriptor list based on configuration
-        Optional<String> optionalShuffle = CONFIGURATION.getProperty(Constants.TEST_CLASS_SHUFFLE);
-        optionalShuffle.ifPresent(
+        Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_SHUFFLE);
+        optional.ifPresent(
                 s -> {
-                    if (Constants.TRUE.equals(optionalShuffle.get())) {
+                    if (Constants.TRUE.equals(optional.get())) {
                         Collections.shuffle(testDescriptors);
                     } else {
                         testDescriptors.sort(Comparator.comparing(TestDescriptor::getDisplayName));
                     }
                 });
 
-        // Add the shuffled or sorted test descriptors to the engine descriptor
         testDescriptors.forEach(engineDescriptor::addChild);
     }
 }
