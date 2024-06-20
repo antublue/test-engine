@@ -16,13 +16,10 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import java.util.Optional;
 import org.antublue.test.engine.internal.metadata.Metadata;
 import org.antublue.test.engine.internal.metadata.MetadataInformation;
 import org.antublue.test.engine.internal.util.StopWatch;
-import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
-import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
