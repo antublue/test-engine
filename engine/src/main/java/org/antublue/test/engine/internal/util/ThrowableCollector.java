@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.function.Executable;
-import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.commons.util.UnrecoverableExceptions;
 import org.junit.platform.engine.TestExecutionResult;
 
@@ -43,43 +42,30 @@ public class ThrowableCollector {
      * @param executable executable
      */
     public void execute(Executable executable) {
+        Throwable throwable = null;
+
         try {
             executable.execute();
         } catch (Throwable t) {
-            if (t instanceof InvocationTargetException) {
-                t = t.getCause();
+            throwable = t;
+        }
+
+        if (throwable != null) {
+            if (throwable instanceof InvocationTargetException) {
+                throwable = throwable.getCause();
             }
 
             if (printStackTrace) {
                 synchronized (System.out) {
                     synchronized (System.err) {
-                        t.printStackTrace();
+                        throwable.printStackTrace();
                     }
                 }
             }
 
-            UnrecoverableExceptions.rethrowIfUnrecoverable(t);
-            this.add(t);
+            UnrecoverableExceptions.rethrowIfUnrecoverable(throwable);
+            throwables.add(throwable);
         }
-    }
-
-    /**
-     * Method to add a Throwable
-     *
-     * @param throwable throwable
-     */
-    private void add(Throwable throwable) {
-        Preconditions.notNull(throwable, "Throwable must not be null");
-        throwables.add(throwable);
-    }
-
-    /**
-     * Method to get the first Throwable
-     *
-     * @return the first Throwable
-     */
-    public Throwable getFirstThrowable() {
-        return throwables.get(0);
     }
 
     /**
