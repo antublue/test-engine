@@ -125,7 +125,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
         consoleSkipMessage =
                 new AnsiColorStringBuilder()
-                        .color(AnsiColor.TEXT_GREEN_BOLD_BRIGHT)
+                        .color(AnsiColor.TEXT_YELLOW_BOLD_BRIGHT)
                         .append(
                                 configuration
                                         .get(Constants.CONSOLE_LOG_SKIP_MESSAGE)
@@ -135,7 +135,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
         consoleFailMessage =
                 new AnsiColorStringBuilder()
-                        .color(AnsiColor.TEXT_GREEN_BOLD_BRIGHT)
+                        .color(AnsiColor.TEXT_RED_BOLD_BRIGHT)
                         .append(
                                 configuration
                                         .get(Constants.CONSOLE_LOG_FAIL_MESSAGE)

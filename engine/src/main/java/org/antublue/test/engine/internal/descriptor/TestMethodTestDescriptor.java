@@ -149,35 +149,50 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void beforeEach() throws Throwable {
-        LOGGER.trace(
-                "beforeEach() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
-
-        for (Method method : beforeEachMethods) {
+        try {
             LOGGER.trace(
-                    "beforeEach() testClass [%s] testInstance [%s] method [%s]",
-                    testInstance.getClass().getName(), testInstance, method);
-            method.invoke(testInstance);
+                    "beforeEach() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+
+            for (Method method : beforeEachMethods) {
+                LOGGER.trace(
+                        "beforeEach() testClass [%s] testInstance [%s] method [%s]",
+                        testInstance.getClass().getName(), testInstance, method);
+                method.invoke(testInstance);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
         }
     }
 
     private void test() throws Throwable {
-        LOGGER.trace(
-                "test() testClass [%s] testInstance [%s] method [%s]",
-                testInstance.getClass().getName(), testInstance, testMethod);
-        testMethod.invoke(testInstance);
+        try {
+            LOGGER.trace(
+                    "test() testClass [%s] testInstance [%s] method [%s]",
+                    testInstance.getClass().getName(), testInstance, testMethod);
+            testMethod.invoke(testInstance);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
+        }
     }
 
     private void afterEach() throws Throwable {
-        LOGGER.trace(
-                "afterEach() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
-
-        for (Method method : afterEachMethods) {
+        try {
             LOGGER.trace(
-                    "afterEach() testClass [%s] testInstance [%s] method [%s]",
-                    testInstance.getClass().getName(), testInstance, method);
-            method.invoke(testInstance);
+                    "afterEach() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+
+            for (Method method : afterEachMethods) {
+                LOGGER.trace(
+                        "afterEach() testClass [%s] testInstance [%s] method [%s]",
+                        testInstance.getClass().getName(), testInstance, method);
+                method.invoke(testInstance);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
         }
     }
 

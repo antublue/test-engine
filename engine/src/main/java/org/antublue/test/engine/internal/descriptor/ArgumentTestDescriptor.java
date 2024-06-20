@@ -154,31 +154,46 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void setArgumentFields() throws Throwable {
-        LOGGER.trace(
-                "setArgumentFields() testClass [%s] testInstance [%s] testArgument [%s]",
-                testInstance.getClass().getName(), testInstance, testArgument);
+        try {
+            LOGGER.trace(
+                    "setArgumentFields() testClass [%s] testInstance [%s] testArgument [%s]",
+                    testInstance.getClass().getName(), testInstance, testArgument);
 
-        ArgumentAnnotationSupport.setArgumentFields(testInstance, testArgument);
+            ArgumentAnnotationSupport.setArgumentFields(testInstance, testArgument);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
+        }
     }
 
     private void setRandomFields() throws Throwable {
-        LOGGER.trace(
-                "setRandomFields() testClass [%s] testInstance [%s] testArgument [%s]",
-                testInstance.getClass().getName(), testInstance, testArgument);
+        try {
+            LOGGER.trace(
+                    "setRandomFields() testClass [%s] testInstance [%s] testArgument [%s]",
+                    testInstance.getClass().getName(), testInstance, testArgument);
 
-        RandomAnnotationSupport.setRandomFields(testInstance);
+            RandomAnnotationSupport.setRandomFields(testInstance);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
+        }
     }
 
     private void beforeAllMethods() throws Throwable {
-        LOGGER.trace(
-                "beforeAllMethods() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
-
-        for (Method method : beforeAllMethods) {
+        try {
             LOGGER.trace(
-                    "beforeAllMethods() testClass [%s] testInstance [%s] method [%s]",
-                    testInstance.getClass().getName(), testInstance, method);
-            method.invoke(testInstance);
+                    "beforeAllMethods() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+
+            for (Method method : beforeAllMethods) {
+                LOGGER.trace(
+                        "beforeAllMethods() testClass [%s] testInstance [%s] method [%s]",
+                        testInstance.getClass().getName(), testInstance, method);
+                method.invoke(testInstance);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
         }
     }
 
@@ -199,32 +214,47 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void afterAllMethods() throws Throwable {
-        LOGGER.trace(
-                "afterAllMethods() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
-
-        for (Method method : afterAllMethods) {
+        try {
             LOGGER.trace(
-                    "afterAllMethods() testClass [%s] testInstance [%s] method [%s]",
-                    testInstance.getClass().getName(), testInstance, method);
-            method.invoke(testInstance);
+                    "afterAllMethods() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+
+            for (Method method : afterAllMethods) {
+                LOGGER.trace(
+                        "afterAllMethods() testClass [%s] testInstance [%s] method [%s]",
+                        testInstance.getClass().getName(), testInstance, method);
+                method.invoke(testInstance);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
         }
     }
 
     private void clearRandomFields() throws Throwable {
-        LOGGER.trace(
-                "clearRandomFields() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
+        try {
+            LOGGER.trace(
+                    "clearRandomFields() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
 
-        RandomAnnotationSupport.clearRandomFields(testInstance);
+            RandomAnnotationSupport.clearRandomFields(testInstance);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
+        }
     }
 
     private void clearArgumentFields() throws Throwable {
-        LOGGER.trace(
-                "clearArgumentFields() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
+        try {
+            LOGGER.trace(
+                    "clearArgumentFields() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
 
-        ArgumentAnnotationSupport.setArgumentFields(testInstance, null);
+            ArgumentAnnotationSupport.setArgumentFields(testInstance, null);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
+        }
     }
 
     /**

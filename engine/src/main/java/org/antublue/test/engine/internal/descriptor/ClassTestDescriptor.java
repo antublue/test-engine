@@ -135,32 +135,50 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void setRandomFields() throws Throwable {
-        LOGGER.trace("setRandomFields() testClass [%s]", testClass.getName());
+        try {
+            LOGGER.trace("setRandomFields() testClass [%s]", testClass.getName());
 
-        RandomAnnotationSupport.setRandomFields(testClass);
+            RandomAnnotationSupport.setRandomFields(testClass);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
+        }
     }
 
     private void prepare() throws Throwable {
-        LOGGER.trace(
-                "prepare() testClass [%s] testInstance [%s]", testClass.getName(), testInstance);
-
-        for (Method method : prepareMethods) {
+        try {
             LOGGER.trace(
-                    "prepare() testClass [%s] testInstance [%s] method [%s]",
-                    testClass.getName(), testInstance, method);
-            method.invoke(testInstance);
+                    "prepare() testClass [%s] testInstance [%s]",
+                    testClass.getName(), testInstance);
+
+            for (Method method : prepareMethods) {
+                LOGGER.trace(
+                        "prepare() testClass [%s] testInstance [%s] method [%s]",
+                        testClass.getName(), testInstance, method);
+                method.invoke(testInstance);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
         }
     }
 
     private void createTestInstance() throws Throwable {
-        LOGGER.trace("createTestInstance() testClass [%s]", testClass.getName());
+        try {
+            LOGGER.trace("createTestInstance() testClass [%s]", testClass.getName());
 
-        testInstance =
-                testClass.getDeclaredConstructor((Class<?>[]) null).newInstance((Object[]) null);
+            testInstance =
+                    testClass
+                            .getDeclaredConstructor((Class<?>[]) null)
+                            .newInstance((Object[]) null);
 
-        LOGGER.trace(
-                "createTestInstance() testClass [%s] testInstance [%s]",
-                testClass.getName(), testInstance);
+            LOGGER.trace(
+                    "createTestInstance() testClass [%s] testInstance [%s]",
+                    testClass.getName(), testInstance);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
+        }
     }
 
     private void execute() {
@@ -177,20 +195,31 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void clearRandomFields() throws Throwable {
-        LOGGER.trace("clearRandomFields() testClass [%s]", testClass.getName());
+        try {
+            LOGGER.trace("clearRandomFields() testClass [%s]", testClass.getName());
 
-        RandomAnnotationSupport.clearRandomFields(testClass);
+            RandomAnnotationSupport.clearRandomFields(testClass);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
+        }
     }
 
     private void conclude() throws Throwable {
-        LOGGER.trace(
-                "conclude() testClass [%s] testInstance [%s]", testClass.getName(), testInstance);
-
-        for (Method method : concludeMethods) {
+        try {
             LOGGER.trace(
-                    "conclude() testClass [%s] testInstance [%s] method [%s]",
-                    testClass.getName(), testInstance, method);
-            method.invoke(testInstance);
+                    "conclude() testClass [%s] testInstance [%s]",
+                    testClass.getName(), testInstance);
+
+            for (Method method : concludeMethods) {
+                LOGGER.trace(
+                        "conclude() testClass [%s] testInstance [%s] method [%s]",
+                        testClass.getName(), testInstance, method);
+                method.invoke(testInstance);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
         }
     }
 

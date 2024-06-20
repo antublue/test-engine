@@ -16,13 +16,10 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
-import java.util.Optional;
 import org.antublue.test.engine.internal.metadata.Metadata;
 import org.antublue.test.engine.internal.metadata.MetadataInformation;
 import org.antublue.test.engine.internal.util.StopWatch;
-import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
-import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
@@ -80,19 +77,6 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor im
     @Override
     public String toString() {
         return getDisplayName();
-    }
-
-    /**
-     * Metod to get the parent test descriptor
-     *
-     * @param clazz clazz
-     * @return the parent test descriptor
-     * @param <T> T
-     */
-    protected <T> T getParent(Class<T> clazz) {
-        Optional<TestDescriptor> optional = getParent();
-        Preconditions.condition(optional.isPresent(), "parent is null");
-        return clazz.cast(optional.get());
     }
 
     /**
