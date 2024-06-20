@@ -83,19 +83,6 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor im
     }
 
     /**
-     * Metod to get the parent test descriptor
-     *
-     * @param clazz clazz
-     * @return the parent test descriptor
-     * @param <T> T
-     */
-    protected <T> T getParent(Class<T> clazz) {
-        Optional<TestDescriptor> optional = getParent();
-        Preconditions.condition(optional.isPresent(), "parent is null");
-        return clazz.cast(optional.get());
-    }
-
-    /**
      * Method to get the stop watch
      *
      * @return the stop watch
