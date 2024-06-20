@@ -16,13 +16,17 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import org.antublue.test.engine.internal.metadata.Metadata;
 import org.antublue.test.engine.internal.metadata.MetadataInformation;
 import org.antublue.test.engine.internal.util.StopWatch;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.ExecutionRequest;
+import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
-import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Abstract class to implement an ExecutableTestDescriptor */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -41,7 +45,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor im
     protected ExecutableTestDescriptor(UniqueId uniqueId, String displayName) {
         super(uniqueId, displayName);
 
-        throwableCollector = new ThrowableCollector(throwable -> true);
+        throwableCollector = new ThrowableCollector();
         metadataInformation = new MetadataInformation();
         stopWatch = new StopWatch();
     }
@@ -58,16 +62,7 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor im
      *
      * @param executionRequest executionRequest
      */
-    public void skip(ExecutionRequest executionRequest, Object testInstance) {
-        getChildren()
-                .forEach(
-                        testDescriptor -> {
-                            if (testDescriptor instanceof ExecutableTestDescriptor) {
-                                ((ExecutableTestDescriptor) testDescriptor)
-                                        .skip(executionRequest, testInstance);
-                            }
-                        });
-    }
+    public abstract void skip(ExecutionRequest executionRequest);
 
     @Override
     public MetadataInformation getMetadata() {
@@ -95,5 +90,35 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor im
      */
     protected ThrowableCollector getThrowableCollector() {
         return throwableCollector;
+    }
+
+    /**
+     * Method to collect all Throwables from parent and children
+     *
+     * @return a List of Throwables
+     */
+    public List<Throwable> collectThrowables() {
+        List<Throwable> throwables = new ArrayList<>();
+
+        if (getThrowableCollector().isNotEmpty()) {
+            throwables.addAll(getThrowableCollector().getThrowables());
+        }
+
+        getChildren()
+                .forEach(
+                        (Consumer<TestDescriptor>)
+                                testDescriptor -> {
+                                    if (testDescriptor instanceof ExecutableTestDescriptor) {
+                                        ExecutableTestDescriptor executableTestDescriptor =
+                                                (ExecutableTestDescriptor) testDescriptor;
+                                        List<Throwable> childThrowables =
+                                                executableTestDescriptor.collectThrowables();
+                                        if (childThrowables != null) {
+                                            throwables.addAll(childThrowables);
+                                        }
+                                    }
+                                });
+
+        return throwables;
     }
 }

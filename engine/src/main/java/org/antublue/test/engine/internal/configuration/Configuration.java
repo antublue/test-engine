@@ -49,8 +49,7 @@ public class Configuration implements org.junit.platform.engine.ConfigurationPar
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd | HH:mm:ss.SSS", Locale.getDefault());
 
-    private static final boolean IS_TRACE_ENABLED =
-            Constants.TRUE.equals(System.getenv().get(ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE));
+    private boolean IS_TRACE_ENABLED;
 
     private final Map<String, String> map;
 
@@ -77,14 +76,16 @@ public class Configuration implements org.junit.platform.engine.ConfigurationPar
                     properties.load(reader);
                 }
                 properties.forEach(
-                        (key, value) -> {
-                            set(toEnvironmentVariable((String) key), (String) value);
-                        });
+                        (key, value) -> set(toEnvironmentVariable((String) key), (String) value));
                 properties.put(
                         ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME, optional.get().getAbsolutePath());
             }
         } catch (IOException e) {
             throw new TestEngineConfigurationException("Exception loading properties", e);
+        }
+
+        if (Constants.TRUE.equals(System.getenv().get(ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE))) {
+            IS_TRACE_ENABLED = true;
         }
 
         System.getenv().forEach(this::set);
@@ -166,9 +167,7 @@ public class Configuration implements org.junit.platform.engine.ConfigurationPar
      * @return the key as an environment variable key
      */
     private static String toEnvironmentVariable(String key) {
-        String environmentVariable = key.toUpperCase(Locale.ENGLISH).replace('.', '_');
-        trace("key [" + key + "] environment variable [" + environmentVariable + "]");
-        return environmentVariable;
+        return key.toUpperCase(Locale.ENGLISH).replace('.', '_');
     }
 
     /**
@@ -204,7 +203,7 @@ public class Configuration implements org.junit.platform.engine.ConfigurationPar
      *
      * @param message message
      */
-    private static void trace(String message) {
+    private void trace(String message) {
         if (IS_TRACE_ENABLED) {
             String dateTime;
 

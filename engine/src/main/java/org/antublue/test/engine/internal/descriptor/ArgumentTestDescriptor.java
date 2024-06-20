@@ -29,6 +29,7 @@ import org.antublue.test.engine.internal.support.DisplayNameSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
 import org.antublue.test.engine.internal.util.Predicates;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -38,7 +39,6 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
-import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement a ArgumentTestDescriptor */
 public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
@@ -104,6 +104,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         getMetadata().put(MetadataConstants.TEST_ARGUMENT, testArgument);
 
         this.executionRequest = executionRequest;
+
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
         ThrowableCollector throwableCollector = getThrowableCollector();
@@ -115,6 +116,8 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 throwableCollector.execute(this::beforeAllMethods);
                 if (throwableCollector.isEmpty()) {
                     execute();
+                } else {
+                    skip();
                 }
                 throwableCollector.execute(this::afterAllMethods);
             }
@@ -129,78 +132,32 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
                         getStopWatch().elapsedNanoseconds());
 
-        if (getThrowableCollector().isEmpty()) {
+        List<Throwable> throwables = collectThrowables();
+        if (throwables.isEmpty()) {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
-            /*
-            getParent(ClassTestDescriptor.class)
-                    .getThrowableCollector()
-                    .add(
-                            new TestClassFailedException(
-                                    format(
-                                            "Exception testing test class [%s]",
-                                            getDisplayName(testClass))));
-             */
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
             executionRequest
                     .getEngineExecutionListener()
-                    .executionFinished(
-                            this,
-                            TestExecutionResult.failed(getThrowableCollector().getThrowable()));
+                    .executionFinished(this, TestExecutionResult.failed(throwables.get(0)));
         }
     }
 
-    private void setArgumentFields() throws Throwable {
-        try {
-            LOGGER.trace(
-                    "setArgumentFields() testClass [%s] testInstance [%s] testArgument [%s]",
-                    testInstance.getClass().getName(), testInstance, testArgument);
+    public void skip(ExecutionRequest executionRequest) {
+        LOGGER.trace("skip(ExecutionRequest executionRequest)");
 
-            ArgumentAnnotationSupport.setArgumentFields(testInstance, testArgument);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
-        }
-    }
+        getStopWatch().stop();
 
-    private void setRandomFields() throws Throwable {
-        try {
-            LOGGER.trace(
-                    "setRandomFields() testClass [%s] testInstance [%s] testArgument [%s]",
-                    testInstance.getClass().getName(), testInstance, testArgument);
-
-            RandomAnnotationSupport.setRandomFields(testInstance);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
-        }
-    }
-
-    private void beforeAllMethods() throws Throwable {
-        try {
-            LOGGER.trace(
-                    "beforeAllMethods() testClass [%s] testInstance [%s]",
-                    testInstance.getClass().getName(), testInstance);
-
-            for (Method method : beforeAllMethods) {
-                LOGGER.trace(
-                        "beforeAllMethods() testClass [%s] testInstance [%s] method [%s]",
-                        testInstance.getClass().getName(), testInstance, method);
-                method.invoke(testInstance);
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
-        }
-    }
-
-    private void execute() {
-        LOGGER.trace(
-                "execute() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
+        getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
+        getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
+        getMetadata()
+                .put(
+                        MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
+                        getStopWatch().elapsedNanoseconds());
+        getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
 
         getChildren()
                 .forEach(
@@ -208,53 +165,110 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                 testDescriptor -> {
                                     if (testDescriptor instanceof ExecutableTestDescriptor) {
                                         ((ExecutableTestDescriptor) testDescriptor)
-                                                .execute(executionRequest, testInstance);
+                                                .skip(executionRequest);
+                                    }
+                                });
+
+        executionRequest.getEngineExecutionListener().executionSkipped(this, "Skipped");
+    }
+
+    private void setArgumentFields() throws Throwable {
+        LOGGER.trace(
+                "setArgumentFields() testClass [%s] testInstance [%s] testArgument [%s]",
+                testInstance.getClass().getName(), testInstance, testArgument);
+
+        ArgumentAnnotationSupport.setArgumentFields(testInstance, testArgument);
+    }
+
+    private void setRandomFields() throws Throwable {
+        LOGGER.trace(
+                "setRandomFields() testClass [%s] testInstance [%s] testArgument [%s]",
+                testInstance.getClass().getName(), testInstance, testArgument);
+
+        RandomAnnotationSupport.setRandomFields(testInstance);
+    }
+
+    private void beforeAllMethods() throws Throwable {
+        LOGGER.trace(
+                "beforeAllMethods() testClass [%s] testInstance [%s]",
+                testInstance.getClass().getName(), testInstance);
+
+        for (Method method : beforeAllMethods) {
+            LOGGER.trace(
+                    "beforeAllMethods() testClass [%s] testInstance [%s] method [%s]",
+                    testInstance.getClass().getName(), testInstance, method);
+            method.invoke(testInstance);
+        }
+    }
+
+    private void execute() {
+        LOGGER.trace("execute() testClass [%s]", testClass.getName());
+
+        getChildren()
+                .forEach(
+                        (Consumer<TestDescriptor>)
+                                testDescriptor -> {
+                                    if (testDescriptor instanceof TestMethodTestDescriptor) {
+                                        ExecutableTestDescriptor executableTestDescriptor =
+                                                (ExecutableTestDescriptor) testDescriptor;
+                                        executableTestDescriptor.execute(
+                                                executionRequest, testInstance);
                                     }
                                 });
     }
 
-    private void afterAllMethods() throws Throwable {
-        try {
-            LOGGER.trace(
-                    "afterAllMethods() testClass [%s] testInstance [%s]",
-                    testInstance.getClass().getName(), testInstance);
+    private void skip() {
+        LOGGER.trace("skip() testClass [%s]", testClass.getName());
 
-            for (Method method : afterAllMethods) {
-                LOGGER.trace(
-                        "afterAllMethods() testClass [%s] testInstance [%s] method [%s]",
-                        testInstance.getClass().getName(), testInstance, method);
-                method.invoke(testInstance);
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
+        getChildren()
+                .forEach(
+                        (Consumer<TestDescriptor>)
+                                testDescriptor -> {
+                                    if (testDescriptor instanceof TestMethodTestDescriptor) {
+                                        ExecutableTestDescriptor executableTestDescriptor =
+                                                (ExecutableTestDescriptor) testDescriptor;
+                                        executableTestDescriptor.skip(executionRequest);
+                                    }
+                                });
+
+        getStopWatch().reset();
+
+        getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
+        getMetadata()
+                .put(
+                        MetadataConstants.TEST_CLASS_DISPLAY_NAME,
+                        DisplayNameSupport.getDisplayName(testClass));
+
+        getMetadata().put(MetadataConstants.TEST_ARGUMENT, testArgument);
+    }
+
+    private void afterAllMethods() throws Throwable {
+        LOGGER.trace(
+                "afterAllMethods() testClass [%s] testInstance [%s]",
+                testInstance.getClass().getName(), testInstance);
+
+        for (Method method : afterAllMethods) {
+            LOGGER.trace(
+                    "afterAllMethods() testClass [%s] testInstance [%s] method [%s]",
+                    testInstance.getClass().getName(), testInstance, method);
+            method.invoke(testInstance);
         }
     }
 
     private void clearRandomFields() throws Throwable {
-        try {
-            LOGGER.trace(
-                    "clearRandomFields() testClass [%s] testInstance [%s]",
-                    testInstance.getClass().getName(), testInstance);
+        LOGGER.trace(
+                "clearRandomFields() testClass [%s] testInstance [%s]",
+                testInstance.getClass().getName(), testInstance);
 
-            RandomAnnotationSupport.clearRandomFields(testInstance);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
-        }
+        RandomAnnotationSupport.clearRandomFields(testInstance);
     }
 
     private void clearArgumentFields() throws Throwable {
-        try {
-            LOGGER.trace(
-                    "clearArgumentFields() testClass [%s] testInstance [%s]",
-                    testInstance.getClass().getName(), testInstance);
+        LOGGER.trace(
+                "clearArgumentFields() testClass [%s] testInstance [%s]",
+                testInstance.getClass().getName(), testInstance);
 
-            ArgumentAnnotationSupport.setArgumentFields(testInstance, null);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
-        }
+        ArgumentAnnotationSupport.setArgumentFields(testInstance, null);
     }
 
     /**

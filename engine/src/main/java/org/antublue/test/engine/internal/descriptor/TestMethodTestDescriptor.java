@@ -26,6 +26,7 @@ import org.antublue.test.engine.internal.metadata.MetadataConstants;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.util.Predicates;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -34,7 +35,6 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.MethodSource;
-import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement a MethodTestDescriptor */
 public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
@@ -101,7 +101,6 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                         DisplayNameSupport.getDisplayName(testClass));
 
         getMetadata().put(MetadataConstants.TEST_ARGUMENT, testArgument);
-
         getMetadata().put(MetadataConstants.TEST_METHOD, testMethod);
         getMetadata().put(MetadataConstants.TEST_METHOD_DISPLAY_NAME, getDisplayName());
 
@@ -110,7 +109,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         ThrowableCollector throwableCollector = getThrowableCollector();
 
         throwableCollector.execute(this::beforeEach);
-        if (getThrowableCollector().isEmpty()) {
+        if (throwableCollector.isEmpty()) {
             throwableCollector.execute(this::test);
         }
         throwableCollector.execute(this::afterEach);
@@ -122,77 +121,72 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
                         getStopWatch().elapsedNanoseconds());
 
-        if (getThrowableCollector().isEmpty()) {
+        List<Throwable> throwables = collectThrowables();
+        if (throwables.isEmpty()) {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
-
-            /*
-            getParent(ArgumentTestDescriptor.class)
-                    .getThrowableCollector()
-                    .add(
-                            new TestArgumentFailedException(
-                                    format(
-                                            "Exception testing test argument name [%s]",
-                                            testArgument.getName())));
-             */
-
             executionRequest
                     .getEngineExecutionListener()
-                    .executionFinished(
-                            this,
-                            TestExecutionResult.failed(getThrowableCollector().getThrowable()));
+                    .executionFinished(this, getThrowableCollector().toTestExecutionResult());
         }
     }
 
-    private void beforeEach() throws Throwable {
-        try {
-            LOGGER.trace(
-                    "beforeEach() testClass [%s] testInstance [%s]",
-                    testInstance.getClass().getName(), testInstance);
+    public void skip(ExecutionRequest executionRequest) {
+        LOGGER.trace("skip(ExecutionRequest executionRequest)");
 
-            for (Method method : beforeEachMethods) {
-                LOGGER.trace(
-                        "beforeEach() testClass [%s] testInstance [%s] method [%s]",
-                        testInstance.getClass().getName(), testInstance, method);
-                method.invoke(testInstance);
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
+        getStopWatch().stop();
+
+        getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
+        getMetadata()
+                .put(
+                        MetadataConstants.TEST_CLASS_DISPLAY_NAME,
+                        DisplayNameSupport.getDisplayName(testClass));
+        getMetadata().put(MetadataConstants.TEST_ARGUMENT, testArgument);
+        getMetadata().put(MetadataConstants.TEST_METHOD, testMethod);
+        getMetadata().put(MetadataConstants.TEST_METHOD_DISPLAY_NAME, getDisplayName());
+        getMetadata()
+                .put(
+                        MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
+                        getStopWatch().elapsedNanoseconds());
+        getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
+
+        executionRequest.getEngineExecutionListener().executionSkipped(this, "Skipped");
+    }
+
+    private void beforeEach() throws Throwable {
+        LOGGER.trace(
+                "beforeEach() testClass [%s] testInstance [%s]",
+                testInstance.getClass().getName(), testInstance);
+
+        for (Method method : beforeEachMethods) {
+            LOGGER.trace(
+                    "beforeEach() testClass [%s] testInstance [%s] method [%s]",
+                    testInstance.getClass().getName(), testInstance, method);
+            method.invoke(testInstance);
         }
     }
 
     private void test() throws Throwable {
-        try {
-            LOGGER.trace(
-                    "test() testClass [%s] testInstance [%s] method [%s]",
-                    testInstance.getClass().getName(), testInstance, testMethod);
-            testMethod.invoke(testInstance);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
-        }
+        LOGGER.trace(
+                "test() testClass [%s] testInstance [%s] method [%s]",
+                testInstance.getClass().getName(), testInstance, testMethod);
+        testMethod.invoke(testInstance);
     }
 
     private void afterEach() throws Throwable {
-        try {
-            LOGGER.trace(
-                    "afterEach() testClass [%s] testInstance [%s]",
-                    testInstance.getClass().getName(), testInstance);
+        LOGGER.trace(
+                "afterEach() testClass [%s] testInstance [%s]",
+                testInstance.getClass().getName(), testInstance);
 
-            for (Method method : afterEachMethods) {
-                LOGGER.trace(
-                        "afterEach() testClass [%s] testInstance [%s] method [%s]",
-                        testInstance.getClass().getName(), testInstance, method);
-                method.invoke(testInstance);
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
+        for (Method method : afterEachMethods) {
+            LOGGER.trace(
+                    "afterEach() testClass [%s] testInstance [%s] method [%s]",
+                    testInstance.getClass().getName(), testInstance, method);
+            method.invoke(testInstance);
         }
     }
 

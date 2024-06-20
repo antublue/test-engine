@@ -33,6 +33,12 @@ public class DebugTestA {
         return Stream.of(Argument.ofInt(1), Argument.ofInt(2), Argument.ofInt(3));
     }
 
+    @TestEngine.Prepare
+    public void prepare() {
+        System.out.println("prepare()");
+        throwException();
+    }
+
     @TestEngine.BeforeAll
     public void beforeAll() {
         System.out.println("beforeAll()");
@@ -51,9 +57,6 @@ public class DebugTestA {
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + argument.getPayload() + ")");
-        if (argument.getPayload() == 1) {
-            fail("FORCED");
-        }
     }
 
     @TestEngine.AfterEach
@@ -64,5 +67,16 @@ public class DebugTestA {
     @TestEngine.AfterAll
     public void afterAll() {
         System.out.println("afterAll()");
+    }
+
+    @TestEngine.Conclude
+    public void conclude() {
+        System.out.println("conclude()");
+    }
+
+    private void throwException() {
+        if (argument.getPayload() == 2) {
+            fail("FORCED");
+        }
     }
 }
