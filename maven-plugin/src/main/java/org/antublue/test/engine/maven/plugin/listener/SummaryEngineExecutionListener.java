@@ -22,10 +22,10 @@ import java.util.List;
 import org.antublue.test.engine.AntuBLUETestEngine;
 import org.antublue.test.engine.internal.descriptor.ArgumentTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.Metadata;
+import org.antublue.test.engine.internal.descriptor.MetadataTestDescriptor;
+import org.antublue.test.engine.internal.descriptor.MetadataTestDescriptorConstants;
 import org.antublue.test.engine.internal.descriptor.TestMethodTestDescriptor;
-import org.antublue.test.engine.internal.metadata.Metadata;
-import org.antublue.test.engine.internal.metadata.MetadataConstants;
-import org.antublue.test.engine.internal.metadata.MetadataInformation;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
 import org.antublue.test.engine.internal.util.HumanReadableTimeUtils;
@@ -138,11 +138,11 @@ public class SummaryEngineExecutionListener
         long methodTestDescriptorSkipped = 0;
 
         for (TestDescriptor testDescriptor : testDescriptors) {
-            if (testDescriptor instanceof Metadata) {
-                Metadata metadata = (Metadata) testDescriptor;
-                MetadataInformation metadataInformation = metadata.getMetadata();
+            if (testDescriptor instanceof MetadataTestDescriptor) {
+                Metadata metadata = ((MetadataTestDescriptor) testDescriptor).getMetadata();
+
                 String testDescriptorStatus =
-                        metadataInformation.get(MetadataConstants.TEST_DESCRIPTOR_STATUS);
+                        metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS);
 
                 if (testDescriptor instanceof TestMethodTestDescriptor) {
                     methodTestDescriptorFound++;
@@ -225,16 +225,19 @@ public class SummaryEngineExecutionListener
                         classTestDescriptorFound,
                         argumentTestDescriptorFound,
                         methodTestDescriptorFound);
+
         int columnWidthSuccess =
                 getColumnWith(
                         classTestDescriptorSuccess,
                         argumentTestDescriptorSuccess,
                         methodTestDescriptorSuccess);
+
         int columnWidthFailure =
                 getColumnWith(
                         classTestDescriptorFailure,
                         argumentTestDescriptorFailure,
                         methodTestDescriptorFailure);
+
         int columnWidthSkipped =
                 getColumnWith(
                         classTestDescriptorSkipped,

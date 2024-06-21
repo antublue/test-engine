@@ -22,7 +22,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.metadata.MetadataConstants;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
@@ -86,8 +85,9 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         stopWatch.reset();
 
-        getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
-        getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
+        getMetadata().put(MetadataTestDescriptorConstants.TEST_CLASS, testClass);
+        getMetadata()
+                .put(MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
 
         this.executionRequest = executionRequest;
 
@@ -113,17 +113,23 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         getMetadata()
                 .put(
-                        MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
+                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
                         stopWatch.elapsedNanoseconds());
 
         List<Throwable> throwables = collectThrowables();
         if (throwables.isEmpty()) {
-            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
+            getMetadata()
+                    .put(
+                            MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
+                            MetadataTestDescriptorConstants.PASS);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
-            getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
+            getMetadata()
+                    .put(
+                            MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
+                            MetadataTestDescriptorConstants.FAIL);
             executionRequest
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.failed(throwables.get(0)));
@@ -135,13 +141,17 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         stopWatch.stop();
 
-        getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
-        getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
+        getMetadata().put(MetadataTestDescriptorConstants.TEST_CLASS, testClass);
+        getMetadata()
+                .put(MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
         getMetadata()
                 .put(
-                        MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
+                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
                         stopWatch.elapsedNanoseconds());
-        getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
+        getMetadata()
+                .put(
+                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
+                        MetadataTestDescriptorConstants.SKIP);
 
         getChildren()
                 .forEach(
@@ -206,8 +216,9 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         stopWatch.reset();
 
-        getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
-        getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
+        getMetadata().put(MetadataTestDescriptorConstants.TEST_CLASS, testClass);
+        getMetadata()
+                .put(MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
 
         executionRequest.getEngineExecutionListener().executionSkipped(this, "Skipped");
 

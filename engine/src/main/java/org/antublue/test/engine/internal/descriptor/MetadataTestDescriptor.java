@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.metadata;
+package org.antublue.test.engine.internal.descriptor;
 
 /** Interface to implement ExecutableTestDescriptorMetadataSupport */
-public interface Metadata {
+public interface MetadataTestDescriptor {
 
     /**
      * Method to get metadata information
      *
      * @return metadata information
      */
-    MetadataInformation getMetadata();
+    Metadata getMetadata();
 }

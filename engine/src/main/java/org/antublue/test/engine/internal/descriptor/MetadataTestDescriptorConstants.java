@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.metadata;
+package org.antublue.test.engine.internal.descriptor;
 
 /** Class to implement MetadataConstants */
-public class MetadataConstants {
+public class MetadataTestDescriptorConstants {
 
     /** Constructor */
-    private MetadataConstants() {
+    private MetadataTestDescriptorConstants() {
         // DO NOTHING
     }
 

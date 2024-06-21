@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.metadata;
+package org.antublue.test.engine.internal.descriptor;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Class to implement MetadataInformation\ */
 @SuppressWarnings("unchecked")
-public class MetadataInformation {
+public class Metadata {
 
     private final Map<String, Object> map;
 
     /** Constructor */
-    public MetadataInformation() {
+    public Metadata() {
         map = new ConcurrentHashMap<>();
     }
 
