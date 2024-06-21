@@ -24,7 +24,32 @@ import org.antublue.test.engine.api.TestEngine;
 public class SubclassTest extends BaseTest {
 
     @TestEngine.Prepare
-    public static void prepare2() {
+    public void prepare2() {
+        EXPECTED.add("b/prepare()");
+        EXPECTED.add("b/prepare3()");
+        EXPECTED.add("prepare2()");
+        arguments()
+                .forEach(
+                        stringArgument -> {
+                            EXPECTED.add("b/beforeAll(" + stringArgument + ")");
+                            EXPECTED.add("beforeAll2(" + stringArgument + ")");
+                            EXPECTED.add("b/beforeEach(" + stringArgument + ")");
+                            EXPECTED.add("beforeEach2(" + stringArgument + ")");
+                            EXPECTED.add("b/testA(" + stringArgument + ")");
+                            EXPECTED.add("afterEach2(" + stringArgument + ")");
+                            EXPECTED.add("b/afterEach(" + stringArgument + ")");
+                            EXPECTED.add("b/beforeEach(" + stringArgument + ")");
+                            EXPECTED.add("beforeEach2(" + stringArgument + ")");
+                            EXPECTED.add("testB(" + stringArgument + ")");
+                            EXPECTED.add("afterEach2(" + stringArgument + ")");
+                            EXPECTED.add("b/afterEach(" + stringArgument + ")");
+                            EXPECTED.add("afterAll2(" + stringArgument + ")");
+                            EXPECTED.add("b/afterAll(" + stringArgument + ")");
+                        });
+        EXPECTED.add("conclude2()");
+        EXPECTED.add("b/conclude3()");
+        EXPECTED.add("b/conclude()");
+
         System.out.println("prepare2()");
         ACTUAL.add("prepare2()");
     }
@@ -65,27 +90,8 @@ public class SubclassTest extends BaseTest {
     }
 
     @TestEngine.Conclude
-    public static void conclude2() {
+    public void conclude2() {
         System.out.println("conclude2()");
         ACTUAL.add("conclude2()");
-
-        assertThat(ACTUAL.size()).isEqualTo(EXPECTED.size());
-
-        for (int i = 0; i < ACTUAL.size(); i++) {
-            if (!ACTUAL.get(i).equals(EXPECTED.get(i))) {
-                System.out.println(
-                        "equal ["
-                                + ACTUAL.get(i).equals(EXPECTED.get(i))
-                                + "] index "
-                                + i
-                                + " actual ["
-                                + ACTUAL.get(i)
-                                + "] expected ["
-                                + EXPECTED.get(i)
-                                + "]");
-            }
-        }
-
-        assertThat(ACTUAL).isEqualTo(EXPECTED);
     }
 }

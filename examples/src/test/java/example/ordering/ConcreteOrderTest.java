@@ -16,8 +16,6 @@
 
 package example.ordering;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -40,7 +38,18 @@ public class ConcreteOrderTest extends BaseOrderTest {
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 2)
-    public static void prepare2() {
+    public void prepare2() {
+        EXPECTED.addAll(
+                listOf(
+                        "BaseOrderTest.prepare()",
+                        "ConcreteOrderTest.prepare2()",
+                        "BaseOrderTest.beforeAll()",
+                        "ConcreteOrderTest.beforeAll2()",
+                        "ConcreteOrderTest.afterAll2()",
+                        "BaseOrderTest.afterAll()",
+                        "ConcreteOrderTest.conclude2()",
+                        "BaseOrderTest.conclude()"));
+
         System.out.println("ConcreteOrderTest.prepare2()");
         ACTUAL.add("ConcreteOrderTest.prepare2()");
     }
@@ -77,9 +86,8 @@ public class ConcreteOrderTest extends BaseOrderTest {
 
     @TestEngine.Conclude
     @TestEngine.Order(order = 1)
-    public static void conclude2() {
+    public void conclude2() {
         System.out.println("ConcreteOrderTest.conclude2()");
         ACTUAL.add("ConcreteOrderTest.conclude2()");
-        assertThat(ACTUAL).isEqualTo(EXPECTED);
     }
 }

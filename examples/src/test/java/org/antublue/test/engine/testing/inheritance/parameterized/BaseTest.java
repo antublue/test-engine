@@ -28,35 +28,8 @@ import org.antublue.test.engine.api.TestEngine;
 // @TestEngine.BaseClass
 public abstract class BaseTest {
 
-    public static final List<String> EXPECTED = new ArrayList<>();
-    public static final List<String> ACTUAL = new ArrayList<>();
-
-    static {
-        EXPECTED.add("b/prepare()");
-        EXPECTED.add("b/prepare3()");
-        EXPECTED.add("prepare2()");
-        arguments()
-                .forEach(
-                        stringArgument -> {
-                            EXPECTED.add("b/beforeAll(" + stringArgument + ")");
-                            EXPECTED.add("beforeAll2(" + stringArgument + ")");
-                            EXPECTED.add("b/beforeEach(" + stringArgument + ")");
-                            EXPECTED.add("beforeEach2(" + stringArgument + ")");
-                            EXPECTED.add("b/testA(" + stringArgument + ")");
-                            EXPECTED.add("afterEach2(" + stringArgument + ")");
-                            EXPECTED.add("b/afterEach(" + stringArgument + ")");
-                            EXPECTED.add("b/beforeEach(" + stringArgument + ")");
-                            EXPECTED.add("beforeEach2(" + stringArgument + ")");
-                            EXPECTED.add("testB(" + stringArgument + ")");
-                            EXPECTED.add("afterEach2(" + stringArgument + ")");
-                            EXPECTED.add("b/afterEach(" + stringArgument + ")");
-                            EXPECTED.add("afterAll2(" + stringArgument + ")");
-                            EXPECTED.add("b/afterAll(" + stringArgument + ")");
-                        });
-        EXPECTED.add("conclude2()");
-        EXPECTED.add("b/conclude3()");
-        EXPECTED.add("b/conclude()");
-    }
+    protected final List<String> EXPECTED = new ArrayList<>();
+    protected final List<String> ACTUAL = new ArrayList<>();
 
     @TestEngine.Argument public Argument<Integer> argument;
 
@@ -76,7 +49,7 @@ public abstract class BaseTest {
     }
 
     @TestEngine.Prepare
-    public static void prepare3() {
+    public void prepare3() {
         System.out.println("b/prepare3()");
         ACTUAL.add("b/prepare3()");
     }
@@ -123,7 +96,7 @@ public abstract class BaseTest {
     }
 
     @TestEngine.Conclude
-    public static void conclude3() {
+    public void conclude3() {
         System.out.println("b/conclude3()");
         ACTUAL.add("b/conclude3()");
     }

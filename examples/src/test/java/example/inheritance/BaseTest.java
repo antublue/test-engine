@@ -20,11 +20,15 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 public abstract class BaseTest {
+
+    protected final List<String> EXPECTED = new ArrayList<>();
+    protected final List<String> ACTUAL = new ArrayList<>();
 
     @TestEngine.Argument public Argument<Integer> privateArgumentInteger;
 

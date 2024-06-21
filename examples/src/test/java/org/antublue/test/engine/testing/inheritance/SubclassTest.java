@@ -25,7 +25,7 @@ import org.antublue.test.engine.api.TestEngine;
 public class SubclassTest extends BaseTest {
 
     @TestEngine.Prepare
-    public static void prepare2() {
+    public void prepare2() {
         System.out.println("prepare2()");
         ACTUAL.add("prepare2()");
     }

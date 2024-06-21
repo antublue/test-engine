@@ -16,31 +16,24 @@
 
 package example.ordering;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 public abstract class BaseOrderTest {
 
-    protected static final List<String> EXPECTED =
-            listOf(
-                    "BaseOrderTest.prepare()",
-                    "ConcreteOrderTest.prepare2()",
-                    "BaseOrderTest.beforeAll()",
-                    "ConcreteOrderTest.beforeAll2()",
-                    "ConcreteOrderTest.afterAll2()",
-                    "BaseOrderTest.afterAll()",
-                    "ConcreteOrderTest.conclude2()",
-                    "BaseOrderTest.conclude()");
-
-    protected static final List<String> ACTUAL = new ArrayList<>();
+    protected final List<String> EXPECTED = new ArrayList<>();
+    protected final List<String> ACTUAL = new ArrayList<>();
 
     @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.Prepare
     @TestEngine.Order(order = 1)
-    public static final void prepare() {
+    public final void prepare() {
         System.out.println("BaseOrderTest.prepare()");
         ACTUAL.add("BaseOrderTest.prepare()");
     }
@@ -67,16 +60,15 @@ public abstract class BaseOrderTest {
 
     @TestEngine.Conclude
     @TestEngine.Order(order = 2)
-    public static final void conclude() {
+    public final void conclude() {
         System.out.println("BaseOrderTest.conclude()");
         ACTUAL.add("BaseOrderTest.conclude()");
+        assertThat(ACTUAL).isEqualTo(EXPECTED);
     }
 
-    private static List<String> listOf(String... strings) {
+    protected static List<String> listOf(String... strings) {
         List<String> list = new ArrayList<>(strings.length);
-        for (String string : strings) {
-            list.add(string);
-        }
+        Collections.addAll(list, strings);
         return list;
     }
 }
