@@ -310,7 +310,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 ReflectionSupport.findMethods(
                         testClass, Predicates.BEFORE_ALL_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
-        if (!beforeAllMethods.isEmpty() && LOGGER.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled() && !beforeAllMethods.isEmpty()) {
             beforeAllMethods.forEach(method -> LOGGER.trace("beforeAll method [%s]", method));
         }
 
@@ -321,7 +321,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 ReflectionSupport.findMethods(
                         testClass, Predicates.AFTER_ALL_METHOD, HierarchyTraversalMode.BOTTOM_UP);
 
-        if (!afterAllMethods.isEmpty() && LOGGER.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled() && !afterAllMethods.isEmpty()) {
             afterAllMethods.forEach(method -> LOGGER.trace("afterAll method [%s]", method));
         }
 

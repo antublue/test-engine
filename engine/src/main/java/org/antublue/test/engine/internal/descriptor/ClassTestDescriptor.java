@@ -285,7 +285,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         prepareMethods =
                 OrdererSupport.orderTestMethods(prepareMethods, HierarchyTraversalMode.TOP_DOWN);
 
-        if (!prepareMethods.isEmpty() && LOGGER.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled() && !prepareMethods.isEmpty()) {
             prepareMethods.forEach(method -> LOGGER.trace("prepare method [%s]", method));
         }
 
@@ -296,7 +296,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         concludeMethods =
                 OrdererSupport.orderTestMethods(concludeMethods, HierarchyTraversalMode.TOP_DOWN);
 
-        if (!concludeMethods.isEmpty() && LOGGER.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled() && !concludeMethods.isEmpty()) {
             concludeMethods.forEach(method -> LOGGER.trace("conclude method [%s]", method));
         }
 

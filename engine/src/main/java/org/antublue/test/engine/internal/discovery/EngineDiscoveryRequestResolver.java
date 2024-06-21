@@ -46,6 +46,7 @@ import org.antublue.test.engine.internal.support.DisplayNameSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.TagSupport;
 import org.antublue.test.engine.internal.util.Predicates;
+import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
@@ -84,6 +85,8 @@ public class EngineDiscoveryRequestResolver {
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
         LOGGER.trace("resolveSelector()");
 
+        StopWatch stopWatch = new StopWatch();
+
         try {
             List<Class<?>> testClasses = resolveEngineDiscoveryRequest(engineDiscoveryRequest);
 
@@ -93,6 +96,7 @@ public class EngineDiscoveryRequestResolver {
             OrdererSupport.orderTestClasses(testClasses);
 
             if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("working testClasses...");
                 testClasses.forEach(c -> LOGGER.trace("testClass [%s]", c.getName()));
             }
 
@@ -108,6 +112,9 @@ public class EngineDiscoveryRequestResolver {
             throw e;
         } catch (Throwable t) {
             throw new TestEngineException(t);
+        } finally {
+            stopWatch.stop();
+            LOGGER.trace("resolveSelector() %d ms", stopWatch.elapsedMilliseconds());
         }
     }
 
@@ -150,7 +157,8 @@ public class EngineDiscoveryRequestResolver {
             Argument<?> testArgument,
             int testArgumentIndex) {
         LOGGER.trace(
-                "buildArgumentTestDescriptor() testClass [%s] testArgument [%s] testArgumentIndex",
+                "buildArgumentTestDescriptor() testClass [%s] testArgument [%s] testArgumentIndex"
+                        + " [%d]",
                 testClass.getName(), testArgument.getName(), testArgumentIndex);
 
         ArgumentTestDescriptor argumentTestDescriptor =
@@ -401,7 +409,7 @@ public class EngineDiscoveryRequestResolver {
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_INCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(Constants.TEST_CLASS_INCLUDE_REGEX + " [%s]", optional.get());
+            LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_INCLUDE_REGEX, optional.get());
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -419,7 +427,7 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_CLASS_EXCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(Constants.TEST_CLASS_EXCLUDE_REGEX + " [%s]", optional.get());
+            LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_EXCLUDE_REGEX, optional.get());
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -430,8 +438,6 @@ public class EngineDiscoveryRequestResolver {
                 matcher.reset(clazz.getName());
                 if (matcher.find()) {
                     iterator.remove();
-                } else {
-                    LOGGER.trace("keeping testClass [%s]", clazz.getName());
                 }
             }
         }
@@ -447,7 +453,7 @@ public class EngineDiscoveryRequestResolver {
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(Constants.TEST_CLASS_TAG_INCLUDE_REGEX + " [%s]", optional.get());
+            LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_TAG_INCLUDE_REGEX, optional.get());
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -464,8 +470,6 @@ public class EngineDiscoveryRequestResolver {
                     if (!matcher.find()) {
                         LOGGER.trace("removing testClass [%s]", clazz.getName());
                         iterator.remove();
-                    } else {
-                        LOGGER.trace("keeping testClass [%s]", clazz.getName());
                     }
                 }
             }
@@ -473,7 +477,7 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX + " [%s]", optional.get());
+            LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_TAG_EXCLUDE_REGEX, optional.get());
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -487,8 +491,6 @@ public class EngineDiscoveryRequestResolver {
                     if (matcher.find()) {
                         LOGGER.trace("removing testClass [%s]", clazz.getName());
                         iterator.remove();
-                    } else {
-                        LOGGER.trace("keeping testClass [%s]", clazz.getName());
                     }
                 }
             }
@@ -505,7 +507,7 @@ public class EngineDiscoveryRequestResolver {
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_INCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(Constants.TEST_METHOD_INCLUDE_REGEX + " [%s]", optional.get());
+            LOGGER.trace(" %s [%s]", Constants.TEST_METHOD_INCLUDE_REGEX, optional.get());
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -515,6 +517,9 @@ public class EngineDiscoveryRequestResolver {
                 Method testMethod = iterator.next();
                 matcher.reset(DisplayNameSupport.getDisplayName(testMethod));
                 if (!matcher.find()) {
+                    LOGGER.trace(
+                            "removing testClass [%s] testMethod [%s]",
+                            testMethod.getClass().getName(), testMethod.getName());
                     iterator.remove();
                 }
             }
@@ -522,7 +527,7 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(Constants.TEST_METHOD_EXCLUDE_REGEX + " [%s]", optional.get());
+            LOGGER.trace(" %s [%s]", Constants.TEST_METHOD_EXCLUDE_REGEX, optional.get());
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -532,6 +537,9 @@ public class EngineDiscoveryRequestResolver {
                 Method testMethod = iterator.next();
                 matcher.reset(DisplayNameSupport.getDisplayName(testMethod));
                 if (matcher.find()) {
+                    LOGGER.trace(
+                            "removing testClass [%s] testMethod [%s]",
+                            testMethod.getClass().getName(), testMethod.getName());
                     iterator.remove();
                 }
             }
@@ -548,7 +556,7 @@ public class EngineDiscoveryRequestResolver {
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(Constants.TEST_METHOD_TAG_INCLUDE_REGEX + " [%s]", optional.get());
+            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_TAG_INCLUDE_REGEX, optional.get());
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -570,7 +578,7 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX + " [%s]", optional.get());
+            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_TAG_EXCLUDE_REGEX, optional.get());
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
