@@ -59,9 +59,11 @@ public class Configuration implements org.junit.platform.engine.ConfigurationPar
 
         map = Collections.synchronizedMap(new TreeMap<>());
 
+        // Load file properties
         try {
             Optional<File> optional =
                     find(Paths.get("."), ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME);
+
             if (optional.isPresent()) {
                 if (IS_TRACE_ENABLED) {
                     trace(
@@ -71,12 +73,15 @@ public class Configuration implements org.junit.platform.engine.ConfigurationPar
                 }
 
                 Properties properties = new Properties();
+
                 try (Reader reader =
                         Files.newBufferedReader(optional.get().toPath(), StandardCharsets.UTF_8)) {
                     properties.load(reader);
                 }
+
                 properties.forEach(
                         (key, value) -> set(toEnvironmentVariable((String) key), (String) value));
+
                 properties.put(
                         ANTUBLUE_TEST_ENGINE_PROPERTIES_FILENAME, optional.get().getAbsolutePath());
             }
@@ -84,10 +89,20 @@ public class Configuration implements org.junit.platform.engine.ConfigurationPar
             throw new TestEngineConfigurationException("Exception loading properties", e);
         }
 
+        // Load System properties
+        System.getProperties()
+                .entrySet()
+                .forEach(
+                        entry ->
+                                map.put(
+                                        toEnvironmentVariable((String) entry.getKey()),
+                                        entry.getValue().toString()));
+
         if (Constants.TRUE.equals(System.getenv().get(ANTUBLUE_TEST_ENGINE_CONFIGURATION_TRACE))) {
             IS_TRACE_ENABLED = true;
         }
 
+        // Load environment variables
         System.getenv().forEach(this::set);
 
         if (IS_TRACE_ENABLED) {

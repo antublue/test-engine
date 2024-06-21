@@ -49,7 +49,6 @@ import org.antublue.test.engine.internal.support.TagSupport;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
-import org.junit.platform.engine.DiscoveryFilter;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -84,6 +83,8 @@ public class EngineDiscoveryRequestResolver {
      */
     public void resolveSelector(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
+        LOGGER.trace("resolveSelector()");
+
         try {
             List<Class<?>> testClasses = resolveEngineDiscoveryRequest(engineDiscoveryRequest);
 
@@ -205,14 +206,17 @@ public class EngineDiscoveryRequestResolver {
      */
     private static List<Class<?>> resolveEngineDiscoveryRequest(
             EngineDiscoveryRequest engineDiscoveryRequest) throws Throwable {
-        Set<Class<?>> testClassSet = new HashSet<>();
+        LOGGER.trace("resolveEngineDiscoveryRequest()");
 
-        Predicate<String> predicate = null;
+        Set<Class<?>> testClassSet = new HashSet<>();
 
         List<? extends DiscoverySelector> discoverySelectors =
                 engineDiscoveryRequest.getSelectorsByType(ClasspathRootSelector.class);
         for (DiscoverySelector discoverySelector : discoverySelectors) {
+            LOGGER.trace("ClasspathRootSelector...");
+
             ClasspathRootSelector classpathRootSelector = (ClasspathRootSelector) discoverySelector;
+            LOGGER.trace("classpathRoot [%s]", classpathRootSelector.getClasspathRoot());
 
             List<Class<?>> javaClasses =
                     ReflectionSupport.findAllClassesInClasspathRoot(
@@ -221,15 +225,23 @@ public class EngineDiscoveryRequestResolver {
                             className -> true);
 
             for (Class<?> javaClass : javaClasses) {
-                if (predicate == null) {
-                    List<DiscoveryFilter<String>> filters = new ArrayList<>();
-                    filters.addAll(engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class));
-                    filters.addAll(
-                            engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class));
-                    predicate = composeFilters(filters).toPredicate();
+                LOGGER.trace("javaClass [%s]", javaClass.getName());
+
+                List<? extends ClassNameFilter> classNameFilters =
+                        engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class);
+
+                Predicate<String> predicate = composeFilters(classNameFilters).toPredicate();
+                if (!predicate.test(javaClass.getName())) {
+                    LOGGER.trace("filtering javaClass [%s]", javaClass.getName());
+                    continue;
                 }
 
+                List<? extends PackageNameFilter> packageNameFilters =
+                        engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
+
+                predicate = composeFilters(packageNameFilters).toPredicate();
                 if (!predicate.test(javaClass.getPackage().getName())) {
+                    LOGGER.trace("filtering javaClass [%s]", javaClass.getName());
                     continue;
                 }
 
@@ -239,6 +251,8 @@ public class EngineDiscoveryRequestResolver {
 
         discoverySelectors = engineDiscoveryRequest.getSelectorsByType(PackageSelector.class);
         for (DiscoverySelector discoverySelector : discoverySelectors) {
+            LOGGER.trace("PackageSelector...");
+
             PackageSelector packageSelector = (PackageSelector) discoverySelector;
             String packageName = packageSelector.getPackageName();
 
@@ -251,27 +265,37 @@ public class EngineDiscoveryRequestResolver {
 
         discoverySelectors = engineDiscoveryRequest.getSelectorsByType(ClassSelector.class);
         for (DiscoverySelector discoverySelector : discoverySelectors) {
+            LOGGER.trace("ClassSelector...");
+
             ClassSelector classSelector = (ClassSelector) discoverySelector;
             Class<?> javaClass = classSelector.getJavaClass();
 
             if (Predicates.TEST_CLASS.test(javaClass)) {
                 testClassSet.add(javaClass);
+            } else {
+                LOGGER.trace("filtering javaClass [%s]", javaClass.getName());
             }
         }
 
         discoverySelectors = engineDiscoveryRequest.getSelectorsByType(MethodSelector.class);
         for (DiscoverySelector discoverySelector : discoverySelectors) {
+            LOGGER.trace("MethodSelector...");
+
             MethodSelector methodSelector = (MethodSelector) discoverySelector;
             Class<?> javaClass = methodSelector.getJavaClass();
             Method javaMethod = methodSelector.getJavaMethod();
 
             if (Predicates.TEST_CLASS.test(javaClass) && Predicates.TEST_METHOD.test(javaMethod)) {
                 testClassSet.add(javaClass);
+            } else {
+                LOGGER.trace("filtering javaClass [%s]", javaClass.getName());
             }
         }
 
         discoverySelectors = engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class);
         for (DiscoverySelector discoverySelector : discoverySelectors) {
+            LOGGER.trace("UniqueIdSelector...");
+
             UniqueIdSelector uniqueIdSelector = (UniqueIdSelector) discoverySelector;
 
             UniqueId uniqueId = uniqueIdSelector.getUniqueId();
@@ -295,7 +319,8 @@ public class EngineDiscoveryRequestResolver {
         }
 
         List<Class<?>> testClassList = new ArrayList<>(testClassSet);
-        testClassList.sort(Comparator.comparing(Class::getName));
+        
+        OrdererSupport.orderTestClasses(testClassList);
 
         return testClassList;
     }
@@ -380,6 +405,7 @@ public class EngineDiscoveryRequestResolver {
                 Class<?> clazz = iterator.next();
                 matcher.reset(clazz.getName());
                 if (!matcher.find()) {
+                    LOGGER.trace("removing testClass [%s]", clazz.getName());
                     iterator.remove();
                 }
             }
@@ -396,6 +422,8 @@ public class EngineDiscoveryRequestResolver {
                 matcher.reset(clazz.getName());
                 if (matcher.find()) {
                     iterator.remove();
+                } else {
+                    LOGGER.trace("keeping testClass [%s]", clazz.getName());
                 }
             }
         }
@@ -419,11 +447,15 @@ public class EngineDiscoveryRequestResolver {
                 Class<?> clazz = iterator.next();
                 String tag = TagSupport.getTag(clazz);
                 if (tag == null) {
+                    LOGGER.trace("removing testClass [%s]", clazz.getName());
                     iterator.remove();
                 } else {
                     matcher.reset(tag);
                     if (!matcher.find()) {
+                        LOGGER.trace("removing testClass [%s]", clazz.getName());
                         iterator.remove();
+                    } else {
+                        LOGGER.trace("keeping testClass [%s]", clazz.getName());
                     }
                 }
             }
@@ -441,7 +473,10 @@ public class EngineDiscoveryRequestResolver {
                 if (tag != null) {
                     matcher.reset(tag);
                     if (matcher.find()) {
+                        LOGGER.trace("removing testClass [%s]", clazz.getName());
                         iterator.remove();
+                    } else {
+                        LOGGER.trace("keeping testClass [%s]", clazz.getName());
                     }
                 }
             }
