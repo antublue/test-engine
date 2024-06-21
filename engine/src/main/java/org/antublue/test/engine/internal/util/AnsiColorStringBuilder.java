@@ -27,26 +27,6 @@ public class AnsiColorStringBuilder {
     }
 
     /**
-     * Constructor
-     *
-     * @param capacity capacity
-     */
-    public AnsiColorStringBuilder(int capacity) {
-        stringBuilder = new StringBuilder(capacity);
-    }
-
-    /**
-     * Method to reset the length
-     *
-     * @param length length
-     * @return this
-     */
-    public AnsiColorStringBuilder setLength(int length) {
-        stringBuilder.setLength(length);
-        return this;
-    }
-
-    /**
      * Method to set the current color. If the color is null, defaults to AnsiColor.RESET
      *
      * @param ansiColor ansiColor
