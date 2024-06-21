@@ -18,7 +18,6 @@ package org.antublue.test.engine.internal.extension;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import org.antublue.test.engine.api.TestEngineExtension;
 import org.antublue.test.engine.exception.TestEngineException;
@@ -44,7 +43,6 @@ public class TestEngineExtensionManager {
             List<Class<?>> classes =
                     ClassSupport.discoverClasses(Predicates.TEST_ENGINE_EXTENSION_CLASS);
 
-            classes.sort(Comparator.comparing(Class::getName));
             OrdererSupport.orderTestClasses(classes);
 
             for (Class<?> clazz : classes) {

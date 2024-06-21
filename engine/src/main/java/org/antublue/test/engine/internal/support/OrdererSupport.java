@@ -56,6 +56,7 @@ public class OrdererSupport {
      * @param testClasses testClasses
      */
     public static void orderTestClasses(List<Class<?>> testClasses) {
+        testClasses.sort(Comparator.comparing(Class::getName));
         testClasses.sort(Comparator.comparing(DisplayNameSupport::getDisplayName));
         testClasses.sort(Comparator.comparingInt(OrdererSupport::getOrderAnnotation));
     }
