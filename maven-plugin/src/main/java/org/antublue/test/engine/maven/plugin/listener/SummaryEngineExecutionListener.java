@@ -90,44 +90,6 @@ public class SummaryEngineExecutionListener
         println(INFO + SEPARATOR);
         println(INFO + BANNER);
         println(INFO + SEPARATOR);
-
-        /*
-        String javaVendor = System.getProperty("java.vendor");
-        String javaVersion = System.getProperty("java.version");
-        String javaVmName = System.getProperty("java.vm.name");
-        String javaVmVendor = System.getProperty("java.vm.vendor");
-        String javaVmVersion = System.getProperty("java.vm.version");
-
-        println(
-                INFO
-                        + javaVendor
-                        + " / "
-                        + javaVersion
-                        + " / "
-                        + javaVmName
-                        + " / "
-                        + javaVmVendor
-                        + " / "
-                        + javaVmVersion);
-        println(INFO + SEPARATOR);
-        */
-
-        /*
-        Configuration configuration = Configuration.getInstance();
-        String propertiesFilename = configuration.getPropertiesFilename();
-
-        if (propertiesFilename != null) {
-            println(INFO + "[" + propertiesFilename + "]");
-
-            for (String property : configuration.getPropertyNames()) {
-                Optional<String> optional = configuration.getProperty(property);
-                String value = optional.orElse("");
-                println(INFO + "- [" + property + "] = [" + value + "]");
-            }
-
-            println(INFO + SEPARATOR);
-        }
-        */
     }
 
     @Override
