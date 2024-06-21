@@ -25,7 +25,7 @@ public class StopWatch {
 
     /** Constructor */
     public StopWatch() {
-        // DO NOTHING
+        reset();
     }
 
     /**
