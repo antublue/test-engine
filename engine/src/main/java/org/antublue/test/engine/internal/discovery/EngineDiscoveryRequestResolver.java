@@ -22,7 +22,6 @@ import static org.junit.platform.engine.Filter.composeFilters;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -101,9 +100,10 @@ public class EngineDiscoveryRequestResolver {
                 buildClassTestDescriptor(engineDescriptor, testClass);
             }
 
+            LOGGER.trace("pruning...");
             prune(engineDescriptor);
 
-            shuffleOrSortTestDescriptors(engineDescriptor);
+            shuffle(engineDescriptor);
         } catch (TestEngineException e) {
             throw e;
         } catch (Throwable t) {
@@ -212,27 +212,29 @@ public class EngineDiscoveryRequestResolver {
 
         List<? extends DiscoverySelector> discoverySelectors =
                 engineDiscoveryRequest.getSelectorsByType(ClasspathRootSelector.class);
+
         for (DiscoverySelector discoverySelector : discoverySelectors) {
             LOGGER.trace("ClasspathRootSelector...");
 
             ClasspathRootSelector classpathRootSelector = (ClasspathRootSelector) discoverySelector;
             LOGGER.trace("classpathRoot [%s]", classpathRootSelector.getClasspathRoot());
 
-            List<Class<?>> javaClasses =
+            List<Class<?>> testClasses =
                     ReflectionSupport.findAllClassesInClasspathRoot(
                             classpathRootSelector.getClasspathRoot(),
                             Predicates.TEST_CLASS,
                             className -> true);
 
-            for (Class<?> javaClass : javaClasses) {
-                LOGGER.trace("javaClass [%s]", javaClass.getName());
+            for (Class<?> testClass : testClasses) {
+                LOGGER.trace("testClass [%s]", testClass.getName());
 
                 List<? extends ClassNameFilter> classNameFilters =
                         engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class);
 
                 Predicate<String> predicate = composeFilters(classNameFilters).toPredicate();
-                if (!predicate.test(javaClass.getName())) {
-                    LOGGER.trace("filtering javaClass [%s]", javaClass.getName());
+                if (!predicate.test(testClass.getName())) {
+                    LOGGER.trace(
+                            "ignoring testClass [%s] (class name filter)", testClass.getName());
                     continue;
                 }
 
@@ -240,12 +242,13 @@ public class EngineDiscoveryRequestResolver {
                         engineDiscoveryRequest.getFiltersByType(PackageNameFilter.class);
 
                 predicate = composeFilters(packageNameFilters).toPredicate();
-                if (!predicate.test(javaClass.getPackage().getName())) {
-                    LOGGER.trace("filtering javaClass [%s]", javaClass.getName());
+                if (!predicate.test(testClass.getPackage().getName())) {
+                    LOGGER.trace(
+                            "ignoring testClass [%s] (package name filter)", testClass.getName());
                     continue;
                 }
 
-                testClassSet.add(javaClass);
+                testClassSet.add(testClass);
             }
         }
 
@@ -255,6 +258,8 @@ public class EngineDiscoveryRequestResolver {
 
             PackageSelector packageSelector = (PackageSelector) discoverySelector;
             String packageName = packageSelector.getPackageName();
+
+            LOGGER.trace("packageName [%s]", packageName);
 
             List<Class<?>> javaClasses =
                     ReflectionSupport.findAllClassesInPackage(
@@ -268,12 +273,12 @@ public class EngineDiscoveryRequestResolver {
             LOGGER.trace("ClassSelector...");
 
             ClassSelector classSelector = (ClassSelector) discoverySelector;
-            Class<?> javaClass = classSelector.getJavaClass();
+            Class<?> testClass = classSelector.getJavaClass();
 
-            if (Predicates.TEST_CLASS.test(javaClass)) {
-                testClassSet.add(javaClass);
+            if (Predicates.TEST_CLASS.test(testClass)) {
+                testClassSet.add(testClass);
             } else {
-                LOGGER.trace("filtering javaClass [%s]", javaClass.getName());
+                LOGGER.trace("filtering javaClass [%s]", testClass.getName());
             }
         }
 
@@ -282,13 +287,15 @@ public class EngineDiscoveryRequestResolver {
             LOGGER.trace("MethodSelector...");
 
             MethodSelector methodSelector = (MethodSelector) discoverySelector;
-            Class<?> javaClass = methodSelector.getJavaClass();
-            Method javaMethod = methodSelector.getJavaMethod();
+            Class<?> testClass = methodSelector.getJavaClass();
+            Method testMethod = methodSelector.getJavaMethod();
 
-            if (Predicates.TEST_CLASS.test(javaClass) && Predicates.TEST_METHOD.test(javaMethod)) {
-                testClassSet.add(javaClass);
+            LOGGER.trace("testMethod [%s]", testMethod.getName());
+
+            if (Predicates.TEST_CLASS.test(testClass) && Predicates.TEST_METHOD.test(testMethod)) {
+                testClassSet.add(testClass);
             } else {
-                LOGGER.trace("filtering javaClass [%s]", javaClass.getName());
+                LOGGER.trace("filtering testClass [%s]", testClass.getName());
             }
         }
 
@@ -297,32 +304,29 @@ public class EngineDiscoveryRequestResolver {
             LOGGER.trace("UniqueIdSelector...");
 
             UniqueIdSelector uniqueIdSelector = (UniqueIdSelector) discoverySelector;
-
             UniqueId uniqueId = uniqueIdSelector.getUniqueId();
             List<UniqueId.Segment> segments = uniqueId.getSegments();
 
-            Class<?> javaClass = null;
+            LOGGER.trace("uniqueId [%s]", uniqueId);
 
             for (UniqueId.Segment segment : segments) {
                 String segmentType = segment.getType();
 
                 if (segmentType.equals(ClassTestDescriptor.class.getName())) {
                     String javaClassName = segment.getValue();
-                    javaClass =
-                            Thread.currentThread().getContextClassLoader().loadClass(javaClassName);
-                }
-            }
 
-            if (javaClass != null) {
-                testClassSet.add(javaClass);
+                    Class<?> testClass =
+                            Thread.currentThread().getContextClassLoader().loadClass(javaClassName);
+
+                    testClassSet.add(testClass);
+                }
             }
         }
 
-        List<Class<?>> testClassList = new ArrayList<>(testClassSet);
+        List<Class<?>> testClasses = new ArrayList<>(testClassSet);
+        OrdererSupport.orderTestClasses(testClasses);
 
-        OrdererSupport.orderTestClasses(testClassList);
-
-        return testClassList;
+        return testClasses;
     }
 
     /**
@@ -397,6 +401,8 @@ public class EngineDiscoveryRequestResolver {
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_INCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace(Constants.TEST_CLASS_INCLUDE_REGEX + " [%s]", optional.get());
+
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -413,6 +419,8 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_CLASS_EXCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace(Constants.TEST_CLASS_EXCLUDE_REGEX + " [%s]", optional.get());
+
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -439,6 +447,8 @@ public class EngineDiscoveryRequestResolver {
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace(Constants.TEST_CLASS_TAG_INCLUDE_REGEX + " [%s]", optional.get());
+
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -463,6 +473,8 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX + " [%s]", optional.get());
+
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -493,6 +505,8 @@ public class EngineDiscoveryRequestResolver {
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_INCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace(Constants.TEST_METHOD_INCLUDE_REGEX + " [%s]", optional.get());
+
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -508,6 +522,8 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace(Constants.TEST_METHOD_EXCLUDE_REGEX + " [%s]", optional.get());
+
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -532,6 +548,8 @@ public class EngineDiscoveryRequestResolver {
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace(Constants.TEST_METHOD_TAG_INCLUDE_REGEX + " [%s]", optional.get());
+
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -552,6 +570,8 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX);
         if (optional.isPresent()) {
+            LOGGER.trace(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX + " [%s]", optional.get());
+
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
 
@@ -575,18 +595,15 @@ public class EngineDiscoveryRequestResolver {
      * @param testDescriptor testDescriptor
      */
     private static void prune(TestDescriptor testDescriptor) {
-        // Prune child test descriptors
         Set<? extends TestDescriptor> children = new LinkedHashSet<>(testDescriptor.getChildren());
         for (TestDescriptor child : children) {
             prune(child);
         }
 
-        // If we are the root, ignore pruning
         if (testDescriptor.isRoot()) {
             return;
         }
 
-        // If test descriptor doesn't have children, remove it
         if (testDescriptor.isContainer() && testDescriptor.getChildren().isEmpty()) {
             testDescriptor.removeFromHierarchy();
         }
@@ -600,20 +617,27 @@ public class EngineDiscoveryRequestResolver {
      *
      * @param engineDescriptor engineDescriptor
      */
-    private static void shuffleOrSortTestDescriptors(EngineDescriptor engineDescriptor) {
-        List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
-        testDescriptors.forEach(engineDescriptor::removeChild);
+    private static void shuffle(EngineDescriptor engineDescriptor) {
+        LOGGER.trace("shuffle()");
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_SHUFFLE);
-        optional.ifPresent(
-                s -> {
-                    if (Constants.TRUE.equals(optional.get())) {
-                        Collections.shuffle(testDescriptors);
-                    } else {
-                        testDescriptors.sort(Comparator.comparing(TestDescriptor::getDisplayName));
-                    }
-                });
+        if (optional.isPresent()) {
+            LOGGER.trace("shuffling...");
 
-        testDescriptors.forEach(engineDescriptor::addChild);
+            /*
+            engineDescriptor.getChildren() return an
+            unmodifiable list so we have to create a copy
+            of the list, remove all children from the engineDescriptor,
+            shuffle our copy of the list, then add or list
+            back to the engineDescriptor
+            */
+
+            List<TestDescriptor> testDescriptors = new ArrayList<>(engineDescriptor.getChildren());
+            testDescriptors.forEach(engineDescriptor::removeChild);
+
+            Collections.shuffle(testDescriptors);
+
+            testDescriptors.forEach(engineDescriptor::addChild);
+        }
     }
 }
