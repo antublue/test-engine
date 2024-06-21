@@ -32,9 +32,9 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor implements Metadata {
 
-    private final ThrowableCollector throwableCollector;
-    private final MetadataInformation metadataInformation;
-    private final StopWatch stopWatch;
+    protected final ThrowableCollector throwableCollector;
+    protected final MetadataInformation metadataInformation;
+    protected final StopWatch stopWatch;
 
     /**
      * Constructor
@@ -75,24 +75,6 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor im
     }
 
     /**
-     * Method to get the stop watch
-     *
-     * @return the stop watch
-     */
-    protected StopWatch getStopWatch() {
-        return stopWatch;
-    }
-
-    /**
-     * Method to get the throwable collector
-     *
-     * @return the throwable collector
-     */
-    protected ThrowableCollector getThrowableCollector() {
-        return throwableCollector;
-    }
-
-    /**
      * Method to collect all Throwables from parent and children
      *
      * @return a List of Throwables
@@ -100,8 +82,8 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor im
     public List<Throwable> collectThrowables() {
         List<Throwable> throwables = new ArrayList<>();
 
-        if (getThrowableCollector().isNotEmpty()) {
-            throwables.addAll(getThrowableCollector().getThrowables());
+        if (throwableCollector.isNotEmpty()) {
+            throwables.addAll(throwableCollector.getThrowables());
         }
 
         getChildren()

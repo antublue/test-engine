@@ -29,7 +29,6 @@ import org.antublue.test.engine.internal.support.DisplayNameSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
 import org.antublue.test.engine.internal.util.Predicates;
-import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -93,7 +92,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         Preconditions.notNull(testInstance, "testInstance is null");
         this.testInstance = testInstance;
 
-        getStopWatch().reset();
+        stopWatch.reset();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata()
@@ -106,8 +105,6 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         this.executionRequest = executionRequest;
 
         executionRequest.getEngineExecutionListener().executionStarted(this);
-
-        ThrowableCollector throwableCollector = getThrowableCollector();
 
         throwableCollector.execute(this::setArgumentFields);
         if (throwableCollector.isEmpty()) {
@@ -125,15 +122,15 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         }
         throwableCollector.execute(this::clearArgumentFields);
 
-        getStopWatch().stop();
+        stopWatch.stop();
 
         getMetadata()
                 .put(
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        getStopWatch().elapsedNanoseconds());
+                        stopWatch.elapsedNanoseconds());
 
         List<Throwable> throwables = collectThrowables();
-        if (throwables.isEmpty()) {
+        if (throwableCollector.isEmpty()) {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.PASS);
             executionRequest
                     .getEngineExecutionListener()
@@ -149,14 +146,14 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     public void skip(ExecutionRequest executionRequest) {
         LOGGER.trace("skip(ExecutionRequest executionRequest)");
 
-        getStopWatch().stop();
+        stopWatch.stop();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
         getMetadata()
                 .put(
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        getStopWatch().elapsedNanoseconds());
+                        stopWatch.elapsedNanoseconds());
         getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
 
         getChildren()
@@ -231,7 +228,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                     }
                                 });
 
-        getStopWatch().reset();
+        stopWatch.reset();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata()

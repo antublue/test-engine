@@ -27,7 +27,6 @@ import org.antublue.test.engine.internal.support.DisplayNameSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
 import org.antublue.test.engine.internal.util.Predicates;
-import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -85,7 +84,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     public void execute(ExecutionRequest executionRequest, Object testInstance) {
         LOGGER.trace("execute(ExecutionRequest executionRequest)");
 
-        getStopWatch().reset();
+        stopWatch.reset();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
@@ -93,8 +92,6 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         this.executionRequest = executionRequest;
 
         executionRequest.getEngineExecutionListener().executionStarted(this);
-
-        ThrowableCollector throwableCollector = getThrowableCollector();
 
         throwableCollector.execute(this::setRandomFields);
         if (throwableCollector.isEmpty()) {
@@ -112,12 +109,12 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         }
         throwableCollector.execute(this::clearRandomFields);
 
-        getStopWatch().stop();
+        stopWatch.stop();
 
         getMetadata()
                 .put(
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        getStopWatch().elapsedNanoseconds());
+                        stopWatch.elapsedNanoseconds());
 
         List<Throwable> throwables = collectThrowables();
         if (throwables.isEmpty()) {
@@ -136,14 +133,14 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     public void skip(ExecutionRequest executionRequest) {
         LOGGER.trace("skip(ExecutionRequest executionRequest)");
 
-        getStopWatch().stop();
+        stopWatch.stop();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
         getMetadata()
                 .put(
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        getStopWatch().elapsedNanoseconds());
+                        stopWatch.elapsedNanoseconds());
         getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
 
         getChildren()
@@ -207,7 +204,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     private void skip() {
         LOGGER.trace("skip() testClass [%s]", testClass.getName());
 
-        getStopWatch().reset();
+        stopWatch.reset();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata().put(MetadataConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());

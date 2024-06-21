@@ -26,7 +26,6 @@ import org.antublue.test.engine.internal.metadata.MetadataConstants;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.util.Predicates;
-import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -92,7 +91,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
 
         this.testInstance = testInstance;
 
-        getStopWatch().reset();
+        stopWatch.reset();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata()
@@ -106,20 +105,18 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
 
         executionRequest.getEngineExecutionListener().executionStarted(this);
 
-        ThrowableCollector throwableCollector = getThrowableCollector();
-
         throwableCollector.execute(this::beforeEach);
         if (throwableCollector.isEmpty()) {
             throwableCollector.execute(this::test);
         }
         throwableCollector.execute(this::afterEach);
 
-        getStopWatch().stop();
+        stopWatch.stop();
 
         getMetadata()
                 .put(
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        getStopWatch().elapsedNanoseconds());
+                        stopWatch.elapsedNanoseconds());
 
         List<Throwable> throwables = collectThrowables();
         if (throwables.isEmpty()) {
@@ -131,14 +128,14 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
             getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.FAIL);
             executionRequest
                     .getEngineExecutionListener()
-                    .executionFinished(this, getThrowableCollector().toTestExecutionResult());
+                    .executionFinished(this, throwableCollector.toTestExecutionResult());
         }
     }
 
     public void skip(ExecutionRequest executionRequest) {
         LOGGER.trace("skip(ExecutionRequest executionRequest)");
 
-        getStopWatch().stop();
+        stopWatch.stop();
 
         getMetadata().put(MetadataConstants.TEST_CLASS, testClass);
         getMetadata()
@@ -151,7 +148,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(
                         MetadataConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        getStopWatch().elapsedNanoseconds());
+                        stopWatch.elapsedNanoseconds());
         getMetadata().put(MetadataConstants.TEST_DESCRIPTOR_STATUS, MetadataConstants.SKIP);
 
         executionRequest.getEngineExecutionListener().executionSkipped(this, "Skipped");
