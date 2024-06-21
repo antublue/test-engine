@@ -319,7 +319,7 @@ public class EngineDiscoveryRequestResolver {
         }
 
         List<Class<?>> testClassList = new ArrayList<>(testClassSet);
-        
+
         OrdererSupport.orderTestClasses(testClassList);
 
         return testClassList;
