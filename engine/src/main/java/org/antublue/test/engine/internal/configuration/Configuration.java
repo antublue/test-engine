@@ -55,8 +55,6 @@ public class Configuration implements org.junit.platform.engine.ConfigurationPar
 
     /** Constructor */
     public Configuration() {
-        trace("Constructor()");
-
         map = Collections.synchronizedMap(new TreeMap<>());
 
         // Load file properties
