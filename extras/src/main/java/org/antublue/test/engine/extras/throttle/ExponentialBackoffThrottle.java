@@ -36,8 +36,6 @@ public class ExponentialBackoffThrottle implements Throttle {
 
     @Override
     public void throttle() {
-        System.out.println("throttleMilliseconds [" + throttleMilliseconds + "]");
-
         try {
             Thread.sleep(throttleMilliseconds);
         } catch (InterruptedException e) {

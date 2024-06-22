@@ -18,7 +18,7 @@ package org.antublue.test.engine.extras.throttle;
 
 /** Class to implement MillisecondsThrottle */
 @SuppressWarnings("PMD.EmptyCatchBlock")
-public class FixedThrottle implements Throttle {
+public class ConstantThrottle implements Throttle {
 
     private final long milliseconds;
 
@@ -27,7 +27,7 @@ public class FixedThrottle implements Throttle {
      *
      * @param milliseconds milliseconds
      */
-    public FixedThrottle(long milliseconds) {
+    public ConstantThrottle(long milliseconds) {
         this.milliseconds = milliseconds;
     }
 
