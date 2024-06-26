@@ -19,9 +19,9 @@ package org.antublue.test.engine.internal.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /** Class to implement ParentLastClassLoader */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -29,6 +29,7 @@ public class ParentLastClassLoader extends ClassLoader {
 
     private final ClassLoader parent;
     private final Set<String> parentClassNames;
+    private final Predicate<String> parentClassNamesPredicate;
 
     /**
      * Constructor
@@ -36,7 +37,10 @@ public class ParentLastClassLoader extends ClassLoader {
      * @param parent parent
      */
     public ParentLastClassLoader(ClassLoader parent) {
-        this(parent, null);
+        super(parent);
+        this.parent = parent;
+        this.parentClassNames = null;
+        this.parentClassNamesPredicate = null;
     }
 
     /**
@@ -49,38 +53,28 @@ public class ParentLastClassLoader extends ClassLoader {
         super(parent);
         this.parent = parent;
         this.parentClassNames = pareClassNames;
+        this.parentClassNamesPredicate = null;
     }
 
-    /**
-     * Method to add a class that will be loaded by the parent class loader
-     *
-     * @param className className
-     * @return this
-     */
-    public ParentLastClassLoader addParentClass(String className) {
-        parentClassNames.add(className);
-        return this;
-    }
-
-    /**
-     * Method to add a collection of classes that will be loaded by the parent class loader
-     *
-     * @param classNames classNames
-     * @return this
-     */
-    public ParentLastClassLoader addParentClass(Collection<String> classNames) {
-        parentClassNames.addAll(classNames);
-        return this;
+    public ParentLastClassLoader(ClassLoader parent, Predicate<String> parentClassNamesPredicate) {
+        super(parent);
+        this.parent = parent;
+        this.parentClassNames = null;
+        this.parentClassNamesPredicate = parentClassNamesPredicate;
     }
 
     @Override
-    public Class<?> loadClass(String name) throws ClassNotFoundException {
-        if (parentClassNames.contains(name)) {
-            return parent.loadClass(name);
+    public Class<?> loadClass(String className) throws ClassNotFoundException {
+        if (parentClassNames != null && parentClassNames.contains(className)) {
+            System.out.println("loadClass(" + className + ") parent");
+            return parent.loadClass(className);
+        } else if (parentClassNamesPredicate != null && parentClassNamesPredicate.test(className)) {
+            System.out.println("loadClass(" + className + ") parent");
+            return parent.loadClass(className);
         }
 
         try {
-            Class<?> loadedClass = findClass(name);
+            Class<?> loadedClass = findClass(className);
             if (loadedClass != null) {
                 return loadedClass;
             }
@@ -88,7 +82,7 @@ public class ParentLastClassLoader extends ClassLoader {
             // DO NOTHING
         }
 
-        return super.loadClass(name);
+        return super.loadClass(className);
     }
 
     @Override
@@ -107,6 +101,12 @@ public class ParentLastClassLoader extends ClassLoader {
             return defineClass(name, classData, 0, classData.length);
         } catch (IOException e) {
             throw new ClassNotFoundException("Failed to load class: " + name, e);
+        } finally {
+            try {
+                classDataStream.close();
+            } catch (Throwable t) {
+                // DO NOTHING
+            }
         }
     }
 
