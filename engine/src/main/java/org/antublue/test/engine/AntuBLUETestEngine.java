@@ -117,7 +117,7 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
         EngineDescriptor engineDescriptor = new EngineDescriptor(uniqueId, getId());
 
         new EngineDiscoveryRequestResolver()
-                .resolveSelector(engineDiscoveryRequest, engineDescriptor);
+                .resolveSelectors(engineDiscoveryRequest, engineDescriptor);
 
         return engineDescriptor;
     }

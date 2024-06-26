@@ -81,9 +81,9 @@ public class EngineDiscoveryRequestResolver {
      * @param engineDiscoveryRequest engineDiscoveryRequest
      * @param engineDescriptor engineDescriptor
      */
-    public void resolveSelector(
+    public void resolveSelectors(
             EngineDiscoveryRequest engineDiscoveryRequest, EngineDescriptor engineDescriptor) {
-        LOGGER.trace("resolveSelector()");
+        LOGGER.trace("resolveSelectors()");
 
         StopWatch stopWatch = new StopWatch();
 
@@ -114,7 +114,7 @@ public class EngineDiscoveryRequestResolver {
             throw new TestEngineException(t);
         } finally {
             stopWatch.stop();
-            LOGGER.trace("resolveSelector() %d ms", stopWatch.elapsedMilliseconds());
+            LOGGER.trace("resolveSelectors() %d ms", stopWatch.elapsedMilliseconds());
         }
     }
 
