@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.util;
+package org.antublue.test.engine.internal.support;
 
 import static java.lang.String.format;
 
@@ -25,10 +25,10 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /** Class to implement RandomGenerator */
-public class RandomUtils {
+public class RandomSupport {
 
     /** Constructor */
-    private RandomUtils() {
+    private RandomSupport() {
         // DO NOTHING
     }
 

@@ -25,7 +25,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
 
-public class RandomUtilsTest {
+public class RandomSupportTest {
 
     @TestEngine.Argument public Argument<String> argument;
 

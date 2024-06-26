@@ -24,7 +24,6 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.util.Predicates;
-import org.antublue.test.engine.internal.util.RandomUtils;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
@@ -114,69 +113,69 @@ public class RandomAnnotationSupport {
 
         for (Field field : fields) {
             if (field.isAnnotationPresent(TestEngine.Random.Boolean.class)) {
-                FieldSupport.setField(testInstance, field, RandomUtils.randomBoolean());
+                FieldSupport.setField(testInstance, field, RandomSupport.randomBoolean());
             } else if (field.isAnnotationPresent(TestEngine.Random.Byte.class)) {
                 TestEngine.Random.Byte annotation =
                         field.getAnnotation(TestEngine.Random.Byte.class);
                 byte minimum = annotation.minimum();
                 byte maximum = annotation.maximum();
-                byte random = (byte) RandomUtils.randomInt(minimum, maximum);
+                byte random = (byte) RandomSupport.randomInt(minimum, maximum);
                 FieldSupport.setField(testInstance, field, random);
             } else if (field.isAnnotationPresent(TestEngine.Random.Character.class)) {
                 TestEngine.Random.Character annotation =
                         field.getAnnotation(TestEngine.Random.Character.class);
                 char minimum = annotation.minimum();
                 char maximum = annotation.maximum();
-                char random = (char) RandomUtils.randomInt(minimum, maximum);
+                char random = (char) RandomSupport.randomInt(minimum, maximum);
                 FieldSupport.setField(testInstance, field, random);
             } else if (field.isAnnotationPresent(TestEngine.Random.Short.class)) {
                 TestEngine.Random.Short annotation =
                         field.getAnnotation(TestEngine.Random.Short.class);
                 short minimum = annotation.minimum();
                 short maximum = annotation.maximum();
-                short random = (short) RandomUtils.randomInt(minimum, maximum);
+                short random = (short) RandomSupport.randomInt(minimum, maximum);
                 FieldSupport.setField(testInstance, field, random);
             } else if (field.isAnnotationPresent(TestEngine.Random.Integer.class)) {
                 TestEngine.Random.Integer annotation =
                         field.getAnnotation(TestEngine.Random.Integer.class);
                 int minimum = annotation.minimum();
                 int maximum = annotation.maximum();
-                int random = RandomUtils.randomInt(minimum, maximum);
+                int random = RandomSupport.randomInt(minimum, maximum);
                 FieldSupport.setField(testInstance, field, random);
             } else if (field.isAnnotationPresent(TestEngine.Random.Long.class)) {
                 TestEngine.Random.Long annotation =
                         field.getAnnotation(TestEngine.Random.Long.class);
                 long minimum = annotation.minimum();
                 long maximum = annotation.maximum();
-                long random = RandomUtils.randomLong(minimum, maximum);
+                long random = RandomSupport.randomLong(minimum, maximum);
                 FieldSupport.setField(testInstance, field, random);
             } else if (field.isAnnotationPresent(TestEngine.Random.Float.class)) {
                 TestEngine.Random.Float annotation =
                         field.getAnnotation(TestEngine.Random.Float.class);
                 float minimum = annotation.minimum();
                 float maximum = annotation.maximum();
-                float random = RandomUtils.randomFloat(minimum, maximum);
+                float random = RandomSupport.randomFloat(minimum, maximum);
                 FieldSupport.setField(testInstance, field, random);
             } else if (field.isAnnotationPresent(TestEngine.Random.Double.class)) {
                 TestEngine.Random.Double annotation =
                         field.getAnnotation(TestEngine.Random.Double.class);
                 double minimum = annotation.minimum();
                 double maximum = annotation.maximum();
-                double random = RandomUtils.randomDouble(minimum, maximum);
+                double random = RandomSupport.randomDouble(minimum, maximum);
                 FieldSupport.setField(testInstance, field, random);
             } else if (field.isAnnotationPresent(TestEngine.Random.BigInteger.class)) {
                 TestEngine.Random.BigInteger annotation =
                         field.getAnnotation(TestEngine.Random.BigInteger.class);
                 String minimum = annotation.minimum();
                 String maximum = annotation.maximum();
-                BigInteger random = RandomUtils.randomBigInteger(minimum, maximum);
+                BigInteger random = RandomSupport.randomBigInteger(minimum, maximum);
                 FieldSupport.setField(testInstance, field, random);
             } else if (field.isAnnotationPresent(TestEngine.Random.BigDecimal.class)) {
                 TestEngine.Random.BigDecimal annotation =
                         field.getAnnotation(TestEngine.Random.BigDecimal.class);
                 String minimum = annotation.minimum();
                 String maximum = annotation.maximum();
-                BigDecimal random = RandomUtils.randomBigDecimal(minimum, maximum);
+                BigDecimal random = RandomSupport.randomBigDecimal(minimum, maximum);
                 FieldSupport.setField(testInstance, field, random);
             } else if (field.isAnnotationPresent(TestEngine.Random.UUID.class)) {
                 UUID random = UUID.randomUUID();
