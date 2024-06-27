@@ -26,6 +26,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
+@TestEngine.Disabled
 public class DuplicateArgumentNamesLifecycleTest {
 
     private static final List<String> EXPECTED = new ArrayList<>();

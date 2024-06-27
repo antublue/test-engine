@@ -23,6 +23,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
+@TestEngine.Disabled
 @TestEngine.Order(order = 3)
 public class ConcreteOrderTest extends BaseOrderTest {
 

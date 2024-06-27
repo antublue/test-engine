@@ -19,6 +19,7 @@ package org.antublue.test.engine.internal.descriptor;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import org.antublue.test.engine.internal.execution.EngineExecutionContextConstants;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
@@ -39,7 +40,7 @@ import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 
 /** Class to implement a ClassTestDescriptor */
-@SuppressWarnings("PMD.UnusedPrivateMethod")
+@SuppressWarnings({"PMD.EmptyCatchBlock", "PMD.UnusedPrivateMethod"})
 public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassTestDescriptor.class);
@@ -247,6 +248,8 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
             LOGGER.trace("doExecute() testClass [%s]", testClass.getName());
         }
 
+        CountDownLatch countDownLatch = new CountDownLatch(getChildren().size());
+
         getChildren()
                 .forEach(
                         (Consumer<TestDescriptor>)
@@ -254,9 +257,39 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                                     if (testDescriptor instanceof ArgumentTestDescriptor) {
                                         ExecutableTestDescriptor executableTestDescriptor =
                                                 (ExecutableTestDescriptor) testDescriptor;
-                                        executableTestDescriptor.execute(executionContext);
+
+                                        ExecutionContext runnableExecutionContext;
+
+                                        try {
+                                            runnableExecutionContext =
+                                                    new ExecutionContext(executionContext);
+                                            Object testInstance =
+                                                    ObjectSupport.createObject(testClass);
+                                            runnableExecutionContext.put(
+                                                    EngineExecutionContextConstants.TEST_INSTANCE,
+                                                    testInstance);
+                                        } catch (Throwable t) {
+                                            throw new RuntimeException(t);
+                                        }
+
+                                        TestDescriptorThreadPool.getInstance()
+                                                .submit(
+                                                        () -> {
+                                                            try {
+                                                                executableTestDescriptor.execute(
+                                                                        runnableExecutionContext);
+                                                            } finally {
+                                                                countDownLatch.countDown();
+                                                            }
+                                                        });
                                     }
                                 });
+
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            // DO NOTHING
+        }
     }
 
     private void doSkip(ExecutionContext executionContext) {

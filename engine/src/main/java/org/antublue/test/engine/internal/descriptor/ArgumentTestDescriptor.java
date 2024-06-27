@@ -197,6 +197,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 + "testClass ["
                 + testClass.getName()
                 + "]"
+                + " testArgument ["
+                + testArgument.getName()
+                + "]"
                 + " beforeAllMethods ["
                 + ObjectSupport.toString(beforeAllMethods)
                 + "]"
