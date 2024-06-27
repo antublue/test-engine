@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import static java.lang.String.format;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -141,7 +143,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     public void skip(ExecutionRequest executionRequest) {
         LOGGER.trace("skip(ExecutionRequest executionRequest)");
 
-        stopWatch.stop();
+        stopWatch.reset();
 
         getMetadata().put(MetadataTestDescriptorConstants.TEST_CLASS, testClass);
         getMetadata()
@@ -152,16 +154,19 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata().put(MetadataTestDescriptorConstants.TEST_METHOD, testMethod);
         getMetadata()
                 .put(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME, getDisplayName());
-        getMetadata()
-                .put(
-                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedNanoseconds());
+        getMetadata().put(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME, 0);
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
                         MetadataTestDescriptorConstants.SKIP);
 
-        executionRequest.getEngineExecutionListener().executionSkipped(this, "Skipped");
+        executionRequest
+                .getEngineExecutionListener()
+                .executionSkipped(
+                        this,
+                        format(
+                                "Argument [%s] test method [%s] skipped",
+                                testArgument, testMethod.getName()));
     }
 
     private void beforeEach() throws Throwable {

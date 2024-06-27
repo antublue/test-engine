@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import static java.lang.String.format;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -151,15 +153,11 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     public void skip(ExecutionRequest executionRequest) {
         LOGGER.trace("skip(ExecutionRequest executionRequest)");
 
-        stopWatch.stop();
+        stopWatch.reset();
 
         getMetadata().put(MetadataTestDescriptorConstants.TEST_CLASS, testClass);
         getMetadata()
                 .put(MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME, getDisplayName());
-        getMetadata()
-                .put(
-                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedNanoseconds());
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
@@ -174,8 +172,16 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                                 .skip(executionRequest);
                                     }
                                 });
+        stopWatch.stop();
 
-        executionRequest.getEngineExecutionListener().executionSkipped(this, "Skipped");
+        getMetadata()
+                .put(
+                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
+                        stopWatch.elapsedNanoseconds());
+
+        executionRequest
+                .getEngineExecutionListener()
+                .executionSkipped(this, format("Argument [%s] skipped", testArgument));
     }
 
     private void setArgumentFields() throws Throwable {
@@ -225,6 +231,8 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
     private void skip() {
         LOGGER.trace("skip() testClass [%s]", testClass.getName());
+
+        stopWatch.stop();
 
         getChildren()
                 .forEach(

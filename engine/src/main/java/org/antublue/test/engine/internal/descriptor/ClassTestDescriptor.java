@@ -139,7 +139,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     public void skip(ExecutionRequest executionRequest) {
         LOGGER.trace("skip(ExecutionRequest executionRequest)");
 
-        stopWatch.stop();
+        stopWatch.reset();
 
         getMetadata().put(MetadataTestDescriptorConstants.TEST_CLASS, testClass);
         getMetadata()
@@ -162,6 +162,13 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                                                 .skip(executionRequest);
                                     }
                                 });
+
+        stopWatch.stop();
+
+        getMetadata()
+                .put(
+                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
+                        stopWatch.elapsedNanoseconds());
 
         executionRequest.getEngineExecutionListener().executionSkipped(this, "Skipped");
     }
@@ -213,8 +220,6 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
     private void skip() {
         LOGGER.trace("skip() testClass [%s]", testClass.getName());
-
-        stopWatch.reset();
 
         getMetadata().put(MetadataTestDescriptorConstants.TEST_CLASS, testClass);
         getMetadata()
