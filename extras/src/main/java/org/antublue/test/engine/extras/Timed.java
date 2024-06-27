@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.extras;
 
+@Deprecated
 public class Timed {
 
     public enum Units {

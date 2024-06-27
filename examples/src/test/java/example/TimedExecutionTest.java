@@ -23,10 +23,10 @@ import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.extras.Timed;
+import org.antublue.test.engine.extras.TimedExecution;
 
 /** Example test */
-public class TimedTest {
+public class TimedExecutionTest {
 
     @TestEngine.Argument public Argument<String> argument;
 
@@ -65,7 +65,7 @@ public class TimedTest {
         System.out.println("test1(" + argument + ")");
         assertThat(argument).isNotNull();
 
-        double time = Timed.execute(() -> Thread.sleep(1000), Timed.Units.MILLISECONDS);
+        long time = TimedExecution.execute(() -> Thread.sleep(1000)).toMillis();
 
         System.out.println("execution time [" + time + "] ms");
     }
