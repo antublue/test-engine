@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.util;
+package org.antublue.test.engine.internal.execution;
 
 import static java.lang.String.format;
 
@@ -30,17 +30,18 @@ import org.antublue.test.engine.internal.configuration.Constants;
 import org.antublue.test.engine.internal.descriptor.ExecutableTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.BlockingRejectedExecutionHandler;
+import org.antublue.test.engine.internal.util.NamedThreadFactory;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
-import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 
 /** Method to execute an ExecutionRequest */
 @SuppressWarnings("PMD.EmptyCatchBlock")
-public class Executor {
+public class ExecutionContextExecutor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Executor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionContextExecutor.class);
 
     private static final int MAX_THREAD_COUNT =
             Math.max(1, Runtime.getRuntime().availableProcessors() - 2);
@@ -48,30 +49,31 @@ public class Executor {
     private final CountDownLatch countDownLatch;
 
     /** Constructor */
-    public Executor() {
+    public ExecutionContextExecutor() {
         countDownLatch = new CountDownLatch(1);
     }
 
     /**
-     * Method to execute the ExecutionRequest
+     * Method to execute the ExecutionContext
      *
-     * @param executionRequest the execution request
+     * @param executionContext executionContext
      */
-    public void execute(ExecutionRequest executionRequest) {
+    public void execute(ExecutionContext executionContext) {
         try {
             LOGGER.trace("execute()");
 
             EngineExecutionListener engineExecutionListener =
-                    executionRequest.getEngineExecutionListener();
+                    executionContext.getExecutionRequest().getEngineExecutionListener();
 
-            TestDescriptor rootTestDescriptor = executionRequest.getRootTestDescriptor();
+            TestDescriptor rootTestDescriptor =
+                    executionContext.getExecutionRequest().getRootTestDescriptor();
 
             ExecutorService executorService = null;
             AtomicReference<CountDownLatch> countDownLatch = new AtomicReference<>();
 
             try {
                 ConfigurationParameters configurationParameters =
-                        executionRequest.getConfigurationParameters();
+                        executionContext.getExecutionRequest().getConfigurationParameters();
 
                 int threadCount =
                         configurationParameters
@@ -108,7 +110,8 @@ public class Executor {
                                 new NamedThreadFactory("test-engine-%02d"),
                                 new BlockingRejectedExecutionHandler());
 
-                engineExecutionListener.executionStarted(executionRequest.getRootTestDescriptor());
+                engineExecutionListener.executionStarted(
+                        executionContext.getExecutionRequest().getRootTestDescriptor());
 
                 Set<? extends TestDescriptor> testDescriptors = rootTestDescriptor.getChildren();
 
@@ -121,7 +124,8 @@ public class Executor {
                         executorService.submit(
                                 () -> {
                                     try {
-                                        executableTestDescriptor.execute(executionRequest, null);
+                                        executableTestDescriptor.execute(
+                                                new ExecutionContext(executionContext));
                                     } catch (Throwable t) {
                                         t.printStackTrace(System.err);
                                     } finally {

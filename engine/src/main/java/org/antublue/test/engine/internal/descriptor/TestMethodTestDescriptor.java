@@ -22,6 +22,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.internal.execution.Constants;
+import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
@@ -30,7 +32,6 @@ import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
-import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -46,7 +47,6 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> beforeEachMethods;
     private final Method testMethod;
     private final List<Method> afterEachMethods;
-    private Object testInstance;
 
     /**
      * Constructor
@@ -86,11 +86,11 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     @Override
-    public void execute(ExecutionRequest executionRequest, Object testInstance) {
-        LOGGER.trace("execute(ExecutionRequest executionRequest)");
-        Preconditions.notNull(testInstance, "testInstance is null");
+    public void execute(ExecutionContext executionContext) {
+        LOGGER.trace("execute(ExecutionContext executionContext)");
 
-        this.testInstance = testInstance;
+        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Preconditions.notNull(testInstance, "testInstance is null");
 
         stopWatch.reset();
 
@@ -105,13 +105,13 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME, getDisplayName());
 
-        executionRequest.getEngineExecutionListener().executionStarted(this);
+        executionContext.getExecutionRequest().getEngineExecutionListener().executionStarted(this);
 
-        throwableCollector.execute(this::beforeEach);
+        throwableCollector.execute(() -> beforeEach(executionContext));
         if (throwableCollector.isEmpty()) {
-            throwableCollector.execute(this::test);
+            throwableCollector.execute(() -> test(executionContext));
         }
-        throwableCollector.execute(this::afterEach);
+        throwableCollector.execute(() -> afterEach(executionContext));
 
         stopWatch.stop();
 
@@ -126,7 +126,8 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                     .put(
                             MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
                             MetadataTestDescriptorConstants.PASS);
-            executionRequest
+            executionContext
+                    .getExecutionRequest()
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
@@ -134,14 +135,15 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                     .put(
                             MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
                             MetadataTestDescriptorConstants.FAIL);
-            executionRequest
+            executionContext
+                    .getExecutionRequest()
                     .getEngineExecutionListener()
                     .executionFinished(this, throwableCollector.toTestExecutionResult());
         }
     }
 
-    public void skip(ExecutionRequest executionRequest) {
-        LOGGER.trace("skip(ExecutionRequest executionRequest)");
+    public void skip(ExecutionContext executionContext) {
+        LOGGER.trace("skip(ExecutionContext executionContext)");
 
         stopWatch.reset();
 
@@ -160,7 +162,8 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
                         MetadataTestDescriptorConstants.SKIP);
 
-        executionRequest
+        executionContext
+                .getExecutionRequest()
                 .getEngineExecutionListener()
                 .executionSkipped(
                         this,
@@ -169,7 +172,9 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                                 testArgument, testMethod.getName()));
     }
 
-    private void beforeEach() throws Throwable {
+    private void beforeEach(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+
         LOGGER.trace(
                 "beforeEach() testClass [%s] testInstance [%s]",
                 testInstance.getClass().getName(), testInstance);
@@ -182,14 +187,18 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         }
     }
 
-    private void test() throws Throwable {
+    private void test(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+
         LOGGER.trace(
                 "test() testClass [%s] testInstance [%s] method [%s]",
                 testInstance.getClass().getName(), testInstance, testMethod);
         testMethod.invoke(testInstance);
     }
 
-    private void afterEach() throws Throwable {
+    private void afterEach(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+
         LOGGER.trace(
                 "afterEach() testClass [%s] testInstance [%s]",
                 testInstance.getClass().getName(), testInstance);

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.internal.execution.Constants;
+import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.support.ArgumentAnnotationSupport;
@@ -33,7 +35,6 @@ import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
-import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -49,8 +50,6 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private final Argument<?> testArgument;
     private final List<Method> beforeAllMethods;
     private final List<Method> afterAllMethods;
-    private ExecutionRequest executionRequest;
-    private Object testInstance;
 
     /**
      * Constructor
@@ -87,11 +86,11 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     @Override
-    public void execute(ExecutionRequest executionRequest, Object testInstance) {
-        LOGGER.trace("execute(ExecutionRequest executionRequest)");
+    public void execute(ExecutionContext executionContext) {
+        LOGGER.trace("execute(ExecutionContext executionContext)");
 
+        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
         Preconditions.notNull(testInstance, "testInstance is null");
-        this.testInstance = testInstance;
 
         stopWatch.reset();
 
@@ -103,25 +102,23 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         getMetadata().put(MetadataTestDescriptorConstants.TEST_ARGUMENT, testArgument);
 
-        this.executionRequest = executionRequest;
+        executionContext.getExecutionRequest().getEngineExecutionListener().executionStarted(this);
 
-        executionRequest.getEngineExecutionListener().executionStarted(this);
-
-        throwableCollector.execute(this::setArgumentFields);
+        throwableCollector.execute(() -> setArgumentFields(executionContext));
         if (throwableCollector.isEmpty()) {
-            throwableCollector.execute(this::setRandomFields);
+            throwableCollector.execute(() -> setRandomFields(executionContext));
             if (throwableCollector.isEmpty()) {
-                throwableCollector.execute(this::beforeAllMethods);
+                throwableCollector.execute(() -> beforeAllMethods(executionContext));
                 if (throwableCollector.isEmpty()) {
-                    execute();
+                    doExecute(executionContext);
                 } else {
-                    skip();
+                    doSkip(executionContext);
                 }
-                throwableCollector.execute(this::afterAllMethods);
+                throwableCollector.execute(() -> afterAllMethods(executionContext));
             }
-            throwableCollector.execute(this::clearRandomFields);
+            throwableCollector.execute(() -> clearRandomFields(executionContext));
         }
-        throwableCollector.execute(this::clearArgumentFields);
+        throwableCollector.execute(() -> clearArgumentFields(executionContext));
 
         stopWatch.stop();
 
@@ -136,7 +133,8 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                     .put(
                             MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
                             MetadataTestDescriptorConstants.PASS);
-            executionRequest
+            executionContext
+                    .getExecutionRequest()
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
@@ -144,14 +142,15 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                     .put(
                             MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
                             MetadataTestDescriptorConstants.FAIL);
-            executionRequest
+            executionContext
+                    .getExecutionRequest()
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.failed(throwables.get(0)));
         }
     }
 
-    public void skip(ExecutionRequest executionRequest) {
-        LOGGER.trace("skip(ExecutionRequest executionRequest)");
+    public void skip(ExecutionContext executionContext) {
+        LOGGER.trace("skip(ExecutionContext executionContext)");
 
         stopWatch.reset();
 
@@ -169,7 +168,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                 testDescriptor -> {
                                     if (testDescriptor instanceof ExecutableTestDescriptor) {
                                         ((ExecutableTestDescriptor) testDescriptor)
-                                                .skip(executionRequest);
+                                                .skip(executionContext);
                                     }
                                 });
         stopWatch.stop();
@@ -179,12 +178,15 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
                         stopWatch.elapsedNanoseconds());
 
-        executionRequest
+        executionContext
+                .getExecutionRequest()
                 .getEngineExecutionListener()
                 .executionSkipped(this, format("Argument [%s] skipped", testArgument));
     }
 
-    private void setArgumentFields() throws Throwable {
+    private void setArgumentFields(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+
         LOGGER.trace(
                 "setArgumentFields() testClass [%s] testInstance [%s] testArgument [%s]",
                 testInstance.getClass().getName(), testInstance, testArgument);
@@ -192,7 +194,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         ArgumentAnnotationSupport.setArgumentFields(testInstance, testArgument);
     }
 
-    private void setRandomFields() throws Throwable {
+    private void setRandomFields(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+
         LOGGER.trace(
                 "setRandomFields() testClass [%s] testInstance [%s] testArgument [%s]",
                 testInstance.getClass().getName(), testInstance, testArgument);
@@ -200,7 +204,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         RandomAnnotationSupport.setRandomFields(testInstance);
     }
 
-    private void beforeAllMethods() throws Throwable {
+    private void beforeAllMethods(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+
         LOGGER.trace(
                 "beforeAllMethods() testClass [%s] testInstance [%s]",
                 testInstance.getClass().getName(), testInstance);
@@ -213,7 +219,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         }
     }
 
-    private void execute() {
+    private void doExecute(ExecutionContext executionContext) {
         LOGGER.trace("execute() testClass [%s]", testClass.getName());
 
         getChildren()
@@ -223,13 +229,12 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                     if (testDescriptor instanceof TestMethodTestDescriptor) {
                                         ExecutableTestDescriptor executableTestDescriptor =
                                                 (ExecutableTestDescriptor) testDescriptor;
-                                        executableTestDescriptor.execute(
-                                                executionRequest, testInstance);
+                                        executableTestDescriptor.execute(executionContext);
                                     }
                                 });
     }
 
-    private void skip() {
+    private void doSkip(ExecutionContext executionContext) {
         LOGGER.trace("skip() testClass [%s]", testClass.getName());
 
         stopWatch.stop();
@@ -241,7 +246,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                     if (testDescriptor instanceof TestMethodTestDescriptor) {
                                         ExecutableTestDescriptor executableTestDescriptor =
                                                 (ExecutableTestDescriptor) testDescriptor;
-                                        executableTestDescriptor.skip(executionRequest);
+                                        executableTestDescriptor.skip(executionContext);
                                     }
                                 });
 
@@ -256,7 +261,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         getMetadata().put(MetadataTestDescriptorConstants.TEST_ARGUMENT, testArgument);
     }
 
-    private void afterAllMethods() throws Throwable {
+    private void afterAllMethods(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+
         LOGGER.trace(
                 "afterAllMethods() testClass [%s] testInstance [%s]",
                 testInstance.getClass().getName(), testInstance);
@@ -269,7 +276,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         }
     }
 
-    private void clearRandomFields() throws Throwable {
+    private void clearRandomFields(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+
         LOGGER.trace(
                 "clearRandomFields() testClass [%s] testInstance [%s]",
                 testInstance.getClass().getName(), testInstance);
@@ -277,7 +286,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         RandomAnnotationSupport.clearRandomFields(testInstance);
     }
 
-    private void clearArgumentFields() throws Throwable {
+    private void clearArgumentFields(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+
         LOGGER.trace(
                 "clearArgumentFields() testClass [%s] testInstance [%s]",
                 testInstance.getClass().getName(), testInstance);

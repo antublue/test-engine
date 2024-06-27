@@ -19,9 +19,9 @@ package org.antublue.test.engine.internal.descriptor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.util.StopWatch;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
-import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
@@ -52,16 +52,16 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
     /**
      * Method to execute the test descriptor
      *
-     * @param executionRequest executionRequest
+     * @param executionContext executionContext
      */
-    public abstract void execute(ExecutionRequest executionRequest, Object testInstance);
+    public abstract void execute(ExecutionContext executionContext);
 
     /**
      * Method to skip child test descriptors
      *
-     * @param executionRequest executionRequest
+     * @param executionContext executionContext
      */
-    public abstract void skip(ExecutionRequest executionRequest);
+    public abstract void skip(ExecutionContext executionContext);
 
     @Override
     public Metadata getMetadata() {
