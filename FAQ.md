@@ -63,7 +63,8 @@ Use a `Locks` to get a `LockReference` or use `Locks.executeInLock()`
 
 ### I want to use the AntuBLUE test engine in place of JUnit 5
 
-You *could* use the AntuBLUE test engine in place of Junit 5 for some test scenarios, but that's not the projects goal.
+You *could* use the AntuBLUE test engine in place of Junit 5 for some test scenarios, but that's not the project's goal.
+
 
 - **It's not a "drop in" replacement**
 
