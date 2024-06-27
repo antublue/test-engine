@@ -25,7 +25,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import java.io.Closeable;
 import java.util.Random;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
@@ -43,15 +42,17 @@ import org.testcontainers.utility.DockerImageName;
 @TestEngine.Disabled
 public class MongoDBTest {
 
+    private Network network;
     private String name;
-
-    private static Network network;
 
     @TestEngine.Argument public MongoDBTestEnvironment mongoDBTestEnvironment;
 
     @TestEngine.ArgumentSupplier
     public static Stream<MongoDBTestEnvironment> arguments() {
-        return Stream.of(MongoDBTestEnvironment.of("mongo:4.0.10"));
+        return Stream.of(
+                new MongoDBTestEnvironment("mongo:4.0.8"),
+                new MongoDBTestEnvironment("mongo:4.0.9"),
+                new MongoDBTestEnvironment("mongo:4.0.10"));
     }
 
     @TestEngine.Prepare
@@ -66,25 +67,24 @@ public class MongoDBTest {
 
     @TestEngine.BeforeAll
     public void startTestContainer() {
-        info("starting test container ...");
-
-        mongoDBTestEnvironment.start(network);
-
-        info("test container started");
+        mongoDBTestEnvironment.initialize(network);
     }
 
     @TestEngine.Test
     @TestEngine.Order(order = 1)
-    public void testInsert() throws Throwable {
+    public void testInsert() {
         info("testing testInsert() ...");
 
         name = randomString(16);
+        info("name [%s]", name);
 
         MongoClientSettings settings =
                 MongoClientSettings.builder()
                         .applyConnectionString(
                                 new ConnectionString(
-                                        mongoDBTestEnvironment.getPayload().getConnectionString()))
+                                        mongoDBTestEnvironment
+                                                .getMongoDBContainer()
+                                                .getConnectionString()))
                         .build();
 
         try (MongoClient mongoClient = MongoClients.create(settings)) {
@@ -101,36 +101,44 @@ public class MongoDBTest {
     @TestEngine.Order(order = 2)
     public void testQuery() {
         info("testing testQuery() ...");
+        info("name [%s]", name);
 
         MongoClientSettings settings =
                 MongoClientSettings.builder()
                         .applyConnectionString(
                                 new ConnectionString(
-                                        mongoDBTestEnvironment.getPayload().getConnectionString()))
+                                        mongoDBTestEnvironment
+                                                .getMongoDBContainer()
+                                                .getConnectionString()))
                         .build();
 
         try (MongoClient mongoClient = MongoClients.create(settings)) {
             MongoDatabase database = mongoClient.getDatabase("test-db");
             MongoCollection<Document> collection = database.getCollection("users");
-            Document query = new Document("name", name).append("age", 30);
+            Document query = new Document("name", name);
             Document result = collection.find(query).first();
             assertThat(result).isNotNull();
             assertThat(result.get("name")).isEqualTo(name);
+            assertThat(result.get("age")).isEqualTo(30);
         }
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        mongoDBTestEnvironment.close();
+        mongoDBTestEnvironment.destroy();
     }
 
     @TestEngine.Conclude
     public void conclude() {
+        info("destroying network ...");
+
         network.close();
+
+        info("network destroyed");
     }
 
     /** Class to implement a TestContext */
-    public static class MongoDBTestEnvironment implements Argument<MongoDBContainer>, Closeable {
+    public static class MongoDBTestEnvironment implements Argument<MongoDBTestEnvironment> {
 
         private final String dockerImageName;
         private MongoDBContainer mongoDBContainer;
@@ -160,17 +168,17 @@ public class MongoDBTest {
          * @return the payload
          */
         @Override
-        public MongoDBContainer getPayload() {
-            return mongoDBContainer;
+        public MongoDBTestEnvironment getPayload() {
+            return this;
         }
 
         /**
-         * Method to start the MongoDBTestEnvironment using a specific network
+         * Method to initialize the MongoDBTestEnvironment using a specific network
          *
          * @param network the network
          */
-        public void start(Network network) {
-            info("test container [%s] starting ...", dockerImageName);
+        public void initialize(Network network) {
+            info("initializing test environment [%s] ...", dockerImageName);
 
             mongoDBContainer = new MongoDBContainer(DockerImageName.parse(dockerImageName));
             mongoDBContainer.withNetwork(network);
@@ -179,26 +187,20 @@ public class MongoDBTest {
             info("test container [%s] started", dockerImageName);
         }
 
-        /** Method to close (shutdown) the MongoDBTestEnvironment */
-        public void close() {
-            info("test container [%s] stopping ..", dockerImageName);
+        public MongoDBContainer getMongoDBContainer() {
+            return mongoDBContainer;
+        }
+
+        /** Method to destroy the MongoDBTestEnvironment */
+        public void destroy() {
+            info("destroying test environment [%s] ...", dockerImageName);
 
             if (mongoDBContainer != null) {
                 mongoDBContainer.stop();
                 mongoDBContainer = null;
             }
 
-            info("test container [%s] stopped", dockerImageName);
-        }
-
-        /**
-         * Method to create a MongoDBTestEnvironment
-         *
-         * @param dockerImageName the name
-         * @return a MongoDBTestEnvironment
-         */
-        public static MongoDBTestEnvironment of(String dockerImageName) {
-            return new MongoDBTestEnvironment(dockerImageName);
+            info("test environment [%s] destroyed", dockerImageName);
         }
     }
 

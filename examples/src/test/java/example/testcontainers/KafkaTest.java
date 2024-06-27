@@ -19,7 +19,6 @@ package example.testcontainers;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.Closeable;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
@@ -53,15 +52,14 @@ public class KafkaTest {
     private static final String GROUP_ID = "test-group-id";
     private static final String EARLIEST = "earliest";
 
+    private Network network;
     private String message;
-
-    private static Network network;
 
     @TestEngine.Argument public KafkaTestEnvironment kafkaTestEnvironment;
 
     @TestEngine.ArgumentSupplier
     public static Stream<KafkaTestEnvironment> arguments() {
-        return Stream.of(KafkaTestEnvironment.of("apache/kafka:3.7.0"));
+        return Stream.of(new KafkaTestEnvironment("apache/kafka:3.7.0"));
     }
 
     @TestEngine.Prepare
@@ -76,11 +74,7 @@ public class KafkaTest {
 
     @TestEngine.BeforeAll
     public void startTestContainer() {
-        info("starting test container ...");
-
-        kafkaTestEnvironment.start(network);
-
-        info("test container started");
+        kafkaTestEnvironment.initialize(network);
     }
 
     @TestEngine.Test
@@ -90,7 +84,7 @@ public class KafkaTest {
 
         message = randomString(16);
 
-        String bootstrapServers = kafkaTestEnvironment.getPayload().getBootstrapServers();
+        String bootstrapServers = kafkaTestEnvironment.getKafkaContainer().getBootstrapServers();
 
         info("producing message [%s] to [%s] ...", message, bootstrapServers);
 
@@ -114,7 +108,7 @@ public class KafkaTest {
     public void testConsume1() {
         info("testing testConsume() ...");
 
-        String bootstrapServers = kafkaTestEnvironment.getPayload().getBootstrapServers();
+        String bootstrapServers = kafkaTestEnvironment.getKafkaContainer().getBootstrapServers();
 
         info("consuming message from [%s] ...", bootstrapServers);
 
@@ -153,7 +147,7 @@ public class KafkaTest {
     public void testConsume2() {
         info("testing testConsume2() ...");
 
-        String bootstrapServers = kafkaTestEnvironment.getPayload().getBootstrapServers();
+        String bootstrapServers = kafkaTestEnvironment.getKafkaContainer().getBootstrapServers();
 
         info("consuming message from [%s] ...", bootstrapServers);
 
@@ -189,16 +183,20 @@ public class KafkaTest {
 
     @TestEngine.AfterAll
     public void afterAll() {
-        kafkaTestEnvironment.close();
+        kafkaTestEnvironment.destroy();
     }
 
     @TestEngine.Conclude
     public void conclude() {
+        info("destroying network ...");
+
         network.close();
+
+        info("network destroyed");
     }
 
     /** Class to implement a TestContext */
-    public static class KafkaTestEnvironment implements Argument<KafkaContainer>, Closeable {
+    public static class KafkaTestEnvironment implements Argument<KafkaTestEnvironment> {
 
         private final String dockerImageName;
         private KafkaContainer kafkaContainer;
@@ -228,45 +226,39 @@ public class KafkaTest {
          * @return the payload
          */
         @Override
-        public KafkaContainer getPayload() {
-            return kafkaContainer;
+        public KafkaTestEnvironment getPayload() {
+            return this;
         }
 
         /**
-         * Method to start the KafkaTestEnvironment using a specific network
+         * Method to initialize the KafkaTestEnvironment using a specific network
          *
          * @param network the network
          */
-        public void start(Network network) {
-            info("test container [%s] starting ...", dockerImageName);
+        public void initialize(Network network) {
+            info("initialize test environment [%s] ...", dockerImageName);
 
             kafkaContainer = new KafkaContainer(DockerImageName.parse(dockerImageName));
             kafkaContainer.withNetwork(network);
             kafkaContainer.start();
 
-            info("test container [%s] started", dockerImageName);
+            info("test environment [%s] initialized", dockerImageName);
         }
 
-        /** Method to close (shutdown) the KafkaTestEnvironment */
-        public void close() {
-            info("test container [%s] stopping ..", dockerImageName);
+        public KafkaContainer getKafkaContainer() {
+            return kafkaContainer;
+        }
+
+        /** Method to destroy the KafkaTestEnvironment */
+        public void destroy() {
+            info("destroying test environment [%s] ...", dockerImageName);
 
             if (kafkaContainer != null) {
                 kafkaContainer.stop();
                 kafkaContainer = null;
             }
 
-            info("test container [%s] stopped", dockerImageName);
-        }
-
-        /**
-         * Method to create a KafkaTestEnvironment
-         *
-         * @param dockerImageName the name
-         * @return a KafkaTestEnvironment
-         */
-        public static KafkaTestEnvironment of(String dockerImageName) {
-            return new KafkaTestEnvironment(dockerImageName);
+            info("test environment [%s] destroyed", dockerImageName);
         }
     }
 
