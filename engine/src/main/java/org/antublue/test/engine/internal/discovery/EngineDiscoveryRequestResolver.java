@@ -361,7 +361,8 @@ public class EngineDiscoveryRequestResolver {
             throw new TestClassDefinitionException(
                     format(
                             "testClass [%s] @TestEngine.ArgumentSupplier must return a"
-                                    + " Stream<Argument> or Iterable<Argument>, or Argument<?> ... type returned [%s]",
+                                + " Stream<Argument> or Iterable<Argument>, or Argument<?> ... type"
+                                + " returned [%s]",
                             testClass.getName(), object.getClass().getName()));
         }
 
