@@ -16,6 +16,12 @@
 
 package org.antublue.test.engine.internal.support;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /** Class to implement ObjectSupport */
 @SuppressWarnings("unchecked")
 public class ObjectSupport {
@@ -35,5 +41,37 @@ public class ObjectSupport {
      */
     public static <T> T createObject(Class<?> clazz) throws Throwable {
         return (T) clazz.getConstructor().newInstance();
+    }
+
+    /**
+     * Method to convert a list Methods to a String representation
+     *
+     * @param methods methods
+     * @return a String representation of the Methods
+     */
+    public static String toString(Method... methods) {
+        return toString(Arrays.stream(methods).collect(Collectors.toList()));
+    }
+
+    /**
+     * Method to convert a list Methods to a String representation
+     *
+     * @param methods methods
+     * @return a String representation of the Methods
+     */
+    public static String toString(List<Method> methods) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (methods != null) {
+            Iterator<Method> iterator = methods.iterator();
+            while (iterator.hasNext()) {
+                stringBuilder.append(iterator.next().getName());
+                if (iterator.hasNext()) {
+                    stringBuilder.append(", ");
+                }
+            }
+        }
+
+        return stringBuilder.toString();
     }
 }

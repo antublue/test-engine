@@ -29,6 +29,7 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.support.ArgumentAnnotationSupport;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
+import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
 import org.antublue.test.engine.internal.util.Predicates;
@@ -87,7 +88,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
     @Override
     public void execute(ExecutionContext executionContext) {
-        LOGGER.trace("execute(ExecutionContext executionContext)");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("execute(ExecutionContext executionContext)");
+        }
 
         Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
         Preconditions.notNull(testInstance, "testInstance is null");
@@ -149,8 +152,11 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         }
     }
 
+    @Override
     public void skip(ExecutionContext executionContext) {
-        LOGGER.trace("skip(ExecutionContext executionContext)");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("skip(ExecutionContext executionContext)");
+        }
 
         stopWatch.reset();
 
@@ -184,12 +190,30 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 .executionSkipped(this, format("Argument [%s] skipped", testArgument));
     }
 
+    @Override
+    public String toString() {
+        return getClass().getName()
+                + "{ "
+                + "testClass ["
+                + testClass.getName()
+                + "]"
+                + " beforeAllMethods ["
+                + ObjectSupport.toString(beforeAllMethods)
+                + "]"
+                + " afterAllMethods ["
+                + ObjectSupport.toString(afterAllMethods)
+                + "]"
+                + " }";
+    }
+
     private void setArgumentFields(ExecutionContext executionContext) throws Throwable {
         Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
-        LOGGER.trace(
-                "setArgumentFields() testClass [%s] testInstance [%s] testArgument [%s]",
-                testInstance.getClass().getName(), testInstance, testArgument);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "setArgumentFields() testClass [%s] testInstance [%s] testArgument [%s]",
+                    testInstance.getClass().getName(), testInstance, testArgument);
+        }
 
         ArgumentAnnotationSupport.setArgumentFields(testInstance, testArgument);
     }
@@ -197,9 +221,11 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void setRandomFields(ExecutionContext executionContext) throws Throwable {
         Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
-        LOGGER.trace(
-                "setRandomFields() testClass [%s] testInstance [%s] testArgument [%s]",
-                testInstance.getClass().getName(), testInstance, testArgument);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "setRandomFields() testClass [%s] testInstance [%s] testArgument [%s]",
+                    testInstance.getClass().getName(), testInstance, testArgument);
+        }
 
         RandomAnnotationSupport.setRandomFields(testInstance);
     }
@@ -207,20 +233,27 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void beforeAllMethods(ExecutionContext executionContext) throws Throwable {
         Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
-        LOGGER.trace(
-                "beforeAllMethods() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "beforeAllMethods() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+        }
 
         for (Method method : beforeAllMethods) {
-            LOGGER.trace(
-                    "beforeAllMethods() testClass [%s] testInstance [%s] method [%s]",
-                    testInstance.getClass().getName(), testInstance, method);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(
+                        "beforeAllMethods() testClass [%s] testInstance [%s] method [%s]",
+                        testInstance.getClass().getName(), testInstance, method);
+            }
+
             method.invoke(testInstance);
         }
     }
 
     private void doExecute(ExecutionContext executionContext) {
-        LOGGER.trace("execute() testClass [%s]", testClass.getName());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("execute() testClass [%s]", testClass.getName());
+        }
 
         getChildren()
                 .forEach(
@@ -235,7 +268,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void doSkip(ExecutionContext executionContext) {
-        LOGGER.trace("skip() testClass [%s]", testClass.getName());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("skip() testClass [%s]", testClass.getName());
+        }
 
         stopWatch.stop();
 
@@ -264,14 +299,19 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void afterAllMethods(ExecutionContext executionContext) throws Throwable {
         Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
-        LOGGER.trace(
-                "afterAllMethods() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "afterAllMethods() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+        }
 
         for (Method method : afterAllMethods) {
-            LOGGER.trace(
-                    "afterAllMethods() testClass [%s] testInstance [%s] method [%s]",
-                    testInstance.getClass().getName(), testInstance, method);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(
+                        "afterAllMethods() testClass [%s] testInstance [%s] method [%s]",
+                        testInstance.getClass().getName(), testInstance, method);
+            }
+
             method.invoke(testInstance);
         }
     }
@@ -279,9 +319,11 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void clearRandomFields(ExecutionContext executionContext) throws Throwable {
         Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
-        LOGGER.trace(
-                "clearRandomFields() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "clearRandomFields() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+        }
 
         RandomAnnotationSupport.clearRandomFields(testInstance);
     }
@@ -289,9 +331,11 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private void clearArgumentFields(ExecutionContext executionContext) throws Throwable {
         Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
-        LOGGER.trace(
-                "clearArgumentFields() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "clearArgumentFields() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+        }
 
         ArgumentAnnotationSupport.setArgumentFields(testInstance, null);
     }
@@ -319,11 +363,15 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                         ArgumentTestDescriptor.class.getName(),
                         testArgumentIndex + "/" + testArgument.getName());
 
-        LOGGER.trace("uniqueId [%s]", uniqueId);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("uniqueId [%s]", uniqueId);
+        }
 
         String displayName = testArgument.getName();
 
-        LOGGER.trace("displayName [%s]", displayName);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("displayName [%s]", displayName);
+        }
 
         List<Method> beforeAllMethods =
                 ReflectionSupport.findMethods(

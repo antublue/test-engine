@@ -27,6 +27,7 @@ import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
+import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
@@ -87,7 +88,9 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
 
     @Override
     public void execute(ExecutionContext executionContext) {
-        LOGGER.trace("execute(ExecutionContext executionContext)");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("execute(ExecutionContext executionContext) %s", toString());
+        }
 
         Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
         Preconditions.notNull(testInstance, "testInstance is null");
@@ -142,8 +145,11 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         }
     }
 
+    @Override
     public void skip(ExecutionContext executionContext) {
-        LOGGER.trace("skip(ExecutionContext executionContext)");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("skip(ExecutionContext executionContext) %s", toString());
+        }
 
         stopWatch.reset();
 
@@ -172,17 +178,40 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                                 testArgument, testMethod.getName()));
     }
 
+    @Override
+    public String toString() {
+        return getClass().getName()
+                + "{ "
+                + "testClass ["
+                + testClass.getName()
+                + "]"
+                + " beforeEachMethods ["
+                + ObjectSupport.toString(beforeEachMethods)
+                + "]"
+                + " testMethod ["
+                + testMethod.getName()
+                + " afterEachMethods ["
+                + ObjectSupport.toString(afterEachMethods)
+                + "]"
+                + " }";
+    }
+
     private void beforeEach(ExecutionContext executionContext) throws Throwable {
         Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
-        LOGGER.trace(
-                "beforeEach() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "beforeEach() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+        }
 
         for (Method method : beforeEachMethods) {
-            LOGGER.trace(
-                    "beforeEach() testClass [%s] testInstance [%s] method [%s]",
-                    testInstance.getClass().getName(), testInstance, method);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(
+                        "beforeEach() testClass [%s] testInstance [%s] method [%s]",
+                        testInstance.getClass().getName(), testInstance, method);
+            }
+
             method.invoke(testInstance);
         }
     }
@@ -190,23 +219,31 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     private void test(ExecutionContext executionContext) throws Throwable {
         Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
-        LOGGER.trace(
-                "test() testClass [%s] testInstance [%s] method [%s]",
-                testInstance.getClass().getName(), testInstance, testMethod);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "test() testClass [%s] testInstance [%s] method [%s]",
+                    testInstance.getClass().getName(), testInstance, testMethod);
+        }
+
         testMethod.invoke(testInstance);
     }
 
     private void afterEach(ExecutionContext executionContext) throws Throwable {
         Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
-        LOGGER.trace(
-                "afterEach() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "afterEach() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+        }
 
         for (Method method : afterEachMethods) {
-            LOGGER.trace(
-                    "afterEach() testClass [%s] testInstance [%s] method [%s]",
-                    testInstance.getClass().getName(), testInstance, method);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(
+                        "afterEach() testClass [%s] testInstance [%s] method [%s]",
+                        testInstance.getClass().getName(), testInstance, method);
+            }
+
             method.invoke(testInstance);
         }
     }
@@ -234,7 +271,15 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                 parentUniqueId.append(
                         TestMethodTestDescriptor.class.getName(), testMethod.getName());
 
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("uniqueId [%s]", uniqueId);
+        }
+
         String displayName = DisplayNameSupport.getDisplayName(testMethod);
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("displayName [%s]", displayName);
+        }
 
         List<Method> beforeEachMethods =
                 ReflectionSupport.findMethods(
@@ -243,12 +288,22 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         beforeEachMethods =
                 OrdererSupport.orderTestMethods(beforeEachMethods, HierarchyTraversalMode.TOP_DOWN);
 
+        if (LOGGER.isTraceEnabled() && !beforeEachMethods.isEmpty()) {
+            beforeEachMethods.forEach(
+                    method -> LOGGER.trace("beforeEachMethods method [%s]", method));
+        }
+
         List<Method> afterEachMethods =
                 ReflectionSupport.findMethods(
                         testClass, Predicates.AFTER_EACH_METHOD, HierarchyTraversalMode.BOTTOM_UP);
 
         afterEachMethods =
                 OrdererSupport.orderTestMethods(afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
+
+        if (LOGGER.isTraceEnabled() && !afterEachMethods.isEmpty()) {
+            afterEachMethods.forEach(
+                    method -> LOGGER.trace("afterEachMethods method [%s]", method));
+        }
 
         return new TestMethodTestDescriptor(
                 uniqueId,

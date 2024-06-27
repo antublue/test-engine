@@ -182,9 +182,11 @@ public class EngineDiscoveryRequestResolver {
      */
     private static void buildTestMethodTestDescriptor(
             TestDescriptor parentTestDescriptor, Class<?> testClass, Argument<?> testArgument) {
-        LOGGER.trace(
-                "buildTestMethodTestDescriptor() testClass [%s] testArgument [%s]",
-                testClass.getName(), testArgument.getName());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "buildTestMethodTestDescriptor() testClass [%s] testArgument [%s]",
+                    testClass.getName(), testArgument.getName());
+        }
 
         List<Method> testMethods =
                 ReflectionSupport.findMethods(
@@ -214,7 +216,9 @@ public class EngineDiscoveryRequestResolver {
      */
     private static List<Class<?>> resolveEngineDiscoveryRequest(
             EngineDiscoveryRequest engineDiscoveryRequest) throws Throwable {
-        LOGGER.trace("resolveEngineDiscoveryRequest()");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("resolveEngineDiscoveryRequest()");
+        }
 
         Set<Class<?>> testClassSet = new HashSet<>();
 
@@ -222,10 +226,15 @@ public class EngineDiscoveryRequestResolver {
                 engineDiscoveryRequest.getSelectorsByType(ClasspathRootSelector.class);
 
         for (DiscoverySelector discoverySelector : discoverySelectors) {
-            LOGGER.trace("ClasspathRootSelector...");
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("ClasspathRootSelector...");
+            }
 
             ClasspathRootSelector classpathRootSelector = (ClasspathRootSelector) discoverySelector;
-            LOGGER.trace("classpathRoot [%s]", classpathRootSelector.getClasspathRoot());
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("classpathRoot [%s]", classpathRootSelector.getClasspathRoot());
+            }
 
             List<Class<?>> testClasses =
                     ReflectionSupport.findAllClassesInClasspathRoot(
@@ -234,15 +243,20 @@ public class EngineDiscoveryRequestResolver {
                             className -> true);
 
             for (Class<?> testClass : testClasses) {
-                LOGGER.trace("testClass [%s]", testClass.getName());
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("testClass [%s]", testClass.getName());
+                }
 
                 List<? extends ClassNameFilter> classNameFilters =
                         engineDiscoveryRequest.getFiltersByType(ClassNameFilter.class);
 
                 Predicate<String> predicate = composeFilters(classNameFilters).toPredicate();
                 if (!predicate.test(testClass.getName())) {
-                    LOGGER.trace(
-                            "ignoring testClass [%s] (class name filter)", testClass.getName());
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace(
+                                "ignoring testClass [%s] (class name filter)", testClass.getName());
+                    }
+
                     continue;
                 }
 
@@ -251,8 +265,12 @@ public class EngineDiscoveryRequestResolver {
 
                 predicate = composeFilters(packageNameFilters).toPredicate();
                 if (!predicate.test(testClass.getPackage().getName())) {
-                    LOGGER.trace(
-                            "ignoring testClass [%s] (package name filter)", testClass.getName());
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace(
+                                "ignoring testClass [%s] (package name filter)",
+                                testClass.getName());
+                    }
+
                     continue;
                 }
 
@@ -262,12 +280,16 @@ public class EngineDiscoveryRequestResolver {
 
         discoverySelectors = engineDiscoveryRequest.getSelectorsByType(PackageSelector.class);
         for (DiscoverySelector discoverySelector : discoverySelectors) {
-            LOGGER.trace("PackageSelector...");
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("PackageSelector...");
+            }
 
             PackageSelector packageSelector = (PackageSelector) discoverySelector;
             String packageName = packageSelector.getPackageName();
 
-            LOGGER.trace("packageName [%s]", packageName);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("packageName [%s]", packageName);
+            }
 
             List<Class<?>> javaClasses =
                     ReflectionSupport.findAllClassesInPackage(
@@ -278,7 +300,9 @@ public class EngineDiscoveryRequestResolver {
 
         discoverySelectors = engineDiscoveryRequest.getSelectorsByType(ClassSelector.class);
         for (DiscoverySelector discoverySelector : discoverySelectors) {
-            LOGGER.trace("ClassSelector...");
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("ClassSelector...");
+            }
 
             ClassSelector classSelector = (ClassSelector) discoverySelector;
             Class<?> testClass = classSelector.getJavaClass();
@@ -286,36 +310,48 @@ public class EngineDiscoveryRequestResolver {
             if (Predicates.TEST_CLASS.test(testClass)) {
                 testClassSet.add(testClass);
             } else {
-                LOGGER.trace("filtering javaClass [%s]", testClass.getName());
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("filtering javaClass [%s]", testClass.getName());
+                }
             }
         }
 
         discoverySelectors = engineDiscoveryRequest.getSelectorsByType(MethodSelector.class);
         for (DiscoverySelector discoverySelector : discoverySelectors) {
-            LOGGER.trace("MethodSelector...");
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("MethodSelector...");
+            }
 
             MethodSelector methodSelector = (MethodSelector) discoverySelector;
             Class<?> testClass = methodSelector.getJavaClass();
             Method testMethod = methodSelector.getJavaMethod();
 
-            LOGGER.trace("testMethod [%s]", testMethod.getName());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("testMethod [%s]", testMethod.getName());
+            }
 
             if (Predicates.TEST_CLASS.test(testClass) && Predicates.TEST_METHOD.test(testMethod)) {
                 testClassSet.add(testClass);
             } else {
-                LOGGER.trace("filtering testClass [%s]", testClass.getName());
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("filtering testClass [%s]", testClass.getName());
+                }
             }
         }
 
         discoverySelectors = engineDiscoveryRequest.getSelectorsByType(UniqueIdSelector.class);
         for (DiscoverySelector discoverySelector : discoverySelectors) {
-            LOGGER.trace("UniqueIdSelector...");
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("UniqueIdSelector...");
+            }
 
             UniqueIdSelector uniqueIdSelector = (UniqueIdSelector) discoverySelector;
             UniqueId uniqueId = uniqueIdSelector.getUniqueId();
             List<UniqueId.Segment> segments = uniqueId.getSegments();
 
-            LOGGER.trace("uniqueId [%s]", uniqueId);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("uniqueId [%s]", uniqueId);
+            }
 
             for (UniqueId.Segment segment : segments) {
                 String segmentType = segment.getType();
@@ -345,6 +381,10 @@ public class EngineDiscoveryRequestResolver {
      * @throws Throwable Throwable
      */
     private static List<Argument<?>> getArguments(Class<?> testClass) throws Throwable {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("getArguments() testClass [%s]", testClass.getName());
+        }
+
         List<Argument<?>> testArguments = new ArrayList<>();
 
         Object object = getArumentSupplierMethod(testClass).invoke(null, (Object[]) null);
@@ -396,6 +436,10 @@ public class EngineDiscoveryRequestResolver {
      * @return the argument supplier method
      */
     private static Method getArumentSupplierMethod(Class<?> testClass) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("getArumentSupplierMethod() testClass [%s]", testClass.getName());
+        }
+
         List<Method> methods =
                 ReflectionSupport.findMethods(
                         testClass,
@@ -411,11 +455,15 @@ public class EngineDiscoveryRequestResolver {
      * @param testClasses testClasses
      */
     private void filterTestClassesByClassName(List<Class<?>> testClasses) {
-        LOGGER.trace("filterTestClassesByName()");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("filterTestClassesByName()");
+        }
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_INCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_INCLUDE_REGEX, optional.get());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_INCLUDE_REGEX, optional.get());
+            }
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -425,7 +473,10 @@ public class EngineDiscoveryRequestResolver {
                 Class<?> clazz = iterator.next();
                 matcher.reset(clazz.getName());
                 if (!matcher.find()) {
-                    LOGGER.trace("removing testClass [%s]", clazz.getName());
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace("removing testClass [%s]", clazz.getName());
+                    }
+
                     iterator.remove();
                 }
             }
@@ -433,7 +484,9 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_CLASS_EXCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_EXCLUDE_REGEX, optional.get());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_EXCLUDE_REGEX, optional.get());
+            }
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -455,11 +508,15 @@ public class EngineDiscoveryRequestResolver {
      * @param testClasses testClasses
      */
     private void filterTestClassesByTags(List<Class<?>> testClasses) {
-        LOGGER.trace("filterTestClassesByTags()");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("filterTestClassesByTags()");
+        }
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_TAG_INCLUDE_REGEX, optional.get());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_TAG_INCLUDE_REGEX, optional.get());
+            }
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -469,12 +526,18 @@ public class EngineDiscoveryRequestResolver {
                 Class<?> clazz = iterator.next();
                 String tag = TagSupport.getTag(clazz);
                 if (tag == null) {
-                    LOGGER.trace("removing testClass [%s]", clazz.getName());
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace("removing testClass [%s]", clazz.getName());
+                    }
+
                     iterator.remove();
                 } else {
                     matcher.reset(tag);
                     if (!matcher.find()) {
-                        LOGGER.trace("removing testClass [%s]", clazz.getName());
+                        if (LOGGER.isTraceEnabled()) {
+                            LOGGER.trace("removing testClass [%s]", clazz.getName());
+                        }
+
                         iterator.remove();
                     }
                 }
@@ -483,7 +546,9 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_CLASS_TAG_EXCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_TAG_EXCLUDE_REGEX, optional.get());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(" %s [%s]", Constants.TEST_CLASS_TAG_EXCLUDE_REGEX, optional.get());
+            }
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -495,7 +560,10 @@ public class EngineDiscoveryRequestResolver {
                 if (tag != null) {
                     matcher.reset(tag);
                     if (matcher.find()) {
-                        LOGGER.trace("removing testClass [%s]", clazz.getName());
+                        if (LOGGER.isTraceEnabled()) {
+                            LOGGER.trace("removing testClass [%s]", clazz.getName());
+                        }
+
                         iterator.remove();
                     }
                 }
@@ -509,11 +577,15 @@ public class EngineDiscoveryRequestResolver {
      * @param testMethods testMethods
      */
     private static void filterTestMethodsByMethodName(List<Method> testMethods) {
-        LOGGER.trace("filterTestMethodsByMethodName()");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("filterTestMethodsByMethodName()");
+        }
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_INCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(" %s [%s]", Constants.TEST_METHOD_INCLUDE_REGEX, optional.get());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(" %s [%s]", Constants.TEST_METHOD_INCLUDE_REGEX, optional.get());
+            }
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -523,9 +595,12 @@ public class EngineDiscoveryRequestResolver {
                 Method testMethod = iterator.next();
                 matcher.reset(DisplayNameSupport.getDisplayName(testMethod));
                 if (!matcher.find()) {
-                    LOGGER.trace(
-                            "removing testClass [%s] testMethod [%s]",
-                            testMethod.getClass().getName(), testMethod.getName());
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace(
+                                "removing testClass [%s] testMethod [%s]",
+                                testMethod.getClass().getName(), testMethod.getName());
+                    }
+
                     iterator.remove();
                 }
             }
@@ -533,7 +608,9 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_METHOD_EXCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace(" %s [%s]", Constants.TEST_METHOD_EXCLUDE_REGEX, optional.get());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(" %s [%s]", Constants.TEST_METHOD_EXCLUDE_REGEX, optional.get());
+            }
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -543,9 +620,12 @@ public class EngineDiscoveryRequestResolver {
                 Method testMethod = iterator.next();
                 matcher.reset(DisplayNameSupport.getDisplayName(testMethod));
                 if (matcher.find()) {
-                    LOGGER.trace(
-                            "removing testClass [%s] testMethod [%s]",
-                            testMethod.getClass().getName(), testMethod.getName());
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace(
+                                "removing testClass [%s] testMethod [%s]",
+                                testMethod.getClass().getName(), testMethod.getName());
+                    }
+
                     iterator.remove();
                 }
             }
@@ -558,11 +638,15 @@ public class EngineDiscoveryRequestResolver {
      * @param testMethods testMethods
      */
     private static void filterTestMethodsByTags(List<Method> testMethods) {
-        LOGGER.trace("filterTestMethodsByTag()");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("filterTestMethodsByTag()");
+        }
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_INCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_TAG_INCLUDE_REGEX, optional.get());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("%s [%s]", Constants.TEST_METHOD_TAG_INCLUDE_REGEX, optional.get());
+            }
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -584,7 +668,9 @@ public class EngineDiscoveryRequestResolver {
 
         optional = CONFIGURATION.get(Constants.TEST_METHOD_TAG_EXCLUDE_REGEX);
         if (optional.isPresent()) {
-            LOGGER.trace("%s [%s]", Constants.TEST_METHOD_TAG_EXCLUDE_REGEX, optional.get());
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("%s [%s]", Constants.TEST_METHOD_TAG_EXCLUDE_REGEX, optional.get());
+            }
 
             Pattern pattern = Pattern.compile(optional.get());
             Matcher matcher = pattern.matcher("");
@@ -609,6 +695,10 @@ public class EngineDiscoveryRequestResolver {
      * @param testDescriptor testDescriptor
      */
     private static void prune(TestDescriptor testDescriptor) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("prune() testDescriptor [%s]", testDescriptor);
+        }
+
         Set<? extends TestDescriptor> children = new LinkedHashSet<>(testDescriptor.getChildren());
         for (TestDescriptor child : children) {
             prune(child);
@@ -632,11 +722,15 @@ public class EngineDiscoveryRequestResolver {
      * @param engineDescriptor engineDescriptor
      */
     private static void shuffle(EngineDescriptor engineDescriptor) {
-        LOGGER.trace("shuffle()");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("shuffle()");
+        }
 
         Optional<String> optional = CONFIGURATION.get(Constants.TEST_CLASS_SHUFFLE);
         if (optional.isPresent()) {
-            LOGGER.trace("shuffling...");
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("shuffling...");
+            }
 
             /*
             engineDescriptor.getChildren() return an
