@@ -24,7 +24,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.platform.commons.util.UnrecoverableExceptions;
 import org.junit.platform.engine.TestExecutionResult;
 
-/** Class to implement PrintStackTraceThrowableCollector */
+/** Class to implement ThrowableCollector */
 public class ThrowableCollector {
 
     private final List<Throwable> throwables;
