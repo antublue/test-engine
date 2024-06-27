@@ -22,15 +22,17 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.internal.execution.EngineExecutionContextConstants;
+import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
+import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
-import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -46,7 +48,6 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> beforeEachMethods;
     private final Method testMethod;
     private final List<Method> afterEachMethods;
-    private Object testInstance;
 
     /**
      * Constructor
@@ -86,11 +87,13 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     @Override
-    public void execute(ExecutionRequest executionRequest, Object testInstance) {
-        LOGGER.trace("execute(ExecutionRequest executionRequest)");
-        Preconditions.notNull(testInstance, "testInstance is null");
+    public void execute(ExecutionContext executionContext) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("execute(ExecutionContext executionContext) %s", toString());
+        }
 
-        this.testInstance = testInstance;
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Preconditions.notNull(testInstance, "testInstance is null");
 
         stopWatch.reset();
 
@@ -105,13 +108,13 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME, getDisplayName());
 
-        executionRequest.getEngineExecutionListener().executionStarted(this);
+        executionContext.getExecutionRequest().getEngineExecutionListener().executionStarted(this);
 
-        throwableCollector.execute(this::beforeEach);
+        throwableCollector.execute(() -> beforeEach(executionContext));
         if (throwableCollector.isEmpty()) {
-            throwableCollector.execute(this::test);
+            throwableCollector.execute(() -> test(executionContext));
         }
-        throwableCollector.execute(this::afterEach);
+        throwableCollector.execute(() -> afterEach(executionContext));
 
         stopWatch.stop();
 
@@ -126,7 +129,8 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                     .put(
                             MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
                             MetadataTestDescriptorConstants.PASS);
-            executionRequest
+            executionContext
+                    .getExecutionRequest()
                     .getEngineExecutionListener()
                     .executionFinished(this, TestExecutionResult.successful());
         } else {
@@ -134,14 +138,18 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                     .put(
                             MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
                             MetadataTestDescriptorConstants.FAIL);
-            executionRequest
+            executionContext
+                    .getExecutionRequest()
                     .getEngineExecutionListener()
                     .executionFinished(this, throwableCollector.toTestExecutionResult());
         }
     }
 
-    public void skip(ExecutionRequest executionRequest) {
-        LOGGER.trace("skip(ExecutionRequest executionRequest)");
+    @Override
+    public void skip(ExecutionContext executionContext) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("skip(ExecutionContext executionContext) %s", toString());
+        }
 
         stopWatch.reset();
 
@@ -160,7 +168,8 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
                         MetadataTestDescriptorConstants.SKIP);
 
-        executionRequest
+        executionContext
+                .getExecutionRequest()
                 .getEngineExecutionListener()
                 .executionSkipped(
                         this,
@@ -169,35 +178,72 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                                 testArgument, testMethod.getName()));
     }
 
-    private void beforeEach() throws Throwable {
-        LOGGER.trace(
-                "beforeEach() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
+    @Override
+    public String toString() {
+        return getClass().getName()
+                + "{ "
+                + "testClass ["
+                + testClass.getName()
+                + "]"
+                + " beforeEachMethods ["
+                + ObjectSupport.toString(beforeEachMethods)
+                + "]"
+                + " testMethod ["
+                + testMethod.getName()
+                + " afterEachMethods ["
+                + ObjectSupport.toString(afterEachMethods)
+                + "]"
+                + " }";
+    }
+
+    private void beforeEach(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "beforeEach() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+        }
 
         for (Method method : beforeEachMethods) {
-            LOGGER.trace(
-                    "beforeEach() testClass [%s] testInstance [%s] method [%s]",
-                    testInstance.getClass().getName(), testInstance, method);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(
+                        "beforeEach() testClass [%s] testInstance [%s] method [%s]",
+                        testInstance.getClass().getName(), testInstance, method);
+            }
+
             method.invoke(testInstance);
         }
     }
 
-    private void test() throws Throwable {
-        LOGGER.trace(
-                "test() testClass [%s] testInstance [%s] method [%s]",
-                testInstance.getClass().getName(), testInstance, testMethod);
+    private void test(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "test() testClass [%s] testInstance [%s] method [%s]",
+                    testInstance.getClass().getName(), testInstance, testMethod);
+        }
+
         testMethod.invoke(testInstance);
     }
 
-    private void afterEach() throws Throwable {
-        LOGGER.trace(
-                "afterEach() testClass [%s] testInstance [%s]",
-                testInstance.getClass().getName(), testInstance);
+    private void afterEach(ExecutionContext executionContext) throws Throwable {
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "afterEach() testClass [%s] testInstance [%s]",
+                    testInstance.getClass().getName(), testInstance);
+        }
 
         for (Method method : afterEachMethods) {
-            LOGGER.trace(
-                    "afterEach() testClass [%s] testInstance [%s] method [%s]",
-                    testInstance.getClass().getName(), testInstance, method);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(
+                        "afterEach() testClass [%s] testInstance [%s] method [%s]",
+                        testInstance.getClass().getName(), testInstance, method);
+            }
+
             method.invoke(testInstance);
         }
     }
@@ -225,7 +271,15 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                 parentUniqueId.append(
                         TestMethodTestDescriptor.class.getName(), testMethod.getName());
 
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("uniqueId [%s]", uniqueId);
+        }
+
         String displayName = DisplayNameSupport.getDisplayName(testMethod);
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("displayName [%s]", displayName);
+        }
 
         List<Method> beforeEachMethods =
                 ReflectionSupport.findMethods(
@@ -234,12 +288,22 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         beforeEachMethods =
                 OrdererSupport.orderTestMethods(beforeEachMethods, HierarchyTraversalMode.TOP_DOWN);
 
+        if (LOGGER.isTraceEnabled() && !beforeEachMethods.isEmpty()) {
+            beforeEachMethods.forEach(
+                    method -> LOGGER.trace("beforeEachMethods method [%s]", method));
+        }
+
         List<Method> afterEachMethods =
                 ReflectionSupport.findMethods(
                         testClass, Predicates.AFTER_EACH_METHOD, HierarchyTraversalMode.BOTTOM_UP);
 
         afterEachMethods =
                 OrdererSupport.orderTestMethods(afterEachMethods, HierarchyTraversalMode.BOTTOM_UP);
+
+        if (LOGGER.isTraceEnabled() && !afterEachMethods.isEmpty()) {
+            afterEachMethods.forEach(
+                    method -> LOGGER.trace("afterEachMethods method [%s]", method));
+        }
 
         return new TestMethodTestDescriptor(
                 uniqueId,

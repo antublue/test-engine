@@ -19,10 +19,11 @@ package org.antublue.test.engine;
 import java.util.Optional;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.discovery.EngineDiscoveryRequestResolver;
+import org.antublue.test.engine.internal.execution.ExecutionContext;
+import org.antublue.test.engine.internal.execution.ExecutionContextExecutor;
 import org.antublue.test.engine.internal.extension.TestEngineExtensionManager;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
-import org.antublue.test.engine.internal.util.Executor;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -137,7 +138,10 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
                 "execute() rootTestDescriptor children [%d]",
                 executionRequest.getRootTestDescriptor().getChildren().size());
 
-        executionRequest
+        ExecutionContext executionContext = new ExecutionContext(executionRequest);
+
+        executionContext
+                .getExecutionRequest()
                 .getEngineExecutionListener()
                 .executionStarted(executionRequest.getRootTestDescriptor());
 
@@ -149,15 +153,10 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
         if (throwableCollector.isEmpty()) {
             throwableCollector.execute(
                     () -> {
-                        Executor executor = new Executor();
-
-                        executor.execute(
-                                ExecutionRequest.create(
-                                        executionRequest.getRootTestDescriptor(),
-                                        executionRequest.getEngineExecutionListener(),
-                                        Configuration.getInstance()));
-
-                        executor.await();
+                        ExecutionContextExecutor executionContextExecutor =
+                                new ExecutionContextExecutor();
+                        executionContextExecutor.execute(executionContext);
+                        executionContextExecutor.await();
                     });
         }
 
