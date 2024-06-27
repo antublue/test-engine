@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.internal.execution.Constants;
+import org.antublue.test.engine.internal.execution.EngineExecutionContextConstants;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -89,7 +89,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     public void execute(ExecutionContext executionContext) {
         LOGGER.trace("execute(ExecutionContext executionContext)");
 
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
         Preconditions.notNull(testInstance, "testInstance is null");
 
         stopWatch.reset();
@@ -173,7 +173,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void beforeEach(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
         LOGGER.trace(
                 "beforeEach() testClass [%s] testInstance [%s]",
@@ -188,7 +188,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void test(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
         LOGGER.trace(
                 "test() testClass [%s] testInstance [%s] method [%s]",
@@ -197,7 +197,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void afterEach(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
         LOGGER.trace(
                 "afterEach() testClass [%s] testInstance [%s]",

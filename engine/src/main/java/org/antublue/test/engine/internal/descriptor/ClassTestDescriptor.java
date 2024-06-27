@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import org.antublue.test.engine.internal.execution.Constants;
+import org.antublue.test.engine.internal.execution.EngineExecutionContextConstants;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -181,7 +181,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void prepare(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
         LOGGER.trace(
                 "prepare() testClass [%s] testInstance [%s]", testClass.getName(), testInstance);
@@ -204,7 +204,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                 "createTestInstance() testClass [%s] testInstance [%s]",
                 testClass.getName(), testInstance);
 
-        executionContext.put(Constants.TEST_INSTANCE, testInstance);
+        executionContext.put(EngineExecutionContextConstants.TEST_INSTANCE, testInstance);
     }
 
     private void doExecute(ExecutionContext executionContext) {
@@ -253,7 +253,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void conclude(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
         LOGGER.trace(
                 "conclude() testClass [%s] testInstance [%s]", testClass.getName(), testInstance);
@@ -267,7 +267,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void destroyTestInstance(ExecutionContext executionContext) {
-        Object testInstance = executionContext.remove(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.remove(EngineExecutionContextConstants.TEST_INSTANCE);
         LOGGER.trace("destroyTestInstance() testClass [%s]", testClass.getName(), testInstance);
     }
 

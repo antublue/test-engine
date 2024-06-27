@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.internal.execution.Constants;
+import org.antublue.test.engine.internal.execution.EngineExecutionContextConstants;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -89,7 +89,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     public void execute(ExecutionContext executionContext) {
         LOGGER.trace("execute(ExecutionContext executionContext)");
 
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
         Preconditions.notNull(testInstance, "testInstance is null");
 
         stopWatch.reset();
@@ -185,7 +185,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void setArgumentFields(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
         LOGGER.trace(
                 "setArgumentFields() testClass [%s] testInstance [%s] testArgument [%s]",
@@ -195,7 +195,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void setRandomFields(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
         LOGGER.trace(
                 "setRandomFields() testClass [%s] testInstance [%s] testArgument [%s]",
@@ -205,7 +205,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void beforeAllMethods(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
         LOGGER.trace(
                 "beforeAllMethods() testClass [%s] testInstance [%s]",
@@ -262,7 +262,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void afterAllMethods(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
         LOGGER.trace(
                 "afterAllMethods() testClass [%s] testInstance [%s]",
@@ -277,7 +277,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void clearRandomFields(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
         LOGGER.trace(
                 "clearRandomFields() testClass [%s] testInstance [%s]",
@@ -287,7 +287,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void clearArgumentFields(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(Constants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
 
         LOGGER.trace(
                 "clearArgumentFields() testClass [%s] testInstance [%s]",

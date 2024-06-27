@@ -16,11 +16,11 @@
 
 package org.antublue.test.engine.internal.execution;
 
-public class Constants {
+public class EngineExecutionContextConstants {
 
     public static final String TEST_INSTANCE = "test.instance";
 
-    private Constants() {
+    private EngineExecutionContextConstants() {
         // DO NOTHING
     }
 }

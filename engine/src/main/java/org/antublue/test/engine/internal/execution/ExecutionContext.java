@@ -32,7 +32,7 @@ public class ExecutionContext {
     /**
      * Constructor
      *
-     * @param executionRequest
+     * @param executionRequest executionContext
      */
     public ExecutionContext(ExecutionRequest executionRequest) {
         Preconditions.notNull(executionRequest, "executionRequest is null");
@@ -45,7 +45,14 @@ public class ExecutionContext {
                         Configuration.getInstance());
     }
 
+    /**
+     * Copy constructor
+     *
+     * @param executionContext executionContext
+     */
     public ExecutionContext(ExecutionContext executionContext) {
+        Preconditions.notNull(executionContext, "executionContext is null");
+
         this.map = new HashMap<>();
         this.executionRequest = executionContext.executionRequest;
     }
@@ -64,14 +71,13 @@ public class ExecutionContext {
      *
      * @param key key
      * @param value value
-     * @return this
+     * @return the existing value, or null if there is no existing value
      */
-    public ExecutionContext put(Object key, Object value) {
+    public <T> T put(Object key, Object value) {
         Preconditions.notNull(key, "key is null");
         Preconditions.notNull(value, "value is null");
 
-        map.put(key, value);
-        return this;
+        return (T) map.put(key, value);
     }
 
     /**
@@ -91,7 +97,7 @@ public class ExecutionContext {
      *
      * @param key key
      * @param clazz clazz
-     * @return an Object
+     * @return the value
      * @param <T> the return type
      */
     public <T> T get(Object key, Class<T> clazz) {
@@ -115,7 +121,7 @@ public class ExecutionContext {
      * Method to remove a value for a key
      *
      * @param key key
-     * @return an Object, or null if a value for the key doesn't exist
+     * @return the value, or null if a value for the key doesn't exist
      * @param <T> the return type
      */
     public <T> T remove(Object key) {
