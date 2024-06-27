@@ -352,6 +352,11 @@ public class EngineDiscoveryRequestResolver {
             return testArguments;
         }
 
+        if (object instanceof Argument<?>) {
+            testArguments.add((Argument<?>) object);
+            return testArguments;
+        }
+
         if (!(object instanceof Stream || object instanceof Iterable)) {
             throw new TestClassDefinitionException(
                     format(
