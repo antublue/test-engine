@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -158,21 +157,6 @@ public class Executor {
             countDownLatch.await();
         } catch (InterruptedException e) {
             // DO NOTHING
-        }
-    }
-
-    /** Class to handle a submit rejection, adding the Runnable using blocking semantics */
-    private static class BlockingRejectedExecutionHandler implements RejectedExecutionHandler {
-
-        @Override
-        public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
-            if (!executor.isShutdown()) {
-                try {
-                    executor.getQueue().put(runnable);
-                } catch (InterruptedException e) {
-                    LOGGER.error("Runnable discarded!!!");
-                }
-            }
         }
     }
 }
