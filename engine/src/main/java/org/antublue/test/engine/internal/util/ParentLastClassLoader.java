@@ -16,12 +16,16 @@
 
 package org.antublue.test.engine.internal.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import static java.lang.String.format;
 
 /** Class to implement ParentLastClassLoader */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -47,15 +51,21 @@ public class ParentLastClassLoader extends ClassLoader {
      * Constructor
      *
      * @param parent parent
-     * @param pareClassNames parentClassNames
+     * @param parentClassNames parentClassNames
      */
-    public ParentLastClassLoader(ClassLoader parent, Set<String> pareClassNames) {
+    public ParentLastClassLoader(ClassLoader parent, Set<String> parentClassNames) {
         super(parent);
         this.parent = parent;
-        this.parentClassNames = pareClassNames;
+        this.parentClassNames = parentClassNames;
         this.parentClassNamesPredicate = null;
     }
 
+    /**
+     * Constructor
+     *
+     * @param parent parent
+     * @param parentClassNamesPredicate parentClassNamesPredicate
+     */
     public ParentLastClassLoader(ClassLoader parent, Predicate<String> parentClassNamesPredicate) {
         super(parent);
         this.parent = parent;
@@ -66,10 +76,8 @@ public class ParentLastClassLoader extends ClassLoader {
     @Override
     public Class<?> loadClass(String className) throws ClassNotFoundException {
         if (parentClassNames != null && parentClassNames.contains(className)) {
-            System.out.println("loadClass(" + className + ") parent");
             return parent.loadClass(className);
         } else if (parentClassNamesPredicate != null && parentClassNamesPredicate.test(className)) {
-            System.out.println("loadClass(" + className + ") parent");
             return parent.loadClass(className);
         }
 
@@ -88,22 +96,32 @@ public class ParentLastClassLoader extends ClassLoader {
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         String classFileName = name.replace('.', '/') + ".class";
-        InputStream classDataStream = getResourceAsStream(classFileName);
-
-        if (classDataStream == null) {
-            throw new ClassNotFoundException("Class not found: " + name);
-        }
+        InputStream inputStream = null;
+        ByteArrayOutputStream byteArrayOutputStream = null;
 
         try {
-            byte[] classData = new byte[classDataStream.available()];
-            classDataStream.read(classData);
+            inputStream = getResourceAsStream(classFileName);
+            if (inputStream == null) {
+                throw new ClassNotFoundException("Failed to load class: " + name);
+            }
 
-            return defineClass(name, classData, 0, classData.length);
+            byteArrayOutputStream = new ByteArrayOutputStream();
+
+            byte[] bytes = new byte[1024 * 100];
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(bytes, 0, bytes.length)) != -1) {
+                byteArrayOutputStream.write(bytes, 0, bytesRead);
+            }
+
+            byte[] classBytes = byteArrayOutputStream.toByteArray();
+            
+            return defineClass(name, classBytes, 0, classBytes.length);
         } catch (IOException e) {
             throw new ClassNotFoundException("Failed to load class: " + name, e);
         } finally {
             try {
-                classDataStream.close();
+                inputStream.close();
             } catch (Throwable t) {
                 // DO NOTHING
             }

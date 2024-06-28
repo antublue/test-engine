@@ -302,14 +302,16 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                     testClass.getName(), testInstance);
         }
 
-        for (Method method : concludeMethods) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(
-                        "conclude() testClass [%s] testInstance [%s] method [%s]",
-                        testClass.getName(), testInstance, method);
-            }
+        if (testInstance != null) {
+            for (Method method : concludeMethods) {
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace(
+                            "conclude() testClass [%s] testInstance [%s] method [%s]",
+                            testClass.getName(), testInstance, method);
+                }
 
-            method.invoke(testInstance);
+                method.invoke(testInstance);
+            }
         }
     }
 
