@@ -23,6 +23,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
+import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to implement ClassPathURIUtils */
 public class ClasspathSupport {
@@ -62,5 +64,30 @@ public class ClasspathSupport {
         } finally {
             LOCK.unlock();
         }
+    }
+
+    /**
+     * Method to find classes
+     *
+     * @param uri uri
+     * @param predicate predicate
+     * @return a List of Classes
+     */
+    public static List<Class<?>> findClasses(URI uri, Predicate<Class<?>> predicate) {
+        return new ArrayList<>(
+                ReflectionSupport.findAllClassesInClasspathRoot(uri, predicate, className -> true));
+    }
+
+    /**
+     * Method to find classes in a package
+     *
+     * @param packageName packageName
+     * @param predicate predicate
+     * @return a List of Classes
+     */
+    public static List<Class<?>> findClasses(String packageName, Predicate<Class<?>> predicate) {
+        return new ArrayList<>(
+                ReflectionSupport.findAllClassesInPackage(
+                        packageName, predicate, className -> true));
     }
 }
