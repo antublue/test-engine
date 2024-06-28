@@ -10,7 +10,7 @@ Provides locking support.
 
 Provides signal support.
 
-## `Timed`
+## `TimedExecution`
 
 Provides timing support.
 
