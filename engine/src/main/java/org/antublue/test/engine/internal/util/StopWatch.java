@@ -16,6 +16,9 @@
 
 package org.antublue.test.engine.internal.util;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 /** Class to implement a stop watch */
 @SuppressWarnings("UnusedReturnValue")
 public class StopWatch {
@@ -60,25 +63,14 @@ public class StopWatch {
      *
      * @return the elapsed time in nanoseconds
      */
-    public long elapsedNanoseconds() {
+    public Duration getElapsedTime() {
+        long duration = 0;
         if (stopNanoTime == null) {
-            return System.nanoTime() - startNanoTime;
+            duration = System.nanoTime() - startNanoTime;
         } else {
-            return stopNanoTime - startNanoTime;
+            duration = stopNanoTime - startNanoTime;
         }
-    }
 
-    /**
-     * Method to get the elapsed time in milliseconds
-     *
-     * @return the elapsed time in milliseconds
-     */
-    public long elapsedMilliseconds() {
-        long elapsedNanoseconds = elapsedNanoseconds();
-        if (elapsedNanoseconds <= 0) {
-            return 0;
-        } else {
-            return elapsedNanoseconds() / 1000000;
-        }
+        return Duration.of(duration, ChronoUnit.NANOS);
     }
 }

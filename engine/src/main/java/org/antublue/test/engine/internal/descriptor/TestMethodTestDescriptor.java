@@ -121,7 +121,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedNanoseconds());
+                        stopWatch.getElapsedTime().toNanos());
 
         List<Throwable> throwables = collectThrowables();
         if (throwables.isEmpty()) {
@@ -162,7 +162,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata().put(MetadataTestDescriptorConstants.TEST_METHOD, testMethod);
         getMetadata()
                 .put(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME, getDisplayName());
-        getMetadata().put(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME, 0);
+        getMetadata().put(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME, 0L);
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,

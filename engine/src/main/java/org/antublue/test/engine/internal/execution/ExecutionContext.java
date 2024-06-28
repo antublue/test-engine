@@ -16,8 +16,8 @@
 
 package org.antublue.test.engine.internal.execution;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.ExecutionRequest;
@@ -26,8 +26,8 @@ import org.junit.platform.engine.ExecutionRequest;
 @SuppressWarnings("unchecked")
 public class ExecutionContext {
 
-    private final Map<Object, Object> map;
     private final ExecutionRequest executionRequest;
+    private final Map<Object, Object> map;
 
     /**
      * Constructor
@@ -37,12 +37,13 @@ public class ExecutionContext {
     public ExecutionContext(ExecutionRequest executionRequest) {
         Preconditions.notNull(executionRequest, "executionRequest is null");
 
-        this.map = new HashMap<>();
         this.executionRequest =
                 ExecutionRequest.create(
                         executionRequest.getRootTestDescriptor(),
                         executionRequest.getEngineExecutionListener(),
                         Configuration.getInstance());
+
+        this.map = new ConcurrentHashMap<>();
     }
 
     /**
@@ -53,8 +54,8 @@ public class ExecutionContext {
     public ExecutionContext(ExecutionContext executionContext) {
         Preconditions.notNull(executionContext, "executionContext is null");
 
-        this.map = new HashMap<>();
         this.executionRequest = executionContext.executionRequest;
+        this.map = new ConcurrentHashMap<>();
     }
 
     /**

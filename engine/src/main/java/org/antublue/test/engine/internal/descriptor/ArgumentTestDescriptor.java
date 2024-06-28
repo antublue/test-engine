@@ -93,6 +93,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         }
 
         Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
+
         Preconditions.notNull(testInstance, "testInstance is null");
 
         stopWatch.reset();
@@ -102,7 +103,6 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 .put(
                         MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME,
                         DisplayNameSupport.getDisplayName(testClass));
-
         getMetadata().put(MetadataTestDescriptorConstants.TEST_ARGUMENT, testArgument);
 
         executionContext.getExecutionRequest().getEngineExecutionListener().executionStarted(this);
@@ -128,7 +128,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedNanoseconds());
+                        stopWatch.getElapsedTime().toNanos());
 
         List<Throwable> throwables = collectThrowables();
         if (throwableCollector.isEmpty()) {
@@ -179,10 +179,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                 });
         stopWatch.stop();
 
-        getMetadata()
-                .put(
-                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedNanoseconds());
+        getMetadata().put(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME, 0L);
 
         executionContext
                 .getExecutionRequest()
@@ -292,7 +289,6 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 .put(
                         MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME,
                         DisplayNameSupport.getDisplayName(testClass));
-
         getMetadata().put(MetadataTestDescriptorConstants.TEST_ARGUMENT, testArgument);
     }
 

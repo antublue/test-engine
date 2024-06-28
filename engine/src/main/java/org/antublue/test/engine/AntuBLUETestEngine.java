@@ -160,10 +160,7 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
                     });
         }
 
-        throwableCollector.execute(
-                () -> {
-                    TestEngineExtensionManager.getInstance().conclude();
-                });
+        throwableCollector.execute(() -> TestEngineExtensionManager.getInstance().conclude());
 
         if (throwableCollector.isEmpty()) {
             executionRequest

@@ -334,7 +334,7 @@ public class SummaryEngineExecutionListener
         println(INFO + message);
         println(INFO + SEPARATOR);
 
-        long elapsedTime = stopWatch.elapsedNanoseconds();
+        long elapsedTime = stopWatch.getElapsedTime().toNanos();
 
         println(
                 new AnsiColorStringBuilder()
