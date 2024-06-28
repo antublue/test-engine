@@ -174,8 +174,8 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                 .executionSkipped(
                         this,
                         format(
-                                "Argument [%s] test method [%s] skipped",
-                                testArgument, testMethod.getName()));
+                                "test class [%s] argument [%s] test method [%s] skipped",
+                                testClass.getName(), testArgument.getName(), testMethod.getName()));
     }
 
     @Override

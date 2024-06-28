@@ -184,7 +184,11 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         executionContext
                 .getExecutionRequest()
                 .getEngineExecutionListener()
-                .executionSkipped(this, format("Argument [%s] skipped", testArgument));
+                .executionSkipped(
+                        this,
+                        format(
+                                "test class [%s] argument [%s] skipped",
+                                testClass.getName(), testArgument.getName()));
     }
 
     @Override

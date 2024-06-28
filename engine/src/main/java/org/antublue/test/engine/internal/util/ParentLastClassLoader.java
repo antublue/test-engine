@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +23,6 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Set;
 import java.util.function.Predicate;
-
-import static java.lang.String.format;
 
 /** Class to implement ParentLastClassLoader */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -115,7 +112,7 @@ public class ParentLastClassLoader extends ClassLoader {
             }
 
             byte[] classBytes = byteArrayOutputStream.toByteArray();
-            
+
             return defineClass(name, classBytes, 0, classBytes.length);
         } catch (IOException e) {
             throw new ClassNotFoundException("Failed to load class: " + name, e);

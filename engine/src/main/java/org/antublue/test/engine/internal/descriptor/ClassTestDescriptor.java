@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.descriptor;
 
+import static java.lang.String.format;
+
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
@@ -178,7 +180,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         executionContext
                 .getExecutionRequest()
                 .getEngineExecutionListener()
-                .executionSkipped(this, "Skipped");
+                .executionSkipped(this, format("test class [%s] skipped", testClass.getName()));
     }
 
     @Override
