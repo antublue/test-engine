@@ -46,10 +46,10 @@ VERSION="${1}"
 PROJECT_ROOT_DIRECTORY=$(git rev-parse --show-toplevel)
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-if [ "${CURRENT_BRANCH}" != "main" ];
-then
-   emit_error "Release should always be from [main] branch not [${CURRENT_BRANCH}] branch"
-fi
+#if [ "${CURRENT_BRANCH}" != "main" ];
+#then
+#   emit_error "Release should always be from [main] branch not [${CURRENT_BRANCH}] branch"
+#fi
 
 cd "${PROJECT_ROOT_DIRECTORY}"
 check_exit_code "Failed to change to project root directory"
@@ -104,8 +104,8 @@ git push origin "${VERSION}"
 check_exit_code "Git tag [${VERSION}] push failed"
 
 # Checkout the main branch
-git checkout main
-check_exit_code "Git checkout [main] failed"
+git checkout "${CURRENT_BRANCH}"
+check_exit_code "Git checkout [${CURRENT_BRANCH}] failed"
 
 echo "------------------------------------------------------------------------"
 echo "SUCCESS"
