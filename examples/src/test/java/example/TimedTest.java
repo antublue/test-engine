@@ -65,9 +65,9 @@ public class TimedTest {
         System.out.println("test1(" + argument + ")");
         assertThat(argument).isNotNull();
 
-        double time = Timed.execute(() -> Thread.sleep(1000), Timed.Units.SECONDS);
+        double time = Timed.execute(() -> Thread.sleep(1000), Timed.Units.MILLISECONDS);
 
-        System.out.println("internal time [" + time + "]");
+        System.out.println("execution time [" + time + "] ms");
     }
 
     @TestEngine.AfterEach
