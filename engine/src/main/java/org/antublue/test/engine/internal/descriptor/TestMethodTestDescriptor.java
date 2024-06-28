@@ -154,11 +154,11 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata().put(MetadataTestDescriptorConstants.TEST_METHOD, testMethod);
         getMetadata()
                 .put(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME, getDisplayName());
-        getMetadata().put(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME, 0);
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
                         MetadataTestDescriptorConstants.SKIP);
+        getMetadata().put(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME, 0L);
 
         executionRequest
                 .getEngineExecutionListener()

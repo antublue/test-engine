@@ -162,6 +162,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
                         MetadataTestDescriptorConstants.SKIP);
+        getMetadata().put(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME, 0L);
 
         getChildren()
                 .forEach(
@@ -172,12 +173,6 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                                                 .skip(executionRequest);
                                     }
                                 });
-        stopWatch.stop();
-
-        getMetadata()
-                .put(
-                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedNanoseconds());
 
         executionRequest
                 .getEngineExecutionListener()
