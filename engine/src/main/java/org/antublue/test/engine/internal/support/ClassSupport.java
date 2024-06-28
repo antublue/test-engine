@@ -36,11 +36,11 @@ public class ClassSupport {
      * Method to scan the Java classpath and return Classes matching the Predicate
      *
      * @param predicate predicate
-     * @return a list of Classes
+     * @return a List of Classes
      */
-    public static List<Class<?>> discoverClasses(Predicate<Class<?>> predicate) {
+    public static List<Class<?>> findClasses(Predicate<Class<?>> predicate) {
         Set<Class<?>> set = new LinkedHashSet<>();
-        for (URI uri : ClasspathSupport.getClasspathURIs()) {
+        for (URI uri : ClassPathSupport.getClasspathURIs()) {
             set.addAll(
                     ReflectionSupport.findAllClassesInClasspathRoot(uri, predicate, name -> true));
         }

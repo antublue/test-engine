@@ -28,7 +28,6 @@ import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
-import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to process @TestEngine.Argument annotations */
 public class ArgumentAnnotationSupport {
@@ -56,7 +55,7 @@ public class ArgumentAnnotationSupport {
                 testArgument != null ? testArgument.getName() : "null");
 
         List<Field> fields =
-                ReflectionSupport.findFields(
+                FieldSupport.findFields(
                         testInstance.getClass(),
                         Predicates.ARGUMENT_FIELD,
                         HierarchyTraversalMode.TOP_DOWN);

@@ -49,6 +49,16 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
         stopWatch = new StopWatch();
     }
 
+    @Override
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    @Override
+    public String toString() {
+        return getDisplayName();
+    }
+
     /**
      * Method to execute the test descriptor
      *
@@ -62,16 +72,6 @@ public abstract class ExecutableTestDescriptor extends AbstractTestDescriptor
      * @param executionContext executionContext
      */
     public abstract void skip(ExecutionContext executionContext);
-
-    @Override
-    public Metadata getMetadata() {
-        return metadata;
-    }
-
-    @Override
-    public String toString() {
-        return getDisplayName();
-    }
 
     /**
      * Method to collect all Throwables from parent and children

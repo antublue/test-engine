@@ -22,16 +22,16 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.internal.execution.EngineExecutionContextConstants;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
+import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
+import org.antublue.test.engine.internal.support.MethodSupport;
 import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
-import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
@@ -92,7 +92,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
             LOGGER.trace("execute(ExecutionContext executionContext) %s", toString());
         }
 
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
         Preconditions.notNull(testInstance, "testInstance is null");
 
         stopWatch.reset();
@@ -197,7 +197,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void beforeEach(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
@@ -217,7 +217,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void test(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
@@ -229,7 +229,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void afterEach(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
@@ -282,7 +282,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         }
 
         List<Method> beforeEachMethods =
-                ReflectionSupport.findMethods(
+                MethodSupport.findMethods(
                         testClass, Predicates.BEFORE_EACH_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
         beforeEachMethods =
@@ -294,7 +294,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         }
 
         List<Method> afterEachMethods =
-                ReflectionSupport.findMethods(
+                MethodSupport.findMethods(
                         testClass, Predicates.AFTER_EACH_METHOD, HierarchyTraversalMode.BOTTOM_UP);
 
         afterEachMethods =

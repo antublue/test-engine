@@ -27,18 +27,18 @@ import java.util.function.Predicate;
 import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to implement ClassPathURIUtils */
-public class ClasspathSupport {
+public class ClassPathSupport {
 
     private static final ReentrantLock LOCK = new ReentrantLock(true);
     private static List<URI> URIS;
 
     /** Constructor */
-    private ClasspathSupport() {
+    private ClassPathSupport() {
         // DO NOTHING
     }
 
     /**
-     * Method to get a Set of classpath URIs
+     * Method to get a List of classpath URIs
      *
      * @return a List of classpath URIs
      */
@@ -48,9 +48,7 @@ public class ClasspathSupport {
 
             if (URIS == null) {
                 Set<URI> uriSet = new LinkedHashSet<>();
-
                 String classpath = System.getProperty("java.class.path");
-
                 String[] paths = classpath.split(File.pathSeparator);
                 for (String path : paths) {
                     URI uri = new File(path).toURI();
@@ -59,7 +57,6 @@ public class ClasspathSupport {
 
                 URIS = new ArrayList<>(uriSet);
             }
-
             return URIS;
         } finally {
             LOCK.unlock();

@@ -23,18 +23,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.internal.execution.EngineExecutionContextConstants;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
+import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.support.ArgumentAnnotationSupport;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
+import org.antublue.test.engine.internal.support.MethodSupport;
 import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
-import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -92,7 +92,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
             LOGGER.trace("execute(ExecutionContext executionContext)");
         }
 
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
         Preconditions.notNull(testInstance, "testInstance is null");
 
         stopWatch.reset();
@@ -207,7 +207,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void setArgumentFields(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
@@ -219,7 +219,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void setRandomFields(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
@@ -231,7 +231,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void beforeAllMethods(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
@@ -297,7 +297,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void afterAllMethods(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
@@ -317,7 +317,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void clearRandomFields(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
@@ -329,7 +329,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void clearArgumentFields(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
@@ -374,7 +374,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         }
 
         List<Method> beforeAllMethods =
-                ReflectionSupport.findMethods(
+                MethodSupport.findMethods(
                         testClass, Predicates.BEFORE_ALL_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
         if (LOGGER.isTraceEnabled() && !beforeAllMethods.isEmpty()) {
@@ -385,7 +385,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 OrdererSupport.orderTestMethods(beforeAllMethods, HierarchyTraversalMode.TOP_DOWN);
 
         List<Method> afterAllMethods =
-                ReflectionSupport.findMethods(
+                MethodSupport.findMethods(
                         testClass, Predicates.AFTER_ALL_METHOD, HierarchyTraversalMode.BOTTOM_UP);
 
         if (LOGGER.isTraceEnabled() && !afterAllMethods.isEmpty()) {

@@ -17,6 +17,11 @@
 package org.antublue.test.engine.internal.support;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+import org.junit.platform.commons.support.HierarchyTraversalMode;
+import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
 
 /** Class to implement FieldSupport */
@@ -25,6 +30,22 @@ public class FieldSupport {
     /** Constructor */
     private FieldSupport() {
         // DO NOTHING
+    }
+
+    /**
+     * Method to find fields of a Class
+     *
+     * @param clazz clazz
+     * @param predicate predicate
+     * @param hierarchyTraversalMode hierarchyTraversalMode
+     * @return a List of Fields
+     */
+    public static List<Field> findFields(
+            Class<?> clazz,
+            Predicate<Field> predicate,
+            HierarchyTraversalMode hierarchyTraversalMode) {
+        return new ArrayList<>(
+                ReflectionSupport.findFields(clazz, predicate, hierarchyTraversalMode));
     }
 
     /**

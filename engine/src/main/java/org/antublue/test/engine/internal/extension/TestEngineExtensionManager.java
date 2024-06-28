@@ -41,7 +41,7 @@ public class TestEngineExtensionManager {
     private synchronized void initialize() {
         if (!initialized) {
             List<Class<?>> classes =
-                    ClassSupport.discoverClasses(Predicates.TEST_ENGINE_EXTENSION_CLASS);
+                    ClassSupport.findClasses(Predicates.TEST_ENGINE_EXTENSION_CLASS);
 
             OrdererSupport.orderTestClasses(classes);
 
@@ -73,7 +73,7 @@ public class TestEngineExtensionManager {
     /**
      * Method to conclude test engine extensions
      *
-     * @return a list of Throwables
+     * @return a List of Throwables
      */
     public List<Throwable> conclude() {
         initialize();

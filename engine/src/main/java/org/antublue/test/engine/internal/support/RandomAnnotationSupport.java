@@ -25,7 +25,6 @@ import java.util.function.Predicate;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
-import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
 
 /** Class to process @TestEngine.Random.X annotations */
@@ -106,7 +105,7 @@ public class RandomAnnotationSupport {
             Class<?> testClass, Object testInstance, Predicate<Field> fieldPredicate)
             throws Throwable {
         List<Field> fields =
-                ReflectionSupport.findFields(
+                FieldSupport.findFields(
                         testClass,
                         field -> fieldPredicate.test(field) && HAS_RANDOM_ANNOTATION.test(field),
                         HierarchyTraversalMode.TOP_DOWN);
@@ -196,7 +195,7 @@ public class RandomAnnotationSupport {
             Class<?> testClass, Object testInstance, Predicate<Field> fieldPredicate)
             throws Throwable {
         List<Field> fields =
-                ReflectionSupport.findFields(
+                FieldSupport.findFields(
                         testClass,
                         field -> fieldPredicate.test(field) && HAS_RANDOM_ANNOTATION.test(field),
                         HierarchyTraversalMode.TOP_DOWN);

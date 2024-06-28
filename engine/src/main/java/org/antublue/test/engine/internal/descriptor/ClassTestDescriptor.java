@@ -20,17 +20,17 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import org.antublue.test.engine.internal.execution.EngineExecutionContextConstants;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
+import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
+import org.antublue.test.engine.internal.support.MethodSupport;
 import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
-import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -206,7 +206,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void prepare(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
@@ -239,7 +239,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                     testClass.getName(), testInstance);
         }
 
-        executionContext.put(EngineExecutionContextConstants.TEST_INSTANCE, testInstance);
+        executionContext.put(ExecutionContextConstant.TEST_INSTANCE, testInstance);
     }
 
     private void doExecute(ExecutionContext executionContext) {
@@ -294,7 +294,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void conclude(ExecutionContext executionContext) throws Throwable {
-        Object testInstance = executionContext.get(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.get(ExecutionContextConstant.TEST_INSTANCE);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
@@ -314,8 +314,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     }
 
     private void destroyTestInstance(ExecutionContext executionContext) {
-        Object testInstance =
-                executionContext.remove(EngineExecutionContextConstants.TEST_INSTANCE);
+        Object testInstance = executionContext.remove(ExecutionContextConstant.TEST_INSTANCE);
         LOGGER.trace("destroyTestInstance() testClass [%s]", testClass.getName(), testInstance);
     }
 
@@ -344,7 +343,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         }
 
         List<Method> prepareMethods =
-                ReflectionSupport.findMethods(
+                MethodSupport.findMethods(
                         testClass, Predicates.PREPARE_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
         prepareMethods =
@@ -355,7 +354,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         }
 
         List<Method> concludeMethods =
-                ReflectionSupport.findMethods(
+                MethodSupport.findMethods(
                         testClass, Predicates.CONCLUDE_METHOD, HierarchyTraversalMode.BOTTOM_UP);
 
         concludeMethods =

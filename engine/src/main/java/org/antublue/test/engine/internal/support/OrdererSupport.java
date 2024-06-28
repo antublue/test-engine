@@ -51,7 +51,7 @@ public class OrdererSupport {
     }
 
     /**
-     * Method to order a list of Classes
+     * Method to order a List of Classes
      *
      * @param testClasses testClasses
      */

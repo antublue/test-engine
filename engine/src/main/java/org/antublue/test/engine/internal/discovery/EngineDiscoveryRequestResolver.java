@@ -42,13 +42,14 @@ import org.antublue.test.engine.internal.descriptor.ClassTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.TestMethodTestDescriptor;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.support.ClassPathSupport;
 import org.antublue.test.engine.internal.support.DisplayNameSupport;
+import org.antublue.test.engine.internal.support.MethodSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.TagSupport;
 import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
-import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -189,7 +190,7 @@ public class EngineDiscoveryRequestResolver {
         }
 
         List<Method> testMethods =
-                ReflectionSupport.findMethods(
+                MethodSupport.findMethods(
                         testClass, Predicates.TEST_METHOD, HierarchyTraversalMode.TOP_DOWN);
 
         testMethods = OrdererSupport.orderTestMethods(testMethods, HierarchyTraversalMode.TOP_DOWN);
@@ -208,10 +209,10 @@ public class EngineDiscoveryRequestResolver {
     }
 
     /**
-     * Method to resolve a list of test classes
+     * Method to resolve a List of test classes
      *
      * @param engineDiscoveryRequest engineDiscoveryRequest
-     * @return a list of classes
+     * @return a List of classes
      * @throws Throwable Throwable
      */
     private static List<Class<?>> resolveEngineDiscoveryRequest(
@@ -237,10 +238,8 @@ public class EngineDiscoveryRequestResolver {
             }
 
             List<Class<?>> testClasses =
-                    ReflectionSupport.findAllClassesInClasspathRoot(
-                            classpathRootSelector.getClasspathRoot(),
-                            Predicates.TEST_CLASS,
-                            className -> true);
+                    ClassPathSupport.findClasses(
+                            classpathRootSelector.getClasspathRoot(), Predicates.TEST_CLASS);
 
             for (Class<?> testClass : testClasses) {
                 if (LOGGER.isTraceEnabled()) {
@@ -292,8 +291,7 @@ public class EngineDiscoveryRequestResolver {
             }
 
             List<Class<?>> javaClasses =
-                    ReflectionSupport.findAllClassesInPackage(
-                            packageName, Predicates.TEST_CLASS, p -> true);
+                    ClassPathSupport.findClasses(packageName, Predicates.TEST_CLASS);
 
             testClassSet.addAll(javaClasses);
         }
@@ -377,7 +375,7 @@ public class EngineDiscoveryRequestResolver {
      * Method to get argument for a test class
      *
      * @param testClass testClass
-     * @return a list of arguments
+     * @return a List of arguments
      * @throws Throwable Throwable
      */
     private static List<Argument<?>> getArguments(Class<?> testClass) throws Throwable {
@@ -441,7 +439,7 @@ public class EngineDiscoveryRequestResolver {
         }
 
         List<Method> methods =
-                ReflectionSupport.findMethods(
+                MethodSupport.findMethods(
                         testClass,
                         Predicates.ARGUMENT_SUPPLIER_METHOD,
                         HierarchyTraversalMode.BOTTOM_UP);

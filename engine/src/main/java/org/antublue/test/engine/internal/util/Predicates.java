@@ -22,8 +22,8 @@ import java.lang.reflect.Modifier;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.TestEngineExtension;
+import org.antublue.test.engine.internal.support.MethodSupport;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
-import org.junit.platform.commons.support.ReflectionSupport;
 
 /** Class to implement Predicates */
 public class Predicates {
@@ -107,10 +107,10 @@ public class Predicates {
 
                 return !Modifier.isAbstract(modifiers)
                         && !clazz.isAnnotationPresent(TestEngine.Disabled.class)
-                        && !ReflectionSupport.findMethods(
+                        && !MethodSupport.findMethods(
                                         clazz, TEST_METHOD, HierarchyTraversalMode.TOP_DOWN)
                                 .isEmpty()
-                        && !ReflectionSupport.findMethods(
+                        && !MethodSupport.findMethods(
                                         clazz,
                                         ARGUMENT_SUPPLIER_METHOD,
                                         HierarchyTraversalMode.TOP_DOWN)

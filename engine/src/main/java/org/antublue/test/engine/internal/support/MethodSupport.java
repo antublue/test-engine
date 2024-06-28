@@ -32,14 +32,14 @@ public class MethodSupport {
     }
 
     /**
-     * Method to get a Methods for a Class matching the Predicate
+     * Method to find Methods of a Class
      *
      * @param clazz clazz
      * @param predicate predicate
      * @param hierarchyTraversalMode hierarchyTraversalMode
-     * @return a list of Methods
+     * @return a List of Methods
      */
-    public static List<Method> getMethods(
+    public static List<Method> findMethods(
             Class<?> clazz,
             Predicate<Method> predicate,
             HierarchyTraversalMode hierarchyTraversalMode) {

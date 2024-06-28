@@ -16,11 +16,14 @@
 
 package org.antublue.test.engine.internal.execution;
 
-public class EngineExecutionContextConstants {
+/** Class to implement ExecutionContextConstant */
+public class ExecutionContextConstant {
 
+    /** Constant */
     public static final String TEST_INSTANCE = "test.instance";
 
-    private EngineExecutionContextConstants() {
+    /** Constructor */
+    private ExecutionContextConstant() {
         // DO NOTHING
     }
 }

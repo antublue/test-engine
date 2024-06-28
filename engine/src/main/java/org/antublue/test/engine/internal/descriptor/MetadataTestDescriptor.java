@@ -20,9 +20,9 @@ package org.antublue.test.engine.internal.descriptor;
 public interface MetadataTestDescriptor {
 
     /**
-     * Method to get metadata information
+     * Method to get Metadata
      *
-     * @return metadata information
+     * @return Metadata
      */
     Metadata getMetadata();
 }

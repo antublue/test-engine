@@ -18,12 +18,13 @@ package org.antublue.test.engine.internal.descriptor;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.junit.platform.commons.util.Preconditions;
 
 /** Class to implement MetadataInformation\ */
 @SuppressWarnings("unchecked")
 public class Metadata {
 
-    private final Map<String, Object> map;
+    private final Map<Object, Object> map;
 
     /** Constructor */
     public Metadata() {
@@ -31,30 +32,41 @@ public class Metadata {
     }
 
     /**
-     * Method to set a metadata key / value
+     * Method to set a Metadata value
      *
      * @param key key
      * @param value value
      */
-    public void put(String key, Object value) {
+    public void put(Object key, Object value) {
+        Preconditions.notNull(key, "key is null");
         map.put(key, value);
     }
 
     /**
-     * Method to get a metadata value
+     * Method to get a Metadata value
      *
      * @param key key
      * @return a metadata value
      * @param <T> T
      */
-    public <T> T get(String key) {
+    public <T> T get(Object key) {
         return (T) map.get(key);
+    }
+
+    /**
+     * Method to return of a Metadata value exists for a key
+     *
+     * @param key key
+     * @return true if a value exists for a key, else false
+     */
+    public boolean containsKey(String key) {
+        return map.containsKey(key);
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
+        for (Map.Entry<Object, Object> entry : map.entrySet()) {
             if (stringBuilder.length() > 0) {
                 stringBuilder.append(" ");
             }
