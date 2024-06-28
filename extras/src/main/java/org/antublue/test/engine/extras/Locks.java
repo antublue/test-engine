@@ -16,86 +16,42 @@
 
 package org.antublue.test.engine.extras;
 
+import static java.lang.String.format;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/** Class to implement a LockReference */
+/** Class to implement Locks */
 public class Locks {
 
     private static final LockManager LOCK_MANAGER = new LockManager();
-
-    public static LockReference getReference(Object name) {
-        return new LockReference(name);
-    }
 
     /** Constructor */
     private Locks() {
         // DO NOTHING
     }
 
-    /** Class to implement LockManager */
-    private static class LockManager {
-
-        private final Map<Object, ReferenceCountingReentrantLock> MAP = new ConcurrentHashMap<>();
-
-        /**
-         * Method to lock
-         *
-         * @param name name
-         */
-        private void lock(Object name) {
-            ReferenceCountingReentrantLock referenceCountingReentrantLock =
-                    MAP.compute(
-                            name,
-                            (o, referenceCountingReentrantLock1) -> {
-                                if (referenceCountingReentrantLock1 == null) {
-                                    referenceCountingReentrantLock1 =
-                                            new ReferenceCountingReentrantLock();
-                                } else {
-                                    referenceCountingReentrantLock1.incrementCount();
-                                }
-                                return referenceCountingReentrantLock1;
-                            });
-
-            referenceCountingReentrantLock.lock();
+    /**
+     * Method to get a LockReference
+     *
+     * @param key key
+     * @return a LockReference
+     */
+    public static LockReference getReference(Object key) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
         }
 
-        /**
-         * Method to unlock
-         *
-         * @param name name
-         */
-        private void unlock(Object name) {
-            try {
-                ReferenceCountingReentrantLock referenceCountingReentrantLock =
-                        MAP.compute(
-                                name,
-                                (o, referenceCountingReentrantLock1) -> {
-                                    if (referenceCountingReentrantLock1 == null) {
-                                        throw new IllegalStateException(
-                                                "lock [" + name + "] is not locked");
-                                    } else {
-                                        referenceCountingReentrantLock1.decrementCount();
-                                    }
-                                    return referenceCountingReentrantLock1;
-                                });
-
-                referenceCountingReentrantLock.unlock();
-
-                if (referenceCountingReentrantLock.getCount() == 0) {
-                    MAP.remove(name);
-                }
-            } catch (IllegalStateException e) {
-                throw new IllegalStateException(e.getMessage());
-            }
-        }
+        return new LockReference(LOCK_MANAGER, key);
     }
 
     /** Class to implement LockReference */
     public static class LockReference {
 
+        private final LockManager lockManager;
         private final Object name;
 
         /**
@@ -103,18 +59,19 @@ public class Locks {
          *
          * @param name name
          */
-        private LockReference(Object name) {
+        private LockReference(LockManager lockManager, Object name) {
+            this.lockManager = lockManager;
             this.name = name;
         }
 
         /** Method to lock */
         public void lock() {
-            LOCK_MANAGER.lock(name);
+            lockManager.acquire(name);
         }
 
         /** Method to unlock */
         public void unlock() {
-            LOCK_MANAGER.unlock(name);
+            lockManager.release(name);
         }
 
         @Override
@@ -137,22 +94,22 @@ public class Locks {
     }
 
     /**
-     * Method to execute an Executable in a named lock
+     * Method to execute an Executable in a lock
      *
-     * @param name name
+     * @param key key
      * @param executable executable
      * @throws Throwable Throwable
      */
-    public static void execute(Object name, Executable executable) throws Throwable {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
+    public static void execute(Object key, Executable executable) throws Throwable {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
         }
 
         if (executable == null) {
             throw new IllegalArgumentException("executable is null");
         }
 
-        LockReference lockReference = getReference(name);
+        LockReference lockReference = getReference(key);
 
         try {
             lockReference.lock();
@@ -162,34 +119,109 @@ public class Locks {
         }
     }
 
-    /** Class to implement ReferenceCountingReentrantLock */
-    static class ReferenceCountingReentrantLock extends ReentrantLock {
+    /** Class to implement LockManager */
+    private static class LockManager {
 
-        private int count;
+        private final Lock LOCK = new ReentrantLock(true);
+        private final Map<Object, LockHolder> MAP = new HashMap<>();
 
-        /** Constructor */
-        public ReferenceCountingReentrantLock() {
-            super(true);
-            count = 1;
-        }
+        /**
+         * Method to acquire the Lock
+         *
+         * @param key key
+         */
+        void acquire(Object key) {
+            LockHolder lockHolder;
+            try {
+                LOCK.lock();
 
-        /** Method to increment the reference count */
-        public void incrementCount() {
-            count++;
-        }
+                lockHolder =
+                        MAP.compute(
+                                key,
+                                (k, lh) -> {
+                                    if (lh == null) {
+                                        lh = new LockHolder();
+                                    }
+                                    return lh;
+                                });
 
-        /** Method to decrement the reference count */
-        public void decrementCount() {
-            count--;
+                lockHolder.increaseLockCount();
+            } finally {
+                LOCK.unlock();
+            }
+
+            lockHolder.getLock().lock();
         }
 
         /**
-         * Method to get the reference count
+         * Method to release the Lock
          *
-         * @return the reference count
+         * @param key key
          */
-        public int getCount() {
-            return count;
+        void release(Object key) {
+            try {
+                LOCK.lock();
+
+                LockHolder lockHolder = MAP.get(key);
+                if (lockHolder == null) {
+                    throw new IllegalMonitorStateException(
+                            format("LockReference [%s] not locked", key));
+                }
+
+                if (lockHolder.getLockCount() == 0) {
+                    throw new IllegalMonitorStateException(
+                            format("LockReference [%s] already unlocked", key));
+                }
+
+                lockHolder.getLock().unlock();
+                lockHolder.decreaseLockCount();
+
+                if (lockHolder.getLockCount() == 0) {
+                    MAP.remove(key);
+                }
+            } finally {
+                LOCK.unlock();
+            }
+        }
+    }
+
+    /** Class to implement LockHolder */
+    private static class LockHolder {
+
+        private final ReentrantLock lock;
+        private int lockCount;
+
+        /** Constructor */
+        LockHolder() {
+            lock = new ReentrantLock(true);
+        }
+
+        /**
+         * Method to get the Lock
+         *
+         * @return the Lock
+         */
+        Lock getLock() {
+            return lock;
+        }
+
+        /** Method to increase lock count */
+        void increaseLockCount() {
+            lockCount++;
+        }
+
+        /** Method to decrease lock count */
+        void decreaseLockCount() {
+            lockCount--;
+        }
+
+        /**
+         * Method to get the lock count
+         *
+         * @return the lock count
+         */
+        int getLockCount() {
+            return lockCount;
         }
     }
 }
