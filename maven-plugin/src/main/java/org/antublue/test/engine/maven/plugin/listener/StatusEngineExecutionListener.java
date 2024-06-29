@@ -50,21 +50,13 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                     .toString();
 
     private final boolean consoleLogTiming;
-
     private final String consoleLogTimingUnits;
-
     private final boolean consoleLogTestMessages;
-
     private final String consoleTestMessage;
-
     private final boolean consoleLogSkipMessages;
-
     private final String consoleSkipMessage;
-
     private final boolean consoleLogPassMessages;
-
     private final String consolePassMessage;
-
     private final String consoleFailMessage;
 
     /** Constructor */
