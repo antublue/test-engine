@@ -135,12 +135,10 @@ public class ExecutionContextExecutor {
                     }
                 }
             } finally {
-                if (countDownLatch.get() != null) {
-                    try {
-                        countDownLatch.get().await();
-                    } catch (InterruptedException e) {
-                        // DO NOTHING
-                    }
+                try {
+                    countDownLatch.get().await();
+                } catch (InterruptedException e) {
+                    // DO NOTHING
                 }
 
                 if (executorService != null) {
