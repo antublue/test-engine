@@ -190,7 +190,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                 + "]"
                 + " testMethod ["
                 + testMethod.getName()
-                + " afterEachMethods ["
+                + "] afterEachMethods ["
                 + ObjectSupport.toString(afterEachMethods)
                 + "]"
                 + " }";
