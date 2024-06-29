@@ -36,6 +36,10 @@ public class TimedExecution {
      * @throws Throwable Throwable
      */
     public static Duration execute(Executable executable) throws Throwable {
+        if (executable == null) {
+            throw new IllegalArgumentException("executable is null");
+        }
+
         long t0 = System.nanoTime();
         executable.execute();
         return Duration.of(System.nanoTime() - t0, ChronoUnit.NANOS);

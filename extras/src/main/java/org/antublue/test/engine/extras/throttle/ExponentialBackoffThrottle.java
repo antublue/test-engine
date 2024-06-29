@@ -30,8 +30,27 @@ public class ExponentialBackoffThrottle implements Throttle {
      * @param maximumMilliseconds maximumMilliseconds
      */
     public ExponentialBackoffThrottle(long minimumMilliseconds, long maximumMilliseconds) {
-        this.maximumMilliseconds = maximumMilliseconds;
+        if (minimumMilliseconds < 1) {
+            throw new IllegalArgumentException(
+                    "minimumMilliseconds [" + minimumMilliseconds + "] is less than 1");
+        }
+
+        if (maximumMilliseconds < 1) {
+            throw new IllegalArgumentException(
+                    "maximumMilliseconds [" + maximumMilliseconds + "] is less than 1");
+        }
+
+        if (minimumMilliseconds > maximumMilliseconds) {
+            throw new IllegalArgumentException(
+                    "minimumMilliseconds ["
+                            + minimumMilliseconds
+                            + "] is greater than maximumMilliseconds ["
+                            + maximumMilliseconds
+                            + "]");
+        }
+
         this.throttleMilliseconds = minimumMilliseconds;
+        this.maximumMilliseconds = maximumMilliseconds;
     }
 
     @Override

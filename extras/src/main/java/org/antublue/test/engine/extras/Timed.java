@@ -30,10 +30,22 @@ public class Timed {
     }
 
     public static double execute(Executable executable) throws Throwable {
+        if (executable == null) {
+            throw new IllegalArgumentException("executable is null");
+        }
+
         return execute(executable, Units.MILLISECONDS);
     }
 
     public static double execute(Executable executable, Units units) throws Throwable {
+        if (executable == null) {
+            throw new IllegalArgumentException("executable is null");
+        }
+
+        if (units == null) {
+            throw new IllegalArgumentException("units is null");
+        }
+
         double t0 = 0;
 
         switch (units) {
