@@ -18,6 +18,7 @@ package org.antublue.test.engine.internal.support;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -60,6 +61,21 @@ public class ClassPathSupport {
             return URIS;
         } finally {
             LOCK.unlock();
+        }
+    }
+
+    public static List<URL> getClassPathURLS() {
+        try {
+            List<URI> uris = getClasspathURIs();
+            List<URL> urls = new ArrayList<>();
+            for (URI uri : uris) {
+                urls.add(uri.toURL());
+            }
+            return urls;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
         }
     }
 
