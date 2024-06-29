@@ -120,243 +120,247 @@ public class SummaryEngineExecutionListener
      * @param message message
      */
     public void end(String message) {
-        stopWatch.stop();
+        try {
+            stopWatch.stop();
 
-        long classTestDescriptorFound = 0;
-        long classTestDescriptorSuccess = 0;
-        long classTestDescriptorFailure = 0;
-        long classTestDescriptorSkipped = 0;
+            long classTestDescriptorFound = 0;
+            long classTestDescriptorSuccess = 0;
+            long classTestDescriptorFailure = 0;
+            long classTestDescriptorSkipped = 0;
 
-        long argumentTestDescriptorFound = 0;
-        long argumentTestDescriptorSuccess = 0;
-        long argumentTestDescriptorFailure = 0;
-        long argumentTestDescriptorSkipped = 0;
+            long argumentTestDescriptorFound = 0;
+            long argumentTestDescriptorSuccess = 0;
+            long argumentTestDescriptorFailure = 0;
+            long argumentTestDescriptorSkipped = 0;
 
-        long methodTestDescriptorFound = 0;
-        long methodTestDescriptorSuccess = 0;
-        long methodTestDescriptorFailure = 0;
-        long methodTestDescriptorSkipped = 0;
+            long methodTestDescriptorFound = 0;
+            long methodTestDescriptorSuccess = 0;
+            long methodTestDescriptorFailure = 0;
+            long methodTestDescriptorSkipped = 0;
 
-        for (TestDescriptor testDescriptor : testDescriptors) {
-            if (testDescriptor instanceof MetadataTestDescriptor) {
-                Metadata metadata = ((MetadataTestDescriptor) testDescriptor).getMetadata();
+            for (TestDescriptor testDescriptor : testDescriptors) {
+                if (testDescriptor instanceof MetadataTestDescriptor) {
+                    Metadata metadata = ((MetadataTestDescriptor) testDescriptor).getMetadata();
 
-                String testDescriptorStatus =
-                        metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS);
+                    String testDescriptorStatus =
+                            metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS);
 
-                if (testDescriptor instanceof TestMethodTestDescriptor) {
-                    methodTestDescriptorFound++;
-                    switch (testDescriptorStatus) {
-                        case "PASS":
-                            {
-                                methodTestDescriptorSuccess++;
-                                break;
-                            }
-                        case "FAIL":
-                            {
-                                methodTestDescriptorFailure++;
-                                break;
-                            }
-                        case "SKIP":
-                            {
-                                methodTestDescriptorSkipped++;
-                                break;
-                            }
-                        default:
-                            {
-                                // DO NOTHING
-                                break;
-                            }
-                    }
-                } else if (testDescriptor instanceof ClassTestDescriptor) {
-                    classTestDescriptorFound++;
-                    switch (testDescriptorStatus) {
-                        case "PASS":
-                            {
-                                classTestDescriptorSuccess++;
-                                break;
-                            }
-                        case "FAIL":
-                            {
-                                classTestDescriptorFailure++;
-                                break;
-                            }
-                        case "SKIP":
-                            {
-                                classTestDescriptorSkipped++;
-                                break;
-                            }
-                        default:
-                            {
-                                // DO NOTHING
-                                break;
-                            }
-                    }
-                } else if (testDescriptor instanceof ArgumentTestDescriptor) {
-                    argumentTestDescriptorFound++;
-                    switch (testDescriptorStatus) {
-                        case "PASS":
-                            {
-                                argumentTestDescriptorSuccess++;
-                                break;
-                            }
-                        case "FAIL":
-                            {
-                                argumentTestDescriptorFailure++;
-                                break;
-                            }
-                        case "SKIP":
-                            {
-                                argumentTestDescriptorSkipped++;
-                                break;
-                            }
-                        default:
-                            {
-                                // DO NOTHING
-                                break;
-                            }
+                    if (testDescriptor instanceof TestMethodTestDescriptor) {
+                        methodTestDescriptorFound++;
+                        switch (testDescriptorStatus) {
+                            case "PASS":
+                                {
+                                    methodTestDescriptorSuccess++;
+                                    break;
+                                }
+                            case "FAIL":
+                                {
+                                    methodTestDescriptorFailure++;
+                                    break;
+                                }
+                            case "SKIP":
+                                {
+                                    methodTestDescriptorSkipped++;
+                                    break;
+                                }
+                            default:
+                                {
+                                    // DO NOTHING
+                                    break;
+                                }
+                        }
+                    } else if (testDescriptor instanceof ClassTestDescriptor) {
+                        classTestDescriptorFound++;
+                        switch (testDescriptorStatus) {
+                            case "PASS":
+                                {
+                                    classTestDescriptorSuccess++;
+                                    break;
+                                }
+                            case "FAIL":
+                                {
+                                    classTestDescriptorFailure++;
+                                    break;
+                                }
+                            case "SKIP":
+                                {
+                                    classTestDescriptorSkipped++;
+                                    break;
+                                }
+                            default:
+                                {
+                                    // DO NOTHING
+                                    break;
+                                }
+                        }
+                    } else if (testDescriptor instanceof ArgumentTestDescriptor) {
+                        argumentTestDescriptorFound++;
+                        switch (testDescriptorStatus) {
+                            case "PASS":
+                                {
+                                    argumentTestDescriptorSuccess++;
+                                    break;
+                                }
+                            case "FAIL":
+                                {
+                                    argumentTestDescriptorFailure++;
+                                    break;
+                                }
+                            case "SKIP":
+                                {
+                                    argumentTestDescriptorSkipped++;
+                                    break;
+                                }
+                            default:
+                                {
+                                    // DO NOTHING
+                                    break;
+                                }
+                        }
                     }
                 }
             }
-        }
 
-        int columnWidthFound =
-                getColumnWith(
-                        classTestDescriptorFound,
-                        argumentTestDescriptorFound,
-                        methodTestDescriptorFound);
+            int columnWidthFound =
+                    getColumnWith(
+                            classTestDescriptorFound,
+                            argumentTestDescriptorFound,
+                            methodTestDescriptorFound);
 
-        int columnWidthSuccess =
-                getColumnWith(
-                        classTestDescriptorSuccess,
-                        argumentTestDescriptorSuccess,
-                        methodTestDescriptorSuccess);
+            int columnWidthSuccess =
+                    getColumnWith(
+                            classTestDescriptorSuccess,
+                            argumentTestDescriptorSuccess,
+                            methodTestDescriptorSuccess);
 
-        int columnWidthFailure =
-                getColumnWith(
-                        classTestDescriptorFailure,
-                        argumentTestDescriptorFailure,
-                        methodTestDescriptorFailure);
+            int columnWidthFailure =
+                    getColumnWith(
+                            classTestDescriptorFailure,
+                            argumentTestDescriptorFailure,
+                            methodTestDescriptorFailure);
 
-        int columnWidthSkipped =
-                getColumnWith(
-                        classTestDescriptorSkipped,
-                        argumentTestDescriptorSkipped,
-                        methodTestDescriptorSkipped);
+            int columnWidthSkipped =
+                    getColumnWith(
+                            classTestDescriptorSkipped,
+                            argumentTestDescriptorSkipped,
+                            methodTestDescriptorSkipped);
 
-        if (hasTests) {
-            println(INFO + SEPARATOR);
-            println(INFO + SUMMARY_BANNER);
-            println(INFO + SEPARATOR);
+            if (hasTests) {
+                println(INFO + SEPARATOR);
+                println(INFO + SUMMARY_BANNER);
+                println(INFO + SEPARATOR);
 
-            println(
-                    new AnsiColorStringBuilder()
-                            .append(INFO)
-                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                            .append("Test Classes   : ")
-                            .append(pad(classTestDescriptorFound, columnWidthFound))
-                            .append(", ")
-                            .color(AnsiColor.TEXT_GREEN_BRIGHT)
-                            .append("PASSED")
-                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                            .append(" : ")
-                            .append(pad(classTestDescriptorSuccess, columnWidthSuccess))
-                            .append(", ")
-                            .color(AnsiColor.TEXT_RED_BRIGHT)
-                            .append("FAILED")
-                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                            .append(" : ")
-                            .append(pad(classTestDescriptorFailure, columnWidthFailure))
-                            .append(", ")
-                            .color(AnsiColor.TEXT_YELLOW_BRIGHT)
-                            .append("SKIPPED")
-                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                            .append(" : ")
-                            .append(pad(classTestDescriptorSkipped, columnWidthSkipped))
-                            .append(AnsiColor.TEXT_RESET));
-
-            if (argumentTestDescriptorFound > 0) {
                 println(
                         new AnsiColorStringBuilder()
                                 .append(INFO)
                                 .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                                .append("Test Arguments : ")
-                                .append(pad(argumentTestDescriptorFound, columnWidthFound))
+                                .append("Test Classes   : ")
+                                .append(pad(classTestDescriptorFound, columnWidthFound))
                                 .append(", ")
                                 .color(AnsiColor.TEXT_GREEN_BRIGHT)
                                 .append("PASSED")
                                 .color(AnsiColor.TEXT_WHITE_BRIGHT)
                                 .append(" : ")
-                                .append(pad(argumentTestDescriptorSuccess, columnWidthSuccess))
+                                .append(pad(classTestDescriptorSuccess, columnWidthSuccess))
                                 .append(", ")
                                 .color(AnsiColor.TEXT_RED_BRIGHT)
                                 .append("FAILED")
                                 .color(AnsiColor.TEXT_WHITE_BRIGHT)
                                 .append(" : ")
-                                .append(pad(argumentTestDescriptorFailure, columnWidthFailure))
+                                .append(pad(classTestDescriptorFailure, columnWidthFailure))
                                 .append(", ")
                                 .color(AnsiColor.TEXT_YELLOW_BRIGHT)
                                 .append("SKIPPED")
                                 .color(AnsiColor.TEXT_WHITE_BRIGHT)
                                 .append(" : ")
-                                .append(pad(argumentTestDescriptorSkipped, columnWidthSkipped))
+                                .append(pad(classTestDescriptorSkipped, columnWidthSkipped))
                                 .append(AnsiColor.TEXT_RESET));
+
+                if (argumentTestDescriptorFound > 0) {
+                    println(
+                            new AnsiColorStringBuilder()
+                                    .append(INFO)
+                                    .color(AnsiColor.TEXT_WHITE_BRIGHT)
+                                    .append("Test Arguments : ")
+                                    .append(pad(argumentTestDescriptorFound, columnWidthFound))
+                                    .append(", ")
+                                    .color(AnsiColor.TEXT_GREEN_BRIGHT)
+                                    .append("PASSED")
+                                    .color(AnsiColor.TEXT_WHITE_BRIGHT)
+                                    .append(" : ")
+                                    .append(pad(argumentTestDescriptorSuccess, columnWidthSuccess))
+                                    .append(", ")
+                                    .color(AnsiColor.TEXT_RED_BRIGHT)
+                                    .append("FAILED")
+                                    .color(AnsiColor.TEXT_WHITE_BRIGHT)
+                                    .append(" : ")
+                                    .append(pad(argumentTestDescriptorFailure, columnWidthFailure))
+                                    .append(", ")
+                                    .color(AnsiColor.TEXT_YELLOW_BRIGHT)
+                                    .append("SKIPPED")
+                                    .color(AnsiColor.TEXT_WHITE_BRIGHT)
+                                    .append(" : ")
+                                    .append(pad(argumentTestDescriptorSkipped, columnWidthSkipped))
+                                    .append(AnsiColor.TEXT_RESET));
+                }
+
+                println(
+                        new AnsiColorStringBuilder()
+                                .append(INFO)
+                                .color(AnsiColor.TEXT_WHITE_BRIGHT)
+                                .append("Test Methods   : ")
+                                .append(pad(methodTestDescriptorFound, columnWidthFound))
+                                .append(", ")
+                                .color(AnsiColor.TEXT_GREEN_BRIGHT)
+                                .append("PASSED")
+                                .color(AnsiColor.TEXT_WHITE_BRIGHT)
+                                .append(" : ")
+                                .append(pad(methodTestDescriptorSuccess, columnWidthSuccess))
+                                .append(", ")
+                                .color(AnsiColor.TEXT_RED_BRIGHT)
+                                .append("FAILED")
+                                .color(AnsiColor.TEXT_WHITE_BRIGHT)
+                                .append(" : ")
+                                .append(pad(methodTestDescriptorFailure, columnWidthFailure))
+                                .append(", ")
+                                .color(AnsiColor.TEXT_YELLOW_BRIGHT)
+                                .append("SKIPPED")
+                                .color(AnsiColor.TEXT_WHITE_BRIGHT)
+                                .append(" : ")
+                                .append(pad(methodTestDescriptorSkipped, columnWidthSkipped))
+                                .append(AnsiColor.TEXT_RESET));
+                println(INFO + SEPARATOR);
             }
+
+            println(INFO + message);
+            println(INFO + SEPARATOR);
+
+            long elapsedTime = stopWatch.elapsedNanoseconds();
 
             println(
                     new AnsiColorStringBuilder()
                             .append(INFO)
                             .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                            .append("Test Methods   : ")
-                            .append(pad(methodTestDescriptorFound, columnWidthFound))
-                            .append(", ")
-                            .color(AnsiColor.TEXT_GREEN_BRIGHT)
-                            .append("PASSED")
+                            .append("Total Test Time : ")
+                            .append(HumanReadableTimeUtils.toHumanReadable(elapsedTime, false))
+                            .append(" (")
+                            .append(elapsedTime / 1e+6)
+                            .append(" ms)")
+                            .color(AnsiColor.TEXT_RESET));
+
+            println(
+                    new AnsiColorStringBuilder()
+                            .append(INFO)
                             .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                            .append(" : ")
-                            .append(pad(methodTestDescriptorSuccess, columnWidthSuccess))
-                            .append(", ")
-                            .color(AnsiColor.TEXT_RED_BRIGHT)
-                            .append("FAILED")
-                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                            .append(" : ")
-                            .append(pad(methodTestDescriptorFailure, columnWidthFailure))
-                            .append(", ")
-                            .color(AnsiColor.TEXT_YELLOW_BRIGHT)
-                            .append("SKIPPED")
-                            .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                            .append(" : ")
-                            .append(pad(methodTestDescriptorSkipped, columnWidthSkipped))
-                            .append(AnsiColor.TEXT_RESET));
-            println(INFO + SEPARATOR);
-        }
+                            .append("Finished At     : ")
+                            .append(HumanReadableTimeUtils.now())
+                            .color(AnsiColor.TEXT_RESET));
 
-        println(INFO + message);
-        println(INFO + SEPARATOR);
-
-        long elapsedTime = stopWatch.elapsedNanoseconds();
-
-        println(
-                new AnsiColorStringBuilder()
-                        .append(INFO)
-                        .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                        .append("Total Test Time : ")
-                        .append(HumanReadableTimeUtils.toHumanReadable(elapsedTime, false))
-                        .append(" (")
-                        .append(elapsedTime / 1e+6)
-                        .append(" ms)")
-                        .color(AnsiColor.TEXT_RESET));
-
-        println(
-                new AnsiColorStringBuilder()
-                        .append(INFO)
-                        .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                        .append("Finished At     : ")
-                        .append(HumanReadableTimeUtils.now())
-                        .color(AnsiColor.TEXT_RESET));
-
-        if (!hasFailures) {
-            println(INFO + SEPARATOR);
+            if (!hasFailures) {
+                println(INFO + SEPARATOR);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 

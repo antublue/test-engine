@@ -30,17 +30,9 @@ public class DelegatingEngineExecutionListener implements EngineExecutionListene
     private final List<EngineExecutionListener> engineExecutionListeners;
 
     /** Constructor */
-    private DelegatingEngineExecutionListener() {
-        engineExecutionListeners = new ArrayList<>();
-    }
-
-    /**
-     * Method to add a delegated EngineExecutionListener listener
-     *
-     * @param delegatedEngineExecutionListener delegatedEngineExecutionListener
-     */
-    private void addListener(EngineExecutionListener delegatedEngineExecutionListener) {
-        engineExecutionListeners.add(delegatedEngineExecutionListener);
+    public DelegatingEngineExecutionListener(EngineExecutionListener... engineExecutionListeners) {
+        this.engineExecutionListeners = new ArrayList<>();
+        this.engineExecutionListeners.addAll(Arrays.asList(engineExecutionListeners));
     }
 
     @Override
@@ -78,23 +70,5 @@ public class DelegatingEngineExecutionListener implements EngineExecutionListene
         engineExecutionListeners.forEach(
                 engineExecutionListener ->
                         engineExecutionListener.reportingEntryPublished(testDescriptor, entry));
-    }
-
-    /**
-     * Method to create an instance of a DelegatingEngineExecutionListener with an array of delegate
-     * EngineExecutionListeners
-     *
-     * @param engineExecutionListeners engineExecutionListeners
-     * @return a DelegatingEngineExecutionListener
-     */
-    public static DelegatingEngineExecutionListener of(
-            EngineExecutionListener... engineExecutionListeners) {
-        DelegatingEngineExecutionListener delegatingEngineExecutionListener =
-                new DelegatingEngineExecutionListener();
-
-        Arrays.stream(engineExecutionListeners)
-                .forEach(delegatingEngineExecutionListener::addListener);
-
-        return delegatingEngineExecutionListener;
     }
 }

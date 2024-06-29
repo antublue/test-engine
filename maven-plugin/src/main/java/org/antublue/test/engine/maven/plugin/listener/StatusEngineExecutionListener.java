@@ -138,186 +138,210 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
 
     @Override
     public void executionStarted(TestDescriptor testDescriptor) {
-        if (consoleLogTestMessages && testDescriptor instanceof MetadataTestDescriptor) {
-            Metadata metadata = ((MetadataTestDescriptor) testDescriptor).getMetadata();
-
-            Class<?> testClass = metadata.get(MetadataTestDescriptorConstants.TEST_CLASS);
-
-            String testClassDisplayName =
-                    metadata.get(MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME);
-
-            Method testMethod = metadata.get(MetadataTestDescriptorConstants.TEST_METHOD);
-
-            String testMethodDisplayName =
-                    metadata.get(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME) + "()";
-
-            Argument<?> testArgument = metadata.get(MetadataTestDescriptorConstants.TEST_ARGUMENT);
-
-            AnsiColorStringBuilder ansiColorStringBuilder =
-                    new AnsiColorStringBuilder()
-                            .append(INFO)
-                            .append(" ")
-                            .append(Thread.currentThread().getName())
-                            .append(" | ")
-                            .append(consoleTestMessage)
-                            .color(AnsiColor.TEXT_RESET);
-
-            if (testArgument != null) {
-                ansiColorStringBuilder.append(" | ").append(testArgument.getName());
+        try {
+            if (consoleLogTestMessages && testDescriptor instanceof MetadataTestDescriptor) {
+                executionStarted((MetadataTestDescriptor) testDescriptor);
             }
-
-            if (testClass != null) {
-                ansiColorStringBuilder.append(" | ").append(testClassDisplayName);
-            }
-
-            if (testMethod != null) {
-                ansiColorStringBuilder.append(" | ").append(testMethodDisplayName);
-            }
-
-            ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
-
-            System.out.println(ansiColorStringBuilder);
-            System.out.flush();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
+    }
+
+    private void executionStarted(MetadataTestDescriptor metadataTestDescriptor) {
+        Metadata metadata = metadataTestDescriptor.getMetadata();
+
+        Class<?> testClass = metadata.get(MetadataTestDescriptorConstants.TEST_CLASS);
+
+        String testClassDisplayName =
+                metadata.get(MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME);
+
+        Method testMethod = metadata.get(MetadataTestDescriptorConstants.TEST_METHOD);
+
+        String testMethodDisplayName =
+                metadata.get(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME) + "()";
+
+        Argument<?> testArgument = metadata.get(MetadataTestDescriptorConstants.TEST_ARGUMENT);
+
+        AnsiColorStringBuilder ansiColorStringBuilder =
+                new AnsiColorStringBuilder()
+                        .append(INFO)
+                        .append(" ")
+                        .append(Thread.currentThread().getName())
+                        .append(" | ")
+                        .append(consoleTestMessage)
+                        .color(AnsiColor.TEXT_RESET);
+
+        if (testArgument != null) {
+            ansiColorStringBuilder.append(" | ").append(testArgument.getName());
+        }
+
+        if (testClass != null) {
+            ansiColorStringBuilder.append(" | ").append(testClassDisplayName);
+        }
+
+        if (testMethod != null) {
+            ansiColorStringBuilder.append(" | ").append(testMethodDisplayName);
+        }
+
+        ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
+
+        System.out.println(ansiColorStringBuilder);
+        System.out.flush();
     }
 
     @Override
     public void executionSkipped(TestDescriptor testDescriptor, String reason) {
-        if (consoleLogSkipMessages && testDescriptor instanceof MetadataTestDescriptor) {
-            Metadata metadata = ((MetadataTestDescriptor) testDescriptor).getMetadata();
-
-            Class<?> testClass = metadata.get(MetadataTestDescriptorConstants.TEST_CLASS);
-
-            String testClassDisplayName =
-                    metadata.get(MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME);
-
-            Argument<?> testArgument = metadata.get(MetadataTestDescriptorConstants.TEST_ARGUMENT);
-
-            Method testMethod = metadata.get(MetadataTestDescriptorConstants.TEST_METHOD);
-
-            String testMethodDisplayName =
-                    metadata.get(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME) + "()";
-
-            Long elapsedTime =
-                    metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
-
-            AnsiColorStringBuilder ansiColorStringBuilder =
-                    new AnsiColorStringBuilder()
-                            .append(INFO)
-                            .append(" ")
-                            .append(Thread.currentThread().getName())
-                            .append(" | ")
-                            .append(AnsiColor.TEXT_WHITE_BRIGHT);
-
-            ansiColorStringBuilder.append(consoleSkipMessage).color(AnsiColor.TEXT_RESET);
-
-            if (testArgument != null) {
-                ansiColorStringBuilder.append(" | ").append(testArgument.getName());
+        try {
+            if (consoleLogSkipMessages && testDescriptor instanceof MetadataTestDescriptor) {
+                executionSkipped((MetadataTestDescriptor) testDescriptor);
             }
-
-            if (testClass != null) {
-                ansiColorStringBuilder.append(" | ").append(testClassDisplayName);
-            }
-
-            if (testMethod != null) {
-                ansiColorStringBuilder.append(" | ").append(testMethodDisplayName);
-            }
-
-            if (consoleLogTiming && elapsedTime != null) {
-                ansiColorStringBuilder
-                        .append(" ")
-                        .append(
-                                HumanReadableTimeUtils.toTimingUnit(
-                                        elapsedTime, consoleLogTimingUnits));
-            }
-
-            ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
-
-            System.out.println(ansiColorStringBuilder);
-            System.out.flush();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
+    }
+
+    private void executionSkipped(MetadataTestDescriptor metadataTestDescriptor) {
+        Metadata metadata = metadataTestDescriptor.getMetadata();
+
+        Class<?> testClass = metadata.get(MetadataTestDescriptorConstants.TEST_CLASS);
+
+        String testClassDisplayName =
+                metadata.get(MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME);
+
+        Argument<?> testArgument = metadata.get(MetadataTestDescriptorConstants.TEST_ARGUMENT);
+
+        Method testMethod = metadata.get(MetadataTestDescriptorConstants.TEST_METHOD);
+
+        String testMethodDisplayName =
+                metadata.get(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME) + "()";
+
+        Long elapsedTime =
+                metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
+
+        AnsiColorStringBuilder ansiColorStringBuilder =
+                new AnsiColorStringBuilder()
+                        .append(INFO)
+                        .append(" ")
+                        .append(Thread.currentThread().getName())
+                        .append(" | ")
+                        .append(AnsiColor.TEXT_WHITE_BRIGHT);
+
+        ansiColorStringBuilder.append(consoleSkipMessage).color(AnsiColor.TEXT_RESET);
+
+        if (testArgument != null) {
+            ansiColorStringBuilder.append(" | ").append(testArgument.getName());
+        }
+
+        if (testClass != null) {
+            ansiColorStringBuilder.append(" | ").append(testClassDisplayName);
+        }
+
+        if (testMethod != null) {
+            ansiColorStringBuilder.append(" | ").append(testMethodDisplayName);
+        }
+
+        if (consoleLogTiming && elapsedTime != null) {
+            ansiColorStringBuilder
+                    .append(" ")
+                    .append(
+                            HumanReadableTimeUtils.toTimingUnit(
+                                    elapsedTime, consoleLogTimingUnits));
+        }
+
+        ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
+
+        System.out.println(ansiColorStringBuilder);
+        System.out.flush();
     }
 
     @Override
     public void executionFinished(
             TestDescriptor testDescriptor, TestExecutionResult testExecutionResult) {
-        if (consoleLogPassMessages && testDescriptor instanceof MetadataTestDescriptor) {
-            Metadata metadata = ((MetadataTestDescriptor) testDescriptor).getMetadata();
-
-            Class<?> testClass = metadata.get(MetadataTestDescriptorConstants.TEST_CLASS);
-
-            String testClassDisplayName =
-                    metadata.get(MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME);
-
-            Argument<?> testArgument = metadata.get(MetadataTestDescriptorConstants.TEST_ARGUMENT);
-
-            Method testMethod = metadata.get(MetadataTestDescriptorConstants.TEST_METHOD);
-
-            String testMethodDisplayName =
-                    metadata.get(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME) + "()";
-
-            Long elapsedTime =
-                    metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
-
-            String testDescriptorStatus =
-                    metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS);
-
-            AnsiColorStringBuilder ansiColorStringBuilder =
-                    new AnsiColorStringBuilder()
-                            .append(INFO)
-                            .append(" ")
-                            .append(Thread.currentThread().getName())
-                            .append(" | ")
-                            .append(AnsiColor.TEXT_WHITE_BRIGHT);
-
-            switch (testDescriptorStatus) {
-                case "PASS":
-                    {
-                        ansiColorStringBuilder.append(consolePassMessage);
-                        break;
-                    }
-                case "FAIL":
-                    {
-                        ansiColorStringBuilder.append(consoleFailMessage);
-                        break;
-                    }
-                case "SKIP":
-                    {
-                        ansiColorStringBuilder.append(consoleSkipMessage);
-                        break;
-                    }
-                default:
-                    {
-                        ansiColorStringBuilder.append(AnsiColor.TEXT_CYAN_BOLD.wrap("????"));
-                    }
+        try {
+            if (consoleLogPassMessages && testDescriptor instanceof MetadataTestDescriptor) {
+                executionFinished((MetadataTestDescriptor) testDescriptor);
             }
-
-            ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
-
-            if (testArgument != null) {
-                ansiColorStringBuilder.append(" | ").append(testArgument.getName());
-            }
-
-            if (testClass != null) {
-                ansiColorStringBuilder.append(" | ").append(testClassDisplayName);
-            }
-
-            if (testMethod != null) {
-                ansiColorStringBuilder.append(" | ").append(testMethodDisplayName);
-            }
-
-            if (consoleLogTiming && elapsedTime != null) {
-                ansiColorStringBuilder
-                        .append(" ")
-                        .append(
-                                HumanReadableTimeUtils.toTimingUnit(
-                                        elapsedTime, consoleLogTimingUnits));
-            }
-
-            ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
-
-            System.out.println(ansiColorStringBuilder);
-            System.out.flush();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
+    }
+
+    public void executionFinished(MetadataTestDescriptor metadataTestDescriptor) {
+        Metadata metadata = metadataTestDescriptor.getMetadata();
+
+        Class<?> testClass = metadata.get(MetadataTestDescriptorConstants.TEST_CLASS);
+
+        String testClassDisplayName =
+                metadata.get(MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME);
+
+        Argument<?> testArgument = metadata.get(MetadataTestDescriptorConstants.TEST_ARGUMENT);
+
+        Method testMethod = metadata.get(MetadataTestDescriptorConstants.TEST_METHOD);
+
+        String testMethodDisplayName =
+                metadata.get(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME) + "()";
+
+        Long elapsedTime =
+                metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
+
+        String testDescriptorStatus =
+                metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS);
+
+        AnsiColorStringBuilder ansiColorStringBuilder =
+                new AnsiColorStringBuilder()
+                        .append(INFO)
+                        .append(" ")
+                        .append(Thread.currentThread().getName())
+                        .append(" | ")
+                        .append(AnsiColor.TEXT_WHITE_BRIGHT);
+
+        switch (testDescriptorStatus) {
+            case "PASS":
+                {
+                    ansiColorStringBuilder.append(consolePassMessage);
+                    break;
+                }
+            case "FAIL":
+                {
+                    ansiColorStringBuilder.append(consoleFailMessage);
+                    break;
+                }
+            case "SKIP":
+                {
+                    ansiColorStringBuilder.append(consoleSkipMessage);
+                    break;
+                }
+            default:
+                {
+                    ansiColorStringBuilder.append(AnsiColor.TEXT_CYAN_BOLD.wrap("????"));
+                }
+        }
+
+        ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
+
+        if (testArgument != null) {
+            ansiColorStringBuilder.append(" | ").append(testArgument.getName());
+        }
+
+        if (testClass != null) {
+            ansiColorStringBuilder.append(" | ").append(testClassDisplayName);
+        }
+
+        if (testMethod != null) {
+            ansiColorStringBuilder.append(" | ").append(testMethodDisplayName);
+        }
+
+        if (consoleLogTiming && elapsedTime != null) {
+            ansiColorStringBuilder
+                    .append(" ")
+                    .append(
+                            HumanReadableTimeUtils.toTimingUnit(
+                                    elapsedTime, consoleLogTimingUnits));
+        }
+
+        ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
+
+        System.out.println(ansiColorStringBuilder);
+        System.out.flush();
     }
 }

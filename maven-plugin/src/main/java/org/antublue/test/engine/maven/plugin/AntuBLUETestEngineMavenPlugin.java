@@ -201,7 +201,7 @@ public class AntuBLUETestEngineMavenPlugin extends AbstractMojo {
             String summaryMessage = null;
 
             DelegatingEngineExecutionListener delegatingEngineExecutionListener =
-                    DelegatingEngineExecutionListener.of(
+                    new DelegatingEngineExecutionListener(
                             summaryEngineExecutionListener, new StatusEngineExecutionListener());
 
             LauncherConfig launcherConfig = LauncherConfig.builder().build();
