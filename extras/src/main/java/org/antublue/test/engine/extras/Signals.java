@@ -16,17 +16,15 @@
 
 package org.antublue.test.engine.extras;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
-/** Class to implement Conditions */
+/** Class to implement Signals */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Signals {
 
-    private static final ReentrantLock LOCK = new ReentrantLock(true);
-    private static final Map<Object, LinkedBlockingQueue<Boolean>> MAP = new HashMap<>();
+    private static final Map<Object, CountDownLatch> MAP = new ConcurrentHashMap<>();
 
     /** Constructor */
     private Signals() {
@@ -34,52 +32,46 @@ public class Signals {
     }
 
     /**
-     * Method to signal a Condition
+     * Method to signal
      *
-     * @param name name
+     * @param key key
      */
-    public static void signal(Object name) {
-        LinkedBlockingQueue<Boolean> linkedBlockingQueue;
-
-        try {
-            LOCK.lock();
-            linkedBlockingQueue = MAP.get(name);
-            if (linkedBlockingQueue == null) {
-                linkedBlockingQueue = new LinkedBlockingQueue<>();
-                MAP.put(name, linkedBlockingQueue);
-            }
-        } finally {
-            LOCK.unlock();
+    public static void signal(Object key) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
         }
 
-        try {
-            linkedBlockingQueue.put(Boolean.TRUE);
-        } catch (InterruptedException e) {
-            // DO NOTHING
-        }
+        MAP.compute(
+                        key,
+                        (k, o) -> {
+                            if (o == null) {
+                                o = new CountDownLatch(1);
+                            }
+                            return o;
+                        })
+                .countDown();
     }
 
     /**
-     * Method to wait for a Condition
+     * Method to wait for a signal
      *
-     * @param name name
+     * @param key key
      */
-    public static void await(Object name) {
-        LinkedBlockingQueue<Boolean> linkedBlockingQueue;
-
-        try {
-            LOCK.lock();
-            linkedBlockingQueue = MAP.get(name);
-            if (linkedBlockingQueue == null) {
-                linkedBlockingQueue = new LinkedBlockingQueue<>();
-                MAP.put(name, linkedBlockingQueue);
-            }
-        } finally {
-            LOCK.unlock();
+    public static void await(Object key) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
         }
 
         try {
-            linkedBlockingQueue.add(linkedBlockingQueue.take());
+            MAP.compute(
+                            key,
+                            (k, o) -> {
+                                if (o == null) {
+                                    o = new CountDownLatch(1);
+                                }
+                                return o;
+                            })
+                    .await();
         } catch (InterruptedException e) {
             // DO NOTHING
         }
