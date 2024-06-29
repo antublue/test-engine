@@ -52,6 +52,9 @@ public class SignalAwaitTimeoutTest {
         System.out.println(getClass().getName() + ".test(" + argument + ")");
 
         assertThatExceptionOfType(TimeoutException.class)
-                .isThrownBy(() -> Signals.await(SignalAwaitTimeoutTest.class, 100, TimeUnit.MILLISECONDS));
+                .isThrownBy(
+                        () ->
+                                Signals.await(
+                                        SignalAwaitTimeoutTest.class, 100, TimeUnit.MILLISECONDS));
     }
 }
