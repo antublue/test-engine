@@ -20,8 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.extras.Executable;
-import org.antublue.test.engine.extras.Locks;
+import org.antublue.test.engine.extras.ExecutableSupport;
 
 /** Example test */
 public class LocksTest {
@@ -59,11 +58,7 @@ public class LocksTest {
         System.out.println("test(" + argument + ")");
         assertThat(argument).isNotNull();
 
-        long time =
-                Locks.execute(
-                                getClass(),
-                                () -> Thread.sleep(1013))
-                        .toMillis();
+        long time = ExecutableSupport.execute(getClass(), () -> Thread.sleep(1013)).toMillis();
 
         System.out.println("execution time [" + time + "] ms");
     }

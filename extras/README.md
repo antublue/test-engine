@@ -10,14 +10,22 @@ Provides locking support.
 
 Provides signal support.
 
-## `TimedExecution`
+## `TimedExecution` (Deprecated)
 
 Provides timing support.
 
-## `Executable`
+## `Timed` (Deprecated)
 
-Provide executable support.
+Provides timing support.
 
 ## `Key`
 
 Provides key support.
+
+## `ExecutableSupport`
+
+Provides executable support
+
+## `Executable`
+
+Executable interface.

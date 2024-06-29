@@ -19,25 +19,49 @@ package org.antublue.test.engine.extras;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-/** Class to implement TimedExecution */
-@Deprecated
-public class TimedExecution {
+/** Class to implement ExecutableSupport */
+public class ExecutableSupport {
 
     /** Constructor */
-    private TimedExecution() {
+    private ExecutableSupport() {
         // DO NOTHING
     }
 
     /**
-     * Method to time an executable
+     * Method execute an Executable
      *
      * @param executable executable
      * @return the Duration
      * @throws Throwable Throwable
      */
     public static Duration execute(Executable executable) throws Throwable {
+        if (executable == null) {
+            throw new IllegalArgumentException("executable is null");
+        }
+
         long t0 = System.nanoTime();
         executable.execute();
         return Duration.of(System.nanoTime() - t0, ChronoUnit.NANOS);
+    }
+
+    /**
+     * Method execute an Executable in a Lock
+     *
+     * @param key key
+     * @param executable executable
+     * @return the Duration
+     * @throws Throwable Throwable
+     */
+    public static Duration execute(Object key, Executable executable) throws Throwable {
+        long t0 = System.nanoTime();
+        Locks.LockReference lockReference = Locks.getReference(key);
+
+        try {
+            lockReference.lock();
+            executable.execute();
+            return Duration.of(System.nanoTime() - t0, ChronoUnit.NANOS);
+        } finally {
+            lockReference.unlock();
+        }
     }
 }

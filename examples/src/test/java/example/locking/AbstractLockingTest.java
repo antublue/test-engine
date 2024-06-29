@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.extras.Locks;
+import org.antublue.test.engine.extras.ExecutableSupport;
 
 public abstract class AbstractLockingTest {
 
@@ -45,7 +45,7 @@ public abstract class AbstractLockingTest {
     public void test() throws Throwable {
         final String className = getClass().getName();
 
-        Locks.execute(
+        ExecutableSupport.execute(
                 NAMESPACE + "/" + LOCK_NAME,
                 () -> {
                     System.out.println(className + ".test1(" + argument + ")");

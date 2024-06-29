@@ -103,6 +103,7 @@ public class Locks {
      * @return the Duration
      * @throws Throwable Throwable
      */
+    @Deprecated
     public static Duration execute(Object key, Executable executable) throws Throwable {
         long t0 = System.nanoTime();
 
