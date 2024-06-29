@@ -69,6 +69,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <groupId>io.github.thunkware</groupId>
+                    <artifactId>virtual-threads-bridge</artifactId>
+                    <version>0.0.4</version>
+                    <packaging>jar</packaging>
+                    <file>${basedir}/dependencies/virtual-threads-bridge-0.0.4.jar</file>
+                    <generatePom>true</generatePom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-jar-lib</id>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

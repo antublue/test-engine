@@ -322,6 +322,11 @@
             <artifactId>junit-platform-launcher</artifactId>
             <version>1.10.3</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.thunkware</groupId>
+            <artifactId>virtual-threads-bridge</artifactId>
+            <version>0.0.4</version>
+        </dependency>
     </dependencies>
 
 </project>

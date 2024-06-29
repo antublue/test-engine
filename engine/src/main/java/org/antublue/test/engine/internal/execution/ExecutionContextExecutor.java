@@ -18,6 +18,8 @@ package org.antublue.test.engine.internal.execution;
 
 import static java.lang.String.format;
 
+import io.github.thunkware.vt.bridge.ExecutorTool;
+import io.github.thunkware.vt.bridge.ThreadTool;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
@@ -60,7 +62,13 @@ public class ExecutionContextExecutor {
      */
     public void execute(ExecutionContext executionContext) {
         try {
-            LOGGER.trace("execute()");
+            LOGGER.trace(
+                    "execute() children [%d]",
+                    executionContext
+                            .getExecutionRequest()
+                            .getRootTestDescriptor()
+                            .getChildren()
+                            .size());
 
             EngineExecutionListener engineExecutionListener =
                     executionContext.getExecutionRequest().getEngineExecutionListener();
@@ -100,15 +108,27 @@ public class ExecutionContextExecutor {
 
                 LOGGER.trace("%s = [%d]", Constants.THREAD_COUNT, threadCount);
 
-                executorService =
-                        new ThreadPoolExecutor(
-                                threadCount,
-                                threadCount,
-                                60L,
-                                TimeUnit.SECONDS,
-                                new ArrayBlockingQueue<>(threadCount * 10),
-                                new NamedThreadFactory("test-engine-%02d"),
-                                new BlockingRejectedExecutionHandler());
+                try {
+                    if (ThreadTool.hasVirtualThreads()) {
+                        LOGGER.info("using virtual threads");
+                        executorService = ExecutorTool.newVirtualThreadPerTaskExecutor();
+                    }
+                } catch (Throwable t) {
+                    LOGGER.error("Exception using virtual threads", t);
+                }
+
+                if (executorService == null) {
+                    LOGGER.info("using platform threads");
+                    executorService =
+                            new ThreadPoolExecutor(
+                                    threadCount,
+                                    threadCount,
+                                    60L,
+                                    TimeUnit.SECONDS,
+                                    new ArrayBlockingQueue<>(threadCount * 10),
+                                    new NamedThreadFactory("test-engine-%02d"),
+                                    new BlockingRejectedExecutionHandler());
+                }
 
                 engineExecutionListener.executionStarted(
                         executionContext.getExecutionRequest().getRootTestDescriptor());
@@ -119,6 +139,7 @@ public class ExecutionContextExecutor {
 
                 for (TestDescriptor testDescriptor : testDescriptors) {
                     if (testDescriptor instanceof ExecutableTestDescriptor) {
+                        LOGGER.info("submitting name [%s]", testDescriptor.getDisplayName());
                         ExecutableTestDescriptor executableTestDescriptor =
                                 (ExecutableTestDescriptor) testDescriptor;
                         executorService.submit(
