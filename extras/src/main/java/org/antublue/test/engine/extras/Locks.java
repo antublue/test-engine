@@ -18,6 +18,8 @@ package org.antublue.test.engine.extras;
 
 import static java.lang.String.format;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -98,9 +100,12 @@ public class Locks {
      *
      * @param key key
      * @param executable executable
+     * @return the Duration
      * @throws Throwable Throwable
      */
-    public static void execute(Object key, Executable executable) throws Throwable {
+    public static Duration execute(Object key, Executable executable) throws Throwable {
+        long t0 = System.nanoTime();
+
         if (key == null) {
             throw new IllegalArgumentException("key is null");
         }
@@ -117,6 +122,8 @@ public class Locks {
         } finally {
             lockReference.unlock();
         }
+
+        return Duration.of(System.nanoTime() - t0, ChronoUnit.NANOS);
     }
 
     /** Class to implement LockManager */
