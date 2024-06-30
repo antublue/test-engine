@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.internal.discovery;
 
-import org.antublue.test.engine.api.InvocationExtension;
+import org.antublue.test.engine.api.extension.InvocationExtension;
 
 /** Class to implement DefaultInvocationExtension */
 public class DefaultInvocationExtension implements InvocationExtension {

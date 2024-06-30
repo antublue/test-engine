@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.api;
+package org.antublue.test.engine.api.extension;
 
 /** Class to implement InvocationExtension */
 public interface InvocationExtension {
@@ -92,5 +92,15 @@ public interface InvocationExtension {
      */
     default void afterDestroy(Class<?> testClass, Object testInstance, Throwable throwable) {
         // DO NOTHING
+    }
+
+    /**
+     * TODO
+     *
+     * @param testExtension
+     * @return
+     */
+    static InvocationExtension of(TestExtension testExtension) {
+        return new InvocationExtensionAdapter(testExtension);
     }
 }

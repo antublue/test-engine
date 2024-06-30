@@ -16,7 +16,7 @@
 
 package org.antublue.test.engine.testing.extension;
 
-import org.antublue.test.engine.api.InvocationExtension;
+import org.antublue.test.engine.api.extension.InvocationExtension;
 
 public class ExampleInvocationExtension implements InvocationExtension {
 
