@@ -68,6 +68,37 @@ public class ThrowableCollector {
         }
     }
 
+    public void execute(
+            Executable preExecutable, Executable executable, Executable postExecutable) {
+        try {
+            preExecutable.execute();
+            executable.execute();
+        } catch (Throwable throwable) {
+            if (printStackTrace) {
+                synchronized (System.out) {
+                    synchronized (System.err) {
+                        throwable.printStackTrace();
+                    }
+                }
+            }
+
+            throwables.add(throwable);
+        }
+
+        try {
+            postExecutable.execute();
+        } catch (Throwable throwable) {
+            throwables.add(throwable);
+            if (printStackTrace) {
+                synchronized (System.out) {
+                    synchronized (System.err) {
+                        throwable.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Method to get the list of Throwables
      *
@@ -75,6 +106,15 @@ public class ThrowableCollector {
      */
     public List<Throwable> getThrowables() {
         return throwables;
+    }
+
+    /**
+     * Method to get the first Throwable
+     *
+     * @return the first Throwable, or null if there are no Throwables
+     */
+    public Throwable getFirst() {
+        return throwables.isEmpty() ? null : throwables.get(0);
     }
 
     /**

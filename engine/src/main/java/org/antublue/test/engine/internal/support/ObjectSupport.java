@@ -39,7 +39,7 @@ public class ObjectSupport {
      * @return an Object of type T
      * @throws Throwable Throwable
      */
-    public static <T> T createObject(Class<?> clazz) throws Throwable {
+    public static <T> T createInstance(Class<?> clazz) throws Throwable {
         return (T) clazz.getConstructor().newInstance();
     }
 

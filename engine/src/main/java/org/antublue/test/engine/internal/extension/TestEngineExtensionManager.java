@@ -47,7 +47,7 @@ public class TestEngineExtensionManager {
 
             for (Class<?> clazz : classes) {
                 try {
-                    testEngineExtensions.add(ObjectSupport.createObject(clazz));
+                    testEngineExtensions.add(ObjectSupport.createInstance(clazz));
                 } catch (Throwable t) {
                     throw new TestEngineException(t);
                 }

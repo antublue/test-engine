@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.InvocationExtension;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -34,6 +36,7 @@ import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
 import org.antublue.test.engine.internal.util.Predicates;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.TestDescriptor;
@@ -51,6 +54,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private final Argument<?> testArgument;
     private final List<Method> beforeAllMethods;
     private final List<Method> afterAllMethods;
+    private final InvocationExtension invocationExtension;
 
     /**
      * Constructor
@@ -68,12 +72,14 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
             Class<?> testClass,
             List<Method> beforeAllMethods,
             List<Method> afterAllMethods,
-            Argument<?> testArgument) {
+            Argument<?> testArgument,
+            InvocationExtension invocationExtension) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testArgument = testArgument;
         this.beforeAllMethods = beforeAllMethods;
         this.afterAllMethods = afterAllMethods;
+        this.invocationExtension = invocationExtension;
     }
 
     @Override
@@ -239,15 +245,24 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                     testInstance.getClass().getName(), testInstance);
         }
 
-        for (Method method : beforeAllMethods) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(
-                        "beforeAllMethods() testClass [%s] testInstance [%s] method [%s]",
-                        testInstance.getClass().getName(), testInstance, method);
-            }
+        ThrowableCollector localThrowableCollector = new ThrowableCollector();
 
-            method.invoke(testInstance);
-        }
+        localThrowableCollector.execute(
+                () ->
+                        invocationExtension.beforeInvocationCallback(
+                                TestEngine.BeforeAll.class, testInstance),
+                () -> {
+                    for (Method method : beforeAllMethods) {
+                        MethodSupport.invoke(testInstance, method);
+                    }
+                },
+                () ->
+                        invocationExtension.afterInvocationCallback(
+                                TestEngine.BeforeAll.class,
+                                testInstance,
+                                localThrowableCollector.getFirst()));
+
+        throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
     }
 
     private void doExecute(ExecutionContext executionContext) {
@@ -305,15 +320,24 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                     testInstance.getClass().getName(), testInstance);
         }
 
-        for (Method method : afterAllMethods) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(
-                        "afterAllMethods() testClass [%s] testInstance [%s] method [%s]",
-                        testInstance.getClass().getName(), testInstance, method);
-            }
+        ThrowableCollector localThrowableCollector = new ThrowableCollector();
 
-            method.invoke(testInstance);
-        }
+        localThrowableCollector.execute(
+                () ->
+                        invocationExtension.beforeInvocationCallback(
+                                TestEngine.AfterAll.class, testInstance),
+                () -> {
+                    for (Method method : afterAllMethods) {
+                        MethodSupport.invoke(testInstance, method);
+                    }
+                },
+                () ->
+                        invocationExtension.afterInvocationCallback(
+                                TestEngine.AfterAll.class,
+                                testInstance,
+                                localThrowableCollector.getFirst()));
+
+        throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
     }
 
     private void clearRandomFields(ExecutionContext executionContext) throws Throwable {
@@ -353,7 +377,8 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
             UniqueId parentUniqueId,
             Class<?> testClass,
             Argument<?> testArgument,
-            int testArgumentIndex) {
+            int testArgumentIndex,
+            InvocationExtension invocationExtension) {
         Preconditions.notNull(parentUniqueId, "parentUniqueId is null");
         Preconditions.notNull(testClass, "testClass is null");
         Preconditions.notNull(testArgument, "testArgument is null");
@@ -396,6 +421,12 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 OrdererSupport.orderTestMethods(afterAllMethods, HierarchyTraversalMode.BOTTOM_UP);
 
         return new ArgumentTestDescriptor(
-                uniqueId, displayName, testClass, beforeAllMethods, afterAllMethods, testArgument);
+                uniqueId,
+                displayName,
+                testClass,
+                beforeAllMethods,
+                afterAllMethods,
+                testArgument,
+                invocationExtension);
     }
 }

@@ -20,6 +20,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import org.antublue.test.engine.api.InvocationExtension;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -30,6 +32,7 @@ import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
 import org.antublue.test.engine.internal.util.Predicates;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.TestDescriptor;
@@ -47,6 +50,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     private final Class<?> testClass;
     private final List<Method> prepareMethods;
     private final List<Method> concludeMethods;
+    private final InvocationExtension invocationExtension;
 
     /**
      * Constructor
@@ -62,11 +66,13 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
             String displayName,
             Class<?> testClass,
             List<Method> prepareMethods,
-            List<Method> concludeMethods) {
+            List<Method> concludeMethods,
+            InvocationExtension invocationExtension) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.prepareMethods = prepareMethods;
         this.concludeMethods = concludeMethods;
+        this.invocationExtension = invocationExtension;
     }
 
     @Override
@@ -214,15 +220,24 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                     testClass.getName(), testInstance);
         }
 
-        for (Method method : prepareMethods) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(
-                        "prepare() testClass [%s] testInstance [%s] method [%s]",
-                        testClass.getName(), testInstance, method);
-            }
+        ThrowableCollector localThrowableCollector = new ThrowableCollector();
 
-            method.invoke(testInstance);
-        }
+        localThrowableCollector.execute(
+                () ->
+                        invocationExtension.beforeInvocationCallback(
+                                TestEngine.Prepare.class, testInstance),
+                () -> {
+                    for (Method method : prepareMethods) {
+                        MethodSupport.invoke(testInstance, method);
+                    }
+                },
+                () ->
+                        invocationExtension.afterInvocationCallback(
+                                TestEngine.Prepare.class,
+                                testInstance,
+                                localThrowableCollector.getFirst()));
+
+        throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
     }
 
     private void createTestInstance(ExecutionContext executionContext) throws Throwable {
@@ -230,16 +245,29 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
             LOGGER.trace("createTestInstance() testClass [%s]", testClass.getName());
         }
 
-        Object testInstance =
-                testClass.getDeclaredConstructor((Class<?>[]) null).newInstance((Object[]) null);
+        Object testInstance = null;
+        Throwable throwable = null;
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(
-                    "createTestInstance() testClass [%s] testInstance [%s]",
-                    testClass.getName(), testInstance);
+        try {
+            invocationExtension.beforeInstantiateCallback(testClass);
+
+            testInstance =
+                    testClass
+                            .getDeclaredConstructor((Class<?>[]) null)
+                            .newInstance((Object[]) null);
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(
+                        "createTestInstance() testClass [%s] testInstance [%s]",
+                        testClass.getName(), testInstance);
+            }
+
+            executionContext.put(ExecutionContextConstant.TEST_INSTANCE, testInstance);
+        } catch (Throwable t) {
+            throwable = t;
         }
 
-        executionContext.put(ExecutionContextConstant.TEST_INSTANCE, testInstance);
+        invocationExtension.afterInstantiateCallback(testClass, testInstance, throwable);
     }
 
     private void doExecute(ExecutionContext executionContext) {
@@ -303,15 +331,24 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         }
 
         if (testInstance != null) {
-            for (Method method : concludeMethods) {
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace(
-                            "conclude() testClass [%s] testInstance [%s] method [%s]",
-                            testClass.getName(), testInstance, method);
-                }
+            ThrowableCollector localThrowableCollector = new ThrowableCollector();
 
-                method.invoke(testInstance);
-            }
+            localThrowableCollector.execute(
+                    () ->
+                            invocationExtension.beforeInvocationCallback(
+                                    TestEngine.Conclude.class, testInstance),
+                    () -> {
+                        for (Method method : concludeMethods) {
+                            MethodSupport.invoke(testInstance, method);
+                        }
+                    },
+                    () ->
+                            invocationExtension.afterInvocationCallback(
+                                    TestEngine.Conclude.class,
+                                    testInstance,
+                                    localThrowableCollector.getFirst()));
+
+            throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
         }
     }
 
@@ -327,7 +364,8 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
      * @param testClass testClass
      * @return a ClassTestDescriptor
      */
-    public static ClassTestDescriptor create(UniqueId parentUniqueId, Class<?> testClass) {
+    public static ClassTestDescriptor create(
+            UniqueId parentUniqueId, Class<?> testClass, InvocationExtension invocationExtension) {
         Preconditions.notNull(parentUniqueId, "parentUniqueId is null");
         Preconditions.notNull(testClass, "testClass is null");
 
@@ -367,6 +405,11 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         }
 
         return new ClassTestDescriptor(
-                uniqueId, displayName, testClass, prepareMethods, concludeMethods);
+                uniqueId,
+                displayName,
+                testClass,
+                prepareMethods,
+                concludeMethods,
+                invocationExtension);
     }
 }

@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.InvocationExtension;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.configuration.Configuration;
@@ -64,6 +65,7 @@ import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 /** Class to implement a EngineDiscoveryRequestResolver */
+@SuppressWarnings("unchecked")
 public class EngineDiscoveryRequestResolver {
 
     private static final Logger LOGGER =
@@ -128,10 +130,17 @@ public class EngineDiscoveryRequestResolver {
      */
     private static void buildClassTestDescriptor(
             TestDescriptor parentTestDescriptor, Class<?> testClass) throws Throwable {
-        LOGGER.trace("buildClassTestDescriptor() testClass [%s]", testClass.getName());
+        LOGGER.trace("buildClassTestDescriptor() testClass [%s]", testClass);
+
+        InvocationExtension invocationExtension = getInvocationExtension(testClass);
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("invocationExtension [%s]", invocationExtension);
+        }
 
         ClassTestDescriptor classTestDescriptor =
-                ClassTestDescriptor.create(parentTestDescriptor.getUniqueId(), testClass);
+                ClassTestDescriptor.create(
+                        parentTestDescriptor.getUniqueId(), testClass, invocationExtension);
 
         parentTestDescriptor.addChild(classTestDescriptor);
 
@@ -139,7 +148,11 @@ public class EngineDiscoveryRequestResolver {
         List<Argument<?>> testArguments = getArguments(testClass);
         for (Argument<?> testArgument : testArguments) {
             buildArgumentTestDescriptor(
-                    classTestDescriptor, testClass, testArgument, testArgumentIndex);
+                    classTestDescriptor,
+                    testClass,
+                    testArgument,
+                    testArgumentIndex,
+                    invocationExtension);
             testArgumentIndex++;
         }
     }
@@ -156,7 +169,8 @@ public class EngineDiscoveryRequestResolver {
             TestDescriptor parentTestDescriptor,
             Class<?> testClass,
             Argument<?> testArgument,
-            int testArgumentIndex) {
+            int testArgumentIndex,
+            InvocationExtension invocationExtension) {
         LOGGER.trace(
                 "buildArgumentTestDescriptor() testClass [%s] testArgument [%s] testArgumentIndex"
                         + " [%d]",
@@ -167,11 +181,13 @@ public class EngineDiscoveryRequestResolver {
                         parentTestDescriptor.getUniqueId(),
                         testClass,
                         testArgument,
-                        testArgumentIndex);
+                        testArgumentIndex,
+                        invocationExtension);
 
         parentTestDescriptor.addChild(argumentTestDescriptor);
 
-        buildTestMethodTestDescriptor(argumentTestDescriptor, testClass, testArgument);
+        buildTestMethodTestDescriptor(
+                argumentTestDescriptor, testClass, testArgument, invocationExtension);
     }
 
     /**
@@ -180,9 +196,13 @@ public class EngineDiscoveryRequestResolver {
      * @param parentTestDescriptor parentTestDescriptor
      * @param testClass testClass
      * @param testArgument testArgument
+     * @param invocationExtension invocationExtension
      */
     private static void buildTestMethodTestDescriptor(
-            TestDescriptor parentTestDescriptor, Class<?> testClass, Argument<?> testArgument) {
+            TestDescriptor parentTestDescriptor,
+            Class<?> testClass,
+            Argument<?> testArgument,
+            InvocationExtension invocationExtension) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
                     "buildTestMethodTestDescriptor() testClass [%s] testArgument [%s]",
@@ -204,7 +224,8 @@ public class EngineDiscoveryRequestResolver {
                             parentTestDescriptor.getUniqueId(),
                             testClass,
                             testMethod,
-                            testArgument));
+                            testArgument,
+                            invocationExtension));
         }
     }
 
@@ -372,6 +393,27 @@ public class EngineDiscoveryRequestResolver {
     }
 
     /**
+     * Method to get the test class invocation extension
+     *
+     * @param testClass testClass
+     * @return an InvocationExtension
+     * @throws Throwable Throwable
+     */
+    private static InvocationExtension getInvocationExtension(Class<?> testClass) throws Throwable {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("getInvocationExtension() testClass [%s]", testClass.getName());
+        }
+
+        InvocationExtension invocationExtension = new DefaultInvocationExtension();
+        Optional<Method> optional = getInvocationExtensionSupplierMethod(testClass);
+        if (optional.isPresent()) {
+            invocationExtension = (InvocationExtension) MethodSupport.invoke(null, optional.get());
+        }
+
+        return invocationExtension;
+    }
+
+    /**
      * Method to get argument for a test class
      *
      * @param testClass testClass
@@ -385,7 +427,7 @@ public class EngineDiscoveryRequestResolver {
 
         List<Argument<?>> testArguments = new ArrayList<>();
 
-        Object object = getArumentSupplierMethod(testClass).invoke(null, (Object[]) null);
+        Object object = getArgumentSupplierMethod(testClass).invoke(null, (Object[]) null);
         if (object == null) {
             return testArguments;
         }
@@ -428,14 +470,34 @@ public class EngineDiscoveryRequestResolver {
     }
 
     /**
+     * Method to get a test class invocation extension supplier method
+     *
+     * @param testClass testClass
+     * @return the argument supplier method
+     */
+    private static Optional<Method> getInvocationExtensionSupplierMethod(Class<?> testClass) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("getInvocationExtensionSupplierMethod() testClass [%s]", testClass);
+        }
+
+        List<Method> methods =
+                MethodSupport.findMethods(
+                        testClass,
+                        Predicates.INVOCATION_EXTENSION_SUPPLIER_METHOD,
+                        HierarchyTraversalMode.BOTTOM_UP);
+
+        return !methods.isEmpty() ? Optional.of(methods.get(0)) : Optional.empty();
+    }
+
+    /**
      * Method to get a test class argument supplier method
      *
      * @param testClass testClass
      * @return the argument supplier method
      */
-    private static Method getArumentSupplierMethod(Class<?> testClass) {
+    private static Method getArgumentSupplierMethod(Class<?> testClass) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("getArumentSupplierMethod() testClass [%s]", testClass.getName());
+            LOGGER.trace("getArgumentSupplierMethod() testClass [%s]", testClass);
         }
 
         List<Method> methods =
@@ -472,7 +534,7 @@ public class EngineDiscoveryRequestResolver {
                 matcher.reset(clazz.getName());
                 if (!matcher.find()) {
                     if (LOGGER.isTraceEnabled()) {
-                        LOGGER.trace("removing testClass [%s]", clazz.getName());
+                        LOGGER.trace("removing testClass [%s]", clazz);
                     }
 
                     iterator.remove();
@@ -732,7 +794,7 @@ public class EngineDiscoveryRequestResolver {
 
             /*
             engineDescriptor.getChildren() return an
-            unmodifiable list so we have to create a copy
+            unmodifiable list, so we have to create a copy
             of the list, remove all children from the engineDescriptor,
             shuffle our copy of the list, then add or list
             back to the engineDescriptor

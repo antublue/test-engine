@@ -22,6 +22,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.InvocationExtension;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -31,6 +33,7 @@ import org.antublue.test.engine.internal.support.MethodSupport;
 import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.util.Predicates;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.TestExecutionResult;
@@ -48,6 +51,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> beforeEachMethods;
     private final Method testMethod;
     private final List<Method> afterEachMethods;
+    private final InvocationExtension invocationExtension;
 
     /**
      * Constructor
@@ -67,13 +71,15 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
             List<Method> beforeEachMethods,
             Method testMethod,
             List<Method> afterEachMethods,
-            Argument<?> testArgument) {
+            Argument<?> testArgument,
+            InvocationExtension invocationExtension) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.beforeEachMethods = beforeEachMethods;
         this.testMethod = testMethod;
         this.afterEachMethods = afterEachMethods;
         this.testArgument = testArgument;
+        this.invocationExtension = invocationExtension;
     }
 
     @Override
@@ -205,15 +211,24 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                     testInstance.getClass().getName(), testInstance);
         }
 
-        for (Method method : beforeEachMethods) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(
-                        "beforeEach() testClass [%s] testInstance [%s] method [%s]",
-                        testInstance.getClass().getName(), testInstance, method);
-            }
+        ThrowableCollector localThrowableCollector = new ThrowableCollector();
 
-            method.invoke(testInstance);
-        }
+        localThrowableCollector.execute(
+                () ->
+                        invocationExtension.beforeInvocationCallback(
+                                TestEngine.BeforeEach.class, testInstance),
+                () -> {
+                    for (Method method : beforeEachMethods) {
+                        MethodSupport.invoke(testInstance, method);
+                    }
+                },
+                () ->
+                        invocationExtension.afterInvocationCallback(
+                                TestEngine.BeforeEach.class,
+                                testInstance,
+                                localThrowableCollector.getFirst()));
+
+        throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
     }
 
     private void test(ExecutionContext executionContext) throws Throwable {
@@ -225,7 +240,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                     testInstance.getClass().getName(), testInstance, testMethod);
         }
 
-        testMethod.invoke(testInstance);
+        MethodSupport.invoke(testInstance, testMethod);
     }
 
     private void afterEach(ExecutionContext executionContext) throws Throwable {
@@ -237,15 +252,24 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                     testInstance.getClass().getName(), testInstance);
         }
 
-        for (Method method : afterEachMethods) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(
-                        "afterEach() testClass [%s] testInstance [%s] method [%s]",
-                        testInstance.getClass().getName(), testInstance, method);
-            }
+        ThrowableCollector localThrowableCollector = new ThrowableCollector();
 
-            method.invoke(testInstance);
-        }
+        localThrowableCollector.execute(
+                () ->
+                        invocationExtension.beforeInvocationCallback(
+                                TestEngine.AfterEach.class, testInstance),
+                () -> {
+                    for (Method method : afterEachMethods) {
+                        MethodSupport.invoke(testInstance, method);
+                    }
+                },
+                () ->
+                        invocationExtension.afterInvocationCallback(
+                                TestEngine.AfterEach.class,
+                                testInstance,
+                                localThrowableCollector.getFirst()));
+
+        throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
     }
 
     /**
@@ -261,7 +285,8 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
             UniqueId parentUniqueId,
             Class<?> testClass,
             Method testMethod,
-            Argument<?> testArgument) {
+            Argument<?> testArgument,
+            InvocationExtension invocationExtension) {
         Preconditions.notNull(parentUniqueId, "parentUniqueId is null");
         Preconditions.notNull(testClass, "testClass is null");
         Preconditions.notNull(testMethod, "testMethod is null");
@@ -312,6 +337,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                 beforeEachMethods,
                 testMethod,
                 afterEachMethods,
-                testArgument);
+                testArgument,
+                invocationExtension);
     }
 }

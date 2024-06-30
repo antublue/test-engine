@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package example.extension;
+package org.antublue.test.engine.testing.extension;
 
 import org.antublue.test.engine.api.TestEngineExtension;
 
-/** Example TestEngineExtensions */
+/** Example TestEngineExtension */
 public class ExampleTestEngineExtension implements TestEngineExtension {
 
     @Override

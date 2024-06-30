@@ -28,6 +28,11 @@ public @interface TestEngine {
     /** ArgumentSupplier annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
+    @interface InvocationExtensionSupplier {}
+
+    /** ArgumentSupplier annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
     @interface ArgumentSupplier {}
 
     /** Argument annotation */

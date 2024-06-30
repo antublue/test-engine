@@ -46,4 +46,16 @@ public class MethodSupport {
         return new ArrayList<>(
                 ReflectionSupport.findMethods(clazz, predicate, hierarchyTraversalMode));
     }
+
+    /**
+     * Method to invoke a Method
+     *
+     * @param object object
+     * @param method method
+     * @return the return value
+     * @throws Throwable Throwable
+     */
+    public static Object invoke(Object object, Method method) throws Throwable {
+        return method.invoke(object);
+    }
 }

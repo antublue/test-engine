@@ -44,6 +44,18 @@ public class Predicates {
                         && TestEngineExtension.class.isAssignableFrom(clazz);
             };
 
+    /** Predicate to filter invocation extensions supplier methods */
+    public static final Predicate<Method> INVOCATION_EXTENSION_SUPPLIER_METHOD =
+            method -> {
+                int modifiers = method.getModifiers();
+
+                return Modifier.isPublic(modifiers)
+                        && Modifier.isStatic(modifiers)
+                        // TODO check return type
+                        && method.getParameterCount() == 0
+                        && method.isAnnotationPresent(TestEngine.InvocationExtensionSupplier.class);
+            };
+
     /** Predicate to filter argument fields */
     public static final Predicate<Field> ARGUMENT_FIELD =
             field -> {
