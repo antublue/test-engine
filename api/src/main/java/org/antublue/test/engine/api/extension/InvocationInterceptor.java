@@ -17,6 +17,7 @@
 package org.antublue.test.engine.api.extension;
 
 import java.lang.reflect.Method;
+import org.antublue.test.engine.api.support.ThrowableSupport;
 
 /** Class to implement InvocationExtension */
 public interface InvocationInterceptor {
@@ -41,9 +42,7 @@ public interface InvocationInterceptor {
      */
     default void afterInstantiateCallback(
             Class<?> testClass, Object testInstance, Throwable throwable) throws Throwable {
-        if (throwable != null) {
-            throw throwable;
-        }
+        ThrowableSupport.rethrow(throwable);
     }
 
     /**
@@ -74,9 +73,7 @@ public interface InvocationInterceptor {
             Method testMethod,
             Throwable throwable)
             throws Throwable {
-        if (throwable != null) {
-            throw throwable;
-        }
+        ThrowableSupport.rethrow(throwable);
     }
 
     /**

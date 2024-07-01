@@ -17,6 +17,7 @@
 package org.antublue.test.engine.api.extension;
 
 import java.lang.reflect.Method;
+import org.antublue.test.engine.api.support.ThrowableSupport;
 
 /** Class to implement LifeCycleExtension */
 public interface TestExtension {
@@ -41,9 +42,7 @@ public interface TestExtension {
      */
     default void postInstantiateCallback(
             Class<?> testClass, Object testInstance, Throwable throwable) throws Throwable {
-        if (throwable != null) {
-            throw throwable;
-        }
+        ThrowableSupport.rethrow(throwable);
     }
 
     /**
@@ -64,9 +63,7 @@ public interface TestExtension {
      * @throws Throwable
      */
     default void postPrepareCallback(Object testInstance, Throwable throwable) throws Throwable {
-        if (throwable != null) {
-            throw throwable;
-        }
+        ThrowableSupport.rethrow(throwable);
     }
 
     /**
@@ -87,9 +84,7 @@ public interface TestExtension {
      * @throws Throwable
      */
     default void postBeforeAllCallback(Object testInstance, Throwable throwable) throws Throwable {
-        if (throwable != null) {
-            throw throwable;
-        }
+        ThrowableSupport.rethrow(throwable);
     }
 
     /**
@@ -110,9 +105,7 @@ public interface TestExtension {
      * @throws Throwable
      */
     default void postBeforeEachCallback(Object testInstance, Throwable throwable) throws Throwable {
-        if (throwable != null) {
-            throw throwable;
-        }
+        ThrowableSupport.rethrow(throwable);
     }
 
     /**
@@ -133,9 +126,7 @@ public interface TestExtension {
      * @throws Throwable
      */
     default void postAfterEachCallback(Object testInstance, Throwable throwable) throws Throwable {
-        if (throwable != null) {
-            throw throwable;
-        }
+        ThrowableSupport.rethrow(throwable);
     }
 
     /**
@@ -159,9 +150,7 @@ public interface TestExtension {
      */
     default void postTestCallback(Object testInstance, Method testMethod, Throwable throwable)
             throws Throwable {
-        if (throwable != null) {
-            throw throwable;
-        }
+        ThrowableSupport.rethrow(throwable);
     }
 
     /**
@@ -182,9 +171,7 @@ public interface TestExtension {
      * @throws Throwable
      */
     default void postAfterAllCallback(Object testInstance, Throwable throwable) throws Throwable {
-        if (throwable != null) {
-            throw throwable;
-        }
+        ThrowableSupport.rethrow(throwable);
     }
 
     /**
@@ -205,9 +192,7 @@ public interface TestExtension {
      * @throws Throwable
      */
     default void postConcludeCallback(Object testInstance, Throwable throwable) throws Throwable {
-        if (throwable != null) {
-            throw throwable;
-        }
+        ThrowableSupport.rethrow(throwable);
     }
 
     /**
