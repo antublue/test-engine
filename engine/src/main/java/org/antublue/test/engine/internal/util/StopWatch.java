@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.util;
 
+import java.util.Objects;
+
 /** Class to implement a stop watch */
 @SuppressWarnings("UnusedReturnValue")
 public class StopWatch {
@@ -80,5 +82,18 @@ public class StopWatch {
         } else {
             return elapsedNanoseconds() / 1000000;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StopWatch stopWatch = (StopWatch) o;
+        return startNanoTime == stopWatch.startNanoTime && Objects.equals(stopNanoTime, stopWatch.stopNanoTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startNanoTime, stopNanoTime);
     }
 }
