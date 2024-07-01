@@ -65,17 +65,17 @@ public class KafkaTest {
     }
 
     @TestEngine.Prepare
-    public void createNetwork() {
-        info("creating network ...");
+    public void initializeNetwork() {
+        info("initializing network ...");
 
         network = Network.newNetwork();
         String id = network.getId();
 
-        info("network [%s] created", id);
+        info("network [%s] initialized", id);
     }
 
     @TestEngine.BeforeAll
-    public void startTestContainer() {
+    public void initializeTestEnvironment() {
         kafkaTestEnvironment.initialize(network);
     }
 
@@ -108,7 +108,7 @@ public class KafkaTest {
     @TestEngine.Test
     @TestEngine.Order(order = 2)
     public void testConsume1() {
-        info("testing testConsume() ...");
+        info("testConsume() ...");
 
         String bootstrapServers = kafkaTestEnvironment.getKafkaContainer().getBootstrapServers();
 
@@ -184,12 +184,12 @@ public class KafkaTest {
     }
 
     @TestEngine.AfterAll
-    public void afterAll() {
+    public void destroyTestEnvironment() {
         kafkaTestEnvironment.destroy();
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public void destroyNetwork() {
         info("destroying network ...");
 
         network.close();
