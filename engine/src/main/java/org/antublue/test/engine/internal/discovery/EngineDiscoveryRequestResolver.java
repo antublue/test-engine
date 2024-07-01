@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.internal.discovery;
 
+import static java.lang.String.format;
 import static org.junit.platform.engine.Filter.composeFilters;
 
 import java.lang.reflect.Method;
@@ -385,13 +386,12 @@ public class EngineDiscoveryRequestResolver {
         Object object = getArgumentSupplierMethod(testClass).invoke(null, (Object[]) null);
         if (object == null) {
             return testArguments;
-        }
-
-        if (object instanceof Argument<?>) {
+        } else if (object instanceof Argument<?>) {
             testArguments.add((Argument<?>) object);
             return testArguments;
         } else if (object instanceof Stream || object instanceof Iterable) {
             Iterator<?> iterator;
+
             if (object instanceof Stream) {
                 Stream<?> stream = (Stream<?>) object;
                 iterator = stream.iterator();
