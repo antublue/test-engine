@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package example;
+package example.arguments.supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +22,7 @@ import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class SingleArgumentTest {
+public class SingleArgumentTest1 {
 
     @TestEngine.Argument public Argument<String> argument;
 

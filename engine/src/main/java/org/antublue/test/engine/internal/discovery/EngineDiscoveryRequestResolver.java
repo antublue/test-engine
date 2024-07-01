@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.discovery;
 
-import static java.lang.String.format;
 import static org.junit.platform.engine.Filter.composeFilters;
 
 import java.lang.reflect.Method;
@@ -33,7 +32,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.configuration.Constants;
@@ -392,35 +390,28 @@ public class EngineDiscoveryRequestResolver {
         if (object instanceof Argument<?>) {
             testArguments.add((Argument<?>) object);
             return testArguments;
-        }
-
-        if (!(object instanceof Stream || object instanceof Iterable)) {
-            throw new TestClassDefinitionException(
-                    format(
-                            "testClass [%s] @TestEngine.ArgumentSupplier must return a"
-                                + " Stream<Argument> or Iterable<Argument>, or Argument<?> ... type"
-                                + " returned [%s]",
-                            testClass.getName(), object.getClass().getName()));
-        }
-
-        Iterator<?> iterator;
-        if (object instanceof Stream) {
-            Stream<?> stream = (Stream<?>) object;
-            iterator = stream.iterator();
-        } else {
-            Iterable<?> iterable = (Iterable<?>) object;
-            iterator = iterable.iterator();
-        }
-
-        long index = 0;
-        while (iterator.hasNext()) {
-            Object o = iterator.next();
-            if (o instanceof Argument<?>) {
-                testArguments.add((Argument<?>) o);
+        } else if (object instanceof Stream || object instanceof Iterable) {
+            Iterator<?> iterator;
+            if (object instanceof Stream) {
+                Stream<?> stream = (Stream<?>) object;
+                iterator = stream.iterator();
             } else {
-                testArguments.add(Argument.of("[" + index + "]", o));
+                Iterable<?> iterable = (Iterable<?>) object;
+                iterator = iterable.iterator();
             }
-            index++;
+
+            long index = 0;
+            while (iterator.hasNext()) {
+                Object o = iterator.next();
+                if (o instanceof Argument<?>) {
+                    testArguments.add((Argument<?>) o);
+                } else {
+                    testArguments.add(Argument.of("argument[" + index + "]", o));
+                }
+                index++;
+            }
+        } else {
+            testArguments.add(Argument.of("argument", object));
         }
 
         return testArguments;

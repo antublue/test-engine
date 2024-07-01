@@ -16,52 +16,70 @@
 
 package example.arguments.supplier;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 
 /** Example test */
-public class CollectionTest {
+public class SingleArgumentTest2 {
 
-    @TestEngine.Argument public Argument<Integer> argument;
+    @TestEngine.Argument public Argument<String> argument;
+
+    @TestEngine.Random.Integer public Integer randomInteger;
 
     @TestEngine.ArgumentSupplier
-    public static Collection<Argument<Integer>> arguments() {
-        Collection<Argument<Integer>> collection = new ArrayList<>();
-        collection.add(Argument.ofInt(1));
-        collection.add(Argument.ofInt(2));
-        collection.add(Argument.ofInt(3));
-        return collection;
+    public static String argument() {
+        return "StringArgument";
+    }
+
+    @TestEngine.Prepare
+    public void prepare() {
+        System.out.println("prepare()");
     }
 
     @TestEngine.BeforeAll
     public void beforeAll() {
-        System.out.println("beforeAll()");
+        System.out.println("beforeAll(" + argument + ")");
+        System.out.println("randomInteger = [" + randomInteger + "]");
+        assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
     }
 
     @TestEngine.BeforeEach
     public void beforeEach() {
-        System.out.println("beforeEach()");
+        System.out.println("beforeEach(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
     public void test1() {
         System.out.println("test1(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test
     public void test2() {
         System.out.println("test2(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterEach
     public void afterEach() {
-        System.out.println("afterEach()");
+        System.out.println("afterEach(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.AfterAll
     public void afterAll() {
-        System.out.println("afterAll()");
+        System.out.println("afterAll(" + argument + ")");
+        System.out.println("randomInteger = [" + randomInteger + "]");
+        assertThat(argument).isNotNull();
+        assertThat(randomInteger).isNotNull();
+    }
+
+    @TestEngine.Conclude
+    public void conclude() {
+        System.out.println("conclude()");
     }
 }
