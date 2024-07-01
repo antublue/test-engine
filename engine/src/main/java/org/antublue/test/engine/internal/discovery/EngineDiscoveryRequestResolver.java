@@ -385,7 +385,7 @@ public class EngineDiscoveryRequestResolver {
 
         List<Argument<?>> testArguments = new ArrayList<>();
 
-        Object object = getArumentSupplierMethod(testClass).invoke(null, (Object[]) null);
+        Object object = getArgumentSupplierMethod(testClass).invoke(null, (Object[]) null);
         if (object == null) {
             return testArguments;
         }
@@ -433,9 +433,9 @@ public class EngineDiscoveryRequestResolver {
      * @param testClass testClass
      * @return the argument supplier method
      */
-    private static Method getArumentSupplierMethod(Class<?> testClass) {
+    private static Method getArgumentSupplierMethod(Class<?> testClass) {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("getArumentSupplierMethod() testClass [%s]", testClass.getName());
+            LOGGER.trace("getArgumentSupplierMethod() testClass [%s]", testClass.getName());
         }
 
         List<Method> methods =
