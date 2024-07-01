@@ -113,7 +113,7 @@ public class Predicates {
                         && !MethodSupport.findMethods(
                                         clazz,
                                         ARGUMENT_SUPPLIER_METHOD,
-                                        HierarchyTraversalMode.TOP_DOWN)
+                                        HierarchyTraversalMode.BOTTOM_UP)
                                 .isEmpty();
             };
 
