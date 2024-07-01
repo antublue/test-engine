@@ -74,10 +74,11 @@ public class ChainedInvocationExtension implements InvocationExtension {
      * @throws Throwable
      */
     @Override
-    public void beforeInvocationCallback(Class<?> testAnnotationClass, Object testInstance, Method testMethod)
-            throws Throwable {
+    public void beforeInvocationCallback(
+            Class<?> testAnnotationClass, Object testInstance, Method testMethod) throws Throwable {
         for (InvocationExtension invocationExtension : invocationExtensions) {
-            invocationExtension.beforeInvocationCallback(testAnnotationClass, testInstance, testMethod);
+            invocationExtension.beforeInvocationCallback(
+                    testAnnotationClass, testInstance, testMethod);
         }
     }
 
@@ -91,7 +92,10 @@ public class ChainedInvocationExtension implements InvocationExtension {
      */
     @Override
     public void afterInvocationCallback(
-            Class<?> testAnnotationClass, Object testInstance, Method testMethod, Throwable throwable)
+            Class<?> testAnnotationClass,
+            Object testInstance,
+            Method testMethod,
+            Throwable throwable)
             throws Throwable {
         for (InvocationExtension invocationExtension : invocationExtensionsReversed) {
             invocationExtension.afterInvocationCallback(

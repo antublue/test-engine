@@ -21,7 +21,6 @@ import static java.lang.String.format;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
-
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.extension.InvocationExtension;
@@ -249,8 +248,12 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                         invocationExtension.beforeInvocationCallback(
                                 TestEngine.Test.class, testInstance, testMethod),
                 () -> MethodSupport.invoke(testInstance, testMethod),
-                () -> invocationExtension.afterInvocationCallback(
-                        TestEngine.Test.class, testInstance, testMethod, localThrowableCollector.getFirst()));
+                () ->
+                        invocationExtension.afterInvocationCallback(
+                                TestEngine.Test.class,
+                                testInstance,
+                                testMethod,
+                                localThrowableCollector.getFirst()));
 
         throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
     }

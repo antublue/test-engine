@@ -16,9 +16,8 @@
 
 package org.antublue.test.engine.testing.extension;
 
-import org.antublue.test.engine.api.extension.TestExtension;
-
 import java.lang.reflect.Method;
+import org.antublue.test.engine.api.extension.TestExtension;
 
 public class ExampleTestExtension2 implements TestExtension {
 

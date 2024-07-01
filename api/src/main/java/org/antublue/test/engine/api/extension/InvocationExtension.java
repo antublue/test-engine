@@ -54,8 +54,8 @@ public interface InvocationExtension {
      * @param testMethod
      * @throws Throwable
      */
-    default void beforeInvocationCallback(Class<?> testAnnotationClass, Object testInstance, Method testMethod)
-            throws Throwable {
+    default void beforeInvocationCallback(
+            Class<?> testAnnotationClass, Object testInstance, Method testMethod) throws Throwable {
         // DO NOTHING
     }
 
@@ -69,7 +69,10 @@ public interface InvocationExtension {
      * @throws Throwable
      */
     default void afterInvocationCallback(
-            Class<?> testAnnotationClass, Object testInstance, Method testMethod, Throwable throwable)
+            Class<?> testAnnotationClass,
+            Object testInstance,
+            Method testMethod,
+            Throwable throwable)
             throws Throwable {
         if (throwable != null) {
             throw throwable;
