@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.util;
+package org.antublue.test.engine.internal.support;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,10 +24,10 @@ import java.util.concurrent.TimeUnit;
 /** Class to create a human-readable time from a duration */
 // Suppress PMD.UselessParentheses - PMD has bug around UselessParentheses calculating milliseconds
 @SuppressWarnings("PMD.UselessParentheses")
-public final class HumanReadableTimeUtils {
+public final class HumanReadableTimeSupport {
 
     /** Constructor */
-    private HumanReadableTimeUtils() {
+    private HumanReadableTimeSupport() {
         // DO NOTHING
     }
 
