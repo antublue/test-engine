@@ -192,7 +192,9 @@ public class KafkaTest {
     public void destroyNetwork() {
         info("destroying network ...");
 
-        network.close();
+        if (network != null) {
+            network.close();
+        }
 
         info("network destroyed");
     }
