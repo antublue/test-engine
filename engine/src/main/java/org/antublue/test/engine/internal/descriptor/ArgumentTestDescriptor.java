@@ -37,7 +37,6 @@ import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.TestDescriptor;
-import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
@@ -131,25 +130,19 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                         stopWatch.elapsedTime());
 
         List<Throwable> throwables = collectThrowables();
-        if (throwableCollector.isEmpty()) {
-            getMetadata()
-                    .put(
-                            MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
-                            MetadataTestDescriptorConstants.PASS);
-            executionContext
-                    .getExecutionRequest()
-                    .getEngineExecutionListener()
-                    .executionFinished(this, TestExecutionResult.successful());
-        } else {
-            getMetadata()
-                    .put(
-                            MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
-                            MetadataTestDescriptorConstants.FAIL);
-            executionContext
-                    .getExecutionRequest()
-                    .getEngineExecutionListener()
-                    .executionFinished(this, TestExecutionResult.failed(throwables.get(0)));
-        }
+        throwableCollector.getThrowables().addAll(throwables);
+
+        getMetadata()
+                .put(
+                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
+                        throwableCollector.isEmpty()
+                                ? MetadataTestDescriptorConstants.PASS
+                                : MetadataTestDescriptorConstants.FAIL);
+
+        executionContext
+                .getExecutionRequest()
+                .getEngineExecutionListener()
+                .executionFinished(this, throwableCollector.toTestExecutionResult());
     }
 
     @Override

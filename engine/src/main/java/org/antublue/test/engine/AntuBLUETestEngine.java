@@ -24,13 +24,13 @@ import org.antublue.test.engine.internal.execution.ExecutionContextExecutor;
 import org.antublue.test.engine.internal.extension.TestEngineExtensionManager;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
-import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /** Class to implement the AntuBLUE Test Engine */
 public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine {
@@ -145,11 +145,10 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
                 .getEngineExecutionListener()
                 .executionStarted(executionRequest.getRootTestDescriptor());
 
-        ThrowableCollector throwableCollector = new ThrowableCollector(throwable -> true);
-        if (throwableCollector.isEmpty()) {
-            throwableCollector.execute(() -> TestEngineExtensionManager.getInstance().prepare());
-        }
+        ThrowableCollector throwableCollector = new ThrowableCollector();
 
+        throwableCollector.execute(
+                () -> TestEngineExtensionManager.getInstance().initializeCallback());
         if (throwableCollector.isEmpty()) {
             throwableCollector.execute(
                     () -> {
@@ -161,9 +160,12 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
         }
 
         throwableCollector.execute(
-                () -> {
-                    TestEngineExtensionManager.getInstance().conclude();
-                });
+                () ->
+                        throwableCollector
+                                .getThrowables()
+                                .addAll(
+                                        TestEngineExtensionManager.getInstance()
+                                                .destroyCallback()));
 
         if (throwableCollector.isEmpty()) {
             executionRequest
@@ -176,7 +178,7 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
                     .getEngineExecutionListener()
                     .executionFinished(
                             executionRequest.getRootTestDescriptor(),
-                            TestExecutionResult.failed(throwableCollector.getThrowable()));
+                            throwableCollector.toTestExecutionResult());
         }
     }
 }

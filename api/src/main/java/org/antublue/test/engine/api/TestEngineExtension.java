@@ -20,20 +20,20 @@ package org.antublue.test.engine.api;
 public interface TestEngineExtension {
 
     /**
-     * Method to prepare the environment
+     * Method to initialize global environment resources
      *
      * @throws Throwable Throwable
      */
-    default void prepareCallback() throws Throwable {
+    default void initializeCallback() throws Throwable {
         // DO NOTHING
     }
 
     /**
-     * Method to conclude the environment
+     * Method to destroy global environment resources
      *
      * @throws Throwable Throwable
      */
-    default void concludeCallback() throws Throwable {
+    default void destroyCallback() throws Throwable {
         // DO NOTHING
     }
 }

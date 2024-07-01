@@ -58,15 +58,15 @@ public class TestEngineExtensionManager {
     }
 
     /**
-     * Method to prepare test engine extensions
+     * Method to initialize test engine extensions
      *
      * @throws Throwable Throwable
      */
-    public void prepare() throws Throwable {
+    public void initializeCallback() throws Throwable {
         initialize();
 
         for (TestEngineExtension testEngineExtension : testEngineExtensions) {
-            testEngineExtension.prepareCallback();
+            testEngineExtension.initializeCallback();
         }
     }
 
@@ -75,7 +75,7 @@ public class TestEngineExtensionManager {
      *
      * @return a List of Throwables
      */
-    public List<Throwable> conclude() {
+    public List<Throwable> destroyCallback() {
         initialize();
 
         List<Throwable> throwables = new ArrayList<>();
@@ -85,7 +85,7 @@ public class TestEngineExtensionManager {
 
         for (TestEngineExtension testEngineExtension : testEngineExtensions) {
             try {
-                testEngineExtension.concludeCallback();
+                testEngineExtension.destroyCallback();
             } catch (Throwable t) {
                 throwables.add(t);
             }

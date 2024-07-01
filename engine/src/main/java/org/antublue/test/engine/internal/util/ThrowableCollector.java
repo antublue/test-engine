@@ -69,15 +69,6 @@ public class ThrowableCollector {
     }
 
     /**
-     * Method to get the list of Throwables
-     *
-     * @return the list of Throwables
-     */
-    public List<Throwable> getThrowables() {
-        return throwables;
-    }
-
-    /**
      * Method to return if the ThrowableCollector has any Throwables
      *
      * @return true if there are no Throwables, else false
@@ -93,6 +84,15 @@ public class ThrowableCollector {
      */
     public boolean isNotEmpty() {
         return !throwables.isEmpty();
+    }
+
+    /**
+     * Method to get the list of Throwables
+     *
+     * @return the list of Throwables
+     */
+    public List<Throwable> getThrowables() {
+        return throwables;
     }
 
     /**
