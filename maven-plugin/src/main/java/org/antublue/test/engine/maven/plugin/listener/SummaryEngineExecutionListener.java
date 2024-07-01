@@ -342,7 +342,7 @@ public class SummaryEngineExecutionListener
                     new AnsiColorStringBuilder()
                             .append(INFO)
                             .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                            .append("Total Test Time : ")
+                            .append("Total time  : ")
                             .append(
                                     HumanReadableTimeSupport.toHumanReadable(
                                             elapsedTime.toNanos(), false))
@@ -355,7 +355,7 @@ public class SummaryEngineExecutionListener
                     new AnsiColorStringBuilder()
                             .append(INFO)
                             .color(AnsiColor.TEXT_WHITE_BRIGHT)
-                            .append("Finished At     : ")
+                            .append("Finished at : ")
                             .append(HumanReadableTimeSupport.now())
                             .color(AnsiColor.TEXT_RESET));
 
