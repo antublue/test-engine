@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.util;
 
+import java.util.Objects;
+
 /** Class to implement ANSI colors */
 public class AnsiColor {
 
@@ -277,6 +279,19 @@ public class AnsiColor {
         } else {
             return EMPTY_STRING;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AnsiColor ansiColor = (AnsiColor) o;
+        return Objects.equals(escapeSequence, ansiColor.escapeSequence);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(escapeSequence);
     }
 
     /**
