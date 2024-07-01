@@ -27,7 +27,7 @@ public interface TestExtension {
      * @param testClass testClass
      * @throws Throwable Throwable
      */
-    default void beforeInstantiateCallback(Class<?> testClass) throws Throwable {
+    default void preInstantiateCallback(Class<?> testClass) throws Throwable {
         // DO NOTHING
     }
 
@@ -39,7 +39,7 @@ public interface TestExtension {
      * @param throwable throwable
      * @throws Throwable Throwable
      */
-    default void afterInstantiateCallback(
+    default void postInstantiateCallback(
             Class<?> testClass, Object testInstance, Throwable throwable) throws Throwable {
         if (throwable != null) {
             throw throwable;
@@ -52,7 +52,7 @@ public interface TestExtension {
      * @param testInstance
      * @throws Throwable
      */
-    default void beforePrepareCallback(Object testInstance) throws Throwable {
+    default void prePrepareCallback(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -63,7 +63,7 @@ public interface TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    default void afterPrepareCallback(Object testInstance, Throwable throwable) throws Throwable {
+    default void postPrepareCallback(Object testInstance, Throwable throwable) throws Throwable {
         if (throwable != null) {
             throw throwable;
         }
@@ -75,7 +75,7 @@ public interface TestExtension {
      * @param testInstance
      * @throws Throwable
      */
-    default void beforeBeforeAllCallback(Object testInstance) throws Throwable {
+    default void preBeforeAllCallback(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -86,7 +86,7 @@ public interface TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    default void afterBeforeAllCallback(Object testInstance, Throwable throwable) throws Throwable {
+    default void postBeforeAllCallback(Object testInstance, Throwable throwable) throws Throwable {
         if (throwable != null) {
             throw throwable;
         }
@@ -98,7 +98,7 @@ public interface TestExtension {
      * @param testInstance
      * @throws Throwable
      */
-    default void beforeBeforeEachCallback(Object testInstance) throws Throwable {
+    default void preBeforeEachCallback(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -109,8 +109,7 @@ public interface TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    default void afterBeforeEachCallback(Object testInstance, Throwable throwable)
-            throws Throwable {
+    default void postBeforeEachCallback(Object testInstance, Throwable throwable) throws Throwable {
         if (throwable != null) {
             throw throwable;
         }
@@ -122,7 +121,7 @@ public interface TestExtension {
      * @param testInstance
      * @throws Throwable
      */
-    default void beforeAfterEachCallback(Object testInstance) throws Throwable {
+    default void preAfterEachCallback(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -133,7 +132,7 @@ public interface TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    default void afterAfterEachCallback(Object testInstance, Throwable throwable) throws Throwable {
+    default void postAfterEachCallback(Object testInstance, Throwable throwable) throws Throwable {
         if (throwable != null) {
             throw throwable;
         }
@@ -158,7 +157,7 @@ public interface TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    default void afterTestCallback(Object testInstance, Method testMethod, Throwable throwable)
+    default void postTestCallback(Object testInstance, Method testMethod, Throwable throwable)
             throws Throwable {
         if (throwable != null) {
             throw throwable;
@@ -171,7 +170,7 @@ public interface TestExtension {
      * @param testInstance
      * @throws Throwable
      */
-    default void beforeAfterAllCallback(Object testInstance) throws Throwable {
+    default void preAfterAllCallback(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -182,7 +181,7 @@ public interface TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    default void afterAfterAllCallback(Object testInstance, Throwable throwable) throws Throwable {
+    default void postAfterAllCallback(Object testInstance, Throwable throwable) throws Throwable {
         if (throwable != null) {
             throw throwable;
         }
@@ -194,7 +193,7 @@ public interface TestExtension {
      * @param testInstance
      * @throws Throwable
      */
-    default void beforeConcludeCallback(Object testInstance) throws Throwable {
+    default void preConcludeCallback(Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -205,7 +204,7 @@ public interface TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    default void afterConcludeCallback(Object testInstance, Throwable throwable) throws Throwable {
+    default void postConcludeCallback(Object testInstance, Throwable throwable) throws Throwable {
         if (throwable != null) {
             throw throwable;
         }
@@ -218,7 +217,7 @@ public interface TestExtension {
      * @param testInstance
      * @throws Throwable
      */
-    default void beforeDestroy(Class<?> testClass, Object testInstance) throws Throwable {
+    default void preDestroyCallback(Class<?> testClass, Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -226,10 +225,9 @@ public interface TestExtension {
      * TODO
      *
      * @param testClass
-     * @param testInstance
      * @param throwable
      */
-    default void afterDestroy(Class<?> testClass, Object testInstance, Throwable throwable) {
+    default void postDestroyCallback(Class<?> testClass, Throwable throwable) {
         // DO NOTHING
     }
 }

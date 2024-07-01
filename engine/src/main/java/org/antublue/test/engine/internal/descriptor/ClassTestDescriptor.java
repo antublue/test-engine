@@ -331,32 +331,42 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                     testClass.getName(), testInstance);
         }
 
-        if (testInstance != null) {
-            ThrowableCollector localThrowableCollector = new ThrowableCollector();
+        ThrowableCollector localThrowableCollector = new ThrowableCollector();
 
-            localThrowableCollector.execute(
-                    () ->
-                            invocationExtension.beforeInvocationCallback(
-                                    TestEngine.Conclude.class, testInstance, null),
-                    () -> {
-                        for (Method method : concludeMethods) {
-                            MethodSupport.invoke(testInstance, method);
-                        }
-                    },
-                    () ->
-                            invocationExtension.afterInvocationCallback(
-                                    TestEngine.Conclude.class,
-                                    testInstance,
-                                    null,
-                                    localThrowableCollector.getFirst()));
+        localThrowableCollector.execute(
+                () ->
+                        invocationExtension.beforeInvocationCallback(
+                                TestEngine.Conclude.class, testInstance, null),
+                () -> {
+                    for (Method method : concludeMethods) {
+                        MethodSupport.invoke(testInstance, method);
+                    }
+                },
+                () ->
+                        invocationExtension.afterInvocationCallback(
+                                TestEngine.Conclude.class,
+                                testInstance,
+                                null,
+                                localThrowableCollector.getFirst()));
 
-            throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
-        }
+        throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
     }
 
     private void destroyTestInstance(ExecutionContext executionContext) {
         Object testInstance = executionContext.remove(ExecutionContextConstant.TEST_INSTANCE);
+
         LOGGER.trace("destroyTestInstance() testClass [%s]", testClass.getName(), testInstance);
+
+        ThrowableCollector localThrowableCollector = new ThrowableCollector();
+
+        localThrowableCollector.execute(
+                () -> invocationExtension.preDestroyCallback(testClass, testInstance),
+                () -> {},
+                () ->
+                        invocationExtension.postDestroyCallback(
+                                testClass, localThrowableCollector.getFirst()));
+
+        throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
     }
 
     /**

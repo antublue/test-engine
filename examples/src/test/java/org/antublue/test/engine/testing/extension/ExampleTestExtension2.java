@@ -22,16 +22,55 @@ import org.antublue.test.engine.api.extension.TestExtension;
 public class ExampleTestExtension2 implements TestExtension {
 
     /**
+     * Method to call before instantiating a test instance
+     *
+     * @param testClass testClass
+     * @throws Throwable Throwable
+     */
+    @Override
+    public void preInstantiateCallback(Class<?> testClass) throws Throwable {
+        System.out.println(
+                getClass().getName()
+                        + " preInstantiateCallback() testClass ["
+                        + testClass.getSimpleName()
+                        + "]");
+    }
+
+    /**
+     * Method to call after instantiating a test instance
+     *
+     * @param testClass testClass
+     * @param testInstance testInstance
+     * @param throwable throwable
+     * @throws Throwable Throwable
+     */
+    @Override
+    public void postInstantiateCallback(
+            Class<?> testClass, Object testInstance, Throwable throwable) throws Throwable {
+        System.out.println(
+                getClass().getName()
+                        + " postInstantiateCallback() testClass ["
+                        + testClass.getSimpleName()
+                        + "] throwable ["
+                        + throwable
+                        + "]");
+
+        if (throwable != null) {
+            throw throwable;
+        }
+    }
+
+    /**
      * TODO
      *
      * @param testInstance
      * @throws Throwable
      */
     @Override
-    public void beforePrepareCallback(Object testInstance) throws Throwable {
+    public void prePrepareCallback(Object testInstance) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " beforePrepareCallback() testAnnotationClass ["
+                        + " prePrepareCallback() testAnnotationClass ["
                         + testInstance.getClass().getName()
                         + "] testInstance ["
                         + testInstance.getClass().getName()
@@ -46,10 +85,10 @@ public class ExampleTestExtension2 implements TestExtension {
      * @throws Throwable
      */
     @Override
-    public void afterPrepareCallback(Object testInstance, Throwable throwable) throws Throwable {
+    public void postPrepareCallback(Object testInstance, Throwable throwable) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " afterPrepareCallback() testInstance ["
+                        + " postPrepareCallback() testInstance ["
                         + testInstance.getClass().getName()
                         + "] throwable ["
                         + throwable
@@ -66,10 +105,10 @@ public class ExampleTestExtension2 implements TestExtension {
      * @param testInstance
      * @throws Throwable
      */
-    public void beforeBeforeAllCallback(Object testInstance) throws Throwable {
+    public void preBeforeAllCallback(Object testInstance) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " beforeBeforeAllCallback() testAnnotationClass ["
+                        + " preBeforeAllCallback() testAnnotationClass ["
                         + testInstance.getClass().getName()
                         + "] testInstance ["
                         + testInstance.getClass().getName()
@@ -83,10 +122,10 @@ public class ExampleTestExtension2 implements TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    public void afterBeforeAllCallback(Object testInstance, Throwable throwable) throws Throwable {
+    public void postBeforeAllCallback(Object testInstance, Throwable throwable) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " afterBeforeAllCallback() testInstance ["
+                        + " postBeforeAllCallback() testInstance ["
                         + testInstance.getClass().getName()
                         + "] throwable ["
                         + throwable
@@ -103,10 +142,10 @@ public class ExampleTestExtension2 implements TestExtension {
      * @param testInstance
      * @throws Throwable
      */
-    public void beforeBeforeEachCallback(Object testInstance) throws Throwable {
+    public void preBeforeEachCallback(Object testInstance) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " beforeBeforeEachCallback() testAnnotationClass ["
+                        + " preBeforeEachCallback() testAnnotationClass ["
                         + testInstance.getClass().getName()
                         + "] testInstance ["
                         + testInstance.getClass().getName()
@@ -120,10 +159,10 @@ public class ExampleTestExtension2 implements TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    public void afterBeforeEachCallback(Object testInstance, Throwable throwable) throws Throwable {
+    public void postBeforeEachCallback(Object testInstance, Throwable throwable) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " afterBeforeEachCallback() testInstance ["
+                        + " postBeforeEachCallback() testInstance ["
                         + testInstance.getClass().getName()
                         + "] throwable ["
                         + throwable
@@ -140,10 +179,10 @@ public class ExampleTestExtension2 implements TestExtension {
      * @param testInstance
      * @throws Throwable
      */
-    public void beforeAfterEachCallback(Object testInstance) throws Throwable {
+    public void preAfterEachCallback(Object testInstance) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " beforeAfterEachCallback() testAnnotationClass ["
+                        + " preAfterEachCallback() testAnnotationClass ["
                         + testInstance.getClass().getName()
                         + "] testInstance ["
                         + testInstance.getClass().getName()
@@ -157,10 +196,10 @@ public class ExampleTestExtension2 implements TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    public void afterAfterEachCallback(Object testInstance, Throwable throwable) throws Throwable {
+    public void postAfterEachCallback(Object testInstance, Throwable throwable) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " afterAfterEachCallback() testInstance ["
+                        + " postAfterEachCallback() testInstance ["
                         + testInstance.getClass().getName()
                         + "] throwable ["
                         + throwable
@@ -198,11 +237,11 @@ public class ExampleTestExtension2 implements TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    public void afterTestCallback(Object testInstance, Method testMethod, Throwable throwable)
+    public void postTestCallback(Object testInstance, Method testMethod, Throwable throwable)
             throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " afterTestCallback() testInstance ["
+                        + " postTestCallback() testInstance ["
                         + testInstance.getClass().getName()
                         + "] testMethod ["
                         + testMethod.getName()
@@ -221,10 +260,10 @@ public class ExampleTestExtension2 implements TestExtension {
      * @param testInstance
      * @throws Throwable
      */
-    public void beforeAfterAllCallback(Object testInstance) throws Throwable {
+    public void preAfterAllCallback(Object testInstance) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " beforeAfterAllCallback() testAnnotationClass ["
+                        + " preAfterAllCallback() testAnnotationClass ["
                         + testInstance.getClass().getName()
                         + "] testInstance ["
                         + testInstance.getClass().getName()
@@ -238,10 +277,10 @@ public class ExampleTestExtension2 implements TestExtension {
      * @param throwable
      * @throws Throwable
      */
-    public void afterAfterAllCallback(Object testInstance, Throwable throwable) throws Throwable {
+    public void postAfterAllCallback(Object testInstance, Throwable throwable) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " afterAfterAllCallback() testInstance ["
+                        + " postAfterAllCallback() testInstance ["
                         + testInstance.getClass().getName()
                         + "] throwable ["
                         + throwable
@@ -259,10 +298,10 @@ public class ExampleTestExtension2 implements TestExtension {
      * @throws Throwable
      */
     @Override
-    public void beforeConcludeCallback(Object testInstance) throws Throwable {
+    public void preConcludeCallback(Object testInstance) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " beforeConcludeCallback() testAnnotationClass ["
+                        + " preConcludeCallback() testAnnotationClass ["
                         + testInstance.getClass().getName()
                         + "] testInstance ["
                         + testInstance.getClass().getName()
@@ -277,10 +316,10 @@ public class ExampleTestExtension2 implements TestExtension {
      * @throws Throwable
      */
     @Override
-    public void afterConcludeCallback(Object testInstance, Throwable throwable) throws Throwable {
+    public void postConcludeCallback(Object testInstance, Throwable throwable) throws Throwable {
         System.out.println(
                 getClass().getName()
-                        + " afterConcludeCallback() testInstance ["
+                        + " postConcludeCallback() testInstance ["
                         + testInstance.getClass().getName()
                         + "] throwable ["
                         + throwable
@@ -289,5 +328,40 @@ public class ExampleTestExtension2 implements TestExtension {
         if (throwable != null) {
             throw throwable;
         }
+    }
+
+    /**
+     * Method to call before instantiating a test instance
+     *
+     * @param testClass testClass
+     * @throws Throwable Throwable
+     */
+    @Override
+    public void preDestroyCallback(Class<?> testClass, Object testInstance) throws Throwable {
+        System.out.println(
+                getClass().getName()
+                        + " preDestroyCallback() testClass ["
+                        + testClass.getSimpleName()
+                        + "] testInstance ["
+                        + testInstance
+                        + "]");
+    }
+
+    /**
+     * Method to call after instantiating a test instance
+     *
+     * @param testClass testClass
+     * @param throwable throwable
+     * @throws Throwable Throwable
+     */
+    @Override
+    public void postDestroyCallback(Class<?> testClass, Throwable throwable) {
+        System.out.println(
+                getClass().getName()
+                        + " postDestroyCallback() testClass ["
+                        + testClass.getSimpleName()
+                        + "] throwable ["
+                        + throwable
+                        + "]");
     }
 }

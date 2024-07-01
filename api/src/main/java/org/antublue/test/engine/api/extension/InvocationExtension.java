@@ -86,7 +86,7 @@ public interface InvocationExtension {
      * @param testInstance
      * @throws Throwable
      */
-    default void beforeDestroy(Class<?> testClass, Object testInstance) throws Throwable {
+    default void preDestroyCallback(Class<?> testClass, Object testInstance) throws Throwable {
         // DO NOTHING
     }
 
@@ -94,10 +94,9 @@ public interface InvocationExtension {
      * TODO
      *
      * @param testClass
-     * @param testInstance
      * @param throwable
      */
-    default void afterDestroy(Class<?> testClass, Object testInstance, Throwable throwable) {
+    default void postDestroyCallback(Class<?> testClass, Throwable throwable) {
         // DO NOTHING
     }
 
@@ -108,6 +107,6 @@ public interface InvocationExtension {
      * @return
      */
     static InvocationExtension of(TestExtension testExtension) {
-        return new InvocationExtensionAdapter(testExtension);
+        return InvocationExtensionAdapter.of(testExtension);
     }
 }

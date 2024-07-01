@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.junit.platform.commons.util.Preconditions;
 
 /** Class to implement InvocationExtension */
 public class ChainedInvocationExtension implements InvocationExtension {
@@ -28,10 +29,16 @@ public class ChainedInvocationExtension implements InvocationExtension {
     private final List<InvocationExtension> invocationExtensions;
     private final List<InvocationExtension> invocationExtensionsReversed;
 
-    public ChainedInvocationExtension(InvocationExtension... invocationExtensions) {
+    /**
+     * Constructor
+     *
+     * @param invocationExtensions invocationExtensions
+     */
+    private ChainedInvocationExtension(InvocationExtension... invocationExtensions) {
         this.invocationExtensions = new ArrayList<>();
         this.invocationExtensions.addAll(Arrays.asList(invocationExtensions));
         this.invocationExtensionsReversed = new ArrayList<>(this.invocationExtensions);
+
         Collections.reverse(invocationExtensionsReversed);
     }
 
@@ -41,6 +48,7 @@ public class ChainedInvocationExtension implements InvocationExtension {
      * @param testClass testClass
      * @throws Throwable Throwable
      */
+    @Override
     public void beforeInstantiateCallback(Class<?> testClass) throws Throwable {
         for (InvocationExtension invocationExtension : invocationExtensions) {
             invocationExtension.beforeInstantiateCallback(testClass);
@@ -55,6 +63,7 @@ public class ChainedInvocationExtension implements InvocationExtension {
      * @param throwable throwable
      * @throws Throwable Throwable
      */
+    @Override
     public void afterInstantiateCallback(
             Class<?> testClass, Object testInstance, Throwable throwable) throws Throwable {
         for (InvocationExtension invocationExtension : invocationExtensionsReversed) {
@@ -114,9 +123,10 @@ public class ChainedInvocationExtension implements InvocationExtension {
      * @param testInstance
      * @throws Throwable
      */
-    public void beforeDestroy(Class<?> testClass, Object testInstance) throws Throwable {
+    @Override
+    public void preDestroyCallback(Class<?> testClass, Object testInstance) throws Throwable {
         for (InvocationExtension invocationExtension : invocationExtensions) {
-            invocationExtension.beforeDestroy(testClass, testInstance);
+            invocationExtension.preDestroyCallback(testClass, testInstance);
         }
     }
 
@@ -124,16 +134,25 @@ public class ChainedInvocationExtension implements InvocationExtension {
      * TODO
      *
      * @param testClass
-     * @param testInstance
      * @param throwable
      */
-    public void afterDestroy(Class<?> testClass, Object testInstance, Throwable throwable) {
+    @Override
+    public void postDestroyCallback(Class<?> testClass, Throwable throwable) {
         for (InvocationExtension invocationExtension : invocationExtensionsReversed) {
-            invocationExtension.afterDestroy(testClass, testInstance, throwable);
+            invocationExtension.postDestroyCallback(testClass, throwable);
         }
     }
 
+    /**
+     * TODO
+     *
+     * @param invocationExtensions
+     * @return
+     */
     public static ChainedInvocationExtension of(InvocationExtension... invocationExtensions) {
+        Preconditions.notNull(invocationExtensions, "invocationExtensions is null");
+        Preconditions.notEmpty(invocationExtensions, "invocationExtensions is empty");
+
         return new ChainedInvocationExtension(invocationExtensions);
     }
 }
