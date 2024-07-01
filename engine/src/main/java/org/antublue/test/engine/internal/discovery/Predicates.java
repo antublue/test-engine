@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.util;
+package org.antublue.test.engine.internal.discovery;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

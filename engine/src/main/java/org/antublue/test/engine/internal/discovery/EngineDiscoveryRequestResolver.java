@@ -47,7 +47,6 @@ import org.antublue.test.engine.internal.support.DisplayNameSupport;
 import org.antublue.test.engine.internal.support.MethodSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.TagSupport;
-import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.engine.DiscoverySelector;

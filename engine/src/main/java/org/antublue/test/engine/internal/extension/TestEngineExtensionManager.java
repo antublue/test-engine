@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.List;
 import org.antublue.test.engine.api.TestEngineExtension;
 import org.antublue.test.engine.exception.TestEngineException;
+import org.antublue.test.engine.internal.discovery.Predicates;
 import org.antublue.test.engine.internal.support.ClassSupport;
 import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
-import org.antublue.test.engine.internal.util.Predicates;
 
 /** Class to implement TestEngineExtensionManager */
 public class TestEngineExtensionManager {
