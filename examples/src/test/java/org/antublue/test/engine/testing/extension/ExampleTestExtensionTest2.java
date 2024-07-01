@@ -30,7 +30,7 @@ public class ExampleTestExtensionTest2 {
 
     @TestEngine.Random.Integer public Integer randomInteger;
 
-    @TestEngine.InvocationExtensionSupplier
+    @TestEngine.InvocationInterceptorSupplier
     public static InvocationInterceptor extension() {
         return ChainedInvocationInterceptor.of(
                 InvocationInterceptor.of(new ExampleTestExtension()),

@@ -29,8 +29,8 @@ public class ExampleTestExtensionTest1 {
 
     @TestEngine.Random.Integer public Integer randomInteger;
 
-    @TestEngine.InvocationExtensionSupplier
-    public static InvocationInterceptor extension() {
+    @TestEngine.InvocationInterceptorSupplier
+    public static InvocationInterceptor invocationInterceptor() {
         return InvocationInterceptor.of(new ExampleTestExtension());
     }
 

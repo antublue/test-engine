@@ -25,10 +25,10 @@ import org.junit.platform.commons.annotation.Testable;
 /** Interface that contains all TestEngine annotations */
 public @interface TestEngine {
 
-    /** ArgumentSupplier annotation */
+    /** InvocationInterceptorSupplier annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface InvocationExtensionSupplier {}
+    @interface InvocationInterceptorSupplier {}
 
     /** ArgumentSupplier annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})

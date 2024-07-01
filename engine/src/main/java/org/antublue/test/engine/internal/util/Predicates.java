@@ -53,7 +53,8 @@ public class Predicates {
                         && Modifier.isStatic(modifiers)
                         // TODO check return type
                         && method.getParameterCount() == 0
-                        && method.isAnnotationPresent(TestEngine.InvocationExtensionSupplier.class);
+                        && method.isAnnotationPresent(
+                                TestEngine.InvocationInterceptorSupplier.class);
             };
 
     /** Predicate to filter argument fields */
