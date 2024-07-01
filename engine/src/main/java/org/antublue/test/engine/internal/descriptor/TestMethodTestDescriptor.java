@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.extension.InvocationExtension;
+import org.antublue.test.engine.api.extension.InvocationInterceptor;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -51,7 +51,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
     private final List<Method> beforeEachMethods;
     private final Method testMethod;
     private final List<Method> afterEachMethods;
-    private final InvocationExtension invocationExtension;
+    private final InvocationInterceptor invocationInterceptor;
 
     /**
      * Constructor
@@ -72,14 +72,14 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
             Method testMethod,
             List<Method> afterEachMethods,
             Argument<?> testArgument,
-            InvocationExtension invocationExtension) {
+            InvocationInterceptor invocationInterceptor) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.beforeEachMethods = beforeEachMethods;
         this.testMethod = testMethod;
         this.afterEachMethods = afterEachMethods;
         this.testArgument = testArgument;
-        this.invocationExtension = invocationExtension;
+        this.invocationInterceptor = invocationInterceptor;
     }
 
     @Override
@@ -215,7 +215,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
 
         localThrowableCollector.execute(
                 () ->
-                        invocationExtension.beforeInvocationCallback(
+                        invocationInterceptor.beforeInvocationCallback(
                                 TestEngine.BeforeEach.class, testInstance, null),
                 () -> {
                     for (Method method : beforeEachMethods) {
@@ -223,7 +223,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                     }
                 },
                 () ->
-                        invocationExtension.afterInvocationCallback(
+                        invocationInterceptor.afterInvocationCallback(
                                 TestEngine.BeforeEach.class,
                                 testInstance,
                                 null,
@@ -245,11 +245,11 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
 
         localThrowableCollector.execute(
                 () ->
-                        invocationExtension.beforeInvocationCallback(
+                        invocationInterceptor.beforeInvocationCallback(
                                 TestEngine.Test.class, testInstance, testMethod),
                 () -> MethodSupport.invoke(testInstance, testMethod),
                 () ->
-                        invocationExtension.afterInvocationCallback(
+                        invocationInterceptor.afterInvocationCallback(
                                 TestEngine.Test.class,
                                 testInstance,
                                 testMethod,
@@ -271,7 +271,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
 
         localThrowableCollector.execute(
                 () ->
-                        invocationExtension.beforeInvocationCallback(
+                        invocationInterceptor.beforeInvocationCallback(
                                 TestEngine.AfterEach.class, testInstance, null),
                 () -> {
                     for (Method method : afterEachMethods) {
@@ -279,7 +279,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                     }
                 },
                 () ->
-                        invocationExtension.afterInvocationCallback(
+                        invocationInterceptor.afterInvocationCallback(
                                 TestEngine.AfterEach.class,
                                 testInstance,
                                 null,
@@ -302,7 +302,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
             Class<?> testClass,
             Method testMethod,
             Argument<?> testArgument,
-            InvocationExtension invocationExtension) {
+            InvocationInterceptor invocationInterceptor) {
         Preconditions.notNull(parentUniqueId, "parentUniqueId is null");
         Preconditions.notNull(testClass, "testClass is null");
         Preconditions.notNull(testMethod, "testMethod is null");
@@ -354,6 +354,6 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                 testMethod,
                 afterEachMethods,
                 testArgument,
-                invocationExtension);
+                invocationInterceptor);
     }
 }

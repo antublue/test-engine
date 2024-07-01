@@ -24,20 +24,20 @@ import java.util.List;
 import org.junit.platform.commons.util.Preconditions;
 
 /** Class to implement InvocationExtension */
-public class ChainedInvocationExtension implements InvocationExtension {
+public class ChainedInvocationInterceptor implements InvocationInterceptor {
 
-    private final List<InvocationExtension> invocationExtensions;
-    private final List<InvocationExtension> invocationExtensionsReversed;
+    private final List<InvocationInterceptor> invocationInterceptors;
+    private final List<InvocationInterceptor> invocationExtensionsReversed;
 
     /**
      * Constructor
      *
-     * @param invocationExtensions invocationExtensions
+     * @param invocationInterceptors invocationExtensions
      */
-    private ChainedInvocationExtension(InvocationExtension... invocationExtensions) {
-        this.invocationExtensions = new ArrayList<>();
-        this.invocationExtensions.addAll(Arrays.asList(invocationExtensions));
-        this.invocationExtensionsReversed = new ArrayList<>(this.invocationExtensions);
+    private ChainedInvocationInterceptor(InvocationInterceptor... invocationInterceptors) {
+        this.invocationInterceptors = new ArrayList<>();
+        this.invocationInterceptors.addAll(Arrays.asList(invocationInterceptors));
+        this.invocationExtensionsReversed = new ArrayList<>(this.invocationInterceptors);
 
         Collections.reverse(invocationExtensionsReversed);
     }
@@ -50,8 +50,8 @@ public class ChainedInvocationExtension implements InvocationExtension {
      */
     @Override
     public void beforeInstantiateCallback(Class<?> testClass) throws Throwable {
-        for (InvocationExtension invocationExtension : invocationExtensions) {
-            invocationExtension.beforeInstantiateCallback(testClass);
+        for (InvocationInterceptor invocationInterceptor : invocationInterceptors) {
+            invocationInterceptor.beforeInstantiateCallback(testClass);
         }
     }
 
@@ -66,8 +66,8 @@ public class ChainedInvocationExtension implements InvocationExtension {
     @Override
     public void afterInstantiateCallback(
             Class<?> testClass, Object testInstance, Throwable throwable) throws Throwable {
-        for (InvocationExtension invocationExtension : invocationExtensionsReversed) {
-            invocationExtension.afterInstantiateCallback(testClass, testInstance, throwable);
+        for (InvocationInterceptor invocationInterceptor : invocationExtensionsReversed) {
+            invocationInterceptor.afterInstantiateCallback(testClass, testInstance, throwable);
         }
 
         if (throwable != null) {
@@ -85,8 +85,8 @@ public class ChainedInvocationExtension implements InvocationExtension {
     @Override
     public void beforeInvocationCallback(
             Class<?> testAnnotationClass, Object testInstance, Method testMethod) throws Throwable {
-        for (InvocationExtension invocationExtension : invocationExtensions) {
-            invocationExtension.beforeInvocationCallback(
+        for (InvocationInterceptor invocationInterceptor : invocationInterceptors) {
+            invocationInterceptor.beforeInvocationCallback(
                     testAnnotationClass, testInstance, testMethod);
         }
     }
@@ -106,8 +106,8 @@ public class ChainedInvocationExtension implements InvocationExtension {
             Method testMethod,
             Throwable throwable)
             throws Throwable {
-        for (InvocationExtension invocationExtension : invocationExtensionsReversed) {
-            invocationExtension.afterInvocationCallback(
+        for (InvocationInterceptor invocationInterceptor : invocationExtensionsReversed) {
+            invocationInterceptor.afterInvocationCallback(
                     testAnnotationClass, testInstance, testMethod, throwable);
         }
 
@@ -125,8 +125,8 @@ public class ChainedInvocationExtension implements InvocationExtension {
      */
     @Override
     public void preDestroyCallback(Class<?> testClass, Object testInstance) throws Throwable {
-        for (InvocationExtension invocationExtension : invocationExtensions) {
-            invocationExtension.preDestroyCallback(testClass, testInstance);
+        for (InvocationInterceptor invocationInterceptor : invocationInterceptors) {
+            invocationInterceptor.preDestroyCallback(testClass, testInstance);
         }
     }
 
@@ -138,21 +138,21 @@ public class ChainedInvocationExtension implements InvocationExtension {
      */
     @Override
     public void postDestroyCallback(Class<?> testClass, Throwable throwable) {
-        for (InvocationExtension invocationExtension : invocationExtensionsReversed) {
-            invocationExtension.postDestroyCallback(testClass, throwable);
+        for (InvocationInterceptor invocationInterceptor : invocationExtensionsReversed) {
+            invocationInterceptor.postDestroyCallback(testClass, throwable);
         }
     }
 
     /**
      * TODO
      *
-     * @param invocationExtensions
+     * @param invocationInterceptors
      * @return
      */
-    public static ChainedInvocationExtension of(InvocationExtension... invocationExtensions) {
-        Preconditions.notNull(invocationExtensions, "invocationExtensions is null");
-        Preconditions.notEmpty(invocationExtensions, "invocationExtensions is empty");
+    public static ChainedInvocationInterceptor of(InvocationInterceptor... invocationInterceptors) {
+        Preconditions.notNull(invocationInterceptors, "invocationExtensions is null");
+        Preconditions.notEmpty(invocationInterceptors, "invocationExtensions is empty");
 
-        return new ChainedInvocationExtension(invocationExtensions);
+        return new ChainedInvocationInterceptor(invocationInterceptors);
     }
 }

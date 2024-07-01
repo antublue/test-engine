@@ -19,7 +19,7 @@ package org.antublue.test.engine.api.extension;
 import java.lang.reflect.Method;
 
 /** Class to implement InvocationExtension */
-public interface InvocationExtension {
+public interface InvocationInterceptor {
 
     /**
      * Method to call before instantiating a test instance
@@ -106,7 +106,7 @@ public interface InvocationExtension {
      * @param testExtension
      * @return
      */
-    static InvocationExtension of(TestExtension testExtension) {
-        return InvocationExtensionAdapter.of(testExtension);
+    static InvocationInterceptor of(TestExtension testExtension) {
+        return InvocationInterceptorAdapter.of(testExtension);
     }
 }

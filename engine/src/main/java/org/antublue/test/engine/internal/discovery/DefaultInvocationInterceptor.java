@@ -16,10 +16,10 @@
 
 package org.antublue.test.engine.internal.discovery;
 
-import org.antublue.test.engine.api.extension.InvocationExtension;
+import org.antublue.test.engine.api.extension.InvocationInterceptor;
 
 /** Class to implement DefaultInvocationExtension */
-public class DefaultInvocationExtension implements InvocationExtension {
+public class DefaultInvocationInterceptor implements InvocationInterceptor {
 
     // DO NOTHING
 }

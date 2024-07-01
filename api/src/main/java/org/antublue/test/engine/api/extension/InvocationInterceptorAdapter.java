@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import org.antublue.test.engine.api.TestEngine;
 import org.junit.platform.commons.util.Preconditions;
 
-public final class InvocationExtensionAdapter implements InvocationExtension {
+public final class InvocationInterceptorAdapter implements InvocationInterceptor {
 
     private final TestExtension testExtension;
 
@@ -29,7 +29,7 @@ public final class InvocationExtensionAdapter implements InvocationExtension {
      *
      * @param testExtension testExtensions
      */
-    private InvocationExtensionAdapter(TestExtension testExtension) {
+    private InvocationInterceptorAdapter(TestExtension testExtension) {
         this.testExtension = testExtension;
     }
 
@@ -140,8 +140,8 @@ public final class InvocationExtensionAdapter implements InvocationExtension {
         testExtension.postDestroyCallback(testClass, throwable);
     }
 
-    public static InvocationExtension of(TestExtension testExtension) {
+    public static InvocationInterceptor of(TestExtension testExtension) {
         Preconditions.notNull(testExtension, "testExtensions is null");
-        return new InvocationExtensionAdapter(testExtension);
+        return new InvocationInterceptorAdapter(testExtension);
     }
 }

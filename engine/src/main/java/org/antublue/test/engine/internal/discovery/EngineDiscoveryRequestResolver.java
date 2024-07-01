@@ -33,7 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.extension.InvocationExtension;
+import org.antublue.test.engine.api.extension.InvocationInterceptor;
 import org.antublue.test.engine.exception.TestClassDefinitionException;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.configuration.Configuration;
@@ -132,15 +132,15 @@ public class EngineDiscoveryRequestResolver {
             TestDescriptor parentTestDescriptor, Class<?> testClass) throws Throwable {
         LOGGER.trace("buildClassTestDescriptor() testClass [%s]", testClass);
 
-        InvocationExtension invocationExtension = getInvocationExtension(testClass);
+        InvocationInterceptor invocationInterceptor = getInvocationExtension(testClass);
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("invocationExtension [%s]", invocationExtension);
+            LOGGER.trace("invocationExtension [%s]", invocationInterceptor);
         }
 
         ClassTestDescriptor classTestDescriptor =
                 ClassTestDescriptor.create(
-                        parentTestDescriptor.getUniqueId(), testClass, invocationExtension);
+                        parentTestDescriptor.getUniqueId(), testClass, invocationInterceptor);
 
         parentTestDescriptor.addChild(classTestDescriptor);
 
@@ -152,7 +152,7 @@ public class EngineDiscoveryRequestResolver {
                     testClass,
                     testArgument,
                     testArgumentIndex,
-                    invocationExtension);
+                    invocationInterceptor);
             testArgumentIndex++;
         }
     }
@@ -170,7 +170,7 @@ public class EngineDiscoveryRequestResolver {
             Class<?> testClass,
             Argument<?> testArgument,
             int testArgumentIndex,
-            InvocationExtension invocationExtension) {
+            InvocationInterceptor invocationInterceptor) {
         LOGGER.trace(
                 "buildArgumentTestDescriptor() testClass [%s] testArgument [%s] testArgumentIndex"
                         + " [%d]",
@@ -182,12 +182,12 @@ public class EngineDiscoveryRequestResolver {
                         testClass,
                         testArgument,
                         testArgumentIndex,
-                        invocationExtension);
+                        invocationInterceptor);
 
         parentTestDescriptor.addChild(argumentTestDescriptor);
 
         buildTestMethodTestDescriptor(
-                argumentTestDescriptor, testClass, testArgument, invocationExtension);
+                argumentTestDescriptor, testClass, testArgument, invocationInterceptor);
     }
 
     /**
@@ -196,13 +196,13 @@ public class EngineDiscoveryRequestResolver {
      * @param parentTestDescriptor parentTestDescriptor
      * @param testClass testClass
      * @param testArgument testArgument
-     * @param invocationExtension invocationExtension
+     * @param invocationInterceptor invocationExtension
      */
     private static void buildTestMethodTestDescriptor(
             TestDescriptor parentTestDescriptor,
             Class<?> testClass,
             Argument<?> testArgument,
-            InvocationExtension invocationExtension) {
+            InvocationInterceptor invocationInterceptor) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(
                     "buildTestMethodTestDescriptor() testClass [%s] testArgument [%s]",
@@ -225,7 +225,7 @@ public class EngineDiscoveryRequestResolver {
                             testClass,
                             testMethod,
                             testArgument,
-                            invocationExtension));
+                            invocationInterceptor));
         }
     }
 
@@ -399,18 +399,18 @@ public class EngineDiscoveryRequestResolver {
      * @return an InvocationExtension
      * @throws Throwable Throwable
      */
-    private static InvocationExtension getInvocationExtension(Class<?> testClass) throws Throwable {
+    private static InvocationInterceptor getInvocationExtension(Class<?> testClass) throws Throwable {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("getInvocationExtension() testClass [%s]", testClass.getName());
         }
 
-        InvocationExtension invocationExtension = new DefaultInvocationExtension();
+        InvocationInterceptor invocationInterceptor = new DefaultInvocationInterceptor();
         Optional<Method> optional = getInvocationExtensionSupplierMethod(testClass);
         if (optional.isPresent()) {
-            invocationExtension = (InvocationExtension) MethodSupport.invoke(null, optional.get());
+            invocationInterceptor = (InvocationInterceptor) MethodSupport.invoke(null, optional.get());
         }
 
-        return invocationExtension;
+        return invocationInterceptor;
     }
 
     /**

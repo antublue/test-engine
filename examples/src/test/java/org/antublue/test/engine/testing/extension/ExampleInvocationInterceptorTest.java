@@ -20,18 +20,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.extension.InvocationExtension;
+import org.antublue.test.engine.api.extension.InvocationInterceptor;
 
 /** Example test */
-public class ExampleInvocationExtensionTest {
+public class ExampleInvocationInterceptorTest {
 
     @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.Random.Integer public Integer randomInteger;
 
     @TestEngine.InvocationExtensionSupplier
-    public static InvocationExtension extension() {
-        return new ExampleInvocationExtension();
+    public static InvocationInterceptor extension() {
+        return new ExampleInvocationInterceptor();
     }
 
     @TestEngine.ArgumentSupplier

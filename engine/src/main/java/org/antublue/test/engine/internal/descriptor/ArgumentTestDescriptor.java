@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.extension.InvocationExtension;
+import org.antublue.test.engine.api.extension.InvocationInterceptor;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -54,7 +54,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
     private final Argument<?> testArgument;
     private final List<Method> beforeAllMethods;
     private final List<Method> afterAllMethods;
-    private final InvocationExtension invocationExtension;
+    private final InvocationInterceptor invocationInterceptor;
 
     /**
      * Constructor
@@ -73,13 +73,13 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
             List<Method> beforeAllMethods,
             List<Method> afterAllMethods,
             Argument<?> testArgument,
-            InvocationExtension invocationExtension) {
+            InvocationInterceptor invocationInterceptor) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.testArgument = testArgument;
         this.beforeAllMethods = beforeAllMethods;
         this.afterAllMethods = afterAllMethods;
-        this.invocationExtension = invocationExtension;
+        this.invocationInterceptor = invocationInterceptor;
     }
 
     @Override
@@ -249,7 +249,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         localThrowableCollector.execute(
                 () ->
-                        invocationExtension.beforeInvocationCallback(
+                        invocationInterceptor.beforeInvocationCallback(
                                 TestEngine.BeforeAll.class, testInstance, null),
                 () -> {
                     for (Method method : beforeAllMethods) {
@@ -257,7 +257,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                     }
                 },
                 () ->
-                        invocationExtension.afterInvocationCallback(
+                        invocationInterceptor.afterInvocationCallback(
                                 TestEngine.BeforeAll.class,
                                 testInstance,
                                 null,
@@ -325,7 +325,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
 
         localThrowableCollector.execute(
                 () ->
-                        invocationExtension.beforeInvocationCallback(
+                        invocationInterceptor.beforeInvocationCallback(
                                 TestEngine.AfterAll.class, testInstance, null),
                 () -> {
                     for (Method method : afterAllMethods) {
@@ -333,7 +333,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                     }
                 },
                 () ->
-                        invocationExtension.afterInvocationCallback(
+                        invocationInterceptor.afterInvocationCallback(
                                 TestEngine.AfterAll.class,
                                 testInstance,
                                 null,
@@ -380,7 +380,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
             Class<?> testClass,
             Argument<?> testArgument,
             int testArgumentIndex,
-            InvocationExtension invocationExtension) {
+            InvocationInterceptor invocationInterceptor) {
         Preconditions.notNull(parentUniqueId, "parentUniqueId is null");
         Preconditions.notNull(testClass, "testClass is null");
         Preconditions.notNull(testArgument, "testArgument is null");
@@ -429,6 +429,6 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                 beforeAllMethods,
                 afterAllMethods,
                 testArgument,
-                invocationExtension);
+                invocationInterceptor);
     }
 }

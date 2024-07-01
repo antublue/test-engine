@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.api.extension.InvocationExtension;
+import org.antublue.test.engine.api.extension.InvocationInterceptor;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -50,7 +50,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
     private final Class<?> testClass;
     private final List<Method> prepareMethods;
     private final List<Method> concludeMethods;
-    private final InvocationExtension invocationExtension;
+    private final InvocationInterceptor invocationInterceptor;
 
     /**
      * Constructor
@@ -67,12 +67,12 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
             Class<?> testClass,
             List<Method> prepareMethods,
             List<Method> concludeMethods,
-            InvocationExtension invocationExtension) {
+            InvocationInterceptor invocationInterceptor) {
         super(uniqueId, displayName);
         this.testClass = testClass;
         this.prepareMethods = prepareMethods;
         this.concludeMethods = concludeMethods;
-        this.invocationExtension = invocationExtension;
+        this.invocationInterceptor = invocationInterceptor;
     }
 
     @Override
@@ -224,7 +224,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         localThrowableCollector.execute(
                 () ->
-                        invocationExtension.beforeInvocationCallback(
+                        invocationInterceptor.beforeInvocationCallback(
                                 TestEngine.Prepare.class, testInstance, null),
                 () -> {
                     for (Method method : prepareMethods) {
@@ -232,7 +232,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                     }
                 },
                 () ->
-                        invocationExtension.afterInvocationCallback(
+                        invocationInterceptor.afterInvocationCallback(
                                 TestEngine.Prepare.class,
                                 testInstance,
                                 null,
@@ -250,7 +250,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         Throwable throwable = null;
 
         try {
-            invocationExtension.beforeInstantiateCallback(testClass);
+            invocationInterceptor.beforeInstantiateCallback(testClass);
 
             testInstance =
                     testClass
@@ -268,7 +268,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
             throwable = t;
         }
 
-        invocationExtension.afterInstantiateCallback(testClass, testInstance, throwable);
+        invocationInterceptor.afterInstantiateCallback(testClass, testInstance, throwable);
     }
 
     private void doExecute(ExecutionContext executionContext) {
@@ -335,7 +335,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         localThrowableCollector.execute(
                 () ->
-                        invocationExtension.beforeInvocationCallback(
+                        invocationInterceptor.beforeInvocationCallback(
                                 TestEngine.Conclude.class, testInstance, null),
                 () -> {
                     for (Method method : concludeMethods) {
@@ -343,7 +343,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                     }
                 },
                 () ->
-                        invocationExtension.afterInvocationCallback(
+                        invocationInterceptor.afterInvocationCallback(
                                 TestEngine.Conclude.class,
                                 testInstance,
                                 null,
@@ -360,10 +360,10 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         ThrowableCollector localThrowableCollector = new ThrowableCollector();
 
         localThrowableCollector.execute(
-                () -> invocationExtension.preDestroyCallback(testClass, testInstance),
+                () -> invocationInterceptor.preDestroyCallback(testClass, testInstance),
                 () -> {},
                 () ->
-                        invocationExtension.postDestroyCallback(
+                        invocationInterceptor.postDestroyCallback(
                                 testClass, localThrowableCollector.getFirst()));
 
         throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
@@ -377,7 +377,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
      * @return a ClassTestDescriptor
      */
     public static ClassTestDescriptor create(
-            UniqueId parentUniqueId, Class<?> testClass, InvocationExtension invocationExtension) {
+            UniqueId parentUniqueId, Class<?> testClass, InvocationInterceptor invocationInterceptor) {
         Preconditions.notNull(parentUniqueId, "parentUniqueId is null");
         Preconditions.notNull(testClass, "testClass is null");
 
@@ -422,6 +422,6 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                 testClass,
                 prepareMethods,
                 concludeMethods,
-                invocationExtension);
+                invocationInterceptor);
     }
 }

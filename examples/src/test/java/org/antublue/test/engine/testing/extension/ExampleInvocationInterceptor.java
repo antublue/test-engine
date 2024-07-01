@@ -16,9 +16,9 @@
 
 package org.antublue.test.engine.testing.extension;
 
-import org.antublue.test.engine.api.extension.InvocationExtension;
+import org.antublue.test.engine.api.extension.InvocationInterceptor;
 
-public class ExampleInvocationExtension implements InvocationExtension {
+public class ExampleInvocationInterceptor implements InvocationInterceptor {
 
     public void beforeInstantiateCallback(Class<?> testClass) throws Throwable {
         System.out.println("beforeInstantiateCallback() testClass [" + testClass + "]");
