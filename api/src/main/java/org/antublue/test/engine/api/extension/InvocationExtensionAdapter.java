@@ -16,12 +16,18 @@
 
 package org.antublue.test.engine.api.extension;
 
+import java.lang.reflect.Method;
 import org.antublue.test.engine.api.TestEngine;
 
 public final class InvocationExtensionAdapter implements InvocationExtension {
 
     private final TestExtension testExtension;
 
+    /**
+     * TODO
+     *
+     * @param testExtension
+     */
     public InvocationExtensionAdapter(TestExtension testExtension) {
         this.testExtension = testExtension;
     }
@@ -32,6 +38,7 @@ public final class InvocationExtensionAdapter implements InvocationExtension {
      * @param testClass testClass
      * @throws Throwable Throwable
      */
+    @Override
     public void beforeInstantiateCallback(Class<?> testClass) throws Throwable {
         testExtension.beforeInstantiateCallback(testClass);
     }
@@ -44,6 +51,7 @@ public final class InvocationExtensionAdapter implements InvocationExtension {
      * @param throwable throwable
      * @throws Throwable Throwable
      */
+    @Override
     public void afterInstantiateCallback(
             Class<?> testClass, Object testInstance, Throwable throwable) throws Throwable {
         testExtension.afterInstantiateCallback(testClass, testInstance, throwable);
@@ -56,18 +64,23 @@ public final class InvocationExtensionAdapter implements InvocationExtension {
      * @param testInstance
      * @throws Throwable
      */
-    public void beforeInvocationCallback(Class<?> testAnnotationClass, Object testInstance)
-            throws Throwable {
+    @Override
+    public void beforeInvocationCallback(
+            Class<?> testAnnotationClass, Object testInstance, Method testMethod) throws Throwable {
         if (testAnnotationClass.equals(TestEngine.Prepare.class)) {
             testExtension.beforePrepareCallback(testInstance);
         } else if (testAnnotationClass.equals(TestEngine.BeforeAll.class)) {
             testExtension.beforeBeforeAllCallback(testInstance);
         } else if (testAnnotationClass.equals(TestEngine.BeforeEach.class)) {
             testExtension.beforeBeforeEachCallback(testInstance);
+        } else if (testAnnotationClass.equals(TestEngine.Test.class)) {
+            testExtension.beforeTestCallback(testInstance, testMethod);
         } else if (testAnnotationClass.equals(TestEngine.AfterEach.class)) {
             testExtension.beforeAfterEachCallback(testInstance);
         } else if (testAnnotationClass.equals(TestEngine.AfterAll.class)) {
             testExtension.beforeAfterAllCallback(testInstance);
+        } else if (testAnnotationClass.equals(TestEngine.Conclude.class)) {
+            testExtension.beforeConcludeCallback(testInstance);
         }
     }
 
@@ -79,8 +92,12 @@ public final class InvocationExtensionAdapter implements InvocationExtension {
      * @param throwable
      * @throws Throwable
      */
+    @Override
     public void afterInvocationCallback(
-            Class<?> testAnnotationClass, Object testInstance, Throwable throwable)
+            Class<?> testAnnotationClass,
+            Object testInstance,
+            Method testMethod,
+            Throwable throwable)
             throws Throwable {
         if (testAnnotationClass.equals(TestEngine.Prepare.class)) {
             testExtension.afterPrepareCallback(testInstance, throwable);
@@ -88,10 +105,14 @@ public final class InvocationExtensionAdapter implements InvocationExtension {
             testExtension.afterBeforeAllCallback(testInstance, throwable);
         } else if (testAnnotationClass.equals(TestEngine.BeforeEach.class)) {
             testExtension.afterBeforeEachCallback(testInstance, throwable);
+        } else if (testAnnotationClass.equals(TestEngine.Test.class)) {
+            testExtension.afterTestCallback(testInstance, testMethod, throwable);
         } else if (testAnnotationClass.equals(TestEngine.AfterEach.class)) {
             testExtension.afterAfterEachCallback(testInstance, throwable);
         } else if (testAnnotationClass.equals(TestEngine.AfterAll.class)) {
             testExtension.afterAfterAllCallback(testInstance, throwable);
+        } else if (testAnnotationClass.equals(TestEngine.Conclude.class)) {
+            testExtension.afterConcludeCallback(testInstance, throwable);
         }
     }
 
@@ -102,6 +123,7 @@ public final class InvocationExtensionAdapter implements InvocationExtension {
      * @param testInstance
      * @throws Throwable
      */
+    @Override
     public void beforeDestroy(Class<?> testClass, Object testInstance) throws Throwable {
         testExtension.beforeDestroy(testClass, testInstance);
     }
@@ -113,6 +135,7 @@ public final class InvocationExtensionAdapter implements InvocationExtension {
      * @param testInstance
      * @param throwable
      */
+    @Override
     public void afterDestroy(Class<?> testClass, Object testInstance, Throwable throwable) {
         testExtension.afterDestroy(testClass, testInstance, throwable);
     }

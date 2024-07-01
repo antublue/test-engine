@@ -16,6 +16,7 @@
 
 package org.antublue.test.engine.api.extension;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -72,10 +73,11 @@ public class ChainedInvocationExtension implements InvocationExtension {
      * @param testInstance
      * @throws Throwable
      */
-    public void beforeInvocationCallback(Class<?> testAnnotationClass, Object testInstance)
+    @Override
+    public void beforeInvocationCallback(Class<?> testAnnotationClass, Object testInstance, Method testMethod)
             throws Throwable {
         for (InvocationExtension invocationExtension : invocationExtensions) {
-            invocationExtension.beforeInvocationCallback(testAnnotationClass, testInstance);
+            invocationExtension.beforeInvocationCallback(testAnnotationClass, testInstance, testMethod);
         }
     }
 
@@ -87,12 +89,13 @@ public class ChainedInvocationExtension implements InvocationExtension {
      * @param throwable
      * @throws Throwable
      */
+    @Override
     public void afterInvocationCallback(
-            Class<?> testAnnotationClass, Object testInstance, Throwable throwable)
+            Class<?> testAnnotationClass, Object testInstance, Method testMethod, Throwable throwable)
             throws Throwable {
         for (InvocationExtension invocationExtension : invocationExtensionsReversed) {
             invocationExtension.afterInvocationCallback(
-                    testAnnotationClass, testInstance, throwable);
+                    testAnnotationClass, testInstance, testMethod, throwable);
         }
 
         if (throwable != null) {

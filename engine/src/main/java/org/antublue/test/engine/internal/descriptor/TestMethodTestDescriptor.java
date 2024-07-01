@@ -21,6 +21,7 @@ import static java.lang.String.format;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.extension.InvocationExtension;
@@ -216,7 +217,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         localThrowableCollector.execute(
                 () ->
                         invocationExtension.beforeInvocationCallback(
-                                TestEngine.BeforeEach.class, testInstance),
+                                TestEngine.BeforeEach.class, testInstance, null),
                 () -> {
                     for (Method method : beforeEachMethods) {
                         MethodSupport.invoke(testInstance, method);
@@ -226,6 +227,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                         invocationExtension.afterInvocationCallback(
                                 TestEngine.BeforeEach.class,
                                 testInstance,
+                                null,
                                 localThrowableCollector.getFirst()));
 
         throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
@@ -240,7 +242,17 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                     testInstance.getClass().getName(), testInstance, testMethod);
         }
 
-        MethodSupport.invoke(testInstance, testMethod);
+        ThrowableCollector localThrowableCollector = new ThrowableCollector();
+
+        localThrowableCollector.execute(
+                () ->
+                        invocationExtension.beforeInvocationCallback(
+                                TestEngine.Test.class, testInstance, testMethod),
+                () -> MethodSupport.invoke(testInstance, testMethod),
+                () -> invocationExtension.afterInvocationCallback(
+                        TestEngine.Test.class, testInstance, testMethod, localThrowableCollector.getFirst()));
+
+        throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
     }
 
     private void afterEach(ExecutionContext executionContext) throws Throwable {
@@ -257,7 +269,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         localThrowableCollector.execute(
                 () ->
                         invocationExtension.beforeInvocationCallback(
-                                TestEngine.AfterEach.class, testInstance),
+                                TestEngine.AfterEach.class, testInstance, null),
                 () -> {
                     for (Method method : afterEachMethods) {
                         MethodSupport.invoke(testInstance, method);
@@ -267,6 +279,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
                         invocationExtension.afterInvocationCallback(
                                 TestEngine.AfterEach.class,
                                 testInstance,
+                                null,
                                 localThrowableCollector.getFirst()));
 
         throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());

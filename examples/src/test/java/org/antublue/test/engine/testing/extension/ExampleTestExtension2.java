@@ -18,7 +18,48 @@ package org.antublue.test.engine.testing.extension;
 
 import org.antublue.test.engine.api.extension.TestExtension;
 
+import java.lang.reflect.Method;
+
 public class ExampleTestExtension2 implements TestExtension {
+
+    /**
+     * TODO
+     *
+     * @param testInstance
+     * @throws Throwable
+     */
+    @Override
+    public void beforePrepareCallback(Object testInstance) throws Throwable {
+        System.out.println(
+                getClass().getName()
+                        + " beforePrepareCallback() testAnnotationClass ["
+                        + testInstance.getClass().getName()
+                        + "] testInstance ["
+                        + testInstance.getClass().getName()
+                        + "]");
+    }
+
+    /**
+     * TODO
+     *
+     * @param testInstance
+     * @param throwable
+     * @throws Throwable
+     */
+    @Override
+    public void afterPrepareCallback(Object testInstance, Throwable throwable) throws Throwable {
+        System.out.println(
+                getClass().getName()
+                        + " afterPrepareCallback() testInstance ["
+                        + testInstance.getClass().getName()
+                        + "] throwable ["
+                        + throwable
+                        + "]");
+
+        if (throwable != null) {
+            throw throwable;
+        }
+    }
 
     /**
      * TODO
@@ -135,6 +176,50 @@ public class ExampleTestExtension2 implements TestExtension {
      * TODO
      *
      * @param testInstance
+     * @param testMethod
+     * @throws Throwable
+     */
+    public void beforeTestCallback(Object testInstance, Method testMethod) throws Throwable {
+        System.out.println(
+                getClass().getName()
+                        + " beforeTestCallback() testAnnotationClass ["
+                        + testInstance.getClass().getName()
+                        + "] testInstance ["
+                        + testInstance.getClass().getName()
+                        + "] testMethod ["
+                        + testMethod.getName()
+                        + "]");
+    }
+
+    /**
+     * TODO
+     *
+     * @param testInstance
+     * @param testMethod
+     * @param throwable
+     * @throws Throwable
+     */
+    public void afterTestCallback(Object testInstance, Method testMethod, Throwable throwable)
+            throws Throwable {
+        System.out.println(
+                getClass().getName()
+                        + " afterTestCallback() testInstance ["
+                        + testInstance.getClass().getName()
+                        + "] testMethod ["
+                        + testMethod.getName()
+                        + "] throwable ["
+                        + throwable
+                        + "]");
+
+        if (throwable != null) {
+            throw throwable;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param testInstance
      * @throws Throwable
      */
     public void beforeAfterAllCallback(Object testInstance) throws Throwable {
@@ -158,6 +243,45 @@ public class ExampleTestExtension2 implements TestExtension {
         System.out.println(
                 getClass().getName()
                         + " afterAfterAllCallback() testInstance ["
+                        + testInstance.getClass().getName()
+                        + "] throwable ["
+                        + throwable
+                        + "]");
+
+        if (throwable != null) {
+            throw throwable;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param testInstance
+     * @throws Throwable
+     */
+    @Override
+    public void beforeConcludeCallback(Object testInstance) throws Throwable {
+        System.out.println(
+                getClass().getName()
+                        + " beforeConcludeCallback() testAnnotationClass ["
+                        + testInstance.getClass().getName()
+                        + "] testInstance ["
+                        + testInstance.getClass().getName()
+                        + "]");
+    }
+
+    /**
+     * TODO
+     *
+     * @param testInstance
+     * @param throwable
+     * @throws Throwable
+     */
+    @Override
+    public void afterConcludeCallback(Object testInstance, Throwable throwable) throws Throwable {
+        System.out.println(
+                getClass().getName()
+                        + " afterConcludeCallback() testInstance ["
                         + testInstance.getClass().getName()
                         + "] throwable ["
                         + throwable

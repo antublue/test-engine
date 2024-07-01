@@ -16,15 +16,15 @@
 
 package org.antublue.test.engine.testing.extension;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.api.extension.ChainedInvocationExtension;
 import org.antublue.test.engine.api.extension.InvocationExtension;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /** Example test */
-public class ExampleTestExtensionTest {
+public class ExampleTestExtensionTest1 {
 
     @TestEngine.Argument public Argument<String> argument;
 
@@ -32,9 +32,7 @@ public class ExampleTestExtensionTest {
 
     @TestEngine.InvocationExtensionSupplier
     public static InvocationExtension extension() {
-        return ChainedInvocationExtension.of(
-                InvocationExtension.of(new ExampleTestExtension()),
-                InvocationExtension.of(new ExampleTestExtension2()));
+        return InvocationExtension.of(new ExampleTestExtension());
     }
 
     @TestEngine.ArgumentSupplier

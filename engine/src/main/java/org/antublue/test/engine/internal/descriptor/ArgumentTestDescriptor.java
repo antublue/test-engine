@@ -250,7 +250,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         localThrowableCollector.execute(
                 () ->
                         invocationExtension.beforeInvocationCallback(
-                                TestEngine.BeforeAll.class, testInstance),
+                                TestEngine.BeforeAll.class, testInstance, null),
                 () -> {
                     for (Method method : beforeAllMethods) {
                         MethodSupport.invoke(testInstance, method);
@@ -260,6 +260,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                         invocationExtension.afterInvocationCallback(
                                 TestEngine.BeforeAll.class,
                                 testInstance,
+                                null,
                                 localThrowableCollector.getFirst()));
 
         throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
@@ -325,7 +326,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         localThrowableCollector.execute(
                 () ->
                         invocationExtension.beforeInvocationCallback(
-                                TestEngine.AfterAll.class, testInstance),
+                                TestEngine.AfterAll.class, testInstance, null),
                 () -> {
                     for (Method method : afterAllMethods) {
                         MethodSupport.invoke(testInstance, method);
@@ -335,6 +336,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                         invocationExtension.afterInvocationCallback(
                                 TestEngine.AfterAll.class,
                                 testInstance,
+                                null,
                                 localThrowableCollector.getFirst()));
 
         throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());

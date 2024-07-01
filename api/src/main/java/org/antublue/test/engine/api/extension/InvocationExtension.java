@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.api.extension;
 
+import java.lang.reflect.Method;
+
 /** Class to implement InvocationExtension */
 public interface InvocationExtension {
 
@@ -49,9 +51,10 @@ public interface InvocationExtension {
      *
      * @param testAnnotationClass
      * @param testInstance
+     * @param testMethod
      * @throws Throwable
      */
-    default void beforeInvocationCallback(Class<?> testAnnotationClass, Object testInstance)
+    default void beforeInvocationCallback(Class<?> testAnnotationClass, Object testInstance, Method testMethod)
             throws Throwable {
         // DO NOTHING
     }
@@ -61,11 +64,12 @@ public interface InvocationExtension {
      *
      * @param testAnnotationClass
      * @param testInstance
+     * @param testMethod
      * @param throwable
      * @throws Throwable
      */
     default void afterInvocationCallback(
-            Class<?> testAnnotationClass, Object testInstance, Throwable throwable)
+            Class<?> testAnnotationClass, Object testInstance, Method testMethod, Throwable throwable)
             throws Throwable {
         if (throwable != null) {
             throw throwable;

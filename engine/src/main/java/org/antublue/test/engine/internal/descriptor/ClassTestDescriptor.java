@@ -225,7 +225,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
         localThrowableCollector.execute(
                 () ->
                         invocationExtension.beforeInvocationCallback(
-                                TestEngine.Prepare.class, testInstance),
+                                TestEngine.Prepare.class, testInstance, null),
                 () -> {
                     for (Method method : prepareMethods) {
                         MethodSupport.invoke(testInstance, method);
@@ -235,6 +235,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                         invocationExtension.afterInvocationCallback(
                                 TestEngine.Prepare.class,
                                 testInstance,
+                                null,
                                 localThrowableCollector.getFirst()));
 
         throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());
@@ -336,7 +337,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
             localThrowableCollector.execute(
                     () ->
                             invocationExtension.beforeInvocationCallback(
-                                    TestEngine.Conclude.class, testInstance),
+                                    TestEngine.Conclude.class, testInstance, null),
                     () -> {
                         for (Method method : concludeMethods) {
                             MethodSupport.invoke(testInstance, method);
@@ -346,6 +347,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                             invocationExtension.afterInvocationCallback(
                                     TestEngine.Conclude.class,
                                     testInstance,
+                                    null,
                                     localThrowableCollector.getFirst()));
 
             throwableCollector.getThrowables().addAll(localThrowableCollector.getThrowables());

@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.api.extension;
 
+import java.lang.reflect.Method;
+
 /** Class to implement LifeCycleExtension */
 public interface TestExtension {
 
@@ -141,6 +143,32 @@ public interface TestExtension {
      * TODO
      *
      * @param testInstance
+     * @param testMethod
+     * @throws Throwable
+     */
+    default void beforeTestCallback(Object testInstance, Method testMethod) throws Throwable {
+        // DO NOTHING
+    }
+
+    /**
+     * TODO
+     *
+     * @param testInstance
+     * @param testMethod
+     * @param throwable
+     * @throws Throwable
+     */
+    default void afterTestCallback(Object testInstance, Method testMethod, Throwable throwable)
+            throws Throwable {
+        if (throwable != null) {
+            throw throwable;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param testInstance
      * @throws Throwable
      */
     default void beforeAfterAllCallback(Object testInstance) throws Throwable {
@@ -155,6 +183,29 @@ public interface TestExtension {
      * @throws Throwable
      */
     default void afterAfterAllCallback(Object testInstance, Throwable throwable) throws Throwable {
+        if (throwable != null) {
+            throw throwable;
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @param testInstance
+     * @throws Throwable
+     */
+    default void beforeConcludeCallback(Object testInstance) throws Throwable {
+        // DO NOTHING
+    }
+
+    /**
+     * TODO
+     *
+     * @param testInstance
+     * @param throwable
+     * @throws Throwable
+     */
+    default void afterConcludeCallback(Object testInstance, Throwable throwable) throws Throwable {
         if (throwable != null) {
             throw throwable;
         }
