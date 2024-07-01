@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.discovery;
 
-import static java.lang.String.format;
 import static org.junit.platform.engine.Filter.composeFilters;
 
 import java.lang.reflect.Method;
