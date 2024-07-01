@@ -399,7 +399,8 @@ public class EngineDiscoveryRequestResolver {
      * @return an InvocationExtension
      * @throws Throwable Throwable
      */
-    private static InvocationInterceptor getInvocationExtension(Class<?> testClass) throws Throwable {
+    private static InvocationInterceptor getInvocationExtension(Class<?> testClass)
+            throws Throwable {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("getInvocationExtension() testClass [%s]", testClass.getName());
         }
@@ -407,7 +408,8 @@ public class EngineDiscoveryRequestResolver {
         InvocationInterceptor invocationInterceptor = new DefaultInvocationInterceptor();
         Optional<Method> optional = getInvocationExtensionSupplierMethod(testClass);
         if (optional.isPresent()) {
-            invocationInterceptor = (InvocationInterceptor) MethodSupport.invoke(null, optional.get());
+            invocationInterceptor =
+                    (InvocationInterceptor) MethodSupport.invoke(null, optional.get());
         }
 
         return invocationInterceptor;

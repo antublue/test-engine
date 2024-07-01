@@ -377,7 +377,9 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
      * @return a ClassTestDescriptor
      */
     public static ClassTestDescriptor create(
-            UniqueId parentUniqueId, Class<?> testClass, InvocationInterceptor invocationInterceptor) {
+            UniqueId parentUniqueId,
+            Class<?> testClass,
+            InvocationInterceptor invocationInterceptor) {
         Preconditions.notNull(parentUniqueId, "parentUniqueId is null");
         Preconditions.notNull(testClass, "testClass is null");
 

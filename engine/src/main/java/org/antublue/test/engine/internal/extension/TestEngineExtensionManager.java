@@ -66,7 +66,7 @@ public class TestEngineExtensionManager {
         initialize();
 
         for (TestEngineExtension testEngineExtension : testEngineExtensions) {
-            testEngineExtension.prepareCallback();
+            testEngineExtension.initializeCallback();
         }
     }
 
@@ -85,7 +85,7 @@ public class TestEngineExtensionManager {
 
         for (TestEngineExtension testEngineExtension : testEngineExtensions) {
             try {
-                testEngineExtension.concludeCallback();
+                testEngineExtension.destroyCallback();
             } catch (Throwable t) {
                 throwables.add(t);
             }

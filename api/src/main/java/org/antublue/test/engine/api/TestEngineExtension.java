@@ -24,7 +24,7 @@ public interface TestEngineExtension {
      *
      * @throws Throwable Throwable
      */
-    default void prepareCallback() throws Throwable {
+    default void initializeCallback() throws Throwable {
         // DO NOTHING
     }
 
@@ -33,7 +33,7 @@ public interface TestEngineExtension {
      *
      * @throws Throwable Throwable
      */
-    default void concludeCallback() throws Throwable {
+    default void destroyCallback() throws Throwable {
         // DO NOTHING
     }
 }

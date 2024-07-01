@@ -22,12 +22,12 @@ import org.antublue.test.engine.api.TestEngineExtension;
 public class ExampleTestEngineExtension implements TestEngineExtension {
 
     @Override
-    public void prepareCallback() {
-        System.out.println(getClass().getName() + ".prepare()");
+    public void initializeCallback() {
+        System.out.println(getClass().getName() + " initialize()");
     }
 
     @Override
-    public void concludeCallback() {
-        System.out.println(getClass().getName() + ".conclude()");
+    public void destroyCallback() {
+        System.out.println(getClass().getName() + " destroy()");
     }
 }
