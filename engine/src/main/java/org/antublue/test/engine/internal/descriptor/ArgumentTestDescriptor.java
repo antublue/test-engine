@@ -128,7 +128,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedNanoseconds());
+                        stopWatch.elapsedTime());
 
         List<Throwable> throwables = collectThrowables();
         if (throwableCollector.isEmpty()) {
@@ -182,7 +182,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedNanoseconds());
+                        stopWatch.elapsedTime());
 
         executionContext
                 .getExecutionRequest()

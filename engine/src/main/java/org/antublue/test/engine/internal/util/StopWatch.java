@@ -16,6 +16,8 @@
 
 package org.antublue.test.engine.internal.util;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 /** Class to implement a stop watch */
@@ -62,25 +64,11 @@ public class StopWatch {
      *
      * @return the elapsed time in nanoseconds
      */
-    public long elapsedNanoseconds() {
+    public Duration elapsedTime() {
         if (stopNanoTime == null) {
-            return System.nanoTime() - startNanoTime;
+            return Duration.of(System.nanoTime() - startNanoTime, ChronoUnit.NANOS);
         } else {
-            return stopNanoTime - startNanoTime;
-        }
-    }
-
-    /**
-     * Method to get the elapsed time in milliseconds
-     *
-     * @return the elapsed time in milliseconds
-     */
-    public long elapsedMilliseconds() {
-        long elapsedNanoseconds = elapsedNanoseconds();
-        if (elapsedNanoseconds <= 0) {
-            return 0;
-        } else {
-            return elapsedNanoseconds() / 1000000;
+            return Duration.of(stopNanoTime - startNanoTime, ChronoUnit.NANOS);
         }
     }
 
@@ -89,7 +77,8 @@ public class StopWatch {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StopWatch stopWatch = (StopWatch) o;
-        return startNanoTime == stopWatch.startNanoTime && Objects.equals(stopNanoTime, stopWatch.stopNanoTime);
+        return startNanoTime == stopWatch.startNanoTime
+                && Objects.equals(stopNanoTime, stopWatch.stopNanoTime);
     }
 
     @Override

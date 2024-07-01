@@ -17,6 +17,7 @@
 package org.antublue.test.engine.maven.plugin.listener;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.configuration.Constants;
@@ -215,7 +216,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
         String testMethodDisplayName =
                 metadata.get(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME) + "()";
 
-        Long elapsedTime =
+        Duration elapsedTime =
                 metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
 
         AnsiColorStringBuilder ansiColorStringBuilder =
@@ -245,7 +246,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                     .append(" ")
                     .append(
                             HumanReadableTimeSupport.toTimingUnit(
-                                    elapsedTime, consoleLogTimingUnits));
+                                    elapsedTime.toNanos(), consoleLogTimingUnits));
         }
 
         ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
@@ -281,7 +282,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
         String testMethodDisplayName =
                 metadata.get(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME) + "()";
 
-        Long elapsedTime =
+        Duration elapsedTime =
                 metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
 
         String testDescriptorStatus =
@@ -336,7 +337,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
                     .append(" ")
                     .append(
                             HumanReadableTimeSupport.toTimingUnit(
-                                    elapsedTime, consoleLogTimingUnits));
+                                    elapsedTime.toNanos(), consoleLogTimingUnits));
         }
 
         ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);

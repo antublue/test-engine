@@ -114,7 +114,7 @@ public class EngineDiscoveryRequestResolver {
             throw new TestEngineException(t);
         } finally {
             stopWatch.stop();
-            LOGGER.trace("resolveSelectors() %d ms", stopWatch.elapsedMilliseconds());
+            LOGGER.trace("resolveSelectors() %d ms", stopWatch.elapsedTime().toMillis());
         }
     }
 
