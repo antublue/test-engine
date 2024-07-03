@@ -220,7 +220,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                     testInstance.getClass().getName(), testInstance, testArgument);
         }
 
-        RandomAnnotationSupport.setRandomFields(testInstance);
+        if (testInstance != null) {
+            RandomAnnotationSupport.setRandomFields(testInstance);
+        }
     }
 
     private void beforeAllMethods(ExecutionContext executionContext) throws Throwable {
@@ -318,7 +320,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                     testInstance.getClass().getName(), testInstance);
         }
 
-        RandomAnnotationSupport.clearRandomFields(testInstance);
+        if (testInstance != null) {
+            RandomAnnotationSupport.clearRandomFields(testInstance);
+        }
     }
 
     private void clearArgumentFields(ExecutionContext executionContext) throws Throwable {
