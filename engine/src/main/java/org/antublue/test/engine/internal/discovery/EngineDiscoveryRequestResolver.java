@@ -139,6 +139,22 @@ public class EngineDiscoveryRequestResolver {
                     classTestDescriptor, testClass, testArgument, testArgumentIndex);
             testArgumentIndex++;
         }
+
+        parentTestDescriptor.removeChild(classTestDescriptor);
+
+        Set<? extends TestDescriptor> children = classTestDescriptor.getChildren();
+        int i = 0;
+        for (TestDescriptor child : children) {
+            ClassTestDescriptor splitClassTestDescriptor =
+                    ClassTestDescriptor.create(
+                            parentTestDescriptor
+                                    .getUniqueId()
+                                    .append(ClassTestDescriptor.class.getName(), "[" + i + "]"),
+                            testClass);
+            splitClassTestDescriptor.addChild(child);
+            parentTestDescriptor.addChild(splitClassTestDescriptor);
+            i++;
+        }
     }
 
     /**

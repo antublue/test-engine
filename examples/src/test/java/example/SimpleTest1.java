@@ -34,7 +34,7 @@ public class SimpleTest1 {
     @TestEngine.ArgumentSupplier
     public static Stream<Argument<String>> arguments() {
         Collection<Argument<String>> collection = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 100; i++) {
             collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
@@ -86,7 +86,9 @@ public class SimpleTest1 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public void conclude() throws Throwable {
         System.out.println("conclude()");
+
+        Thread.sleep(10000);
     }
 }
