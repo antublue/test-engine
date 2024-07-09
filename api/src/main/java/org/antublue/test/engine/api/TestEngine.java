@@ -28,7 +28,7 @@ public @interface TestEngine {
     /** MultiThreadExecution annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface MultiThreadExecution {}
+    @interface Parallelize {}
 
     /** ArgumentSupplier annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})

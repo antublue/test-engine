@@ -141,7 +141,7 @@ public class EngineDiscoveryRequestResolver {
             testArgumentIndex++;
         }
 
-        if (testClass.isAnnotationPresent(TestEngine.MultiThreadExecution.class)) {
+        if (testClass.isAnnotationPresent(TestEngine.Parallelize.class)) {
             parentTestDescriptor.removeChild(classTestDescriptor);
 
             Set<? extends TestDescriptor> children = classTestDescriptor.getChildren();

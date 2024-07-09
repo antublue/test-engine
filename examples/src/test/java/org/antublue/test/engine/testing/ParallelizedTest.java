@@ -18,6 +18,7 @@ package org.antublue.test.engine.testing;
 
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.support.RandomSupport;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,8 +27,8 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /** Example test */
-@TestEngine.MultiThreadExecution
-public class MultiThreadArgumentExecutionTest {
+@TestEngine.Parallelize
+public class ParallelizedTest {
 
     @TestEngine.Argument public Argument<String> argument;
 
@@ -66,7 +67,7 @@ public class MultiThreadArgumentExecutionTest {
         System.out.println("test(" + argument + ")");
         assertThat(argument).isNotNull();
 
-        Thread.sleep(1000);
+        Thread.sleep(RandomSupport.randomLong(0, 10000));
     }
 
 
