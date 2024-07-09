@@ -482,7 +482,6 @@ public class EngineDiscoveryRequestResolver {
                     if (LOGGER.isTraceEnabled()) {
                         LOGGER.trace("removing testClass [%s]", clazz.getName());
                     }
-
                     iterator.remove();
                 }
             }
@@ -502,6 +501,9 @@ public class EngineDiscoveryRequestResolver {
                 Class<?> clazz = iterator.next();
                 matcher.reset(clazz.getName());
                 if (matcher.find()) {
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace("removing testClass [%s]", clazz.getName());
+                    }
                     iterator.remove();
                 }
             }
@@ -535,7 +537,6 @@ public class EngineDiscoveryRequestResolver {
                     if (LOGGER.isTraceEnabled()) {
                         LOGGER.trace("removing testClass [%s]", clazz.getName());
                     }
-
                     iterator.remove();
                 } else {
                     matcher.reset(tag);
@@ -543,7 +544,6 @@ public class EngineDiscoveryRequestResolver {
                         if (LOGGER.isTraceEnabled()) {
                             LOGGER.trace("removing testClass [%s]", clazz.getName());
                         }
-
                         iterator.remove();
                     }
                 }
@@ -569,7 +569,6 @@ public class EngineDiscoveryRequestResolver {
                         if (LOGGER.isTraceEnabled()) {
                             LOGGER.trace("removing testClass [%s]", clazz.getName());
                         }
-
                         iterator.remove();
                     }
                 }
@@ -606,7 +605,6 @@ public class EngineDiscoveryRequestResolver {
                                 "removing testClass [%s] testMethod [%s]",
                                 testMethod.getClass().getName(), testMethod.getName());
                     }
-
                     iterator.remove();
                 }
             }
@@ -631,7 +629,6 @@ public class EngineDiscoveryRequestResolver {
                                 "removing testClass [%s] testMethod [%s]",
                                 testMethod.getClass().getName(), testMethod.getName());
                     }
-
                     iterator.remove();
                 }
             }
@@ -662,10 +659,20 @@ public class EngineDiscoveryRequestResolver {
                 Method testMethod = iterator.next();
                 String tag = TagSupport.getTag(testMethod);
                 if (tag == null) {
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace(
+                                "removing testClass [%s] testMethod [%s]",
+                                testMethod.getClass().getName(), testMethod.getName());
+                    }
                     iterator.remove();
                 } else {
                     matcher.reset(tag);
                     if (!matcher.find()) {
+                        if (LOGGER.isTraceEnabled()) {
+                            LOGGER.trace(
+                                    "removing testClass [%s] testMethod [%s]",
+                                    testMethod.getClass().getName(), testMethod.getName());
+                        }
                         iterator.remove();
                     }
                 }
@@ -688,6 +695,11 @@ public class EngineDiscoveryRequestResolver {
                 if (tag != null) {
                     matcher.reset(tag);
                     if (matcher.find()) {
+                        if (LOGGER.isTraceEnabled()) {
+                            LOGGER.trace(
+                                    "removing testClass [%s] testMethod [%s]",
+                                    testMethod.getClass().getName(), testMethod.getName());
+                        }
                         iterator.remove();
                     }
                 }
