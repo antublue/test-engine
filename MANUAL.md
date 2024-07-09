@@ -10,35 +10,20 @@ The AntuBLUE test engine is a JUnit5 based test engine designed specifically for
 
 ## API
 
-Test classes support both `Argument` injection (`@TestEngine.Argument` annotated field) and/or method an `Argument` for the following methods:
-
-- `@TestEngine.BeforeAll`
-- `@TestEngine.BeforeEach`
-- `@TestEngine.Test` 
-- `@TestEngine.AfterEach`
-- `@TestEngine.AfterAll`
-
-`@TestEngine.Argument` member field argument example:
-
-- [SimpleTest1.java](/examples/src/test/java/example/SimpleTest1.java)
-
-`@TestEngine` test method parameter example:
-
-- [SimpleTest2.java](/examples/src/test/java/example/SimpleTest2.java)
-
 ### Test Annotations
 
-| Annotation                     | Static | Scope  | Required | Example                                                                                                                                                                                                                                    |
-|--------------------------------|--------|--------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Annotation                     | Static | Scope     | Required | Example                                                                                                                                                                                                                                  |
+|--------------------------------|--------|-----------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `@TestEngine.ArgumentSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments()`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments()`</nobr><nobr>public static Argument<[Object]> argument()</nobr> |
-| `@TestEngine.Argument`         | no     | field  | no       | `public Argument argument;`                                                                                                                                                                                                                |
-| `@TestEngine.Prepare`          | no     | method | no       | `public void prepare();`                                                                                                                                                                                                                   |
-| `@TestEngine.BeforeAll`        | no     | method | no       | `public void beforeAll();`                                                                                                                                                                                                                 |
-| `@TestEngine.BeforeEach`       | no     | method | no       | `public void beforeEach();`                                                                                                                                                                                                                |
-| `@TestEngine.Test`             | no     | method | yes      | `public void test();`                                                                                                                                                                                                                      |
-| `@TestEngine.AfterEach`        | no     | method | no       | `public void afterEach();`                                                                                                                                                                                                                 |
-| `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                                                                                  |
-| `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                                                                                  |
+| `@TestEngine.Argument`         | no     | field  | no       | `public Argument argument;`                                                                                                                                                                                                              |
+| `@TestEngine.Prepare`          | no     | method | no       | `public void prepare();`                                                                                                                                                                                                                 |
+| `@TestEngine.BeforeAll`        | no     | method | no       | `public void beforeAll();`                                                                                                                                                                                                               |
+| `@TestEngine.BeforeEach`       | no     | method | no       | `public void beforeEach();`                                                                                                                                                                                                              |
+| `@TestEngine.Test`             | no     | method | yes      | `public void test();`                                                                                                                                                                                                                    |
+| `@TestEngine.AfterEach`        | no     | method | no       | `public void afterEach();`                                                                                                                                                                                                               |
+| `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                                                                                |
+| `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                                                                                |
+| `@TestEngine.Parallelize`      | no     | class  | no       |                                                                                                                                                                                                                                          |
 
 Reference the [Design](https://github.com/antublue/test-engine#design) for the test engine execution flow.
 
@@ -51,11 +36,15 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 
 
 - `@TestEngine.Order` can be used to control test class order / test method order of execution.
-  - Classes/methods are sorted by the order annotation value first, then alphabetically by the class name/method name.
-  - The test class / test method names can be changed by using the `@TestEngine.DisplayName` annotation.
+  - Classes/methods are sorted alphabetically first by test class name or display name, then by the order annotation value.
 
-
+  
 - **Class execution order can't be guaranteed unless the test engine is configured to use a single thread.**
+
+
+- `@TestEngine.Parallelize` is used to create a "split" where a test class is instantiated for each test argument to allow parallel execution
+  - Test classes **must be thread-safe**.
+  - The Maven plugin test engine summary will treat the "split" classes as unique tests.
 
 ### Additional Test Annotations
 
