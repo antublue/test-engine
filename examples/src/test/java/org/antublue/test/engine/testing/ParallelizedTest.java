@@ -16,15 +16,14 @@
 
 package org.antublue.test.engine.testing;
 
-import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.internal.support.RandomSupport;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.TestEngine;
+import org.antublue.test.engine.internal.support.RandomSupport;
 
 /** Example test */
 @TestEngine.Parallelize
@@ -69,7 +68,6 @@ public class ParallelizedTest {
 
         Thread.sleep(RandomSupport.randomLong(0, 10000));
     }
-
 
     @TestEngine.AfterEach
     public void afterEach() {
