@@ -24,7 +24,6 @@ import org.antublue.test.engine.internal.util.StopWatch;
 import org.antublue.test.engine.internal.util.ThrowableCollector;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 /** Abstract class to implement an ExecutableTestDescriptor */
 @SuppressWarnings("PMD.EmptyCatchBlock")
