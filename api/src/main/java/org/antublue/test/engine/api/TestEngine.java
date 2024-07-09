@@ -25,6 +25,11 @@ import org.junit.platform.commons.annotation.Testable;
 /** Interface that contains all TestEngine annotations */
 public @interface TestEngine {
 
+    /** MultiThreadExecution annotation */
+    @Target({ElementType.ANNOTATION_TYPE, ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface MultiThreadExecution {}
+
     /** ArgumentSupplier annotation */
     @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)

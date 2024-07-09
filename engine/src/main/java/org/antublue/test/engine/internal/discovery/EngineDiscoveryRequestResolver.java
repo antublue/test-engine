@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.configuration.Constants;
@@ -140,20 +141,22 @@ public class EngineDiscoveryRequestResolver {
             testArgumentIndex++;
         }
 
-        parentTestDescriptor.removeChild(classTestDescriptor);
+        if (testClass.isAnnotationPresent(TestEngine.MultiThreadExecution.class)) {
+            parentTestDescriptor.removeChild(classTestDescriptor);
 
-        Set<? extends TestDescriptor> children = classTestDescriptor.getChildren();
-        int i = 0;
-        for (TestDescriptor child : children) {
-            ClassTestDescriptor splitClassTestDescriptor =
-                    ClassTestDescriptor.create(
-                            parentTestDescriptor
-                                    .getUniqueId()
-                                    .append(ClassTestDescriptor.class.getName(), "[" + i + "]"),
-                            testClass);
-            splitClassTestDescriptor.addChild(child);
-            parentTestDescriptor.addChild(splitClassTestDescriptor);
-            i++;
+            Set<? extends TestDescriptor> children = classTestDescriptor.getChildren();
+            int i = 0;
+            for (TestDescriptor child : children) {
+                ClassTestDescriptor splitClassTestDescriptor =
+                        ClassTestDescriptor.create(
+                                parentTestDescriptor
+                                        .getUniqueId()
+                                        .append(ClassTestDescriptor.class.getName(), "[" + i + "]"),
+                                testClass);
+                splitClassTestDescriptor.addChild(child);
+                parentTestDescriptor.addChild(splitClassTestDescriptor);
+                i++;
+            }
         }
     }
 
