@@ -220,6 +220,7 @@ The test engine will use `4` threads.
 
 | Property                                           | Type    | Default value                    |
 |----------------------------------------------------|---------|----------------------------------|
+| antublue.test.engine.thread.type                   | string  | platform                         |
 | antublue.test.engine.thread.count                  | integer | Max(1, number of processors - 2) |
 | antublue.test.engine.test.class.include.regex      | string  |                                  |
 | antublue.test.engine.test.class.exclude.regex      | string  |                                  |
@@ -241,6 +242,11 @@ The test engine will use `4` threads.
 | antublue.test.engine.console.log.fail.message      | string  | F                                |
 
 **Notes**
+
+`antublue.test.engine.thread.type` supports the values:
+
+- `platform` (default value)
+- `virtual`
 
 `antublue.test.engine.console.log.timing.units` supports the following values:
 
