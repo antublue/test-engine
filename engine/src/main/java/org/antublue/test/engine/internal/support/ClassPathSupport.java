@@ -17,15 +17,27 @@
 package org.antublue.test.engine.internal.support;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.regex.Pattern;
 import org.junit.platform.commons.support.ReflectionSupport;
+import org.junit.platform.commons.util.Preconditions;
 
 /** Class to implement ClassPathURIUtils */
 public class ClassPathSupport {
@@ -85,7 +97,22 @@ public class ClassPathSupport {
     }
 
     /**
-     * Method to find classes
+     * Method to scan the Java class path and return a list of classes matching the Predicate
+     *
+     * @param predicate predicate
+     * @return a List of Classes
+     */
+    public static List<Class<?>> findClasses(Predicate<Class<?>> predicate) {
+        Set<Class<?>> set = new LinkedHashSet<>();
+        for (URI uri : getClasspathURIs()) {
+            set.addAll(
+                    ReflectionSupport.findAllClassesInClasspathRoot(uri, predicate, name -> true));
+        }
+        return new ArrayList<>(set);
+    }
+
+    /**
+     * Method to scan the Java class path URI and return a list of classes matching the Predicate
      *
      * @param uri uri
      * @param predicate predicate
@@ -97,7 +124,8 @@ public class ClassPathSupport {
     }
 
     /**
-     * Method to find classes in a package
+     * Method to scan the Java class path and return a list of lasses matching the package name and
+     * Predicate
      *
      * @param packageName packageName
      * @param predicate predicate
@@ -107,5 +135,74 @@ public class ClassPathSupport {
         return new ArrayList<>(
                 ReflectionSupport.findAllClassesInPackage(
                         packageName, predicate, className -> true));
+    }
+
+    /**
+     * Method to scan the Java class path and return a list of URLs matching the name
+     *
+     * @param regex regex
+     * @return a List of URLs
+     */
+    public static List<URL> findResources(String regex) throws IOException {
+        Preconditions.notNull(regex, "regex is null");
+
+        Pattern pattern = Pattern.compile(regex);
+        List<URL> resourceUrls = new ArrayList<>();
+
+        for (URI uri : getClasspathURIs()) {
+            Path path = Paths.get(uri);
+            if (Files.isDirectory(path)) {
+                scanDirectory(pattern, path, resourceUrls);
+            } else if (path.toString().toLowerCase().endsWith(".jar")) {
+                scanJarFile(pattern, path, resourceUrls);
+            }
+        }
+        return resourceUrls;
+    }
+
+    private static void scanDirectory(Pattern pattern, Path directoryPath, List<URL> resourceUrls)
+            throws IOException {
+        Files.walkFileTree(directoryPath, new PathSimpleFileVisitor(pattern, resourceUrls));
+    }
+
+    private static void scanJarFile(Pattern pattern, Path jarPath, List<URL> resourceUrls)
+            throws IOException {
+        try (JarFile jarFile = new JarFile(jarPath.toFile().getPath())) {
+            Enumeration<JarEntry> jarEntryEnumeration = jarFile.entries();
+            while (jarEntryEnumeration.hasMoreElements()) {
+                JarEntry jarEntry = jarEntryEnumeration.nextElement();
+                if (!jarEntry.isDirectory() && pattern.matcher(jarEntry.getName()).matches()) {
+                    resourceUrls.add(new URL("jar:" + jarPath.toUri() + "!/" + jarEntry.getName()));
+                }
+            }
+        }
+    }
+
+    /** Class to implement PathSimpleFileVisitor */
+    private static class PathSimpleFileVisitor extends SimpleFileVisitor<Path> {
+
+        private final Pattern pattern;
+        private final List<URL> foundUrls;
+
+        public PathSimpleFileVisitor(Pattern pattern, List<URL> foundUrls) {
+            this.pattern = pattern;
+            this.foundUrls = foundUrls;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes)
+                throws IOException {
+            if (basicFileAttributes.isRegularFile()
+                    && pattern.matcher(path.getFileName().toString()).matches()) {
+                foundUrls.add(path.toUri().toURL());
+            }
+
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFileFailed(Path path, IOException ioException) {
+            return FileVisitResult.CONTINUE;
+        }
     }
 }
