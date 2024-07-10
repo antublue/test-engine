@@ -49,10 +49,10 @@ public class UrlSupport {
     }
 
     /**
-     * Method to create a BufferedStream from a URL
+     * Method to create a BufferedReader from a URL
      *
      * @param url url
-     * @return an BufferedStream for the URL
+     * @return a BufferedReader for the URL
      * @throws IOException IOException
      */
     public static BufferedReader createBufferedReader(URL url) throws IOException {
