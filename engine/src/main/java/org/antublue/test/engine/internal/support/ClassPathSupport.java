@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
@@ -153,7 +154,7 @@ public class ClassPathSupport {
             Path path = Paths.get(uri);
             if (Files.isDirectory(path)) {
                 scanDirectory(pattern, path, resourceUrls);
-            } else if (path.toString().toLowerCase().endsWith(".jar")) {
+            } else if (path.toString().toLowerCase(Locale.ENGLISH).endsWith(".jar")) {
                 scanJarFile(pattern, path, resourceUrls);
             }
         }
