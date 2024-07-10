@@ -124,26 +124,27 @@ public class VirtualThreadsExecutionContextExecutor implements ExecutionContextE
 
                         try {
                             semaphore.acquire();
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
 
-                        Thread thread =
-                                ThreadTool.unstartedVirtualThread(
-                                        () -> {
-                                            try {
-                                                executableTestDescriptor.execute(
-                                                        new ExecutionContext(executionContext));
-                                            } catch (Throwable t) {
-                                                t.printStackTrace(System.err);
-                                            } finally {
-                                                countDownLatch.get().countDown();
-                                                threadId.decrementAndGet();
-                                                semaphore.release();
-                                            }
-                                        });
-                        thread.setName(format("test-engine-vt-%02d", threadId.getAndIncrement()));
-                        thread.start();
+                            Thread thread =
+                                    ThreadTool.unstartedVirtualThread(
+                                            () -> {
+                                                try {
+                                                    executableTestDescriptor.execute(
+                                                            new ExecutionContext(executionContext));
+                                                } catch (Throwable t) {
+                                                    t.printStackTrace(System.err);
+                                                } finally {
+                                                    countDownLatch.get().countDown();
+                                                    threadId.decrementAndGet();
+                                                    semaphore.release();
+                                                }
+                                            });
+                            thread.setName(
+                                    format("test-engine-vt-%02d", threadId.getAndIncrement()));
+                            thread.start();
+                        } catch (InterruptedException e) {
+                            // DO NOTHING
+                        }
                     }
                 }
             } finally {
