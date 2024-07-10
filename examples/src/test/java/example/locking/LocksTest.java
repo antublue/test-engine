@@ -18,29 +18,20 @@ package example.locking;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.extras.ExecutableSupport;
 
 /** Example test */
-public class ThreadLocalMethodLockingTest1 {
-
-    private static final String LOCK_NAME = "Lock";
+public class LocksTest {
 
     @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.Random.Integer public Integer randomInteger;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument<String>> arguments() {
-        Collection<Argument<String>> collection = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            collection.add(Argument.ofString("StringArgument " + i));
-        }
-        return collection.stream();
+    public static Argument<String> argument() {
+        return Argument.ofString("StringArgument");
     }
 
     @TestEngine.Prepare
@@ -63,22 +54,13 @@ public class ThreadLocalMethodLockingTest1 {
     }
 
     @TestEngine.Test
-    public void test1() throws Throwable {
-        ExecutableSupport.execute(
-                Thread.currentThread() + "/" + LOCK_NAME,
-                () -> {
-                    System.out.println("test1(" + argument + ")");
-                    System.out.println("sleeping 1000");
-                    Thread.sleep(1000);
-                    assertThat(argument).isNotNull();
-                    System.out.println("continuing");
-                });
-    }
-
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + argument + ")");
+    public void test() throws Throwable {
+        System.out.println("test(" + argument + ")");
         assertThat(argument).isNotNull();
+
+        long time = ExecutableSupport.execute(getClass(), () -> Thread.sleep(1013)).toMillis();
+
+        System.out.println("execution time [" + time + "] ms");
     }
 
     @TestEngine.AfterEach

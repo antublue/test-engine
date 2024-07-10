@@ -16,7 +16,6 @@
 
 package org.antublue.test.engine.internal.discovery;
 
-import static java.lang.String.format;
 import static org.junit.platform.engine.Filter.composeFilters;
 
 import java.lang.reflect.Method;
@@ -33,7 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
-import org.antublue.test.engine.exception.TestClassDefinitionException;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.configuration.Constants;
@@ -47,7 +46,6 @@ import org.antublue.test.engine.internal.support.DisplayNameSupport;
 import org.antublue.test.engine.internal.support.MethodSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.TagSupport;
-import org.antublue.test.engine.internal.util.Predicates;
 import org.antublue.test.engine.internal.util.StopWatch;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.engine.DiscoverySelector;
@@ -115,7 +113,7 @@ public class EngineDiscoveryRequestResolver {
             throw new TestEngineException(t);
         } finally {
             stopWatch.stop();
-            LOGGER.trace("resolveSelectors() %d ms", stopWatch.elapsedMilliseconds());
+            LOGGER.trace("resolveSelectors() %d ms", stopWatch.elapsedTime().toMillis());
         }
     }
 
@@ -141,6 +139,24 @@ public class EngineDiscoveryRequestResolver {
             buildArgumentTestDescriptor(
                     classTestDescriptor, testClass, testArgument, testArgumentIndex);
             testArgumentIndex++;
+        }
+
+        if (testClass.isAnnotationPresent(TestEngine.Parallelize.class)) {
+            parentTestDescriptor.removeChild(classTestDescriptor);
+
+            Set<? extends TestDescriptor> children = classTestDescriptor.getChildren();
+            int i = 0;
+            for (TestDescriptor child : children) {
+                ClassTestDescriptor splitClassTestDescriptor =
+                        ClassTestDescriptor.create(
+                                parentTestDescriptor
+                                        .getUniqueId()
+                                        .append(ClassTestDescriptor.class.getName(), "[" + i + "]"),
+                                testClass);
+                splitClassTestDescriptor.addChild(child);
+                parentTestDescriptor.addChild(splitClassTestDescriptor);
+                i++;
+            }
         }
     }
 
@@ -388,40 +404,32 @@ public class EngineDiscoveryRequestResolver {
         Object object = getArgumentSupplierMethod(testClass).invoke(null, (Object[]) null);
         if (object == null) {
             return testArguments;
-        }
-
-        if (object instanceof Argument<?>) {
+        } else if (object instanceof Argument<?>) {
             testArguments.add((Argument<?>) object);
             return testArguments;
-        }
+        } else if (object instanceof Stream || object instanceof Iterable) {
+            Iterator<?> iterator;
 
-        if (!(object instanceof Stream || object instanceof Iterable)) {
-            throw new TestClassDefinitionException(
-                    format(
-                            "testClass [%s] @TestEngine.ArgumentSupplier must return a"
-                                + " Stream<Argument> or Iterable<Argument>, or Argument<?> ... type"
-                                + " returned [%s]",
-                            testClass.getName(), object.getClass().getName()));
-        }
-
-        Iterator<?> iterator;
-        if (object instanceof Stream) {
-            Stream<?> stream = (Stream<?>) object;
-            iterator = stream.iterator();
-        } else {
-            Iterable<?> iterable = (Iterable<?>) object;
-            iterator = iterable.iterator();
-        }
-
-        long index = 0;
-        while (iterator.hasNext()) {
-            Object o = iterator.next();
-            if (o instanceof Argument<?>) {
-                testArguments.add((Argument<?>) o);
+            if (object instanceof Stream) {
+                Stream<?> stream = (Stream<?>) object;
+                iterator = stream.iterator();
             } else {
-                testArguments.add(Argument.of("[" + index + "]", o));
+                Iterable<?> iterable = (Iterable<?>) object;
+                iterator = iterable.iterator();
             }
-            index++;
+
+            long index = 0;
+            while (iterator.hasNext()) {
+                Object o = iterator.next();
+                if (o instanceof Argument<?>) {
+                    testArguments.add((Argument<?>) o);
+                } else {
+                    testArguments.add(Argument.of("argument[" + index + "]", o));
+                }
+                index++;
+            }
+        } else {
+            testArguments.add(Argument.of("argument", object));
         }
 
         return testArguments;
@@ -474,7 +482,6 @@ public class EngineDiscoveryRequestResolver {
                     if (LOGGER.isTraceEnabled()) {
                         LOGGER.trace("removing testClass [%s]", clazz.getName());
                     }
-
                     iterator.remove();
                 }
             }
@@ -494,6 +501,9 @@ public class EngineDiscoveryRequestResolver {
                 Class<?> clazz = iterator.next();
                 matcher.reset(clazz.getName());
                 if (matcher.find()) {
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace("removing testClass [%s]", clazz.getName());
+                    }
                     iterator.remove();
                 }
             }
@@ -527,7 +537,6 @@ public class EngineDiscoveryRequestResolver {
                     if (LOGGER.isTraceEnabled()) {
                         LOGGER.trace("removing testClass [%s]", clazz.getName());
                     }
-
                     iterator.remove();
                 } else {
                     matcher.reset(tag);
@@ -535,7 +544,6 @@ public class EngineDiscoveryRequestResolver {
                         if (LOGGER.isTraceEnabled()) {
                             LOGGER.trace("removing testClass [%s]", clazz.getName());
                         }
-
                         iterator.remove();
                     }
                 }
@@ -561,7 +569,6 @@ public class EngineDiscoveryRequestResolver {
                         if (LOGGER.isTraceEnabled()) {
                             LOGGER.trace("removing testClass [%s]", clazz.getName());
                         }
-
                         iterator.remove();
                     }
                 }
@@ -598,7 +605,6 @@ public class EngineDiscoveryRequestResolver {
                                 "removing testClass [%s] testMethod [%s]",
                                 testMethod.getClass().getName(), testMethod.getName());
                     }
-
                     iterator.remove();
                 }
             }
@@ -623,7 +629,6 @@ public class EngineDiscoveryRequestResolver {
                                 "removing testClass [%s] testMethod [%s]",
                                 testMethod.getClass().getName(), testMethod.getName());
                     }
-
                     iterator.remove();
                 }
             }
@@ -654,10 +659,20 @@ public class EngineDiscoveryRequestResolver {
                 Method testMethod = iterator.next();
                 String tag = TagSupport.getTag(testMethod);
                 if (tag == null) {
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace(
+                                "removing testClass [%s] testMethod [%s]",
+                                testMethod.getClass().getName(), testMethod.getName());
+                    }
                     iterator.remove();
                 } else {
                     matcher.reset(tag);
                     if (!matcher.find()) {
+                        if (LOGGER.isTraceEnabled()) {
+                            LOGGER.trace(
+                                    "removing testClass [%s] testMethod [%s]",
+                                    testMethod.getClass().getName(), testMethod.getName());
+                        }
                         iterator.remove();
                     }
                 }
@@ -680,6 +695,11 @@ public class EngineDiscoveryRequestResolver {
                 if (tag != null) {
                     matcher.reset(tag);
                     if (matcher.find()) {
+                        if (LOGGER.isTraceEnabled()) {
+                            LOGGER.trace(
+                                    "removing testClass [%s] testMethod [%s]",
+                                    testMethod.getClass().getName(), testMethod.getName());
+                        }
                         iterator.remove();
                     }
                 }

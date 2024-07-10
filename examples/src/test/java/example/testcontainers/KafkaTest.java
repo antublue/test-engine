@@ -46,6 +46,7 @@ import org.testcontainers.utility.DockerImageName;
  * <p>Disabled by default since users may not have Docker installed
  */
 @TestEngine.Disabled
+@TestEngine.Parallelize
 public class KafkaTest {
 
     private static final String TOPIC = "test";
@@ -59,21 +60,25 @@ public class KafkaTest {
 
     @TestEngine.ArgumentSupplier
     public static Stream<KafkaTestEnvironment> arguments() {
-        return Stream.of(new KafkaTestEnvironment("apache/kafka:3.7.0"));
+        return Stream.of(
+                new KafkaTestEnvironment("apache/kafka:3.7.0"),
+                new KafkaTestEnvironment("apache/kafka:3.7.1"),
+                new KafkaTestEnvironment("apache/kafka:3.7.0"),
+                new KafkaTestEnvironment("apache/kafka:3.7.1"));
     }
 
     @TestEngine.Prepare
-    public void createNetwork() {
-        info("creating network ...");
+    public void initializeNetwork() {
+        info("initializing network ...");
 
         network = Network.newNetwork();
         String id = network.getId();
 
-        info("network [%s] created", id);
+        info("network [%s] initialized", id);
     }
 
     @TestEngine.BeforeAll
-    public void startTestContainer() {
+    public void initializeTestEnvironment() {
         kafkaTestEnvironment.initialize(network);
     }
 
@@ -106,7 +111,7 @@ public class KafkaTest {
     @TestEngine.Test
     @TestEngine.Order(order = 2)
     public void testConsume1() {
-        info("testing testConsume() ...");
+        info("testConsume() ...");
 
         String bootstrapServers = kafkaTestEnvironment.getKafkaContainer().getBootstrapServers();
 
@@ -182,15 +187,17 @@ public class KafkaTest {
     }
 
     @TestEngine.AfterAll
-    public void afterAll() {
+    public void destroyTestEnvironment() {
         kafkaTestEnvironment.destroy();
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public void destroyNetwork() {
         info("destroying network ...");
 
-        network.close();
+        if (network != null) {
+            network.close();
+        }
 
         info("network destroyed");
     }

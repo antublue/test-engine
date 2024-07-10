@@ -40,6 +40,7 @@ import org.testcontainers.utility.DockerImageName;
  * <p>Disabled by default since users may not have Docker installed
  */
 @TestEngine.Disabled
+@TestEngine.Parallelize
 public class MongoDBTest {
 
     private Network network;
@@ -56,17 +57,17 @@ public class MongoDBTest {
     }
 
     @TestEngine.Prepare
-    public void createNetwork() {
-        info("creating network ...");
+    public void initializeNetwork() {
+        info("initializing network ...");
 
         network = Network.newNetwork();
         String id = network.getId();
 
-        info("network [%s] created", id);
+        info("network [%s] initialized", id);
     }
 
     @TestEngine.BeforeAll
-    public void startTestContainer() {
+    public void initializeTestEnvironment() {
         mongoDBTestEnvironment.initialize(network);
     }
 
@@ -124,15 +125,17 @@ public class MongoDBTest {
     }
 
     @TestEngine.AfterAll
-    public void afterAll() {
+    public void destroyTestEnvironment() {
         mongoDBTestEnvironment.destroy();
     }
 
     @TestEngine.Conclude
-    public void conclude() {
+    public void destroyNetwork() {
         info("destroying network ...");
 
-        network.close();
+        if (network != null) {
+            network.close();
+        }
 
         info("network destroyed");
     }
@@ -184,7 +187,7 @@ public class MongoDBTest {
             mongoDBContainer.withNetwork(network);
             mongoDBContainer.start();
 
-            info("test container [%s] started", dockerImageName);
+            info("test environment [%s] initialized", dockerImageName);
         }
 
         public MongoDBContainer getMongoDBContainer() {

@@ -14,33 +14,23 @@
  * limitations under the License.
  */
 
-package example.locking;
+package example.arguments.supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.extras.ExecutableSupport;
 
 /** Example test */
-public class ThreadLocalMethodLockingTest1 {
+public class SingleArgumentTest3 {
 
-    private static final String LOCK_NAME = "Lock";
-
-    @TestEngine.Argument public Argument<String> argument;
+    @TestEngine.Argument public String argument;
 
     @TestEngine.Random.Integer public Integer randomInteger;
 
     @TestEngine.ArgumentSupplier
-    public static Stream<Argument<String>> arguments() {
-        Collection<Argument<String>> collection = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            collection.add(Argument.ofString("StringArgument " + i));
-        }
-        return collection.stream();
+    public static Argument<String> argument() {
+        return Argument.ofString("StringArgument");
     }
 
     @TestEngine.Prepare
@@ -63,16 +53,9 @@ public class ThreadLocalMethodLockingTest1 {
     }
 
     @TestEngine.Test
-    public void test1() throws Throwable {
-        ExecutableSupport.execute(
-                Thread.currentThread() + "/" + LOCK_NAME,
-                () -> {
-                    System.out.println("test1(" + argument + ")");
-                    System.out.println("sleeping 1000");
-                    Thread.sleep(1000);
-                    assertThat(argument).isNotNull();
-                    System.out.println("continuing");
-                });
+    public void test1() {
+        System.out.println("test1(" + argument + ")");
+        assertThat(argument).isNotNull();
     }
 
     @TestEngine.Test

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.antublue.test.engine.internal.util;
+package org.antublue.test.engine.internal.discovery;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -113,7 +113,7 @@ public class Predicates {
                         && !MethodSupport.findMethods(
                                         clazz,
                                         ARGUMENT_SUPPLIER_METHOD,
-                                        HierarchyTraversalMode.TOP_DOWN)
+                                        HierarchyTraversalMode.BOTTOM_UP)
                                 .isEmpty();
             };
 

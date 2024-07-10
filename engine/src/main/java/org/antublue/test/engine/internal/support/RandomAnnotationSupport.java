@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.internal.util.Predicates;
+import org.antublue.test.engine.internal.discovery.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.Preconditions;
 

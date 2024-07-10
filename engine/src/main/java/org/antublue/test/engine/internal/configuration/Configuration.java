@@ -47,7 +47,7 @@ public class Configuration implements org.junit.platform.engine.ConfigurationPar
             "antublue-test-engine.properties";
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
-            new SimpleDateFormat("yyyy-MM-dd | HH:mm:ss.SSS", Locale.getDefault());
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
 
     private boolean IS_TRACE_ENABLED;
 

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.internal.discovery.Predicates;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -33,11 +34,9 @@ import org.antublue.test.engine.internal.support.MethodSupport;
 import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 import org.antublue.test.engine.internal.support.RandomAnnotationSupport;
-import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.TestDescriptor;
-import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
@@ -128,28 +127,22 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedNanoseconds());
+                        stopWatch.elapsedTime());
 
         List<Throwable> throwables = collectThrowables();
-        if (throwableCollector.isEmpty()) {
-            getMetadata()
-                    .put(
-                            MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
-                            MetadataTestDescriptorConstants.PASS);
-            executionContext
-                    .getExecutionRequest()
-                    .getEngineExecutionListener()
-                    .executionFinished(this, TestExecutionResult.successful());
-        } else {
-            getMetadata()
-                    .put(
-                            MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
-                            MetadataTestDescriptorConstants.FAIL);
-            executionContext
-                    .getExecutionRequest()
-                    .getEngineExecutionListener()
-                    .executionFinished(this, TestExecutionResult.failed(throwables.get(0)));
-        }
+        throwableCollector.getThrowables().addAll(throwables);
+
+        getMetadata()
+                .put(
+                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
+                        throwableCollector.isEmpty()
+                                ? MetadataTestDescriptorConstants.PASS
+                                : MetadataTestDescriptorConstants.FAIL);
+
+        executionContext
+                .getExecutionRequest()
+                .getEngineExecutionListener()
+                .executionFinished(this, throwableCollector.toTestExecutionResult());
     }
 
     @Override
@@ -182,7 +175,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedNanoseconds());
+                        stopWatch.elapsedTime());
 
         executionContext
                 .getExecutionRequest()
@@ -227,7 +220,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                     testInstance.getClass().getName(), testInstance, testArgument);
         }
 
-        RandomAnnotationSupport.setRandomFields(testInstance);
+        if (testInstance != null) {
+            RandomAnnotationSupport.setRandomFields(testInstance);
+        }
     }
 
     private void beforeAllMethods(ExecutionContext executionContext) throws Throwable {
@@ -325,7 +320,9 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
                     testInstance.getClass().getName(), testInstance);
         }
 
-        RandomAnnotationSupport.clearRandomFields(testInstance);
+        if (testInstance != null) {
+            RandomAnnotationSupport.clearRandomFields(testInstance);
+        }
     }
 
     private void clearArgumentFields(ExecutionContext executionContext) throws Throwable {

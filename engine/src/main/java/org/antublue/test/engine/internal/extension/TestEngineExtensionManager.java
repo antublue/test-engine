@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.List;
 import org.antublue.test.engine.api.TestEngineExtension;
 import org.antublue.test.engine.exception.TestEngineException;
+import org.antublue.test.engine.internal.discovery.Predicates;
 import org.antublue.test.engine.internal.support.ClassSupport;
 import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
-import org.antublue.test.engine.internal.util.Predicates;
 
 /** Class to implement TestEngineExtensionManager */
 public class TestEngineExtensionManager {
@@ -58,15 +58,15 @@ public class TestEngineExtensionManager {
     }
 
     /**
-     * Method to prepare test engine extensions
+     * Method to initialize test engine extensions
      *
      * @throws Throwable Throwable
      */
-    public void prepare() throws Throwable {
+    public void initializeCallback() throws Throwable {
         initialize();
 
         for (TestEngineExtension testEngineExtension : testEngineExtensions) {
-            testEngineExtension.prepareCallback();
+            testEngineExtension.initializeCallback();
         }
     }
 
@@ -75,7 +75,7 @@ public class TestEngineExtensionManager {
      *
      * @return a List of Throwables
      */
-    public List<Throwable> conclude() {
+    public List<Throwable> destroyCallback() {
         initialize();
 
         List<Throwable> throwables = new ArrayList<>();
@@ -85,7 +85,7 @@ public class TestEngineExtensionManager {
 
         for (TestEngineExtension testEngineExtension : testEngineExtensions) {
             try {
-                testEngineExtension.concludeCallback();
+                testEngineExtension.destroyCallback();
             } catch (Throwable t) {
                 throwables.add(t);
             }

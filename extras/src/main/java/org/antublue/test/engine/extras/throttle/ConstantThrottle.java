@@ -28,6 +28,11 @@ public class ConstantThrottle implements Throttle {
      * @param milliseconds milliseconds
      */
     public ConstantThrottle(long milliseconds) {
+        if (milliseconds < 1) {
+            throw new IllegalArgumentException(
+                    "milliseconds [" + milliseconds + "] is less than 1");
+        }
+
         this.milliseconds = milliseconds;
     }
 

@@ -17,6 +17,7 @@
 package org.antublue.test.engine.maven.plugin.listener;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.configuration.Constants;
@@ -25,9 +26,9 @@ import org.antublue.test.engine.internal.descriptor.MetadataTestDescriptor;
 import org.antublue.test.engine.internal.descriptor.MetadataTestDescriptorConstants;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
+import org.antublue.test.engine.internal.support.HumanReadableTimeSupport;
 import org.antublue.test.engine.internal.util.AnsiColor;
 import org.antublue.test.engine.internal.util.AnsiColorStringBuilder;
-import org.antublue.test.engine.internal.util.HumanReadableTimeUtils;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
@@ -215,7 +216,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
         String testMethodDisplayName =
                 metadata.get(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME) + "()";
 
-        Long elapsedTime =
+        Duration elapsedTime =
                 metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
 
         AnsiColorStringBuilder ansiColorStringBuilder =
@@ -244,8 +245,8 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             ansiColorStringBuilder
                     .append(" ")
                     .append(
-                            HumanReadableTimeUtils.toTimingUnit(
-                                    elapsedTime, consoleLogTimingUnits));
+                            HumanReadableTimeSupport.toTimingUnit(
+                                    elapsedTime.toNanos(), consoleLogTimingUnits));
         }
 
         ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);
@@ -281,7 +282,7 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
         String testMethodDisplayName =
                 metadata.get(MetadataTestDescriptorConstants.TEST_METHOD_DISPLAY_NAME) + "()";
 
-        Long elapsedTime =
+        Duration elapsedTime =
                 metadata.get(MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME);
 
         String testDescriptorStatus =
@@ -335,8 +336,8 @@ public class StatusEngineExecutionListener implements EngineExecutionListener {
             ansiColorStringBuilder
                     .append(" ")
                     .append(
-                            HumanReadableTimeUtils.toTimingUnit(
-                                    elapsedTime, consoleLogTimingUnits));
+                            HumanReadableTimeSupport.toTimingUnit(
+                                    elapsedTime.toNanos(), consoleLogTimingUnits));
         }
 
         ansiColorStringBuilder.color(AnsiColor.TEXT_RESET);

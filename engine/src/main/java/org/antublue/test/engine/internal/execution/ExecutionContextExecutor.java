@@ -135,6 +135,7 @@ public class ExecutionContextExecutor {
 
                 Set<? extends TestDescriptor> testDescriptors = rootTestDescriptor.getChildren();
 
+                LOGGER.trace("test descriptor count [%d]", testDescriptors.size());
                 countDownLatch.set(new CountDownLatch(testDescriptors.size()));
 
                 for (TestDescriptor testDescriptor : testDescriptors) {

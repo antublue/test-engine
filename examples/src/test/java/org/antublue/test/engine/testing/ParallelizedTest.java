@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package example.locking;
+package org.antublue.test.engine.testing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,12 +23,11 @@ import java.util.Collection;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.extras.ExecutableSupport;
+import org.antublue.test.engine.internal.support.RandomSupport;
 
 /** Example test */
-public class ThreadLocalMethodLockingTest1 {
-
-    private static final String LOCK_NAME = "Lock";
+@TestEngine.Parallelize
+public class ParallelizedTest {
 
     @TestEngine.Argument public Argument<String> argument;
 
@@ -37,7 +36,7 @@ public class ThreadLocalMethodLockingTest1 {
     @TestEngine.ArgumentSupplier
     public static Stream<Argument<String>> arguments() {
         Collection<Argument<String>> collection = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 20; i++) {
             collection.add(Argument.ofString("StringArgument " + i));
         }
         return collection.stream();
@@ -45,7 +44,7 @@ public class ThreadLocalMethodLockingTest1 {
 
     @TestEngine.Prepare
     public void prepare() {
-        System.out.println("prepare()");
+        System.out.println("prepare(" + this + ")");
     }
 
     @TestEngine.BeforeAll
@@ -63,22 +62,11 @@ public class ThreadLocalMethodLockingTest1 {
     }
 
     @TestEngine.Test
-    public void test1() throws Throwable {
-        ExecutableSupport.execute(
-                Thread.currentThread() + "/" + LOCK_NAME,
-                () -> {
-                    System.out.println("test1(" + argument + ")");
-                    System.out.println("sleeping 1000");
-                    Thread.sleep(1000);
-                    assertThat(argument).isNotNull();
-                    System.out.println("continuing");
-                });
-    }
-
-    @TestEngine.Test
-    public void test2() {
-        System.out.println("test2(" + argument + ")");
+    public void test() throws InterruptedException {
+        System.out.println("test(" + argument + ")");
         assertThat(argument).isNotNull();
+
+        Thread.sleep(RandomSupport.randomLong(0, 10000));
     }
 
     @TestEngine.AfterEach
@@ -96,7 +84,7 @@ public class ThreadLocalMethodLockingTest1 {
     }
 
     @TestEngine.Conclude
-    public void conclude() {
-        System.out.println("conclude()");
+    public void conclude() throws Throwable {
+        System.out.println("conclude(" + this + ")");
     }
 }

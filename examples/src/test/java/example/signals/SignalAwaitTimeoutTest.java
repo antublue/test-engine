@@ -14,45 +14,47 @@
  * limitations under the License.
  */
 
-package example.locking;
+package example.signals;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 import org.antublue.test.engine.api.Argument;
 import org.antublue.test.engine.api.TestEngine;
-import org.antublue.test.engine.extras.ExecutableSupport;
+import org.antublue.test.engine.extras.Signals;
 
-public abstract class AbstractLockingTest {
-
-    private static final String NAMESPACE = "AbstractLockingTest";
-    private static final String LOCK_NAME = "Lock";
+public class SignalAwaitTimeoutTest {
 
     @TestEngine.Argument public Argument<String> argument;
 
     @TestEngine.ArgumentSupplier
     public static Stream<Argument<String>> arguments() {
         Collection<Argument<String>> collection = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            collection.add(Argument.ofString("StringArgument " + i));
+
+        for (int i = 0; i < 5; i++) {
+            collection.add(Argument.ofString("String " + i));
         }
+
         return collection.stream();
+    }
+
+    @TestEngine.Prepare
+    public void prepare() {
+        System.out.println(getClass().getName() + ".prepare()");
     }
 
     @TestEngine.Test
     public void test() throws Throwable {
-        final String className = getClass().getName();
+        System.out.println(getClass().getName() + ".test(" + argument + ")");
 
-        ExecutableSupport.execute(
-                NAMESPACE + "/" + LOCK_NAME,
-                () -> {
-                    System.out.println(className + ".test1(" + argument + ")");
-                    System.out.println("sleeping 1000");
-                    Thread.sleep(5000);
-                    assertThat(argument).isNotNull();
-                    System.out.println(className + ".continuing");
-                });
+        assertThatExceptionOfType(TimeoutException.class)
+                .isThrownBy(
+                        () ->
+                                Signals.await(
+                                        SignalAwaitTimeoutTest.class, 100, TimeUnit.MILLISECONDS));
     }
 }

@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import org.antublue.test.engine.api.Argument;
+import org.antublue.test.engine.internal.discovery.Predicates;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
 import org.antublue.test.engine.internal.logger.Logger;
@@ -30,10 +31,8 @@ import org.antublue.test.engine.internal.support.DisplayNameSupport;
 import org.antublue.test.engine.internal.support.MethodSupport;
 import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
-import org.antublue.test.engine.internal.util.Predicates;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.util.Preconditions;
-import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.MethodSource;
@@ -121,28 +120,22 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_DESCRIPTOR_ELAPSED_TIME,
-                        stopWatch.elapsedNanoseconds());
+                        stopWatch.elapsedTime());
 
         List<Throwable> throwables = collectThrowables();
-        if (throwables.isEmpty()) {
-            getMetadata()
-                    .put(
-                            MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
-                            MetadataTestDescriptorConstants.PASS);
-            executionContext
-                    .getExecutionRequest()
-                    .getEngineExecutionListener()
-                    .executionFinished(this, TestExecutionResult.successful());
-        } else {
-            getMetadata()
-                    .put(
-                            MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
-                            MetadataTestDescriptorConstants.FAIL);
-            executionContext
-                    .getExecutionRequest()
-                    .getEngineExecutionListener()
-                    .executionFinished(this, throwableCollector.toTestExecutionResult());
-        }
+        throwableCollector.getThrowables().addAll(throwables);
+
+        getMetadata()
+                .put(
+                        MetadataTestDescriptorConstants.TEST_DESCRIPTOR_STATUS,
+                        throwableCollector.isEmpty()
+                                ? MetadataTestDescriptorConstants.PASS
+                                : MetadataTestDescriptorConstants.FAIL);
+
+        executionContext
+                .getExecutionRequest()
+                .getEngineExecutionListener()
+                .executionFinished(this, throwableCollector.toTestExecutionResult());
     }
 
     @Override

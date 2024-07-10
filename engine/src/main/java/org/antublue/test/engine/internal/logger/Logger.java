@@ -37,7 +37,7 @@ public class Logger {
     private static final Configuration CONFIGURATION = Configuration.getInstance();
 
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT =
-            new SimpleDateFormat("yyyy-MM-dd | HH:mm:ss.SSS", Locale.getDefault());
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
 
     private final String name;
     private Level level;
@@ -53,6 +53,7 @@ public class Logger {
 
         String loggerLevel =
                 CONFIGURATION.get(Constants.LOGGER_LEVEL).orElse(Level.INFO.toString());
+
         String regex = CONFIGURATION.get(Constants.LOGGER_REGEX).orElse(".*");
 
         try {
