@@ -28,6 +28,7 @@
     <description>AntuBLUE Test Engine</description>
 
     <url>http://github.com/antublue/test-engine</url>
+
     <developers>
         <developer>
             <name>AntuBLUE</name>
@@ -325,7 +326,7 @@
         <dependency>
             <groupId>io.github.thunkware</groupId>
             <artifactId>virtual-threads-bridge</artifactId>
-            <version>0.0.4</version>
+            <version>0.0.4-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

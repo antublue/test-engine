@@ -76,9 +76,9 @@
                 <configuration>
                     <groupId>io.github.thunkware</groupId>
                     <artifactId>virtual-threads-bridge</artifactId>
-                    <version>0.0.4</version>
+                    <version>0.0.4-SNAPSHOT</version>
                     <packaging>jar</packaging>
-                    <file>${basedir}/dependencies/virtual-threads-bridge-0.0.4.jar</file>
+                    <file>${basedir}/dependencies/virtual-threads-bridge-0.0.4-SNAPSHOT.jar</file>
                     <generatePom>true</generatePom>
                 </configuration>
                 <executions>

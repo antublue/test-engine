@@ -110,7 +110,7 @@ public class ExecutionContextExecutor {
 
                 try {
                     if (ThreadTool.hasVirtualThreads()) {
-                        LOGGER.info("using virtual threads");
+                        LOGGER.trace("using virtual threads");
                         executorService = ExecutorTool.newVirtualThreadPerTaskExecutor();
                     }
                 } catch (Throwable t) {
@@ -118,7 +118,7 @@ public class ExecutionContextExecutor {
                 }
 
                 if (executorService == null) {
-                    LOGGER.info("using platform threads");
+                    LOGGER.trace("using platform threads");
                     executorService =
                             new ThreadPoolExecutor(
                                     threadCount,
@@ -140,7 +140,7 @@ public class ExecutionContextExecutor {
 
                 for (TestDescriptor testDescriptor : testDescriptors) {
                     if (testDescriptor instanceof ExecutableTestDescriptor) {
-                        LOGGER.info("submitting name [%s]", testDescriptor.getDisplayName());
+                        LOGGER.trace("submitting name [%s]", testDescriptor.getDisplayName());
                         ExecutableTestDescriptor executableTestDescriptor =
                                 (ExecutableTestDescriptor) testDescriptor;
                         executorService.submit(
