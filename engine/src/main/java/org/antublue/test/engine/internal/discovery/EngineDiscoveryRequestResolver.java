@@ -341,7 +341,7 @@ public class EngineDiscoveryRequestResolver {
             Method testMethod = methodSelector.getJavaMethod();
 
             if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("testMethod [%s]", testMethod.getName());
+                LOGGER.trace("testMethod [%s]", testMethod);
             }
 
             if (Predicates.TEST_CLASS.test(testClass) && Predicates.TEST_METHOD.test(testMethod)) {

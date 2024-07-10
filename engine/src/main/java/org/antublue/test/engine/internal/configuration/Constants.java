@@ -28,6 +28,9 @@ public final class Constants {
     public static final String PREFIX = "antublue.test.engine";
 
     /** Configuration constant */
+    public static final String THREAD_TYPE = PREFIX + ".thread.type";
+
+    /** Configuration constant */
     public static final String THREAD_COUNT = PREFIX + ".thread.count";
 
     /** Configuration constant */

@@ -28,6 +28,7 @@
     <description>AntuBLUE Test Engine</description>
 
     <url>http://github.com/antublue/test-engine</url>
+
     <developers>
         <developer>
             <name>AntuBLUE</name>
@@ -231,6 +232,28 @@
                                     <exclude>org.opentest4j:opentest4j</exclude>
                                 </excludes>
                             </artifactSet>
+                            <!-- Remove the META-INFO/MANIFEST.MF file from the shaded jar -->
+                            <filters>
+                                <filter>
+                                    <artifact>io.github.thunkware:virtual-threads-bridge</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <!-- Relocate common classes and version specific classes to the same package -->
+                            <relocations>
+                                <relocation>
+                                    <pattern>io.github.thunkware</pattern>
+                                    <!-- Prefix is an MD5 hash "io.github.thunkware" -->
+                                    <shadedPattern>48ebc8ca020a5ac33af85257ea798591.io.github.thunkware</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>META-INF/versions/21/io.github.thunkware</pattern>
+                                    <!-- Prefix is an MD5 hash "io.github.thunkware" -->
+                                    <shadedPattern>48ebc8ca020a5ac33af85257ea798591.io.github.thunkware</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -321,6 +344,11 @@
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
             <version>1.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.thunkware</groupId>
+            <artifactId>virtual-threads-bridge</artifactId>
+            <version>0.0.3</version>
         </dependency>
     </dependencies>
 

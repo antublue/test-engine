@@ -22,7 +22,7 @@ import java.util.List;
 import org.antublue.test.engine.api.TestEngineExtension;
 import org.antublue.test.engine.exception.TestEngineException;
 import org.antublue.test.engine.internal.discovery.Predicates;
-import org.antublue.test.engine.internal.support.ClassSupport;
+import org.antublue.test.engine.internal.support.ClassPathSupport;
 import org.antublue.test.engine.internal.support.ObjectSupport;
 import org.antublue.test.engine.internal.support.OrdererSupport;
 
@@ -41,7 +41,7 @@ public class TestEngineExtensionManager {
     private synchronized void initialize() {
         if (!initialized) {
             List<Class<?>> classes =
-                    ClassSupport.findClasses(Predicates.TEST_ENGINE_EXTENSION_CLASS);
+                    ClassPathSupport.findClasses(Predicates.TEST_ENGINE_EXTENSION_CLASS);
 
             OrdererSupport.orderTestClasses(classes);
 
