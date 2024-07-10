@@ -21,6 +21,7 @@ import org.antublue.test.engine.internal.configuration.Configuration;
 import org.antublue.test.engine.internal.discovery.EngineDiscoveryRequestResolver;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.execution.ExecutionContextExecutor;
+import org.antublue.test.engine.internal.execution.ExecutionContextExecutorFactory;
 import org.antublue.test.engine.internal.extension.TestEngineExtensionManager;
 import org.antublue.test.engine.internal.logger.Logger;
 import org.antublue.test.engine.internal.logger.LoggerFactory;
@@ -149,11 +150,12 @@ public class AntuBLUETestEngine implements org.junit.platform.engine.TestEngine 
 
         throwableCollector.execute(
                 () -> TestEngineExtensionManager.getInstance().initializeCallback());
+
         if (throwableCollector.isEmpty()) {
             throwableCollector.execute(
                     () -> {
                         ExecutionContextExecutor executionContextExecutor =
-                                new ExecutionContextExecutor();
+                                ExecutionContextExecutorFactory.createExecutionContextExecutor();
                         executionContextExecutor.execute(executionContext);
                         executionContextExecutor.await();
                     });
