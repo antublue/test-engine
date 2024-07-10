@@ -39,9 +39,9 @@ public class ClassPathSupport {
     }
 
     /**
-     * Method to get a List of classpath URIs
+     * Method to get a List of clas path URIs
      *
-     * @return a List of classpath URIs
+     * @return a List of class path URIs
      */
     public static List<URI> getClasspathURIs() {
         try {
@@ -64,6 +64,11 @@ public class ClassPathSupport {
         }
     }
 
+    /**
+     * Method to get a list of class path URLs
+     *
+     * @return a List of class path URLs
+     */
     public static List<URL> getClassPathURLS() {
         try {
             List<URI> uris = getClasspathURIs();
