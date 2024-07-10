@@ -39,7 +39,7 @@ import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestExecutionResult;
 
-/** Method to execute an ExecutionRequest */
+/** Class to implement PlatformThreadsExecutionContextExecutor */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class PlatformThreadsExecutionContextExecutor implements ExecutionContextExecutor {
 
@@ -56,11 +56,7 @@ public class PlatformThreadsExecutionContextExecutor implements ExecutionContext
         countDownLatch = new CountDownLatch(1);
     }
 
-    /**
-     * Method to execute the ExecutionContext
-     *
-     * @param executionContext executionContext
-     */
+    @Override
     public void execute(ExecutionContext executionContext) {
         try {
             LOGGER.trace(
@@ -165,7 +161,7 @@ public class PlatformThreadsExecutionContextExecutor implements ExecutionContext
         }
     }
 
-    /** Method to wait for the executor to finish */
+    @Override
     public void await() {
         try {
             countDownLatch.await();
