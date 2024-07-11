@@ -100,7 +100,7 @@ public class TestMethodTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME,
-                        DisplayNameSupport.getDisplayName(testClass));
+                        getParent().get().getParent().get().getDisplayName());
 
         getMetadata().put(MetadataTestDescriptorConstants.TEST_ARGUMENT, testArgument);
         getMetadata().put(MetadataTestDescriptorConstants.TEST_METHOD, testMethod);

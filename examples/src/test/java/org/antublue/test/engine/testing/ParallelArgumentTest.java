@@ -26,8 +26,9 @@ import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.support.RandomSupport;
 
 /** Example test */
-@TestEngine.Parallelize
-public class ParallelizedTest {
+@TestEngine.ParallelArgumentTest
+@TestEngine.DisplayName(name = "ParallelArgumentTest")
+public class ParallelArgumentTest {
 
     @TestEngine.Argument public Argument<String> argument;
 

@@ -141,22 +141,12 @@ public class EngineDiscoveryRequestResolver {
             testArgumentIndex++;
         }
 
-        if (testClass.isAnnotationPresent(TestEngine.Parallelize.class)) {
+        if (testClass.isAnnotationPresent(TestEngine.ParallelArgumentTest.class)
+                && classTestDescriptor.getChildren().size() > 1) {
             parentTestDescriptor.removeChild(classTestDescriptor);
-
-            Set<? extends TestDescriptor> children = classTestDescriptor.getChildren();
-            int i = 0;
-            for (TestDescriptor child : children) {
-                ClassTestDescriptor splitClassTestDescriptor =
-                        ClassTestDescriptor.create(
-                                parentTestDescriptor
-                                        .getUniqueId()
-                                        .append(ClassTestDescriptor.class.getName(), "[" + i + "]"),
-                                testClass);
-                splitClassTestDescriptor.addChild(child);
-                parentTestDescriptor.addChild(splitClassTestDescriptor);
-                i++;
-            }
+            classTestDescriptor
+                    .split(parentTestDescriptor.getUniqueId())
+                    .forEach(parentTestDescriptor::addChild);
         }
     }
 

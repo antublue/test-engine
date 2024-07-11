@@ -40,7 +40,7 @@ import org.testcontainers.utility.DockerImageName;
  * <p>Disabled by default since users may not have Docker installed
  */
 @TestEngine.Disabled
-@TestEngine.Parallelize
+@TestEngine.ParallelArgumentTest
 public class MongoDBTest {
 
     private Network network;
