@@ -135,8 +135,7 @@ public class VirtualThreadsExecutionContextExecutor implements ExecutionContextE
                                                     semaphore.release();
                                                 }
                                             });
-                            thread.setName(
-                                    format("test-engine-vt-%02d", threadId.getAndIncrement()));
+                            thread.setName(format("test-engine-%02d", threadId.getAndIncrement()));
                             thread.start();
                         } catch (InterruptedException e) {
                             // DO NOTHING
