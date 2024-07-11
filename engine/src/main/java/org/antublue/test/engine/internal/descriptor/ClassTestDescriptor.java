@@ -176,9 +176,17 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                 .executionSkipped(this, "Skipped");
     }
 
+    /**
+     * Method to split the ClassTestDescriptor into multiple ClassTestDescriptors if the test class
+     * is annotated with @TestEngine.ParallelArgumentTest and there is more than one test argument
+     *
+     * @param parentUniqueId parentUniqueId
+     * @return a List of ClassTestDescriptors
+     */
     public List<ClassTestDescriptor> split(UniqueId parentUniqueId) {
         List<ClassTestDescriptor> classTestDescriptors = new ArrayList<>();
 
+        // Safety check
         if (testClass.isAnnotationPresent(TestEngine.ParallelArgumentTest.class)
                 && getChildren().size() < 2) {
             classTestDescriptors.add(this);
@@ -190,8 +198,8 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
             UniqueId uniqueId =
                     parentUniqueId.append(
                             ClassTestDescriptor.class.getName(),
-                            testClass.getName() + " [" + index + "]");
-            String displayName = this.getDisplayName() + " [" + index + "]";
+                            testClass.getName() + "[" + index + "]");
+            String displayName = this.getDisplayName() + "[" + index + "]";
             Class<?> testClass = this.testClass;
             List<Method> prepareMethods = this.prepareMethods;
             List<Method> concludeMethods = this.concludeMethods;
