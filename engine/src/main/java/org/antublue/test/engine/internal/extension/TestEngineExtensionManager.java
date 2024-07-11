@@ -107,6 +107,7 @@ public class TestEngineExtensionManager {
     private static class SingletonHolder {
 
         /** The singleton instance */
-        public static final TestEngineExtensionManager SINGLETON = new TestEngineExtensionManager();
+        private static final TestEngineExtensionManager SINGLETON =
+                new TestEngineExtensionManager();
     }
 }
