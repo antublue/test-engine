@@ -242,6 +242,6 @@ public class Configuration implements org.junit.platform.engine.ConfigurationPar
     private static class SingletonHolder {
 
         /** The singleton instance */
-        public static final Configuration SINGLETON = new Configuration();
+        private static final Configuration SINGLETON = new Configuration();
     }
 }
