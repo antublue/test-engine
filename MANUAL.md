@@ -12,18 +12,18 @@ The AntuBLUE test engine is a JUnit5 based test engine designed specifically for
 
 ### Test Annotations
 
-| Annotation                     | Static | Scope     | Required | Example                                                                                                                                                                                                                                  |
-|--------------------------------|--------|-----------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `@TestEngine.ArgumentSupplier` | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments()`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments()`</nobr><nobr>public static Argument<[Object]> argument()</nobr> |
-| `@TestEngine.Argument`         | no     | field  | no       | `public Argument argument;`                                                                                                                                                                                                              |
-| `@TestEngine.Prepare`          | no     | method | no       | `public void prepare();`                                                                                                                                                                                                                 |
-| `@TestEngine.BeforeAll`        | no     | method | no       | `public void beforeAll();`                                                                                                                                                                                                               |
-| `@TestEngine.BeforeEach`       | no     | method | no       | `public void beforeEach();`                                                                                                                                                                                                              |
-| `@TestEngine.Test`             | no     | method | yes      | `public void test();`                                                                                                                                                                                                                    |
-| `@TestEngine.AfterEach`        | no     | method | no       | `public void afterEach();`                                                                                                                                                                                                               |
-| `@TestEngine.AfterAll`         | no     | method | no       | `public void afterAll();`                                                                                                                                                                                                                |
-| `@TestEngine.Conclude`         | no     | method | no       | `public void conclude();`                                                                                                                                                                                                                |
-| `@TestEngine.Parallelize`      | no     | class  | no       |                                                                                                                                                                                                                                          |
+| Annotation                          | Static | Scope  | Required | Example                                                                                                                                                                                                                                  |
+|-------------------------------------|--------|--------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `@TestEngine.ArgumentSupplier`      | yes    | method | yes      | <nobr>`public static Stream<[Object that implements Argument]> arguments()`</nobr><br/><br/><nobr>`public static Iterable<[Object that implements Argument]> arguments()`</nobr><nobr>public static Argument<[Object]> argument()</nobr> |
+| `@TestEngine.Argument`              | no     | field  |          | no       | `public Argument argument;`                                                                                                                                                                                                              |
+| `@TestEngine.Prepare`               | no     | method | no       | `public void prepare();`                                                                                                                                                                                                                 |
+| `@TestEngine.BeforeAll`             | no     | method | no       | `public void beforeAll();`                                                                                                                                                                                                               |
+| `@TestEngine.BeforeEach`            | no     | method | no       | `public void beforeEach();`                                                                                                                                                                                                              |
+| `@TestEngine.Test`                  | no     | method | yes      | `public void test();`                                                                                                                                                                                                                    |
+| `@TestEngine.AfterEach`             | no     | method | no       | `public void afterEach();`                                                                                                                                                                                                               |
+| `@TestEngine.AfterAll`              | no     | method | no       | `public void afterAll();`                                                                                                                                                                                                                |
+| `@TestEngine.Conclude`              | no     | method | no       | `public void conclude();`                                                                                                                                                                                                                |
+| `@TestEngine.ParallelArgumentTest`  | no     | class  | no       |                                                                                                                                                                                                                                          |
 
 Reference the [Design](https://github.com/antublue/test-engine#design) for the test engine execution flow.
 
@@ -42,8 +42,8 @@ Reference the [Design](https://github.com/antublue/test-engine#design) for the t
 - **Class execution order can't be guaranteed unless the test engine is configured to use a single thread.**
 
 
-- `@TestEngine.Parallelize` is used to create a "split" where a test class is instantiated for each test argument to allow parallel execution
-  - Test classes **must be thread-safe**.
+- `@TestEngine.ParallelArgumentTest` is used to indicate to the test engine to test each argument in parallel
+  - Annotated test classes **must be thread-safe**.
   - The Maven plugin test engine summary will treat the "split" classes as unique tests.
 
 ### Additional Test Annotations
