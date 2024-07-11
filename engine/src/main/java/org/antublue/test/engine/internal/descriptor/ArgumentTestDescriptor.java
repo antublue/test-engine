@@ -100,7 +100,7 @@ public class ArgumentTestDescriptor extends ExecutableTestDescriptor {
         getMetadata()
                 .put(
                         MetadataTestDescriptorConstants.TEST_CLASS_DISPLAY_NAME,
-                        DisplayNameSupport.getDisplayName(testClass));
+                        getParent().get().getDisplayName());
 
         getMetadata().put(MetadataTestDescriptorConstants.TEST_ARGUMENT, testArgument);
 

@@ -17,9 +17,11 @@
 package org.antublue.test.engine.internal.descriptor;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import org.antublue.test.engine.api.TestEngine;
 import org.antublue.test.engine.internal.discovery.Predicates;
 import org.antublue.test.engine.internal.execution.ExecutionContext;
 import org.antublue.test.engine.internal.execution.ExecutionContextConstant;
@@ -92,7 +94,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
 
         executionContext.getExecutionRequest().getEngineExecutionListener().executionStarted(this);
 
-        throwableCollector.execute(() -> setRandomFields());
+        throwableCollector.execute(this::setRandomFields);
         if (throwableCollector.isEmpty()) {
             throwableCollector.execute(() -> createTestInstance(executionContext));
             if (throwableCollector.isEmpty()) {
@@ -106,7 +108,7 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
             }
             throwableCollector.execute(() -> destroyTestInstance(executionContext));
         }
-        throwableCollector.execute(() -> clearRandomFields());
+        throwableCollector.execute(this::clearRandomFields);
 
         stopWatch.stop();
 
@@ -172,6 +174,39 @@ public class ClassTestDescriptor extends ExecutableTestDescriptor {
                 .getExecutionRequest()
                 .getEngineExecutionListener()
                 .executionSkipped(this, "Skipped");
+    }
+
+    public List<ClassTestDescriptor> split(UniqueId parentUniqueId) {
+        List<ClassTestDescriptor> classTestDescriptors = new ArrayList<>();
+
+        if (testClass.isAnnotationPresent(TestEngine.ParallelArgumentTest.class)
+                && getChildren().size() < 2) {
+            classTestDescriptors.add(this);
+            return classTestDescriptors;
+        }
+
+        int index = 0;
+        for (TestDescriptor childTestDescriptor : getChildren()) {
+            UniqueId uniqueId =
+                    parentUniqueId.append(
+                            ClassTestDescriptor.class.getName(),
+                            testClass.getName() + " [" + index + "]");
+            String displayName = this.getDisplayName() + " [" + index + "]";
+            Class<?> testClass = this.testClass;
+            List<Method> prepareMethods = this.prepareMethods;
+            List<Method> concludeMethods = this.concludeMethods;
+
+            ClassTestDescriptor classTestDescriptor =
+                    new ClassTestDescriptor(
+                            uniqueId, displayName, testClass, prepareMethods, concludeMethods);
+
+            classTestDescriptor.addChild(childTestDescriptor);
+            classTestDescriptors.add(classTestDescriptor);
+
+            index++;
+        }
+
+        return classTestDescriptors;
     }
 
     @Override
