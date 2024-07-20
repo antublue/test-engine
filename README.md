@@ -1,5 +1,17 @@
 [![Build](https://github.com/antublue/test-engine/actions/workflows/build.yml/badge.svg)](https://github.com/antublue/test-engine/actions/workflows/build.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/06036e5d592b46238f98025f297add26)](https://app.codacy.com/gh/antublue/test-engine/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
+# SUNSET NOTICE
+
+July 19, 2024
+
+Today, we announce the sunset of the AntuBLUE test engine.
+
+While accomplishing the project goals and fully functional, it became apparent that some of the design/API paradigms would require refactoring that would dramatically change usage, resulting in major test changes.
+
+In pursuit of a better paradigm/APIs, we introduce [Verifyica](https://github.com/antublue/verifyica)
+
+# SUNSET NOTICE
+
 <br/>
 
 ![AntuBLUE logo](assets/logo.png)
